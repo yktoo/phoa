@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.8 2004-09-23 13:10:13 dale Exp $
+//  $Id: phGUIObj.pas,v 1.9 2004-09-23 14:36:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -69,6 +69,10 @@ type
     FTextLineHeight: Integer;
      // Флаг валидности параметров шрифта
     FFontParamsValid: Boolean;
+     // Битмэп тени эскиза
+    FShadow: TBitmap32;
+     // Флаг валидности FShadow
+    FShadowValid: Boolean;
 
      // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
     FPicLinks: TPhoaPicLinks;
@@ -89,8 +93,6 @@ type
      // Текущая и прежняя координаты вставки перетаскиваемых эскизов
     FDragTargetCoord: TViewerInsertionCoord;
     FOldDragTargetCoord: TViewerInsertionCoord;
-     // Время для подстройки скорости скроллинга при Drag'n'Drop
-    FLastDragScrollTicks: Cardinal;
      // Счётчик блокировки
     FUpdateLock: Integer;
      // Поля для рамки группового выделения (marquee)
@@ -133,6 +135,8 @@ type
     function  GetValidTopOffset(iOffset: Integer): Integer;
      // Рассчитывает параметры шрифта
     procedure CalcFontParams;
+     // Готовит FShadowBitmap
+    procedure PrepareShadow;
      // Рассчитывает основные параметры отображения эскизов
     procedure CalcLayout;
      // Возвращает индекс самого верхнего отображаемого эскиза
@@ -562,6 +566,7 @@ type
     FThumbCache.Free;
     FPicLinks.Free;
     FBuffer.Free;
+    FShadow.Free;
     inherited Destroy;
   end;
 
@@ -576,119 +581,102 @@ type
   end;
 
   procedure TThumbnailViewer.DragDrawInsertionPoint(var Coord: TViewerInsertionCoord; bInvalidate: Boolean);
-//  var
-//    dc: HDC;
-//    hp, hOld: HPEN;
-//    idx, ix, iy: Integer;
+  var
+    dc: HDC;
+    hp, hOld: HPEN;
+    p: TPoint;
+    r: TRect;
+    bLower: Boolean;
   begin
-//    if Coord.iIndex>=0 then begin
-//       // Находим пиксельные координаты
-//      idx := Coord.iIndex;
-//       // Если не выше клиентской области
-//      if idx>=FTopIndex then begin
-//        Dec(idx, FTopIndex);
-//        ix := (idx mod FColCount)*FItemSize.cx;
-//        iy := (idx div FColCount)*FItemSize.cy;
-//         // Если не ниже нижней границы клиентской области
-//        if iy<ClientHeight then begin
-//           // Неоднозначность?
-//          if (ix=0) and Coord.bLower then begin
-//            ix := FColCount*FItemSize.cx;
-//            Dec(iy, FItemSize.cy);
-//          end;
-//           // Отрисовываем
-//          dc := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
-//          hp := CreatePen(PS_SOLID, 3, ColorToRGB(Color) xor ColorToRGB(CInsertionPoint));
-//          hOld := SelectObject(dc, hp);
-//          SetROP2(dc, R2_XORPEN);
-//          MoveToEx(dc, ix, iy, nil);
-//          LineTo(dc, ix, iy+FItemSize.cy);
-//          MoveToEx(dc, ix-3, iy, nil);
-//          LineTo(dc, ix+3, iy);
-//          MoveToEx(dc, ix-3, iy+FItemSize.cy, nil);
-//          LineTo(dc, ix+3, iy+FItemSize.cy);
-//          SelectObject(dc, hOld);
-//          DeleteObject(hp);
-//          ReleaseDC(Handle, dc);
-//        end;
-//      end;
-//       // Invalidate coord if needed
-//      if bInvalidate then begin
-//        Coord.iIndex := -1;
-//        Coord.bLower := False;
-//      end;
-//    end;
+    if Coord.iIndex>=0 then begin
+       // Находим пиксельные координаты. Если bLower, то предыдущего эскиза, иначе текущего
+      bLower := (Coord.iIndex mod FColCount=0) and Coord.bLower;
+      r := ItemRect(Coord.iIndex-iif(bLower, 1, 0), False);
+       // Если эскиз хоть сколько-нибудь виден
+      if not IsRectEmpty(r) then begin
+        p.x := iif(bLower, r.Right, r.Left);
+        p.y := r.Top;
+         // Отрисовываем
+        dc := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
+        hp := CreatePen(PS_SOLID, 3, ColorToRGB(Color) xor ColorToRGB(CInsertionPoint));
+        hOld := SelectObject(dc, hp);
+        SetROP2(dc, R2_XORPEN);
+        MoveToEx(dc, p.x,   p.y, nil);
+        LineTo  (dc, p.x,   p.y+FItemSize.cy);
+        MoveToEx(dc, p.x-3, p.y, nil);
+        LineTo  (dc, p.x+3, p.y);
+        MoveToEx(dc, p.x-3, p.y+FItemSize.cy, nil);
+        LineTo  (dc, p.x+3, p.y+FItemSize.cy);
+        SelectObject(dc, hOld);
+        DeleteObject(hp);
+        ReleaseDC(Handle, dc);
+      end;
+       // Invalidate coord if needed
+      if bInvalidate then begin
+        Coord.iIndex := -1;
+        Coord.bLower := False;
+      end;
+    end;
   end;
 
   procedure TThumbnailViewer.DragOver(Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-//  var
-//    iCol, iRow: Integer;
-//    bLower: Boolean;
-//
-//    procedure SpeedAdjust;
-//    var cTicks: Cardinal;
-//    begin
-//      cTicks := GetTickCount;
-//       // Первый раз не ждём
-//      if (FLastDragScrollTicks>0) and (cTicks<FLastDragScrollTicks+IDragScrollDelay) then Sleep(FLastDragScrollTicks+IDragScrollDelay-cTicks);
-//      FLastDragScrollTicks := cTicks;
-//    end;
-//
-//     // Прокручивает список эскизов вверх (bUp=True) или вниз (bUp=False)
-//    procedure DoScroll(bUp: Boolean);
-//    begin
-//       // Подстраиваем скорость
-//      SpeedAdjust;
-//       // Стираем старое место вставки
-//      DragDrawInsertionPoint(FOldDragTargetCoord, True);
-//       // Прокручиваем
-//      SetTopIndex(FTopIndex+iif(bUp, -FColCount, FColCount));
-//      Update;
-//    end;
-//
+  var
+    iCol, iRow: Integer;
+    bLower: Boolean;
+
+     // Прокручивает список эскизов вверх (bUp=True) или вниз (bUp=False)
+    procedure DoScroll(bUp: Boolean);
+    begin
+       // Стираем старое место вставки
+      DragDrawInsertionPoint(FOldDragTargetCoord, True);
+       // Прокручиваем
+      TopOffset := TopOffset+iif(bUp, -20, 20);
+      Update;
+    end;
+
   begin
-//    if (Source=Self) and FDragInsideEnabled then begin
-//      FDragTargetCoord.iIndex := -1;
-//      FDragTargetCoord.bLower := False;
-//       // Если входим/находимся в контроле
-//      if PtInRect(ClientRect, Point(x, y)) then begin
-//         // Если у верхней или нижней границ окна, мотаем
-//        if (y<IDragScrollAreaMargin) or (y>=ClientHeight-IDragScrollAreaMargin) then DoScroll(y<IDragScrollAreaMargin);
-//         // Определяем место вставки
-//        if FItemCount>0 then begin
-//           // Находим столбец (с округлением)
-//          iCol := Round(x/FItemSize.cx);
-//           // Если справа от эскизов, включаем режим bLower и устанавливаем индекс на эскиз в начале следующей строки
-//          bLower := iCol>=FColCount;
-//          if bLower then iCol := FColCount;
-//           // Находим строку (индекс эскиза в начале строки)
-//          iRow := FTopIndex+(y div FItemSize.cy)*FColCount;
-//           // Если строка содержит эскизы
-//          if iRow<FItemCount then begin
-//            FDragTargetCoord.iIndex := iRow+iCol;
-//             // Если указывает за последний эскиз - надо включить bLower
-//            if FDragTargetCoord.iIndex>=FItemCount then begin
-//              FDragTargetCoord.iIndex := FItemCount;
-//              bLower := True;
-//            end;
-//            FDragTargetCoord.bLower := bLower;
-//          end;
-//        end;
-//      end;
-//       // Если изменилось положение маркера - отрисовываем его
-//      if (FDragTargetCoord.iIndex<>FOldDragTargetCoord.iIndex) or (FDragTargetCoord.bLower<>FOldDragTargetCoord.bLower) then begin
-//        DragDrawInsertionPoint(FOldDragTargetCoord, False);
-//        DragDrawInsertionPoint(FDragTargetCoord, False);
-//        FOldDragTargetCoord := FDragTargetCoord;
-//      end;
-//       // Drop возможен, если есть нормальная координата вставки, и перетаскиваются не все разом, и не единственное
-//       //   изображение или место вставки не совпадает с положением этого изображения
-//      Accept :=
-//        (FDragTargetCoord.iIndex>=0) and
-//        (FSelIndexes.Count<FPicLinks.Count) and
-//        ((FSelIndexes.Count>1) or ((FSelIndexes[0]<>FDragTargetCoord.iIndex) and (FSelIndexes[0]<>FDragTargetCoord.iIndex-1)));
-//    end else
-//      inherited DragOver(Source, X, Y, State, Accept);
+    if (Source=Self) and FDragInsideEnabled then begin
+      FDragTargetCoord.iIndex := -1;
+      FDragTargetCoord.bLower := False;
+       // Если входим/находимся в контроле
+      if PtInRect(ClientRect, Point(x, y)) then begin
+         // Если у верхней или нижней границ окна, мотаем
+        if (y<IDragScrollAreaMargin) or (y>=ClientHeight-IDragScrollAreaMargin) then DoScroll(y<IDragScrollAreaMargin);
+         // Определяем место вставки
+        if FItemCount>0 then begin
+           // Находим столбец (с округлением)
+          iCol := Trunc(x/FItemSize.cx+0.5);
+           // Если справа от эскизов, включаем режим bLower и устанавливаем индекс на эскиз в начале следующей строки
+          bLower := iCol>=FColCount;
+          if bLower then iCol := FColCount;
+           // Находим строку (индекс эскиза в начале строки)
+          iRow := ((y+FTopOffset) div FItemSize.cy)*FColCount;
+           // Если строка содержит эскизы
+          if iRow<FItemCount then begin
+            FDragTargetCoord.iIndex := iRow+iCol;
+             // Если указывает за последний эскиз - надо включить bLower
+            if FDragTargetCoord.iIndex>=FItemCount then begin
+              FDragTargetCoord.iIndex := FItemCount;
+              bLower := True;
+            end;
+            FDragTargetCoord.bLower := bLower;
+          end;
+        end;
+      end;
+       // Если изменилось положение маркера - отрисовываем его
+      if (FDragTargetCoord.iIndex<>FOldDragTargetCoord.iIndex) or (FDragTargetCoord.bLower<>FOldDragTargetCoord.bLower) then begin
+        DragDrawInsertionPoint(FOldDragTargetCoord, False);
+        DragDrawInsertionPoint(FDragTargetCoord, False);
+        FOldDragTargetCoord := FDragTargetCoord;
+      end;
+       // Drop возможен, если есть нормальная координата вставки, и перетаскиваются не все разом, и не единственное
+       //   изображение или место вставки не совпадает с положением этого изображения
+      Accept :=
+        (FDragTargetCoord.iIndex>=0) and
+        (FSelIndexes.Count<FPicLinks.Count) and
+        ((FSelIndexes.Count>1) or ((FSelIndexes[0]<>FDragTargetCoord.iIndex) and (FSelIndexes[0]<>FDragTargetCoord.iIndex-1)));
+    end else
+      inherited DragOver(Source, X, Y, State, Accept);
   end;
 
   procedure TThumbnailViewer.EndUpdate;
@@ -953,7 +941,6 @@ type
         FDragTargetCoord.bLower    := False;
         FOldDragTargetCoord.iIndex := -1;
         FOldDragTargetCoord.bLower := False;
-        FLastDragScrollTicks := 0;
          // Начинаем Dragging
         BeginDrag(True);
       end;
@@ -1181,11 +1168,15 @@ type
           InflateRect(r, -iBorderWidth, -iBorderWidth);
         end;
         p^.FillRectS(r, Color32(iif(bSelected, aSelBackClr[Info.bFocused], FThumbBackColor)));
+
+         // Тень? !!!
+        p^.Draw(p^.Width-FShadow.Width, p^.Height-FShadow.Height, FShadow); 
       end;
       Result := p^;
     end;
 
   begin
+    PrepareShadow;
      // Отрисовываем эскизы
     idxStart := GetFirstVisibleIndex;
     if idxStart>=0 then begin
@@ -1219,6 +1210,15 @@ type
   procedure TThumbnailViewer.Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
   begin
     Info.Bitmap.DrawTo(Canvas.Handle, 0, 0);
+  end;
+
+  procedure TThumbnailViewer.PrepareShadow;
+  begin
+    if not FShadowValid then begin
+      if FShadow=nil then FShadow := TBitmap32.Create;
+      RenderShadow(FShadow, 10, 50, clBlack{!!!});
+      FShadowValid := True;
+    end;
   end;
 
   procedure TThumbnailViewer.PutThumbToCache(Pic: TPhoaPic; Bitmap: TBitmap);

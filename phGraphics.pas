@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.4 2004-09-11 17:52:36 dale Exp $
+//  $Id: phGraphics.pas,v 1.5 2004-09-23 14:36:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -89,12 +89,38 @@ type
     property OnApplied: TNotifyEvent read FOnApplied write FOnApplied;
   end;
 
+   // Отрисовывает на Bitmap круг-заготовку тени с alpha-каналом
+  procedure RenderShadow(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
+
 const
   BColor_Alpha_Transparent = $00;
   BColor_Alpha_Opaque      = $FF;
 
 implementation
 uses phUtils;
+
+  procedure RenderShadow(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
+  var
+    iSize, ix, iy, i2R2, iy2: Integer;
+    c32: TColor32;
+    bAlpha: Byte;
+  begin
+    iSize := iRadius*2;
+    i2R2 := 2*iRadius*iRadius;
+    c32 := Color32(Color);
+     // Устанавливаем параметры битмэпа
+    Bitmap.SetSize(iSize, iSize);
+    Bitmap.DrawMode    := dmBlend;
+    Bitmap.MasterAlpha := bOpacity;
+    for iy := 0 to iRadius-1 do begin
+       // Заранее считаем квадрат iy
+      iy2 := iy*iy;
+      for ix := 0 to iRadius-1 do begin
+        if (ix=0) and (iy=0) then bAlpha := $ff else bAlpha := Trunc(255*(1-i2R2/(ix*ix+iy2)));
+        Bitmap.SetPixelT(iRadius+ix, iRadius+iy, SetAlpha(c32, bAlpha));
+      end;
+    end;
+  end;
 
    //===================================================================================================================
    // TColor32Map
