@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.17 2004-10-15 13:49:35 dale Exp $
+//  $Id: udStats.pas,v 1.18 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,8 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  VirtualShellUtilities, Placemnt, 
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phDlg,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phDlg, VirtualShellUtilities,
   DKLang, VirtualTrees, StdCtrls, ExtCtrls;
 
 type
@@ -26,7 +25,6 @@ type
   TdStats = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
     tvMain: TVirtualStringTree;
-    fpMain: TFormPlacement;
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
@@ -39,6 +37,8 @@ type
     function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
   protected
     procedure InitializeDialog; override;
+    function  GetFormRegistrySection: String; override;
+    function  GetSizeable: Boolean; override;
   end;
 
   procedure ShowProjectStats(AApp: IPhotoAlbumApp);
@@ -56,6 +56,16 @@ uses phUtils, Main, phPhoa, phSettings;
       finally
         Free;
       end;
+  end;
+
+  function TdStats.GetFormRegistrySection: String;
+  begin
+    Result := SRegStats_Root;
+  end;
+
+  function TdStats.GetSizeable: Boolean;
+  begin
+    Result := True;
   end;
 
   procedure TdStats.InitializeDialog;
@@ -178,10 +188,6 @@ uses phUtils, Main, phPhoa, phSettings;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_stats;
-    MakeSizeable;
-     // Настраиваем fpMain
-    fpMain.IniFileName := SRegRoot;
-    fpMain.IniSection  := SRegStats_Root;
      // Настраиваем tvMain
     tvMain.NodeDataSize := SizeOf(Pointer);
     ApplyTreeSettings(tvMain);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.16 2004-09-11 17:52:36 dale Exp $
+//  $Id: udSettings.pas,v 1.17 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,9 +9,8 @@ unit udSettings;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings,
-  phDlg, TB2Dock, TB2Toolbar, TBX, StdCtrls, ExtCtrls,
-  Placemnt, Menus, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings, Registry,
+  phDlg, DKLang, TB2Dock, TB2Toolbar, TBX, StdCtrls, ExtCtrls;
 
 type
   TdSettings = class(TPhoaDialog)
@@ -19,7 +18,6 @@ type
     pMain: TPanel;
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
-    fpMain: TFormPlacement;
     pEditor: TPanel;
     procedure FormShow(Sender: TObject);
   private
@@ -43,6 +41,8 @@ type
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
+    function  GetFormRegistrySection: String; override;
+    function  GetSizeable: Boolean; override;
   public
      // Props
      // -- Текущая выбранная страница-настройка (кнопка на NavBar)
@@ -110,13 +110,19 @@ uses phUtils, Main, TypInfo;
     ActiveControl := FEditor;
   end;
 
+  function TdSettings.GetFormRegistrySection: String;
+  begin
+    Result := SRegSettings_Root;
+  end;
+
+  function TdSettings.GetSizeable: Boolean;
+  begin
+    Result := True;
+  end;
+
   procedure TdSettings.InitializeDialog;
   begin
     inherited InitializeDialog;
-    MakeSizeable;
-     // Настраиваем fpMain
-    fpMain.IniFileName := SRegRoot;
-    fpMain.IniSection  := SRegSettings_Root;
      // Копируем настройки
     FLocalRootSetting := TPhoaSetting.Create(nil, 0, '');
     FLocalRootSetting.Assign(RootSetting);

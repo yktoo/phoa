@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.15 2004-10-05 13:16:34 dale Exp $
+//  $Id: phToolSetting.pas,v 1.16 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -815,7 +815,7 @@ type
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Если нет выделения, выделяем первый узел
-      if FocusedNode=nil then ActivateVTNode(Self, GetFirst);
+      if FocusedNode=nil then ActivateFirstVTNode(Self);
     finally
       EndUpdate;
     end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.61 2004-10-23 06:35:47 dale Exp $
+//  $Id: Main.pas,v 1.62 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1193,9 +1193,9 @@ uses
 
   function TfMain.GetFocusedControl: TPhoaAppFocusedControl;
   begin
-    if tvGroups.Focused     then Result := pafcGroupTree
-    else if FViewer.Focused then Result := pafcThumbViewer
-    else                         Result := pafcNone;
+    if      ActiveControl=tvGroups then Result := pafcGroupTree
+    else if ActiveControl=FViewer  then Result := pafcThumbViewer
+    else                                Result := pafcNone;
   end;
 
   function TfMain.GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
@@ -1261,7 +1261,7 @@ uses
       tvGroups.BeginUpdate;
       try
         tvGroups.ReinitChildren(nil, True);
-        ActivateVTNode(tvGroups, tvGroups.GetFirst);
+        ActivateFirstVTNode(tvGroups);
         StateChanged([asActionChangePending]);
       finally
         tvGroups.EndUpdate;
@@ -1287,7 +1287,7 @@ uses
   var
     Changes: TPhoaOperationChanges;
     ViewerData: IThumbnailViewerDisplayData;
-    iCurRoot, iCurGroupID: Integer;
+    iCurView, iCurGroupID: Integer;
     pGroupOffset: TPoint;
   begin
     BeginUpdate;
@@ -1295,7 +1295,7 @@ uses
       StartWait;
       try
          // Сохраняем текущее состояние интерфейса
-        iCurRoot     := Integer(FProject.ViewRootGroupX); // Избегаем создания ссылки, он ведь нам только для проверки
+        iCurView     := Integer(FProject.CurrentViewX); // Избегаем создания ссылки, iCurView ведь нам только для проверки
         iCurGroupID  := CurGroupID;
         pGroupOffset := tvGroups.OffsetXY;
         ViewerData   := Viewer.SaveDisplay;
@@ -1309,7 +1309,7 @@ uses
           StateChanged([asActionChangePending, asModifiedChangePending]);
         end;
          // Восстанавливаем состояние интерфейса
-        if iCurRoot=Integer(FProject.ViewRootGroupX) then begin
+        if iCurView=Integer(FProject.CurrentView) then begin
            // Восстанавливаем текущую группу
           tvGroups.BeginUpdate;
           try
@@ -1444,9 +1444,10 @@ uses
         else if pocPicProps in Changes then begin
            // Перерисовываем Viewer
           FViewer.Invalidate;
-           // Сбрасываем представления (закладываемся исключительно на то, что менять св-ва изображений при отображении
-           //   представления нельзя! Иначе нужно перегружать также и дерево)
+           // Сбрасываем представления
           FProject.Views.Invalidate;
+           // Если отображалось представление, перегружаем дерево групп (могло измениться)
+          if FProject.ViewIndex>=0 then LoadGroupTree;
         end;
       end;
     finally
@@ -1742,15 +1743,15 @@ uses
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   const
-    aiImgIdx: Array[TGroupNodeKind] of Integer = (
-      -1,             // gnkNone
-      iiPhoA,         // gnkProject
-      iiView,         // gnkView
-      iiFolderSearch, // gnkSearch
-      iiFolder,       // gnkPhoaGroup
-      iiFolder);      // gnkViewGroup
+    aiImgIdx: Array[TGroupNodeKind, Boolean] of Integer = (
+      (-1,             -1),             // gnkNone
+      (iiPhoA,         iiPhoA),         // gnkProject
+      (iiView,         iiView),         // gnkView
+      (iiFolderSearch, iiFolderSearch), // gnkSearch
+      (iiFolder,       iiFolderOpen),   // gnkPhoaGroup
+      (iiFolder,       iiFolderOpen));  // gnkViewGroup
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[GetNodeKind(Sender, Node)];
+    if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[GetNodeKind(Sender, Node), Kind=ikSelected];
   end;
 
   procedure TfMain.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -1867,12 +1868,12 @@ uses
       aNewGroup.Enabled            := gnk in [gnkProject, gnkPhoaGroup];
       aNewPic.Enabled              := gnk in [gnkProject, gnkPhoaGroup];
       aDelete.Enabled              := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel);
-      aEdit.Enabled                := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPicSel and not bView);
+      aEdit.Enabled                := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkSearch, gnkPhoaGroup, gnkViewGroup]) and bPicSel {!!!and not bView});
       aCut.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
       aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
       aPaste.Enabled               := (gnk in [gnkProject, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
       aSortPics.Enabled            := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPics;
-      aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.Pics.Count);
+      aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<FViewedPics.Count);
       aSelectNone.Enabled          := bPicSel;
       aView.Enabled                := Viewer.ItemIndex>=0;
       aViewSlideShow.Enabled       := Viewer.ItemIndex>=0;
@@ -1885,7 +1886,7 @@ uses
       aPhoaView_Edit.Enabled       := bView;
       aPhoaView_MakeGroup.Enabled  := bView;
        // Drag-and-drop
-      Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+      Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop) and not bView;
       Viewer.DragInsideEnabled := gnk in [gnkProject, gnkPhoaGroup];
     end;
 

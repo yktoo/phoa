@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
+//  $Id: phIntf.pas,v 1.15 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -255,10 +255,12 @@ type
 
   IPhoaPicGroupList = interface(IInterface)
     ['{5B299022-5911-4154-8307-37170FDD7950}']
+     // Returns index of a group; -1 if no such item found
+    function  IndexOf(Group: IPhoaPicGroup): Integer; stdcall;
      // Returns index of a group by its ID; -1 if no such item found
     function  IndexOfID(iID: Integer): Integer; stdcall;
      // Prop handlers
-    function  GetCount: Integer; stdcall; 
+    function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaPicGroup; stdcall;
     function  GetOwner: IPhoaPicGroup; stdcall;
      // Props

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.36 2004-10-19 15:03:31 dale Exp $
+//  $Id: phUtils.pas,v 1.37 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -40,6 +40,11 @@ uses
   function  RectsOverlap(const r1, r2: TRect): Boolean;
    // Возвращает результат пересечения прямоугольников
   function  GetRectIntersection(const r1, r2: TRect): TRect;
+
+   // Преобразование Положение/размеры формы<->Строка. FormPositionFromStr возвращает True, если извлечение данных из
+   //   строки прошло успешно 
+  function  FormPositionToStr(const BoundsRect: TRect): String;
+  function  FormPositionFromStr(const sBounds: String; Constraints: TSizeConstraints; out BoundsRect: TRect): Boolean;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
@@ -124,8 +129,11 @@ uses
    // Возвращает размер указанного файла, или iDefault, если такого файла не существует
   function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
 
-   // Фокусирует и выделяет узел и проматывает дерево так, чтобы он был виден. Возвращает True, если Node<>nil
-  function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
+   // Фокусирует и выделяет узел. При bScrollIntoView=True проматывает дерево так, чтобы он был виден. Возвращает True,
+   //   если Node<>nil
+  function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode; bScrollIntoView: Boolean = True): Boolean;
+   // Фокусирует первый узел в дереве (если он есть) и устанавливает положение скроллбаров в левый верхний узел
+  procedure ActivateFirstVTNode(Tree: TBaseVirtualTree);
    // Сохранение/загрузка настроек столбцов VirtualTree
   procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
   procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
@@ -303,6 +311,46 @@ uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
     IntersectRect(Result, r1, r2);
   end;
   
+  function FormPositionToStr(const BoundsRect: TRect): String;
+  begin
+    Result := Format('%d,%d,%d,%d', [BoundsRect.Left, BoundsRect.Top, BoundsRect.Right, BoundsRect.Bottom]);
+  end;
+
+  function FormPositionFromStr(const sBounds: String; Constraints: TSizeConstraints; out BoundsRect: TRect): Boolean;
+  var
+    r, rScreen: TRect;
+    iw, ih: Integer;
+    s: String;
+
+    function ConstrDef(iConstraint, iDefault: Integer): Integer;
+    begin
+      Result := iif(iConstraint=0, iDefault, iConstraint);
+    end;
+
+  begin
+    s := sBounds;
+    r.Left    := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Top     := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Right   := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Bottom  := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+     // Если все координаты нормальные
+    Result := (r.Left<MaxInt) and (r.Top<MaxInt) and (r.Right<MaxInt) and (r.Bottom<MaxInt);
+    if Result then begin
+      rScreen := Screen.WorkAreaRect;
+       // Исправляем размер при необходимости
+      iw := Min(Min(Max(r.Right-r.Left, ConstrDef(Constraints.MinWidth,  10)), rScreen.Right-rScreen.Left), ConstrDef(Constraints.MaxWidth,  MaxInt));
+      ih := Min(Min(Max(r.Bottom-r.Top, ConstrDef(Constraints.MinHeight, 10)), rScreen.Bottom-rScreen.Top), ConstrDef(Constraints.MaxHeight, MaxInt));
+       // Рассчитываем границы, при необходимости исправляя положение
+      BoundsRect := Bounds(
+        Max(rScreen.Left, Min(rScreen.Right-iw,  r.Left)),
+        Max(rScreen.Top,  Min(rScreen.Bottom-ih, r.Top)),
+        iw,
+        ih);
+     // Иначе стираем BoundsRect
+    end else
+      FillChar(BoundsRect, SizeOf(BoundsRect), 0);
+  end;
+
    //-------------------------------------------------------------------------------------------------------------------
    // Fonts / chars
    //-------------------------------------------------------------------------------------------------------------------
@@ -658,13 +706,30 @@ uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
       Result := iDefault;
   end;
 
-  function ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
+  function ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode; bScrollIntoView: Boolean = True): Boolean;
   begin
     Result := Node<>nil;
-    Tree.FocusedNode := Node;
-    if Result then begin
-      Tree.Selected[Node] := True;
-      Tree.ScrollIntoView(Node, False, False);
+    Tree.BeginUpdate;
+    try
+      Tree.ClearSelection;
+      Tree.FocusedNode := Node;
+      if Result then begin
+        Tree.Selected[Node] := True;
+        if bScrollIntoView then Tree.ScrollIntoView(Node, False, False);
+      end;
+    finally
+      Tree.EndUpdate;
+    end;
+  end;
+
+  procedure ActivateFirstVTNode(Tree: TBaseVirtualTree);
+  begin
+    Tree.BeginUpdate;
+    try
+      ActivateVTNode(Tree, Tree.GetFirst, False);
+      Tree.OffsetXY := Point(0, 0);
+    finally
+      Tree.EndUpdate;
     end;
   end;
 

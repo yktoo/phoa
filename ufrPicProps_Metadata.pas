@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.12 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.13 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -39,7 +39,6 @@ type
     procedure InitializePage; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   end;
 
 implementation
@@ -49,16 +48,13 @@ uses ConsVars, phUtils, phObj, phMetadata, udSettings, phSettings, Main;
 type
   PPExifTag = ^PExifTag;
 
-  procedure TfrPicProps_Metadata.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := tvMain;
-  end;
-
   procedure TfrPicProps_Metadata.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPics.Count;
+    if tvMain.RootNodeCount=0 then begin
+      tvMain.RootNodeCount := EditedPics.Count;
+      ActivateFirstVTNode(tvMain);
+    end;
   end;
 
   function TfrPicProps_Metadata.GetRegistrySection: String;

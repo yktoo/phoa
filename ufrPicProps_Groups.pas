@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.15 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.16 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,7 +29,6 @@ type
   protected
     procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
@@ -45,12 +44,6 @@ type
   TGroupData = record
     Group: IPhotoAlbumPicGroup; // Ссылка на группу
     iSelCount: Integer;         // Количество изображений в группе из числа выбранных
-  end;
-
-  procedure TfrPicProps_Groups.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := tvMain;
   end;
 
   procedure TfrPicProps_Groups.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
@@ -89,18 +82,17 @@ type
   procedure TfrPicProps_Groups.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    with tvMain do
-      if RootNodeCount=0 then begin
-        BeginUpdate;
-        try
-          RootNodeCount := 1;
-           // Инициализируем все узлы, чтобы раскрылись отмеченные
-          ReinitChildren(nil, True);
-          OffsetXY := Point(0, 0);
-        finally
-          EndUpdate;
-        end;
+    if tvMain.RootNodeCount=0 then begin
+      tvMain.BeginUpdate;
+      try
+        tvMain.RootNodeCount := 1;
+         // Инициализируем все узлы, чтобы раскрылись отмеченные
+        tvMain.ReinitChildren(nil, True);
+        ActivateFirstVTNode(tvMain);
+      finally
+        tvMain.EndUpdate;
       end;
+    end;
   end;
 
   function TfrPicProps_Groups.CanApply: Boolean;
@@ -184,7 +176,7 @@ type
 
   procedure TfrPicProps_Groups.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := iif(Sender.NodeParent[Node]=nil, iiPhoA, iiFolder);
+    if Kind in [ikNormal, ikSelected] then ImageIndex := iif(Sender.NodeParent[Node]=nil, iiPhoA, iif(Kind=ikSelected, iiFolderOpen, iiFolder));
     Ghosted := Node.CheckState=csUncheckedNormal;
   end;
 

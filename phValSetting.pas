@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.12 2004-09-11 17:52:36 dale Exp $
+//  $Id: phValSetting.pas,v 1.13 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1010,7 +1010,7 @@ type
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Выделяем первый узел
-      ActivateVTNode(Self, GetFirst);
+      ActivateFirstVTNode(Self);
     finally
       EndUpdate;
     end;

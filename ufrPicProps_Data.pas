@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.16 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.17 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -68,7 +68,6 @@ type
     procedure PropValEdited(Prop: TPicProperty);
   protected
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
@@ -82,12 +81,6 @@ const
    // Редактируемые свойства
   EditablePicProps: TPicProperties = [
     ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia];
-
-  procedure TfrPicProps_Data.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := eDate;
-  end;
 
   procedure TfrPicProps_Data.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   var

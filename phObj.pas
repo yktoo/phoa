@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.55 2004-10-22 12:43:18 dale Exp $
+//  $Id: phObj.pas,v 1.56 2004-10-23 14:05:08 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1708,7 +1708,7 @@ type
 
   function TPhotoAlbumPicGroup.GetIndex: Integer;
   begin
-    if FList=nil then Result := -1 else Result := IPhoaPicGroupList(FList).IndexOfID(FID);
+    if FList=nil then Result := -1 else Result := IPhoaPicGroupList(FList).IndexOf(Self);
   end;
 
   function TPhotoAlbumPicGroup.GetMaxGroupID: Integer;
@@ -1990,6 +1990,7 @@ type
      // Prop storage
     FOwner: Pointer;
      // IPhoaPicGroupList
+    function  IndexOf(Group: IPhoaPicGroup): Integer; stdcall;
     function  IndexOfID(iID: Integer): Integer; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaPicGroup; stdcall;
@@ -2075,6 +2076,13 @@ type
   function TPhotoAlbumPicGroupList.GetOwnerX: IPhotoAlbumPicGroup;
   begin
     Result := GetOwner as IPhotoAlbumPicGroup;
+  end;
+
+  function TPhotoAlbumPicGroupList.IndexOf(Group: IPhoaPicGroup): Integer;
+  begin
+    for Result := 0 to FList.Count-1 do
+      if GetItems(Result)=Group then Exit;
+    Result := -1;
   end;
 
   function TPhotoAlbumPicGroupList.IndexOfID(iID: Integer): Integer;
@@ -2694,7 +2702,7 @@ type
     Result := 0;
     for i := 0 to GetCount-1 do begin
       case GetItems(i).Prop of
-        gbpFilePath:    Result := AnsiCompareText(ExtractFilePath(Pic1.FileName), ExtractFilePath(Pic2.FileName));
+        gbpFilePath:    Result := AnsiCompareText(Pic1.PropStrValues[ppFilePath], Pic2.PropStrValues[ppFilePath]);
         gbpDateByYear:  Result := YearOf(PhoaDateToDate(Pic1.Date))-YearOf(PhoaDateToDate(Pic2.Date));
         gbpDateByMonth: Result := MonthOf(PhoaDateToDate(Pic1.Date))-MonthOf(PhoaDateToDate(Pic2.Date));
         gbpDateByDay:   Result := DayOf(PhoaDateToDate(Pic1.Date))-DayOf(PhoaDateToDate(Pic2.Date));
@@ -2849,14 +2857,14 @@ type
 
   function TPhotoAlbumView.GetIndex: Integer;
   var
-    pSelf: Pointer;
+    pSelfIntf: Pointer;
     VList: IPhoaViewList;
   begin
     VList := GetList;
-     // Ищем себя в списке-владельце (по указателю на интерфейс IPhoaView, с которым в этом списке регистрировались)
-    pSelf := Pointer(Self as IPhoaView); 
+     // Ищем себя в списке-владельце (по указателю на интерфейс)
+    pSelfIntf := Pointer(Self as IPhoaView);
     for Result := 0 to VList.Count-1 do
-      if Pointer(VList[Result])=pSelf then Exit;
+      if Pointer(VList[Result])=pSelfIntf then Exit;
     Result := -1;
   end;
 
@@ -2924,6 +2932,7 @@ type
      // Помещает сортированный список изображений фотоальбома в корневую группу
     procedure FillRootGroup;
     begin
+      FRootGroup.PicsX.Clear;
       FRootGroup.PicsX.Add(GetList.Pics, False);
       FRootGroup.PicsX.CustomSort(PhoaViewSortCompareFunc, Cardinal(Self));
     end;
@@ -2931,7 +2940,6 @@ type
      // Создаёт дерево по пути к изображению
     procedure ProcessFilePathTree(ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
-      iSlashPos: Integer;
       sDir, sOneDir: String;
       Group, GParent: IPhotoAlbumPicGroup;
     begin
@@ -2939,15 +2947,12 @@ type
        // Начинаем с корня
       Group := ParentGroup;
       repeat
-         // Выделяем один (первый) каталог из пути
-        iSlashPos := Pos('\', sDir);
-        if iSlashPos=0 then iSlashPos := Length(sDir)+1;
-        sOneDir := Copy(sDir, 1, iSlashPos-1);
-        Delete(sDir, 1, iSlashPos);
+         // Выделяем первый каталог из пути и удаляем его из sDir
+        sOneDir := ExtractFirstWord(sDir, '\');
          // Если корневой каталог, добавляем слэш в конце
         if (Length(sOneDir)=2) and (sOneDir[2]=':') then sOneDir := sOneDir+'\';
          // Получаем последнего ребёнка текущей группы
-        if Group.Groups.Count=0 then GParent := nil else GParent := Group.GroupsX[ParentGroup.Groups.Count-1];
+        if Group.Groups.Count=0 then GParent := nil else GParent := Group.GroupsX[Group.Groups.Count-1];
          // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
         if (GParent=nil) or not AnsiSameText(GParent.Text, sOneDir) then begin
           GParent := NewPhotoAlbumPicGroup(Group, 0);
@@ -3057,7 +3062,7 @@ type
         if Result=nil then begin
           Result := NewPhotoAlbumPicGroup(ParentGroup, 0);
           Result.Text := sKW;
-           // Если нужно  вставить перед найденной группой - передвигаем
+           // Если нужно вставить перед найденной группой - передвигаем
           if idx>=0 then Result.Index := idx;
         end;
       end;

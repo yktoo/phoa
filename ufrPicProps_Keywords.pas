@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.15 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -67,7 +67,6 @@ type
     procedure FocusNode(Index: Integer);
   protected
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure InitializePage; override;
   public
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
@@ -132,12 +131,6 @@ uses phUtils, Main, phSettings;
     CheckKeywords(mcmNone);
   end;
 
-  procedure TfrPicProps_Keywords.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := tvMain;
-  end;
-
   procedure TfrPicProps_Keywords.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   begin
      // ≈сли страница инициализирована, возвращаем параметры дл€ операции изменени€ списка ключевых слов
@@ -155,6 +148,7 @@ uses phUtils, Main, phSettings;
       FKeywords.PopulateFromPicList(App.Project.Pics, IsPicSelectedCallback, EditedPics.Count);
        // Ќастраиваем дерево
       tvMain.RootNodeCount := FKeywords.Count;
+      ActivateFirstVTNode(tvMain);
       FInitialized := True;
     end;
     EnableActions;

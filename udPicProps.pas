@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.13 2004-10-19 15:03:31 dale Exp $
+//  $Id: udPicProps.pas,v 1.14 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,32 +9,33 @@ unit udPicProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phMetadata,
-  GR32_Layers, phWizard,
-  phDlg, Menus, TB2Item, TBX, ImgList, Placemnt, TB2Dock, TB2Toolbar,
-  ExtCtrls, StdCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phMetadata, GR32_Layers, phWizard,
+  phDlg, Menus, TB2Item, TBX, ImgList, DKLang, TB2Dock, TB2Toolbar,
+  StdCtrls, ExtCtrls;
 
 type
   TdPicProps = class(TPhoaDialog, IWizardHostForm)
-    dklcMain: TDKLanguageController;
-    fpMain: TFormPlacement;
-    pMain: TPanel;
-    dkNav: TTBXDock;
-    tbNav: TTBXToolbar;
+    bPgData: TTBXItem;
     bPgFileProps: TTBXItem;
+    bPgGroups: TTBXItem;
+    bPgKeywords: TTBXItem;
     bPgMetadata: TTBXItem;
     bPgView: TTBXItem;
-    bPgData: TTBXItem;
-    bPgKeywords: TTBXItem;
-    bPgGroups: TTBXItem;
+    dklcMain: TDKLanguageController;
+    dkNav: TTBXDock;
     ilFiles: TImageList;
-    pPages: TPanel;
+    pMain: TPanel;
     pmNav: TTBXPopupMenu;
+    pPages: TPanel;
+    tbNav: TTBXToolbar;
     procedure PageButtonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
      // Контроллер страниц
     FController: TWizardController;
+     // ID последней использованной (видимой) страницы
+    FLastUsedPageID: Integer;
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
      // Список операций для отмены редактирования/добавления
@@ -42,6 +43,8 @@ type
      // Prop storage
     FApp: IPhotoAlbumApp;
     FEditedPics: IPhotoAlbumPicList;
+     // Фокусирует первый контрол на текущей странице
+    procedure FocusFirstPageControl;
      // IWizardHostForm
     function  WizHost_PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;
     procedure WizHost_PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
@@ -59,9 +62,14 @@ type
     function  GetFileImageIndex(Index: Integer): Integer;
   protected
     procedure InitializeDialog; override;
-    procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
+    procedure SettingsStore(rif: TRegIniFile); override;
+    procedure SettingsRestore(rif: TRegIniFile); override;
+    function  GetFormRegistrySection: String; override;
+    function  GetSizeable: Boolean; override;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
      // Props
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
@@ -77,7 +85,7 @@ implementation
 {$R *.dfm}
 uses
   ShellAPI,
-  phUtils, ConsVars, Main,
+  phUtils, phSettings, ConsVars, Main,
   phPicPropsDlgPage, ufrPicProps_FileProps, ufrPicProps_Metadata, ufrPicProps_View, ufrPicProps_Data,
   ufrPicProps_Keywords, ufrPicProps_Groups;
 
@@ -132,10 +140,39 @@ uses
     inherited ButtonClick_OK;
   end;
 
-  procedure TdPicProps.FinalizeDialog;
+  constructor TdPicProps.Create(AOwner: TComponent);
+  begin
+    inherited Create(AOwner);
+     // Создаём контроллер страниц
+    FController := TWizardController.Create(Self);
+    with FController do begin
+      KeepHistory := False;
+       // Создаём страницы
+      CreatePage(TfrPicProps_FileProps, IDlgPicPropsPageID_FileProps, IDH_intf_pic_props_fprops,   '');
+      CreatePage(TfrPicProps_Metadata,  IDlgPicPropsPageID_Metadata,  IDH_intf_pic_props_metadata, '');
+      CreatePage(TfrPicProps_View,      IDlgPicPropsPageID_View,      IDH_intf_pic_props_view,     '');
+      CreatePage(TfrPicProps_Data,      IDlgPicPropsPageID_Data,      IDH_intf_pic_props_data,     '');
+      CreatePage(TfrPicProps_Keywords,  IDlgPicPropsPageID_Keywords,  IDH_intf_pic_props_keywords, '');
+      CreatePage(TfrPicProps_Groups,    IDlgPicPropsPageID_Groups,    IDH_intf_pic_props_groups,   '');
+    end;
+  end;
+
+  destructor TdPicProps.Destroy;
   begin
     FController.Free;
-    inherited FinalizeDialog;
+    inherited Destroy;
+  end;
+
+type TWinControlCast = class(TWinControl);
+
+  procedure TdPicProps.FocusFirstPageControl;
+  begin
+    if Visible and (FController.VisiblePage<>nil) then TWinControlCast(FController.VisiblePage).SelectFirst;
+  end;
+
+  procedure TdPicProps.FormShow(Sender: TObject);
+  begin
+    FocusFirstPageControl;
   end;
 
   function TdPicProps.GetFileImageIndex(Index: Integer): Integer;
@@ -143,17 +180,23 @@ uses
     Result := FFileImageIndices[Index];
   end;
 
+  function TdPicProps.GetFormRegistrySection: String;
+  begin
+    Result := SRegPicProps_Root;
+  end;
+
+  function TdPicProps.GetSizeable: Boolean;
+  begin
+    Result := True;
+  end;
+
   procedure TdPicProps.InitializeDialog;
   var
-    i: Integer;
+    i, iPageID: Integer;
     HSysIL: THandle;
     FileInfo: TSHFileInfo;
   begin
     inherited InitializeDialog;
-    MakeSizeable;
-     // Настраиваем fpMain
-    fpMain.IniFileName := SRegRoot;
-    fpMain.IniSection  := SRegPicProps_Root;
     pmNav.LinkSubitems := tbNav.Items;
      // Считываем ImageIndices файлов изображений
     SetLength(FFileImageIndices, FEditedPics.Count);
@@ -163,24 +206,37 @@ uses
       FFileImageIndices[i] := FileInfo.iIcon;
     end;
     ilFiles.Handle := HSysIL;
-     // Создаём контроллер страниц
-    FController := TWizardController.Create(Self);
-    with FController do begin
-      KeepHistory := False;
-       // Создаём страницы и отображаем первую страницу
-      CreatePage(TfrPicProps_FileProps, IDlgPicPropsPageID_FileProps, IDH_intf_pic_props_fprops,   '');
-      CreatePage(TfrPicProps_Metadata,  IDlgPicPropsPageID_Metadata,  IDH_intf_pic_props_metadata, '');
-      CreatePage(TfrPicProps_View,      IDlgPicPropsPageID_View,      IDH_intf_pic_props_view,     '');
-      CreatePage(TfrPicProps_Data,      IDlgPicPropsPageID_Data,      IDH_intf_pic_props_data,     '');
-      CreatePage(TfrPicProps_Keywords,  IDlgPicPropsPageID_Keywords,  IDH_intf_pic_props_keywords, '');
-      CreatePage(TfrPicProps_Groups,    IDlgPicPropsPageID_Groups,    IDH_intf_pic_props_groups,   '');
-      SetVisiblePageID(IDlgPicPropsPageID_Data, pcmForced);
+     // Определяем требуемую начальную страницу
+    case TPicPropsDlgDefaultPage(SettingValueInt(ISettingID_Dlgs_PP_DefaultPage)) of
+      ppddpFileProps:      iPageID := IDlgPicPropsPageID_FileProps;
+      ppddpMetadata:       iPageID := IDlgPicPropsPageID_Metadata;
+      ppddpView:           iPageID := IDlgPicPropsPageID_View;
+      ppddpData:           iPageID := IDlgPicPropsPageID_Data;
+      ppddpKeywords:       iPageID := IDlgPicPropsPageID_Keywords;
+      ppddpGroups:         iPageID := IDlgPicPropsPageID_Groups;
+      else {ppddpLastUsed} iPageID := FLastUsedPageID;
     end;
+     // Если не удалось определить допустимый ID страницы - пусть это будет страница "Данные"
+    if (iPageID=0) or (FController.IndexOfID(iPageID)<0) then iPageID := IDlgPicPropsPageID_Data;
+     // Выставляем начальную страницу
+    FController.SetVisiblePageID(iPageID, pcmForced);
   end;
 
   procedure TdPicProps.PageButtonClick(Sender: TObject);
   begin
     FController.SetVisiblePageID(TComponent(Sender).Tag+1, pcmForced);
+  end;
+
+  procedure TdPicProps.SettingsRestore(rif: TRegIniFile);
+  begin
+    inherited SettingsRestore(rif);
+    FLastUsedPageID := rif.ReadInteger('', 'LastUsedPageID', 0);
+  end;
+
+  procedure TdPicProps.SettingsStore(rif: TRegIniFile);
+  begin
+    inherited SettingsStore(rif);
+    rif.WriteInteger('', 'LastUsedPageID', FController.VisiblePageID);
   end;
 
   function TdPicProps.WizHost_GetHostControl: TWinControl;
@@ -201,10 +257,12 @@ uses
   procedure TdPicProps.WizHost_PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
   var i, iPageID: Integer;
   begin
-    // Настраиваем "нажатость" кнопок выбора страниц
+     // Настраиваем "нажатость" кнопок выбора страниц
     iPageID := FController.VisiblePageID;
     for i := 0 to tbNav.Items.Count-1 do
       with tbNav.Items[i] do Checked := Tag=iPageID-1;
+     // Фокусируем первый контрол
+    FocusFirstPageControl;
   end;
 
   function TdPicProps.WizHost_PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;

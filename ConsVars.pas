@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.69 2004-10-22 20:29:30 dale Exp $
+//  $Id: ConsVars.pas,v 1.70 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -184,6 +184,16 @@ type
     formfName,  // Совпадение по имени файла
     formfSize); // Совпадение по размеру файла
   TFileOpRepairMatchFlags = set of TFileOpRepairMatchFlag;
+
+   // Страница диалога свойств изображений, показываемая по умолчанию
+  TPicPropsDlgDefaultPage = (
+    ppddpLastUsed,  // Последняя использованная
+    ppddpFileProps, // Свойства файла
+    ppddpMetadata,  // Метаданные
+    ppddpView,      // Просмотр и настройка
+    ppddpData,      // Данные
+    ppddpKeywords,  // Ключевые слова
+    ppddpGroups);   // Группы
 
    //-------------------------------------------------------------------------------------------------------------------
    // Предметные интерфейсы страниц мастеров
@@ -521,6 +531,7 @@ const
   iiSlideShowBackward             = 76;
   iiSlideShowRandom               = 77;
   iiSlideShowCyclic               = 78;
+  iiFolderOpen                    = 79;
 
    // Help topics
   IDH_start                       = 00001;
@@ -748,8 +759,16 @@ const
     ISettingID_Dlgs_APW_ReplaceTime    = 3056; // Переписывать время, если оно уже указано
     ISettingID_Dlgs_APW_AutofillXfrm   = 3060; // Автоматически заполнять преобразования изображения
   ISettingID_Dlgs_PicProps             = 0;    // Окно свойств изображений
-    ISettingID_Dlgs_PP_ExpFileProps    = 3101; // Сразу раскрывать свойства файлов
-    ISettingID_Dlgs_PP_ExpMetadata     = 3102; // Сразу раскрывать метаданные изображений
+    ISettingID_Dlgs_PP_DefaultPage     = 3100; // Страница по умолчанию
+      ISettingID_Dlgs_PP_Def_LastUsed  = 3101; // Страница по умолчанию: последняя использованная
+      ISettingID_Dlgs_PP_Def_FProps    = 3102; // Страница по умолчанию: "Свойства файла"
+      ISettingID_Dlgs_PP_Def_Metadata  = 3103; // Страница по умолчанию: "Метаданные"
+      ISettingID_Dlgs_PP_Def_View      = 3104; // Страница по умолчанию: "Просмотр и настройка"
+      ISettingID_Dlgs_PP_Def_Data      = 3105; // Страница по умолчанию: "Данные"
+      ISettingID_Dlgs_PP_Def_Keywords  = 3106; // Страница по умолчанию: "Ключевые слова"
+      ISettingID_Dlgs_PP_Def_Groups    = 3107; // Страница по умолчанию: "Группы"
+    ISettingID_Dlgs_PP_ExpFileProps    = 3111; // Сразу раскрывать свойства файлов
+    ISettingID_Dlgs_PP_ExpMetadata     = 3112; // Сразу раскрывать метаданные изображений
   ISettingID_Dlgs_FileOpsWizard        = 0;    // Мастер операций с файлами изобраежний
     ISettingID_Dlgs_FOW_CfmCopyFiles   = 3120; // Подтверждение для операции копирования файлов
     ISettingID_Dlgs_FOW_CfmMoveFiles   = 3121; // Подтверждение для операции перемещения файлов
@@ -1169,10 +1188,18 @@ type
         AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);                                                              
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_ReplaceDate,    '@ISettingID_Dlgs_APW_ReplaceDate',    False);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Dlgs_APW_AutofillTime,   '@ISettingID_Dlgs_APW_AutofillTime',   Byte(DTAP_DefaultTimeProps), MinInt, MaxInt);
-        AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);                                                              
+        AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_ReplaceTime,    '@ISettingID_Dlgs_APW_ReplaceTime',    False);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_AutofillXfrm,   '@ISettingID_Dlgs_APW_AutofillXfrm',   False);
-      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Dlgs_PicProps,           '@ISettingID_Dlgs_PicProps');          
+      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Dlgs_PicProps,           '@ISettingID_Dlgs_PicProps');
+        Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Dlgs_PP_DefaultPage,     '@ISettingID_Dlgs_PP_DefaultPage',     Byte(ppddpData), Byte(Low(TPicPropsDlgDefaultPage)), Byte(High(TPicPropsDlgDefaultPage)));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_LastUsed,    '@ISettingID_Dlgs_PP_Def_LastUsed',    Byte(ppddpLastUsed));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_FProps,      '@ISettingID_Dlgs_PP_Def_FProps',      Byte(ppddpFileProps));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_Metadata,    '@ISettingID_Dlgs_PP_Def_Metadata',    Byte(ppddpMetadata));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_View,        '@ISettingID_Dlgs_PP_Def_View',        Byte(ppddpView));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_Data,        '@ISettingID_Dlgs_PP_Def_Data',        Byte(ppddpData));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_Keywords,    '@ISettingID_Dlgs_PP_Def_Keywords',    Byte(ppddpKeywords));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_Dlgs_PP_Def_Groups,      '@ISettingID_Dlgs_PP_Def_Groups',      Byte(ppddpGroups));
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_PP_ExpFileProps,    '@ISettingID_Dlgs_PP_ExpFileProps',    False);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_PP_ExpMetadata ,    '@ISettingID_Dlgs_PP_ExpMetadata',     False);
       Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Dlgs_FileOpsWizard,      '@ISettingID_Dlgs_FileOpsWizard');     

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.40 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufImgView.pas,v 1.41 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -238,6 +238,9 @@ type
   private
      // Приложение
     FApp: IPhotoAlbumApp;
+     // Список просматриваемых изображений. Нужен из-за того, что исходный список может меняться из-за редактирования
+     //   свойств изображения (например, при отображении представления)
+    FPics: IPhotoAlbumPicList;
      // Количество изображений в FPics
     FPicCount: Integer;
      // Инициализационные флаги
@@ -440,10 +443,10 @@ uses
       try
         FInitFlags      := AInitFlags;
         FApp            := AApp;
-        FPicCount       := FApp.ViewedPics.Count;
+        FPics.Assign(FApp.ViewedPics);
+        FPicCount       := FPics.Count;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
-        aEdit.Enabled   := FApp.Project.ViewIndex<0;
         ApplySettings(True);
         ShowModal;
         if FReturnUpdatedPicIdx then iPicIdx := FPicIdx;
@@ -1015,7 +1018,7 @@ uses
         if FCyclicViewing then idxNextPic := 0 else idxNextPic := -1;
        // Ставим файл в очередь 
       if idxNextPic>=0 then begin
-        FDecodeThread.QueuedFileName := FApp.ViewedPics[idxNextPic].FileName;
+        FDecodeThread.QueuedFileName := FPics[idxNextPic].FileName;
         UpdateCursor;
       end;
     end;
@@ -1064,7 +1067,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FApp.ViewedPics[FPicIdx];
+    FPic := FPics[FPicIdx];
      // Определяем, есть ли изображение в кэше
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
@@ -1176,6 +1179,8 @@ uses
     FTransform.OnApplied := TransformApplied;
      // Создаём карту цветов
     FColorMap := TColor32Map.Create;
+     // Создаём список изображений
+    FPics := NewPhotoAlbumPicList(False);
      // Восстанавливаем положение и видимость панелей инструментов
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
   end;
@@ -1185,6 +1190,7 @@ uses
      // Сохраняем положение и видимость панелей инструментов
     TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
      // Уничтожаем объекты
+    FPics := nil;
     FColorMap.Free;
     FTransform.Free;
      // Уведомляем фоновый поток о необходимости завершиться

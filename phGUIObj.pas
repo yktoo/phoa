@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.28 2004-10-22 20:29:30 dale Exp $
+//  $Id: phGUIObj.pas,v 1.29 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,7 +25,6 @@ type
   TThumbnailViewerStates = set of TThumbnailViewerState;
 
    // Информация о состоянии TThumbnailViewer, используемая его методами SaveDisplay() и RestoreDisplay()
-   //??? Надо ли?
   IThumbnailViewerDisplayData = interface(IInterface)
     ['{436126B8-5E50-4BAB-83D1-CA83FE19B976}']
      // Prop handlers

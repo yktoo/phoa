@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.11 2004-09-17 14:07:32 dale Exp $
+//  $Id: phWizForm.pas,v 1.12 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -226,23 +226,19 @@ uses phUtils, ChmHlp, phSettings, phGUIObj;
   end;
 
   procedure TPhoaWizardForm.SettingsRestore(rif: TRegIniFile);
-  var
-    s: String;
-    r: TRect;
+  var r: TRect;
   begin
      // Восстанавливаем размеры формы
-    s := rif.ReadString('', 'Position', '');
-    r.Left   := StrToIntDef(ExtractFirstWord(s, ','), Left);
-    r.Top    := StrToIntDef(ExtractFirstWord(s, ','), Top);
-    r.Right  := StrToIntDef(ExtractFirstWord(s, ','), Left+Width);
-    r.Bottom := StrToIntDef(ExtractFirstWord(s, ','), Top+Height);
-    BoundsRect := r;
+    if FormPositionFromStr(rif.ReadString('', 'Position', ''), Constraints, r) then
+      BoundsRect := r
+    else
+      Position := poMainFormCenter;
   end;
 
   procedure TPhoaWizardForm.SettingsStore(rif: TRegIniFile);
   begin
      // Сохраняем размеры формы
-    rif.WriteString('', 'Position', Format('%d,%d,%d,%d', [Left, Top, Left+Width, Top+Height]));
+    rif.WriteString('', 'Position', FormPositionToStr(BoundsRect));
   end;
 
   procedure TPhoaWizardForm.UpdateButtons;

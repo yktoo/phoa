@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.14 2004-10-14 08:11:09 dale Exp $
+//  $Id: phDlg.pas,v 1.15 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit phDlg;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  StdCtrls, ExtCtrls;
 
 type
   TPhoaDialog = class(TForm)
@@ -32,6 +32,8 @@ type
     FModified: Boolean;
     FOKIgnoresDataValidity: Boolean;
     FOKIgnoresModified: Boolean;
+     // Если требуется, создаёт и возвращает TRegIniFile для сохранения/загрузки настроек; иначе возвращает nil
+    function  CreateRegIni: TRegIniFile;
      // Message handlers
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
      // Prop handlers
@@ -48,11 +50,16 @@ type
     procedure ButtonClick_OK; virtual;
     procedure ButtonClick_Cancel; virtual;
     procedure ButtonClick_Help; virtual;
-     // Делает диалог окном изменяемого размера. Необходимо вызывать из InitializeDialog, иначе возникают проблемы при
-     //   использовании Large Fonts (если вызывать при создании диалога)
-    procedure MakeSizeable;
-     // Prop handler. В базовом классе всегда возвращает True
+     // Должна возвращать имя раздела реестра для сохранения настроек. В базовом классе возвращает пустую строку, что
+     //   означает, что сохранения настроек не требуется
+    function  GetFormRegistrySection: String; virtual;
+     // Процедуры, вызываемые в процессе записи/чтения настроек из реестра. Могут использоваться потомками для
+     //   сохранения/восстановления собственных настроек
+    procedure SettingsStore(rif: TRegIniFile); virtual;
+    procedure SettingsRestore(rif: TRegIniFile); virtual;
+     // Prop handlers
     function  GetDataValid: Boolean; virtual;
+    function  GetSizeable: Boolean; virtual;
   public
      // Отображает диалог. Возвращает HasUpdates
     function  Execute: Boolean;
@@ -62,7 +69,7 @@ type
      // Настраивает разрешённость и вид кнопок
     procedure UpdateButtons; virtual;
      // Props
-     // -- Если True, данные в диалоге допустимы
+     // -- Если True, данные в диалоге допустимы. В базовом классе всегда возвращает True
     property DataValid: Boolean read GetDataValid;
      // -- True, если диалог произвёл какие-то изменения
     property HasUpdates: Boolean read FHasUpdates write SetHasUpdates;
@@ -72,6 +79,8 @@ type
     property OKIgnoresDataValidity: Boolean read FOKIgnoresDataValidity write SetOKIgnoresOKIgnoresDataValidity;
      // -- Если True, разрешённость кнопки ОК не зависит от Modified
     property OKIgnoresModified: Boolean read FOKIgnoresModified write SetOKIgnoresModified;
+     // -- True, если размер формы позволяется менять. В базовом классе всегда возвращает False
+    property Sizeable: Boolean read GetSizeable;
   end;
 
 implementation
@@ -118,6 +127,13 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     ModalResult := mrOK;
   end;
 
+  function TPhoaDialog.CreateRegIni: TRegIniFile;
+  var sRegSection: String;
+  begin
+    sRegSection := GetFormRegistrySection;
+    if sRegSection='' then Result := nil else Result := TRegIniFile.Create(SRegRoot+'\'+sRegSection);
+  end;
+
   procedure TPhoaDialog.DlgDataChange(Sender: TObject);
   begin
     Modified := True;
@@ -149,8 +165,16 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   end;
 
   procedure TPhoaDialog.FinalizeDialog;
+  var rif: TRegIniFile;
   begin
-    { does nothing }
+     // Сохраняем настройки, если требуется
+    rif := CreateRegIni;
+    if rif<>nil then
+      try
+        SettingsStore(rif);
+      finally
+        rif.Free;
+      end;
   end;
 
   procedure TPhoaDialog.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -167,28 +191,48 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     Result := True;
   end;
 
-  procedure TPhoaDialog.InitializeDialog;
+  function TPhoaDialog.GetFormRegistrySection: String;
   begin
+    Result := '';
+  end;
+
+  function TPhoaDialog.GetSizeable: Boolean;
+  begin
+    Result := False;
+  end;
+
+  procedure TPhoaDialog.InitializeDialog;
+  var rif: TRegIniFile;
+  begin
+     // Если нужно, делаем диалог Sizeable
+    if Sizeable then begin
+       // Делаем sizeable
+      BorderStyle := bsSizeable;
+      BorderIcons := [biSystemMenu, biMaximize];
+      Position    := poDesigned;
+      AutoScroll  := False;
+       // Переписываем текущие размеры в качестве минимальных
+      Constraints.MinWidth  := Width;
+      Constraints.MinHeight := Height;
+       // Создаём size gripper
+      TSizeGripper.Create(Self).Parent := pButtonsBottom;
+    end;
      // Настраиваем шрифт
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+     // Восстанавливаем настройки, если требуется
+    rif := CreateRegIni;
+    if rif<>nil then
+      try
+        SettingsRestore(rif);
+      finally
+        rif.Free;
+      end;
   end;           
 
   procedure TPhoaDialog.Loaded;
   begin
     inherited Loaded;
     AutoScroll := False;
-  end;
-
-  procedure TPhoaDialog.MakeSizeable;
-  begin
-     // Делаем sizeable
-    BorderStyle := bsSizeable;
-    AutoScroll := False;
-     // Переписываем текущие размеры в качестве минимальных
-    Constraints.MinWidth  := Width;
-    Constraints.MinHeight := Height;
-     // Создаём size gripper
-    TSizeGripper.Create(Self).Parent := pButtonsBottom;
   end;
 
   procedure TPhoaDialog.SetHasUpdates(Value: Boolean);
@@ -218,6 +262,22 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
       FOKIgnoresDataValidity := Value;
       UpdateButtons;
     end;
+  end;
+
+  procedure TPhoaDialog.SettingsRestore(rif: TRegIniFile);
+  var r: TRect;
+  begin
+     // Если размер формы можно менять, восстанавливаем размеры формы
+    if Sizeable and FormPositionFromStr(rif.ReadString('', 'Position', ''), Constraints, r) then
+      BoundsRect := r
+    else
+      Position := poMainFormCenter;
+  end;
+
+  procedure TPhoaDialog.SettingsStore(rif: TRegIniFile);
+  begin
+     // Если размер формы можно менять, сохраняем её позицию
+    if Sizeable then rif.WriteString('', 'Position', FormPositionToStr(BoundsRect));
   end;
 
   procedure TPhoaDialog.UpdateButtons;

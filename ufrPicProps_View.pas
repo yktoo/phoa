@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.25 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.26 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -124,7 +124,6 @@ type
     procedure FinalizePage; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
      // Props
@@ -202,12 +201,6 @@ uses phUtils, Main, phSettings;
       FHView := iMain.Height;
       ViewZoomFactor := BestFitZoomFactor;
     end;
-  end;
-
-  procedure TfrPicProps_View.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := iMain;
   end;
 
   procedure TfrPicProps_View.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);

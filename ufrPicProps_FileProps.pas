@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.7 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.8 2004-10-23 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,7 +29,6 @@ type
   protected
     procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   end;
 
 implementation
@@ -39,16 +38,13 @@ uses TypInfo, VirtualShellUtilities, ConsVars, phUtils, phObj, phSettings;
 type
   PNamespace = ^TNamespace;
 
-  procedure TfrPicProps_FileProps.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  begin
-    inherited AfterDisplay(ChangeMethod);
-    StorageForm.ActiveControl := tvMain;
-  end;
-
   procedure TfrPicProps_FileProps.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPics.Count;
+    if tvMain.RootNodeCount=0 then begin
+      tvMain.RootNodeCount := EditedPics.Count;
+      ActivateFirstVTNode(tvMain);
+    end;
   end;
 
   procedure TfrPicProps_FileProps.InitializePage;

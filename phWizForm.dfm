@@ -11,7 +11,7 @@ object PhoaWizardForm: TPhoaWizardForm
   Constraints.MinWidth = 600
   ParentFont = True
   OldCreateOrder = True
-  Position = poScreenCenter
+  Position = poMainFormCenter
   ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
