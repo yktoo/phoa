@@ -1,33 +1,34 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.7 2004-05-20 11:50:54 dale Exp $
+;   $Id: phoa.iss,v 1.8 2004-06-15 14:01:13 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
 ;***********************************************************************************************************************
 [Setup]
-  MinVersion           = 4.0,4.0
-  AppName              = PhoA
-  AppVersion           = 1.1.5 beta
-  AppVerName           = PhoA v1.1.5 beta
-  AppCopyright         = Copyright ©2002-2004 Dmitry Kann
-  AppPublisher         = DaleTech
-  AppPublisherURL      = http://phoa.narod.ru/
-  AppSupportURL        = mailto:phoa@narod.ru
-  AppUpdatesURL        = http://phoa.narod.ru/
-  AppMutex             = PHOA_RUNNING_MUTEX
-  AllowNoIcons         = yes
-  ChangesAssociations  = yes
-  DisableStartupPrompt = yes
-  DefaultDirName       = {pf}\DaleTech\PhoA
-  DefaultGroupName     = PhoA (Photo Album)
-  OutputDir            = .
-  OutputBaseFilename   = phoa-setup-1.1.5beta
-  VersionInfoVersion   = 1.1.5
-  WizardImageFile      = SetupImage.bmp
-  WizardSmallImageFile = SetupSmallImage.bmp
+  MinVersion             = 4.0,4.0
+  AppName                = PhoA
+  AppVersion             = 1.1.6 beta
+  AppVerName             = PhoA v1.1.6 beta
+  AppCopyright           = Copyright ©2002-2004 Dmitry Kann
+  AppPublisher           = DaleTech
+  AppPublisherURL        = http://phoa.narod.ru/
+  AppSupportURL          = mailto:phoa@narod.ru
+  AppUpdatesURL          = http://phoa.narod.ru/
+  AppMutex               = PHOA_RUNNING_MUTEX
+  AllowNoIcons           = yes
+  ChangesAssociations    = yes
+  DisableStartupPrompt   = yes
+  DefaultDirName         = {pf}\DaleTech\PhoA
+  DefaultGroupName       = PhoA (Photo Album)
+  OutputDir              = .
+  OutputBaseFilename     = phoa-setup-1.1.6beta
+  VersionInfoVersion     = 1.1.6
+  VersionInfoTextVersion = 1.1.6 beta
+  WizardImageFile        = SetupImage.bmp
+  WizardSmallImageFile   = SetupSmallImage.bmp
   ; -- Compression
-  SolidCompression     = yes
-  Compression          = lzma
+  SolidCompression       = yes
+  Compression            = lzma
 
 [Languages]
   Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf

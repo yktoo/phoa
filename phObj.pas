@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.23 2004-06-11 14:42:22 dale Exp $
+//  $Id: phObj.pas,v 1.24 2004-06-15 14:01:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1149,7 +1149,7 @@ type
 
   TThumbnailViewer = class(TCustomControl)
   private
-     // Список ссылок на изображения группы, наполняется вызовом ViewGroup()
+     // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
     FPicLinks: TPhoaPicLinks;
      // Количество столбцов с эскизами
     FColCount: Integer;
@@ -1208,6 +1208,7 @@ type
     FThumbCacheSize: Integer;
     FThumbBackColor: TColor;
     FThumbFontColor: TColor;
+    FOnStartViewMode: TNotifyEvent;
      // Определяет количество эскизов в строчке
     procedure CalcLayout;
      // Отрисовывает один эскиз
@@ -1221,8 +1222,10 @@ type
      // Перемещает ItemIndex на новое место, не трогая выделения. При bUpdateStreamSelStart=True также обновляет
      //   FStreamSelStart
     procedure MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
-     // Вызывает событие OnSelectionChange
-    procedure SelectionChange;
+     // Вызывает OnSelectionChange
+    procedure DoSelectionChange;
+     // Вызывает OnStartViewMode
+    procedure DoStartViewMode;
      // Возвращает ссылку на кэшированный эскиз _Pic, если он есть в кэше, иначе возвращает nil
     function  GetCachedThumb(_Pic: TPhoaPic): TBitmap;
      // Помещает эскиз в кэш. После этого кэш становится владельцем Bitmap. Должна вызываться только в том случае, если
@@ -1277,6 +1280,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure DblClick; override;
     procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
     procedure CreateParams(var Params: TCreateParams); override;
     procedure CreateWnd; override;
@@ -1372,7 +1376,6 @@ type
     property ThumbFontColor: TColor read FThumbFontColor write SetThumbFontColor default clWindowText;
     property Visible;
     property OnContextPopup;
-    property OnDblClick;
     property OnDragDrop;
     property OnDragOver;
     property OnEndDock;
@@ -1389,6 +1392,8 @@ type
     property OnSelectionChange: TNotifyEvent read FOnSelectionChange write FOnSelectionChange;
     property OnStartDock;
     property OnStartDrag;
+     // -- Событие, происходящее тогда, когда нужно начать просмотр изображений
+    property OnStartViewMode: TNotifyEvent read FOnStartViewMode write FOnStartViewMode;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5366,6 +5371,11 @@ var
     SetWindowPos(Handle, 0, Left, Top, iw, ih, SWP_NOZORDER or SWP_NOACTIVATE);
   end;
 
+  procedure TThumbnailViewer.DblClick;
+  begin
+    DoStartViewMode;
+  end;
+
   destructor TThumbnailViewer.Destroy;
   begin
     FSelIndexes.Free;
@@ -5373,6 +5383,16 @@ var
     FThumbCache.Free;
     FPicLinks.Free;
     inherited Destroy;
+  end;
+
+  procedure TThumbnailViewer.DoSelectionChange;
+  begin
+    if Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
+  end;
+
+  procedure TThumbnailViewer.DoStartViewMode;
+  begin
+    if Assigned(FOnStartViewMode) then FOnStartViewMode(Self);
   end;
 
   procedure TThumbnailViewer.DragDrawInsertionPoint(var Coord: TViewerInsertionCoord; bInvalidate: Boolean);
@@ -5613,14 +5633,15 @@ var
        (Shift=[ssShift]) or
        (((Shift=[ssCtrl]) or (Shift=[ssShift, ssCtrl])) and (Key in [VK_PRIOR, VK_NEXT, VK_HOME, VK_END])) then
       case Key of
-        VK_UP:    if ItemIndex>=FColCount then           SetII(ItemIndex-FColCount);
-        VK_LEFT:  if ItemIndex>0          then           SetII(ItemIndex-1);
-        VK_DOWN:  if ItemIndex<FItemCount-FColCount then SetII(ItemIndex+FColCount);
-        VK_RIGHT: if ItemIndex<FItemCount-1 then         SetII(ItemIndex+1);
+        VK_UP:     if ItemIndex>=FColCount then           SetII(ItemIndex-FColCount);
+        VK_LEFT:   if ItemIndex>0          then           SetII(ItemIndex-1);
+        VK_DOWN:   if ItemIndex<FItemCount-FColCount then SetII(ItemIndex+FColCount);
+        VK_RIGHT:  if ItemIndex<FItemCount-1 then         SetII(ItemIndex+1);
         VK_HOME:                                         SetII(0);
         VK_END:                                          SetII(FItemCount-1);
-        VK_PRIOR: if (ItemIndex>=FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex-FVisibleItems) else SetII(0);
-        VK_NEXT:  if (ItemIndex<FItemCount-FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex+FVisibleItems) else SetII(FItemCount-1);
+        VK_PRIOR:  if (ItemIndex>=FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex-FVisibleItems) else SetII(0);
+        VK_NEXT:   if (ItemIndex<FItemCount-FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex+FVisibleItems) else SetII(FItemCount-1);
+        VK_RETURN: DoStartViewMode;
       end;
   end;
 
@@ -5658,7 +5679,7 @@ var
       if not IsRectEmpty(rThumb) then AddToSelection(i);
       Inc(i);
     end;
-    SelectionChange;
+    DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.MarqueingStart;
@@ -5693,7 +5714,7 @@ var
           Exit;
         end;
       end;
-      SelectionChange;
+      DoSelectionChange;
      // Если нажат Shift - выделяем подряд идущие эскизы
     end else if ssShift in Shift then
       if FStreamSelStart>=0 then SelectRange(FStreamSelStart, idx) else SetItemIndex(idx)
@@ -5989,18 +6010,13 @@ var
       ClearSelection;
       for i := 0 to FItemCount-1 do FSelIndexes.Add(i);
       Invalidate;
-      SelectionChange;
+      DoSelectionChange;
     end;
-  end;
-
-  procedure TThumbnailViewer.SelectionChange;
-  begin
-    if Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
   end;
 
   procedure TThumbnailViewer.SelectNone;
   begin
-    if ClearSelection then SelectionChange;
+    if ClearSelection then DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.SelectRange(idxStart, idxEnd: Integer);
@@ -6014,7 +6030,7 @@ var
       idxEnd := i;
     end;
     for i := idxStart to idxEnd do AddToSelection(i);
-    SelectionChange;
+    DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.SetBorderStyle(Value: TBorderStyle);
@@ -6084,7 +6100,7 @@ var
       EndUpdate;
     end;
      // Уведомляем
-    SelectionChange;
+    DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.SetItemIndex(Value: Integer);
@@ -6094,7 +6110,7 @@ var
       ClearSelection;
       AddToSelection(Value);
       MoveItemIndex(Value, True);
-      SelectionChange;
+      DoSelectionChange;
     end;
   end;
 

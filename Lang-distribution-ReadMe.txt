@@ -1,8 +1,8 @@
-$Id: Lang-distribution-ReadMe.txt,v 1.3 2004-05-20 11:50:54 dale Exp $
+$Id: Lang-distribution-ReadMe.txt,v 1.4 2004-06-15 14:01:13 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 Dmitry Kann :: http://phoa.narod.ru
 Notes on language files distribution
-Applicable to PhoA version 1.1.5 beta
+Applicable to PhoA version 1.1.6 beta
 ------------------------------------------------------------------------------------------------------------------------
 
 For RUSSIAN: —м. далее по тексту

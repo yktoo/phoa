@@ -105,17 +105,13 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
-[Language]
-ActiveLang=
-ProjectLang=
-RootDir=
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=1
 MinorVer=1
-Release=5
-Build=246
+Release=6
+Build=247
 Debug=0
 PreRelease=1
 Special=0
@@ -126,13 +122,13 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Dmitry Kann
 FileDescription=PhoA image arranging and searching tool
-FileVersion=1.1.5.246
+FileVersion=1.1.6.247
 InternalName=PhoA
 LegalCopyright=©2002-2004 Dmitry Kann
 LegalTrademarks=
 OriginalFilename=phoa.exe
 ProductName=PhoA
-ProductVersion=1.1.5
+ProductVersion=1.1.6
 Comments=All rights reserved. Refer to http://phoa.narod.ru for detailed info or distribution terms.
 VendorWebsite=http://phoa.narod.ru
 [HistoryLists\hlUnitAliases]

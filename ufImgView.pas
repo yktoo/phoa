@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.18 2004-06-04 14:18:18 dale Exp $
+//  $Id: ufImgView.pas,v 1.19 2004-06-15 14:01:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -340,6 +340,10 @@ type
     procedure SetFullScreen(Value: Boolean);
     procedure SetSlideShow(Value: Boolean);
     procedure SetShowInfo(Value: Boolean);
+  protected
+     // ≈сли True, то по выходу из ViewImage iPicIdx устанавливаетс€ равным индексу последнего просмотренного
+     //   изображени€
+    FReturnUpdatedPicIdx: Boolean;
   public
      // Props
      // -- True, если в насто€щий момент полноэкранный режим
@@ -359,17 +363,18 @@ type
    // ѕереход в режим просмотра изображений
    //   Group          - группа, в которой просматривать изображени€
    //   PhoA           - фотоальбом
-   //   iPicIdx        - индекс изображени€ в группе, с которого начинать просмотр
+   //   iPicIdx        - индекс изображени€ в группе, с которого начинать просмотр. ¬ него же возвращаетс€ индекс
+   //                    последнего просмотренного изображени€ 
    //   UndoOperations - буфер отката
    //   bPhGroups      - True, если отображаетс€ дерево папок фотоальбома (не представление)
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
 
 implementation
 {$R *.dfm}
 uses
   Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
     with TfImgView.Create(Application) do
       try
@@ -381,6 +386,7 @@ uses
         aEdit.Enabled   := bPhGroups;
         ApplySettings(True);
         ShowModal;
+        if FReturnUpdatedPicIdx then iPicIdx := FPicIdx;
       finally
         if FCursorHidden then ShowCursor(True);
         Free;
@@ -1088,7 +1094,10 @@ uses
   begin
     case Key of
       #8:  aPrevPic.Execute;
-      #13: aClose.Execute;
+      #13: begin
+        FReturnUpdatedPicIdx := True;
+        aClose.Execute;
+      end;
       '+': aZoomIn.Execute;
       '-': aZoomOut.Execute;
       '*': aZoomFit.Execute;

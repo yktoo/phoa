@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.43 2004-06-14 10:32:01 dale Exp $
+//  $Id: ConsVars.pas,v 1.44 2004-06-15 14:01:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -357,7 +357,7 @@ type
 
 const
    // Версия программы
-  SAppVersion                     = 'v1.1.5 beta';
+  SAppVersion                     = 'v1.1.6 beta';
    // Расширение и имя файла фотоальбома по умолчанию
   SDefaultExt                     = 'phoa';
   SDefaultFName                   = 'untitled.'+SDefaultExt;

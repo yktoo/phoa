@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.26 2004-06-11 14:19:41 dale Exp $
+//  $Id: Main.pas,v 1.27 2004-06-15 14:01:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -322,7 +322,7 @@ type
     procedure ToolItemClick(Sender: TObject);
      // Отображает прогресс загрузки
     procedure ShowProgressInfo(const sConstName: String; const aParams: Array of const);
-     // Вводит в режим просмотра, начиная с текущего изображения
+     // Вводит в режим просмотра, начиная с текущего изображения. InitFlags задаёт опции инициализации
     procedure StartViewMode(InitFlags: TImgViewInitFlags);
      // Отменяет все "неустойчивые" режимы и возвращается в основной режим просмотра
     procedure ResetMode;
@@ -1052,9 +1052,9 @@ uses
         DragCursor        := crDragMove;
         PhoA              := FPhoA;
         PopupMenu         := pmPics;
-        OnDblClick        := aaView;
         OnDragDrop        := ViewerDragDrop;
         OnSelectionChange := ViewerSelectionChange;
+        OnStartViewMode   := aaView;
       end;
        // Load language list
       LoadLanguageSettings;
@@ -1451,9 +1451,13 @@ uses
   end;
 
   procedure TfMain.StartViewMode(InitFlags: TImgViewInitFlags);
+  var iPicIndex: Integer;
   begin
-    if (CurGroup<>nil) and (Viewer.ItemIndex>=0) then
-      ViewImage(InitFlags, CurGroup, FPhoA, Viewer.ItemIndex, FOperations, ViewIndex<0);
+    iPicIndex := Viewer.ItemIndex;
+    if (CurGroup<>nil) and (iPicIndex>=0) then begin
+      ViewImage(InitFlags, CurGroup, FPhoA, iPicIndex, FOperations, ViewIndex<0);
+      Viewer.ItemIndex := iPicIndex;
+    end;
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);
