@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.6 2004-12-01 09:06:16 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.7 2004-12-02 11:19:43 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -44,7 +44,7 @@ type
      // Props
      // -- Текущее вырыжение
     property Expression: String read GetExpression write SetExpression;
-     // -- содержит ли разобранное выражение ошибки
+     // -- Содержит ли разобранное выражение ошибки
     property HasErrors: Boolean read GetHasErrors;
      // -- Разобрано ли текущее выражение
     property Parsed: Boolean read GetParsed;
@@ -52,7 +52,7 @@ type
     property ParseErrorPos: Integer read GetParseErrorPos;
      // -- Позиция ошибки в выражении
     property ParseErrorLocation: TPoint read GetParseErrorLocation;
-     // -- сообщение об ошибке при разборе выражения
+     // -- Сообщение об ошибке при разборе выражения
     property ParseErrorMsg: String read GetParseErrorMsg;
   end;
 
