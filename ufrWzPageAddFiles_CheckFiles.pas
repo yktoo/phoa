@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.11 2004-11-24 11:42:17 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.12 2004-12-28 10:51:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -167,7 +167,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
 
   procedure TfrWzPageAddFiles_CheckFiles.tvFilesGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
-    if (Kind=ikNormal) and (Column=0) then ImageIndex := FFiles[Node.Index].iIconIndex;
+    if (Kind in [ikNormal, ikSelected]) and (Column=0) then ImageIndex := FFiles[Node.Index].iIconIndex;
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.tvFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
