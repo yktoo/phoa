@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.4 2004-04-18 12:08:27 dale Exp $
+;   $Id: phoa.iss,v 1.5 2004-04-23 12:41:43 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -23,8 +23,8 @@
   OutputDir            = .
   OutputBaseFilename   = phoa-setup-1.1.4beta
   VersionInfoVersion   = 1.1.4
-  WizardImageFile      = Setup-Image.bmp
-  WizardSmallImageFile = Setup-Small-Image.bmp
+  WizardImageFile      = SetupImage.bmp
+  WizardSmallImageFile = SetupSmallImage.bmp
   ; -- Compression
   SolidCompression     = yes
   Compression          = lzma
