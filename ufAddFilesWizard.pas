@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.30 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.31 2005-02-05 16:16:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -60,6 +60,10 @@ type
     FFilter_DateTo: TDateTime;
     FFilter_Masks: String;
     FFilter_Presence: TAddFilePresenceFilter;
+    FFilter_SizeFrom: Integer;
+    FFilter_SizeFromUnit: TFileSizeUnit;
+    FFilter_SizeTo: Integer;
+    FFilter_SizeToUnit: TFileSizeUnit;
     FFilter_TimeFrom: TDateTime;
     FFilter_TimeTo: TDateTime;
     FRecurseFolders: Boolean;
@@ -136,6 +140,14 @@ type
     property Filter_Masks: String read FFilter_Masks write FFilter_Masks;
      // -- Фильтр: присутствие файлов в фотоальбоме
     property Filter_Presence: TAddFilePresenceFilter read FFilter_Presence write FFilter_Presence;
+     // -- Фильтр: минимальный размер файла в единицах Filter_SizeFromUnits
+    property Filter_SizeFrom: Integer read FFilter_SizeFrom write FFilter_SizeFrom;
+     // -- Фильтр: единица измерения минимального размера файла
+    property Filter_SizeFromUnit: TFileSizeUnit read FFilter_SizeFromUnit write FFilter_SizeFromUnit;
+     // -- Фильтр: максимальный размер файла в единицах Filter_SizeToUnits
+    property Filter_SizeTo: Integer read FFilter_SizeTo write FFilter_SizeTo;
+     // -- Фильтр: единица измерения минимального размера файла
+    property Filter_SizeToUnit: TFileSizeUnit read FFilter_SizeToUnit write FFilter_SizeToUnit;
      // -- Фильтр: время модификации файла "С" фильтра
     property Filter_TimeFrom: TDateTime read FFilter_TimeFrom write FFilter_TimeFrom;
      // -- Фильтр: время модификации файла "По" фильтра
@@ -584,35 +596,43 @@ uses
   end;
 
   function TfAddFilesWizard.LoadFileList(bRecurse, bUseFilter: Boolean): Boolean;
-  var Masks: TPhoaMasks;
+  var
+    Masks: TPhoaMasks;
+    i64MinSize, i64MaxSize: Int64;
+    iInitialImgIdx: Integer;
 
-     // Добавляет файл к списку по его SearchRec. Если bUseFilter=True, предварительно проверяет его соответствие фильтру
+     // Добавляет файл к списку по его SearchRec. Если bUseFilter=True, предварительно проверяет его соответствие
+     //   фильтру
     procedure AddFile(const sPath: String; SRec: TSearchRec); overload;
     var
-      d: TDateTime;
+      dDateTime: TDateTime;
+      i64Size: Int64;
       bMatches: Boolean;
     begin
        // Проверяем, что расширение знакомого типа
       if FileFormatList.GraphicFromExtension(ExtractFileExt(SRec.Name))=nil then Exit;
-      d := FileDateToDateTime(SRec.Time);
-       // Если фильтр выключен
-      if not bUseFilter or not FShowAdvancedOptions then
-        bMatches := True
-      else begin
+      dDateTime := FileDateToDateTime(SRec.Time);
+      i64Size   := (Int64(SRec.FindData.nFileSizeHigh) shl 32) or SRec.FindData.nFileSizeLow;
+      bMatches  := True;
+       // Если фильтр включен
+      if bUseFilter and FShowAdvancedOptions then begin
+         // Проверяем размер файла
+        if bMatches then bMatches := (i64Size>=i64MinSize) and (i64Size<=i64MaxSize);
          // Проверяем дату изменения файла
-        bMatches :=
-          ((FFilter_DateFrom<0) or (Int(d) >=FFilter_DateFrom)) and
-          ((FFilter_DateTo<0)   or (Int(d) <=FFilter_DateTo))   and
-          ((FFilter_TimeFrom<0) or (Frac(d)>=FFilter_TimeFrom)) and
-          ((FFilter_TimeTo<0)   or (Frac(d)<=FFilter_TimeTo));
+        if bMatches then
+          bMatches :=
+            ((FFilter_DateFrom<0) or (Int (dDateTime)>=FFilter_DateFrom)) and
+            ((FFilter_DateTo<0)   or (Int (dDateTime)<=FFilter_DateTo))   and
+            ((FFilter_TimeFrom<0) or (Frac(dDateTime)>=FFilter_TimeFrom)) and
+            ((FFilter_TimeTo<0)   or (Frac(dDateTime)<=FFilter_TimeTo));
          // Проверяем соответствие маске
-        if bMatches then bMatches := Masks.Matches(SRec.Name);
+        if bMatches and (Masks<>nil) then bMatches := Masks.Matches(SRec.Name);
          // Проверяем присутствие в фотоальбоме
         if bMatches and (FFilter_Presence<>afpfDontCare) then
           bMatches := (FApp.Project.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (FFilter_Presence=afpfExistingOnly);
       end;
        // Если все критерии удовлетворены
-      if bMatches then FFileList.Add(SRec.Name, sPath, SRec.Size, -2, d);
+      if bMatches then FFileList.Add(SRec.Name, sPath, i64Size, iInitialImgIdx, dDateTime);
     end;
 
     procedure AddFolder(const sPath: String);
@@ -653,17 +673,23 @@ uses
        // Обрабатываем список выбранных файлов/папок
       for i := 0 to FAddList.Count-1 do begin
         sName := FAddList[i];
-        iRes := FindFirst(sName, faAnyFile, sr);
-        try
-          if iRes=0 then
-             // Файл
-            if sr.Attr and faDirectory=0 then
-              AddFile(ExtractFilePath(sName), sr)
-             // Каталог
-            else
-              AddFolder(IncludeTrailingPathDelimiter(sName));
-        finally
-          FindClose(sr);
+         // Если это корень диска вида 'X:\'
+        if (Length(sName)=3) and (sName[2]=':') and (sName[3]='\') then
+          AddFolder(sName)
+         // Иначе определяем, файл это или папка
+        else begin
+          iRes := FindFirst(sName, faAnyFile, sr);
+          try
+            if iRes=0 then
+               // Файл
+              if sr.Attr and faDirectory=0 then
+                AddFile(ExtractFilePath(sName), sr)
+               // Каталог
+              else
+                AddFolder(IncludeTrailingPathDelimiter(sName));
+          finally
+            FindClose(sr);
+          end;
         end;
       end;
     end;
@@ -673,8 +699,16 @@ uses
     StartWait;
     pProcess.Show;
     try
-       // Если нужно, создаём список масок
-      if FShowAdvancedOptions and (FFilter_Masks<>'') then Masks := TPhoaMasks.Create(FFilter_Masks) else Masks := nil;
+       // Если необходимо отображать значки, необходимо передать индекс значка -2. Иначе - -1
+      iInitialImgIdx := iif(SettingValueBool(ISettingID_Dlgs_APW_ExtractIcons), -2, -1);
+       // Если фильтр активен
+      if FShowAdvancedOptions then begin
+         // Определяем минимальный и максимальный размеры файлов
+        i64MinSize := aFileSizeUnitMultipliers[FFilter_SizeFromUnit]*Int64(FFilter_SizeFrom);
+        i64MaxSize := aFileSizeUnitMultipliers[FFilter_SizeToUnit]  *Int64(FFilter_SizeTo);
+         // Если нужно, создаём список масок
+        if FFilter_Masks<>'' then Masks := TPhoaMasks.Create(FFilter_Masks) else Masks := nil;
+      end;
       try
          // Обрабатываем файлы/папки
         ProcessAddList;
@@ -764,23 +798,29 @@ uses
   var r: TRect;
   begin
     inherited SettingsRestore(rif);
-    FDefaultPath             := rif.ReadString ('', 'DefaultFolder',       '');
-    FRecurseFolders          := rif.ReadBool   ('', 'RecurseFolders',      True);
-    FShowAdvancedOptions     := rif.ReadBool   ('', 'ShowAdvancedOptions', False);
-    FFilter_Presence         := TAddFilePresenceFilter(
-                                rif.ReadInteger('', 'FilterPresence',      0));
-    FFilter_Masks            := rif.ReadString ('', 'FilterMasks',         '*.*');
-    FFilter_DateFrom         := rif.ReadInteger('', 'FilterDateFrom',      -1);
-    FFilter_DateTo           := rif.ReadInteger('', 'FilterDateTo',        -1);
-    FFilter_TimeFrom         := StrToTimeDef(
-                                rif.ReadString ('', 'FilterTimeFrom',      ''), -1, AppFormatSettings);
-    FFilter_TimeTo           := StrToTimeDef(
-                                rif.ReadString ('', 'FilterTimeTo',        ''), -1, AppFormatSettings);
+    FDefaultPath         := rif.ReadString ('', 'DefaultFolder',       '');
+    FRecurseFolders      := rif.ReadBool   ('', 'RecurseFolders',      True);
+    FShowAdvancedOptions := rif.ReadBool   ('', 'ShowAdvancedOptions', False);
+    FFilter_Presence     := TAddFilePresenceFilter(
+                            rif.ReadInteger('', 'FilterPresence',      0));
+    FFilter_Masks        := rif.ReadString ('', 'FilterMasks',         '*.*');
+    FFilter_DateFrom     := rif.ReadInteger('', 'FilterDateFrom',      -1);
+    FFilter_DateTo       := rif.ReadInteger('', 'FilterDateTo',        -1);
+    FFilter_TimeFrom     := StrToTimeDef(
+                            rif.ReadString ('', 'FilterTimeFrom',      ''), -1, AppFormatSettings);
+    FFilter_TimeTo       := StrToTimeDef(
+                            rif.ReadString ('', 'FilterTimeTo',        ''), -1, AppFormatSettings);
+    FFilter_SizeFrom     := rif.ReadInteger('', 'FilterSizeFrom',      0);
+    FFilter_SizeFromUnit := TFileSizeUnit(
+                            rif.ReadInteger('', 'FilterSizeFromUnit',  Byte(fsuKBytes)));
+    FFilter_SizeTo       := rif.ReadInteger('', 'FilterSizeTo',        999999999);
+    FFilter_SizeToUnit   := TFileSizeUnit(
+                            rif.ReadInteger('', 'FilterSizeToUnit',    Byte(fsuKBytes)));
      // Восстанавливаем параметры просмотра
-    FShowPreview             := rif.ReadBool   ('', 'ShowPreview',         False);
-    r                        := StrToRect(
-                                rif.ReadString ('', 'PreviewBounds',       ''),
-                                Rect(-1, -1, -1, -1));
+    FShowPreview         := rif.ReadBool   ('', 'ShowPreview',         False);
+    r                    := StrToRect(
+                            rif.ReadString ('', 'PreviewBounds',       ''),
+                            Rect(-1, -1, -1, -1));
     if (r.Left>=0) and (r.Top>=0) then begin
       dpPreview.FloatingPosition := r.TopLeft;
       dpPreview.FloatingWidth    := r.Right-r.Left;
@@ -812,9 +852,13 @@ uses
     PutDate(FFilter_DateTo,   'FilterDateTo');
     PutTime(FFilter_TimeFrom, 'FilterTimeFrom');
     PutTime(FFilter_TimeTo,   'FilterTimeTo');
+    rif.WriteInteger('', 'FilterSizeFrom',      FFilter_SizeFrom);
+    rif.WriteInteger('', 'FilterSizeFromUnit',  Byte(FFilter_SizeFromUnit));
+    rif.WriteInteger('', 'FilterSizeTo',        FFilter_SizeTo);
+    rif.WriteInteger('', 'FilterSizeToUnit',    Byte(FFilter_SizeToUnit));
      // Сохраняем параметры просмотра
-    rif.WriteBool  ('', 'ShowPreview', FShowPreview);
-    rif.WriteString(
+    rif.WriteBool   ('', 'ShowPreview',         FShowPreview);
+    rif.WriteString (
       '',
       'PreviewBounds',
       RectToStr(Bounds(dpPreview.FloatingPosition.x, dpPreview.FloatingPosition.y, dpPreview.FloatingWidth, dpPreview.FloatingHeight)));

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.88 2004-12-31 13:38:57 dale Exp $
+//  $Id: ConsVars.pas,v 1.89 2005-02-05 16:16:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -131,6 +131,9 @@ const
   DefaultPicClipboardFormats: TPicClipboardFormats = [Low(TPicClipboardFormat)..High(TPicClipboardFormat)];
 
 type
+   // Вид единиц измерения размера файла
+  TFileSizeUnit = (fsuBytes, fsuKBytes, fsuMBytes, fsuGBytes); 
+
    // Вид фильтра присутствия файлов в фотоальбоме (при добавлении изображений)
   TAddFilePresenceFilter = (
     afpfDontCare,      // Отключить критерий
@@ -314,9 +317,10 @@ type
 
 const
    // Версия программы
+  SAppVersion                     = 'v1.1.10';
+  
   SAppProductSID                  = 'phoa';
-  SAppVersion                     = 'v1.1.9';
-  SAppVersionSID                  = '119';
+  SAppVersionSID                  = '1.1.10';
 
   SProject_Generator              = 'PhoA '+SAppVersion;
   SProject_Remark                 = 'Created by PhoA '+SAppVersion+', '+SWeb_MainSite;
@@ -456,6 +460,13 @@ const
   IDragScrollAreaMargin           = 30;
    // -- Задержка в мс, в течение которой прокручивается одна строка эскизов
   IDragScrollDelay                = 400;
+
+   // Множители, соответствующие единицам измерения размера файла
+  aFileSizeUnitMultipliers: Array[TFileSizeUnit] of Int64 = (
+    1,               // fsuBytes
+    1024,            // fsuKBytes
+    1024*1024,       // fsuMBytes
+    1024*1024*1024); // fsuGBytes
 
    // Набор возможных изменений масштаба
   adMagnifications: Array[0..6] of Double = (1.10, 1.25, 1.33, 1.50, 1.75, 2, 3);
@@ -791,12 +802,13 @@ const
     ISettingID_Dlgs_NotifyPaste        = 3032; // Уведомление: После вставки изображений из буфера обмена
   ISettingID_Dlgs_AddPicWizard         = 0;    // Мастер добавления изображений
     ISettingID_Dlgs_APW_ShowHidden     = 3050; // Отображать скрытые файлы и папки
-    ISettingID_Dlgs_APW_SkipChkPage    = 3051; // Пропускать страницу отметки файлов
-    ISettingID_Dlgs_APW_LogOnErrOnly   = 3052; // Отображать протокол только при наличии ошибок
-    ISettingID_Dlgs_APW_AutofillDate   = 3053; // Автоматически заполнять дату изображения из свойств:
-    ISettingID_Dlgs_APW_ReplaceDate    = 3054; // Переписывать дату, если она уже указана
-    ISettingID_Dlgs_APW_AutofillTime   = 3055; // Автоматически заполнять время изображения из свойств:
-    ISettingID_Dlgs_APW_ReplaceTime    = 3056; // Переписывать время, если оно уже указано
+    ISettingID_Dlgs_APW_ExtractIcons   = 3051; // Извлекать значки файлов
+    ISettingID_Dlgs_APW_SkipChkPage    = 3052; // Пропускать страницу отметки файлов
+    ISettingID_Dlgs_APW_LogOnErrOnly   = 3053; // Отображать протокол только при наличии ошибок
+    ISettingID_Dlgs_APW_AutofillDate   = 3054; // Автоматически заполнять дату изображения из свойств:
+    ISettingID_Dlgs_APW_ReplaceDate    = 3055; // Переписывать дату, если она уже указана
+    ISettingID_Dlgs_APW_AutofillTime   = 3056; // Автоматически заполнять время изображения из свойств:
+    ISettingID_Dlgs_APW_ReplaceTime    = 3057; // Переписывать время, если оно уже указано
     ISettingID_Dlgs_APW_AutofillXfrm   = 3060; // Автоматически заполнять преобразования изображения
   ISettingID_Dlgs_PicProps             = 0;    // Окно свойств изображений
     ISettingID_Dlgs_PP_DefaultPage     = 3100; // Страница по умолчанию
@@ -1224,6 +1236,7 @@ type
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_NotifyPaste,        '@ISettingID_Dlgs_NotifyPaste',        True);
       Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Dlgs_AddPicWizard,       '@ISettingID_Dlgs_AddPicWizard');      
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_ShowHidden,     '@ISettingID_Dlgs_APW_ShowHidden',     False);
+        Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_ExtractIcons,   '@ISettingID_Dlgs_APW_ExtractIcons',   False);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_SkipChkPage,    '@ISettingID_Dlgs_APW_SkipChkPage',    False);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_APW_LogOnErrOnly,   '@ISettingID_Dlgs_APW_LogOnErrOnly',   True);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Dlgs_APW_AutofillDate,   '@ISettingID_Dlgs_APW_AutofillDate',   Byte(DTAP_DefaultDateProps), MinInt, MaxInt);

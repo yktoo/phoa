@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.22 2005-01-18 15:46:53 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.23 2005-02-05 16:16:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -13,24 +13,30 @@ uses
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, VirtualTrees, VirtualExplorerTree, StdCtrls,
   ExtCtrls, Mask, ToolEdit, DKLang, TB2Dock, TB2ToolWindow, TBX, GR32_Image,
-  TBXDkPanels;
+  TBXDkPanels, RXSpin;
 
 type
   TfrWzPageAddFiles_SelFiles = class(TWizardPage, IPhoaWizardPage_PreviewInfo)
     bAdvanced: TButton;
     cbFileMasks: TComboBox;
+    cbFileSizeFromUnit: TComboBox;
+    cbFileSizeToUnit: TComboBox;
     cbPresence: TComboBox;
     cbRecurseFolders: TCheckBox;
     cbShowPreview: TCheckBox;
     dklcMain: TDKLanguageController;
     eFileDateFrom: TDateEdit;
     eFileDateTo: TDateEdit;
+    eFileSizeFrom: TRxSpinEdit;
+    eFileSizeTo: TRxSpinEdit;
     eFileTimeFrom: TMaskEdit;
     eFileTimeTo: TMaskEdit;
     gbFilter: TGroupBox;
     lFileDateFrom: TLabel;
     lFileDateTo: TLabel;
     lFileMasks: TLabel;
+    lFileSizeFrom: TLabel;
+    lFileSizeTo: TLabel;
     lPresence: TLabel;
     pMain: TPanel;
     tvMain: TVirtualExplorerTree;
@@ -45,6 +51,7 @@ type
     procedure PreviewVisibilityChanged(bVisible: Boolean);
     function  GetCurrentFileName: String;
   protected
+    procedure InitializePage; override;
     function  GetDataValid: Boolean; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
@@ -92,6 +99,10 @@ uses
       if Wiz.Filter_DateTo>0    then eFileDateTo.Date   := Wiz.Filter_DateTo;
       if Wiz.Filter_TimeFrom>=0 then eFileTimeFrom.Text := ChangeTimeSeparator(FormatDateTime('hh:nn', Wiz.Filter_TimeFrom, AppFormatSettings), True);
       if Wiz.Filter_TimeTo>=0   then eFileTimeTo.Text   := ChangeTimeSeparator(FormatDateTime('hh:nn', Wiz.Filter_TimeTo,   AppFormatSettings), True);
+      eFileSizeFrom.AsInteger      := Wiz.Filter_SizeFrom;
+      cbFileSizeFromUnit.ItemIndex := Byte(Wiz.Filter_SizeFromUnit);
+      eFileSizeTo.AsInteger        := Wiz.Filter_SizeTo;
+      cbFileSizeToUnit.ItemIndex   := Byte(Wiz.Filter_SizeToUnit);
        // Настраиваем расширенные опции
       AdjustAdvancedCtls(Wiz.ShowAdvancedOptions);
     end;
@@ -132,6 +143,15 @@ uses
     end;
   end;
 
+  procedure TfrWzPageAddFiles_SelFiles.InitializePage;
+  var fsu: TFileSizeUnit;
+  begin
+    inherited InitializePage;
+     // Заполняем комбо-боксы единиц размера файла
+    for fsu := Low(fsu) to High(fsu) do cbFileSizeFromUnit.Items.Add(FileSizeUnitName(fsu));
+    cbFileSizeToUnit.Items.Assign(cbFileSizeFromUnit.Items);
+  end;
+
   function TfrWzPageAddFiles_SelFiles.NextPage: Boolean;
   var
     Wiz: TfAddFilesWizard;
@@ -147,6 +167,10 @@ uses
     Wiz.Filter_DateTo       := StrToDateDef(eFileDateTo.Text,   -1, AppFormatSettings);
     Wiz.Filter_TimeFrom     := StrToTimeDef(ChangeTimeSeparator(eFileTimeFrom.Text, False), -1, AppFormatSettings);
     Wiz.Filter_TimeTo       := StrToTimeDef(ChangeTimeSeparator(eFileTimeTo.Text,   False), -1, AppFormatSettings);
+    Wiz.Filter_SizeFrom     := eFileSizeFrom.AsInteger;
+    Wiz.Filter_SizeFromUnit := TFileSizeUnit(cbFileSizeFromUnit.ItemIndex);
+    Wiz.Filter_SizeTo       := eFileSizeTo.AsInteger;
+    Wiz.Filter_SizeToUnit   := TFileSizeUnit(cbFileSizeToUnit.ItemIndex);
     Wiz.RecurseFolders      := cbRecurseFolders.Checked;
     Wiz.DefaultPath         := tvMain.SelectedPath;
     Wiz.ShowAdvancedOptions := bAdvanced.Tag<>0;

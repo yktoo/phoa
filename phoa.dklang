@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.43 2004-12-31 13:38:58 dale Exp $
+;  $Id: phoa.dklang,v 1.44 2005-02-05 16:16:52 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -395,6 +395,8 @@ tvMain.Header.Columns[0].Text=00000056,Name
 tvMain.Header.Columns[1].Text=00000057,Size
 tvMain.Header.Columns[2].Text=00000058,Modified
 cbShowPreview.Caption=00000059,Show pre&view
+lFileSizeFrom.Caption=00000060,File si&ze from:
+lFileSizeTo.Caption=00000063,t&o:
 
 [frWzPageAddFiles_CheckFiles]
 tvFiles.Header.Columns[0].Text=00000023,File
@@ -660,6 +662,10 @@ dtfrEXIF=Value extracted from EXIF tag
 dtfrFilename=Value extracted from filename
 dtfrModified=Value extracted from file modification time
 dtfrSpecified=Value already specified, unchanged
+fsuBytes=bytes
+fsuGBytes=Gbytes
+fsuKBytes=Kbytes
+fsuMBytes=Mbytes
 gbpAuthor=By author
 gbpDateByDay=By date day
 gbpDateByMonth=By date month
@@ -718,6 +724,7 @@ ISettingID_Dlgs_AddPicWizard=Add pictures Wizard
 ISettingID_Dlgs_APW_AutofillDate=Automatically fill picture date from (in the order of preference):
 ISettingID_Dlgs_APW_AutofillTime=Automatically fill picture time from (in the order of preference):
 ISettingID_Dlgs_APW_AutofillXfrm=Automatically fill picture transformations from metadata
+ISettingID_Dlgs_APW_ExtractIcons=Extract file icons
 ISettingID_Dlgs_APW_LogOnErrOnly=Show log page only if errors occured
 ISettingID_Dlgs_APW_ReplaceDate=Overwrite date if already specified
 ISettingID_Dlgs_APW_ReplaceTime=Overwrite time if already specified

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.61 2004-12-31 13:38:58 dale Exp $
+//  $Id: phObj.pas,v 1.62 2005-02-05 16:16:52 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -57,12 +57,12 @@ type
    // Запись с данными о файле
   PFileRec = ^TFileRec;
   TFileRec = record
-    sName: String;        // Имя файла
-    sPath: String;        // Путь к файлу
-    iSize: Integer;       // Размер файла в байтах
-    iIconIndex: Integer;  // Индекс значка из системного ImageList'а, -1 если нет
-    dModified: TDateTime; // Дата/время модификации файла
-    bChecked: Boolean;    // True, если файл отмечен (custom value), по умолчанию False
+    sName:      String;    // Имя файла
+    sPath:      String;    // Путь к файлу
+    i64Size:    Int64;     // Размер файла в байтах
+    iIconIndex: Integer;   // Индекс значка из системного ImageList'а, -1 если нет
+    dModified:  TDateTime; // Дата/время модификации файла
+    bChecked:   Boolean;   // True, если файл отмечен (custom value), по умолчанию False
   end;
 
    // Режим сортировки списка файлов
@@ -81,14 +81,14 @@ type
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
      // Добавляет запись о файле к списку, если такого файла ещё нет, иначе обновляет его данные
-     //   Если _iIconIndex=-1, это означает отсутствие иконки у файла
-     //   Если _iIconIndex=-2, иконка файла получается вызовом SHGetFileInfo; Handle системного ImageList'а в этом
+     //   Если iIconIndex=-1, это означает отсутствие иконки у файла
+     //   Если iIconIndex=-2, иконка файла получается вызовом SHGetFileInfo; Handle системного ImageList'а в этом
      //     случае будет находиться в SysImageListHandle
-    function  Add(const _sName, _sPath: String; _iSize, _iIconIndex: Integer; const _dModified: TDateTime): Integer;
+    function  Add(const sName, sPath: String; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
      // Удаляет файл с заданными именем и путём, возвращает его прежний индекс или -1, если нет такого в списке
-    function  Remove(const _sName, _sPath: String): Integer;
+    function  Remove(const sName, sPath: String): Integer;
      // Возвращает индекс файла с заданными именем и путём, или -1, если нет такого в списке
-    function  IndexOf(const _sName, _sPath: String): Integer;
+    function  IndexOf(const sName, sPath: String): Integer;
      // Сортирует список файлов по заданному свойству
     procedure Sort(Prop: TFileListSortProperty; Direction: TPhoaSortDirection);
      // Оставляет в списке только отмеченные (bChecked) файлы
@@ -3861,34 +3861,32 @@ type
    // TFileList
    //===================================================================================================================
 
-  function TFileList.Add(const _sName, _sPath: String; _iSize, _iIconIndex: Integer; const _dModified: TDateTime): Integer;
+  function TFileList.Add(const sName, sPath: String; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
   var
     p: PFileRec;
     FileInfo: TSHFileInfo;
   begin
      // Ищем такой же файл
-    Result := IndexOf(_sName, _sPath);
+    Result := IndexOf(sName, sPath);
      // Не нашли, добавляем запись
     if Result<0 then begin
       New(p);
       Result := inherited Add(p);
-      p^.sName    := _sName;
-      p^.sPath    := _sPath;
-      p^.bChecked := True;
-     // Нашли, получаем указатель 
+      p.sName    := sName;
+      p.sPath    := sPath;
+      p.bChecked := True;
+     // Нашли, получаем указатель
     end else
       p := GetItems(Result);
      // Проверяем индекс иконки. Получаем, если надо
-    if _iIconIndex=-2 then begin
-      FSysImageListHandle := SHGetFileInfo(PAnsiChar(IncludeTrailingPathDelimiter(_sPath)+_sName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
-      _iIconIndex := FileInfo.iIcon;
+    if iIconIndex=-2 then begin
+      FSysImageListHandle := SHGetFileInfo(PAnsiChar(IncludeTrailingPathDelimiter(sPath)+sName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+      iIconIndex := FileInfo.iIcon;
     end;
      // Сохраняем данные
-    with p^ do begin
-      iSize      := _iSize;
-      iIconIndex := _iIconIndex;
-      dModified  := _dModified;
-    end;
+    p.i64Size    := i64Size;
+    p.iIconIndex := iIconIndex;
+    p.dModified  := dModified;
   end;
 
   procedure TFileList.DeleteUnchecked;
@@ -3908,11 +3906,13 @@ type
     Result := PFileRec(inherited Items[Index]);
   end;
 
-  function TFileList.IndexOf(const _sName, _sPath: String): Integer;
+  function TFileList.IndexOf(const sName, sPath: String): Integer;
+  var p: PFileRec;
   begin
-    for Result := 0 to Count-1 do
-      with GetItems(Result)^ do
-        if AnsiSameText(sName, _sName) and AnsiSameText(sPath, _sPath) then Exit;
+    for Result := 0 to Count-1 do begin
+      p := GetItems(Result);
+      if AnsiSameText(p.sName, sName) and AnsiSameText(p.sPath, sPath) then Exit;
+    end;
     Result := -1;
   end;
 
@@ -3926,7 +3926,7 @@ type
       case Prop of
         flspName:       Result := AnsiCompareText(p1.sName, p2.sName);
         flspPath:       Result := AnsiCompareText(p1.sPath, p2.sPath);
-        flspSize:       Result := p1.iSize-p2.iSize;
+        flspSize:       Result := Sign(p1.i64Size-p2.i64Size);
         else {flspDate} Result := Sign(p1.dModified-p2.dModified);
       end;
        // Для одноимённых файлов сортируем по пути, для остальных совпадающих сортируем по имени
@@ -3959,9 +3959,9 @@ type
     if Action in [lnExtracted, lnDeleted] then Dispose(PFileRec(Ptr));
   end;
 
-  function TFileList.Remove(const _sName, _sPath: String): Integer;
+  function TFileList.Remove(const sName, sPath: String): Integer;
   begin
-    Result := IndexOf(_sName, _sPath);
+    Result := IndexOf(sName, sPath);
     if Result>=0 then Delete(Result);
   end;
 

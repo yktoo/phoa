@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.44 2005-01-18 15:46:53 dale Exp $
+//  $Id: phUtils.pas,v 1.45 2005-02-05 16:16:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -86,8 +86,7 @@ uses
   function  iif(b: Boolean; sTrue, sFalse: Single): Single; overload;
 
    // Преобразует размер файла в удобочитаемую форму
-  function  HumanReadableSize(iSize: Integer): String; overload;
-  function  HumanReadableSize(i64Size: Int64): String; overload;
+  function  HumanReadableSize(i64Size: Int64): String; 
 
    // Проверяет ввод текста, представляющего из себя дату (bTime=False) или время (bTime=True). В случае удачи результат
    //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
@@ -119,6 +118,8 @@ uses
   function  GroupByPropName(GBProp: TPicGroupByProperty): String;
    // Возвращает наименование пиксельного формата изображения
   function  PixelFormatName(PFmt: TPhoaPixelFormat): String;
+   // Возвращает наименование единицы измерения размера файла
+  function  FileSizeUnitName(FSUnit: TFileSizeUnit): String;
    // Возвращает наименование свойства дискового файла
   function  DiskFilePropName(DFProp: TDiskFileProp): String;
    // Возвращает значение свойства дискового файла по объекту TNamespace файла. Если Namespace=nil, возвращает пустую строку
@@ -624,16 +625,6 @@ var
     if b then Result := sTrue else Result := sFalse;
   end;
 
-  function  HumanReadableSize(iSize: Integer): String;
-  begin
-    case iSize of
-      0..1023:             Result := ConstVal('SSizeBytes',  [iSize]);
-      1024..1048575:       Result := ConstVal('SSizeKBytes', [iSize/1024]);
-      1048576..1073741823: Result := ConstVal('SSizeMBytes', [iSize/1048576]);
-      else                 Result := ConstVal('SSizeGBytes', [iSize/1073741824]);
-    end;
-  end;
-
   function HumanReadableSize(i64Size: Int64): String;
   begin
     case i64Size of
@@ -735,6 +726,11 @@ var
   function PixelFormatName(PFmt: TPhoaPixelFormat): String;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TPhoaPixelFormat), Byte(PFmt)));
+  end;
+
+  function FileSizeUnitName(FSUnit: TFileSizeUnit): String;
+  begin
+    Result := ConstVal(GetEnumName(TypeInfo(TFileSizeUnit), Byte(FSUnit)));
   end;
 
   function DiskFilePropName(DFProp: TDiskFileProp): String;

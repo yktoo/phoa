@@ -1,16 +1,16 @@
 inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
   object gbFilter: TGroupBox
     Left = 0
-    Top = 166
+    Top = 140
     Width = 576
-    Height = 94
+    Height = 120
     Align = alBottom
     Caption = 'File selection filter'
     TabOrder = 1
     Visible = False
     DesignSize = (
       576
-      94)
+      120)
     object lFileDateFrom: TLabel
       Left = 12
       Top = 68
@@ -36,17 +36,33 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       FocusControl = cbPresence
     end
     object lFileDateTo: TLabel
-      Left = 324
+      Left = 364
       Top = 68
       Width = 14
       Height = 13
       Caption = '&to:'
       FocusControl = eFileDateTo
     end
+    object lFileSizeFrom: TLabel
+      Left = 12
+      Top = 92
+      Width = 66
+      Height = 13
+      Caption = 'File si&ze from:'
+      FocusControl = eFileSizeFrom
+    end
+    object lFileSizeTo: TLabel
+      Left = 364
+      Top = 92
+      Width = 14
+      Height = 13
+      Caption = 't&o:'
+      FocusControl = eFileSizeTo
+    end
     object cbFileMasks: TComboBox
       Left = 184
       Top = 40
-      Width = 369
+      Width = 377
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       DropDownCount = 20
@@ -58,7 +74,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     object cbPresence: TComboBox
       Left = 184
       Top = 16
-      Width = 369
+      Width = 377
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -82,7 +98,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       OnChange = PageDataChange
     end
     object eFileDateTo: TDateEdit
-      Left = 348
+      Left = 388
       Top = 64
       Width = 89
       Height = 21
@@ -99,18 +115,61 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 3
-      Text = '  *  '
+      Text = '  :  '
       OnChange = PageDataChange
     end
     object eFileTimeTo: TMaskEdit
-      Left = 440
+      Left = 480
       Top = 64
       Width = 41
       Height = 21
       EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 5
-      Text = '  *  '
+      Text = '  :  '
+      OnChange = PageDataChange
+    end
+    object eFileSizeFrom: TRxSpinEdit
+      Left = 184
+      Top = 88
+      Width = 89
+      Height = 21
+      Alignment = taRightJustify
+      ButtonKind = bkStandard
+      MaxValue = 2147483647.000000000000000000
+      TabOrder = 6
+      OnChange = PageDataChange
+    end
+    object cbFileSizeFromUnit: TComboBox
+      Left = 276
+      Top = 88
+      Width = 81
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 7
+      OnChange = PageDataChange
+    end
+    object eFileSizeTo: TRxSpinEdit
+      Left = 388
+      Top = 88
+      Width = 89
+      Height = 21
+      Alignment = taRightJustify
+      ButtonKind = bkStandard
+      MaxValue = 2147483647.000000000000000000
+      Value = 999999999.000000000000000000
+      TabOrder = 8
+      OnChange = PageDataChange
+    end
+    object cbFileSizeToUnit: TComboBox
+      Left = 480
+      Top = 88
+      Width = 81
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 9
       OnChange = PageDataChange
     end
   end
@@ -157,7 +216,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     Left = 0
     Top = 0
     Width = 576
-    Height = 166
+    Height = 140
     Active = False
     Align = alClient
     AnimationDuration = 100
@@ -237,7 +296,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     Left = 8
     Top = 24
     LangData = {
-      19006672577A5061676541646446696C65735F53656C46696C65730001100000
+      19006672577A5061676541646446696C65735F53656C46696C65730001160000
       000800676246696C746572010100000007000000070043617074696F6E000D00
       6C46696C654461746546726F6D01010000000A000000070043617074696F6E00
       0A006C46696C654D61736B7301010000000D000000070043617074696F6E0009
@@ -252,6 +311,10 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       6C756D6E735B305D2E546578743900000016004865616465722E436F6C756D6E
       735B315D2E546578743A00000016004865616465722E436F6C756D6E735B325D
       2E54657874000D00636253686F775072657669657701010000003B0000000700
-      43617074696F6E00}
+      43617074696F6E000D006C46696C6553697A6546726F6D01010000003C000000
+      070043617074696F6E000D006546696C6553697A6546726F6D00001200636246
+      696C6553697A6546726F6D556E697400000B006C46696C6553697A65546F0101
+      0000003F000000070043617074696F6E000B006546696C6553697A65546F0000
+      1000636246696C6553697A65546F556E69740000}
   end
 end

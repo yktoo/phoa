@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.13 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.14 2005-02-05 16:16:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -179,7 +179,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
     case Column of
       0: s := p.sName;
       1: s := p.sPath;
-      2: s := HumanReadableSize(p.iSize);
+      2: s := HumanReadableSize(p.i64Size);
       3: s := DateTimeToStr(p.dModified, AppFormatSettings);
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);

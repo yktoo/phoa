@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.9
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-21-01 12:30:00
+LastModified=2005-02-05 18:50:49
 SourceLANGID=1033
 
 [fMain]
@@ -231,6 +231,8 @@ SourceLANGID=1033
 00000057=Размер
 00000058=Изменён
 00000059=Отобра&жать окно просмотра
+00000060=&Размер файла от:
+00000063=д&о:
 
 [frWzPageAddFiles_CheckFiles]
 00000012=&Отметить все файлы
@@ -664,6 +666,10 @@ dtfrEXIF=Значение взято из EXIF-тега
 dtfrFilename=Значение взято из имени файла
 dtfrModified=Значение взято из времени изменения файла
 dtfrSpecified=Было заполнено, оставлено без изменений
+fsuBytes=байт
+fsuGBytes=Гбайт
+fsuKBytes=Кбайт
+fsuMBytes=Мбайт
 gbpAuthor=По автору
 gbpDateByDay=По дню даты
 gbpDateByMonth=По месяцу даты
@@ -722,6 +728,7 @@ ISettingID_Dlgs_AddPicWizard=Мастер добавления изображений
 ISettingID_Dlgs_APW_AutofillDate=Автозаполнение даты изображения из (в порядке предпочтения):
 ISettingID_Dlgs_APW_AutofillTime=Автозаполнение времени изображения из (в порядке предпочтения):
 ISettingID_Dlgs_APW_AutofillXfrm=Автозаполнение преобразований изображения из метаданных
+ISettingID_Dlgs_APW_ExtractIcons=Извлекать значки файлов
 ISettingID_Dlgs_APW_LogOnErrOnly=Отображать протокол добавления только при наличии ошибок
 ISettingID_Dlgs_APW_ReplaceDate=Переписывать дату, если она уже указана
 ISettingID_Dlgs_APW_ReplaceTime=Переписывать время, если оно уже указано
