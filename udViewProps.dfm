@@ -55,7 +55,6 @@ inherited dViewProps: TdViewProps
     Width = 402
     Height = 161
     Anchors = [akLeft, akTop, akRight, akBottom]
-    DragMode = dmAutomatic
     Header.AutoSizeIndex = 0
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
@@ -68,7 +67,7 @@ inherited dViewProps: TdViewProps
     PopupMenu = pmGrouping
     TabOrder = 2
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
-    TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+    TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toFullRowDrag]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toExtendedFocus, toRightClickSelect]
     OnAfterCellPaint = tvGroupingAfterCellPaint

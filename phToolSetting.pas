@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.3 2004-04-29 13:50:19 dale Exp $
+//  $Id: phToolSetting.pas,v 1.4 2004-04-30 04:38:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -329,12 +329,11 @@ type
     FDataOffset := AllocateInternalDataArea(SizeOf(Pointer));
     Align    := alClient;
     Images   := fMain.ilActionsSmall;
-    DragMode := dmAutomatic;
      // Настраиваем Header
     SetupHeader;
     with TreeOptions do begin
-      AutoOptions      := [toAutoDropExpand, toAutoScroll, toAutoTristateTracking, toAutoDeleteMovedNodes];
-      MiscOptions      := [toCheckSupport, toFullRepaintOnResize, toFullRowDrag, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning];
+      AutoOptions      := [toAutoDropExpand, toAutoScroll];
+      MiscOptions      := [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toFullRowDrag, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning];
       PaintOptions     := [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages];
       SelectionOptions := [toFullRowSelect, toRightClickSelect];
     end;
@@ -426,6 +425,7 @@ type
       am := amInsertBefore;
     GetSetting(nSrc).Index := idxNew;
     MoveTo(nSrc, nTgt, am, False);
+    EnablePopupMenuItems;
     DoSettingChange;
   end;
 
@@ -531,7 +531,7 @@ type
 
   function TPhoaToolSettingEditor.IsSettingNode(Node: PVirtualNode): Boolean;
   begin
-    Result := (Node<>nil) and (Node.Index<RootNodeCount);
+    Result := (Node<>nil) and (Node.Index<RootNodeCount-1);
   end;
 
   procedure TPhoaToolSettingEditor.LoadTree;
@@ -553,12 +553,18 @@ type
 
   procedure TPhoaToolSettingEditor.MoveToolDownClick(Sender: TObject);
   begin
-    //!!!
+    with GetSetting(FocusedNode) do Index := Index+1;
+    MoveTo(FocusedNode, GetNextSibling(FocusedNode), amInsertAfter, False);
+    EnablePopupMenuItems;
+    DoSettingChange;
   end;
 
   procedure TPhoaToolSettingEditor.MoveToolUpClick(Sender: TObject);
   begin
-    //!!!
+    with GetSetting(FocusedNode) do Index := Index-1;
+    MoveTo(FocusedNode, GetPreviousSibling(FocusedNode), amInsertBefore, False);
+    EnablePopupMenuItems;
+    DoSettingChange;
   end;
 
   procedure TPhoaToolSettingEditor.SetRootSetting(Value: TPhoaPageSetting);
