@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.25 2004-06-16 14:44:55 dale Exp $
+//  $Id: phObj.pas,v 1.26 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -485,6 +485,7 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOperations = class;
+  TPhoaUndo       = class;
 
   TPhotoAlbum = class(TObject)
   private
@@ -511,16 +512,16 @@ type
     constructor Create;
     destructor Destroy; override;
      // Очищает все внутренние поля фотоальбома
-    procedure New(UndoOperations: TPhoaOperations);
+    procedure New(Undo: TPhoaUndo);
      // Копирует настройки фотоальбома. bCopyRevision - копировать ли ревизию
     procedure Assign(Src: TPhotoAlbum; bCopyRevision: Boolean);
      // Загрузка/сохранение в файл
      // -- Загружает фотоальбом из файла
-    procedure FileLoad(const sFileName: String; UndoOperations: TPhoaOperations);
+    procedure FileLoad(const sFileName: String; Undo: TPhoaUndo);
      // -- Записывает фотоальбом в текущий файл
-    procedure FileSave(UndoOperations: TPhoaOperations);
+    procedure FileSave(Undo: TPhoaUndo);
      // -- Записывает фотоальбом в любой файл (с заданной ревизией iRevisionNumber)
-    procedure FileSaveTo(const sFileName: String; iRevisionNumber: Integer; UndoOperations: TPhoaOperations);
+    procedure FileSaveTo(const sFileName: String; iRevisionNumber: Integer; Undo: TPhoaUndo);
      // Удаляет все изображения, на которые не ссылается ни одна из групп фотоальбома и помещает удаляемые изображения
      //   в UndoOperations
     procedure RemoveUnlinkedPics(UndoOperations: TPhoaOperations);
@@ -585,6 +586,61 @@ type
    //  Операции и откат
    //*******************************************************************************************************************
 
+   //-------------------------------------------------------------------------------------------------------------------
+   // Файл отката PhoA (организован по принципу стека)
+   //-------------------------------------------------------------------------------------------------------------------
+   // Формат файла:
+   //    <данные1><тип1><данные2><тип2>...
+   //    Позиция в потоке всегда сохраняется *за последним байтом потока*
+
+   // Тип данных, сохраняемых в файле
+  TPhoaUndoFileDatatype = (pufdStr, pufdInt, pufdByte, pufdBool);
+
+  TPhoaUndoFile = class(TObject)
+  private
+     // Файловый поток данных отката
+    FStream: TFileStream;
+     // Счётчик вложенности вызовов BeginUndo/EndUndo
+    FUndoCounter: Integer;
+     // Положение, запомненное в первом вызове BeginUndo
+    FUndoPosition: Int64;
+     // Prop storage
+    FFileName: String;
+     // Создаёт поток, если он ещё не создан
+    procedure CreateStream;
+     // Записывает в поток тип данных
+    procedure WriteDatatype(DT: TPhoaUndoFileDatatype);
+     // Считывает из файла байт типа данных и проверяет его на соответствие DTRequired. Если не совпадает, вызывает
+     //   Exception
+    procedure ReadCheckDatatype(DTRequired: TPhoaUndoFileDatatype);
+     // Prop handlers
+    function  GetPosition: Int64;
+  public
+    constructor Create;
+    destructor Destroy; override;
+     // Уничтожает поток и файл 
+    procedure Clear;
+     // Методы для записи/чтения данных из файла
+    procedure WriteStr (const s: String);
+    procedure WriteInt (i: Integer);
+    procedure WriteByte(b: Byte);
+    procedure WriteBool(b: Boolean);
+    function  ReadStr: String;
+    function  ReadInt: Integer;
+    function  ReadByte: Byte;
+    function  ReadBool: Boolean;
+     // Процедуры начала/окончания процесса считывания данных отката. BeginUndo позиционирует файл в заданную позицию,
+     //   и, если это первый вызов BeginUndo, запоминает эту позицию. EndUndo уменьшает счётчик вложенных считываний,
+     //   и, если это последний вызов EndUndo, усекает файл по запомненной в первом вызове BeginUndo позиции
+    procedure BeginUndo(i64Position: Int64);
+    procedure EndUndo;
+     // Props
+     // -- Имя файла данных (временного)
+    property FileName: String read FFileName;
+     // -- Текущее положение в потоке данных. Создаёт поток при первом обращении
+    property Position: Int64 read GetPosition; 
+  end;
+
    // Базовая операция, не изменяющая состояния фотоальбома
 
   TBaseOperation = class(TObject)
@@ -594,19 +650,22 @@ type
 
   TPhoaOperation = class(TBaseOperation)
   private
+     // Позиция данных отката операции в Undo-файле данных отката (UndoFile)
+    FUndoDataPosition: Int64;
      // Prop storage
-    FSavepoint: Boolean;
     FPhoA: TPhotoAlbum;
      // Prop handlers
     function  GetOpGroup: TPhoaGroup;
     function  GetParentOpGroup: TPhoaGroup;
     procedure SetOpGroup(Value: TPhoaGroup);
     procedure SetParentOpGroup(Value: TPhoaGroup);
+    function  GetUndoFile: TPhoaUndoFile;
   protected
      // Prop storage
     FList: TPhoaOperations;
     FOpGroupID: Integer;
     FOpParentGroupID: Integer;
+    FSavepoint: Boolean;
      // Prop handlers
     function GetInvalidationFlags: TUndoInvalidationFlags; virtual;
      // Props
@@ -618,6 +677,9 @@ type
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
     destructor Destroy; override;
     procedure Undo; virtual;
+     // Процедуры позиционирования файла данных
+    procedure BeginFileUndo;
+    procedure EndFileUndo;
      // Наименование операции
     function Name: String;
      // Props
@@ -632,57 +694,73 @@ type
      // -- Указывает, что после данной операции было произведено сохранение фотоальбома, т.е., если эта операция -
      //    последняя в буфере отката, то это указывает на unmodified-состояние фотоальбома
     property Savepoint: Boolean read FSavepoint;
+     // -- Файл данных отката (получается через FList)
+    property UndoFile: TPhoaUndoFile read GetUndoFile;
   end;
 
-   // Список сделанных операций (буфер отката)
+   // Список сделанных операций
   TPhoaOperations = class(TList)
   private
-     // True, если "пустое" состояние буфера отката соответствует сохранённому состоянию фотоальбома
-    FSavepointOnEmpty: Boolean;
      // Счётчик блокировки
     FUpdateLock: Integer;
      // Prop storage
+    FUndoFile: TPhoaUndoFile;
     FOnStatusChange: TNotifyEvent;
     FOnOpUndone: TNotifyEvent;
     FOnOpDone: TNotifyEvent;
-     // Вызывает OnStatusChange
-    procedure DoStatusChange;
      // Prop handlers
     function  GetItems(Index: Integer): TPhoaOperation;
-    function  GetLastOpName: String;
     function  GetCanUndo: Boolean;
-    function  GetIsUnmodified: Boolean;
   protected
+     // Вызывает OnStatusChange
+    procedure DoStatusChange;
      // Откатывает весь буфер (предназначено для вторичных буферов множественных операций)
     procedure UndoAll;
   public
-    constructor Create;
+    constructor Create(AUndoFile: TPhoaUndoFile);
     function  Add(Item: TPhoaOperation): Integer;
     function  Remove(Item: TPhoaOperation): Integer;
     procedure Delete(Index: Integer);
+    procedure Clear; override;
+     // Установка/снятие блокировки
+    procedure BeginUpdate;
+    procedure EndUpdate;
+     // Props
+     // -- Возвращает True, если в списке есть операции для отмены
+    property CanUndo: Boolean read GetCanUndo;
+     // -- Индексированный список операций
+    property Items[Index: Integer]: TPhoaOperation read GetItems; default;
+     // -- Файл данных отката
+    property UndoFile: TPhoaUndoFile read FUndoFile;
+     // -- Событие, возникающее при выполнении операции (точнее, при регистрации операции в списке)
+    property OnOpDone: TNotifyEvent read FOnOpDone write FOnOpDone;
+     // -- Событие, возникающее при откате операции
+    property OnOpUndone: TNotifyEvent read FOnOpUndone write FOnOpUndone;
+     // -- Событие смены состояния (содержимого списка - вызывается при добавлении/удалении операции, или изменения SavePoint)
+    property OnStatusChange: TNotifyEvent read FOnStatusChange write FOnStatusChange;
+  end;
+
+   // Буфер отката PhoA. Является только *самостоятельным* объектом и обладает собственным файлом отката 
+  TPhoaUndo = class(TPhoaOperations)
+  private
+     // True, если "пустое" состояние буфера отката соответствует сохранённому состоянию фотоальбома
+    FSavepointOnEmpty: Boolean;
+     // Prop handlers
+    function  GetLastOpName: String;
+    function  GetIsUnmodified: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
     procedure Clear; override;
      // Устанавливает, что текущее состояние фотоальбома является сохранённым
     procedure SetSavepoint;
      // Устанавливает, что текущее состояние является модифицированным, но откат невомозжен
     procedure SetNonUndoable;
-     // Установка/снятие блокировки
-    procedure BeginUpdate;
-    procedure EndUpdate; 
      // Props
-     // -- Возвращает True, если в списке есть операции для отмены
-    property CanUndo: Boolean read GetCanUndo;
      // -- Возвращает True, если текущее состояние буфера отката соответствует сохранённому состоянию фотоальбома
     property IsUnmodified: Boolean read GetIsUnmodified;
-     // -- Индексированный список операций
-    property Items[Index: Integer]: TPhoaOperation read GetItems; default;
      // -- Возвращает наименование последней сделанной операции
     property LastOpName: String read GetLastOpName;
-     // -- Событие, возникающее при выполнении операции (точнее, при регистрации операции в списке) 
-    property OnOpDone: TNotifyEvent read FOnOpDone write FOnOpDone;
-     // -- Событие, возникающее при откате операции 
-    property OnOpUndone: TNotifyEvent read FOnOpUndone write FOnOpUndone;
-     // -- Событие смены состояния (содержимого списка - вызывается при добавлении/удалении операции, или изменения SavePoint)
-    property OnStatusChange: TNotifyEvent read FOnStatusChange write FOnStatusChange;
   end;
 
    // Абстрактная операция, состоящая из нескольких операций. При отмене откатывает все операции оптом
@@ -708,7 +786,7 @@ type
 
   TPhoaOp_GroupNew = class(TPhoaOperation)
   protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; CurGroup: TPhoaGroup);
     procedure Undo; override;
@@ -719,11 +797,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_GroupRename = class(TPhoaOperation)
-  private
-     // Старое имя группы
-    FOldText: String;
-  protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText: String);
     procedure Undo; override;
@@ -781,9 +854,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_InternalPicRemoving = class(TPhoaOperation)
-  private
-     // Бинарное содержимое изображения
-    FPicData: String;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic);
     procedure Undo; override;
@@ -924,8 +994,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaMultiOp_PicDelete = class(TPhoaMultiOp)
-  protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
   end;
@@ -935,8 +1003,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaMultiOp_PicPaste = class(TPhoaMultiOp)
-  protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup);
   end;
@@ -963,8 +1029,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaMultiOp_PicOperation = class(TPhoaMultiOp)
-  protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; const aSelPicIDs: TIDArray; PicOperation: TPictureOperation);
   end;
@@ -1015,8 +1079,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaMultiOp_PicDragAndDropToGroup = class(TPhoaMultiOp)
-  protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; aSelPicIDs: TIDArray; bCopy: Boolean);
   end;
@@ -1297,8 +1359,19 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Сохраняет текущие параметры отображения и возвращает:
+     //   в SelectedIDs - список ID выделенных изображений (может быть nil!)
+     //   в iFocusedID  - ID изображения, которому соответствует ItemIndex (0, если нет такого)
+     //   в iTopIndex   - текущий TopIndex
+    procedure SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopIndex: Integer);
+     // Восстанавливает параметры отображения; подразумевается возможность использования данных,
+     //   полученных в результате предыдущего вызова SaveDisplay():
+     //     Если SelectedIDs<>nil, то сразу выделяет изображения с заданными ID
+     //     Если iFocusedID>0, устанавливает ItemIndex на изображение с заданным ID
+     //     iTopIndex задаёт желаемый индекс верхнего эскиза
+    procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopIndex: Integer);
      // Устанавливает группу Group для просмотра в качестве текущей
-    procedure SetCurrentGroup(Group: TPhoaGroup);
+    procedure ViewGroup(Group: TPhoaGroup);
      // Снимает выделение со всех эскизов
     procedure SelectNone;
      // Выделяет все эскизы
@@ -3734,10 +3807,10 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhotoAlbum.FileLoad(const sFileName: String; UndoOperations: TPhoaOperations);
+  procedure TPhotoAlbum.FileLoad(const sFileName: String; Undo: TPhoaUndo);
   var Streamer: TPhoaStreamer;
   begin
-    New(UndoOperations);
+    New(Undo);
     try
        // Создаём FilerEx и загружаем с его помощью
       Streamer := TPhoaFilerEx.Create(psmRead, sFileName);
@@ -3751,17 +3824,17 @@ var
         Streamer.Free;
       end;
     except
-      New(UndoOperations);
+      New(Undo);
       raise;
     end;
   end;
 
-  procedure TPhotoAlbum.FileSave(UndoOperations: TPhoaOperations);
+  procedure TPhotoAlbum.FileSave(Undo: TPhoaUndo);
   begin
-    FileSaveTo(FFileName, FFileRevision, UndoOperations);
+    FileSaveTo(FFileName, FFileRevision, Undo);
   end;
 
-  procedure TPhotoAlbum.FileSaveTo(const sFileName: String; iRevisionNumber: Integer; UndoOperations: TPhoaOperations);
+  procedure TPhotoAlbum.FileSaveTo(const sFileName: String; iRevisionNumber: Integer; Undo: TPhoaUndo);
   var Streamer: TPhoaStreamer;
   begin
      // Предупреждаем пользователя, если он сохраняет в более старую ревизию
@@ -3779,10 +3852,10 @@ var
     FFileName     := sFileName;
     FFileRevision := iRevisionNumber;
      // Invoke UndoOperations' status change
-    if UndoOperations<>nil then UndoOperations.SetSavepoint;
+    if Undo<>nil then Undo.SetSavepoint;
   end;
 
-  procedure TPhotoAlbum.New(UndoOperations: TPhoaOperations);
+  procedure TPhotoAlbum.New(Undo: TPhoaUndo);
   begin
     FRootGroup.PicIDs.Clear;
     FRootGroup.Groups.Clear;
@@ -3794,9 +3867,9 @@ var
     FThumbnailQuality := IDefaultThumbQuality;
     FThumbnailHeight  := IDefaultThumbHeight;
     FThumbnailWidth   := IDefaultThumbWidth;
-    if UndoOperations<>nil then begin
-      UndoOperations.Clear;
-      UndoOperations.SetSavepoint;
+    if Undo<>nil then begin
+      Undo.Clear;
+      Undo.SetSavepoint;
     end;
   end;
 
@@ -3957,20 +4030,149 @@ var
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
+   // TPhoaUndoFile
+   //-------------------------------------------------------------------------------------------------------------------
+
+  procedure TPhoaUndoFile.BeginUndo(i64Position: Int64);
+  begin
+    if FUndoCounter=0 then FUndoPosition := i64Position;
+    FStream.Position := i64Position;
+    Inc(FUndoCounter);
+  end;
+
+  procedure TPhoaUndoFile.Clear;
+  begin
+    if FStream<>nil then begin
+      FreeAndNil(FStream);
+      SysUtils.DeleteFile(FFileName);
+    end;
+  end;
+
+  constructor TPhoaUndoFile.Create;
+  begin
+    inherited Create;
+     // Определяем имя файла
+    FFileName := Format('%sphoa_undo_%.8x.tmp', [GetWindowsTempPath, GetCurrentProcessId]);
+  end;
+
+  procedure TPhoaUndoFile.CreateStream;
+  begin
+    if FStream=nil then FStream := TFileStream.Create(FFileName, fmCreate);
+  end;
+
+  destructor TPhoaUndoFile.Destroy;
+  begin
+     // Уничтожаем поток и файл
+    Clear;
+    inherited Destroy;
+  end;
+
+  procedure TPhoaUndoFile.EndUndo;
+  begin
+    Assert(FUndoCounter>0, 'Excessive TPhoaUndoFile.EndUndo() call');
+    Dec(FUndoCounter);
+     // Счётчик сравнялся с нулём - позиционируем в запомненную позицию и усекаем файл
+    if FUndoCounter=0 then begin
+      FStream.Position := FUndoPosition;
+      FStream.Size     := FUndoPosition;
+    end;
+  end;
+
+  function TPhoaUndoFile.GetPosition: Int64;
+  begin
+    CreateStream;
+    Result := FStream.Position;
+  end;
+
+  function TPhoaUndoFile.ReadBool: Boolean;
+  begin
+    ReadCheckDatatype(pufdByte);
+    Result := phObj.ReadByte(FStream)<>0;
+  end;
+
+  function TPhoaUndoFile.ReadByte: Byte;
+  begin
+    ReadCheckDatatype(pufdByte);
+    Result := phObj.ReadByte(FStream);
+  end;
+
+  procedure TPhoaUndoFile.ReadCheckDatatype(DTRequired: TPhoaUndoFileDatatype);
+  var DTActual: TPhoaUndoFileDatatype;
+  begin
+    Byte(DTActual) := phObj.ReadByte(FStream);
+    if DTActual<>DTRequired then
+      raise Exception.CreateFmt(
+        'Invalid undo stream datatype; required: %s, actual: %s',
+        [GetEnumName(TypeInfo(TPhoaUndoFileDatatype), Byte(DTRequired)), GetEnumName(TypeInfo(TPhoaUndoFileDatatype), Byte(DTActual))]);
+  end;
+
+  function TPhoaUndoFile.ReadInt: Integer;
+  begin
+    ReadCheckDatatype(pufdInt);
+    Result := phObj.ReadInt(FStream);
+  end;
+
+  function TPhoaUndoFile.ReadStr: String;
+  begin
+    ReadCheckDatatype(pufdStr);
+    Result := phObj.ReadStr(FStream);
+  end;
+
+  procedure TPhoaUndoFile.WriteBool(b: Boolean);
+  begin
+    WriteDatatype(pufdBool);
+    phObj.WriteByte(FStream, Byte(b));
+  end;
+
+  procedure TPhoaUndoFile.WriteByte(b: Byte);
+  begin
+    WriteDatatype(pufdByte);
+    phObj.WriteByte(FStream, b);
+  end;
+
+  procedure TPhoaUndoFile.WriteDatatype(DT: TPhoaUndoFileDatatype);
+  begin
+    phObj.WriteByte(FStream, Byte(DT));
+  end;
+
+  procedure TPhoaUndoFile.WriteInt(i: Integer);
+  begin
+    WriteDatatype(pufdInt);
+    phObj.WriteInt(FStream, i);
+  end;
+
+  procedure TPhoaUndoFile.WriteStr(const s: String);
+  begin
+    WriteDatatype(pufdStr);
+    phObj.WriteStr(FStream, s);
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
    // TPhoaOperation
    //-------------------------------------------------------------------------------------------------------------------
+
+  procedure TPhoaOperation.BeginFileUndo;
+  begin
+    UndoFile.BeginUndo(FUndoDataPosition);
+  end;
 
   constructor TPhoaOperation.Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
   begin
     FList := List;
     List.Add(Self);
     FPhoA := PhoA;
+    FUndoDataPosition := FList.UndoFile.Position;
   end;
 
   destructor TPhoaOperation.Destroy;
   begin
     FList.Remove(Self);
     inherited Destroy;
+  end;
+
+  procedure TPhoaOperation.EndFileUndo;
+  begin
+    UndoFile.EndUndo;
   end;
 
   function TPhoaOperation.GetInvalidationFlags: TUndoInvalidationFlags;
@@ -3986,6 +4188,11 @@ var
   function TPhoaOperation.GetParentOpGroup: TPhoaGroup;
   begin
     Result := FPhoA.RootGroup.GroupByID[FOpParentGroupID];
+  end;
+
+  function TPhoaOperation.GetUndoFile: TPhoaUndoFile;
+  begin
+    Result := FList.UndoFile;
   end;
 
   function TPhoaOperation.Name: String;
@@ -4035,10 +4242,10 @@ var
     end;
   end;
 
-  constructor TPhoaOperations.Create;
+  constructor TPhoaOperations.Create(AUndoFile: TPhoaUndoFile);
   begin
     inherited Create;
-    FSavepointOnEmpty := True;
+    FUndoFile := AUndoFile;
   end;
 
   procedure TPhoaOperations.Delete(Index: Integer);
@@ -4064,19 +4271,9 @@ var
     Result := Count>0;
   end;
 
-  function TPhoaOperations.GetIsUnmodified: Boolean;
-  begin
-    if Count=0 then Result := FSavepointOnEmpty else Result := GetItems(Count-1).FSavepoint;
-  end;
-
   function TPhoaOperations.GetItems(Index: Integer): TPhoaOperation;
   begin
     Result := TPhoaOperation(inherited Items[Index]);
-  end;
-
-  function TPhoaOperations.GetLastOpName: String;
-  begin
-    if Count=0 then Result := '' else Result := GetItems(Count-1).Name;
   end;
 
   function TPhoaOperations.Remove(Item: TPhoaOperation): Integer;
@@ -4085,29 +4282,6 @@ var
     if Result>=0 then begin
       DoStatusChange;
       if Assigned(FOnOpUndone) then FOnOpUndone(Self);
-    end;
-  end;
-
-  procedure TPhoaOperations.SetNonUndoable;
-  begin
-    BeginUpdate;
-    try
-      Clear;
-      FSavepointOnEmpty := False;
-    finally
-      EndUpdate;
-    end;
-  end;
-
-  procedure TPhoaOperations.SetSavepoint;
-  var i: Integer;
-  begin
-    BeginUpdate;
-    try
-      for i := 0 to Count-1 do GetItems(i).FSavepoint := i=Count-1;
-      FSavepointOnEmpty := Count=0;
-    finally
-      EndUpdate;
     end;
   end;
 
@@ -4123,13 +4297,72 @@ var
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
+   // TPhoaUndo
+   //-------------------------------------------------------------------------------------------------------------------
+
+  procedure TPhoaUndo.Clear;
+  begin
+    inherited Clear;
+     // Обрезаем файл
+    UndoFile.Clear;
+  end;
+
+  constructor TPhoaUndo.Create;
+  begin
+    inherited Create(TPhoaUndoFile.Create);
+    FSavepointOnEmpty := True;
+  end;
+
+  destructor TPhoaUndo.Destroy;
+  var UFile: TPhoaUndoFile;
+  begin
+    UFile := UndoFile;
+    inherited Destroy;
+     // Уничтожаем файл отката 
+    UFile.Free;
+  end;
+
+  function TPhoaUndo.GetIsUnmodified: Boolean;
+  begin
+    if Count=0 then Result := FSavepointOnEmpty else Result := GetItems(Count-1).FSavepoint;
+  end;
+
+  function TPhoaUndo.GetLastOpName: String;
+  begin
+    if Count=0 then Result := '' else Result := GetItems(Count-1).Name;
+  end;
+
+  procedure TPhoaUndo.SetNonUndoable;
+  begin
+    BeginUpdate;
+    try
+      Clear;
+      FSavepointOnEmpty := False;
+    finally
+      EndUpdate;
+    end;
+  end;
+
+  procedure TPhoaUndo.SetSavepoint;
+  var i: Integer;
+  begin
+    BeginUpdate;
+    try
+      for i := 0 to Count-1 do Items[i].FSavepoint := i=Count-1;
+      FSavepointOnEmpty := Count=0;
+    finally
+      EndUpdate;
+    end;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
    // TPhoaMultiOp
    //-------------------------------------------------------------------------------------------------------------------
 
   constructor TPhoaMultiOp.Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
   begin
     inherited Create(List, PhoA);
-    FOperations := TPhoaOperations.Create;
+    FOperations := TPhoaOperations.Create(List.UndoFile);
   end;
 
   destructor TPhoaMultiOp.Destroy;
@@ -4180,21 +4413,22 @@ var
   constructor TPhoaOp_GroupRename.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText: String);
   begin
     inherited Create(List, PhoA);
-     // Выполняем операцию и запоминаем данные отката
-    FOldText := Group.Text;
-    Group.Text := sNewText;
+     // Запоминаем данные отката
+    UndoFile.WriteStr(Group.Text);
     OpGroup := Group;
-  end;
-
-  function TPhoaOp_GroupRename.GetInvalidationFlags: TUndoInvalidationFlags;
-  begin
-    Result := [uifUInvalidateNode]; // Undo flags
+     // Выполняем операцию
+    Group.Text := sNewText;    
   end;
 
   procedure TPhoaOp_GroupRename.Undo;
   begin
      // Получаем группу и восстанавливаем текст
-    OpGroup.Text := FOldText;
+    BeginFileUndo;
+    try
+      OpGroup.Text := UndoFile.ReadStr;
+    finally
+      EndFileUndo;
+    end;
     inherited Undo;
   end;
 
@@ -4239,7 +4473,7 @@ var
     end;
      // Запоминаем список каскадно удаляемых узлов
     if Group.Groups.Count>0 then begin
-      FCascadedDeletes    := TPhoaOperations.Create;
+      FCascadedDeletes    := TPhoaOperations.Create(List.UndoFile);
       for i := 0 to Group.Groups.Count-1 do TPhoaOp_GroupDelete.Create(FCascadedDeletes, PhoA, Group.Groups[i], False);
     end;
      // Выполняем операцию
@@ -4247,7 +4481,7 @@ var
        // Удаляем группу
       Group.Free;
        // Удаляем неиспользуемые изображения
-      FUnlinkedPicRemoves := TPhoaOperations.Create;
+      FUnlinkedPicRemoves := TPhoaOperations.Create(List.UndoFile);
       PhoA.RemoveUnlinkedPics(FUnlinkedPicRemoves);
     end;
   end;
@@ -4301,7 +4535,7 @@ var
   begin
     inherited Create(List, PhoA);
      // Сохраняем данные изображения
-    FPicData := Pic.RawData[PPAllProps];
+    UndoFile.WriteStr(Pic.RawData[PPAllProps]);
      // Выполняем операцию
     Pic.Free;
   end;
@@ -4309,14 +4543,19 @@ var
   procedure TPhoaOp_InternalPicRemoving.Undo;
   var Pic: TPhoaPic;
   begin
-     // Создаём изображение и загружаем данные
-    Pic := TPhoaPic.Create(FPhoA);
+    BeginFileUndo;
     try
-      Pic.RawData[PPAllProps] := FPicData;
-      Pic.List := FPhoA.Pics; // Assign the List AFTER props have been read because List sorts pics by IDs
-    except
-      Pic.Free;
-      raise;
+       // Создаём изображение и загружаем данные
+      Pic := TPhoaPic.Create(FPhoA);
+      try
+        Pic.RawData[PPAllProps] := UndoFile.ReadStr;
+        Pic.List := FPhoA.Pics; // Assign the List AFTER props have been read because List sorts pics by IDs
+      except
+        Pic.Free;
+        raise;
+      end;
+    finally
+      EndFileUndo;
     end;
     inherited Undo;
   end;
@@ -4774,14 +5013,6 @@ var
     FPhoA.RemoveUnlinkedPics(FOperations);
   end;
 
-  function TPhoaMultiOp_PicDelete.GetInvalidationFlags: TUndoInvalidationFlags;
-  begin
-     // Делаем Invalidate, чтобы обновить счётчик узла группы (static text)
-    Result := [
-      uifXInvalidateNode,  // Execution flags
-      uifUInvalidateNode]; // Undo flags
-  end;
-
    //-------------------------------------------------------------------------------------------------------------------
    // TPhoaMultiOp_PicPaste
    //-------------------------------------------------------------------------------------------------------------------
@@ -4840,14 +5071,6 @@ var
     finally
       StopWait;
     end;
-  end;
-
-  function TPhoaMultiOp_PicPaste.GetInvalidationFlags: TUndoInvalidationFlags;
-  begin
-     // Делаем Invalidate, чтобы обновить счётчик узла группы (static text)
-    Result := [
-      uifXInvalidateNode,  // Execution flags
-      uifUInvalidateNode]; // Undo flags
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4913,13 +5136,6 @@ var
         PhoA.RemoveUnlinkedPics(FOperations);
       end;
     end;
-  end;
-
-  function TPhoaMultiOp_PicOperation.GetInvalidationFlags: TUndoInvalidationFlags;
-  begin
-    Result := [
-      uifXInvalidateTree,  // Execution flags
-      uifUInvalidateTree]; // Undo flags
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5016,13 +5232,6 @@ var
      // Выполняем операцию
     TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, TargetGroup, aSelPicIDs);
     if not bCopy then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, SourceGroup, aSelPicIDs);
-  end;
-
-  function TPhoaMultiOp_PicDragAndDropToGroup.GetInvalidationFlags: TUndoInvalidationFlags;
-  begin
-    Result := [
-      uifXInvalidateTree,  // Execution flags
-      uifUInvalidateTree]; // Undo flags
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5375,7 +5584,7 @@ var
       if FBorderStyle=bsSingle then
         if NewStyleControls and Ctl3D then begin
           Style := Style and not WS_BORDER;
-          ExStyle := ExStyle or WS_EX_CLIENTEDGE; 
+          ExStyle := ExStyle or WS_EX_CLIENTEDGE;
         end else
           Style := Style or WS_BORDER;
     end;
@@ -5406,7 +5615,7 @@ var
 
   procedure TThumbnailViewer.DoSelectionChange;
   begin
-    if Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
+    if (FUpdateLock=0) and Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
   end;
 
   procedure TThumbnailViewer.DoStartViewMode;
@@ -5537,6 +5746,7 @@ var
       Perform(WM_SETREDRAW, 1, 0);
       CalcLayout;
       Refresh;
+      DoSelectionChange;
     end;
   end;
 
@@ -6021,6 +6231,41 @@ var
     if FSelIndexes.Remove(Index)>=0 then InvalidateItem(Index);
   end;
 
+  procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopIndex: Integer);
+  var i, iItemIdx: Integer;
+  begin
+    ClearSelection;
+     // Добавляем в выделение изображения с заданными ID
+    if SelectedIDs<>nil then
+      for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicLinks.IndexOfID(SelectedIDs[i]));
+     // Если нет выделения, выделяем первое изображение (если оно есть)
+    if FSelIndexes.Count=0 then AddToSelection(0);
+     // Находим сфокусированное изображение
+    if iFocusedID>0 then iItemIdx := FPicLinks.IndexOfID(iFocusedID) else iItemIdx := -1;
+     // Если так и не нашлось
+    if iItemIdx<0 then
+       // Фокусируем последнее из выделенных, если они есть
+      if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[FSelIndexes.Count-1]
+       // Иначе пытаемся выделить самое первое изображение, если оно есть
+      else if FPicLinks.Count>0 then iItemIdx := 0;
+    TopIndex := iTopIndex;
+    MoveItemIndex(iItemIdx, True);
+    DoSelectionChange;
+  end;
+
+  procedure TThumbnailViewer.SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopIndex: Integer);
+  var i: Integer;
+  begin
+    iFocusedID := 0;
+    if FSelIndexes.Count>0 then begin
+      SelectedIDs := TIntegerList.Create(False);
+      for i := 0 to FSelIndexes.Count-1 do SelectedIDs.Add(SelectedPics[i].ID);
+      if FItemIndex>=0 then iFocusedID := FPicLinks[FItemIndex].ID;
+    end else
+      SelectedIDs := nil;
+    iTopIndex := FTopIndex;
+  end;
+
   procedure TThumbnailViewer.ScrollIntoView;
   begin
     if FItemIndex>=0 then
@@ -6076,60 +6321,6 @@ var
     end;
   end;
 
-  procedure TThumbnailViewer.SetCurrentGroup(Group: TPhoaGroup);
-  var
-    i, iPrevGroupID, iFocusedID, iItemIdx: Integer;
-    SelectedIDs: TIntegerList;
-  begin
-    BeginUpdate;
-    try
-       // Сохраняем прежний GroupID
-      iPrevGroupID := FGroupID;
-       // Если группа не поменялась и есть выделение, запоминаем ID выделенных изображений
-      iFocusedID := 0;
-      if (iPrevGroupID=FGroupID) and (FSelIndexes.Count>0) then begin
-        SelectedIDs := TIntegerList.Create(False);
-        for i := 0 to FSelIndexes.Count-1 do SelectedIDs.Add(SelectedPics[i].ID);
-        if FItemIndex>=0 then iFocusedID := FPicLinks[FItemIndex].ID;
-      end else
-        SelectedIDs := nil;
-      try
-         // Находим новый GroupID
-        if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
-         // Копируем ссылки на изображения по их IDs из группы
-        FPicLinks.AddFromGroup(FPhoA, Group, True);
-         // Стираем кэш эскизов
-        LimitCacheSize(0);
-         // Стираем выделение
-        ClearSelection;
-         // Если группа поменялась - скроллим в начало
-        if iPrevGroupID<>FGroupID then
-          FTopIndex := 0
-         // Иначе - добавляем в выделение сохранённые изображения
-        else if SelectedIDs<>nil then
-          for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicLinks.IndexOfID(SelectedIDs[i]));
-      finally
-        SelectedIDs.Free;
-      end;
-       // Если нет выделения, выделяем первое изображение (если оно есть)
-      if FSelIndexes.Count=0 then AddToSelection(0);
-       // Находим сфокусированное изображение
-      if iFocusedID>0 then iItemIdx := FPicLinks.IndexOfID(iFocusedID) else iItemIdx := -1;
-       // Если так и не нашлось
-      if iItemIdx<0 then
-         // Фокусируем последнее из выделенных, если они есть
-        if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[FSelIndexes.Count-1]
-         // Иначе пытаемся выделить самое первое изображение, если оно есть
-        else if FPicLinks.Count>0 then iItemIdx := 0;
-      MoveItemIndex(iItemIdx, True);  
-    finally
-       // Пересчитываем layout, validate TopIndex, обновляем
-      EndUpdate;
-    end;
-     // Уведомляем
-    DoSelectionChange;
-  end;
-
   procedure TThumbnailViewer.SetDisplayMode(Value: TThumbViewerDisplayMode);
   begin
     if FDisplayMode<>Value then begin
@@ -6155,7 +6346,7 @@ var
       if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := nil;
       FPhoA := Value;
       if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := PhoaThumbDimensionsChanged;
-      SetCurrentGroup(nil);
+      ViewGroup(nil);
     end;
   end;
 
@@ -6242,6 +6433,30 @@ var
       nPos   := FTopIndex;
     end;
     SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
+  end;
+
+  procedure TThumbnailViewer.ViewGroup(Group: TPhoaGroup);
+  var iItemIdx: Integer;
+  begin
+    BeginUpdate;
+    try
+       // Находим новый GroupID
+      if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
+       // Копируем ссылки на изображения по их IDs из группы
+      FPicLinks.AddFromGroup(FPhoA, Group, True);
+       // Стираем кэш эскизов
+      LimitCacheSize(0);
+       // Стираем выделение
+      ClearSelection;
+      FTopIndex := 0;
+       // Выделяем первое изображение (если оно есть)
+      AddToSelection(0);
+      if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[0] else iItemIdx := -1;
+      MoveItemIndex(iItemIdx, True);
+    finally
+       // Пересчитываем layout, validate TopIndex, обновляем, уведомляем об изменении выделения
+      EndUpdate;
+    end;
   end;
 
   procedure TThumbnailViewer.WMContextMenu(var Msg: TWMContextMenu);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.19 2004-06-15 14:01:13 dale Exp $
+//  $Id: ufImgView.pas,v 1.20 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -625,8 +625,15 @@ uses
   end;
 
   procedure TfImgView.aaStoreTransform(Sender: TObject);
+  var Operation: TPhoaOperation;
   begin
-    fMain.PerformOperation(TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips));
+    Operation := nil;
+    fMain.BeginOperation;
+    try
+      Operation := TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips);
+    finally
+      fMain.EndOperation(Operation);
+    end;
     EnableActions;
   end;
 

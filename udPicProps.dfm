@@ -1,6 +1,6 @@
 inherited dPicProps: TdPicProps
   Left = 426
-  Top = 233
+  Top = 211
   Caption = 'Properties: picture'
   ClientHeight = 433
   ClientWidth = 590

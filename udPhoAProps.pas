@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.3 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -51,14 +51,21 @@ uses ConsVars, phUtils, Main;
   end;
 
   procedure TdPhoAProps.ButtonClick_OK;
+  var Operation: TPhoaOperation;
   begin
-    fMain.PerformOperation(TPhoaOp_PhoAEdit.Create(
-      FUndoOperations,
-      FPhoA,
-      eThumbSizeX.AsInteger,
-      eThumbSizeY.AsInteger,
-      tbThumbQuality.Position,
-      mDesc.Lines.Text));
+    Operation := nil;
+    fMain.BeginOperation;
+    try
+      Operation := TPhoaOp_PhoAEdit.Create(
+        FUndoOperations,
+        FPhoA,
+        eThumbSizeX.AsInteger,
+        eThumbSizeY.AsInteger,
+        tbThumbQuality.Position,
+        mDesc.Lines.Text);
+    finally
+      fMain.EndOperation(Operation);
+    end;
     inherited ButtonClick_OK;
   end;
 

@@ -1,6 +1,6 @@
 object PhoaDialog: TPhoaDialog
-  Left = 600
-  Top = 294
+  Left = 601
+  Top = 295
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'PhoaDialog'

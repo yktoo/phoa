@@ -48,8 +48,15 @@ uses ConsVars, phUtils, Main;
    //===================================================================================================================
 
   procedure TdGroupProps.ButtonClick_OK;
+  var Operation: TPhoaOperation;
   begin
-    fMain.PerformOperation(TPhoaOp_GroupEdit.Create(FUndoOperations, FPhoA, FGroup, eText.Text, mDescription.Lines.Text));
+    Operation := nil;
+    fMain.BeginOperation;
+    try
+      Operation := TPhoaOp_GroupEdit.Create(FUndoOperations, FPhoA, FGroup, eText.Text, mDescription.Lines.Text);
+    finally
+      fMain.EndOperation(Operation);
+    end;
     inherited ButtonClick_OK;
   end;
 

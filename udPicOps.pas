@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.4 2004-06-09 12:18:15 dale Exp $
+//  $Id: udPicOps.pas,v 1.5 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -60,16 +60,21 @@ uses phUtils, Main, phSettings;
   end;
 
   procedure TdPicOps.ButtonClick_OK;
+  var Operation: TPhoaOperation;
   begin
-     // Выполняем операцию
-    fMain.PerformOperation(
-      TPhoaMultiOp_PicOperation.Create(
+    Operation := nil;
+    fMain.BeginOperation;
+    try
+      Operation := TPhoaMultiOp_PicOperation.Create(
         FUndoOperations,
         FPhoA,
         FSourceGroup,
         PPhoaGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
         FSelIDs,
-        TPictureOperation(cbOp.ItemIndex)));
+        TPictureOperation(cbOp.ItemIndex))
+    finally
+      fMain.EndOperation(Operation);
+    end;
     inherited ButtonClick_OK;
   end;
 

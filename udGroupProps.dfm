@@ -1,6 +1,6 @@
 inherited dGroupProps: TdGroupProps
-  Left = 446
-  Top = 207
+  Left = 447
+  Top = 208
   ActiveControl = eText
   Caption = 'Properties: Picture group'
   ClientHeight = 209

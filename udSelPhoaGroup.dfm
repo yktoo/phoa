@@ -1,6 +1,6 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
   Left = 543
-  Top = 244
+  Top = 209
   Caption = 'Select picture group'
   ClientHeight = 435
   ClientWidth = 473

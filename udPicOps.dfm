@@ -1,5 +1,5 @@
 inherited dPicOps: TdPicOps
-  Top = 246
+  Top = 211
   ActiveControl = cbOp
   Caption = 'Picture operations'
   ClientHeight = 433

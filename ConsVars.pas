@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.44 2004-06-15 14:01:13 dale Exp $
+//  $Id: ConsVars.pas,v 1.45 2004-06-22 12:59:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -172,14 +172,10 @@ type
     uifXReinitSiblings,      // Переинициализировать соседние с узлом группы операции узлы дерева. Должно быть заполнено Op.ParentGroupAbsIdx
     uifXReinitRecursive,     // При переинициализации (флаги uifXReinitParent и uifXReinitSiblings) действовать рекурсивно
     uifXEditGroup,           // Ввести узел группы Op.GroupAbsIdx в режим редактирования его текста. Должно быть заполнено Op.GroupAbsIdx
-    uifXInvalidateNode,      // Сделать Invalidate узлу группы. Должно быть заполнено Op.GroupAbsIdx
-    uifXInvalidateTree,      // Сделать Invalidate всму контролу дерева групп
      // -- Флаги действий при откате (Undoing)
     uifUReinitAll,           // Переинициализировать все узлы дерева
     uifUReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifUReinitRecursive,     // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
-    uifUInvalidateNode,      // Сделать Invalidate узлу группы. Должно быть заполнено Op.GroupAbsIdx
-    uifUInvalidateTree);     // Сделать Invalidate всему контролу дерева групп
+    uifUReinitRecursive);    // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
 
   TUndoInvalidationFlags = set of TUndoInvalidationFlag;
 

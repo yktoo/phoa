@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.3 2004-05-01 04:03:24 dale Exp $
+//  $Id: udPicProps.pas,v 1.4 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -101,18 +101,22 @@ uses
     i: Integer;
     Operation: TPhoaMultiOp_PicEdit;
   begin
-     // Проверяем последовательно все страницы
-    for i := 0 to FController.Count-1 do
-      if not (FController[i] as TPicPropsDialogPage).CanApply then begin
-        FController.SetVisiblePageID(FController[i].ID, pcmForced);
-        Exit;
-      end;
-     // Создаём операцию отката
-    Operation := TPhoaMultiOp_PicEdit.Create(FUndoOperations, FPhoA);
-     // Применяем последовательно все страницы
-    for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations);
-     // Заставляем главную форму выполнить обновление после операции
-    fMain.PerformOperation(Operation);
+    Operation := nil;
+    fMain.BeginOperation;
+    try
+       // Проверяем последовательно все страницы
+      for i := 0 to FController.Count-1 do
+        if not (FController[i] as TPicPropsDialogPage).CanApply then begin
+          FController.SetVisiblePageID(FController[i].ID, pcmForced);
+          Exit;
+        end;
+       // Создаём операцию отката
+      Operation := TPhoaMultiOp_PicEdit.Create(FUndoOperations, FPhoA);
+       // Применяем последовательно все страницы
+      for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations);
+    finally
+      fMain.EndOperation(Operation);
+    end;
     inherited ButtonClick_OK;
   end;
 

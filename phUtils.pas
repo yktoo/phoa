@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.17 2004-06-11 14:42:22 dale Exp $
+//  $Id: phUtils.pas,v 1.18 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,10 +14,10 @@ uses
   procedure PhoaException(const sMsg: String; const aParams: Array of const);
 
    // Min/max values
-  function Max(i1, i2: Integer): Integer;
-  function Min(i1, i2: Integer): Integer;
-  function MinS(s1, s2: Single): Single;
-  function MaxS(s1, s2: Single): Single;
+  function  Max(i1, i2: Integer): Integer;
+  function  Min(i1, i2: Integer): Integer;
+  function  MinS(s1, s2: Single): Single;
+  function  MaxS(s1, s2: Single): Single;
 
   procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
@@ -26,7 +26,7 @@ uses
    // Преобразование TRect<->Строка вида '1,2,3,4'
   function  RectToStr(const r: TRect): String;
   function  StrToRect(const s: String; const rDefault: TRect): TRect;
-  
+
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
   procedure FontFromStr(Font: TFont; const sFont: String);
@@ -54,6 +54,8 @@ uses
    // Возвращает строку, представляющую собой наиболее длинную совпадающую часть обоих строк. Сравнение ведётся без
    //   учёта регистра
   function  LongestCommonPart(const s1, s2: String): String;
+   // Возвращает путь к каталогу временных файлов Windows
+  function  GetWindowsTempPath: String;
 
   function  iif(b: Boolean; const sTrue, sFalse: String): String; overload;
   function  iif(b: Boolean; iTrue, iFalse: Integer): Integer;     overload;
@@ -419,6 +421,13 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
       Result := Result+s1[i];
       Inc(i);
     end;
+  end;
+
+  function GetWindowsTempPath: String;
+  var aBuf: Array[0..MAX_PATH] of Char;
+  begin
+    GetTempPath(MAX_PATH, aBuf);
+    Result := IncludeTrailingPathDelimiter(aBuf);
   end;
 
   function iif(b: Boolean; const sTrue, sFalse: String): String;

@@ -1,6 +1,6 @@
 object dMsgBox: TdMsgBox
-  Left = 491
-  Top = 465
+  Left = 492
+  Top = 466
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = '<>'

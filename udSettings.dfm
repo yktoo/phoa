@@ -1,6 +1,6 @@
 inherited dSettings: TdSettings
   Left = 384
-  Top = 244
+  Top = 209
   Caption = 'Program settings'
   ClientHeight = 435
   ClientWidth = 632

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.7 2004-06-14 10:32:01 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.8 2004-06-22 12:59:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -148,8 +148,8 @@ type
     property AddedPic: TPhoaPic read FAddedPic;
   end;
 
-   // Показывает мастер выбора списка файлов. Возвращает True, если что-то в фотоальбоме было изменено
-  function SelectFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
+   // Показывает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
+  function AddFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -158,7 +158,7 @@ uses
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
   phPhoa, phSettings;
 
-  function SelectFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try
@@ -434,7 +434,7 @@ uses
     FFileList.Free;
     FLog.Free;
      // Если есть операция, уведомляем главную форму
-    if FOperation<>nil then fMain.PerformOperation(FOperation);
+    if FOperation<>nil then fMain.EndOperation(FOperation);
     inherited FinalizeWizard;
   end;
 
@@ -608,7 +608,10 @@ uses
      // Создаём протокол
     if FLog=nil then FLog := TStringList.Create;
      // Создаём операцию, если она ещё не создана
-    if FOperation=nil then FOperation := TPhoaMultiOp_PicAdd.Create(FUndoOperations, FPhoA);
+    if FOperation=nil then begin
+      fMain.BeginOperation;
+      FOperation := TPhoaMultiOp_PicAdd.Create(FUndoOperations, FPhoA);
+    end;
      // Удаляем неотмеченные файлы
     FFileList.DeleteUnchecked;
      // Запоминаем исходное количество файлов
