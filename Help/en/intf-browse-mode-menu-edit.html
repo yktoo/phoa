@@ -1,0 +1,32 @@
+<!-- $Id: intf-browse-mode-menu-edit.html,v 1.1 2004-10-30 12:07:01 dale Exp $ -->
+{[%hh_hdr_en:Browse mode menu commands :: Edit menu]}
+
+<p align=justify>This menu gathers photo album editing commands:
+<ul>
+  <li>{[%hh_ii:Undo]} <b>Edit | Undo <i>operation</i></b> menu item rolls back the changes done to the photo album by the indicated (most recent) operation.</li>
+  <li>{[%hh_ii:UndoHistory]} <b>Edit | Undo history</b> submenu contains the changes made list, allowing you to roll back a number of sequential changes at once.</li>
+  <li>{[%hh_ii:Cut]} <b>Edit | Cut</b> menu item removes pictures highlighted and places it into the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>
+     (you can add them later to another picture group).</li>
+  <li>{[%hh_ii:Copy]} Similarly, <b>Edit | Copy</b> menu item copies highlighted pictures to the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>.</li>
+  <li>{[%hh_ii:Paste]} <b>Edit | Paste</b> item adds pictures (if any) from the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a> to the current group.
+      Obviously, you can only add new pictures to a group so all duplicates are skipped. If this is specified in the
+      <a href="setup-dialogs.html">program settings</a>, <b>PhoA</b> notifies you of number of the pictures actually pasted.</li>
+  <li>{[%hh_ii:Edit]} The <i>photo album</i> is the ultimate parent for all the picture groups, and therefore it is the root node of the group tree. The photo
+      album has a text description and it also defines the thumbnail parameters - you can change them in <a href="intf-album-props.html">Photo album
+      properties dialog</a> which appears when you select the <b>Edit | Edit...</b> menu item while photo album node is highlighted.</li>
+  <li>{[%hh_ii:Edit]} A picture group can also be renamed by selecting the <b>Edit | Edit...</b> menu item, but the group node must be highlighted in the tree;
+      alternatively, you can click once on a highlighted group name, or press the <b>F2</b> key. To cancel edit you press the <b>Esc</b> key or
+      the <b>Enter</b> key to apply the new group name.</li>
+  <li>{[%hh_ii:NewGroup]} To add new group you select the <b>Edit | Add group</b> menu item. The group is created as a child to group currently highlighted. When the
+      photo album node is highlighted the group is created in the photo album's root directory. The default group name is &quot;New group&quot;, 
+      you change it by editing it and pressing <b>Enter</b>.</li>
+  <li>{[%hh_ii:Delete]} A group can be deleted by selecting <b>Edit | Delete</b> menu item while folder tree is active.</li>
+  <li>{[%hh_ii:NewPic]} To add pictures to a group you select <b>Edit | Add picture...</b> menu item which invokes <a href="intf-pic-add.html">Add pictures wizard</a>
+      window.</li>
+  <li>{[%hh_ii:Sort]} To arrange (sort) the pictures the <b>Edit | Sort pictures...</b> menu item shows the <a href="intf-sort-pics.html">Sort pictures dialog</a>.</li>
+  <li>{[%hh_ii:SelectAll]} The <b>Edit | Select all</b> highlights all the pictures in the current group.</li>
+  <li>{[%hh_ii:SelectNone]} The <b>Edit | Select none</b> removes the highlighting from all the pictures.</li>
+  <li>{[%hh_ii:ViewMode]} To swith to <a href="intf-view-mode.html">view mode</a> you select the <b>Edit | View</b> menu item or double-click a picture.</li>
+</ul>
+
+{[%hh_ftr_en]}

@@ -69,6 +69,28 @@
 				<param name="Name" value="&Icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring; &igrave;&aring;&iacute;&thorn;">
 				<param name="Local" value="intf-browse-mode-menu.html">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Igrave;&aring;&iacute;&thorn; &quot;&Ocirc;&agrave;&eacute;&euml;&quot;">
+					<param name="Local" value="intf-browse-mode-menu-file.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Igrave;&aring;&iacute;&thorn; &quot;&Iuml;&eth;&agrave;&acirc;&ecirc;&agrave;&quot;">
+					<param name="Local" value="intf-browse-mode-menu-edit.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Igrave;&aring;&iacute;&thorn; &quot;&Acirc;&egrave;&auml;&quot;">
+					<param name="Local" value="intf-browse-mode-menu-view.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Igrave;&aring;&iacute;&thorn; &quot;&Ntilde;&aring;&eth;&acirc;&egrave;&ntilde;&quot;">
+					<param name="Local" value="intf-browse-mode-menu-tools.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Igrave;&aring;&iacute;&thorn; &quot;&Ntilde;&iuml;&eth;&agrave;&acirc;&ecirc;&agrave;&quot;">
+					<param name="Local" value="intf-browse-mode-menu-help.html">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Dstrok;&agrave;&aacute;&icirc;&ograve;&agrave; &acirc; &eth;&aring;&aelig;&egrave;&igrave;&aring; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave;">
 				<param name="Local" value="intf-browse-mode-tasks.html">

@@ -1,4 +1,4 @@
-<!-- $Id: rev-history.html,v 1.19 2004-06-15 14:01:13 dale Exp $ -->
+<!-- $Id: rev-history.html,v 1.20 2004-10-30 12:07:01 dale Exp $ -->
 {[%hh_hdr_en:Revision History]}
 
 <p align=justify>This document summarizes the differences between versions of <b>PhoA</b> in reverse chronological order.
@@ -12,12 +12,31 @@
   <td nowrap><b>PhoA 1.1.6 beta</b><br>[xxx xx, 2004]</td>
   <td>
     <ul>
+      <li>Completely reworked program localization mechanism. All you need to do to add a new interface language is place
+          a transaltion file into the Language folder. The translation file itself is a plain text one, accessible with
+          any text editor; but you are strongly recommended to use <b>DKLang Translation Editor</b> (available on the
+          site) for this purpose since it provides a number of additional, translation-specific features.</li>
+      <li>About 80% rewrite of internal program design. This might affect the number of bugs ;)</li>
+      <li>Undo data are now stored to the disk, not to memory. This allowed to increase the default undo buffer size to 100
+          operations.</li>
+      <li>Thumbnail window: smooth scrolling; <b>Ctrl+Arrows/PgUp/PgDn/Home/End</b> now moves the focus leaving the selection
+          intact; <b>Shift+Alt+Arrows/PgUp/PgDn/Home/End</b> creates rectangular selection; <b>Space/Ctrl+Space</b> toggles
+          focused thumbnail selection; <b>Ctrl+Mouse wheel</b> scrolls one screen per detent.</li>
+      <li>Enabled file drag'n'drop into the group tree.</li>
+      <li>New resampling filters: <b>Draft</b> (more precise than Nearest neighbor but significantly faster than Bilinear/Bicubic)
+          and <b>Cosine</b>.</li>
+      <li>Additional thumbnail appearance settings: thumbnail background border style and color.</li>
+      <li>A possibility of Picture properties dialog default page selection.</li>
+      <li>A possibility of picture data editing while a view is active.</li>
+      <li>Thumbnail caching in the Browse mode is no longer pertinent. Things showed it caused big problems under Win9x.</li>
       <!--li>File operations wizard: <b>Repairing file links for selected pictures</b> allows to repair &quot;lost&quot; file links caused by
           physically relocated files. The program searches matched files by their name and/or size. Also option for removing unrepaired pictures
           is present.</li-->
-      <li>Pressing the <b>Enter</b> key in the Browse mode when thumbnail window is active starts viewing of the current picture.</li>
-      <li>Pressing the <b>Enter</b> key in the View mode exits back to the Browse mode provided the last viewed picture is selected in the thumbnails
-          window.</li>
+      <li>Pressing the <b>Enter</b> key in the Browse mode when thumbnail window is active starts viewing of the current picture.
+          Pressing <b>Shift+Ctrl+Enter</b> enters the View mode and starts slide show.</li>
+      <li>Pressing the <b>Enter</b> key in the View mode exits back to the Browse mode provided the last viewed picture is selected
+          in the thumbnails window.</li>
+      <li>Tons of minor fixes.</li>
     </ul>
   </td>
 </tr>
