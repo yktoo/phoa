@@ -1,0 +1,345 @@
+<!-- $Id: info-filter-expr.html,v 1.1 2004-12-05 16:17:50 dale Exp $ -->
+{[%hh_hdr_en:Picture filter expressions]}
+
+<p align=justify>Picture filter expressions are used for <a href="intf-search-expr.html">expression search</a> and allow
+  to specify search criteria of an arbitrary complexity using special language similar to modern programming languages.
+
+{[%hh_h2:Filter expression language description]}
+<p align=justify>Filter expression language is <b>case-insensitive</b>; filter expression can be of arbitrary length
+  and can occupy an arbitrary number of lines.
+<p align=justify>Filter expression must return a <i>logical</i> (or <i>boolean</i>) <i>value</i>: <i>True</i> or
+  <i>False</i>. If an expression evaluates to <i>True</i>, the picture is assumed matching the filter; otherwise it is
+  discarded.
+<p align=justify>Filter expression is written using the following elements: <a href=#pic_props>picture properties</a>,
+  <a href=#operators>operators</a>, <a href=#parens>parentheses</a>, <a href=#consts>constants</a>,
+  <a href=#comments>comments</a>.
+
+<a name=pic_props></a>{[%hh_h2:Picture properties]}
+<p align=justify>Picture properties are always start with <b>$</b> symbol and correspond to actual
+  <a href="general-pic-data.html">picture data</a> which are replaced for them during the filtering (or search):
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Name</td>
+    <td nowrap>Data type</td>
+    <td nowrap>Property</td>
+  </tr>
+  <tr>
+    <td class=command>$ID</td>
+    <td>Integer</td>
+    <td>Picture ID (an unique identifier of the picture)</td>
+  </tr>
+  <tr>
+    <td class=command>$FileName</td>
+    <td>String</td>
+    <td>Picture file name</td>
+  </tr>
+  <tr>
+    <td class=command>$FullFileName</td>
+    <td>String</td>
+    <td>Picture file name with full path</td>
+  </tr>
+  <tr>
+    <td class=command>$FilePath</td>
+    <td>String</td>
+    <td>Picture file path</td>
+  </tr>
+  <tr>
+    <td class=command>$FileSize</td>
+    <td>String</td>
+    <td>Picture file size</td>
+  </tr>
+  <tr>
+    <td class=command>$FileSizeBytes</td>
+    <td>Integer</td>
+    <td>Picture file size in bytes</td>
+  </tr>
+  <tr>
+    <td class=command>$PicWidth</td>
+    <td>Integer</td>
+    <td>Picture width in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$PicHeight</td>
+    <td>Integer</td>
+    <td>Picture height in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$PicDims</td>
+    <td>Size (dimensions)</td>
+    <td>Picture dimensions in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbWidth</td>
+    <td>Integer</td>
+    <td>Thumbnail image width in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbHeight</td>
+    <td>Integer</td>
+    <td>Thumbnail image height in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbDims</td>
+    <td>Size (dimensions)</td>
+    <td>Thumbnail image dimensions in pixels</td>
+  </tr>
+  <tr>
+    <td class=command>$Format</td>
+    <td>Pixel Format</td>
+    <td>Image pixel format</td>
+  </tr>
+  <tr>
+    <td class=command>$Date</td>
+    <td>Date</td>
+    <td>Date</td>
+  </tr>
+  <tr>
+    <td class=command>$Time</td>
+    <td>Time</td>
+    <td>Time</td>
+  </tr>
+  <tr>
+    <td class=command>$Place</td>
+    <td>String</td>
+    <td>Place</td>
+  </tr>
+  <tr>
+    <td class=command>$FilmNumber</td>
+    <td>String</td>
+    <td>Film number or name</td>
+  </tr>
+  <tr>
+    <td class=command>$FrameNumber</td>
+    <td>String</td>
+    <td>Frame number</td>
+  </tr>
+  <tr>
+    <td class=command>$Author</td>
+    <td>String</td>
+    <td>Author</td>
+  </tr>
+  <tr>
+    <td class=command>$Description</td>
+    <td>String</td>
+    <td>Description</td>
+  </tr>
+  <tr>
+    <td class=command>$Notes</td>
+    <td>String</td>
+    <td>Notes</td>
+  </tr>
+  <tr>
+    <td class=command>$Media</td>
+    <td>String</td>
+    <td>Media name or code</td>
+  </tr>
+  <tr>
+    <td class=command>$Keywords</td>
+    <td>String List</td>
+    <td>Picture keywords</td>
+  </tr>
+  <tr>
+    <td class=command>$Rotation</td>
+    <td>Rotation</td>
+    <td>Picture rotation</td>
+  </tr>
+  <tr>
+    <td class=command>$Flips</td>
+    <td>Flips</td>
+    <td>Picture flips</td>
+  </tr>
+</table>
+
+<a name=operators></a>{[%hh_h2:Operators]}
+<p align=justify>Operators can be of the two types:
+<ul>
+  <li><b>Unary operators</b> are operators having single operand placed on the right side of it.<br>
+      Examples: <i>not</i>, <i>isEmpty</i>.</li>
+  <li><b>Binary operators</b> are operators having two operands on left and right sides of it.<br>
+      Examples: <i>and</i>, <i>contains</i>, <i>&gt;</i>.</li>
+</ul>
+<p align=justify>Operators can be applied only to operands which are of a datatype compatible with the given operator.
+
+<p align=justify>Current program version implements the following operators:
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td width=15% nowrap>Name</td>
+    <td width=15% nowrap>Type</td>
+    <td width=20% nowrap>Syntax</td>
+    <td width=50% nowrap>Description and examples</td>
+  </tr>
+  <tr>
+    <td class=command>and</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i> <b>and</b> <i>expression2</i></span></td>
+    <td>Logical <b>AND</b>. Returns <i>True</i> only if both <i>expression1</i> and <i>expression2</i> are <i>True</i>;
+        otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Author='John Smith' <b>and</b> $Date&gt;'Apr 01, 2001'</span></td>
+  </tr>
+  <tr>
+    <td class=command>or</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i> <b>or</b> <i>expression2</i></span></td>
+    <td>Logical <b>OR</b>. Returns <i>True</i> if any of <i>expression1</i> or <i>expression2</i> is <i>True</i>;
+        otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Place <b>contains</b> 'dom' <b>or</b> $Description='freedom'</span></td>
+  </tr>
+  <tr>
+    <td class=command>not</td>
+    <td>Unary</td>
+    <td><span class=fp><b>not</b> <i>expression</i></span></td>
+    <td>Logical negation. If <i>expression</i> is <i>True</i> returns <i>False</i> and vice versa.<br>
+        Example:<br>
+        <span class=fp><b>not</b> ('parrot' <b>in</b> $Keywords)</span></td>
+  </tr>
+  <tr>
+    <td class=command>in</td>
+    <td>Binary</td>
+    <td><span class=fp><i>element</i> <b>in</b> <i>list</i></span></td>
+    <td>Checking of existence of an element in a list. Returns <i>True</i> if <i>element</i> is in the <i>list</i>; 
+        otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>'parrot' <b>in</b> $Keywords</span></td>
+  </tr>
+  <tr>
+    <td class=command>startsWith</td>
+    <td>Binary</td>
+    <td><span class=fp><i>string</i> <b>startsWith</b> <i>substring</i></span></td>
+    <td>Returns <i>True</i> if <i>string</i> starts with <i>substring</i>; otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Place <b>startsWith</b> 'city'</span></td>
+  </tr>
+  <tr>
+    <td class=command>endsWith</td>
+    <td>Binary</td>
+    <td><span class=fp><i>string</i> <b>endsWith</b> <i>substring</i></span></td>
+    <td>Returns <i>True</i> if <i>string</i> ends with <i>substring</i>; otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Place <b>endsWith</b> 'dom'</span></td>
+  </tr>
+  <tr>
+    <td class=command>contains</td>
+    <td>Binary</td>
+    <td><span class=fp><i>string</i> <b>contains</b> <i>substring</i></span></td>
+    <td>Returns <i>True</i> if <i>string</i> contains <i>substring</i>; otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Description <b>contains</b> 'crocodile'</span></td>
+  </tr>
+  <tr>
+    <td class=command>isEmpty</td>
+    <td>Unary</td>
+    <td><span class=fp><b>isEmpty</b> <i>list</i></span></td>
+    <td>Returns <i>True</i> if <i>list</i> is empty (contains no elements); otherwise returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp><b>isEmpty</b> $Keywords</span></td>
+  </tr>
+  <tr>
+    <td class=command>=</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>=<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is equal to <i>expression2</i> value; otherwise returns
+        <i>False</i><br>
+        Example:<br>
+        <span class=fp>$PicWidth=1024</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;&gt;</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>&lt;&gt;<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is <b>not</b> equal to <i>expression2</i> value; otherwise
+        returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$Notes&lt;&gt;''</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>&lt;<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is less than <i>expression2</i> value; otherwise returns
+        <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$ThumbWidth&lt;$ThumbHeight</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;=</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>&lt;=<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is less than or equal to <i>expression2</i> value; otherwise
+        returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$ThumbWidth&lt;=100</span></td>
+  </tr>
+  <tr>
+    <td class=command>&gt;</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>&gt;<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is greater than <i>expression2</i> value; otherwise returns
+        <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$ThumbWidth&gt;$ThumbHeight</span></td>
+  </tr>
+  <tr>
+    <td class=command>&gt;=</td>
+    <td>Binary</td>
+    <td><span class=fp><i>expression1</i>&gt;=<i>expression2</i></span></td>
+    <td>Returns <i>True</i> if <i>expression1</i> value is greater than or equal to <i>expression2</i> value; otherwise
+        returns <i>False</i>.<br>
+        Example:<br>
+        <span class=fp>$ThumbWidth&gt;=100</span></td>
+  </tr>
+</table>
+
+<a name=parens></a>{[%hh_h2:Parentheses]}
+<p align=justify>Parentheses are used for grouping parts of the expression, or to change the evaluation order. Expressions
+  can contain only round brackets: <b>(</b> and <b>)</b>. Example:<br>
+  <span class=fp><b>not</b> (<b>isEmpty</b> $Keywords <b>or</b> ($Author <b>startsWith</b> 'John') <b>or</b>
+    ($Description='' <b>and</b> $PicWidth=$PicHeight))</span>                                              
+
+<a name=consts></a>{[%hh_h2:Constants]}
+<p align=justify>Constants in the expressions can be of the following types:
+<ul>
+  <li><b>Integer constants</b> contain digits <b>0...9</b> and an optional &quot;minus&quot; (<b>-</b>) sign.
+      Example:<br>
+      <span class=fp>-123</span></li>
+  <li><b>Real constants</b> contain digits <b>0...9</b>, symbol <b>-</b> and a decimal point (<b>.</b>).
+      Example:<br>
+      <span class=fp>-123.45</span></li>
+  <li><b>String constants</b> or <b>literals</b> are enclosed with single quotes (<b>'</b>) and can contain any
+      characters. If you need to insert a single quote inside a literal, you should double it.
+      Example:<br>
+      <span class=fp>'Mary had a little lamb'</span><br>
+      <span class=fp>'Don''t get me wrong'</span><br></li>
+  <li><b>Date constants</b> are written in the same way as literals but their format must conform to the current
+      regional settings of your system. Example:<br>
+      <span class=fp>'Jul 25, 2003'</span></li>
+  <li><b>Time constants</b> are written in the same way as literals but using format &quot;Hours:Minutes&quot; or
+      &quot;Hours:Minutes:Seconds&quot;. Example:<br>
+      <span class=fp>'12:00:03'</span></li>
+</ul>
+
+<a name=comments></a>{[%hh_h2:Comments]}
+<p align=justify>Comments are ignored when expression is parsed. They are used for describing and explaining expression
+  blocks or to temporarily &quot;disconnect&quot; an expression block. The following comment kinds are supported:
+<ul>
+  <li>Stream comment <b>{comment}</b>: all the symbols starting with first occurence of <b>{</b> and ending with first 
+      occurence of <b>}</b> are considered to be a comment. Example:<br>
+      <span class=fp>$Date&gt;'01.01.1914' { my grandma birth-date } <b>or</b>
+      $Author&lt;&gt;'grandma'</span>
+  </li>
+  <li>Line comment <b>//comment</b>: all the symbols from <b>//</b> up to line end are considered to be a comment.
+      Example:<br>
+      <span class=fp>$Date&gt;'01.01.1914' // my grandma birth-date<br>
+      <b>or</b> $Time&lt;'08:00'</span>
+  </li>
+</ul>
+
+{[%hh_seealso_en]}
+  <a href="intf-search.html">Find pictures</a><br>
+  <a href="intf-search-simple.html">Find pictures :: Simple search</a><br>
+  <a href="intf-search-expr.html">Find pictures :: Expression search</a><br>
+  <a href="general-pic-data.html">Picture data</a><br>
+
+{[%hh_ftr_en]}

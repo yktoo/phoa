@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.82 2004-11-25 20:42:59 dale Exp $
+//  $Id: ConsVars.pas,v 1.83 2004-12-05 16:17:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -566,6 +566,7 @@ const
   IDH_info_cmd_line               = 02010;
   IDH_info_faq                    = 02020;
   IDH_info_file_masks             = 02030;
+  IDH_info_filter_expr            = 02035;
   IDH_info_metadata               = 02040;
   IDH_info_pic_prop_autofill      = 02050;
   IDH_info_resampling             = 02060;

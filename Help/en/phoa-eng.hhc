@@ -370,6 +370,10 @@
 			<param name="Local" value="info-file-masks.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Picture filter expressions">
+			<param name="Local" value="info-filter-expr.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Tools">
 			<param name="Local" value="info-tools.html">
 			</OBJECT>

@@ -12,6 +12,7 @@ IDH_general_thumbnails          = general-thumbnails.html
 IDH_info_cmd_line               = info-cmd-line.html
 IDH_info_faq                    = info-faq.html
 IDH_info_file_masks             = info-file-masks.html
+IDH_info_filter_expr            = info-filter-expr.html
 IDH_info_metadata               = info-metadata.html
 IDH_info_pic_prop_autofill      = info-pic-prop-autofill.html
 IDH_info_resampling             = info-resampling.html

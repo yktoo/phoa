@@ -1,0 +1,351 @@
+<!-- $Id: info-filter-expr.html,v 1.1 2004-12-05 16:17:50 dale Exp $ -->
+{[%hh_hdr_ru:Выражения фильтра изображений]}
+
+<p align=justify>Выражения фильтра изображений используются при <a href="intf-search-expr.html">поиске изображений по
+  выражению</a> и позволяют задавать сколь угодно сложные критерии поиска на специальном языке, чем-то напоминающем
+  современные языки программирования.
+
+{[%hh_h2:Описание языка выражений фильтра]}
+<p align=justify>Язык выражений фильтра является <b>регистронезависимым</b>; выражение фильтра может быть сколь
+  угодно большим и занимать любое количество строк.
+<p align=justify>Выражение фильтра должно возвращать <i>логическое значение</i>: <i>Истина</i> или <i>Ложь</i>. Если
+  результатом его вычисления будет <i>Истина</i>, то изображение считается подходящим и проходит через фильтр; иначе оно
+  пропускается.
+<p align=justify>Выражение фильтра составляется из следующих элементов: <a href=#pic_props>свойств изображений</a>,
+  <a href=#operators>операторов</a>, <a href=#parens>скобок</a>, <a href=#consts>констант</a>,
+  <a href=#comments>комментариев</a>.
+
+<a name=pic_props></a>{[%hh_h2:Свойства изображений]}
+<p align=justify>Свойства изображений всегда начинаются с символа <b>$</b> и соответствуют реальным
+  <a href="general-pic-data.html">данным изображений</a>, подставляемым в процессе фильтрации (или поиска):
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Имя</td>
+    <td nowrap>Тип данных</td>
+    <td nowrap>Свойство</td>
+  </tr>
+  <tr>
+    <td class=command>$ID</td>
+    <td>Integer (целое число)</td>
+    <td>ID (уникальный идентификатор) изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$FileName</td>
+    <td>String (строка)</td>
+    <td>Имя файла изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$FullFileName</td>
+    <td>String (строка)</td>
+    <td>Имя и путь к файлу изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$FilePath</td>
+    <td>String (строка)</td>
+    <td>Путь к файлу изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$FileSize</td>
+    <td>String (строка)</td>
+    <td>Размер файла изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$FileSizeBytes</td>
+    <td>Integer (целое число)</td>
+    <td>Размер файла изображения в байтах</td>
+  </tr>
+  <tr>
+    <td class=command>$PicWidth</td>
+    <td>Integer (целое число)</td>
+    <td>Ширина изображения в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$PicHeight</td>
+    <td>Integer (целое число)</td>
+    <td>Высота изображения в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$PicDims</td>
+    <td>Size (размеры)</td>
+    <td>Размеры изображения в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbWidth</td>
+    <td>Integer (целое число)</td>
+    <td>Ширина изображения эскиза в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbHeight</td>
+    <td>Integer (целое число)</td>
+    <td>Высота изображения эскиза в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$ThumbDims</td>
+    <td>Size (размеры)</td>
+    <td>Размеры изображения эскиза в пикселах</td>
+  </tr>
+  <tr>
+    <td class=command>$Format</td>
+    <td>Pixel Format (пиксельный формат)</td>
+    <td>Пиксельный формат изображения</td>
+  </tr>
+  <tr>
+    <td class=command>$Date</td>
+    <td>Date (дата)</td>
+    <td>Дата</td>
+  </tr>
+  <tr>
+    <td class=command>$Time</td>
+    <td>Time (время)</td>
+    <td>Время</td>
+  </tr>
+  <tr>
+    <td class=command>$Place</td>
+    <td>String (строка)</td>
+    <td>Место</td>
+  </tr>
+  <tr>
+    <td class=command>$FilmNumber</td>
+    <td>String (строка)</td>
+    <td>Номер/название плёнки</td>
+  </tr>
+  <tr>
+    <td class=command>$FrameNumber</td>
+    <td>String (строка)</td>
+    <td>Номер кадра</td>
+  </tr>
+  <tr>
+    <td class=command>$Author</td>
+    <td>String (строка)</td>
+    <td>Автор</td>
+  </tr>
+  <tr>
+    <td class=command>$Description</td>
+    <td>String (строка)</td>
+    <td>Описание</td>
+  </tr>
+  <tr>
+    <td class=command>$Notes</td>
+    <td>String (строка)</td>
+    <td>Примечание</td>
+  </tr>
+  <tr>
+    <td class=command>$Media</td>
+    <td>String (строка)</td>
+    <td>Имя/код носителя</td>
+  </tr>
+  <tr>
+    <td class=command>$Keywords</td>
+    <td>String List (список строк)</td>
+    <td>Ключевые слова</td>
+  </tr>
+  <tr>
+    <td class=command>$Rotation</td>
+    <td>Rotation (поворот)</td>
+    <td>Поворот</td>
+  </tr>
+  <tr>
+    <td class=command>$Flips</td>
+    <td>Flips (отражения)</td>
+    <td>Отражения</td>
+  </tr>
+</table>
+
+<a name=operators></a>{[%hh_h2:Операторы]}
+<p align=justify>Операторы бывают двух видов:
+<ul>
+  <li><b>Унарные операторы</b> &mdash; это операторы, имеющие один операнд, расположенный справа от него.<br>
+      Примеры: <i>not</i>, <i>isEmpty</i>.</li>
+  <li><b>Бинарные операторы</b> &mdash; операторы, имеющие два операнда слева и справа от него.<br>
+      Примеры: <i>and</i>, <i>contains</i>, <i>&gt;</i>.</li>
+</ul>
+<p align=justify>Операторы могут применяться только к операндам, имеющим определённый тип данных, зависящий от
+  конкретного оператора.
+
+<p align=justify>В текущей версии программы реализованы следующие операторы:
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td width=15% nowrap>Имя</td>
+    <td width=15% nowrap>Тип</td>
+    <td width=20% nowrap>Синтаксис</td>
+    <td width=50% nowrap>Описание и примеры</td>
+  </tr>
+  <tr>
+    <td class=command>and</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i> <b>and</b> <i>expression2</i></span></td>
+    <td>Логическое <b>И</b>. Возвращает значение <i>Истина</i>, если оба выражения <i>expression1</i> и
+        <i>expression2</i> истинны; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Author='Вася Пупкин' <b>and</b> $Date&gt;'01.04.2001'</span></td>
+  </tr>
+  <tr>
+    <td class=command>or</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i> <b>or</b> <i>expression2</i></span></td>
+    <td>Логическое <b>ИЛИ</b>. Возвращает значение <i>Истина</i>, если любое из выражений <i>expression1</i> или
+        <i>expression2</i> истинно; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Place <b>contains</b> 'сарай' <b>or</b> $Description='Бахчисарай'</span></td>
+  </tr>
+  <tr>
+    <td class=command>not</td>
+    <td>Унарный</td>
+    <td><span class=fp><b>not</b> <i>expression</i></span></td>
+    <td>Логическое отрицание. Если выражение <i>expression</i> истинно, возвращает <i>Ложь</i> и наоборот.<br>
+        Пример:<br>
+        <span class=fp><b>not</b> ('попугай' <b>in</b> $Keywords)</span></td>
+  </tr>
+  <tr>
+    <td class=command>in</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>element</i> <b>in</b> <i>list</i></span></td>
+    <td>Проверка наличия элемента в списке. Возвращает значение <i>Истина</i>, если элемент <i>element</i> присутствует
+        в списке <i>list</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>'попугай' <b>in</b> $Keywords</span></td>
+  </tr>
+  <tr>
+    <td class=command>startsWith</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>string</i> <b>startsWith</b> <i>substring</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если строка <i>string</i> начинается с подстроки <i>substring</i>; иначе
+        возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Place <b>startsWith</b> 'город'</span></td>
+  </tr>
+  <tr>
+    <td class=command>endsWith</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>string</i> <b>endsWith</b> <i>substring</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если строка <i>string</i> оканчивается на подстроку <i>substring</i>; иначе
+        возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Place <b>endsWith</b> 'сарай'</span></td>
+  </tr>
+  <tr>
+    <td class=command>contains</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>string</i> <b>contains</b> <i>substring</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если строка <i>string</i> содержит подстроку <i>substring</i>; иначе
+        возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Description <b>contains</b> 'крокодил'</span></td>
+  </tr>
+  <tr>
+    <td class=command>isEmpty</td>
+    <td>Унарный</td>
+    <td><span class=fp><b>isEmpty</b> <i>list</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если список <i>list</i> пуст (не содержит элементов); иначе возвращает
+        <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp><b>isEmpty</b> $Keywords</span></td>
+  </tr>
+  <tr>
+    <td class=command>=</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>=<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> равно значению выражения
+        <i>expression2</i>; иначе возвращает <i>Ложь</i><br>
+        Пример:<br>
+        <span class=fp>$PicWidth=1024</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;&gt;</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>&lt;&gt;<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> <b>не</b> равно значению выражения
+        <i>expression2</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$Notes&lt;&gt;''</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>&lt;<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> меньше значения выражения
+        <i>expression2</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$ThumbWidth&lt;$ThumbHeight</span></td>
+  </tr>
+  <tr>
+    <td class=command>&lt;=</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>&lt;=<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> меньше или равно значению
+        выражения <i>expression2</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$ThumbWidth&lt;=100</span></td>
+  </tr>
+  <tr>
+    <td class=command>&gt;</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>&gt;<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> больше значения выражения
+        <i>expression2</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$ThumbWidth&gt;$ThumbHeight</span></td>
+  </tr>
+  <tr>
+    <td class=command>&gt;=</td>
+    <td>Бинарный</td>
+    <td><span class=fp><i>expression1</i>&gt;=<i>expression2</i></span></td>
+    <td>Возвращает значение <i>Истина</i>, если значение выражения <i>expression1</i> больше или равно значению
+        выражения <i>expression2</i>; иначе возвращает <i>Ложь</i>.<br>
+        Пример:<br>
+        <span class=fp>$ThumbWidth&gt;=100</span></td>
+  </tr>
+</table>
+
+<a name=parens></a>{[%hh_h2:Скобки]}
+<p align=justify>Скобки служат для группировки отдельных частей выражения и изменения порядка их вычисления. В
+  выражениях могут использоваться только круглые скобки: <b>(</b> и <b>)</b>. Например:<br>
+  <span class=fp><b>not</b> (<b>isEmpty</b> $Keywords <b>or</b> ($Author <b>startsWith</b> 'Вася') <b>or</b>
+    ($Description='' <b>and</b> $PicWidth=$PicHeight))</span>                                              
+
+<a name=consts></a>{[%hh_h2:Константы]}
+<p align=justify>Константы в выражениях могут быть следующих типов:
+<ul>
+  <li><b>Целочисленные константы</b> могут состоять из цифр <b>0...9</b> и знака &quot;минус&quot; (<b>-</b>).
+      Например:<br>
+      <span class=fp>-123</span></li>
+  <li><b>Вещественные константы</b> состоят из цифр <b>0...9</b>, знака <b>-</b> и десятичной точки (<b>.</b>).
+      Например:<br>
+      <span class=fp>-123.45</span></li>
+  <li><b>Строковые константы</b> или <b>литералы</b> заключаются в одинарные кавычки (<b>'</b>) и могут содержать любые
+      символы. Если внутри строки необходимо вставить символ одинарной кавычки, его необходимо продублировать.
+      Например:<br>
+      <span class=fp>'Однажды в студёную'</span><br>
+      <span class=fp>'Don''t get me wrong'</span><br></li>
+  <li><b>Константы даты</b> пишутся так же, как и литералы, но их формат должен совпадать с текущими установками
+      формата даты в системе. Например:<br>
+      <span class=fp>'25.07.2003'</span></li>
+  <li><b>Константы времени</b> пишутся так же, как и литералы, но в формате &quot;Часы:Минуты&quot; или
+      &quot;Часы:Минуты:Секунды&quot;. Например:<br>
+      <span class=fp>'12:00:03'</span></li>
+</ul>
+
+<a name=comments></a>{[%hh_h2:Комментарии]}
+<p align=justify>Коментарии игнорируются при разборе выражения и служат для пояснения отдельных частей выражения или 
+  для временного их &quot;отключения&quot;. Программа поддерживает следующие виды комментариев:
+<ul>
+  <li>Поточный комментарий <b>{comment}</b>: комментарием считаются все символы с первого символа <b>{</b> и до первого
+      символа <b>}</b>. Например:<br>
+      <span class=fp>$Date&gt;'01.01.1914' { это дата рождения моей прабабушки } <b>or</b>
+      $Author&lt;&gt;'бабушка'</span>
+  </li>
+  <li>Строчный комментарий <b>//comment</b>: комментарием считаются все символы, начиная с последовательности
+      <b>//</b> и до конца текущей строки. Например:<br>
+      <span class=fp>$Date&gt;'01.01.1914' // это дата рождения моей прабабушки<br>
+      <b>or</b> $Time&lt;'08:00'</span>
+  </li>
+</ul>
+
+{[%hh_seealso_ru]}
+  <a href="intf-search.html">Поиск изображений</a><br>
+  <a href="intf-search-simple.html">Поиск изображений :: Простой поиск</a><br>
+  <a href="intf-search-expr.html">Поиск изображений :: Поиск по выражению</a><br>
+  <a href="general-pic-data.html">Данные изображений</a><br>
+
+{[%hh_ftr_ru]}

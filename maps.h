@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.12 2004-11-25 20:42:59 dale Exp $
+//  $Id: maps.h,v 1.13 2004-12-05 16:17:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -19,6 +19,7 @@
 #define IDH_info_cmd_line               02010
 #define IDH_info_faq                    02020
 #define IDH_info_file_masks             02030
+#define IDH_info_filter_expr            02035
 #define IDH_info_metadata               02040
 #define IDH_info_pic_prop_autofill      02050
 #define IDH_info_resampling             02060
