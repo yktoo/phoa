@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-22 21:00:42
+LastModified=2004-09-25 13:15:00
 SourceLANGID=1033
 
 [fMain]
@@ -630,8 +630,6 @@ ISettingID_Browse_GT_HintTips=Отображать, если строка не помещается в окне
 ISettingID_Browse_MaxUndoCount=Макс. количество операций в буфере отмены:
 ISettingID_Browse_Viewer=Окно просмотра эскизов
 ISettingID_Browse_ViewerBkColor=Цвет фона:
-ISettingID_Browse_ViewerCacheSze=Размер кэша эскизов (количество эскизов):
-ISettingID_Browse_ViewerCacheThs=Кэшировать эскизы при просмотре
 ISettingID_Browse_ViewerDragDrop=Drag'n'Drop
 ISettingID_Browse_ViewerStchFilt=Метод ресэмплинга эскизов
 ISettingID_Browse_ViewerThBColor=Цвет фона эскиза:
