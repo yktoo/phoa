@@ -1,0 +1,1102 @@
+TargetApplication=Phoa
+Author=Alberto Polizzano
+SourceLANGID=1033
+LANGID=1040
+Generator=DKLang Translation Editor v2.4
+LastModified=2004-12-07 09.27.47
+
+[dAbout]
+00000003=Informazioni
+00000012=OK
+
+[dFileOpsWizard]
+00000003=Procedura guidata operazioni sui file
+00000017=Annulla
+00000020=Avanti >
+00000023=Aiuto
+00000026=< Indietro
+
+[dGroupProps]
+00000003=Prorietà: Gruppo immagini
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&ID:
+00000024=&Testo:
+00000027=&Descrizione:
+
+[dMsgBox]
+00000012=Non mo&strare questo messaggio di nuovo
+
+[dPicOps]
+00000003=Operazioni sulle immagini
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&Gruppo:
+00000024=&Operazione:
+00000029=Muovi le immagini selezionate nel gruppo specificato sotto\nCopia 
+le immagini selezionate nel gruppo specificato sotto\nCancella le immagini 
+selezionate dal gruppo specificato sotto\nLascia solo le immagini 
+selezionate nel gruppo sotto (intersezione)\n
+
+[dPicProps]
+00000003=Prorprietà: immagine
+00000012=Chiudi
+00000015=OK
+00000018=Aiuto
+00000026=Proprietà dei file
+00000030=Vedi && Aggiusta
+00000034=Parole chiave
+00000036=Gruppi
+
+[dProjectProps]
+00000003=Prpietà: Album foto
+00000012=Chiudi
+00000015=OK
+00000018=Aiuto
+00000021=&Descrizione:
+00000024=&Grandezza miniatura (WxH):
+00000030=&Qualità miniatura:
+00000033=più bassa\nmeno grande
+00000036=più alta\npiù grande
+
+[dSearch]
+00000003=trova immagini
+00000012=Annulla
+00000015=Trova
+00000018=Aiuto
+00000021=&Criteri di ricerca:
+00000027=Effettua ricerca
+00000030=Nell'&album
+00000033=Nel &gruppo corrente
+00000036=Nel &risultato della ricerca
+
+[dSelKeywords]
+00000003=Parole chiave selezionate
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&Seleziona una o più parole chiavi dalla lista completa:
+
+[dSelPhoaGroup]
+00000003=Seleziona il gruppo di immagini
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&Gruppo:
+
+[dSettings]
+00000003=Settaggi programma
+00000012=Chiudi
+00000015=OK
+00000018=Aiuto
+
+[dSortPics]
+00000003=Ordina immagini
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000024=Dove ordinare le immagini
+00000027=Nel &gruppo corrente
+00000030=In &tutti i gruppi dell'album
+00000035=&Ordina immagini per:
+00000039=&Proprietà immagini
+00000041=&Cancella
+00000044=Muovi s&u
+00000046=Muovi &giù
+00000047=Proprietà immagine
+00000048=Direzione del sort
+
+[dStats]
+00000003=Statistiche dell'album
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+
+[dToolProps]
+00000003=Proprietà: Strumenti
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&Tipo:
+00000024=&Nome (cattura; usa '&&' per indicare il tasto collegato):
+00000027=&Suggerimento:
+00000030=&Comando (applicazione):
+00000033=&Parametri:
+00000036=&Cartella (lascia vuoto per default):
+00000039=Stato f&inestra:
+00000042=&Maschere file (una maschera vuota include tutti i file):
+00000062=&Visualizza...
+00000073=&Visualizza...
+00000078=Normale\nMinimizzata\nMassimizzata\n
+00000081=Utilizzo Strumenti
+00000084=Mostra nel menu Strumenti
+00000087=Mostra nel menu del riquadro Gruppi Immagini
+00000090=Mostra nel menu del riquadro Finestra miniature
+00000093=Mostra nel menu del riquadro Visualizza
+00000100=Applicazioni (*.bat;*.com;*.exe)|*.bat;*.com;*.exe|Tutti i file 
+(*.*)|*.*
+00000102=Seleziona una applicazione
+
+[dViewProps]
+00000003=Proprietà: vista album
+00000012=Annulla
+00000015=OK
+00000018=Aiuto
+00000021=&Nome:
+00000024=Ordine di raggru&ppamento immagini:
+00000036=&Ordina immagini in ciascun gruppo per:
+00000040=Proprietà immagine
+00000042=Cancella
+00000045=Muovi su
+00000047=Muovi giù
+00000049=Proprietà immagine
+00000051=Cancella
+00000054=Muovi su
+00000056=Muovi giù
+00000057=Proprietà di raggruppamento
+00000058=Non classificate nel proprio folder
+00000059=Proprietà immagine
+00000060=Direzione del sort
+
+[fAddFilesWizard]
+00000003=Procedura guidata aggiunta immagini
+00000017=Annulla
+00000020=Avanti >
+00000023=Aiuto
+00000026=< Indietro
+
+[fImgView]
+00000008=Barra Strumenti principale
+00000129=Modifica
+00000130=&Modifica...
+00000132=Modifica...|Modifica immagine corrente
+00000149=Modifica
+00000150=Impostazione Pro&gramma...
+00000152=Impostazioni programma...|Visualizza/Cambia impostazione programma
+00000162=Corrente/Tutte immagini
+00000165=Transformazioni
+00000168=Avanza
+00000169=Immagine &seguente
+00000171=Immagine seguente|Avanze all'immagine seguente del gruppo
+00000172=Avanza
+00000173=Immagine &precedente
+00000175=Immagine precedente|Ritorna alla precedente immagine del gruppo
+00000176=Avanza
+00000177=U&ltima immagine
+00000179=Ultima immagine|Vai all'ultima immagine del gruppo
+00000180=Avanza
+00000181=&Prima immagine
+00000183=Prima immagine|Vai alla prima immagine del gruppo
+00000184=Ingrandimento
+00000185=&Ingrandisci
+00000187=Ingrandisci|Allarga l'immagine
+00000188=Ingrandimento
+00000189=Riduce
+00000191=Riduce|Riduce l'immagine
+00000192=Ingrandimento
+00000193=Dimensione &reale
+00000195=Dimensione reale|Imposta dimensione 1:1
+00000196=Ingrandimento
+00000197=Adatta allo scher&mo
+00000199=Adatta allo schermo|Imposta la dimensione per farla rientrare nella 
+finestra
+00000200=Visualizza
+00000201=Schermi &intero
+00000203=Schermo intero|Passa alla modalità schermo intero
+00000208=Visualizza
+00000209=&Ricarica
+00000211=Ricarica|Ricarica l'immagine corrente dal file
+00000212=Visualizza
+00000213=&Mostra informazioni
+00000215=Mostra informazioni|Visualizza la descrizione delle immagini
+00000216=Visualizza
+00000217=Ril&oca la barra delle informazioni
+00000219=Cambia la posizione e la grandezza della barra delle informazioni
+00000220=Aiuto
+00000221=Aiuto
+00000225=Chiudi
+00000227=Chiudi|Chiudi la finestra di visualizzazione
+00000228=Strumenti
+00000229=&Nessuna rotazione
+00000231=Nessuna rotazione|Non applica rotazione all'immagine
+00000232=Strumenti
+00000233=Ruota di &90° in senso orario
+00000235=Ruota di &90° in senso orario|Ruota di &90° in senso orario
+00000236=Strumenti
+00000237=Ruota di &180°
+00000239=Ruota di 180°|Ruota l'immagine di 180°
+00000240=Strumenti
+00000241=Ruota di 9&0° in senso antiorario
+00000243=Ruota di 9&0° in senso antiorario|Ruota di 9&0° in senso antiorario 
+(o in senso orario di 270°)
+00000244=Strumenti
+00000245=Metti in &orizzontale
+00000247=Metti in &orizzontale|Mette l'immagine in orizzontale
+00000248=Strumenti
+00000249=Metti in &verticale
+00000251=Metti in verticale|Mette l'immagine in verticale
+00000252=Strumenti
+00000253=Memorizza &transformazioni
+00000255=Memorizza transformazioni|Memorizza le transformazioni applicate 
+all'immagine
+00000271=&Avanti
+00000273=&Indietro
+00000275=&Casuale
+00000277=C&iclico
+00000278=Ciclico|Visualizza le immagini in circolo nella modalità Slide Show
+00000279=Avanti|Imposta la direzione dello show in avanti
+00000280=Indietro|Imposta la direzione dello show a indietro
+00000281=Casuale|Imposta la direzione dello show in modo casuale
+00000282=Menu principale
+00000283=&Immagine
+00000284=In&grandimento
+00000285=&Visualizza
+00000286=Strumenti
+00000287=Aiuto
+00000289=&Transformazioni
+00000290=&Barra Strumenti principale
+00000291=Barra Strumenti principale|Mostra o nasconde la barra Strumenti 
+principale
+00000292=Barra &Transformazioni
+00000293=Barra Trasformazioni|Mostra o nascondi la barra trasformazioni
+00000294=Barra Slide S&how
+00000295=Barra Slide Show|Mostra o nasconde la barra Slide Show
+00000296=&Menu principale
+00000297=Menu principale|Mostra o nasconde il m enu principale
+00000298=Intervallo Slide sho&w:
+00000299=Intervallo Slide show|Intervallo in secondi dello Slide Show
+00000301=&Visualizza
+00000302=Altri bottoni|
+00000303=Altri bottoni|
+00000304=Altri bottoni|
+00000305=Altri bottoni|
+
+[fMain]
+00000008=Barra Strumenti
+00000009=Altri bottoni|
+00000018=Altri bottoni|
+00000024=&Modifica
+00000026=Operazioni a&nnullabili
+00000027=Mostra la lista dei cambiamenti fatti e permette di annullare un 
+numero di azioni
+00000032=&Visualizza
+00000034=&Barra Strumenti
+00000035=Barra Strumenti|Mostra o nasconde la barra Strumenti
+00000036=Barra di &Stato
+00000037=Barra di Stato|Mostra o nasconde la Barra di Stato
+00000039=Strumenti
+00000043=Aiuto
+00000052=Gruppi immagini
+00000061=Visualizza
+00000062=Rimuove i risultati della &ricerca
+00000064=Rimuove i risultati della ricerca|Rimuove i risultati della ricerca 
+dall'albero del gruppo
+00000065=Vista
+00000066=&Nuova vista...
+00000068=Nuova vista...|Crea una nuova vista dell'album
+00000070=&Nuovo
+00000072=Nuovo|Crea un nuovo album
+00000074=&Apri...
+00000076=Apri...|Apre un album esistente
+00000077=Vista
+00000078=&Cancella vista
+00000080=Cancella vista|Cancella la vista corrente dell'album
+00000082=&Salva
+00000084=Salva|Salva l'album corrente sul file
+00000086=Salva &come...
+00000088=Salva come...|Salva il corrente album su un file diverso
+00000090=Sal&va impostazioni correnti su file...
+00000092=Salva impostazioni correnti su file...|Salva impostazioni del 
+programma su un file ti tipo ini
+00000094=&Carica impostazioni da un file...
+00000096=Carica impostazioni da un file...|Carica i Impostazioni da un file 
+di tipo ini
+00000098=E&sci
+00000100=Esci|Esce dal programma
+00000101=Modifica
+00000102=Annulla
+00000104=Annulla|Annulla l'ultima operazione eseguita
+00000105=Modifica
+00000106=Aggiungi &gruppo
+00000108=Aggiungi gruppo|Aggiungi un nuovo gruppo di immagini
+00000109=Modifica
+00000110=Aggiungi &Immagini...
+00000112=Aggiungi immagini...|Apre la procedura guidata che permette di 
+aggiungere immagini al gruppo correntemente selezionato
+00000113=Modifica
+00000114=Cancella
+00000116=Cancella|Cancella gli elementi selezionati
+00000117=Modifica
+00000118=&Taglia
+00000120=Taglia|Taglia le immagini selezionate
+00000121=Modifica
+00000122=&Copia
+00000124=Copia|Copia le immagini selezionate
+00000125=Modifica
+00000126=&Incolla
+00000128=Incolla|Incolla le immagini tagliate o copiate
+00000129=Modifica
+00000130=&Modifica...
+00000132=Modifica...|Modifica gli elementi selezionati
+00000133=Modifica
+00000134=&Ordina immagini...
+00000136=Ordina immagini...|Ordina le immagini secondo il criterio prescelto
+00000137=Modifica
+00000138=&Seleziona tutte
+00000140=Seleziona tutte|Seleziona tutte le immagini
+00000141=Modifica
+00000142=Seleziona &Nessuna
+00000144=Seleziona Nessuna|Seleziona nessuna immagine
+00000145=Modifica
+00000146=&Visualizza
+00000148=Visualizza|Attiva la modalità visualizzazione dall'immagine 
+corrente
+00000149=Strumenti
+00000150=Impostazioni Pro&gramma...
+00000152=Impostazioni programma...|Visualizza/Modifica le impostazioni
+00000153=Strumenti
+00000154=&Statistiche...
+00000156=Statistiche...|Informazioni sommarie sull'album
+00000157=Strumenti
+00000158=O&perazioni sulle immagini...
+00000160=Operazioni sulle immagini...|Permette di copiare, muovere ecc. le 
+immagini selezionate
+00000161=Strumenti
+00000162=Ope&razione sui file...
+00000164=Operazioni sui file...|Apre la procedura guidata per le operazioni 
+sui file per copiare, muovere ecc., o per riparare link a file rotti
+00000165=Strumenti
+00000166=&Trova...
+00000168=Trova...|Trova le immagini secondo i criteri forniti
+00000169=Aiuto
+00000170=&Informazioni...
+00000172=informazioni...|Informazioni sulla versione e sul Copyright
+00000173=Aiuto
+00000174=Contenuti &aiuto
+00000176=Conternuti Aiuto|Visualizza i contenuti dell'aiuto
+00000177=Vista
+00000178=&Modifica vista...
+00000180=Modifica vista...|Modifica la vista corrente dell'album
+00000181=Vista
+00000182=For&ma un gruppo...
+00000184=Forma un gruppo...|Trasferisce la gerarchia del corrente gruppo nel 
+gruppo selezionato
+00000185=Aiuto
+00000188=FAQ|Visualizza le FAQ (Domande poste più frequentemente)
+00000189=Aiuto
+00000190=PhoA Sito &Ufficiale
+00000192=PhoA Sito Ufficiale|Ape nel browser il sito ufficiale di PhoA
+00000204=Gru&ppi
+00000205=Gruppi|Visualizza l'albero dei gruppi
+00000206=Vista
+00000207=Modalità &Flat
+00000208=Modalità Flat|Mosta le miniature del gruppo selezionato e dei suoi 
+sottogruppi
+00000209=Aiuto
+00000210=Sito &Web DK Software
+00000211=Sito Web DK Software|Apre il sito web del produttore
+00000212=Aiuto
+00000213=Controlla per &aggiornamenti
+00000214=Controlla per aggiornamenti|Controlla il sito per eventuali 
+aggiornamenti
+00000216=Aiuto
+00000217=&Supporto
+00000218=Supporto|Apre nel browser la pagina di supporto del prodotto
+00000219=Modifica
+00000220=&Visualizza lo Slide show
+00000221=Visualizza lo slide show|Attiva la modalità slide show
+
+[frPicProps_Data]
+00000007=&Posto:
+00000010=D&escrizione (per visualizzazione):
+00000013=&Numero film o nome:
+00000016=Numero f&rame:
+00000019=&Autore:
+00000022=&Note (informazioni addizionali):
+00000025=&Data:
+00000028=&Ora:
+00000031=Nome &Media o codice:
+
+[frPicProps_Keywords]
+00000130=&Modifica
+00000132=Modifica parole chiavi|Modifica le parole selezionate
+00000137=Soltanto &selezionati
+00000139=Soltanto selezionati|viasualizza solo le parole chiavi selezionate
+00000141=&Aggiungi
+00000143=Aggiungi una parola chiave|Aggiunge una parola chiave all'immagini 
+selezionate
+00000145=&Seleziona tutte
+00000147=Seleziona tutte|Seleziona tutte le parole chiave della lista
+00000149=&Deseleziona tutte
+00000151=Deseleziona tutte|Deseleziona tutte le parole chiave nella lista
+00000153=&Inverte
+00000155=Inverte selezione|Inverte la selezione delle parole chiave
+
+[frPicProps_Metadata]
+00000053=Descrizione
+00000057=Pannello Descrizione
+00000058=Pannello Descrizione|Mostra/Nasconde il pannello descrizione
+
+[frPicProps_View]
+00000008=Barra Strumenti principale
+00000062=File da vedere
+00000066=Strumenti
+00000068=Ingrandimento
+00000069=&Ingrandisci
+00000071=Ingrandisci|Allarga l'immagine
+00000072=Ingrandimento
+00000073=Rid&uci
+00000075=Riduci|Riduci l'immagine
+00000076=Ingrandimento
+00000077=Dimensione &reale
+00000079=Imposta la dimensione 1:1
+00000080=Ingrandimento
+00000081=&Addatta alla finestra
+00000083=Adatta la dimensione alla finestra
+00000084=Strumenti
+00000085=&Nessuna rotazione
+00000087=Nessuna rotazione|Non applica rotazione all'immagine
+00000088=Strumenti
+00000089=Ruota di &90° in senso orario
+00000091=Ruota di 90° in senso orario|Ruota di 90° in senso orario
+00000092=Strumenti
+00000093=Ruota di &180°
+00000095=Ruota di 180°|Ruota l'immagine di 180°
+00000096=Strumenti
+00000097=Ruota di 9&0° in senso antiorario
+00000099=Ruota di 90° in senso antiorario|Ruota di 90° in senso antiorario 
+(o in senso orario di 270°)
+00000100=Strumenti
+00000101=Metti in &orizzontale
+00000103=Metti in orizzontale|Mette l'immagine in orizzontale
+00000104=Strumenti
+00000105=Metti in &verticale
+00000107=Metti in verticale|Mette l'immagine in verticale
+
+[frWzPageAddFiles_CheckFiles]
+00000012=Seleziona &tutti i file
+00000014=Seleziona tutti i file nella lista
+00000016=&Deseleziona tutti i file
+00000018=Deseleziona tutti i files
+00000020=&Inverti la selezione
+00000022=Inverti la selezione sui file
+00000024=Percorso
+00000025=Grandezza
+00000026=Data
+
+[frWzPageAddFiles_SelFiles]
+00000007=Filtro di selezione
+00000010=&File modificati dal:
+00000013=Maschere &File (delimitate con ';'):
+00000016=&Presenze Album:
+00000019=&a:
+00000029=Ignorate\nSolo i file che sono assenti dall'album\nSolo i file che 
+sono presenti nell'album\n
+00000055=&Analizza sottocartelle
+00000056=Nome
+00000057=Grandezza
+00000058=Modificato
+
+[frWzPageFileOps_CDOptions]
+00000007=&Etichetta il media come:
+00000010=&Descrizione album:
+00000013=Copia il p&rogramma stesso sulla cartella di destinazione
+00000016=Crea un &file album con le immagini selezionate:
+00000023=Crea un file &autorun.inf per lanciare in automatico il play del 
+CD/DVD, nella cartella di destinazione
+00000034=Includi anche le &viste esistenti
+00000037=Copia le impostazioni correnti nel file phoa.&ini
+
+[frWzPageFileOps_DelOptions]
+00000007=Sposta i file nel &cestino
+
+[frWzPageFileOps_MoveOptions]
+00000007=Sistemazione File
+00000010=Usa percorso &relativo a:
+00000013=Usa percorso r&elativa al gruppo:
+00000016=Rimpiazza i simboli &non permessi con il carattere:
+00000019=Metti tutti i file nella cartella di &destinazione
+00000022=&Mantieni il formato della cartella originale
+00000025=Rior&ganizza i file nella cartella mantenendo il formato del gruppo
+00000028=Permetti &copie multiple del file
+
+[frWzPageFileOps_MoveOptions2]
+00000007=Se il file &esiste già:
+00000010=Se il file &originale non esiste:
+00000013=&Cancella i file originali
+00000016=&Sposta nel cestino
+00000019=Imposta le opzioni di crea&zione CD/DVD
+00000024=Salta l'immagine corrente\nChiedi per sovrascrivere il 
+file\nSovrascrivi sempre il file\n
+00000029=Tratta come un errore\nAggiorna il link solo se il target 
+esiste\nAggiorna il link in ogni caso\n
+
+[frWzPageFileOps_RepairOptions]
+00000007=Sto cercando il file da accoppiare
+00000010=Accoppia il file per &nome
+00000013=Accoppia il file per grande&zza
+00000016=Accoppia il file per nome e grand&ezza
+00000019=Controlla nelle sottocarte&lle della cartella di destinazione
+00000022=Se un file da accoppiare è stato trovato ma è usato da un'altra 
+immagine
+00000025=&Saltalo e cerca il successivo
+00000028=Cancella l'immagine al quale il file è collegato, e ricollegalo 
+alla &nuova immagine
+
+[frWzPageFileOps_RepairSelLinks]
+00000013=&Cancella le immagini che non hanno un file accoppiato (si applica 
+solo alle immagini con nessun file collegato)
+
+[frWzPageFileOps_SelFolder]
+00000014=&Crea cartella
+
+[frWzPageFileOps_SelPics]
+00000064=&Seleziona immagini
+00000067=Immagini nei &gruppi selezionati:
+00000070=Filtro di validità dei link
+00000073=&Tutte le immagini selezionate
+00000076=Solo le immagini che hanno un file collegato &valido (esistente)
+00000079=Solo le immagini che &NON hanno un collegamento valido (esistente) 
+ad un file
+00000081=&Seleziona tutti i gruppi
+00000083=Seleziona tutti i gruppi che contengono immagini
+00000085=&Deseleziona tutti i gruppi
+00000087=Deseleziona tutti i gruppi
+00000089=&Inverti selezione
+00000091=Inverti la selezione attuale
+
+[frWzPageFileOps_SelTask]
+00000007=Copia i file delle immagini che hai selezionato, nella cartella 
+specificata. Usa questa opzione per preparare l'album ad essere scritto su 
+CD o DVD
+00000010=Muovi i file dell immagini che hai selezionato, nella cartella 
+specificata, e aggiorna i collegamenti delle immagini ai file 
+appropriatamente
+00000013=Cancella i file delle immagini che hai selezionato e fisicamente 
+cancella i corrispondenti file. Use questa opzione per cancelllare i file 
+delle immagini che non si vogliono
+00000016=Permette di riparare collegamenti rotti trovando i file nella 
+cartella specificata, e, opzionalmente, a cancellare le immagini non più 
+associate con file validi (esistenti)
+00000019=• NB: Queste operazioni non possono essere annullate dopo essere 
+state portate a termine!
+00000022=Rilegge i file delle immagini, ricrea le miniature e aggiorna le 
+informazioni relative ai file, quali ad esempio la dimensione dell'imagine
+00000025=&Copia i file su una cartella
+00000028=&Muove i file su una cartella
+00000031=C&ancella immagini e file
+00000034=Ri&para i collegamenti ai file
+00000037=&Rileggi le miniature
+
+[frWzPage_Log]
+00000122=Copia
+00000124=Copia|Copia il record corrente
+00000166=Trova...
+00000168=Trova...|Mostra il dialogo di ricerca
+00000183=&Salva su file...
+00000185=Salva su file...|Salva il log sul file selezionato
+00000187=&Visualizza solo gli errori
+00000189=Visualizza solo gli errori|Nascondi le informazioni di caricamento 
+terminate con successo
+
+[$CONSTANTS]
+dfpArchive=Archivio
+dfpCompressed=Compresso
+dfpCreationTime=Creato
+dfpFileName=Nome file
+dfpFileType=Tipo file
+dfpHidden=Nascosto
+dfpLastAccessTime=Acceduto
+dfpLastWriteTime=Modificato
+dfpReadOnlyFile=Sola lettura
+dfpSizeOfFile=Grandezza
+dfpSizeOfFileDiskUsage=Occupazione disco
+dfpSystemFile=Sistema
+dfpTemporary=Temporaneo
+dpcEqual=è uguale a
+dpcGreater=è dopo
+dpcGreaterEqual=è dopo o uguale
+dpcLess=è prima
+dpcLessEqual=è prima o uguale
+dpcNotEqual=non è uguale
+dpcNotSpecified=non è specificato
+dpcSpecified=è specificato
+dtapDTFileCreated=Data/Ora creazione file
+dtapDTFileModified=Data/Ora ultima modifica
+dtapExifDateTime=EXIF: Data e ora
+dtapExifDTDigitized=EXIF: Data/Ora digitalizzate
+dtapExifDTOriginal=EXIF: Data/Ora originali
+dtapFilename=Estrai dal nome
+dtfrCreation=Valore estratto dall'ora di creazione del file
+dtfrEmpty=Nessun valore trovato
+dtfrEXIF=Valore estratto dal tag EXIF
+dtfrFilename=Valore estratto dal nome del file
+dtfrModified=Valore estratto dall'ora di ultima modifica del file
+dtfrSpecified=Valore già specificato, non cambiato
+gbpAuthor=Per Autore
+gbpDateByDay=Per Giorno
+gbpDateByMonth=Per Mese
+gbpDateByYear=Per Anno
+gbpFilePath=Per percorso del file
+gbpFilmNumber=Per numero del film
+gbpKeywords=Per Parole Chiavi
+gbpMedia=Per Nome/Codice del media
+gbpPlace=Per Posto
+gbpTimeHour=Per Ora
+gbpTimeMinute=Per Minuti
+gpDescription=Descrizione
+gpGroupCount=Numero di gruppi interni
+gpPicCount=Numero di immagini
+gpText=Testo
+IMS_CannotOpenFile=Non riesco ad aprire il file
+IMS_InternalError=Errore interno
+IMS_InvalidEXIFHeader=La testa EXIF non combacia
+IMS_InvalidTIFFHeader=La testata TIFF (all'interno della testata EXIF) è 
+invalida o mancante
+IMS_NoMetadata=Non sono stati trovati metadata nel file
+IMS_NotAJPEGFile=Non si tratta di un file JPEG
+IMS_ReadFailure=Non riesco a leggere dal file
+ipcEqual=è uguale a
+ipcGreater=è maggiore di
+ipcGreaterEqual=è maggiore o uguale a
+ipcLess=è minore di
+ipcLessEqual=è minore o uguale di
+ipcNotEqual=è diverso da
+ISettingID_Browse=Visualizza\nmodalità
+ISettingID_Browse_FlatMode=Modalità Flat
+ISettingID_Browse_GTree=Alberi di gruppi di immagini
+ISettingID_Browse_GT_HintInfo=Visualizza con le proprietà selezionate
+ISettingID_Browse_GT_HintNone=Nessuno
+ISettingID_Browse_GT_HintProps=Visualizza nella barra dei suggerimenti
+ISettingID_Browse_GT_Hints=Barra dei suggerimenti
+ISettingID_Browse_GT_HintTips=Visualizza se è troncato dal margine della 
+finestra
+ISettingID_Browse_MaxUndoCount=Numero massimo di annullamenti
+ISettingID_Browse_Viewer=Finestra visualizzazione miniature
+ISettingID_Browse_ViewerBkColor=Colore di sfondo:
+ISettingID_Browse_ViewerDragDrop=Trascinamento
+ISettingID_Browse_ViewerStchFilt=Filtro per resampling
+ISettingID_Browse_ViewerThBColor=Colore sfondo miniature:
+ISettingID_Browse_ViewerThBordCl=Colore personalizzato del bordo dello 
+sfondo della miniatura
+ISettingID_Browse_ViewerThBordSt=Stile del bordo dello sfondo della 
+miniatura
+ISettingID_Browse_ViewerThFColor=Colore font miniatura:
+ISettingID_Browse_ViewerThInfo=Dettaglio delle immagini visualizzato sulle 
+miniature
+ISettingID_Browse_ViewerThLBProp=Nell'angolo in basso a sinistra:
+ISettingID_Browse_ViewerThLTProp=Nell'angolo in alto a sinistra:
+ISettingID_Browse_ViewerThRBProp=Nell'angolo in basso a destra:
+ISettingID_Browse_ViewerThRTProp=Nell'angolo in alto a destra:
+ISettingID_Browse_ViewerThShadow=Mostra ombra miniatura
+ISettingID_Browse_ViewerThShColor=Colore ombra:
+ISettingID_Browse_ViewerThShOffsX=Spostamento orizzontale ombra, pixel:
+ISettingID_Browse_ViewerThShOffsY=Spostamento verticale ombra, pixel:
+ISettingID_Browse_ViewerThShOpact=Opacità ombra (0-255):
+ISettingID_Browse_ViewerThShRadius=Raggi di Blur dell'ombra, pixel:
+ISettingID_Browse_ViewerTipProps=Visualizza nella barra dei suggerimenti
+ISettingID_Browse_ViewerTooltips=Mostra nella barra dei suggerimenti della 
+miniatura
+ISettingID_Dialogs=Dialoghi
+ISettingID_Dlgs_AddPicWizard=Procedura guidata aggiunta immagini
+ISettingID_Dlgs_APW_AutofillDate=Riempi automaticamente la data 
+dell'immagine da (in ordine di preferenza):
+ISettingID_Dlgs_APW_AutofillTime=Riempi automaticamente l'ora dell'immagine 
+da (in ordine di preferenza):
+ISettingID_Dlgs_APW_AutofillXfrm=Riempi automaticamente le trasformazioni 
+dell'immagine dal metadata
+ISettingID_Dlgs_APW_LogOnErrOnly=Mostra la pagina di log solo se si sono 
+verificati degli errori
+ISettingID_Dlgs_APW_ReplaceDate=Sovrascrivi la data se già specificata
+ISettingID_Dlgs_APW_ReplaceTime=Sovrascrivi l'ora se già specificata
+ISettingID_Dlgs_APW_ShowHidden=Mostra i file e le cartelle nascoste
+ISettingID_Dlgs_APW_SkipChkPage=Salta sempre la pagina 'Controlla file'
+ISettingID_Dlgs_ConfmAppExit=Prima di uscire (quando l'album non è stato 
+modificato)
+ISettingID_Dlgs_ConfmDelGroup=Prima di cancellare un gruppo
+ISettingID_Dlgs_ConfmDelPics=Prima di cancellare una immagine
+ISettingID_Dlgs_ConfmDelView=Prima di cancellare una vista
+ISettingID_Dlgs_ConfmOldFile=Prima di salvare file di una vecchia versione
+ISettingID_Dlgs_Confms=Conferme
+ISettingID_Dlgs_FileOpsWizard=Procedura guidata di operazione sui file 
+dell'immagine
+ISettingID_Dlgs_FOW_CfmCopyFiles=Conferma la copia dei file
+ISettingID_Dlgs_FOW_CfmDelFiles=Conferma la cancellazione dei file
+ISettingID_Dlgs_FOW_CfmMoveFiles=Conferma lo spostamento dei file
+ISettingID_Dlgs_FOW_CfmRebuildTh=Conferma la ricostruzione delle miniature
+ISettingID_Dlgs_FOW_CfmRepairFLs=Conferma la riparazione dei collegamenti
+ISettingID_Dlgs_FOW_LogOnErrOnly=Mostra la pagina di log solo se si sono 
+verificati degli errori
+ISettingID_Dlgs_Notifies=Notifiche
+ISettingID_Dlgs_NotifyDragCopy=Dopo aver copiato immagini usango 
+Trascinamento
+ISettingID_Dlgs_NotifyDragMove=Dopo aver spostato immagini usando 
+Trascinamento
+ISettingID_Dlgs_NotifyPaste=Dopo aver incollato immagini
+ISettingID_Dlgs_PicProps=Dialogo delle proprietà dell'immagine
+ISettingID_Dlgs_PP_DefaultPage=Pagina visualizzata per default
+ISettingID_Dlgs_PP_Def_FProps=Proprietà dei file
+ISettingID_Dlgs_PP_Def_Groups=Gruppi
+ISettingID_Dlgs_PP_Def_Keywords=Parole chiave
+ISettingID_Dlgs_PP_Def_LastUsed=Ultima usata
+ISettingID_Dlgs_PP_Def_View=Visualizzazione & Aggiusta
+ISettingID_Dlgs_PP_ExpFileProps=Apri le proprietà del file sul display
+ISettingID_Dlgs_PP_ExpMetadata=April'immagine metadata sul display
+ISettingID_Dlgs_SplashAboutFade=Dialogo di Informazioni animato in uscita 
+(Windows 2000+)
+ISettingID_Dlgs_SplashStartFade=Schermata di partenza animata (Windows 
+2000+)
+ISettingID_Dlgs_SplashStartShow=Mostra la schermata di inizio alla partenza
+ISettingID_Gen=Generale
+ISettingID_Gen_Clipboard=Memoria
+ISettingID_Gen_ClipFormats=Formati di copia
+ISettingID_Gen_Intf=Interfaccia utente
+ISettingID_Gen_Language=Interfaccia linguaggio
+ISettingID_Gen_LookupPhoaIni=Alla partenza carica le impostazioni dal file 
+phoa.ini se è presente nella cartella del programma
+ISettingID_Gen_MainFont=Font principale programma:
+ISettingID_Gen_OpenMRUCount=Lista dei file aperti di recente:
+ISettingID_Gen_Theme=Tema visuale:
+ISettingID_Gen_ToolbarBSz16=Piccolol (16x16)
+ISettingID_Gen_ToolbarBSz24=Medio (24x24)
+ISettingID_Gen_ToolbarBSz32=Grande (32x32)
+ISettingID_Gen_ToolbarBtnSize=Grandezza bottoni barra principale
+ISettingID_Gen_ToolbarDragStyle=Stile della barra di trascinamento
+ISettingID_Gen_ToolbarDrgFree=All'interno ed all'esterno del dock (floating)
+ISettingID_Gen_ToolbarDrgNoFloat=All'interno e in mezzo al dock
+ISettingID_Gen_ToolbarDrgNone=Disabilitato
+ISettingID_Gen_ToolbarDrgOneDock=Solo all'interno del dock
+ISettingID_Gen_Toolbars=Barra Accessori
+ISettingID_Gen_TooltipDisplTime=Lunghezza della barra dei suggerimenti, ms:
+ISettingID_Gen_Tree=Alberi/liste
+ISettingID_Gen_TreeAnimation=Espansione/Collasso animati
+ISettingID_Gen_TreeBS_Triangle=Triangoli
+ISettingID_Gen_TreeButtonStyle=Stile dei bottoni Collassa/espandi (sistemi 
+non-XP)
+ISettingID_Gen_TreeCenterSel=Centra la selezione nella vista
+ISettingID_Gen_TreeCheckStyle=Stile delle caselle di spunta (sistemi 
+non-XP):
+ISettingID_Gen_TreeIncrSearch=Ricerca incrementale durante la digitazione
+ISettingID_Gen_TreeIncrSrchDelay=Ritardo nella pulizia della ricerca 
+incrementale, ms:
+ISettingID_Gen_TreeSelBlended=Rettangoli mescolati
+ISettingID_Gen_TreeSelDotted=Contorno puntato
+ISettingID_Gen_TreeSelStyle=Stile rettangolo selezione multiplo
+ISettingID_Gen_TreeWhPanning=Panning usando il click della ruota del mouse
+ISettingID_Profiles=Profile
+ISettingID_Tools=Accessori
+ISettingID_View=Vista\nmodalità
+ISettingID_View_AlwaysOnTop=Visualizza la finestra sempre in primo piano
+ISettingID_View_BkColor=Colore della finestra di sfondo:
+ISettingID_View_CaptionProps=Visualizza in cattura finestra
+ISettingID_View_CenterWindow=Centra la finestra sul desktop
+ISettingID_View_Cyclic=Visualizzazione ciclica
+ISettingID_View_FitWindowToPic=Adatta la finestra alla dimensione 
+dell'immagine
+ISettingID_View_Fullscreen=Schermi intero
+ISettingID_View_HideCursor=Nascondi il cursore de l mouse a schermo intero
+ISettingID_View_Info=Visualizza informazioni
+ISettingID_View_InfoBkColor=Colore di sfondo:
+ISettingID_View_InfoBkOpacity=Opacità sfondo (0-255):
+ISettingID_View_InfoPicProps=Proprietà immagine
+ISettingID_View_KeepCursorOverTB=Mantieni il cursore del mouse sopra la 
+barra dei bottoni durante il ridimensionamento della finestra
+ISettingID_View_Optimizing=Ottimizzazione della velocità di vista
+ISettingID_View_PicChange=Avanzamento immagine
+ISettingID_View_Predecode=Predecodifica l'immagine seguente in anticipo
+ISettingID_View_ShowInfo=Mostra le informazioni sull'immagine
+ISettingID_View_ShowToolbar=Mostra la barra degli accessori
+ISettingID_View_ShrinkPicToFit=Adatta l'immagine alla dimensione della 
+finestra
+ISettingID_View_SlideCyclic=Ciclico
+ISettingID_View_SlideDirBackward=Indietro
+ISettingID_View_SlideDirection=Direzione dell Slide show
+ISettingID_View_SlideDirForward=Avanti
+ISettingID_View_SlideDirRandom=Casuale
+ISettingID_View_SlideInterval=Visualizza ora, ms:
+ISettingID_View_StchFilt=Filtro di resampling immagine
+ISettingID_View_ZoomFactor=Scala per:
+ISettingID_View_ZoomPicToFit=Ingrandisci immagine per adattarla alla 
+finestra
+lpcAll=tutti di
+lpcAny=qualunque da
+lpcNone=nessuno di
+lpcNotSpecified=non sono specificati
+lpcSpecified=sono specificati
+mpcMatches=si accoppia alla maschera
+mpcNotMatches=non si accoppia alla maschera
+pcfHDrop=File immagine
+pcfPhoa=Immagine PhoA
+pcfPlainList=Percorso immagine file
+pcfSingleBitmap=Miniature bitmap (quando la singola immagine selezionata)
+ppAuthor=Autore
+ppDate=Data
+ppDescription=Descrizione
+ppf15bit=15 bit (32768 colori)
+ppf16bit=16 bit (65536 colori)
+ppf1bit=1 bit (monocromatico)
+ppf24bit=24 bit (16 milioni di colori)
+ppf32bit=32 bit (16 milioni di colori)
+ppf4bit=4 bit (16 colori)
+ppf8bit=8 bit (256 colori)
+ppfCustom=Sconosciuto
+ppfDevice=Dipendente dal dispositivo
+ppFileName=Nome del file immagine
+ppFilePath=Percorso del file immagine
+ppFileSize=Grandezza del file immagine
+ppFileSizeBytes=Grandezza del file immagine in bytes
+ppFilmNumber=Numero/Nome del Film
+ppFormat=Formato immagine
+ppFrameNumber=Numero frame
+ppFullFileName=Nome con percorso del file immagine
+ppKeywords=Parole chiave
+ppMedia=Nome/Codice del Media
+ppNotes=Note
+ppPicDims=Dimensioni immagine
+ppPicHeight=Altezza immagine
+ppPicWidth=Larghezza immagine
+ppPlace=Posto
+ppRotation=Rotazione
+ppTime=Ora
+ptkCustom=Azione personalizzata
+ptkDefault=Azione di default
+ptkEdit=Azione di modifica standard
+ptkOpen=Azione apertura standard
+ptkPrint=Azione stampa standard
+ptkSeparator=Carattere separatore
+SActionHint_OpenPics=Apri|Apri le immagini selezionate
+SActionHint_PrintPics=Stampa|Stampa le immagini selezionate
+SAction_Delete=Cancella
+SAction_Edit=Modifica
+SAction_EditEllipsis=Modifica...
+SAction_MoveDown=Muovi giù
+SAction_MoveUp=Muovi su
+SAction_Open=&Apri
+SAction_Print=&Stampa
+SAll=(tutti)
+SBtn_Cancel=Annulla
+SBtn_Close=Chiudi
+SBtn_Continue=Continua
+SBtn_ExpandOff=&Avanzato >>
+SBtn_ExpandOn=&Avanzato <<
+SBtn_Help=Aiuto
+SBtn_Interrupt=Interrompi
+SBtn_NoToAll=No a &tutti
+SBtn_OK=OK
+SBtn_Yes=&Si
+SBtn_YesToAll=Si a t&utti
+SCannotUndo=(Non posso annullare)
+SConfirm_AppExit=Esci dal programma?
+SConfirm_DelGroup=Cancello il gruppo selezionato?
+SConfirm_DelPics=Cancello le immagini selezionate?
+SConfirm_DelView=Cancello la vista corrente?
+SConfirm_FileNotSaved=File dell'album "%s" non salvato. Vuoi salvare i 
+cambiamenti?
+SConfirm_FileOverwrite=Sovrascrivi il file "%s"?
+SConfirm_PerformFileOperation=Vuoi continuare l'operazione che hai 
+scelto?\n\nATTENZIONE! Questa operazione non può essere annullata una volta 
+portata a termine!
+SConfirm_SavingOldFormatFile=Attenzione!\nTu stai salvando il file in un 
+formato più vecchio di questo. Se tu salvi l'album in questo file potresti 
+perdere alcuni dei dati a causa di funzioni non supportate in questo 
+formato.\n  • Per salvare il file in un formato aggiornato clicca su 
+Annulla, quindi usa File | Salva come... \n  • Per conoscere le differenze 
+tra i formati delle varie versioni di PhoA fai riferimento al sistema di 
+aiuto PhoA.\n\nVuoi continuare ?
+SDefaultNewGroupName=Nuovo gruppo
+SDefaultNewKeyword=Nuova parola chiave
+SDlgTitle_Confirm=PhoA: Conferma
+SDlgTitle_ConfirmWarning=PhoA: Conferma
+SDlgTitle_Error=PhoA: Errore
+SDlgTitle_OpenIni=Apri il file delle impostazioni
+SDlgTitle_OpenPhoa=Apri l'album
+SDlgTitle_SaveIni=Salva il file delle impostazioni
+SDlgTitle_SavePhoa=Salva l'album come
+SDlgTitle_SelectFolder=Seleziona una cartella
+SDlgTitle_Warning=PhoA: Attenzione
+SErrCannotCreateFolder=Non riesco a creare la cartella "%s"
+SErrCannotDecodePicture=Errore decodificando il file "%s":\n%s
+SErrCannotLoadPicture=Errore caricando l'immagine "%s":\n%s
+SErrCannotRead=Errore lettura stream
+SErrCannotWrite=Errore scrittura stream
+SErrDuplicateKeyword=Questa parola chiave è già nella lista
+SErrExecutingToolFailed=Errore eseguendo il tool "%s" per il file "%s": %s
+SErrFileNotFound=File non trovato
+SErrFileNotFoundFmt=File non trovato: "%s"
+SErrFileRevHigher=L'album è stato creato con una versione più nuova di 
+questa. Non posso aprire il file.
+SErrInvalidPicFileName=Nome dell'immagine non valido: "%s"
+SErrNotAllPicsLinked=%d immagini selezionate di %d non sono inserite in un 
+gruppo, è questo è un errore. Ciascuna immagine deve essere collegata ad 
+almeno un gruppo.
+SErrNoTargetPathDetermined=Nessun percorso di arrivo trovato per il file 
+"%s"
+SError=Errore
+SErrSrcAndDestFoldersAreSame=Le cartelle sorgente e destinazione sono le 
+stesse ("%s") per il file "%s"
+SErrTargetFileExists=File di destinazione "%s" già esiste
+SErrUnknownPicFileExtension=Estensione sconosciuta per il file "%s"
+SFileFilter_Ini=File Ini (*.ini)|*.ini
+SFileFilter_OpenPhoa=Album (*.phoa)|*.phoa|Tutti i file (*.*)|*.*
+SImgView_DefaultCaption=Visualizza immagine
+SImgView_ErrorMsg=ERRORE
+SInfo_SearchStringNotFound=Testo non trovato
+SLogEntry_AddingError=Aggiungendo %s si è verificato un errore: %s
+SLogEntry_AddingOK=%s aggiunto senza errori. Riempimento automatico Data: 
+%s. Riempimento automatico Ora: %s. Riempimento automatico Transformazione: 
+%s.
+SLogEntry_AutorunCreatedOK=autorun.inf creato senza errori
+SLogEntry_AutorunCreationError=Impossibile creare autorun.inf: %s
+SLogEntry_ExecutableCopiedOK=Il programma eseguibile è stato copiato senza 
+errori sulla cartella "%s"
+SLogEntry_ExecutableCopyingError=Errore durante la copia del programma 
+eseguibile sulla cartella "%s": %s
+SLogEntry_FileCopiedOK=Copiati da "%s" a "%s" senza errori
+SLogEntry_FileDeletedOK=Il file "%s" è stato cancellato
+SLogEntry_FileDeletingError=Impossibile cancellare il file "%s"
+SLogEntry_FileOpError=Elaborazione immagine "%s" failita: %s
+SLogEntry_FileOpFinalizationError=Operazione di finalizzazione fallita: %s
+SLogEntry_FileRecycledOK=Il file "%s" è stato spostato nel cestino
+SLogEntry_FileRecyclingError=Impossibile spostare il file "%s" nel cestino
+SLogEntry_PhoaSavedOK=L'album è stato salvato su "%s" senza errori
+SLogEntry_PhoaSaveError=Errore durante il salvataggio dell'album sul 
+file"%s": %s
+SLogEntry_PicDeletedOK=L'immagine "%s" è stata rimossa dall'album
+SLogEntry_PicRelinkedOK=Cambiato il collegamento dell'immagine da "%s" a 
+"%s"
+SLogEntry_PicRelinkingError=Non posso aggiornare il percorso del file 
+dell'immagine a "%s": il file è già utilizzato da un'altra immagine
+SLogEntry_SkipInsteadOfDelFile=il file "%s" non esiste, non è necessario 
+cancellarlo
+SLogEntry_ThumbRebuiltOK=La miniatura per "%s" è stata ricostruita senza 
+errori (grandezza miniatura: %d -> %d, grandezza file: %d -> %d)
+SLogEntry_UserAbort=Processo interrotto dall'utente
+SLogEntry_UserDeniedFileOverwrite=L'utente ha rifiutato di sovrascrivere il 
+file "%s"
+SLogInfoNoErrors=Totali: %d righe, nessun errore
+SLogInfoWithErrors=Totali: %d righe, errori: %d
+SMsg_ApplyingLanguage=Sto applicando il corrente linguaggio...
+SMsg_ApplyingSettings=Sto applicando le impostazioni...
+SMsg_Initializing=Sto inializzando...
+SMsg_LoadingPhoa=Sto caricando l'album %s...
+SMsg_NoMetatagSelected=Nessun metatag selezionato. Seleziona un elemento per 
+vedere la sua descrizione
+SMsg_ProcessingSomething=Sto elaborando %s...
+SMsg_ScanningLanguages=Sto cercando file di linguaggio...
+SMsg_Starting=Sto lanciando l'applicazione...
+SNoFilesSelected=Nessun file selezionato nella lista dei risultati
+SNone=(nessuno)
+SNotAValidDate="%s" non è una data valida
+SNotAValidTime="%s" non è un'ora valida
+SNotify_DragCopy=Totali: %0:d immagini copiate, incluse:\n  • %1:d erano 
+nuove per il gruppo di arrivo;\n  • %2:d erano già contenute nel gruppo di 
+arrivo.\n
+SNotify_DragMove=Totali: %0:d immagini spostate, incluse:\n  • %1:d erano 
+nuove per il gruppo di arrivo;\n  • %2:d erano già contenute nel gruppo di 
+arrivo.\n
+SNotify_Paste=Incollate %d immagini
+spcContains=contiene
+spcEnds=finisce con
+spcEqual=è uguale a
+spcNotContains=non contiene
+spcNotEnds=non finisce con
+spcNotEqual=è diverso da
+spcNotSpecified=non è specificato
+spcNotStarts=non inizia con
+spcSpecified=è specificato
+spcStarts=inizia con
+SPhotoAlbumNode=Album
+SPicCount=%d immagini
+SPicsNotFound=Queste immagini non sono state trovate.
+SSearchResultsNode=Risultato ricerca
+SSelectedPicCount=%d selezionate
+SSort_Ascending=Ascendente
+SSort_Descending=Discendente
+SStats_DistinctPics=Numero di differenti immagini
+SStats_PhoaFileRevision=Revisione album
+SStat_AvgFileSize=Grandezza media file immagine
+SStat_AvgThumbSize=Grandezza media miniature
+SStat_CntDistinctPics=Numero di immagini differenti
+SStat_CntNestedGroups=Numero di gruppi interni
+SStat_CntPics=Numero totale di immagini
+SStat_CntPicsInGroup=Numero di immagini nel gruppo
+SStat_Group=Gruppo selezionato
+SStat_MaxFileName=File immagine più grande
+SStat_MaxFileSize=Grandezza del file più grande
+SStat_MinFileName=File immagine più piccolo
+SStat_MinFileSize=Grandezza del file più piccolo
+SStat_PhoaFilename=File Album
+SStat_PhotoAlbum=Album
+SStat_TotalFileSize=Grandezza totale dei file immagine
+SStat_TotalThumbSize=Grandezza totale delle miniature
+SText_Application=Applicazione
+SText_Folder=Cartella
+SText_Hint=Suggerimento
+SText_Kind=Tipo
+SText_Masks=Maschere
+SText_Name=Nome
+SText_Params=Parametri
+STransformFilledFromExif=Riempito dal tag EXIF
+SUnclassified_Author=Nessun autore
+SUnclassified_Date=Nessuna data
+SUnclassified_FilmNumber=Nessun numero di film
+SUnclassified_Keywords=Nessuna parola chiave
+SUnclassified_Media=Nessun media
+SUnclassified_Place=Nessun posto
+SUnclassified_Time=Nessuna ora
+SUndoActionTitle=Ann&ullamento %s
+SUndoOperationCount=Azioni annullamento %d
+SWzAddFiles_Paused=Immagini aggiunte: %d\nImmagini saltate a causa di 
+errori: %d\nClicca su Continua per riprendere l'elaborazione
+SWzAddFiles_Processing=Sto aggiungendo l'immagine %d di %d (errori: %d):\n%s
+SWzFileOps_AllPicsInPhoa=Tutte le imm&agini dell'album
+SWzFileOps_AllPicsInView=Tutte le imm&agini della vista "%s"
+SWzFileOps_Paused=Immagini elaborate senza errori: %d\nErrori durante 
+l'elaborazione     : %d\nClicca "Continua" per riprendere l'elaborazione
+SWzFileOps_PicGroupSelectedCount=Selezionate %d immagini in %d grouppi; 
+grandezza totale: %s
+SWzFileOps_Processing=Sto elaborando l'immagine %d di %d\nErrori: %d\nFile: 
+%s
+SWzPageAddFiles_CheckFiles=Scegli i file che vuoi aggiungere all'album
+SWzPageAddFiles_CheckFiles_Info=File selezionati: %d; files scelti: %d
+SWzPageAddFiles_Log=Log dell'aggiunta immagini
+SWzPageAddFiles_Processing=Sto aggiungo le immagini
+SWzPageAddFiles_SelFiles=Seleziona i file e/o cartelle che vuoi aggiungere 
+all'album
+SWzPageFileOps_Log=La log dell'operazione
+SWzPageFileOps_Options=Scegli le seguenti opzioni
+SWzPageFileOps_Processing=Sto eseguendo l'operazione
+SWzPageFileOps_RepairSelLinks=Qui sotto ci sono i file immagine originali, 
+come pure le opzioni di riparazione.\nScegli le immagini che vuoi riparare. 
+Se ci sono diverse opzioni per una immagine, seleziona il file appropriato
+SWzPageFileOps_SelFolder=Seleziona la cartella di destinazione
+SWzPageFileOps_SelPics=Seleziona l'immagine per l'operazione
+SWzPageFileOps_SelTask=Seleziona un lavoro
+tbbsColor=Personalizza i colori
+tbbsNone=Nessuno
+tbbsPlain=Piano
+tbbsRaised=Alzato
+tbbsSunken=Sommerso
+TPhoaOp_GroupDelete=Cancella gruppo
+TPhoaOp_GroupDragAndDrop=Trascina gruppo
+TPhoaOp_GroupEdit=Modifica proprietà del gruppo
+TPhoaOp_GroupNew=Nuovo gruppo
+TPhoaOp_GroupRename=Rinomina gruppo
+TPhoaOp_PicAdd=Aggiungi immagini
+TPhoaOp_PicDelete=Cancella immagini
+TPhoaOp_PicDragAndDropInsideGroup=Trascina immagini
+TPhoaOp_PicDragAndDropToGroup=Trascina immagini
+TPhoaOp_PicEdit=Modifica proprietà immagine
+TPhoaOp_PicEditGroupAdd=Aggiungi immagine
+TPhoaOp_PicOperation=Operazioni sulla immagine
+TPhoaOp_PicPaste=Incolla le immagini
+TPhoaOp_PicSort=Ordina immagini
+TPhoaOp_ProjectEdit=Modifica le proprietà dell'album
+TPhoaOp_StoreTransform=Memorizza transformazioni
+TPhoaOp_ViewDelete=Cancella vista
+TPhoaOp_ViewEdit=Modifica vista
+TPhoaOp_ViewMakeGroup=Crea un gruppo a partire dalla vista
+TPhoaOp_ViewNew=Crea vista
+
