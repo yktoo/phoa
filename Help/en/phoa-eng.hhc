@@ -103,7 +103,6 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Group properties dialog">
 				<param name="Local" value="intf-group-props.html">
-				<param name="New" value="1">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Add pictures wizard">
@@ -273,12 +272,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Transformations">
 			<param name="Local" value="theory-transform.html">
-			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Command line parameters">
 			<param name="Local" value="info-cmd-line.html">
-			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Metadata">

@@ -103,7 +103,6 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc; &atilde;&eth;&oacute;&iuml;&iuml;&ucirc;">
 				<param name="Local" value="intf-group-props.html">
-				<param name="New" value="1">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Igrave;&agrave;&ntilde;&ograve;&aring;&eth; &auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&yuml; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
@@ -271,14 +270,12 @@
 			<param name="Local" value="intf-key-mouse-controls.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="&Iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&acirc;&agrave;&iacute;&egrave;&yuml;">
+			<param name="Name" value="&Iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
 			<param name="Local" value="theory-transform.html">
-			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc; &ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&icirc;&eacute; &ntilde;&ograve;&eth;&icirc;&ecirc;&egrave;">
 			<param name="Local" value="info-cmd-line.html">
-			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
