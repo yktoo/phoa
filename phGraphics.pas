@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.13 2004-10-13 14:29:09 dale Exp $
+//  $Id: phGraphics.pas,v 1.14 2004-11-23 14:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -112,7 +112,7 @@ const
   BColor_Alpha_Opaque      = $ff;
 
 implementation
-uses JPEG, Math, GraphicEx, phUtils;
+uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
 
   procedure RenderShadowTemplate(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
   var
@@ -376,33 +376,45 @@ var
 
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const OnProgress: TProgressEvent);
   var
+    sExt: String;
     GClass: TGraphicClass;
     Graphic: TGraphic;
   begin
-    GClass := FileFormatList.GraphicFromExtension(ExtractFileExt(sFileName));
-    if GClass=nil then PhoaException(ConstVal('SErrUnknownPicFileExtension', [sFileName]));
-    Graphic := GClass.Create;
-    try
-      Graphic.OnProgress := OnProgress;
-       // Загружаем изображение
+    sExt := ExtractFileExt(sFileName);
+     // Если IJL доступна, JPEG грузим с её помощью (якобы 300% faster) 
+    if bIJL_Available and (SameText(sExt, '.JPG') or SameText(sExt, '.JPEG')) then begin
       try
-        Graphic.LoadFromFile(sFileName);
+        LoadJPEGFromFile(Bitmap32, sFileName)
       except
-        on e: Exception do begin
-          FreeAndNil(Graphic);
-          if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
-        end;
+        on e: Exception do PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
       end;
-       // Преобразовываем в TBitmap32
-      if Graphic<>nil then
+     // Остальное - с помощью GraphicEx
+    end else begin
+      GClass := FileFormatList.GraphicFromExtension(sExt);
+      if GClass=nil then PhoaException(ConstVal('SErrUnknownPicFileExtension', [sFileName]));
+      Graphic := GClass.Create;
+      try
+        Graphic.OnProgress := OnProgress;
+         // Загружаем изображение
         try
-          Bitmap32.Assign(Graphic);
+          Graphic.LoadFromFile(sFileName);
         except
-          on e: Exception do
-            if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotDecodePicture', [sFileName, e.Message]));
+          on e: Exception do begin
+            FreeAndNil(Graphic);
+            if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
+          end;
         end;
-    finally
-      Graphic.Free;
+         // Преобразовываем в TBitmap32
+        if Graphic<>nil then
+          try
+            Bitmap32.Assign(Graphic);
+          except
+            on e: Exception do
+              if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotDecodePicture', [sFileName, e.Message]));
+          end;
+      finally
+        Graphic.Free;
+      end;
     end;
   end;
 

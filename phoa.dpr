@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.32 2004-11-16 17:49:05 dale Exp $
+//  $Id: phoa.dpr,v 1.33 2004-11-23 14:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -69,7 +69,8 @@ uses
   phNativeIntf in 'phNativeIntf.pas',
   phObjConst in 'phObjConst.pas',
   phParsingPicFilter in 'phParsingPicFilter.pas',
-  phPicFilterHighlighter in 'phPicFilterHighlighter.pas';
+  phPicFilterHighlighter in 'phPicFilterHighlighter.pas',
+  phIJLIntf in 'phIJLIntf.pas';
 
 {$R *.res}
 
