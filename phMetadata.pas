@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.3 2004-04-17 05:00:23 dale Exp $
+//  $Id: phMetadata.pas,v 1.4 2004-06-09 12:59:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -807,7 +807,6 @@ const
   function FindEXIFTag(iTag: Integer): PEXIFTag;
 
 implementation
-uses phUtils;
 
    // Intel-to-Motorola (and back) byte-order data conversion
 
@@ -838,6 +837,28 @@ uses phUtils;
     Result := nil;
   end;
   
+  function GetFirstWord(const s, sDelimiters: String): String;
+  var i: Integer;
+  begin
+    i := 1;
+    while (i<=Length(s)) and (Pos(s[i], sDelimiters)=0) do Inc(i);
+    Result := Copy(s, 1, i-1);
+  end;
+
+  function ExtractFirstWord(var s: String; const sDelimiters: String): String;
+  begin
+    Result := GetFirstWord(s, sDelimiters);
+    Delete(s, 1, Length(Result)+1);
+  end;
+
+  procedure AccumulateStr(var s: String; const sSeparator, sAdd: String);
+  begin
+    if sAdd<>'' then begin
+      if s<>'' then s := s+sSeparator;
+      s := s+sAdd;
+    end;
+  end;
+
    //===================================================================================================================
    // TImageMetadata
    //===================================================================================================================
@@ -1005,9 +1026,10 @@ uses phUtils;
       sValue: Single absolute i64Value;
       dValue: Double absolute i64Value;
     begin
+      Result := '';
       case IE.wFmt of
         iedUByte, iedUndef: Result := IntToStr(Byte(i64Value));
-        iedAscii:           Result := iif(i64Value and $ff=0, '', Char(i64Value)); // Skip terminating char (#0)
+        iedAscii:           if i64Value and $ff<>0 then Result := Char(i64Value); // Skip terminating char (#0)
         iedUShort:          Result := IntToStr(Word(i64Value));
         iedULong:           Result := IntToStr(Cardinal(i64Value));
         iedURational:       Result := Format('%d/%d', [Cardinal(i64Value shr 32), Cardinal(i64Value)]);
