@@ -1,20 +1,22 @@
-<!-- $Id: info-pic-prop-autofill.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: info-pic-prop-autofill.html,v 1.2 2004-11-10 16:07:51 dale Exp $ -->
 {[%hh_hdr_ru:Автозаполнение свойств изображений]}
 
-<p align=justify><b>PhoA</b> может автоматически заполнять некоторые свойства добавляемых изображений. На текущий момент возможности
-  автозаполнения таковы:
+<p align=justify><b>PhoA</b> может автоматически заполнять некоторые свойства добавляемых изображений. На текущий момент
+  возможности автозаполнения таковы:
 <table class=plain border=0>
   <tr class=tblhdr>
     <td nowrap>Свойство</td>
     <td nowrap>Возможность автозаполнения</td>
   </tr>
   <tr>
-    <td><b>Дата</b></td>
+    <td class=command>Дата</td>
     <td>
       <ul>
         <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Original date & time</i> (оригинальные дата и время)</li>
-        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Dititized date & time</i> (дата и время оцифровки изображения)</li>
-        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Date & time</i> (дата и время последней модификации изображения)</li>
+        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Dititized date & time</i> (дата и время оцифровки
+            изображения)</li>
+        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Date & time</i> (дата и время последней модификации
+            изображения)</li>
         <li>Извлечение из имени файла &mdash; если имя файла в формате <i>yyyy-mm-dd hh-mm-ss.*</i></li>
         <li>Из даты/времени создания файла</li>
         <li>Из даты/времени изменения файла</li>
@@ -22,12 +24,14 @@
     </td>
   </tr>
   <tr>
-    <td><b>Время</b></td>
+    <td class=command>Время</td>
     <td>
       <ul>
         <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Original date & time</i> (оригинальные дата и время)</li>
-        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Dititized date & time</i> (дата и время оцифровки изображения)</li>
-        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Date & time</i> (дата и время последней модификации изображения)</li>
+        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Dititized date & time</i> (дата и время оцифровки
+            изображения)</li>
+        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Date & time</i> (дата и время последней модификации
+            изображения)</li>
         <li>Извлечение из имени файла &mdash; если имя файла в формате <i>yyyy-mm-dd hh-mm-ss.*</i></li>
         <li>Из даты/времени создания файла</li>
         <li>Из даты/времени изменения файла</li>
@@ -35,19 +39,21 @@
     </td>
   </tr>
   <tr>
-    <td><b><a href="info-transform.html">Преобразования</a></b><br>(поворот, отражения)</td>
+    <td class=command><a href="info-transform.html">Преобразования</a><br>(поворот, отражения)</td>
     <td>
       <ul>
-        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Orientation</i> (ориентация, или положение изображения)</li>
+        <li>Из <a href="info-metadata.html">EXIF-тега</a> <i>Orientation</i> (ориентация, или положение
+            изображения)</li>
       </ul>
     </td>
   </tr>
 </table>  
 
-<p align=justify>Программа пытается заполнить конкретное <a href="general-pic-data.html">свойство изображения</a>, перебирая разрешённые в
-  <a href="setup-dialogs.html">настройках</a> варианты в том порядке, в котором они перечислены. Если свойство было успешно заполнено, перебор
-  на этом заканчивается.
-<p align=justify>Кроме того, на поведение автозаполнения влияет и опция <b>Переписывать <i>свойство</i>, если оно уже указано</b>.
+<p align=justify>Программа пытается заполнить конкретное <a href="general-pic-data.html">свойство изображения</a>,
+  перебирая разрешённые в <a href="setup-dialogs.html">настройках</a> варианты в том порядке, в котором они перечислены.
+  Если свойство было успешно заполнено, перебор на этом заканчивается.
+<p align=justify>Кроме того, на поведение автозаполнения влияет и опция <b>Переписывать <i>свойство</i>, если оно уже
+  указано</b>.
 
 {[%hh_seealso_ru]}
   <a href="setup-dialogs.html">Настройки программы :: Диалоги</a><br>
