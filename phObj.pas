@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.5 2004-04-18 16:13:35 dale Exp $
+//  $Id: phObj.pas,v 1.6 2004-04-23 03:57:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2429,7 +2429,7 @@ type
        // Создаём, загружаем картинку и превращаем её в Bitmap
       bmpFullSize := LoadGraphicFromFile(FPicFileName);
       try
-        bmpFullSize.StretchFilter := TStretchFilter(RootSetting.ValueIntByID[ISettingID_Browse_ViewerStchFilt]);
+        bmpFullSize.StretchFilter := TStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt));
         FPicWidth  := bmpFullSize.Width;
         FPicHeight := bmpFullSize.Height;
          // Определяем размеры эскиза

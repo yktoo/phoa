@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.1 2004-04-22 17:54:00 dale Exp $
+//  $Id: phValSetting.pas,v 1.2 2004-04-23 03:57:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -15,7 +15,7 @@ type
    // TPhoaValSetting - настройка, имеющая значение
    //===================================================================================================================
 
-  TPhoaValSetting = class(TObject)
+  TPhoaValSetting = class(TPhoaSetting)
   protected
      // Данные
     FData: Integer;
@@ -220,8 +220,8 @@ type
     procedure EmbeddedFontButtonClick(Sender: TObject);
      // IPhoaSettingEditor
     procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
-    function  GetRootSetting: TPhoaValPageSetting;
-    procedure SetRootSetting(Value: TPhoaValPageSetting);
+    function  GetRootSetting: TPhoaPageSetting;
+    procedure SetRootSetting(Value: TPhoaPageSetting);
      // Message handlers
     procedure WMEmbedControl(var Msg: TMessage); message WM_EMBEDCONTROL;
   protected
@@ -271,9 +271,9 @@ type
   begin
     inherited Assign(Source);
     if Source is TPhoaIntSetting then begin
-      FData     := Source.FData;
-      FMinValue := Source.FMinValue;
-      FMaxValue := Source.FMaxValue;
+      FData     := TPhoaIntSetting(Source).FData;
+      FMinValue := TPhoaIntSetting(Source).FMinValue;
+      FMaxValue := TPhoaIntSetting(Source).FMaxValue;
     end;
   end;
 
@@ -297,7 +297,7 @@ type
 
   procedure TPhoaIntSetting.SetValue(Value: Integer);
   begin
-    FData := Min(Max(iValue, FMinValue), FMaxValue);
+    FData := Min(Max(Value, FMinValue), FMaxValue);
   end;
 
    //===================================================================================================================
@@ -307,7 +307,7 @@ type
   procedure TPhoaBoolSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
-    if Source is TPhoaBoolSetting then FData := Source.FData; 
+    if Source is TPhoaBoolSetting then FData := TPhoaBoolSetting(Source).FData;
   end;
 
   constructor TPhoaBoolSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; bValue: Boolean);
@@ -328,7 +328,7 @@ type
 
   procedure TPhoaBoolSetting.SetValue(Value: Boolean);
   begin
-    FData := Byte(bValue);
+    FData := Byte(Value);
   end;
 
    //===================================================================================================================
@@ -380,9 +380,9 @@ type
 
   constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; bRefObject: Boolean);
   begin
-    inherited Create(AOwner, iID, sName);
-    FVariants := TStringList.Create;
-    Value := iValue;
+    inherited Create(AOwner, iID, sName, iValue, -1, MaxInt);
+    FRefObject := bRefObject;
+    FVariants  := TStringList.Create;
   end;
 
   destructor TPhoaListSetting.Destroy;
@@ -582,7 +582,7 @@ type
        // RadioButton, где (значение родителя)=(значение выбранного ребёнка)
     end else if Setting is TPhoaMutexIntSetting then begin
       Node.CheckType := ctRadioButton;
-      bChecked := (ParentSetting as TPhoaIntSetting)=TPhoaMutexIntSetting(Setting).Value;
+      bChecked := (ParentSetting as TPhoaIntSetting).Value=TPhoaMutexIntSetting(Setting).Value;
     end;
     Node.CheckState := aCheckStates[bChecked];
      // Инициализируем к-во детей
@@ -715,7 +715,7 @@ type
            // Создаём или уничтожаем контрол
           if      Setting is TPhoaListSetting  then NewComboBox
           else if Setting is TPhoaColorSetting then NewColorBox
-          else if Setting is TPhoaIntSetting   then NewEdit(Length(IntToStr(TPhoaIntSetting(Setting).MaxValue)));
+          else if Setting is TPhoaIntSetting   then NewEdit(Length(IntToStr(TPhoaIntSetting(Setting).MaxValue)))
           else if Setting is TPhoaFontSetting  then NewFontButton
           else FreeAndNil(FEditorControl);
         end;
@@ -739,7 +739,7 @@ type
     Setting := GetSetting(Node);
     if      Setting is TPhoaListSetting       then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TComboBox).ItemIndex
     else if Setting is TPhoaColorSetting      then TPhoaColorSetting(Setting).Value := (FEditorControl as TColorBox).Selected
-    else if Setting.ClassType=TPhoaIntSetting then TPhoaIntSetting(Setting).Value := StrToIntDef((FEditorControl as TEdit).Text, Setting.ValueInt);
+    else if Setting.ClassType=TPhoaIntSetting then TPhoaIntSetting(Setting).Value := StrToIntDef((FEditorControl as TEdit).Text, TPhoaIntSetting(Setting).Value);
     DoSettingChange;
   end;
 
@@ -778,7 +778,7 @@ type
       end;
   end;
 
-  function TPhoaValSettingEditor.GetRootSetting: TPhoaValPageSetting;
+  function TPhoaValSettingEditor.GetRootSetting: TPhoaPageSetting;
   begin
     Result := FRootSetting;
   end;
@@ -814,10 +814,10 @@ type
     end;
   end;
 
-  procedure TPhoaValSettingEditor.SetRootSetting(Value: TPhoaValPageSetting);
+  procedure TPhoaValSettingEditor.SetRootSetting(Value: TPhoaPageSetting);
   begin
     if FRootSetting<>Value then begin
-      FRootSetting := Value;
+      FRootSetting := Value as TPhoaValPageSetting;
       LoadTree;
     end;
   end;

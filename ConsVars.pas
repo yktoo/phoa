@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.7 2004-04-22 17:54:00 dale Exp $
+//  $Id: ConsVars.pas,v 1.8 2004-04-23 03:57:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,7 +9,7 @@ unit ConsVars;
 interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees;
+  SysUtils, Windows, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32;
 
 type
   EPhoaError = class(Exception);
@@ -736,15 +736,17 @@ var
    // Misc settings
   ViewInfoPos: TRect;         // Границы информации при просмотре в 10-тысячных долях размера экрана [90, 9400, 9910, 9880]
 
-   // Корневой пункт установки
-  RootSetting: TPhoaSetting;
-
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
    // Возвращает индекс в aFileRevisions[], соответствующий указанной ревизии, или -1, если такой нет
   function  GetIndexOfRevision(iRev: Integer): Integer;
    // Возвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии)
   function  ValidRevisionIndex(idxRev: Integer): Integer;
+
+   // Применяет пользовательские настройки к TVirtualStringTree
+  procedure ApplyTreeSettings(Tree: TVirtualStringTree);
+   // Применяет пользовательские настройки к докам/панелям инструментов
+  procedure ApplyToolbarSettings(Dock: TTBXDock);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses Forms, phPhoa, phUtils;
