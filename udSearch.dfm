@@ -111,31 +111,38 @@ inherited dSearch: TdSearch
         Header.Font.Height = -11
         Header.Font.Name = 'Tahoma'
         Header.Font.Style = []
-        Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
+        Header.Options = [hoAutoResize, hoColumnResize, hoShowSortGlyphs, hoVisible]
         Header.ParentFont = True
+        PopupMenu = pmSimple
         TabOrder = 0
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
-        TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+        TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toExtendedFocus]
+        OnChecked = tvSimpleCriteriaChecked
         OnCreateEditor = tvSimpleCriteriaCreateEditor
         OnFocusChanged = tvSimpleCriteriaFocusChanged
         OnGetText = tvSimpleCriteriaGetText
+        OnPaintText = tvSimpleCriteriaPaintText
         OnInitNode = tvSimpleCriteriaInitNode
         Columns = <
           item
-            Color = 16250871
-            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coResizable, coShowDropMark, coVisible]
+            Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
             Width = 180
+            WideText = 'Picture property'
           end
           item
+            Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 1
             Width = 130
+            WideText = 'Condition'
           end
           item
+            Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
             Width = 280
+            WideText = 'Value'
           end>
         WideDefaultText = ''
       end
@@ -204,7 +211,7 @@ inherited dSearch: TdSearch
     Left = 116
     Top = 432
     LangData = {
-      070064536561726368010100000003000000070043617074696F6E0115000000
+      070064536561726368010100000003000000070043617074696F6E0118000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
       6243616E63656C01010000000C000000070043617074696F6E000300624F4B01
       010000000F000000070043617074696F6E0005006248656C7001010000001200
@@ -224,7 +231,10 @@ inherited dSearch: TdSearch
       7072496E736572744F70657261746F7201020000002D00000007004361707469
       6F6E2F000000040048696E740007007363704D61696E0104000000300000000D
       00456E644F66546F6B656E4368723300000005005469746C65320000000E0054
-      69746C65466F6E742E4E616D65310000000C0054726967676572436861727300}
+      69746C65466F6E742E4E616D65310000000C0054726967676572436861727300
+      0800706D53696D706C6500000F0069706D736D53696D706C6550726F70010100
+      000034000000070043617074696F6E000F0069706D53696D706C6544656C6574
+      65010100000035000000070043617074696F6E00}
   end
   object scpMain: TSynCompletionProposal
     Options = [scoLimitToMatchedText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
@@ -245,7 +255,22 @@ inherited dSearch: TdSearch
     ShortCut = 16416
     Editor = eExpression
     TimerInterval = 200
-    Left = 44
-    Top = 112
+    Left = 84
+    Top = 124
+  end
+  object pmSimple: TTBXPopupMenu
+    Images = fMain.ilActionsSmall
+    OnPopup = pmSimplePopup
+    Left = 32
+    Top = 124
+    object ipmsmSimpleProp: TTBXSubmenuItem
+      Caption = '&Picture property'
+    end
+    object ipmSimpleDelete: TTBXItem
+      Caption = '&Delete'
+      ImageIndex = 7
+      ShortCut = 16430
+      OnClick = ipmSimpleDeleteClick
+    end
   end
 end

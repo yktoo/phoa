@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.30 2004-11-21 09:15:51 dale Exp $
+;  $Id: phoa.dklang,v 1.31 2004-11-21 13:18:24 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -295,6 +295,8 @@ scpMain.EndOfTokenChr=00000048,()[].
 scpMain.Title=00000051,Properties
 scpMain.TitleFont.Name=00000050,MS Sans Serif
 scpMain.TriggerChars=00000049,$
+ipmsmSimpleProp.Caption=00000052,&Picture property
+ipmSimpleDelete.Caption=00000053,&Delete
 
 [dProjectProps]
 Caption=00000003,Properties: photo album
@@ -932,6 +934,7 @@ SMsg_LoadingPhoa=Loading photo album %s...
 SMsg_NoMetatagSelected=No metatag selected. Select an item to view its description
 SMsg_ProcessingSomething=Processing %s...
 SMsg_ScanningLanguages=Scanning for language files...
+SMsg_SelectSearchPicProp=(select a property)
 SMsg_Starting=Starting the application...
 SNoFilesSelected=No files selected in the result list
 SNone=(none)

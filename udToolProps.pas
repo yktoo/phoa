@@ -8,31 +8,31 @@ uses
 
 type
   TdToolProps = class(TPhoaDialog)
-    dklcMain: TDKLanguageController;
-    lKind: TLabel;
-    cbKind: TComboBox;
-    lName: TLabel;
-    eName: TEdit;
-    lHint: TLabel;
-    eHint: TEdit;
-    lRunCommand: TLabel;
-    eRunCommand: TEdit;
     bBrowseRunCommand: TButton;
-    lRunParams: TLabel;
-    eRunParams: TEdit;
-    lRunFolder: TLabel;
-    eRunFolder: TEdit;
     bBrowseRunFolder: TButton;
-    lRunShowCommand: TLabel;
+    cbKind: TComboBox;
     cbRunShowCommand: TComboBox;
-    gbUsage: TGroupBox;
-    cbUsageTools: TCheckBox;
     cbUsageGroups: TCheckBox;
     cbUsageThViewer: TCheckBox;
-    lMasks: TLabel;
-    eMasks: TEdit;
-    odRunCommand: TOpenDialog;
+    cbUsageTools: TCheckBox;
     cbUsageViewMode: TCheckBox;
+    dklcMain: TDKLanguageController;
+    eHint: TEdit;
+    eMasks: TEdit;
+    eName: TEdit;
+    eRunCommand: TEdit;
+    eRunFolder: TEdit;
+    eRunParams: TEdit;
+    gbUsage: TGroupBox;
+    lHint: TLabel;
+    lKind: TLabel;
+    lMasks: TLabel;
+    lName: TLabel;
+    lRunCommand: TLabel;
+    lRunFolder: TLabel;
+    lRunParams: TLabel;
+    lRunShowCommand: TLabel;
+    odRunCommand: TOpenDialog;
     procedure bBrowseRunCommandClick(Sender: TObject);
     procedure bBrowseRunFolderClick(Sender: TObject);
     procedure cbKindChange(Sender: TObject);
@@ -116,7 +116,7 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
       sHint := eHint.Text;
     end;
     if Kind=ptkCustom then begin
-      iShowCmd    := Integer(cbRunShowCommand.Items.Objects[cbRunShowCommand.ItemIndex]);
+      iShowCmd    := GetCurrentCBObject(cbRunShowCommand);
       sRunCommand := eRunCommand.Text;
       sRunFolder  := eRunFolder.Text;
       sRunParams  := eRunParams.Text;
@@ -184,7 +184,7 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
      // Инициализируем значения контролов 
     if FTool=nil then begin
       cbKind.ItemIndex           := Byte(ptkOpen);
-      cbRunShowCommand.ItemIndex := cbRunShowCommand.Items.IndexOfObject(Pointer(SW_SHOWNORMAL));
+      SetCurrentCBObject(cbRunShowCommand, SW_SHOWNORMAL);
     end else begin
       cbKind.ItemIndex           := Byte(FTool.Kind);
       eName.Text                 := ConstValEx(FTool.Name);
@@ -193,7 +193,7 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
       eRunCommand.Text           := FTool.RunCommand;
       eRunParams.Text            := FTool.RunParameters;
       eRunFolder.Text            := FTool.RunFolder;
-      cbRunShowCommand.ItemIndex := cbRunShowCommand.Items.IndexOfObject(Pointer(FTool.RunShowCommand));
+      SetCurrentCBObject(cbRunShowCommand, FTool.RunShowCommand);
       cbUsageTools.Checked       := ptuToolsMenu         in FTool.Usages;
       cbUsageGroups.Checked      := ptuGroupPopupMenu    in FTool.Usages;
       cbUsageThViewer.Checked    := ptuThViewerPopupMenu in FTool.Usages;

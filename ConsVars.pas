@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.76 2004-11-10 10:35:24 dale Exp $
+//  $Id: ConsVars.pas,v 1.77 2004-11-21 13:18:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -410,6 +410,7 @@ const
     SRegSearch_FrNumberMRU        = SRegSearch_Root+'\FrameNumberMRU';
     SRegSearch_DescMRU            = SRegSearch_Root+'\DescMRU';
     SRegSearch_NotesMRU           = SRegSearch_Root+'\NotesMRU';
+    SRegSearch_SimpleCriteria     = 'SimpleCriteria';
 
   SRegSort_Root                   = SRegDialogsRoot+'\Sort';
     SRegSort_LastSortings         = SRegSort_Root+'\LastSortings';

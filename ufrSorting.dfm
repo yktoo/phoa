@@ -64,10 +64,10 @@ object frSorting: TfrSorting
     Left = 8
     Top = 40
     object ipmsmProp: TTBXSubmenuItem
-      Caption = '&'#1057#1074#1086#1081#1089#1090#1074#1086' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
+      Caption = '&Picture property'
     end
     object ipmDelete: TTBXItem
-      Caption = '&'#1059#1076#1072#1083#1080#1090#1100
+      Caption = '&Delete'
       ImageIndex = 7
       ShortCut = 46
       OnClick = ipmDeleteClick
@@ -75,13 +75,13 @@ object frSorting: TfrSorting
     object ipmSep: TTBXSeparatorItem
     end
     object ipmMoveUp: TTBXItem
-      Caption = #1057#1076#1074#1080#1085#1091#1090#1100' &'#1074#1074#1077#1088#1093
+      Caption = 'Move &up'
       ImageIndex = 55
       ShortCut = 16422
       OnClick = ipmMoveUpClick
     end
     object ipmMoveDown: TTBXItem
-      Caption = #1057#1076#1074#1080#1085#1091#1090#1100' '#1074'&'#1085#1080#1079
+      Caption = 'Move do&wn'
       ImageIndex = 56
       ShortCut = 16424
       OnClick = ipmMoveDownClick

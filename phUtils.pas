@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.37 2004-10-23 14:05:08 dale Exp $
+//  $Id: phUtils.pas,v 1.38 2004-11-21 13:18:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -27,6 +27,10 @@ uses
   procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
   procedure RegisterCBHistory(cb: TComboBox);
+   // Возвращает Integer(Items.Objects[ItemIndex]) для TComboBox, или -1, если ItemIndex<0
+  function  GetCurrentCBObject(ComboBox: TComboBox): Integer;
+   // То же, для установки ComboBox по Objects[]. Возвращает True, если удалось
+  function  SetCurrentCBObject(ComboBox: TComboBox; iObj: Integer): Boolean;
 
    // Изготовление типа TSize
   function  Size(cx, cy: Integer): TSize; 
@@ -154,7 +158,7 @@ uses
 
 implementation
 uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
-  Variants;
+  Variants, phPhoa;
 
   procedure PhoaException(const sMsg: String);
 
@@ -256,6 +260,21 @@ uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
         while Count>IMaxHistoryEntries do Delete(IMaxHistoryEntries);
       end;
     cb.Text := s;
+  end;
+
+  function GetCurrentCBObject(ComboBox: TComboBox): Integer;
+  var idx: Integer;
+  begin
+    idx := ComboBox.ItemIndex;
+    if idx<0 then Result := -1 else Result := Integer(ComboBox.Items.Objects[idx]);
+  end;
+
+  function SetCurrentCBObject(ComboBox: TComboBox; iObj: Integer): Boolean;
+  var idx: Integer;
+  begin
+    idx := ComboBox.Items.IndexOfObject(Pointer(iObj));
+    ComboBox.ItemIndex := idx;
+    Result := idx>=0;
   end;
 
   function Size(cx, cy: Integer): TSize;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.8 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrSorting.pas,v 1.9 2004-11-21 13:18:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -211,8 +211,7 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TfrSorting.tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   var p: TPoint;
   begin
-    Sender.Selected[Node] := True;
-    Sender.FocusedNode := Node;
+    ActivateVTNode(Sender, Node);
     EnableActions;
     with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
     pmMain.Popup(p.x, p.y);

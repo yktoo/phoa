@@ -93,20 +93,6 @@ inherited dSortPics: TdSortPics
         end>
       WideDefaultText = ''
     end
-    inherited pmMain: TTBXPopupMenu
-      inherited ipmsmProp: TTBXSubmenuItem
-        Caption = '&Picture property'
-      end
-      inherited ipmDelete: TTBXItem
-        Caption = '&Delete'
-      end
-      inherited ipmMoveUp: TTBXItem
-        Caption = 'Move &up'
-      end
-      inherited ipmMoveDown: TTBXItem
-        Caption = 'Move do&wn'
-      end
-    end
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
