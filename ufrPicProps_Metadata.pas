@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.14 2004-12-09 17:35:36 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.15 2004-12-10 04:46:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,6 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   Dialogs, phWizard, VirtualTrees, phPicPropsDlgPage, TBXDkPanels, TB2Dock,
   TBX, Menus, TB2Item, DKLang;
 
@@ -45,8 +46,7 @@ type
 
 implementation
 {$R *.dfm}
-uses ConsVars, phUtils, phObj, phMetadata, udSettings, phSettings, Main,
-  udPicProps;
+uses ConsVars, phUtils, phMetadata, udSettings, phSettings, Main;
 
 type
   PPExifTag = ^PExifTag;
@@ -65,7 +65,7 @@ type
   begin
     inherited FileChanged(iIndex);
      // При изменении файла "сбрасываем" (очищаем) узел
-    n := GetVTRootNodeByIndex(tvMain, iIndex); 
+    n := GetVTRootNodeByIndex(tvMain, iIndex);
     if n<>nil then tvMain.ResetNode(n);
   end;
 

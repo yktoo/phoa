@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.11 2004-12-09 17:35:36 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.12 2004-12-10 04:46:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,6 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phWizard, VirtualTrees, phPicPropsDlgPage, TB2Dock, TB2Toolbar, TBX,
   ActnList, TB2Item;
 
@@ -37,17 +38,20 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure FileChanged(iIndex: Integer); override;
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
 {$R *.dfm}
-uses TypInfo, VirtualShellUtilities, phUtils, phObj, phSettings, GraphicEx, Main;
+uses TypInfo, VirtualShellUtilities, phUtils, phSettings, GraphicEx, Main;
 
 type
   PNamespace = ^TNamespace;
 
   procedure TfrPicProps_FileProps.aaChangeFile(Sender: TObject);
-  var n: PVirtualNode;
+  var
+    n: PVirtualNode;
+    Pic: IPhoaPic;
   begin
     n := tvMain.FocusedNode;
     if n<>nil then
@@ -56,11 +60,30 @@ type
           FileName   := Dialog.PictureFiles[n.Index];
           Filter     := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
           Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-          Title      := {!!!}ConstVal('SDlgTitle_OpenSearchExpr');
-          if Execute then Dialog.PictureFiles[n.Index] := FileName;
+          Title      := ConstVal('SDlgTitle_SelectPicFile');
+          if Execute then begin
+             // Ищем изображение с таким файлом
+            Pic := App.Project.Pics.ItemsByFileName[FileName];
+             // Не нашли - изменяем файл
+            if Pic=nil then Dialog.PictureFiles[n.Index] := FileName
+             // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
+            else if Pic.ID<>EditedPics[n.Index].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [FileName, Pic.ID]));
+          end;
         finally
           Free;
         end;
+  end;
+
+  procedure TfrPicProps_FileProps.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  var i: Integer;
+  begin
+     // Если страница посещалась/есть файлы
+    if tvMain.RootNodeCount>0 then begin
+       // Составляем список изменений файлов
+      for i := 0 to EditedPics.Count-1 do begin
+        //!!!
+      end;
+    end;
   end;
 
   procedure TfrPicProps_FileProps.BeforeDisplay(ChangeMethod: TPageChangeMethod);

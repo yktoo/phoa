@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.40 2004-12-07 14:54:31 dale Exp $
+;  $Id: phoa.dklang,v 1.41 2004-12-10 04:46:00 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -910,6 +910,7 @@ SDlgTitle_SaveIni=Save settings file
 SDlgTitle_SavePhoa=Save photo album file as
 SDlgTitle_SaveSearchExprAs=Save search expression as
 SDlgTitle_SelectFolder=Select a folder
+SDlgTitle_SelectPicFile=Select a picture file
 SDlgTitle_Warning=PhoA: Warning
 SErrCannotCreateFolder=Unable to create folder "%s"
 SErrCannotDecodePicture=Error decoding picture file "%s":\n%s
@@ -925,6 +926,7 @@ SErrInvalidPicFileName=Invalid picture file name: "%s"
 SErrNotAllPicsLinked=%d of %d selected pictures won't be placed in a group, which is invalid. Each picture must be linked to at least one group.
 SErrNoTargetPathDetermined=No target path determined for file "%s"
 SError=Error
+SErrPicFileAlreadyInUse=File "%s" is already used by another picture (ID=%d) in the photo album
 SErrSrcAndDestFoldersAreSame=Source and destination folders are the same ("%s") for file "%s"
 SErrTargetFileExists=Target file "%s" already exists
 SErrUnknownPicFileExtension=Unknown picture file extension for "%s"
@@ -1099,3 +1101,4 @@ TPhoaOp_ViewDelete=Delete view
 TPhoaOp_ViewEdit=Edit view
 TPhoaOp_ViewMakeGroup=Make group from view
 TPhoaOp_ViewNew=Create view
+

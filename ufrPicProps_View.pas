@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.30 2004-12-09 17:35:36 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.31 2004-12-10 04:46:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -101,6 +101,8 @@ type
     FDisplayingImage: Boolean;
      // Возвращает коэффициент оптимального масштаба изображения
     function  BestFitZoomFactor: Single;
+     // Запускает таймер на загрузку изображения
+    procedure SetViewImageTimer;
      // Загружает и отображает изображение
     procedure LoadViewImage;
      // Находит размеры окна и устанавливает масштаб так, чтобы изображение целиком туда вписалось
@@ -228,7 +230,12 @@ uses phUtils, Main, phSettings;
     Pic: IPhoaPic;
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if not FInitialized then begin
+     // Если страница проинициализирована
+    if FInitialized then begin
+       // Если нужно загрузить изображение
+      if not FImageLoaded then SetViewImageTimer;
+     // Иначе инициализируем 
+    end else begin
        // Создаём преобразование
       FTransform := TPicTransform.Create(iMain.Bitmap);
       FTransform.OnApplied := TransformApplied;
@@ -262,8 +269,7 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_View.cbViewFileChange(Sender: TObject; const Text: String);
   begin
-    KillTimer(Handle, IPicPropsViewTimerID);
-    SetTimer(Handle, IPicPropsViewTimerID, 500, nil);
+    SetViewImageTimer;
   end;
 
   procedure TfrPicProps_View.EnableActions;
@@ -278,7 +284,12 @@ uses phUtils, Main, phSettings;
   begin
     inherited FileChanged(iIndex);
      // При изменении файла обновляем строчку в cbViewFile
-    if FInitialized then cbViewFile.Strings[iIndex] := Dialog.PictureFiles[iIndex];
+    if FInitialized then begin
+      cbViewFile.Strings[iIndex] := Dialog.PictureFiles[iIndex];
+       // Если это текущее отображаемое изображение, его нужно перегрузить
+      if cbViewFile.ItemIndex=iIndex then
+        if Visible then SetViewImageTimer else FImageLoaded := False;
+    end;
   end;
 
   procedure TfrPicProps_View.FinalizePage;
@@ -398,6 +409,12 @@ uses phUtils, Main, phSettings;
       EndUpdate;
       EnableActions;
     end;
+  end;
+
+  procedure TfrPicProps_View.SetViewImageTimer;
+  begin
+    KillTimer(Handle, IPicPropsViewTimerID);
+    SetTimer(Handle, IPicPropsViewTimerID, 500, nil);
   end;
 
   procedure TfrPicProps_View.SetViewOffset(const Value: TPoint);
