@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.24 2004-10-22 20:29:30 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.25 2004-10-26 13:51:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  GR32,
+  GR32, GraphicEx,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
@@ -19,6 +19,7 @@ type
 
   TfAddFilesWizard = class(TPhoaWizardForm, IPhoaWizardPageHost_Log, IPhoaWizardPageHost_Process)
     dklcMain: TDKLanguageController;
+    pProcess: TPanel;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
      // Поток, добавляющий файлы
@@ -42,17 +43,20 @@ type
      // Следующий свободный ID изображения 
     FFreePicID: Integer;
      // Prop storage
-    FFileList: TFileList;
+    FAddList: TStrings;
     FApp: IPhotoAlbumApp;
-    FRecurseFolders: Boolean;
     FDefaultPath: String;
-    FShowAdvancedOptions: Boolean;
+    FFileList: TFileList;
+    FFilter_DateFrom: TDateTime;
+    FFilter_DateTo: TDateTime;
     FFilter_Masks: String;
     FFilter_Presence: TAddFilePresenceFilter;
-    FFilter_DateFrom: TDateTime;
-    FFilter_TimeTo: TDateTime;
     FFilter_TimeFrom: TDateTime;
-    FFilter_DateTo: TDateTime;
+    FFilter_TimeTo: TDateTime;
+    FRecurseFolders: Boolean;
+    FShowAdvancedOptions: Boolean;
+     // Загружает в FFileList список файлов (папок), имена которых перечислены в FAddList
+    procedure LoadFileList;
      // Обновляет информацию о добавлении файлов
     procedure UpdateProgressInfo;
      // Вызывается потоком, добавляющим файлы, для уведомления о том, что файл обработан
@@ -86,6 +90,7 @@ type
     function  GetFormRegistrySection: String; override;
     procedure SettingsStore(rif: TRegIniFile); override;
     procedure SettingsRestore(rif: TRegIniFile); override;
+    function  PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
   public
      // Запускает добавление файлов
@@ -93,6 +98,8 @@ type
      // Прерывает добавление файлов
     procedure InterruptFileProcessing;
      // Props
+     // -- Список файлов/папок для добавления в FileList
+    property AddList: TStrings read FAddList;
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
      // -- Папка для добавления, выбираемая по умолчанию
@@ -144,22 +151,24 @@ type
     property AddedPic: IPhotoAlbumPic read FAddedPic;
   end;
 
-   // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
-  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
+   // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено. Если
+   //   FileList<>nil, то пропускает страницу выбора файлов и сразу добавляет указанные файлы/папки
+  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
 
 implementation
 {$R *.dfm}
 uses
   phUtils, phMetadata, Main, VirtualShellUtilities,
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
-  phPhoa, phSettings;
+  phPhoa, phSettings, udMsgBox;
 
-  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
+        if AAddList<>nil then FAddList.Assign(AAddList);
         Result := Execute;
       finally
         Free;
@@ -436,6 +445,7 @@ uses
   procedure TfAddFilesWizard.FinalizeWizard;
   begin
     FFileList.Free;
+    FAddList.Free;
     FLog.Free;
      // Если есть добавленные изображения, выполняем операцию
     if (FPics<>nil) and (FPics.Count>0) then FApp.PerformOperation('PicAdd', ['Group', FApp.CurGroup, 'Pics', FPics]);
@@ -467,6 +477,7 @@ uses
   procedure TfAddFilesWizard.InitializeWizard;
   begin
     inherited InitializeWizard;
+    FAddList   := TStringList.Create;
     FFileList  := TFileList.Create;
     FPics      := NewPhotoAlbumPicList(False);
     FFreePicID := FApp.Project.PicsX.MaxPicID+1;
@@ -509,6 +520,117 @@ uses
       end;
   end;
 
+  procedure TfAddFilesWizard.LoadFileList;
+  var
+    Masks: TPhoaMasks;
+
+     // Добавляет файл к списку по его SearchRec, проверяя его соответствие фильтру
+    procedure AddFile(const sPath: String; SRec: TSearchRec); overload;
+    var
+      d: TDateTime;
+      bMatches: Boolean;
+    begin
+       // Проверяем, что расширение знакомого типа
+      if FileFormatList.GraphicFromExtension(ExtractFileExt(SRec.Name))=nil then Exit;
+      d := FileDateToDateTime(SRec.Time);
+       // Если фильтр выключен
+      if not FShowAdvancedOptions then
+        bMatches := True
+      else begin
+         // Проверяем дату изменения файла
+        bMatches :=
+          ((FFilter_DateFrom<0) or (Int(d) >=FFilter_DateFrom)) and
+          ((FFilter_DateTo<0)   or (Int(d) <=FFilter_DateTo))   and
+          ((FFilter_TimeFrom<0) or (Frac(d)>=FFilter_TimeFrom)) and
+          ((FFilter_TimeTo<0)   or (Frac(d)<=FFilter_TimeTo));
+         // Проверяем соответствие маске
+        if bMatches then bMatches := Masks.Matches(SRec.Name);
+         // Проверяем присутствие в фотоальбоме
+        if bMatches and (FFilter_Presence<>afpfDontCare) then
+          bMatches := (FApp.Project.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (FFilter_Presence=afpfExistingOnly);
+      end;
+       // Если все критерии удовлетворены
+      if bMatches then FFileList.Add(SRec.Name, sPath, SRec.Size, -2, d);
+    end;
+
+     // Добавляет файл по его имени
+    procedure AddFile(const sFilename: String); overload;
+    var
+      sr: TSearchRec;
+      iRes: Integer;
+    begin
+      iRes := FindFirst(sFilename, faAnyFile, sr);
+      try
+        if (iRes=0) and (sr.Attr and faDirectory=0) then AddFile(ExtractFilePath(sFileName), sr);
+      finally
+        FindClose(sr);
+      end;
+    end;
+
+    procedure AddFolder(const sPath: String; bRecurse: Boolean);
+    var
+      sr: TSearchRec;
+      iRes: Integer;
+    begin
+       // Обновляем информацию о процессе
+      pProcess.Caption := ConstVal('SMsg_ProcessingSomething', [sPath]);
+      pProcess.Update;
+       // Сканируем каталог
+      iRes := FindFirst(sPath+'*.*', faAnyFile, sr);
+      try
+        while iRes=0 do begin
+          if sr.Name[1]<>'.' then
+             // Если каталог - рекурсивно сканируем
+            if sr.Attr and faDirectory<>0 then begin
+              if bRecurse then AddFolder(sPath+sr.Name+'\', True);
+             // Если файл - добавляем к списку
+            end else
+              AddFile(sPath, sr);
+          iRes := FindNext(sr);
+        end;
+      finally
+        FindClose(sr);
+      end;
+    end;
+
+     // Добавляет в FFileList файлы/папки из FAddList
+    procedure ProcessAddList;
+    var
+      i: Integer;
+      sName: String;
+    begin
+       // Стираем существующий список файлов
+      FFileList.Clear;
+       // Обрабатываем список выбранных файлов/папок
+      for i := 0 to FAddList.Count-1 do begin
+        sName := FAddList[i];
+         // Файл?
+        if FileExists(sName) then AddFile(sName)
+         // Каталог? (несуществующие пока игнорируем)
+        else if DirectoryExists(sName) then AddFolder(IncludeTrailingPathDelimiter(sName), FRecurseFolders);
+      end;
+    end;
+
+  begin
+     // Отображаем панель процесса
+    StartWait;
+    pProcess.Show;
+    try
+       // Если нужно, создаём список масок
+      if FShowAdvancedOptions and (FFilter_Masks<>'') then Masks := TPhoaMasks.Create(FFilter_Masks) else Masks := nil;
+      try
+         // Обрабатываем файлы/папки
+        ProcessAddList;
+      finally
+        Masks.Free;
+      end;
+     // Скрываем панель процесса
+    finally
+      pProcess.Hide;
+      StopWait;
+    end;
+  end;
+
   procedure TfAddFilesWizard.LogFailure(const s: String; const aParams: array of const);
   begin
     FLog.Add('[!] '+ConstVal(s, aParams));
@@ -528,6 +650,18 @@ uses
   begin
     inherited PageChanged(ChangeMethod, iPrevPageID);
     if (ChangeMethod=pcmNextBtn) and (CurPageID=IWzAddFilesPageID_Processing) then StartFileProcessing;
+  end;
+
+  function TfAddFilesWizard.PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;
+  begin
+    Result := inherited PageChanging(ChangeMethod, iNewPageID);
+    if Result and (ChangeMethod=pcmNextBtn) and (Controller.VisiblePageID=IWzAddFilesPageID_SelFiles) then begin
+       // Загружаем список файлов
+      LoadFileList;
+       // Если в списке есть файлы
+      Result := FFileList.Count>0;
+      if not Result then PhoaInfo(False, 'SNoFilesSelected');
+    end;
   end;
 
   function TfAddFilesWizard.ProcPage_GetCurrentStatus: String;
