@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.32 2004-06-02 08:24:31 dale Exp $
+//  $Id: ConsVars.pas,v 1.33 2004-06-03 12:47:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -34,6 +34,29 @@ type
    // ‘лаги отражени€ изображени€ (используетс€ префикс pfl, чтобы не путать с TPixelFormat)
   TPicFlip = (pflHorz, pflVert);
   TPicFlips = set of TPicFlip;
+
+   // ѕреобразование изображени€ (набор параметров преобразовани€)
+  TPicTransform = class
+  private
+     // Prop storage
+    FBitmap: TBitmap32;
+    FFlips: TPicFlips;
+    FRotation: TPicRotation;
+     // ѕримен€ет преобразовани€ к изображению
+    procedure ApplyTransform; 
+     // Prop handlers
+    procedure SetFlips(Value: TPicFlips);
+    procedure SetRotation(Value: TPicRotation);
+  public
+    constructor Create(ABitmap: TBitmap32; ARotation: TPicRotation; AFlips: TPicFlips);
+     // Props
+     // -- »зображение, к которому примен€етс€ преобразование 
+    property Bitmap: TBitmap32 read FBitmap;
+     // -- ќтражени€ изображени€ относительно исходного
+    property Flips: TPicFlips read FFlips write SetFlips;
+     // -- ѕоворот изображени€ относительно исходного
+    property Rotation: TPicRotation read FRotation write SetRotation;
+  end;
 
    // —войства дл€ автоматического заполнени€ даты/времени изображени€
   TDateTimeAutofillProp = (
@@ -1063,6 +1086,39 @@ type
             2: DockMode := dmCannotFloat;
             3: DockMode := dmCanFloat;
           end;
+  end;
+
+   //===================================================================================================================
+   // TPicTransform
+   //===================================================================================================================
+
+  procedure TPicTransform.ApplyTransform;
+  begin
+    //
+  end;
+
+  constructor TPicTransform.Create(ABitmap: TBitmap32; ARotation: TPicRotation; AFlips: TPicFlips);
+  begin
+    inherited Create;
+    FBitmap   := ABitmap;
+    FRotation := ARotation;
+    FFlips    := AFlips;
+  end;
+
+  procedure TPicTransform.SetFlips(Value: TPicFlips);
+  begin
+    if FFlips<>Value then begin
+      FFlips := Value;
+      ApplyTransform;
+    end;
+  end;
+
+  procedure TPicTransform.SetRotation(Value: TPicRotation);
+  begin
+    if FRotation<>Value then begin
+      FRotation := Value;
+      ApplyTransform;
+    end;
   end;
 
    //===================================================================================================================
