@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.35 2004-11-24 13:39:24 dale Exp $
+;  $Id: phoa.dklang,v 1.36 2004-11-25 08:45:00 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -297,22 +297,31 @@ ipmsmSimpleProp.Caption=00000052,&Picture property
 tbSimpleMain.Caption=00000054,Toolbar
 tbSimpleMain.ChevronHint=00000055,More Buttons|
 aSimpleCrDelete.Caption=00000056,&Delete
+aSimpleCrDelete.Category=00000078,Simple search
 aSimpleCrDelete.Hint=00000057,Delete selected criterion
 aSimpleConvertToExpression.Caption=00000058,Convert to e&xpression
+aSimpleConvertToExpression.Category=00000079,Simple search
 aSimpleConvertToExpression.Hint=00000059,Convert selected criteria to search expression
 aReset.Caption=00000063,&Reset
+aReset.Category=00000077,General
 aReset.Hint=00000064,Reset|Clear entered criteria or expression
 aExprSyntaxCheck.Caption=00000065,Syntax check
+aExprSyntaxCheck.Category=00000080,Expression search
 aExprSyntaxCheck.Hint=00000066,Syntax check the expression
 aExprCut.Caption=00000067,&Cut
+aExprCut.Category=00000083,Expression search
 aExprCut.Hint=00000068,Cut|Cut selected text to the clipboard
 aExprCopy.Caption=00000069,Co&py
+aExprCopy.Category=00000084,Expression search
 aExprCopy.Hint=00000070,Copy|Copy selected text to the clipboard
 aExprPaste.Caption=00000071,&Paste
+aExprPaste.Category=00000085,Expression search
 aExprPaste.Hint=00000074,Paste|Paste text from the clipboard
 aExprUndo.Caption=00000072,&Undo
+aExprUndo.Category=00000081,Expression search
 aExprUndo.Hint=00000075,Undo|Undo the last change
 aExprRedo.Caption=00000073,&Redo
+aExprRedo.Category=00000082,Expression search
 aExprRedo.Hint=00000076,Redo|Redo the last undone change
 
 [dProjectProps]
