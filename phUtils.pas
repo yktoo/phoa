@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.13 2004-05-30 18:41:18 dale Exp $
+//  $Id: phUtils.pas,v 1.14 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -115,8 +115,6 @@ uses
 
    // Фокусирует и выделяет узел и проматывает дерево так, чтобы он был виден. Возвращает True, если Node<>nil
   function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
-   // Возвращает узел по его абсолютному индексу (0, если нет такого)
-  function  VTNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
    // Сохранение/загрузка настроек столбцов VirtualTree
   procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
   procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
@@ -666,15 +664,6 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
     if Result then begin
       Tree.Selected[Node] := True;
       Tree.ScrollIntoView(Node, False, False);
-    end;
-  end;
-
-  function VTNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
-  begin
-    Result := Tree.GetFirst;
-    while (idx>0) and (Result<>nil) do begin
-      Result := Tree.GetNext(Result);
-      Dec(idx);
     end;
   end;
 

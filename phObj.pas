@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.14 2004-05-30 18:41:18 dale Exp $
+//  $Id: phObj.pas,v 1.15 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -145,12 +145,12 @@ type
     FGroups: TPhoaGroups;
     FOwner: TPhoaGroup;
     FPicIDs: TIntegerList;
-     // Возвращает абсолютный индекс группы Group относительно себя и наоборот
-    function  GetAbsoluteIndexOf(Group: TPhoaGroup): Integer;
-    function  GetGroupByAbsoluteIndex(AbsIndex: Integer): TPhoaGroup;
+    FID: Integer;
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
+     // Рекурсивная процедура, назначающая ID группам, имеющим ID=0
+    procedure InternalFixupIDs(var iFreeID: Integer);
      // Prop handlers
     procedure SetOwner(Value: TPhoaGroup);
     function  GetIndex: Integer;
@@ -158,25 +158,37 @@ type
     function  GetNestedGroupCount: Integer;
     function  GetPath(const sRootName: String): String;
     function  GetGroupByPath(const sPath: String): TPhoaGroup;
+    function  GetFreeID: Integer;
+    function  GetRoot: TPhoaGroup;
+    function  GetGroupByID(iID: Integer): TPhoaGroup;
   public
-    constructor Create(_Owner: TPhoaGroup);
+    constructor Create(_Owner: TPhoaGroup; iID: Integer);
     destructor Destroy; override;
      // Возвращает True, если ID изображения присутствует в списке группы (или любой её подгруппы при bRecursive=True)
     function  IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean;
      // Копирует свойства группы: наименование, Expanded;
+     //   при bCopyIDs=True       - также и ID
      //   при bCopyPicIDs=True    - также список ID изображений;
-     //   при bCopySubgroups=True - рекурсивно повторяет всё для вложенных групп;
-    procedure Assign(Src: TPhoaGroup; bCopyPicIDs, bCopySubgroups: Boolean);
+     //   при bCopySubgroups=True - рекурсивно повторяет всё для вложенных групп
+    procedure Assign(Src: TPhoaGroup; bCopyIDs, bCopyPicIDs, bCopySubgroups: Boolean);
      // Сортирует изображения по заданным сортировкам
     procedure SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
+     // Рекурсивно просматривает группу и все подгруппы, назначая ID группам, его не имеющим
+    procedure FixupIDs;
      // Props
      // -- True, если соответствующий группе узел дерева развёрнут
     property Expanded: Boolean read FExpanded write FExpanded;
+     // -- Возвращает следующий свободный ID, больший ID самой группы и ID всх её детей
+    property FreeID: Integer read GetFreeID;
      // -- Список групп, входящих в данную группу
     property Groups: TPhoaGroups read FGroups;
+     // -- Возвращает группу по ID среди группы и её детей; nil, если нет такой
+    property GroupByID[iID: Integer]: TPhoaGroup read GetGroupByID;
      // -- Возвращает группу по заданному пути; nil, если нет такой (case-insensitive); начинает поиск среди детей с
      //    самого первого элемента, если путь начинается с '/', отбрасывает этот символ
     property GroupByPath[const sPath: String]: TPhoaGroup read GetGroupByPath;
+     // -- Уникальный идентификатор группы
+    property ID: Integer read FID;
      // -- Индекс группы в её владельце (Owner)
     property Index: Integer read GetIndex write SetIndex;
      // -- Количество подгрупп у группы (включая все вложенные)
@@ -186,7 +198,9 @@ type
      // -- Путь группы в виде '<sRootName>/Группа1/Группа2/.../ТекущаяГруппа'
     property Path[const sRootName: String]: String read GetPath;
      // -- Список ID изображений, входящих в группу
-    property PicIDs: TIntegerList read FPicIDs; 
+    property PicIDs: TIntegerList read FPicIDs;
+     // -- Возвращает окончательного владельца всех групп иерархии
+    property Root: TPhoaGroup read GetRoot;
      // -- Текст (наименование) группы
     property Text: String read FText write FText;
   end;
@@ -460,12 +474,10 @@ type
    // Фотоальбом
    //-------------------------------------------------------------------------------------------------------------------
 
-  TPhoaOperations = class; 
+  TPhoaOperations = class;
 
   TPhotoAlbum = class(TObject)
   private
-     // Экземпляр просмотрщика эскизов
-    FViewer: TThumbnailViewer;
      // Prop storage
     FRootGroup: TPhoaGroup;
     FPics: TPhoaPics;
@@ -476,9 +488,12 @@ type
     FThumbnailQuality: Byte;
     FThumbnailWidth: Integer;
     FThumbnailHeight: Integer;
+    FOnThumbDimensionsChanged: TNotifyEvent;
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
+     // Вызывает OnThumbDimensionsChanged
+    procedure ThumbDimensionsChanged; 
      // Prop handlers
     procedure SetThumbnailHeight(Value: Integer);
     procedure SetThumbnailWidth(Value: Integer);
@@ -518,6 +533,8 @@ type
     property ThumbnailWidth: Integer read FThumbnailWidth write SetThumbnailWidth;
      // -- Список представлений фотоальбома
     property Views: TPhoaViews read FViews;
+     // -- Событие изменения размеров эскиза
+    property OnThumbDimensionsChanged: TNotifyEvent read FOnThumbDimensionsChanged write FOnThumbDimensionsChanged;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -567,19 +584,26 @@ type
 
   TPhoaOperation = class(TBaseOperation)
   private
+     // Prop storage
     FSavepoint: Boolean;
     FPhoA: TPhotoAlbum;
+     // Prop handlers
+    function  GetOpGroup: TPhoaGroup;
+    function  GetParentOpGroup: TPhoaGroup;
+    procedure SetOpGroup(Value: TPhoaGroup);
+    procedure SetParentOpGroup(Value: TPhoaGroup);
   protected
      // Prop storage
     FList: TPhoaOperations;
-    FGroupAbsIdx: Integer;
-    FParentGroupAbsIdx: Integer;
-     // Возвращает группу, соответствующую индексу GroupAbsIdx
-    function OpGroup: TPhoaGroup;
-     // Возвращает группу, соответствующую индексу ParentGroupAbsIdx
-    function OpParentGroup: TPhoaGroup;
+    FOpGroupID: Integer;
+    FOpParentGroupID: Integer;
      // Prop handlers
-    function GetInvalidationFlags: TUndoInvalidationFlags; virtual; 
+    function GetInvalidationFlags: TUndoInvalidationFlags; virtual;
+     // Props
+     // -- Возвращает группу, соответствующую GroupID
+    property OpGroup: TPhoaGroup read GetOpGroup write SetOpGroup;
+     // -- Возвращает группу, соответствующую ParentGroupID
+    property OpParentGroup: TPhoaGroup read GetParentOpGroup write SetParentOpGroup;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
     destructor Destroy; override;
@@ -587,17 +611,17 @@ type
      // Наименование операции
     function Name: String;
      // Props
+     // -- Флаги требуемого обновления после отката операции
+    property InvalidationFlags: TUndoInvalidationFlags read GetInvalidationFlags;
+     // -- ID группы, которой касается операция (если касается)
+    property OpGroupID: Integer read FOpGroupID;
+     // -- ID родителя группы, которой касается операция (если касается)
+    property OpParentGroupID: Integer read FOpParentGroupID;
+     // -- Фотоальбом
+    property PhoA: TPhotoAlbum read FPhoA;
      // -- Указывает, что после данной операции было произведено сохранение фотоальбома, т.е., если эта операция -
      //    последняя в буфере отката, то это указывает на unmodified-состояние фотоальбома
     property Savepoint: Boolean read FSavepoint;
-     // -- Флаги требуемого обновления после отката операции
-    property InvalidationFlags: TUndoInvalidationFlags read GetInvalidationFlags;
-     // -- Абсолютный индекс группы, которой касается операция (если касается)
-    property GroupAbsIdx: Integer read FGroupAbsIdx;
-     // -- Абсолютный индекс родителя группы, которой касается операция (если касается)
-    property ParentGroupAbsIdx: Integer read FParentGroupAbsIdx;
-     // -- Фотоальбом
-    property PhoA: TPhotoAlbum read FPhoA;
   end;
 
    // Список сделанных операций (буфер отката)
@@ -707,6 +731,8 @@ type
     FUnlinkedPicRemoves: TPhoaOperations;
      // Список ID изображений группы
     FPicIDs: TIntegerList;
+     // ID группы
+    FGroupID: Integer;
      // Наименование группы
     FGroupName: String;
      // Индекс группы во владельце
@@ -1147,6 +1173,7 @@ type
     FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
     FPhoA: TPhotoAlbum;
+    FGroupID: Integer;
     FCacheThumbnails: Boolean;
     FThickThumbBorder: Boolean;
     FOnSelectionChange: TNotifyEvent;
@@ -1167,8 +1194,9 @@ type
     procedure ToggleSelection(Index: Integer);
     procedure AddToSelection(Index: Integer);
     procedure RemoveFromSelection(Index: Integer);
-     // Перемещает ItemIndex на новое место, не трогая выделения
-    procedure MoveItemIndex(iNewIndex: Integer);
+     // Перемещает ItemIndex на новое место, не трогая выделения. При bUpdateStreamSelStart=True также обновляет
+     //   FStreamSelStart
+    procedure MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
      // Вызывает событие OnSelectionChange
     procedure SelectionChange;
      // Возвращает ссылку на кэшированный эскиз _Pic, если он есть в кэше, иначе возвращает nil
@@ -1180,8 +1208,8 @@ type
     procedure LimitCacheSize(iNumber: Integer);
      // Возвращает допустимый TopIndex на основе предлагаемого
     function  GetValidTopIndex(idxOffered: Integer): Integer;
-     // Callback-обработчик изменения размеров эскиза фотоальбома
-    procedure PhoaThumbDimensionsChanged;
+     // Событие изменения размеров эскиза фотоальбома
+    procedure PhoaThumbDimensionsChanged(Sender: TObject);
      // Настраивает ScrollBar
     procedure UpdateScrollBar;
      // Выделяет диапазон индексов эскизов и сдвигает ItemIndex в idxEnd
@@ -1234,6 +1262,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Устанавливает группу Group для просмотра в качестве текущей
+    procedure SetCurrentGroup(Group: TPhoaGroup);
      // Снимает выделение со всех эскизов
     procedure SelectNone;
      // Выделяет все эскизы
@@ -1248,8 +1278,6 @@ type
     procedure InvalidateItem(Index: Integer);
      // Прокручивает содержимое, чтобы было видно ItemIndex
     procedure ScrollIntoView;
-     // Загружает и отображает в viewer'е все изображения группы
-    procedure ViewGroup(Group: TPhoaGroup);
      // Блокировка перерисовки
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -1258,6 +1286,8 @@ type
     property DragEnabled: Boolean read FDragEnabled write FDragEnabled;
      // -- Индекс последнего места вставки при Drag'n'Drop. -1, если не было подходящего
     property DropTargetIndex: Integer read GetDropTargetIndex;
+     // -- ID группы, отображаемой в данный момент (0, если нет)
+    property GroupID: Integer read FGroupID;
      // -- True, если изображение с заданным ID выделено
     property IDSelected[iID: Integer]: Boolean read GetIDSelected;
      // -- Индекс сфокусированного изображения
@@ -2097,9 +2127,10 @@ type
    // TPhoaGroup
    //-------------------------------------------------------------------------------------------------------------------
 
-  procedure TPhoaGroup.Assign(Src: TPhoaGroup; bCopyPicIDs, bCopySubgroups: Boolean);
+  procedure TPhoaGroup.Assign(Src: TPhoaGroup; bCopyIDs, bCopyPicIDs, bCopySubgroups: Boolean);
   var i: Integer;
   begin
+    if bCopyIDs then FID := Src.FID;
     FText     := Src.FText;
     FExpanded := Src.FExpanded;
      // Копируем список ID изображений
@@ -2107,16 +2138,17 @@ type
      // Копируем подчинённые группы
     if bCopySubgroups then begin
       FGroups.Clear;
-      for i := 0 to Src.FGroups.Count-1 do TPhoaGroup.Create(Self).Assign(Src.FGroups[i], bCopyPicIDs, True);
+      for i := 0 to Src.FGroups.Count-1 do TPhoaGroup.Create(Self, 0).Assign(Src.FGroups[i], bCopyIDs, bCopyPicIDs, True);
     end;
   end;
 
-  constructor TPhoaGroup.Create(_Owner: TPhoaGroup);
+  constructor TPhoaGroup.Create(_Owner: TPhoaGroup; iID: Integer);
   begin
     inherited Create;
     FGroups := TPhoaGroups.Create(Self);
     FPicIDs := TIntegerList.Create(False);
     Owner   := _Owner;
+    FID     := iID;
   end;
 
   destructor TPhoaGroup.Destroy;
@@ -2127,48 +2159,38 @@ type
     inherited Destroy;
   end;
 
-  function TPhoaGroup.GetAbsoluteIndexOf(Group: TPhoaGroup): Integer;
-  var
-    idx: Integer;
-    bFound: Boolean;
-
-    function ScanOwned(OwnerGroup: TPhoaGroup): Boolean;
-    var i: Integer;
-    begin
-      Result := OwnerGroup=Group;
-      i := 0;
-      while not Result and (i<OwnerGroup.FGroups.Count) do begin
-        Result := ScanOwned(OwnerGroup.FGroups[i]);
-        Inc(i);
-        Inc(idx);
-      end;
-    end;
-
+  procedure TPhoaGroup.FixupIDs;
+  var iFreeID: Integer;
   begin
-    idx := 0;
-    bFound := ScanOwned(Self);
-    Assert(bFound, 'Cannot determine AbsoluteIndex for the Group: possibly wrong Group argument');
-    Result := idx;
+    iFreeID := FreeID;
+    InternalFixupIDs(iFreeID);
   end;
 
-  function TPhoaGroup.GetGroupByAbsoluteIndex(AbsIndex: Integer): TPhoaGroup;
-  var idx: Integer;
-
-    function ScanOwned(OwnerGroup: TPhoaGroup): TPhoaGroup;
-    var i: Integer;
-    begin
-      if AbsIndex=idx then Result := OwnerGroup else Result := nil;
-      i := 0;
-      while (Result=nil) and (i<OwnerGroup.FGroups.Count) do begin
-        Inc(idx);
-        Result := ScanOwned(OwnerGroup.FGroups[i]);
-        Inc(i);
-      end;
-    end;
-
+  function TPhoaGroup.GetFreeID: Integer;
+  var i, iChildFreeID: Integer;
   begin
-    idx := 0;
-    Result := ScanOwned(Self);
+     // Устанавливаем свободным ID, следующий за нашим
+    Result := FID+1;
+     // Перебираем всех детей, проверяя на максимальный FreeID
+    for i := 0 to FGroups.Count-1 do begin
+      iChildFreeID := FGroups[i].FreeID;
+      if Result<iChildFreeID then Result := iChildFreeID;
+    end;
+  end;
+
+  function TPhoaGroup.GetGroupByID(iID: Integer): TPhoaGroup;
+  var i: Integer;
+  begin
+    Assert(iID>0, 'Invalid ID passed to TPhoaGroup.GroupByID[]');
+    if FID=iID then
+      Result := Self
+    else begin
+      for i := 0 to FGroups.Count-1 do begin
+        Result := FGroups[i].GroupByID[iID];
+        if Result<>nil then Exit;
+      end;
+      Result := nil;
+    end;
   end;
 
   function TPhoaGroup.GetGroupByPath(const sPath: String): TPhoaGroup;
@@ -2215,6 +2237,23 @@ type
   function TPhoaGroup.GetPath(const sRootName: String): String;
   begin
     if FOwner=nil then Result := sRootName else Result := FOwner.Path[sRootName]+'/'+FText;
+  end;
+
+  function TPhoaGroup.GetRoot: TPhoaGroup;
+  begin
+    if FOwner=nil then Result := Self else Result := FOwner.Root;
+  end;
+
+  procedure TPhoaGroup.InternalFixupIDs(var iFreeID: Integer);
+  var i: Integer;
+  begin
+     // Проверяем свой ID
+    if FID=0 then begin
+      FID := iFreeID;
+      Inc(iFreeID);
+    end;
+     // Повторяем то же для подгрупп
+    for i := 0 to FGroups.Count-1 do FGroups[i].InternalFixupIDs(iFreeID);
   end;
 
   function TPhoaGroup.IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean;
@@ -2294,6 +2333,7 @@ type
         while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
           case Code of
              // Group properties
+            IPhChunk_Group_ID:       FID       := vValue;
             IPhChunk_Group_Text:     FText     := vValue;
             IPhChunk_Group_Expanded: FExpanded := vValue<>Byte(0);
              // Picture IDs
@@ -2335,6 +2375,7 @@ type
          // Write open-chunk
         WriteChunk(IPhChunk_Group_Open);
          // Write group props
+        WriteChunkInt   (IPhChunk_Group_ID,       FID);
         WriteChunkString(IPhChunk_Group_Text,     FText);
         WriteChunkByte  (IPhChunk_Group_Expanded, Byte(FExpanded));
          // Write picture IDs
@@ -2391,13 +2432,13 @@ type
        // *** Old format
       if not Chunked then
          // Read nested groups
-        for i := 0 to ReadInt-1 do TPhoaGroup.Create(FOwner).StreamerLoad(Streamer)
+        for i := 0 to ReadInt-1 do TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer)
        // *** New format
       else
         while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
           case Code of
              // Nested group
-            IPhChunk_Group_Open: TPhoaGroup.Create(FOwner).StreamerLoad(Streamer);
+            IPhChunk_Group_Open: TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer);
              // Close-chunk
             IPhChunk_Groups_Close: Break;
              // Ensure unknown nested structures are skipped whole
@@ -3187,7 +3228,7 @@ var
           if Count=0 then GParent := nil else GParent := Items[Count-1];
          // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
         if (GParent=nil) or not AnsiSameText(GParent.Text, sOneDir) then begin
-          GParent := TPhoaGroup.Create(Group);
+          GParent := TPhoaGroup.Create(Group, 0);
           GParent.Text     := sOneDir;
           GParent.Expanded := True;
         end;
@@ -3214,7 +3255,7 @@ var
         if Count=0 then Group := nil else Group := Items[Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
       if (Group=nil) or not AnsiSameText(Group.Text, sDatePart) then begin
-        Group := TPhoaGroup.Create(ParentGroup);
+        Group := TPhoaGroup.Create(ParentGroup, 0);
         Group.Text     := sDatePart;
         Group.Expanded := True;
       end;
@@ -3234,7 +3275,7 @@ var
         if Count=0 then Group := nil else Group := Items[Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
       if (Group=nil) or not AnsiSameText(Group.Text, sTimePart) then begin
-        Group := TPhoaGroup.Create(ParentGroup);
+        Group := TPhoaGroup.Create(ParentGroup, 0);
         Group.Text     := sTimePart;
         Group.Expanded := True;
       end;
@@ -3253,7 +3294,7 @@ var
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
       sPropVal := Pic.Props[PicProp];
       if (Group=nil) or not AnsiSameText(Group.Text, sPropVal) then begin
-        Group := TPhoaGroup.Create(ParentGroup);
+        Group := TPhoaGroup.Create(ParentGroup, 0);
         Group.Text := sPropVal;
       end;
        // Добавляем изображение к группе
@@ -3295,7 +3336,7 @@ var
         end;
          // Создаём группу
         if Result=nil then begin
-          Result := TPhoaGroup.Create(ParentGroup);
+          Result := TPhoaGroup.Create(ParentGroup, 0);
           Result.Text := sKW;
            // Если нужно  вставить перед найденной группой - передвигаем
           if idx>=0 then Result.Index := idx;
@@ -3319,7 +3360,7 @@ var
     StartWait;
     try
        // Создаём корневую или стираем подчинённые группы по необходимости
-      if FRootGroup=nil then FRootGroup := TPhoaGroup.Create(nil) else FRootGroup.Groups.Clear;
+      if FRootGroup=nil then FRootGroup := TPhoaGroup.Create(nil, 1) else FRootGroup.Groups.Clear;
        // Создаём вспомогательный список, сортируем его и помещаем ID изображений в корневую группу
       with TPhoaViewHelperPics.Create(False) do
         try
@@ -3378,7 +3419,7 @@ var
                //   папку при необходимости и помещаем туда изображение 
               else if Gpg.bUnclassified then begin
                 if GUnclassified=nil then begin
-                  GUnclassified := TPhoaGroup.Create(Grp);
+                  GUnclassified := TPhoaGroup.Create(Grp, 0);
                   GUnclassified.Index := 0;
                   GUnclassified.Text := ConstVal(asUnclassifiedConsts[Gpg.Prop]);
                 end;
@@ -3396,6 +3437,8 @@ var
       finally
         GroupWithPics.Free;
       end;
+       // Распределяем группам уникальные ID
+      FRootGroup.FixupIDs;
     finally
       StopWait;
     end;
@@ -3577,7 +3620,8 @@ var
   constructor TPhotoAlbum.Create;
   begin
     inherited Create;
-    FRootGroup        := TPhoaGroup.Create(nil);
+    FRootGroup        := TPhoaGroup.Create(nil, 1);
+    FRootGroup.FixupIDs;
     FPics             := TPhoaPics.Create(Self);
     FViews            := TPhoaViews.Create(Self);
     FFileRevision     := IPhFileRevisionNumber;
@@ -3676,7 +3720,7 @@ var
   begin
     if FThumbnailHeight<>Value then begin
       FThumbnailHeight := Value;
-      if FViewer<>nil then FViewer.PhoaThumbDimensionsChanged;
+      ThumbDimensionsChanged;
     end;
   end;
 
@@ -3684,7 +3728,7 @@ var
   begin
     if FThumbnailWidth<>Value then begin
       FThumbnailWidth := Value;
-      if FViewer<>nil then FViewer.PhoaThumbDimensionsChanged;
+      ThumbDimensionsChanged;
     end;
   end;
 
@@ -3727,6 +3771,8 @@ var
            // Ensure unknown nested structures are skipped whole
           else Streamer.SkipNestedChunks(Code);
         end;
+     // Запускаем назначение ID группам, его не имеющим (нужно, если фотоальбом сохранён версией PhoA раньше 1.1.5)
+    FRootGroup.FixupIDs; 
   end;
 
   procedure TPhotoAlbum.StreamerSave(Streamer: TPhoaStreamer);
@@ -3767,6 +3813,11 @@ var
        // Write views
       FViews.StreamerSave(Streamer);
     end;
+  end;
+
+  procedure TPhotoAlbum.ThumbDimensionsChanged;
+  begin
+    if Assigned(FOnThumbDimensionsChanged) then FOnThumbDimensionsChanged(Self);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -3831,19 +3882,29 @@ var
     Result := [];
   end;
 
+  function TPhoaOperation.GetOpGroup: TPhoaGroup;
+  begin
+    Result := FPhoA.RootGroup.GroupByID[FOpGroupID];
+  end;
+
+  function TPhoaOperation.GetParentOpGroup: TPhoaGroup;
+  begin
+    Result := FPhoA.RootGroup.GroupByID[FOpParentGroupID];
+  end;
+
   function TPhoaOperation.Name: String;
   begin
     Result := ConstVal(ClassName);
   end;
 
-  function TPhoaOperation.OpGroup: TPhoaGroup;
+  procedure TPhoaOperation.SetOpGroup(Value: TPhoaGroup);
   begin
-    Result := FPhoA.RootGroup.GetGroupByAbsoluteIndex(FGroupAbsIdx);
+    FOpGroupID := Value.ID;
   end;
 
-  function TPhoaOperation.OpParentGroup: TPhoaGroup;
+  procedure TPhoaOperation.SetParentOpGroup(Value: TPhoaGroup);
   begin
-    Result := FPhoA.RootGroup.GetGroupByAbsoluteIndex(FParentGroupAbsIdx);
+    FOpParentGroupID := Value.ID;
   end;
 
   procedure TPhoaOperation.Undo;
@@ -3996,10 +4057,10 @@ var
   begin
     inherited Create(List, PhoA);
      // Создаём дочернюю группу
-    g := TPhoaGroup.Create(CurGroup);
-    FParentGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(CurGroup);
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(g);
+    g := TPhoaGroup.Create(CurGroup, PhoA.RootGroup.FreeID);
     g.Text := ConstVal('SDefaultNewGroupName');
+    OpParentGroup := CurGroup;
+    OpGroup       := g;
   end;
 
   function TPhoaOp_GroupNew.GetInvalidationFlags: TUndoInvalidationFlags;
@@ -4025,8 +4086,8 @@ var
     inherited Create(List, PhoA);
      // Выполняем операцию и запоминаем данные отката
     FOldGroupName := Group.Text;
-    FGroupAbsIdx  := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
     Group.Text := sNewText;
+    OpGroup := Group;
   end;
 
   function TPhoaOp_GroupRename.GetInvalidationFlags: TUndoInvalidationFlags;
@@ -4050,10 +4111,11 @@ var
   begin
     inherited Create(List, PhoA);
      // Запоминаем данные удаляемой группы
-    FParentGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group.Owner);
-    FGroupName         := Group.Text;
-    FGroupIndex        := Group.Index;
-    FExpanded          := Group.Expanded;
+    OpParentGroup := Group.Owner;
+    FGroupID      := Group.ID;
+    FGroupName    := Group.Text;
+    FGroupIndex   := Group.Index;
+    FExpanded     := Group.Expanded;
      // Запоминаем содержимое (ID изображений)
     if Group.PicIDs.Count>0 then begin
       FPicIDs := TIntegerList.Create(False);
@@ -4095,7 +4157,7 @@ var
     g: TPhoaGroup;
   begin
      // Восстанавливаем группу
-    g := TPhoaGroup.Create(gOwner);
+    g := TPhoaGroup.Create(gOwner, FGroupID);
     g.Text     := FGroupName;
     g.Index    := FGroupIndex;
     g.Expanded := FExpanded;
@@ -4355,8 +4417,8 @@ var
      // Добавляем изображение в группу, если его не было
     if Group.PicIDs.Add(Pic.ID) then begin
        // Сохраняем данные для отката
-      FPicID       := Pic.ID;
-      FGroupAbsIdx := FPhoA.RootGroup.GetAbsoluteIndexOf(Group);
+      FPicID  := Pic.ID;
+      OpGroup := Group;
     end;
   end;
 
@@ -4391,8 +4453,8 @@ var
         Group.PicIDs.Delete(idx);
       end;
     end;
-     // Запоминаем индекс группы
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+     // Запоминаем группу
+    OpGroup := Group;
   end;
 
   destructor TPhoaOp_InternalPicFromGroupRemoving.Destroy;
@@ -4424,7 +4486,7 @@ var
   var i: Integer;
   begin
     inherited Create(List, PhoA);
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+    OpGroup := Group;
     FAddedIDs := TIntegerList.Create(False);
      // Добавляем изображения в группу и в список
     for i := 0 to High(aPicIDs) do
@@ -4588,7 +4650,7 @@ var
   constructor TPhoaMultiOp_PicDelete.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
   begin
     inherited Create(List, PhoA);
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+    OpGroup := Group;
      // Удаляем ID изображений из группы
     TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, Group, aPicIDs);
      // Удаляем несвязанные изображения из фотоальбома
@@ -4621,7 +4683,7 @@ var
     StartWait;
     try
       if Clipboard.HasFormat(wClipbrdPicFormatID) then begin
-        FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+        OpGroup := Group;
          // Сорздаём временный поток
         ms := TMemoryStream.Create;
         try
@@ -4753,8 +4815,8 @@ var
      // Запоминаем порядок следования ID изображений в группе
     FOldPicIDs := TIntegerList.Create(False);
     FOldPicIDs.Assign(Group.PicIDs);
-     // Запоминаем индекс группы
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+     // Запоминаем группу
+    OpGroup := Group;
      // Сортируем изображения в группе
     Group.SortPics(Sortings, PhoA.Pics); 
   end;
@@ -4807,9 +4869,9 @@ var
      // Перемещаем группу
     Group.Owner := NewParentGroup;
     if iNewIndex>=0 then Group.Index := iNewIndex; // Индекс -1 означает добавление последним ребёнком
-     // Запоминаем абсолютные индексы ПОСЛЕ перемещения (абс. индекс прежнего родителя и новый абс. индекс группы)
-    FParentGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(gOldParent);
-    FGroupAbsIdx       := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+     // Запоминаем группы (ID прежнего родителя и ID группы)
+    OpParentGroup := gOldParent;
+    OpGroup       := Group;
   end;
 
   function TPhoaOp_GroupDragAndDrop.GetInvalidationFlags: TUndoInvalidationFlags;
@@ -4866,8 +4928,8 @@ var
       Group.PicIDs.Move(idxOld, idxNew);
       Inc(idxNew);
     end;
-     // Запоминаем индекс группы
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(Group);
+     // Запоминаем группу
+    OpGroup := Group;
   end;
 
   destructor TPhoaOp_PicDragAndDropInsideGroup.Destroy;
@@ -5035,11 +5097,14 @@ var
     inherited Create(List, PhoA);
     FViewsIntf := ViewsIntf;
     View := ViewsIntf.Views[ViewsIntf.ViewIndex];
-     // Создаём группы
-    g := TPhoaGroup.Create(Group);
-    g.Assign(View.RootGroup, True, True);
+     // Создаём группы (изначально с нулевыми ID)
+    g := TPhoaGroup.Create(Group, 0);
+    g.Assign(View.RootGroup, False, True, True);
     g.Text := View.Name;
-    FGroupAbsIdx := PhoA.RootGroup.GetAbsoluteIndexOf(g);
+     // Распределяем группам настоящие ID
+    PhoA.RootGroup.FixupIDs;
+     // Запоминаем главную (корневую) группу из добавленных
+    OpGroup := g;
      // Загружаем дерево папок
     ViewsIntf.ViewIndex := -1;
   end;
@@ -5059,10 +5124,7 @@ var
 
   procedure TThumbnailViewer.AddToSelection(Index: Integer);
   begin
-    if FSelIndexes.IndexOf(Index)<0 then begin
-      FSelIndexes.Add(Index);
-      InvalidateItem(Index);
-    end;
+    if (Index>=0) and (Index<FPicLinks.Count) and FSelIndexes.Add(Index) then InvalidateItem(Index);
   end;
 
   procedure TThumbnailViewer.AdjustTooltip(ix, iy: Integer);
@@ -5137,11 +5199,18 @@ var
   function TThumbnailViewer.ClearSelection: Boolean;
   var i: Integer;
   begin
+     // Если есть выделение
     Result := FSelIndexes.Count>0;
-    for i := FSelIndexes.Count-1 downto 0 do begin
-      InvalidateItem(FSelIndexes[i]);
-      FSelIndexes.Delete(i);
-    end;
+    if Result then
+       // Если обновление не блокировано, invalidate thumbnails selected
+      if FUpdateLock=0 then
+        for i := FSelIndexes.Count-1 downto 0 do begin
+          InvalidateItem(FSelIndexes[i]);
+          FSelIndexes.Delete(i);
+        end
+       // Иначе просто очищаем
+      else
+        FSelIndexes.Clear;
   end;
 
   procedure TThumbnailViewer.CMDrag(var Msg: TCMDrag);
@@ -5335,7 +5404,7 @@ var
       with PThumbCacheRec(FThumbCache[i])^ do
         if Pic=_Pic then begin
           Result := Thumb;
-           // Перемещаем иображение в начало кэша
+           // Перемещаем изображение в начало кэша
           FThumbCache.Move(i, 0);
           Exit;
         end;
@@ -5396,8 +5465,10 @@ var
   procedure TThumbnailViewer.InvalidateItem(Index: Integer);
   var r: TRect;
   begin
-    r := ItemRect(Index);
-    if not IsRectEmpty(r) then InvalidateRect(Handle, @r, False);
+    if (FUpdateLock=0) and HandleAllocated then begin
+      r := ItemRect(Index);
+      if not IsRectEmpty(r) then InvalidateRect(Handle, @r, False);
+    end;
   end;
 
   function TThumbnailViewer.ItemAtPos(ix, iy: Integer): Integer;
@@ -5508,7 +5579,7 @@ var
        // Если левая кнопка - переключаем выделение эскиза, на котором кликнули
       if Button=mbLeft then begin
         ToggleSelection(idx);
-        MoveItemIndex(idx);
+        MoveItemIndex(idx, True);
        // Если правая кнопка - готовим вызов Shell Context Menu
       end else if Button=mbRight then begin
         ClearSelection;
@@ -5518,7 +5589,6 @@ var
           Exit;
         end;
       end;
-      FStreamSelStart := idx;
       SelectionChange;
      // Если нажат Shift - выделяем подряд идущие эскизы
     end else if ssShift in Shift then
@@ -5585,13 +5655,14 @@ var
     inherited MouseUp(Button, Shift, x, y);
   end;
 
-  procedure TThumbnailViewer.MoveItemIndex(iNewIndex: Integer);
+  procedure TThumbnailViewer.MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
   begin
     if iNewIndex<>FItemIndex then begin
       InvalidateItem(FItemIndex);
       FItemIndex := iNewIndex;
       InvalidateItem(FItemIndex);
     end;
+    if bUpdateStreamSelStart then FStreamSelStart := iNewIndex;
   end;
 
   procedure TThumbnailViewer.Paint;
@@ -5775,7 +5846,7 @@ var
     DrawDetailsLR(tcLeftBottom, tcRightBottom, Rect(r.Left, r.Bottom-iLineHeight, r.Right, r.Bottom));
   end;
 
-  procedure TThumbnailViewer.PhoaThumbDimensionsChanged;
+  procedure TThumbnailViewer.PhoaThumbDimensionsChanged(Sender: TObject);
   begin
     LimitCacheSize(0);
     CalcLayout;
@@ -5794,13 +5865,8 @@ var
   end;
 
   procedure TThumbnailViewer.RemoveFromSelection(Index: Integer);
-  var i: Integer;
   begin
-    i := FSelIndexes.IndexOf(Index);
-    if i>=0 then begin
-      FSelIndexes.Delete(i);
-      InvalidateItem(Index);
-    end;
+    if FSelIndexes.Remove(Index)>=0 then InvalidateItem(Index);
   end;
 
   procedure TThumbnailViewer.ScrollIntoView;
@@ -5837,7 +5903,7 @@ var
   var i: Integer;
   begin
     ClearSelection;
-    MoveItemIndex(idxEnd);
+    MoveItemIndex(idxEnd, False);
     if idxStart>idxEnd then begin
       i := idxStart;
       idxStart := idxEnd;
@@ -5863,17 +5929,67 @@ var
     end;
   end;
 
+  procedure TThumbnailViewer.SetCurrentGroup(Group: TPhoaGroup);
+  var
+    i, iPrevGroupID, iFocusedID, iItemIdx: Integer;
+    SelectedIDs: TIntegerList;
+  begin
+    BeginUpdate;
+    try
+       // Сохраняем прежний GroupID
+      iPrevGroupID := FGroupID;
+       // Если группа не поменялась и есть выделение, запоминаем ID выделенных изображений
+      iFocusedID := 0;
+      if (iPrevGroupID=FGroupID) and (FSelIndexes.Count>0) then begin
+        SelectedIDs := TIntegerList.Create(False);
+        for i := 0 to FSelIndexes.Count-1 do SelectedIDs.Add(SelectedPics[i].ID);
+        if FItemIndex>=0 then iFocusedID := FPicLinks[FItemIndex].ID;
+      end else
+        SelectedIDs := nil;
+      try
+         // Находим новый GroupID
+        if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
+         // Копируем ссылки на изображения по их IDs из группы
+        FPicLinks.AddFromGroup(FPhoA, Group, True);
+         // Стираем кэш эскизов
+        LimitCacheSize(0);
+         // Стираем выделение
+        ClearSelection;
+         // Если группа поменялась - скроллим в начало
+        if iPrevGroupID<>FGroupID then
+          FTopIndex := 0
+         // Иначе - добавляем в выделение сохранённые изображения
+        else if SelectedIDs<>nil then
+          for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicLinks.IndexOfID(SelectedIDs[i]));
+      finally
+        SelectedIDs.Free;
+      end;
+       // Если нет выделения, выделяем первое изображение (если оно есть)
+      if FSelIndexes.Count=0 then AddToSelection(0);
+       // Находим сфокусированное изображение
+      if iFocusedID>0 then iItemIdx := FPicLinks.IndexOfID(iFocusedID) else iItemIdx := -1;
+       // Если так и не нашлось
+      if iItemIdx<0 then
+         // Фокусируем последнее из выделенных, если они есть
+        if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[FSelIndexes.Count-1]
+         // Иначе пытаемся выделить самое первое изображение, если оно есть
+        else if FPicLinks.Count>0 then iItemIdx := 0;
+      MoveItemIndex(iItemIdx, True);  
+    finally
+       // Пересчитываем layout, validate TopIndex, обновляем
+      EndUpdate;
+    end;
+     // Уведомляем
+    SelectionChange;
+  end;
+
   procedure TThumbnailViewer.SetItemIndex(Value: Integer);
   begin
      // Если меняется индекс, или нет выделения, а оно нужно, или наоборот
     if (FItemIndex<>Value) or ((FSelIndexes.Count=0)<>(Value<0)) then begin
       ClearSelection;
-      if Value>=0 then begin
-        FSelIndexes.Add(Value);
-        InvalidateItem(Value);
-      end;
-      MoveItemIndex(Value);
-      FStreamSelStart := Value;
+      AddToSelection(Value);
+      MoveItemIndex(Value, True);
       SelectionChange;
     end;
   end;
@@ -5881,11 +5997,10 @@ var
   procedure TThumbnailViewer.SetPhoA(Value: TPhotoAlbum);
   begin
     if FPhoA<>Value then begin
-      if (Value<>nil) and (Value.FViewer<>nil) then PhoaException('Photo album cannot be linked to more than one viewer instance', []);
-      if (FPhoA<>nil) then FPhoA.FViewer := nil;
+      if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := nil;
       FPhoA := Value;
-      if (FPhoA<>nil) then FPhoA.FViewer := Self;
-      ViewGroup(nil);
+      if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := PhoaThumbDimensionsChanged;
+      SetCurrentGroup(nil);
     end;
   end;
 
@@ -5974,28 +6089,6 @@ var
     SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
   end;
 
-  procedure TThumbnailViewer.ViewGroup(Group: TPhoaGroup);
-  begin
-     // Копируем ссылки на изображения по их IDs из группы
-    FPicLinks.AddFromGroup(FPhoA, Group, True);
-     // Стираем кэш эскизов
-    LimitCacheSize(0);
-     // Скроллим в начало
-    FTopIndex := 0;
-     // Пересчитываем layout
-    CalcLayout;
-     // Если в группе есть изображения, выделяем первое, иначе удаляем выделение
-    FSelIndexes.Clear;
-    if FPicLinks.Count>0 then begin
-      FItemIndex := 0;
-      AddToSelection(0);
-    end else
-      FItemIndex := -1;
-     // Уведомляем
-    SelectionChange;
-    Invalidate;
-  end;
-
   procedure TThumbnailViewer.WMContextMenu(var Msg: TWMContextMenu);
   begin
      // Вызываем context menu только если не был нажат Ctrl
@@ -6045,15 +6138,6 @@ var
       WM_KILLFOCUS, WM_SETFOCUS: begin
         for i := 0 to FSelIndexes.Count-1 do InvalidateItem(FSelIndexes[i]);
         if (FItemIndex>=0) and (FSelIndexes.IndexOf(FItemIndex)<0) then InvalidateItem(FItemIndex);
-      end;
-       // Override TControl's reaction (no BeginAutoDrag)
-      WM_LBUTTONDOWN: begin
-//        with TWMLButtonDown(Msg) do MouseDown(mbLeft,  KeysToShiftState(Keys), XPos, YPos);
-//        Exit;
-      end;
-      WM_RBUTTONDOWN: begin
-//        with TWMRButtonDown(Msg) do MouseDown(mbRight, KeysToShiftState(Keys), XPos, YPos);
-//        Exit;
       end;
       WM_LBUTTONDBLCLK: begin
         DblClick;

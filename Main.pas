@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.20 2004-05-31 15:04:40 dale Exp $
+//  $Id: Main.pas,v 1.21 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -304,7 +304,7 @@ type
      // Application events
     procedure AppHint(Sender: TObject);
     procedure AppException(Sender: TObject; E: Exception);
-    procedure AppIdle(Sender: TObject; var Done: Boolean); 
+    procedure AppIdle(Sender: TObject; var Done: Boolean);
      // Clipboard messages
     procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
     procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
@@ -323,6 +323,8 @@ type
     procedure StartViewMode(InitFlags: TImgViewInitFlags);
      // Отменяет все "неустойчивые" режимы и возвращается в основной режим просмотра
     procedure ResetMode;
+     // Находит и возвращает узел в tvGroups по ID группы; nil, если нет такого
+    function  FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
      // IPhoaViews
     function  GetViewIndex: Integer;
     procedure SetViewIndex(Value: Integer);
@@ -990,6 +992,15 @@ uses
     FPicsPopupToolsValidated   := False;
   end;
 
+  function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
+  begin
+    Result := FRootNode;
+    repeat
+      if PPhoaGroup(tvGroups.GetNodeData(Result))^.ID=iGroupID then Exit;
+      Result := tvGroups.GetNext(Result);
+    until Result=nil;
+  end;
+
   procedure TfMain.FormActivate(Sender: TObject);
   begin
      // Если есть окошко прогресса, держим главное окно позади него  
@@ -1023,8 +1034,8 @@ uses
       Application.OnHint      := AppHint;
       Application.OnException := AppException;
       Application.OnIdle      := AppIdle;
-       // Создаём список результатов поиска
-      FSearchResults := TPhoaGroup.Create(nil);
+       // Создаём группу - список результатов поиска
+      FSearchResults := TPhoaGroup.Create(nil, IGroupID_SearchResults);
        // Create undoable operations list
       FOperations := TPhoaOperations.Create;
       FOperations.OnStatusChange := OperationsStatusChange;
@@ -1228,15 +1239,17 @@ uses
      // Получает узел в tvGroups, соответствующий группе GroupAbsIdx операции, кэшируя результат
     function GetOpGroupNode: PVirtualNode;
     begin
-      if GetOpGroupNode_Cache=nil then GetOpGroupNode_Cache := VTNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
+      if GetOpGroupNode_Cache=nil then GetOpGroupNode_Cache := FindGroupNodeByID(Op.OpGroupID);
       Result := GetOpGroupNode_Cache;
+      Assert(Result<>nil, 'Failed to locate Operation Group Node in TfMainPerformOperation()');
     end;
 
      // Получает узел в tvGroups, соответствующий группе ParentGroupAbsIdx операции, кэшируя результат
     function GetOpParentGroupNode: PVirtualNode;
     begin
-      if GetOpParentGroupNode_Cache=nil then GetOpParentGroupNode_Cache := VTNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
+      if GetOpParentGroupNode_Cache=nil then GetOpParentGroupNode_Cache := FindGroupNodeByID(Op.OpParentGroupID);
       Result := GetOpParentGroupNode_Cache;
+      Assert(Result<>nil, 'Failed to locate Operation Parent Group Node in TfMainPerformOperation()');
     end;
 
   begin
@@ -1358,7 +1371,7 @@ uses
 
   procedure TfMain.RefreshViewer;
   begin
-    Viewer.ViewGroup(CurGroup);
+    Viewer.SetCurrentGroup(CurGroup);
   end;
 
   procedure TfMain.ResetMode;
@@ -1608,7 +1621,7 @@ uses
     p := Sender.GetNodeData(Node);
      // Static text
     if TextType=ttStatic then begin
-      if p^.PicIDs.Count>0 then                   s := Format('(%d)', [p^.PicIDs.Count]);
+      {!!!if p^.PicIDs.Count>0 then }                  s := {!!!Format('(%d)', [p^.PicIDs.Count]);} Format('(%d) - %d', [p^.PicIDs.Count, p^.ID]);
      // Обычная группа
     end else if Sender.NodeParent[Node]<>nil then s := p^.Text
      // Узел результатов поиска
@@ -1675,8 +1688,8 @@ uses
     IFlags := Op.InvalidationFlags;
     OpGroupNode       := nil;
     OpParentGroupNode := nil;
-    if uifUReinitParent   in IFlags then OpParentGroupNode := VTNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
-    if uifUInvalidateNode in IFlags then OpGroupNode       := VTNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
+    if uifUReinitParent   in IFlags then OpParentGroupNode := FindGroupNodeByID(Op.OpParentGroupID);
+    if uifUInvalidateNode in IFlags then OpGroupNode       := FindGroupNodeByID(Op.OpGroupID);
      // Откатываем (и уничтожаем) операцию
     Op.Undo;
      // Проверяем флаги требуемых обновлений

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.3 2004-05-30 18:41:18 dale Exp $
+//  $Id: phPhoa.pas,v 1.4 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -31,7 +31,8 @@
 // Language:        Object Pascal
 //
 // Change log:
-//   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties 
+//   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties
+//   Jun 02, 2004 - dale - added a chunk for Group ID
 //**********************************************************************************************************************
 unit phPhoa;
 
@@ -185,6 +186,16 @@ uses SysUtils, Windows, Classes;
    //     * If chunk is a data-chunk, it may or may not be processed, depending
    //       on the Reader implementation.
    //
+   // Notes:
+   //  - The Group IDs introduced in PhoA 1.1.5 aren't supported in previous
+   //    versions, and therefore require some fixup. The fixup is that the
+   //    Reader should review all the groups once the loading is complete
+   //    assigning an unique ID to each group having no assigned one yet.
+   //    This workaround doesn't allow for steady referencing groups by ID
+   //    (as this ID may change each time the photo album is open, unless
+   //    you have saved it by a program version supporting the Group ID chunk),
+   //    but it is better than nothing.
+   //
    // That is all for now. Yeah, quite long preface :)
 
 {$DEFINE StrictRevision} // If defined, fail opening files with revisions higher than specified in this unit
@@ -256,6 +267,7 @@ const
   IPhChunk_Pic_Rotation            = $1140; // Byte     Image Rotation ID (see below)
   IPhChunk_Pic_Flips               = $1141; // Byte     Image Flip flags (see below)
    // Picture group properties
+  IPhChunk_Group_ID                = $1200; // Int      Group ID
   IPhChunk_Group_Text              = $1201; // StringW  Group text (name)
   IPhChunk_Group_Expanded          = $1202; // Byte     Group-node expanded flag (0/1)
    // Picture linked in group properties
@@ -303,7 +315,7 @@ type
 
    // List of chunks known for the moment, and their datatypes and ranges
 const
-  aPhChunks: Array[0..58] of TPhChunkEntry = (
+  aPhChunks: Array[0..59] of TPhChunkEntry = (
     (wCode: IPhChunk_Remark;                 Datatype: pcdStringW),
     (wCode: IPhChunk_PhoaGenerator;          Datatype: pcdStringB),
     (wCode: IPhChunk_PhoaSavedDate;          Datatype: pcdInt;    iRangeMin: 0;  iRangeMax: 3652058 {Dec 31, 9999}),
@@ -333,6 +345,7 @@ const
     (wCode: IPhChunk_Pic_Keywords;           Datatype: pcdStringW),
     (wCode: IPhChunk_Pic_Rotation;           Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 3),
     (wCode: IPhChunk_Pic_Flips;              Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 3),
+    (wCode: IPhChunk_Group_ID;               Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_Group_Text;             Datatype: pcdStringW),
     (wCode: IPhChunk_Group_Expanded;         Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),

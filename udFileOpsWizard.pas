@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.9 2004-05-23 13:23:09 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.10 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -694,9 +694,9 @@ uses
        // Если группа или подгруппа выбраны - добавляем группу в иерархию
       if GS<>gsNotSelected then begin
          // Если это не корневая группа, создаём соотв. target-группу
-        if not bUseTgtGroup then TgtGroup := TPhoaGroup.Create(OwnerGroup);
+        if not bUseTgtGroup then TgtGroup := TPhoaGroup.Create(OwnerGroup, 0);
          // Копируем свойства исходной группы. Если выбрана сама группа, добавляем в неё и изображения исходной группы
-        TgtGroup.Assign(SrcGroup, GS=gsSelected, False);
+        TgtGroup.Assign(SrcGroup, True, GS=gsSelected, False);
          // Повторяем то же для всех подгрупп
         for i := 0 to SrcGroup.Groups.Count-1 do AddGroup(nil, TgtGroup, SrcGroup.Groups[i], False);
       end;
@@ -707,9 +707,9 @@ uses
     var i: Integer;
     begin
        // Если это не корневая группа, создаём соотв. target-группу
-      if bUseTgtAsOwnerGroup then TgtGroup := TPhoaGroup.Create(TgtGroup);
+      if bUseTgtAsOwnerGroup then TgtGroup := TPhoaGroup.Create(TgtGroup, 0);
        // Копируем свойства исходной группы
-      TgtGroup.Assign(SrcGroup, False, False);
+      TgtGroup.Assign(SrcGroup, True, False, False);
        // Добавляем ID выбранных изображений
       for i := 0 to FSelectedPics.Count-1 do TgtGroup.PicIDs.Add(FSelectedPics[i].ID);
     end;
@@ -727,7 +727,7 @@ uses
      // Копируем группы и ID изображений в них
     case SelPicMode of
       fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
-      fospmAll:       FExportedPhoA.RootGroup.Assign(FPhoA.RootGroup, True, True);
+      fospmAll:       FExportedPhoA.RootGroup.Assign(FPhoA.RootGroup, True, True, True);
       fospmSelGroups: AddGroup(FExportedPhoA.RootGroup, nil, FPhoA.RootGroup, True);
     end;
      // Копируем представления

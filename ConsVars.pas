@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.31 2004-06-01 14:05:04 dale Exp $
+//  $Id: ConsVars.pas,v 1.32 2004-06-02 08:24:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -469,6 +469,9 @@ const
     'SUnclassified_Author',     // gbpAuthor
     'SUnclassified_Media',      // gbpMedia
     'SUnclassified_Keywords');  // gbpKeywords
+
+   // ID группы результатов поиска 
+  IGroupID_SearchResults          = MaxInt;
 
    // Timer IDs
   ISlideShowTimerID               = $01010101;
