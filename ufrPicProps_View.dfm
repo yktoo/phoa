@@ -69,25 +69,25 @@ inherited frPicProps_View: TfrPicProps_View
       DockRow = 1
       Images = fMain.ilActionsSmall
       TabOrder = 1
-      object TBXItem3: TTBXItem
-        ImageIndex = 66
+      object bRotate0: TTBXItem
+        Action = aRotate0
       end
-      object TBXItem2: TTBXItem
-        ImageIndex = 67
+      object bRotate90: TTBXItem
+        Action = aRotate90
       end
-      object TBXItem1: TTBXItem
-        ImageIndex = 68
+      object bRotate180: TTBXItem
+        Action = aRotate180
       end
-      object TBXItem5: TTBXItem
-        ImageIndex = 69
+      object bRotate270: TTBXItem
+        Action = aRotate270
       end
-      object TBXSeparatorItem1: TTBXSeparatorItem
+      object tbSepFlipHorz: TTBXSeparatorItem
       end
-      object TBXItem4: TTBXItem
-        ImageIndex = 70
+      object bFlipHorz: TTBXItem
+        Action = aFlipHorz
       end
-      object TBXItem6: TTBXItem
-        ImageIndex = 71
+      object bFlipVert: TTBXItem
+        Action = aFlipVert
       end
     end
   end
@@ -191,8 +191,8 @@ inherited frPicProps_View: TfrPicProps_View
   end
   object pmMain: TTBXPopupMenu
     Images = fMain.ilActionsSmall
-    Left = 36
-    Top = 308
+    Left = 64
+    Top = 252
   end
   object dtlsMain: TDTLanguageSwitcher
     Language = 1033

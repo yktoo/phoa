@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.15 2004-06-02 08:24:31 dale Exp $
+//  $Id: phObj.pas,v 1.16 2004-06-03 20:33:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2687,6 +2687,8 @@ type
   var
     Stream: TStringStream;
     j: TJPEGImage;
+    Bmp32: TBitmap32;
+    Transform: TPicTransform;
   begin
     if FThumbnailData='' then Exit;
     j := TJPEGImage.Create;
@@ -2698,8 +2700,25 @@ type
       finally
         Stream.Free;
       end;
-       // Отрисовываем изображение на битмэпе
-      Bitmap.Assign(j);
+       // Если есть, применяем преобразования
+      if (FPicRotation<>pr0) or (FPicFlips<>[]) then begin
+        Bmp32 := TBitmap32.Create;
+        try
+          Bmp32.Assign(j);
+          Transform := TPicTransform.Create(Bmp32);
+          try
+            Transform.Rotation := FPicRotation;
+            Transform.Flips    := FPicFlips;
+          finally
+            Transform.Free;
+          end;
+          Bitmap.Assign(Bmp32);
+        finally
+          Bmp32.Free;
+        end;
+       // Иначе просто отрисовываем изображение на битмэпе
+      end else
+        Bitmap.Assign(j);
     finally
       j.Free;
     end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.10 2004-06-03 12:47:33 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.11 2004-06-03 20:33:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,7 +9,8 @@ unit ufrPicProps_View;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
+  phObj,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
   TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DTLangTools;
 
@@ -34,13 +35,13 @@ type
     dkRight: TTBXDock;
     dkBottom: TTBXDock;
     tbTools: TTBXToolbar;
-    TBXItem1: TTBXItem;
-    TBXItem2: TTBXItem;
-    TBXItem3: TTBXItem;
-    TBXSeparatorItem1: TTBXSeparatorItem;
-    TBXItem4: TTBXItem;
-    TBXItem5: TTBXItem;
-    TBXItem6: TTBXItem;
+    bRotate180: TTBXItem;
+    bRotate90: TTBXItem;
+    bRotate0: TTBXItem;
+    tbSepFlipHorz: TTBXSeparatorItem;
+    bFlipHorz: TTBXItem;
+    bRotate270: TTBXItem;
+    bFlipVert: TTBXItem;
     aRotate0: TAction;
     aRotate90: TAction;
     aRotate180: TAction;
@@ -81,18 +82,33 @@ type
     FTrackY: Integer;
      // Флаг того, что изображение загружено
     FImageLoaded: Boolean;
+     // Текущее отобржаемое изображение (инициализируется в LoadViewImage)
+    FPic: TPhoaPic;
+     // Преобразование изображений
+    FTransform: TPicTransform;
+     // Флаг, свидетельствующий о том, что поворот у выделенных изображений разный, и применять поворот из Transform не
+     //   нужно 
+    FNoRotation: Boolean;
+     // Флаги, свидетельствующий о том, что наличие отражений у выделенных изображений разное, и применять соотв.
+     //   отражения из Transform не нужно
+    FNoFlipHorz: Boolean;
+    FNoFlipVert: Boolean;
      // Возвращает коэффициент оптимального масштаба изображения
     function  BestFitZoomFactor: Single;
      // Загружает и отображает изображение
     procedure LoadViewImage;
      // Находит размеры окна и устанавливает масштаб так, чтобы изображение целиком туда вписалось
     procedure AdjustView;
+     // События преобразования
+    procedure TransformApplied(Sender: TObject);
      // Настраивает свойство Checked для Actions преобразований
     procedure UpdateTransformActions;
      // Настраивает доступность Actions
     procedure EnableActions;
      // Обработчик события таймера задержки
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
+     // Возвращает требуемые преобразования для изображения с учётом флагов FNoRotation, FNoFlipHorz, FNoFlipVert
+    procedure GetRequiredTransform(Pic: TPhoaPic; out Rotation: TPicRotation; out Flips: TPicFlips);
      // Prop handlers
     function  GetViewOffset: TPoint;
     function  GetViewZoomFactor: Single;
@@ -100,10 +116,12 @@ type
     procedure SetViewZoomFactor(Value: Single);
   protected
     procedure InitializePage; override;
+    procedure FinalizePage; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
+    procedure Apply(FOperations: TPhoaOperations); override;
      // Props
      // -- Масштаб просматриваемого изображения
     property ViewZoomFactor: Single read GetViewZoomFactor write SetViewZoomFactor;
@@ -113,36 +131,42 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, phObj, ConsVars, Main, phSettings;
+uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_View.aaFlipHorz(Sender: TObject);
   begin
-    //
+    FNoFlipHorz := False;
+    FTransform.ToggleFlip(pflHorz);
   end;
 
   procedure TfrPicProps_View.aaFlipVert(Sender: TObject);
   begin
-    //
+    FNoFlipVert := False;
+    FTransform.ToggleFlip(pflVert);
   end;
 
   procedure TfrPicProps_View.aaRotate0(Sender: TObject);
   begin
-    //
+    FNoRotation := False;
+    FTransform.Rotation := pr0;
   end;
 
   procedure TfrPicProps_View.aaRotate180(Sender: TObject);
   begin
-    //
+    FNoRotation := False;
+    FTransform.Rotation := pr180;
   end;
 
   procedure TfrPicProps_View.aaRotate270(Sender: TObject);
   begin
-    //
+    FNoRotation := False;
+    FTransform.Rotation := pr270;
   end;
 
   procedure TfrPicProps_View.aaRotate90(Sender: TObject);
   begin
-    //
+    FNoRotation := False;
+    FTransform.Rotation := pr90;
   end;
 
   procedure TfrPicProps_View.aaZoomActual(Sender: TObject);
@@ -181,19 +205,50 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
     StorageForm.ActiveControl := iMain;
   end;
 
+  procedure TfrPicProps_View.Apply(FOperations: TPhoaOperations);
+  var
+    i: Integer;
+    Pic: TPhoaPic;
+    Rotation: TPicRotation;
+    Flips: TPicFlips;
+  begin
+    inherited Apply(FOperations);
+     // Если страница инициализирована, создаём операции применения преобразований
+    if FInitialized and not (FNoRotation and FNoFlipHorz and FNoFlipVert) then
+      for i := 0 to EditedPicCount-1 do begin
+        Pic := EditedPics[i];
+         // Определяем требуемое преобразование
+        GetRequiredTransform(Pic, Rotation, Flips);
+         // Если оно не совпадает - создаём операцию
+        if (Rotation<>Pic.PicRotation) or (Flips<>Pic.PicFlips) then TPhoaOp_StoreTransform.Create(FOperations, PhoA, Pic, Rotation, Flips);
+      end;
+  end;
+
   procedure TfrPicProps_View.BeforeDisplay(ChangeMethod: TPageChangeMethod);
-  var i: Integer;
+  var
+    i: Integer;
+    Pic: TPhoaPic;
   begin
     inherited BeforeDisplay(ChangeMethod);
-
     if not FInitialized then begin
-       // Считываем имена файлов, если ещё не делали этого
-      for i := 0 to EditedPicCount-1 do cbViewFile.Strings.Add(EditedPics[i].PicFileName);
+       // Создаём преобразование
+      FTransform := TPicTransform.Create(iMain.Bitmap);
+      FTransform.OnApplied := TransformApplied;
+       // Считываем имена файлов и проверяем свойства преобразований
+      for i := 0 to EditedPicCount-1 do begin
+        Pic := EditedPics[i];
+        cbViewFile.Strings.Add(Pic.PicFileName);
+        if i=0 then
+          FTransform.InitValues(Pic.PicRotation, Pic.PicFlips)
+        else begin
+          if Pic.PicRotation<>FTransform.Rotation                     then FNoRotation := True;
+          if (pflHorz in Pic.PicFlips)<>(pflHorz in FTransform.Flips) then FNoFlipHorz := True;
+          if (pflVert in Pic.PicFlips)<>(pflVert in FTransform.Flips) then FNoFlipVert := True;
+        end;
+      end;
       cbViewFile.ItemIndex := 0;
-       // Init transform!!!
       FInitialized := True;
     end;
-
   end;
 
   function TfrPicProps_View.BestFitZoomFactor: Single;
@@ -221,6 +276,12 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
     aZoomFit.Enabled    := FImageLoaded and (ViewZoomFactor<>BestFitZoomFactor);
   end;
 
+  procedure TfrPicProps_View.FinalizePage;
+  begin
+    FTransform.Free;
+    inherited FinalizePage;
+  end;
+
   procedure TfrPicProps_View.FrameMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   begin
     if WheelDelta<0 then aZoomOut.Execute else aZoomIn.Execute;
@@ -230,6 +291,14 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   function TfrPicProps_View.GetRegistrySection: String;
   begin
     Result := SRegWizPage_PicProp_View;
+  end;
+
+  procedure TfrPicProps_View.GetRequiredTransform(Pic: TPhoaPic; out Rotation: TPicRotation; out Flips: TPicFlips);
+  begin
+    if FNoRotation then Rotation := Pic.PicRotation else Rotation := FTransform.Rotation;
+    Flips := [];
+    if (FNoFlipHorz and (pflHorz in Pic.PicFlips)) or (not FNoFlipHorz and (pflHorz in FTransform.Flips)) then Include(Flips, pflHorz);
+    if (FNoFlipVert and (pflVert in Pic.PicFlips)) or (not FNoFlipVert and (pflVert in FTransform.Flips)) then Include(Flips, pflVert);
   end;
 
   function TfrPicProps_View.GetViewOffset: TPoint;
@@ -281,21 +350,38 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   end;
 
   procedure TfrPicProps_View.LoadViewImage;
+  var
+    Rotation: TPicRotation;
+    Flips: TPicFlips;
   begin
+     // Запрещаем изменения Modified
+    BeginUpdate;
     StartWait;
     try
+      FPic := EditedPics[cbViewFile.ItemIndex];
        // Загружаем изображение
       try
-        LoadGraphicFromFile(cbViewFile.Text, iMain.Bitmap);
+        LoadGraphicFromFile(FPic.PicFileName, iMain.Bitmap);
         FImageLoaded := True;
       except
         FImageLoaded := False;
         raise;
       end;
-       // Устанавливаем масштаб
-      AdjustView;
+       // Определяем требуемое преобразование
+      GetRequiredTransform(FPic, Rotation, Flips);
+       // Применяем преобразование
+      FTransform.BeginUpdate;
+      try
+        FTransform.InitValues(pr0, []);
+        FTransform.Rotation := Rotation;
+        FTransform.Flips    := Flips;
+      finally
+         // Этот вызов применяет преобразование и устанавливает масштаб
+        FTransform.EndUpdate;
+      end;
     finally
       StopWait;
+      EndUpdate;
       EnableActions;
     end;
   end;
@@ -327,14 +413,21 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
     EnableActions;
   end;
 
+  procedure TfrPicProps_View.TransformApplied(Sender: TObject);
+  begin
+    AdjustView;
+    UpdateTransformActions;
+    Modified; // Не сработает в процессе отображения, т.к. там действует BeginUpdate
+  end;
+
   procedure TfrPicProps_View.UpdateTransformActions;
   begin
-//    aRotate0.Checked   := FCurRotation=pr0;
-//    aRotate90.Checked  := FCurRotation=pr90;
-//    aRotate180.Checked := FCurRotation=pr180;
-//    aRotate270.Checked := FCurRotation=pr270;
-//    aFlipHorz.Checked  := pflHorz in FCurFlips;
-//    aFlipVert.Checked  := pflVert in FCurFlips;
+    aRotate0.Checked   := not FNoRotation and (FTransform.Rotation=pr0);
+    aRotate90.Checked  := not FNoRotation and (FTransform.Rotation=pr90);
+    aRotate180.Checked := not FNoRotation and (FTransform.Rotation=pr180);
+    aRotate270.Checked := not FNoRotation and (FTransform.Rotation=pr270);
+    aFlipHorz.Checked  := not FNoFlipHorz and (pflHorz in FTransform.Flips);
+    aFlipVert.Checked  := not FNoFlipVert and (pflVert in FTransform.Flips);
   end;
 
   procedure TfrPicProps_View.WMTimer(var Msg: TWMTimer);

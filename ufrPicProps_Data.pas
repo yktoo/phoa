@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.3 2004-06-03 20:33:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -209,7 +209,7 @@ const
       ppDescription,
         ppNotes:  pv.sValue := (pv.Control as TMemo).Text;
     end;
-    pv.State  := pvsModified;
+    pv.State := pvsModified;
     SetPropEditor(Prop, True);
     Modified;
   end;

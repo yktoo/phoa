@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.3 2004-06-03 20:33:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -27,6 +27,9 @@ type
     procedure InitializePage; override;
      // ”ведомл€ет форму диалога об изменении
     procedure Modified;
+     // ”становка/сн€тие блокировки изменени€ Modified
+    procedure BeginUpdate;
+    procedure EndUpdate;
      // —войства, получаемые через родительский диалог
      // --  оличество редактируемых изображений
     property EditedPicCount: Integer read GetEditedPicCount;
@@ -57,9 +60,19 @@ implementation
     { does nothing }
   end;
 
+  procedure TPicPropsDialogPage.BeginUpdate;
+  begin
+    FDialog.BeginUpdate;
+  end;
+
   function TPicPropsDialogPage.CanApply: Boolean;
   begin
     Result := True;
+  end;
+
+  procedure TPicPropsDialogPage.EndUpdate;
+  begin
+    FDialog.EndUpdate;
   end;
 
   function TPicPropsDialogPage.GetEditedPicArray: TPicArray;

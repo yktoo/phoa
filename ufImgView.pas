@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.16 2004-06-03 04:37:29 dale Exp $
+//  $Id: ufImgView.pas,v 1.17 2004-06-03 20:33:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -203,9 +203,11 @@ type
     FRBLayer: TRubberbandLayer;
      // Текущее отображаемое изображение
     FPic: TPhoaPic;
-     // Предыдущее просмотренное скэшированное изображение и имя его файла
+     // Предыдущее просмотренное скэшированное изображение, имя его файла и его преобразования
     FCachedBitmap: TBitmap32;
     FCachedBitmapFilename: String;
+    FCachedRotation: TPicRotation;
+    FCachedFlips: TPicFlips;
      // True, если курсор принудительно скрыт
     FCursorHidden: Boolean;
      // Курсор для iMain (crHand или crDefault)
@@ -267,10 +269,10 @@ type
     FErroneous: Boolean;
      // Флаг блокировки перегрузки изображения
     FDisplayLock: Integer;
-     // Текущий поворот изображения относительно исходного
-    FCurRotation: TPicRotation;
-     // Текущие отражения изображения относительно исходного
-    FCurFlips: TPicFlips; 
+     // Флаг того, что идёт процесс отображения изображения
+    FDisplayingPic: Boolean;
+     // Преобразование изображения
+    FTransform: TPicTransform;
      // Текущая карта каналов
     FColorMap: TColor32Map;
      // Prop storage
@@ -282,7 +284,7 @@ type
      //   FInitFlags
     procedure ApplySettings(bUseInitFlags: Boolean);
      // Настраивает инструменты
-    procedure ApplyTools; 
+    procedure ApplyTools;
      // Настраивает видимость курсора мыши
     procedure AdjustCursorVisibility(bForceShow: Boolean);
      // Загружает и буферизирует изображение; рассчитывает коэффициенты масштабирования.
@@ -307,8 +309,8 @@ type
     procedure DP_EnqueueNext;
      // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bCanResize=True
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
-     // Применяет заданные преобразования к отображаемому битмэпу, обновляя переменные текущих преобразований
-    procedure ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
+     // События преобразования
+    procedure TransformApplied(Sender: TObject);
      // Настраивает свойство Checked для Actions преобразований
     procedure UpdateTransformActions;
      // Разрешает/запрещает Actions
@@ -497,19 +499,13 @@ uses
   end;
 
   procedure TfImgView.aaFlipHorz(Sender: TObject);
-  var fl: TPicFlips;
   begin
-    fl := FCurFlips;
-    if pflHorz in fl then Exclude(fl, pflHorz) else Include(fl, pflHorz);
-    ApplyTransform(FCurRotation, fl);
+    FTransform.ToggleFlip(pflHorz);
   end;
 
   procedure TfImgView.aaFlipVert(Sender: TObject);
-  var fl: TPicFlips;
   begin
-    fl := FCurFlips;
-    if pflVert in fl then Exclude(fl, pflVert) else Include(fl, pflVert);
-    ApplyTransform(FCurRotation, fl);
+    FTransform.ToggleFlip(pflVert);
   end;
 
   procedure TfImgView.aaFullScreen(Sender: TObject);
@@ -573,22 +569,22 @@ uses
 
   procedure TfImgView.aaRotate0(Sender: TObject);
   begin
-    ApplyTransform(pr0, FCurFlips);
+    FTransform.Rotation := pr0;
   end;
 
   procedure TfImgView.aaRotate180(Sender: TObject);
   begin
-    ApplyTransform(pr180, FCurFlips);
+    FTransform.Rotation := pr180;
   end;
 
   procedure TfImgView.aaRotate270(Sender: TObject);
   begin
-    ApplyTransform(pr270, FCurFlips);
+    FTransform.Rotation := pr270;
   end;
 
   procedure TfImgView.aaRotate90(Sender: TObject);
   begin
-    ApplyTransform(pr90, FCurFlips);
+    FTransform.Rotation := pr90;
   end;
 
   procedure TfImgView.aaSettings(Sender: TObject);
@@ -624,7 +620,7 @@ uses
 
   procedure TfImgView.aaStoreTransform(Sender: TObject);
   begin
-    fMain.PerformOperation(TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FCurRotation, FCurFlips));
+    fMain.PerformOperation(TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips));
     EnableActions;
   end;
 
@@ -726,15 +722,6 @@ uses
     end;
   end;
 
-  procedure TfImgView.ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
-  begin
-    ApplyBitmapTransform(iMain.Bitmap, FCurRotation, Rotation, FCurFlips, Flips);
-    FCurRotation := Rotation;
-    FCurFlips    := Flips;
-    DisplayPic(False, False);
-    UpdateTransformActions;
-  end;
-
   procedure TfImgView.ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
   var
     ixWindow, iyWindow, iwWindow, ihWindow: Integer;
@@ -817,21 +804,26 @@ uses
 
   procedure TfImgView.DisplayPic(bReload, bApplyTransforms: Boolean);
   begin
-    if FDisplayLock>0 then Exit;
+    if FDisplayingPic or (FDisplayLock>0) then Exit;
     CommitInfoRelocation;
     FTrackDrag := False;
-     // Загружаем изображение
-    if bReload then DP_LoadImage;
-     // Применяем преобразования к изображению
-    if bReload or bApplyTransforms then DP_ApplyTransforms;
-     // Рассчитываем размеры окна и изображения
-    DP_ComputeDimensions;
-     // Настраиваем описания
-    DP_DescribePic;
-     // Отображаем картинку
-    ApplyZoom(FDefaultZoomFactor, True);
-     // Ставим в очередь предыдущее/следующее (зависит от направления листания) изображение
-    DP_EnqueueNext;
+    FDisplayingPic := True;
+    try
+       // Загружаем изображение
+      if bReload then DP_LoadImage;
+       // Применяем преобразования к изображению
+      if bReload or bApplyTransforms then DP_ApplyTransforms;
+       // Рассчитываем размеры окна и изображения
+      DP_ComputeDimensions;
+       // Настраиваем описания
+      DP_DescribePic;
+       // Отображаем картинку
+      ApplyZoom(FDefaultZoomFactor, True);
+       // Ставим в очередь предыдущее/следующее (зависит от направления листания) изображение
+      DP_EnqueueNext;
+    finally
+      FDisplayingPic := False;
+    end;
      // Перезапускаем таймер
     RestartShowTimer;
   end;
@@ -840,10 +832,13 @@ uses
   begin
      // Сообщение об ошибке не преобразовываем
     if not FErroneous then begin
-      ApplyBitmapTransform(iMain.Bitmap, FCurRotation, FPic.PicRotation, FCurFlips, FPic.PicFlips);
-      FCurRotation := FPic.PicRotation;
-      FCurFlips    := FPic.PicFlips;
-      UpdateTransformActions;
+      FTransform.BeginUpdate;
+      try
+        FTransform.Rotation := FPic.PicRotation;
+        FTransform.Flips    := FPic.PicFlips;
+      finally
+        FTransform.EndUpdate;
+      end;
     end;
   end;
 
@@ -959,18 +954,28 @@ uses
       bmpPrevTemp.Assign(iMain.Bitmap);
     end else
       bmpPrevTemp := nil;
-     // Если изображение скэшировано, копируем его
-    if bPicInCache then
+     // Если изображение скэшировано, копируем его и учитываем применённые преобразования
+    if bPicInCache then begin
       try
         iMain.Bitmap.Assign(FCachedBitmap);
       except
         bmpPrevTemp.Free;
         raise;
       end;
-     // Освобождаем кэш и сохраняем в кэше старое изображение
+      FTransform.InitValues(FCachedRotation, FCachedFlips);
+     // Иначе сбрасываем текущие параметры преобразования
+    end else
+      FTransform.InitValues(pr0, []);
+     // Освобождаем кэш и сохраняем в кэше старое изображение 
     FCachedBitmap.Free;
     FCachedBitmap := bmpPrevTemp;
-    if bmpPrevTemp=nil then FCachedBitmapFilename := '' else FCachedBitmapFilename := FPrevPic.PicFileName;
+    if bmpPrevTemp=nil then
+      FCachedBitmapFilename := ''
+    else begin
+      FCachedBitmapFilename := FPrevPic.PicFileName;
+      FCachedRotation       := FTransform.Rotation;
+      FCachedFlips          := FTransform.Flips;
+    end;
      // Если не взяли из кэша, дожидаемся окончания загрузки изображения фоновым потоком
     if not bPicInCache then begin
       StartWait;
@@ -991,9 +996,6 @@ uses
         StopWait;
       end;
     end;
-     // Сбрасываем текущие параметры преобразования
-    FCurRotation := pr0;
-    FCurFlips    := []; 
      // Настраиваем фильтр ресэмплинга
     iMain.Bitmap.StretchFilter := FStretchFilter;
      // !!!
@@ -1021,7 +1023,7 @@ uses
     aRotate270.Enabled      := bNoErr;
     aFlipHorz.Enabled       := bNoErr;
     aFlipVert.Enabled       := bNoErr;
-    aStoreTransform.Enabled := bNoErr and ((FPic.PicRotation<>FCurRotation) or (FPic.PicFlips<>FCurFlips));
+    aStoreTransform.Enabled := bNoErr and ((FPic.PicRotation<>FTransform.Rotation) or (FPic.PicFlips<>FTransform.Flips));
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1042,17 +1044,22 @@ uses
      // Создаём слой для отрисовки описания
     FDescLayer := TPositionedLayer.Create(iMain.Layers);
     FDescLayer.OnPaint := PaintDescLayer;
-     // Восстанавливаем положение и видимость панелей инструментов
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+     // Создаём преобразование
+    FTransform := TPicTransform.Create(iMain.Bitmap);
+    FTransform.OnApplied := TransformApplied;
      // Создаём карту цветов
     FColorMap := TColor32Map.Create;
+     // Восстанавливаем положение и видимость панелей инструментов
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
   end;
 
   procedure TfImgView.FormDestroy(Sender: TObject);
   begin
-    FColorMap.Free;
      // Сохраняем положение и видимость панелей инструментов
     TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+     // Уничтожаем объекты
+    FColorMap.Free;
+    FTransform.Free;
      // Уведомляем фоновый поток о необходимости завершиться
     FDecodeThread.Terminate;
      // Уничтожаем таймер слайдшоу
@@ -1325,14 +1332,20 @@ uses
     if FAlwaysOnTop then SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
   end;
 
+  procedure TfImgView.TransformApplied(Sender: TObject);
+  begin
+    DisplayPic(False, False);
+    UpdateTransformActions;
+  end;
+
   procedure TfImgView.UpdateTransformActions;
   begin
-    aRotate0.Checked   := FCurRotation=pr0;
-    aRotate90.Checked  := FCurRotation=pr90;
-    aRotate180.Checked := FCurRotation=pr180;
-    aRotate270.Checked := FCurRotation=pr270;
-    aFlipHorz.Checked  := pflHorz in FCurFlips;
-    aFlipVert.Checked  := pflVert in FCurFlips;
+    aRotate0.Checked   := FTransform.Rotation=pr0;
+    aRotate90.Checked  := FTransform.Rotation=pr90;
+    aRotate180.Checked := FTransform.Rotation=pr180;
+    aRotate270.Checked := FTransform.Rotation=pr270;
+    aFlipHorz.Checked  := pflHorz in FTransform.Flips;
+    aFlipVert.Checked  := pflVert in FTransform.Flips;
   end;
 
   procedure TfImgView.WMHelp(var Msg: TWMHelp);
