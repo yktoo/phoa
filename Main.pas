@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.79 2005-02-26 12:35:51 dale Exp $
+//  $Id: Main.pas,v 1.80 2005-03-02 17:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1145,7 +1145,7 @@ uses
        // Создаём интерфейсы
       FProject       := NewPhotoAlbumProject;
       FAppActionList := TPhoaActionList.Create(alMain);
-      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, True);
+      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, nil, False, True);
        // Настраиваем Application
       Application.OnActionExecute := AppActionExecute;
       Application.OnHint          := AppHint;

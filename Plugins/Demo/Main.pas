@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.6 2005-03-01 21:35:40 dale Exp $
+//  $Id: Main.pas,v 1.7 2005-03-02 17:13:45 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit Main;
 
 interface
 
-uses Windows, phPlugin, phAppIntf;
+uses Windows, phAppIntf;
 
 type
 
@@ -53,10 +53,10 @@ type
 
   TPhoaDemoPlugin = class(TInterfacedObject, IPhoaPlugin)
   private
-     // Plugin menu item
-    FItem: IPhoaMenuItem;
-     // Main plugin action
-    FAction: IPhoaAction;
+     // Plugin menu
+    FMenu: IPhoaMenu;
+     // Plugin menu separator
+    FSeparator: IPhoaMenuSeparator;
      // Prop storage
     FPluginClass: IPhoaPluginClass;
      // Plugin action execute proc
@@ -65,7 +65,6 @@ type
     function  GetPluginClass: IPhoaPluginClass; stdcall;
   public
     constructor Create(APluginClass: IPhoaPluginClass);
-    destructor Destroy; override;
   end;
 
 var
@@ -188,35 +187,30 @@ implementation
   end;
 
   constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaPluginClass);
+  var
+    ExitItem: IPhoaMenuItem;
+    Action: IPhoaAction;
   begin
     inherited Create;
     FPluginClass := APluginClass;
      // Create and register a new action
-    FAction := PhoaApp.ActionList.AddW('aDemoPlugin_Info', DemoPluginActionExec);
-    FAction.CategoryW := 'Demo';
-    FAction.CaptionW  := '&Demo plugin info...';
-    FAction.HintW     := 'Demo plugin info...|Click and you''ll see!';
-     // Store self reference into action tag to track the target of the action in execute handler.
-     // WARNING: avoid referencing self as an interface because this would cause circular interface reference (we have
-     //   to keep Action reference to track its state, maybe Caption etc.)
-    FAction.Tag       := Integer(Self);
-     // Create a new item corresponding to the action
-    FItem := (PhoaApp.Menu.Subentries[0] as IPhoaMenu).AddItem(FAction);
-  end;
-
-  destructor TPhoaDemoPlugin.Destroy;
-  begin
-     // Remove menu item
-    if FItem<>nil then begin
-      FItem.Remove;
-      FItem := nil;
-    end;
-     // Release action
-    if FAction<>nil then begin
-      PhoaApp.ActionList.Remove(FAction);
-      FAction := nil;
-    end;
-    inherited Destroy;
+    Action := PhoaApp.ActionList.Add('aDemoPlugin_Info', DemoPluginActionExec);
+    Action.Category := 'Demo';
+    Action.Caption  := '&Demo plugin info...';
+    Action.Hint     := 'Demo plugin info...|Click and you''ll see!';
+     // Store self reference into action tag to track the target of the action in execute handler
+    Action.Tag       := Integer(Self);
+     // Find the 'Exit' item
+    ExitItem := PhoaApp.Menu.ItemByActionName['aExit', True];
+     // Create a menu and insert it before 'Exit'
+    FMenu := ExitItem.Owner.AddMenu;
+    FMenu.Index := ExitItem.Index;
+    FMenu.Caption := 'Demo pl&ugin menu';
+     // Create a new item corresponding to the action. This creates a permanent Action reference
+    FMenu.AddItem(Action);
+     // Create a separator between menu and 'Exit'
+    FSeparator := ExitItem.Owner.AddSeparator;
+    FSeparator.Index := ExitItem.Index;
   end;
 
   function TPhoaDemoPlugin.GetPluginClass: IPhoaPluginClass;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.11 2005-03-01 21:35:40 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.12 2005-03-02 17:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -308,8 +308,6 @@ type
 
   IPhotoAlbumAction = interface(IPhoaAction)
     ['{9E126412-46AA-4961-A966-7333C163AB4C}']
-     // ”ничтожает NativeAction
-    procedure FreeNativeAction;
      // Prop handlers
     function  GetNativeAction: TCustomAction; 
      // Props

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.90 2005-02-14 19:34:08 dale Exp $
+//  $Id: ConsVars.pas,v 1.91 2005-03-02 17:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -860,6 +860,9 @@ const
 
 const
   aCheckStates: Array[Boolean] of TCheckState = (csUncheckedNormal, csCheckedNormal);
+
+resourcestring
+  SErrMsg_PhoaActionNotFound = 'Action "%s" not found.';  
 
 var
    // Кодовая страница ANSI для текущего основного шрифта программы

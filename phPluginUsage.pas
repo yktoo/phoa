@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.5 2005-02-27 15:51:49 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.6 2005-03-02 17:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phPluginUsage;
 
 interface
-uses Windows, SysUtils, Classes, phIntf, phAppIntf, phMutableIntf, phNativeIntf, phPlugin;
+uses Windows, SysUtils, Classes, phIntf, phAppIntf, phMutableIntf, phNativeIntf;
 
 type
 
