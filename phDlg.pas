@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.6 2004-05-01 04:03:24 dale Exp $
+//  $Id: phDlg.pas,v 1.7 2004-06-09 13:55:25 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -25,6 +25,7 @@ type
     procedure bOKClick(Sender: TObject);
     procedure bCancelClick(Sender: TObject);
     procedure bHelpClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FLockCounter: Integer;
      // Prop storage
@@ -151,6 +152,15 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj;
   procedure TPhoaDialog.FinalizeDialog;
   begin
     { does nothing }
+  end;
+
+  procedure TPhoaDialog.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  begin
+     // Перехватываем нажатие Ctrl+Enter и отрабатываем его как нажатие на ОК
+    if (Key=VK_RETURN) and (Shift=[ssCtrl]) and DataValid then begin
+      Key := 0;
+      ButtonClick_OK;
+    end;
   end;
 
   function TPhoaDialog.GetDataValid: Boolean;

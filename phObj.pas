@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.20 2004-06-08 13:43:07 dale Exp $
+//  $Id: phObj.pas,v 1.21 2004-06-09 13:55:25 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -754,15 +754,15 @@ type
     FUnlinkedPicRemoves: TPhoaOperations;
      // Список ID изображений группы
     FPicIDs: TIntegerList;
-     // ID группы
-    FGroupID: Integer;
-     // Наименование группы
-    FGroupName: String;
+     // Текст группы
+    FGroupText: String;
+     // Описание группы
+    FGroupDescription: String;
      // Индекс группы во владельце
     FGroupIndex: Integer;
      // True, если узел был развёрнут
     FExpanded: Boolean;
-     // Внутренняя процедура отката
+     // Внутренняя (оптимизированная на использование заранее известного Owner-а) процедура отката
     procedure InternalUndo(gOwner: TPhoaGroup);
   protected
     function GetInvalidationFlags: TUndoInvalidationFlags; override;
@@ -2154,8 +2154,9 @@ type
   var i: Integer;
   begin
     if bCopyIDs then FID := Src.FID;
-    FText     := Src.FText;
-    FExpanded := Src.FExpanded;
+    FText        := Src.FText;
+    FDescription := Src.FDescription;
+    FExpanded    := Src.FExpanded;
      // Копируем список ID изображений
     if bCopyPicIDs then FPicIDs.Assign(Src.FPicIDs);
      // Копируем подчинённые группы
@@ -4200,11 +4201,12 @@ var
   begin
     inherited Create(List, PhoA);
      // Запоминаем данные удаляемой группы
-    OpParentGroup := Group.Owner;
-    FGroupID      := Group.ID;
-    FGroupName    := Group.Text;
-    FGroupIndex   := Group.Index;
-    FExpanded     := Group.Expanded;
+    OpGroup           := Group;
+    OpParentGroup     := Group.Owner;
+    FGroupText        := Group.Text;
+    FGroupDescription := Group.Description;
+    FGroupIndex       := Group.Index;
+    FExpanded         := Group.Expanded;
      // Запоминаем содержимое (ID изображений)
     if Group.PicIDs.Count>0 then begin
       FPicIDs := TIntegerList.Create(False);
@@ -4246,10 +4248,11 @@ var
     g: TPhoaGroup;
   begin
      // Восстанавливаем группу
-    g := TPhoaGroup.Create(gOwner, FGroupID);
-    g.Text     := FGroupName;
-    g.Index    := FGroupIndex;
-    g.Expanded := FExpanded;
+    g := TPhoaGroup.Create(gOwner, OpGroupID);
+    g.Text        := FGroupText;
+    g.Description := FGroupDescription;
+    g.Index       := FGroupIndex;
+    g.Expanded    := FExpanded;
     if FPicIDs<>nil then g.PicIDs.Assign(FPicIDs);
      // Восстанавливаем каскадно удалённые группы
     if FCascadedDeletes<>nil then
