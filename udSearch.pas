@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.21 2004-11-19 13:01:06 dale Exp $
+//  $Id: udSearch.pas,v 1.22 2004-11-21 09:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,14 +9,107 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
-  phDlg, StdCtrls, VirtualTrees, ExtCtrls, ComCtrls, DKLang, SynEdit,
-  TB2Dock, TB2Toolbar, TBX, TB2Item;
+  phDlg, SynCompletionProposal, DKLang, TB2Item, TBX, TB2Dock, TB2Toolbar,
+  SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls;
 
 type
+   // Условие критерия простого поиска
+  TSimpleSearchCondition = (
+    sscInvalid, // "Недопустимое условие" 
+     // Number conditions
+    sscNumberLess, sscNumberLessEqual, sscNumberEqual, sscNumberNotEqual, sscNumberGreaterEqual, sscNumberGreater,
+     // String conditions
+    sscStrSpecified, sscStrNotSpecified, sscStrStarts, sscStrNotStarts, sscStrEqual, sscStrNotEqual, sscStrEnds,
+    sscStrNotEnds, sscStrContains, sscStrNotContains, sscStrMatchesMask, sscStrNotMatchesMask,
+     // Date/Time conditions
+    sscDateTimeSpecified, sscDateTimeNotSpecified, sscDateTimeLess, sscDateTimeLessEqual, sscDateTimeEqual,
+    sscDateTimeNotEqual, sscDateTimeGreaterEqual, sscDateTimeGreater,
+     // List conditions
+    sscListSpecified, sscListNotSpecified, sscListAny, sscListNone, sscListAll);
+  TSimpleSearchConditions = set of TSimpleSearchCondition;
+
+   //===================================================================================================================
+   // Критерий простого поиска
+   //===================================================================================================================
+
+  TSimpleSearchCriterion = class(TObject)
+  private
+     // Заготовленные на время поиска типизированные значения критерия
+    FValue_Integer: Integer;
+    FValue_Float: Double;
+    FValue_String: String;
+    FValue_Masks: TPhoaMasks;
+     // Prop storage
+    FPicProperty: TPicProperty;
+    FCondition: TSimpleSearchCondition;
+    FValue: Variant;
+    FDatatype: TPicPropDatatype;
+     // Настраивает поля, зависящие от PicProperty
+    procedure AdjustPicProperty;
+     // Prop handlers
+    procedure SetPicProperty(Value: TPicProperty);
+    procedure SetCondition(Value: TSimpleSearchCondition);
+    function  GetPicPropertyName: String;
+    function  GetConditionName: String;
+    function  GetValueStr: String;
+  public
+    constructor Create;
+     // Возвращает True, если изображение подходит под критерий
+    function  Matches(Pic: IPhoaPic): Boolean;
+     // Подготовка/финализация поиска
+    procedure InitializeSearch;
+    procedure FinalizeSearch; 
+     // Props
+     // -- Условие критерия
+    property Condition: TSimpleSearchCondition read FCondition write SetCondition;
+     // -- Наименование условия критерия
+    property ConditionName: String read GetConditionName;
+     // -- Тип данных PicProperty
+    property Datatype: TPicPropDatatype read FDatatype;
+     // -- Свойство изображения, проверяемое на условие
+    property PicProperty: TPicProperty read FPicProperty write SetPicProperty;
+     // -- Наименование свойства изображения
+    property PicPropertyName: String read GetPicPropertyName;
+     // -- Значение критерия
+    property Value: Variant read FValue write FValue;
+     // -- Значение критерия в виде строки
+    property ValueStr: String read GetValueStr;
+  end;
+
+   //===================================================================================================================
+   // Список критериев типа TSimpleSearchCriterion
+   //===================================================================================================================
+
+  TSimpleSearchCriterionList = class(TObject)
+  private
+     // Собственно список
+    FList: TObjectList;
+     // Prop handlers
+    function GetCount: Integer;
+    function GetItems(Index: Integer): TSimpleSearchCriterion;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function  Add(Item: TSimpleSearchCriterion): Integer;
+    procedure Delete(Index: Integer);
+    procedure Clear;
+     // Подготовка/финализация поиска
+    procedure InitializeSearch;
+    procedure FinalizeSearch;
+     // Props
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TSimpleSearchCriterion read GetItems; default;
+  end;
+  
+   //===================================================================================================================
+   // TdSearch
+   //===================================================================================================================
+
   TdSearch = class(TPhoaDialog)
     bReset: TButton;
+    dkExprTop: TTBXDock;
     dklcMain: TDKLanguageController;
     eExpression: TSynEdit;
     gbSearch: TGroupBox;
@@ -25,31 +118,39 @@ type
     rbAll: TRadioButton;
     rbCurGroup: TRadioButton;
     rbSearchResults: TRadioButton;
+    scpMain: TSynCompletionProposal;
+    smExprInsertOperator: TTBXSubmenuItem;
+    smExprInsertProp: TTBXSubmenuItem;
+    tbExprMain: TTBXToolbar;
     tsExpression: TTabSheet;
     tsSimple: TTabSheet;
-    tvCriteria: TVirtualStringTree;
-    dkExprTop: TTBXDock;
-    tbExprMain: TTBXToolbar;
-    smExprInsertProp: TTBXSubmenuItem;
-    smExprInsertOperator: TTBXSubmenuItem;
+    tvSimpleCriteria: TVirtualStringTree;
     procedure bResetClick(Sender: TObject);
-    procedure tvCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
-    procedure tvCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure tvSimpleCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
+    procedure tvSimpleCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   private
+     // Список критериев простого поиска
+    FSimpleCriteria: TSimpleSearchCriterionList;
      // Локальный список результатов поиска (ссылок на изображения)
     FLocalResults: IPhoaMutablePicList;
      // Приложение
     FApp: IPhotoAlbumApp;
      // Группа, в которую помещать результаты
     FResultsGroup: IPhotoAlbumPicGroup;
+     // Обновляет tvSimpleCriteria (в ответ на изменение FSimpleCriteria)
+    procedure SyncSimpleCriteria;
+     // Возвращает True, если Node - "настоящий" узел критерия (не nil и не последний "пустой" узел) 
+    function  IsSimpleCritNode(Node: PVirtualNode): Boolean;
      // Основная процедура поиска
     procedure PerformSearch;
      // Сбрасывает критерии в первоначальное состояние
     procedure ResetCriteria;
      // Событие клика на пункте вставки свойства изображения в выражение
-    procedure ExprInsertPropClick(Sender: TObject); 
+    procedure ExprInsertPropClick(Sender: TObject);
+     // Событие клика на пункте вставки опреатора в выражение
+    procedure ExprInsertOpClick(Sender: TObject);
   protected
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
@@ -61,9 +162,52 @@ type
     procedure SettingsRestore(rif: TRegIniFile); override;
   end;
 
+const
+   // Наборы условий критериев для типов данных свойств избражений
+  SSCNumberConditions   = [
+    sscNumberLess, sscNumberLessEqual, sscNumberEqual, sscNumberNotEqual, sscNumberGreaterEqual, sscNumberGreater];
+  SSCStringConditions   = [
+    sscStrSpecified, sscStrNotSpecified, sscStrStarts, sscStrNotStarts, sscStrEqual, sscStrNotEqual, sscStrEnds,
+    sscStrNotEnds, sscStrContains, sscStrNotContains, sscStrMatchesMask, sscStrNotMatchesMask];
+  SSCDateTimeConditions = [
+    sscDateTimeSpecified, sscDateTimeNotSpecified, sscDateTimeLess, sscDateTimeLessEqual, sscDateTimeEqual,
+    sscDateTimeNotEqual, sscDateTimeGreaterEqual, sscDateTimeGreater];
+  SSCListConditions     = [sscListSpecified, sscListNotSpecified, sscListAny, sscListNone, sscListAll];
+   // Наборы условий критериев в зависимости от типа данных свойства избражения
+  aSSConditionsByDatatype: Array[TPicPropDatatype] of TSimpleSearchConditions = (
+    SSCStringConditions,   // ppdtString
+    SSCNumberConditions,   // ppdtInteger
+    SSCNumberConditions,   // ppdtFloat
+    SSCDateTimeConditions, // ppdtDate
+    SSCDateTimeConditions, // ppdtTime
+    [],                    // ppdtBoolean
+    SSCListConditions,     // ppdtList
+    [],                    // ppdtSize
+    [],                    // ppdtPixelFormat
+    [],                    // ppdtRotation
+    []);                   // ppdtFlips
+   // Условия по умолчанию для типов данных свойств избражений
+  aSSDefaultConditionsForDatatype: Array[TPicPropDatatype] of TSimpleSearchCondition = (
+    sscStrContains,   // ppdtString
+    sscNumberEqual,   // ppdtInteger
+    sscNumberEqual,   // ppdtFloat
+    sscDateTimeEqual, // ppdtDate
+    sscDateTimeEqual, // ppdtTime
+    sscInvalid,       // ppdtBoolean
+    sscListAny,       // ppdtList
+    sscInvalid,       // ppdtSize
+    sscInvalid,       // ppdtPixelFormat
+    sscInvalid,       // ppdtRotation
+    sscInvalid);      // ppdtFlips
+
+   // Индексы столбцов tvSimpleCriteria
+  IColIdx_Simple_Property  = 0;
+  IColIdx_Simple_Condition = 1;
+  IColIdx_Simple_Value     = 2;
+
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
 
-implementation
+implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 {$R *.dfm}
 uses
   TypInfo, StrUtils, Mask, ToolEdit,
@@ -82,181 +226,361 @@ uses
       end;
   end;
 
-type
-  TSearchCritType = (sctInteger, sctFileMasks, sctString, sctDate, sctTime, sctKeywords);
-  TIntPropCondition = (ipcLess, ipcLessEqual, ipcEqual, ipcNotEqual, ipcGreaterEqual, ipcGreater);
-  TMskPropCondition = (mpcMatches, mpcNotMatches);
-  TStrPropCondition = (spcSpecified, spcNotSpecified, spcStarts, spcNotStarts, spcEqual, spcNotEqual, spcEnds, spcNotEnds, spcContains, spcNotContains);
-  TDatPropCondition = (dpcSpecified, dpcNotSpecified, dpcLess, dpcLessEqual, dpcEqual, dpcNotEqual, dpcGreaterEqual, dpcGreater);
-  TLstPropCondition = (lpcSpecified, lpcNotSpecified, lpcAny, lpcNone, lpcAll);
-   // Запись критерия поиска
-  PSearchCriteriaEntry = ^TSearchCriteriaEntry;
-  TSearchCriteriaEntry = record
-    CritType: TSearchCritType; // Тип критерия поиска
-    Prop:     TPicProperty;    // Свойство, по которому проверяется
-    sValue:   String;          // Значение критерия
-    sHistKey: String;          // Ключ реестра, где хранится история (для комбобоксов)
-    case TSearchCritType of    // Условие сравнения текущее и по умолчанию
-      sctInteger:       (IntCond, IntDefCond: TIntPropCondition);
-      sctFileMasks:     (MskCond, MskDefCond: TMskPropCondition);
-      sctString:        (StrCond, StrDefCond: TStrPropCondition);
-      sctDate, sctTime: (DatCond, DatDefCond: TDatPropCondition);
-      sctKeywords:      (LstCond, LstDefCond: TLstPropCondition);
+   //===================================================================================================================
+   // TSimpleSearchCriterion
+   //===================================================================================================================
+
+  procedure TSimpleSearchCriterion.AdjustPicProperty;
+  begin
+    FDatatype  := aPicPropDatatype[FPicProperty];
+    Condition := aSSDefaultConditionsForDatatype[FDatatype];
+    Value := Null;
   end;
 
-var
-  aSearchCriteria: Array[0..17] of TSearchCriteriaEntry = (
-    {00}(CritType: sctInteger;   Prop: ppID;            sValue: ''; sHistKey: SRegSearch_IDMRU;       IntCond: ipcEqual;        IntDefCond: ipcEqual),
-    {01}(CritType: sctFileMasks; Prop: ppFileName;      sValue: ''; sHistKey: SRegSearch_FMaskMRU;    MskCond: mpcMatches;      MskDefCond: mpcMatches),
-    {02}(CritType: sctString;    Prop: ppFilePath;      sValue: ''; sHistKey: SRegSearch_FPathMRU;    StrCond: spcContains;     StrDefCond: spcContains),
-    {03}(CritType: sctInteger;   Prop: ppFileSizeBytes; sValue: ''; sHistKey: SRegSearch_FSizeMRU;    IntCond: ipcEqual;        IntDefCond: ipcEqual),
-    {04}(CritType: sctInteger;   Prop: ppPicWidth;      sValue: ''; sHistKey: SRegSearch_PWidthMRU;   IntCond: ipcEqual;        IntDefCond: ipcEqual),
-    {05}(CritType: sctInteger;   Prop: ppPicHeight;     sValue: ''; sHistKey: SRegSearch_PHeightMRU;  IntCond: ipcEqual;        IntDefCond: ipcEqual),
-    {06}(CritType: sctDate;      Prop: ppDate;          sValue: ''; sHistKey: '';                     DatCond: dpcGreaterEqual; DatDefCond: dpcGreaterEqual),
-    {07}(CritType: sctDate;      Prop: ppDate;          sValue: ''; sHistKey: '';                     DatCond: dpcLessEqual;    DatDefCond: dpcLessEqual),
-    {08}(CritType: sctTime;      Prop: ppTime;          sValue: ''; sHistKey: '';                     DatCond: dpcGreaterEqual; DatDefCond: dpcGreaterEqual),
-    {09}(CritType: sctTime;      Prop: ppTime;          sValue: ''; sHistKey: '';                     DatCond: dpcLessEqual;    DatDefCond: dpcLessEqual),
-    {10}(CritType: sctString;    Prop: ppPlace;         sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
-    {11}(CritType: sctString;    Prop: ppFilmNumber;    sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
-    {12}(CritType: sctString;    Prop: ppFrameNumber;   sValue: ''; sHistKey: SRegSearch_FrNumberMRU; StrCond: spcContains;     StrDefCond: spcContains),
-    {13}(CritType: sctString;    Prop: ppAuthor;        sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
-    {14}(CritType: sctString;    Prop: ppDescription;   sValue: ''; sHistKey: SRegSearch_DescMRU;     StrCond: spcContains;     StrDefCond: spcContains),
-    {15}(CritType: sctString;    Prop: ppNotes;         sValue: ''; sHistKey: SRegSearch_NotesMRU;    StrCond: spcContains;     StrDefCond: spcContains),
-    {16}(CritType: sctString;    Prop: ppMedia;         sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
-    {17}(CritType: sctKeywords;  Prop: ppKeywords;      sValue: ''; sHistKey: '';                     LstCond: lpcAny;          LstDefCond: lpcAny));
-   // Списки все упоминаемых мест, номеров плёнок, авторов, носителей
-  SLPhoaPlaces: TStringList;
-  SLPhoaFilmNumbers: TStringList;
-  SLPhoaAuthors: TStringList;
-  SLPhoaMedia: TStringList;
-  sSearchExpression: String;
-
-const
-   // Индексы отдельных критериев из aSearchCriteria[]
-  ICritIdx_ID        = 00;
-  ICritIdx_FileMasks = 01;
-  ICritIdx_FileSize  = 03;
-  ICritIdx_PicWidth  = 04;
-  ICritIdx_PicHeight = 05;
-  ICritIdx_Date1     = 06;
-  ICritIdx_Date2     = 07;
-  ICritIdx_Time1     = 08;
-  ICritIdx_Time2     = 09;
-  ICritIdx_Keywords  = 17;
-
-   // Возвращает название условия
-  function PropConditionName(CritType: TSearchCritType; const Condition): String;
-  var pti: PTypeInfo;
+  constructor TSimpleSearchCriterion.Create;
   begin
-    case CritType of
-      sctInteger:       pti := TypeInfo(TIntPropCondition);
-      sctFileMasks:     pti := TypeInfo(TMskPropCondition);
-      sctString:        pti := TypeInfo(TStrPropCondition);
-      sctDate, sctTime: pti := TypeInfo(TDatPropCondition);
-      sctKeywords:      pti := TypeInfo(TLstPropCondition);
-      else Exit;
+    inherited Create;
+    FPicProperty := ppID;
+    AdjustPicProperty;
+  end;
+
+  procedure TSimpleSearchCriterion.FinalizeSearch;
+  begin
+    FValue_String := ''; // Release memory
+    FreeAndNil(FValue_Masks);
+  end;
+
+  function TSimpleSearchCriterion.GetConditionName: String;
+  begin
+    Result := ConstVal(GetEnumName(TypeInfo(TSimpleSearchCondition), Byte(FCondition)));
+  end;
+
+  function TSimpleSearchCriterion.GetPicPropertyName: String;
+  begin
+    Result := PicPropName(FPicProperty);
+  end;
+
+  function TSimpleSearchCriterion.GetValueStr: String;
+  begin
+    Result := VarToStr(FValue);
+  end;
+
+  procedure TSimpleSearchCriterion.InitializeSearch;
+  begin
+    case FDatatype of
+      ppdtString:
+        case FCondition of
+          sscStrStarts,
+            sscStrNotStarts,
+            sscStrEqual,
+            sscStrNotEqual,
+            sscStrEnds,
+            sscStrNotEnds,
+            sscStrContains,
+            sscStrNotContains:    FValue_String  := VarToStr(FValue);
+          sscStrMatchesMask,   
+            sscStrNotMatchesMask: if not VarIsNull(FValue) then FValue_Masks := TPhoaMasks.Create(FValue);
+        end;
+      ppdtInteger,
+        ppdtDate,
+        ppdtTime: if VarIsNull(FValue) then FValue_Integer := 0 else FValue_Integer := FValue;
+      ppdtFloat:  if VarIsNull(FValue) then FValue_Float   := 0 else FValue_Float   := FValue;
+      ppdtList:  {!!!???};
     end;
-    Result := ConstVal(GetEnumName(pti, Byte(Condition)));
   end;
 
-   // Возвращает список строк условий для заданного типа, разделённых символом #13
-  function GetConditionStrings(CritType: TSearchCritType): String;
-  var b, bMax: Byte;
-  begin
-    Result := '';
-    case CritType of
-      sctInteger:       bMax := Byte(High(TIntPropCondition));
-      sctFileMasks:     bMax := Byte(High(TMskPropCondition));
-      sctString:        bMax := Byte(High(TStrPropCondition));
-      sctDate, sctTime: bMax := Byte(High(TDatPropCondition));
-      sctKeywords:      bMax := Byte(High(TLstPropCondition));
-      else Exit;
+  function TSimpleSearchCriterion.Matches(Pic: IPhoaPic): Boolean;
+  var vProp: Variant;
+
+    procedure InvalidDatatype;
+    begin
+      PhoaException('Invalid or incompatible datatype');
     end;
-    for b := 0 to bMax do AccumulateStr(Result, #13, PropConditionName(CritType, b));
-  end;
 
-   // Функции, проверяющие соответствие условиям
-  function MatchesCondition(Condition: TIntPropCondition; iValue, iCritValue: Integer): Boolean; overload;
-  begin
-    Result := iCritValue<0;
-    if not Result then
-      case Condition of
-        ipcLess:         Result := iValue<iCritValue;
-        ipcLessEqual:    Result := iValue<=iCritValue;
-        ipcEqual:        Result := iValue=iCritValue;
-        ipcNotEqual:     Result := iValue<>iCritValue;
-        ipcGreaterEqual: Result := iValue>=iCritValue;
-        ipcGreater:      Result := iValue>iCritValue;
+    function TestString: Boolean;
+    var sProp: String;
+    begin
+       // Проверяем на условие без учёта отрицания
+      sProp := VarToStr(vProp);
+      case FCondition of
+        sscStrSpecified,
+          sscStrNotSpecified:   Result := sProp<>'';
+        sscStrStarts,
+          sscStrNotStarts:      Result := AnsiStartsText(FValue_String, sProp);
+        sscStrEqual,
+          sscStrNotEqual:       Result := AnsiSameText(FValue_String, sProp);
+        sscStrEnds,
+          sscStrNotEnds:        Result := AnsiEndsText(FValue_String, sProp);
+        sscStrContains,
+          sscStrNotContains:    Result := AnsiContainsText(FValue_String, sProp);
+        sscStrMatchesMask,
+          sscStrNotMatchesMask: Result := (FValue_Masks=nil) or FValue_Masks.Matches(sProp);
+        else InvalidDatatype;
       end;
-  end;
-
-  function MatchesCondition(Condition: TMskPropCondition; const sValue: String; Masks: TPhoaMasks): Boolean; overload;
-  begin
-    Result := (Condition=mpcMatches) = Masks.Matches(sValue);
-  end;
-
-  function MatchesCondition(Condition: TStrPropCondition; const sValue, sCritValue: String): Boolean; overload;
-  begin
-    case Condition of
-      spcSpecified:    Result := sValue<>'';
-      spcNotSpecified: Result := sValue='';
-      else begin
-        Result := sCritValue='';
-        if not Result then
-          case Condition of
-            spcStarts:      Result := AnsiStartsText(sCritValue, sValue);
-            spcNotStarts:   Result := not AnsiStartsText(sCritValue, sValue);
-            spcEqual:       Result := AnsiSameText(sValue, sCritValue);
-            spcNotEqual:    Result := not AnsiSameText(sValue, sCritValue);
-            spcEnds:        Result := AnsiEndsText(sCritValue, sValue);
-            spcNotEnds:     Result := not AnsiEndsText(sCritValue, sValue);
-            spcContains:    Result := AnsiContainsText(sValue, sCritValue);
-            spcNotContains: Result := not AnsiContainsText(sValue, sCritValue);
-          end;
-      end;
+       // Если отрицательное условие - инвертируем результат сравнения
+      if FCondition in [sscStrNotSpecified, sscStrNotStarts, sscStrNotEqual, sscStrNotEnds, sscStrNotContains, sscStrNotMatchesMask] then
+        Result := not Result;
     end;
-  end;
 
-  function MatchesCondition(Condition: TDatPropCondition; const iValue, iCritValue: Integer): Boolean; overload;
-  begin
-    case Condition of
-      dpcSpecified:    Result := iValue>=0;
-      dpcNotSpecified: Result := iValue<0;
+    function TestInteger: Boolean;
+    var iProp: Integer;
+    begin
+      if VarIsNull(vProp) then
+        Result := False
       else begin
-        Result := iCritValue<0;
-        if not Result then
-          case Condition of
-            dpcLess:         Result := iValue<iCritValue;
-            dpcLessEqual:    Result := iValue<=iCritValue;
-            dpcEqual:        Result := iValue=iCritValue;
-            dpcNotEqual:     Result := iValue<>iCritValue;
-            dpcGreaterEqual: Result := iValue>=iCritValue;
-            dpcGreater:      Result := iValue>iCritValue;
-          end;
-      end;
-    end;
-  end;
-
-  function MatchesCondition(Condition: TLstPropCondition; List, CritList: IPhoaKeywordList): Boolean; overload;
-  var i: Integer;
-  begin
-    case Condition of
-      lpcSpecified:    Result := List.Count>0;
-      lpcNotSpecified: Result := List.Count=0;
-      else begin
-        Result := CritList.Count=0;
-         // Проверяем каждое слово
-        if not Result then begin
-          Result := Condition in [lpcNone, lpcAll];
-          for i := 0 to CritList.Count-1 do
-            if (List.IndexOf(CritList[i])>=0) xor (Condition=lpcAll) then begin
-              Result := not Result;
-              Break;
-            end;
+        iProp := vProp;
+        case FCondition of
+          sscNumberLess:         Result := iProp< FValue_Integer;
+          sscNumberLessEqual:    Result := iProp<=FValue_Integer;
+          sscNumberEqual:        Result := iProp= FValue_Integer;
+          sscNumberNotEqual:     Result := iProp<>FValue_Integer;
+          sscNumberGreaterEqual: Result := iProp>=FValue_Integer;
+          sscNumberGreater:      Result := iProp> FValue_Integer;
+          else InvalidDatatype;
         end;
       end;
     end;
+
+    function TestFloat: Boolean;
+    var dProp: Double;
+    begin
+      if VarIsNull(vProp) then
+        Result := False
+      else begin
+        dProp := vProp;
+        case FCondition of
+          sscNumberLess:         Result := dProp< FValue_Float;
+          sscNumberLessEqual:    Result := dProp<=FValue_Float;
+          sscNumberEqual:        Result := dProp= FValue_Float;
+          sscNumberNotEqual:     Result := dProp<>FValue_Float;
+          sscNumberGreaterEqual: Result := dProp>=FValue_Float;
+          sscNumberGreater:      Result := dProp> FValue_Float;
+          else InvalidDatatype;
+        end;
+      end;
+    end;
+
+    function TestDateTime: Boolean;
+    var iProp: Integer;
+    begin
+      if VarIsNull(vProp) then iProp := 0 else iProp := vProp;
+      case FCondition of
+        sscDateTimeSpecified:    Result := not VarIsNull(vProp);
+        sscDateTimeNotSpecified: Result := VarIsNull(vProp);
+        sscDateTimeLess:         Result := iProp< FValue_Integer;
+        sscDateTimeLessEqual:    Result := iProp<=FValue_Integer;
+        sscDateTimeEqual:        Result := iProp= FValue_Integer;
+        sscDateTimeNotEqual:     Result := iProp<>FValue_Integer;
+        sscDateTimeGreaterEqual: Result := iProp>=FValue_Integer;
+        sscDateTimeGreater:      Result := iProp> FValue_Integer;
+        else InvalidDatatype;
+      end;
+    end;
+
+    function TestList: Boolean;
+    begin
+
+    end;
+
+  begin
+    vProp := Pic.PropValues[FPicProperty];
+    Result := not VarIsNull(FValue) and not VarIsNull(vProp);
+    if Result then
+      case FDatatype of
+        ppdtString:  Result := TestString;
+        ppdtInteger: Result := TestInteger;
+        ppdtFloat:   Result := TestFloat;
+        ppdtDate:    Result := TestDate;
+        ppdtTime:    Result := TestTime;
+        ppdtList:    Result := TestList;
+        else InvalidDatatype;
+      end;
   end;
+
+  procedure TSimpleSearchCriterion.SetCondition(Value: TSimpleSearchCondition);
+  begin
+    if FCondition<>Value then begin
+      if not (Value in aSSConditionsByDatatype[FDatatype]) then
+        PhoaException(
+          'Condition %s is incompatible with datatype %s',
+          [GetEnumName(TypeInfo(TSimpleSearchCondition), Byte(Value)),
+           GetEnumName(TypeInfo(TPicPropDatatype), Byte(FDatatype))]);
+      FCondition := Value;
+    end;
+  end;
+
+  procedure TSimpleSearchCriterion.SetPicProperty(Value: TPicProperty);
+  begin
+    if FPicProperty<>Value then begin
+      if aSSConditionsByDatatype[aPicPropDatatype[Value]]=[] then
+        PhoaException('Property "%s" isn''t a search property', [PicPropName(Value)]);
+      FPicProperty := Value;
+      AdjustPicProperty;
+    end;
+  end;
+
+   //===================================================================================================================
+   // TSimpleSearchCriterionList
+   //===================================================================================================================
+
+  function TSimpleSearchCriterionList.Add(Item: TSimpleSearchCriterion): Integer;
+  begin
+    Result := FList.Add(Item);
+  end;
+
+  procedure TSimpleSearchCriterionList.Clear;
+  begin
+    FList.Clear;
+  end;
+
+  constructor TSimpleSearchCriterionList.Create;
+  begin
+    inherited Create;
+    FList := TObjectList.Create(True);
+  end;
+
+  procedure TSimpleSearchCriterionList.Delete(Index: Integer);
+  begin
+    FList.Delete(Index);
+  end;
+
+  destructor TSimpleSearchCriterionList.Destroy;
+  begin
+    FList.Free;
+    inherited Destroy;
+  end;
+
+  procedure TSimpleSearchCriterionList.FinalizeSearch;
+  var i: Integer;
+  begin
+    for i := 0 to FList.Count-1 do TSimpleSearchCriterion(FList[i]).FinalizeSearch;
+  end;
+
+  function TSimpleSearchCriterionList.GetCount: Integer;
+  begin
+    Result := FList.Count;
+  end;
+
+  function TSimpleSearchCriterionList.GetItems(Index: Integer): TSimpleSearchCriterion;
+  begin
+    Result := TSimpleSearchCriterion(FList[Index]);
+  end;
+
+  procedure TSimpleSearchCriterionList.InitializeSearch;
+  var i: Integer;
+  begin
+    for i := 0 to FList.Count-1 do TSimpleSearchCriterion(FList[i]).InitializeSearch;
+  end;
+
+//var
+//  aSearchCriteria: Array[0..17] of TSearchCriteriaEntry = (
+//    {00}(CritType: sctInteger;   Prop: ppID;            sValue: ''; sHistKey: SRegSearch_IDMRU;       IntCond: ipcEqual;        IntDefCond: ipcEqual),
+//    {01}(CritType: sctFileMasks; Prop: ppFileName;      sValue: ''; sHistKey: SRegSearch_FMaskMRU;    MskCond: mpcMatches;      MskDefCond: mpcMatches),
+//    {02}(CritType: sctString;    Prop: ppFilePath;      sValue: ''; sHistKey: SRegSearch_FPathMRU;    StrCond: spcContains;     StrDefCond: spcContains),
+//    {03}(CritType: sctInteger;   Prop: ppFileSizeBytes; sValue: ''; sHistKey: SRegSearch_FSizeMRU;    IntCond: ipcEqual;        IntDefCond: ipcEqual),
+//    {04}(CritType: sctInteger;   Prop: ppPicWidth;      sValue: ''; sHistKey: SRegSearch_PWidthMRU;   IntCond: ipcEqual;        IntDefCond: ipcEqual),
+//    {05}(CritType: sctInteger;   Prop: ppPicHeight;     sValue: ''; sHistKey: SRegSearch_PHeightMRU;  IntCond: ipcEqual;        IntDefCond: ipcEqual),
+//    {06}(CritType: sctDate;      Prop: ppDate;          sValue: ''; sHistKey: '';                     DatCond: dpcGreaterEqual; DatDefCond: dpcGreaterEqual),
+//    {07}(CritType: sctDate;      Prop: ppDate;          sValue: ''; sHistKey: '';                     DatCond: dpcLessEqual;    DatDefCond: dpcLessEqual),
+//    {08}(CritType: sctTime;      Prop: ppTime;          sValue: ''; sHistKey: '';                     DatCond: dpcGreaterEqual; DatDefCond: dpcGreaterEqual),
+//    {09}(CritType: sctTime;      Prop: ppTime;          sValue: ''; sHistKey: '';                     DatCond: dpcLessEqual;    DatDefCond: dpcLessEqual),
+//    {10}(CritType: sctString;    Prop: ppPlace;         sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
+//    {11}(CritType: sctString;    Prop: ppFilmNumber;    sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
+//    {12}(CritType: sctString;    Prop: ppFrameNumber;   sValue: ''; sHistKey: SRegSearch_FrNumberMRU; StrCond: spcContains;     StrDefCond: spcContains),
+//    {13}(CritType: sctString;    Prop: ppAuthor;        sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
+//    {14}(CritType: sctString;    Prop: ppDescription;   sValue: ''; sHistKey: SRegSearch_DescMRU;     StrCond: spcContains;     StrDefCond: spcContains),
+//    {15}(CritType: sctString;    Prop: ppNotes;         sValue: ''; sHistKey: SRegSearch_NotesMRU;    StrCond: spcContains;     StrDefCond: spcContains),
+//    {16}(CritType: sctString;    Prop: ppMedia;         sValue: ''; sHistKey: '';                     StrCond: spcContains;     StrDefCond: spcContains),
+//    {17}(CritType: sctKeywords;  Prop: ppKeywords;      sValue: ''; sHistKey: '';                     LstCond: lpcAny;          LstDefCond: lpcAny));
+//   // Списки все упоминаемых мест, номеров плёнок, авторов, носителей
+//  SLPhoaPlaces: TStringList;
+//  SLPhoaFilmNumbers: TStringList;
+//  SLPhoaAuthors: TStringList;
+//  SLPhoaMedia: TStringList;
+//  sSearchExpression: String;
+
+//   // Функции, проверяющие соответствие условиям
+//  function MatchesCondition(Condition: TIntPropCondition; iValue, iCritValue: Integer): Boolean; overload;
+//  begin
+//    Result := iCritValue<0;
+//    if not Result then
+//      case Condition of
+//        ipcLess:         Result := iValue<iCritValue;
+//        ipcLessEqual:    Result := iValue<=iCritValue;
+//        ipcEqual:        Result := iValue=iCritValue;
+//        ipcNotEqual:     Result := iValue<>iCritValue;
+//        ipcGreaterEqual: Result := iValue>=iCritValue;
+//        ipcGreater:      Result := iValue>iCritValue;
+//      end;
+//  end;
+//
+//  function MatchesCondition(Condition: TMskPropCondition; const sValue: String; Masks: TPhoaMasks): Boolean; overload;
+//  begin
+//    Result := (Condition=mpcMatches) = Masks.Matches(sValue);
+//  end;
+//
+//  function MatchesCondition(Condition: TStrPropCondition; const sValue, sCritValue: String): Boolean; overload;
+//  begin
+//    case Condition of
+//      spcSpecified:    Result := sValue<>'';
+//      spcNotSpecified: Result := sValue='';
+//      else begin
+//        Result := sCritValue='';
+//        if not Result then
+//          case Condition of
+//            spcStarts:      Result := AnsiStartsText(sCritValue, sValue);
+//            spcNotStarts:   Result := not AnsiStartsText(sCritValue, sValue);
+//            spcEqual:       Result := AnsiSameText(sValue, sCritValue);
+//            spcNotEqual:    Result := not AnsiSameText(sValue, sCritValue);
+//            spcEnds:        Result := AnsiEndsText(sCritValue, sValue);
+//            spcNotEnds:     Result := not AnsiEndsText(sCritValue, sValue);
+//            spcContains:    Result := AnsiContainsText(sValue, sCritValue);
+//            spcNotContains: Result := not AnsiContainsText(sValue, sCritValue);
+//          end;
+//      end;
+//    end;
+//  end;
+//
+//  function MatchesCondition(Condition: TDatPropCondition; const iValue, iCritValue: Integer): Boolean; overload;
+//  begin
+//    case Condition of
+//      dpcSpecified:    Result := iValue>=0;
+//      dpcNotSpecified: Result := iValue<0;
+//      else begin
+//        Result := iCritValue<0;
+//        if not Result then
+//          case Condition of
+//            dpcLess:         Result := iValue<iCritValue;
+//            dpcLessEqual:    Result := iValue<=iCritValue;
+//            dpcEqual:        Result := iValue=iCritValue;
+//            dpcNotEqual:     Result := iValue<>iCritValue;
+//            dpcGreaterEqual: Result := iValue>=iCritValue;
+//            dpcGreater:      Result := iValue>iCritValue;
+//          end;
+//      end;
+//    end;
+//  end;
+//
+//  function MatchesCondition(Condition: TLstPropCondition; List, CritList: IPhoaKeywordList): Boolean; overload;
+//  var i: Integer;
+//  begin
+//    case Condition of
+//      lpcSpecified:    Result := List.Count>0;
+//      lpcNotSpecified: Result := List.Count=0;
+//      else begin
+//        Result := CritList.Count=0;
+//         // Проверяем каждое слово
+//        if not Result then begin
+//          Result := Condition in [lpcNone, lpcAll];
+//          for i := 0 to CritList.Count-1 do
+//            if (List.IndexOf(CritList[i])>=0) xor (Condition=lpcAll) then begin
+//              Result := not Result;
+//              Break;
+//            end;
+//        end;
+//      end;
+//    end;
+//  end;
 
    //===================================================================================================================
    // VirtualStringTree EditLink для редакторов свойств
@@ -615,6 +939,11 @@ type
     end;
   end;
 
+  procedure TdSearch.ExprInsertOpClick(Sender: TObject);
+  begin
+    eExpression.SelText := asPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
+  end;
+
   procedure TdSearch.ExprInsertPropClick(Sender: TObject);
   begin
     eExpression.SelText := '$'+PicPropToStr(TPicProperty(TComponent(Sender).Tag), True);
@@ -623,6 +952,7 @@ type
   procedure TdSearch.FinalizeDialog;
   begin
     FLocalResults := nil;
+    FSimpleCriteria.Free;
     SLPhoaPlaces.Free;
     SLPhoaFilmNumbers.Free;
     SLPhoaAuthors.Free;
@@ -656,32 +986,46 @@ type
       Result.Duplicates := dupIgnore;
     end;
 
-     // Добавляет пункты меню "Вставить свойство"
+     // Добавляет к Menu новый пункт
+    procedure AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iTag: Integer; const AOnClick: TNotifyEvent);
+    var tbi: TTBCustomItem;
+    begin
+      tbi := TTBXItem.Create(Self);
+      tbi.Caption := sCaption;
+      tbi.Tag     := iTag;
+      tbi.OnClick := AOnClick;
+      Menu.Add(tbi);
+    end;
+
+     // Добавляет пункты меню "Вставить свойство" и для scpMain
     procedure AddExprInsertPropItems;
     var
       pp: TPicProperty;
-      tbi: TTBCustomItem;
+      sProp: String;
     begin
       for pp := Low(pp) to High(pp) do begin
-        tbi := TTBXItem.Create(Self);
-        with tbi do begin
-          Caption    := Format('$%s - %s', [PicPropToStr(pp, True), PicPropName(pp)]);
-          Tag        := Byte(pp);
-          OnClick    := ExprInsertPropClick;
-        end;
-        smExprInsertProp.Add(tbi);
+        sProp := '$'+PicPropToStr(pp, True);
+        AddTBXMenuItem(
+          smExprInsertProp,
+          Format('%s - %s', [sProp, PicPropName(pp)]),
+          Byte(pp),
+          ExprInsertPropClick);
+        scpMain.AddItem(sProp, sProp);  
       end;
     end;
 
     procedure AddExprInsertOperatorItems;
+    var ok: TPicFilterOperatorKind;
     begin
-      //!!!
+      for ok := Low(ok) to High(ok) do
+        AddTBXMenuItem(smExprInsertOperator, asPicFilterOperators[ok], Byte(ok), ExprInsertOpClick);
     end;
 
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_search;
     OKIgnoresModified := True;
+    FSimpleCriteria   := TSimpleSearchCriterionList.Create;
     FLocalResults     := NewPhotoAlbumPicList(False);
      // Загружаем списки мест, номеров плёнок, авторов
     SLPhoaPlaces      := NewSL;
@@ -694,13 +1038,20 @@ type
     rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
      // Инициализируем дерево
     ApplyTreeSettings(tvCriteria);
-    tvCriteria.RootNodeCount := High(aSearchCriteria)+1;
+    SyncSimpleCriteria;
      // Создаём пункты меню "Вставить свойство" и "Вставить оператор"
     AddExprInsertPropItems;
     AddExprInsertOperatorItems;
      // Инициализируем выражение
+    scpMain.Font.Assign(Font);
+    scpMain.TitleFont.Assign(Font);
     eExpression.Highlighter := TSynPicFilterSyn.Create(Self);
-    eExpression.Text        := sSearchExpression; 
+    eExpression.Text        := sSearchExpression;
+  end;
+
+  function TdSearch.IsSimpleCritNode(Node: PVirtualNode): Boolean;
+  begin
+    Result := (Node<>nil) and (Node.Index<FSimpleCriteria.Count);
   end;
 
   procedure TdSearch.PerformSearch;
@@ -846,14 +1197,9 @@ type
   end;
 
   procedure TdSearch.ResetCriteria;
-  var i: Integer;
   begin
-    for i := 0 to High(aSearchCriteria) do
-      with aSearchCriteria[i] do begin
-        sValue := '';
-        IntCond := IntDefCond;
-      end;
-    tvCriteria.Invalidate;
+    FSimpleCriteria.Clear;
+    SyncSimpleCriteria;
   end;
 
   procedure TdSearch.SettingsRestore(rif: TRegIniFile);
@@ -868,34 +1214,45 @@ type
     rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);
   end;
 
-  procedure TdSearch.tvCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
+  procedure TdSearch.SyncSimpleCriteria;
+  begin
+    tvSimpleCriteria.RootNodeCount := FSimpleCriteria.Count+1; // Добавляем виртуальную "пустую" строку
+    tvSimpleCriteria.Invalidate;
+    //!!!EnableActions;
+  end;
+
+  procedure TdSearch.tvSimpleCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
   begin
     EditLink := TPicPropEditLink.Create;
   end;
 
-  procedure TdSearch.tvCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+  procedure TdSearch.tvSimpleCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   begin
      // Редактируем ячейку, в которую входим
     if (Node<>nil) and not (tsIncrementalSearching in Sender.TreeStates) then Sender.EditNode(Node, Column);
   end;
 
-  procedure TdSearch.tvCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  procedure TdSearch.tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
-    psce: PSearchCriteriaEntry;
+    Crit: TSimpleSearchCriterion;
     s: String;
   begin
-    psce := @aSearchCriteria[Node.Index];
-    case Column of
-      0: s := PicPropName(psce.Prop);
-      1: s := PropConditionName(psce.CritType, psce.IntCond);
-      2: s := psce.sValue;
+    s := '';
+    if IsSimpleCritNode(Node) then begin
+      Crit := FSimpleCriteria[Node.Index];
+      case Column of
+        IColIdx_Simple_Property:  s := Crit.PicPropertyName;
+        IColIdx_Simple_Condition: s := Crit.ConditionName;
+        IColIdx_Simple_Value:     s := Crit.ValueStr;
+      end;
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
-  procedure TdSearch.tvCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+  procedure TdSearch.tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
-    if Column=0 then TargetCanvas.Font.Style := [fsBold];
+     // У каждого узла есть кнопка
+    Node.CheckType := ctButton; 
   end;
 
 end.

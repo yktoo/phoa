@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.2 2004-11-19 13:01:06 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.3 2004-11-21 09:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -53,37 +53,97 @@ type
     property ParseErrorMsg: String read GetParseErrorMsg;
   end;
 
+   // Вид оператора
+  TPicFilterOperatorKind = (
+    okAnd, okOr, okNot, okIn, okStartsWith, okEndsWith, okContains, okIsEmpty, okEQ, okNotEQ, okLT, okLE, okGT, okGE);
+
+const
+   // Тексты операторов
+  asPicFilterOperators: Array [TPicFilterOperatorKind] of String = (
+    'and', 'or', 'not', 'in', 'startsWith', 'endsWith', 'contains', 'isEmpty', '=', '<>', '<', '<=', '>', '>=');
+
    // Создаёт новый экземпляр IPhoaParsingPicFilter
   function  NewPhoaParsingPicFilter: IPhoaParsingPicFilter;
 
   procedure PhoaParseError(iPos: Integer; const sMsg: String); overload;
   procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const); overload;
 
-implementation
-
-uses phPhoa; /////////////////////////////////////////////////////////////////////////////////////////////////////////
+implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
+uses phPhoa, Variants;
 
 type
   TChars = set of Char;
-  
+
    // Тип скобки
   TBracketType = (btOpen, btClose);
 
-   // Вид оператора
-  TOperatorKind = (
-    okAnd, okOr, okNot, okIn, okStartsWith, okEndsWith, okContains, okIsEmpty, okEQ, okNotEQ, okLT, okLE, okGT, okGE);
+const
+  CSSpaceChars    = [#9, #10, #12, #13, ' '];
+  CSBrackets      = ['(', ')'];
+  CSDigits        = ['0'..'9'];
+  CSEngChars      = ['a'..'z', 'A'..'Z'];
+  CSMathCompChars = ['<', '>', '='];
+  CSIDStartChars  = CSEngChars+['_'];
+  CSIDChars       = CSIDStartChars+CSDigits;
+  CSValueChars    = CSDigits+['.', '-'];
 
-   // Тип данных  
-  TDatatype = (dtString, dtInteger, dtFloat, dtDate, dtTime, dtBoolean, dtList);
+  OSUnaryOperators = [okNot, okIsEmpty];
+  
+   // Массив для определения, в качестве какого типа должны сравниваться операнды
+   // ppdtString, ppdtInteger, ppdtFloat, ppdtDate, ppdtTime, ppdtBoolean, ppdtList, ppdtSize, ppdtPixelFormat, ppdtRotation, ppdtFlips
+  DatatypeCastMap: Array [TPicPropDatatype, TPicPropDatatype] of TPicPropDatatype = (
+    (ppdtString,      ppdtInteger,     ppdtFloat,       ppdtDate,        ppdtTime,        ppdtString,      ppdtString,      ppdtString,      ppdtString,      ppdtString,      ppdtString),
+    (ppdtInteger,     ppdtInteger,     ppdtFloat,       ppdtInteger,     ppdtInteger,     ppdtInteger,     ppdtInteger,     ppdtInteger,     ppdtInteger,     ppdtInteger,     ppdtInteger),
+    (ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat,       ppdtFloat),
+    (ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate,        ppdtDate),
+    (ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime,        ppdtTime),
+    (ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean,     ppdtBoolean),
+    (ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList,        ppdtList),
+    (ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize,        ppdtSize),
+    (ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat, ppdtPixelFormat),
+    (ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation,    ppdtRotation),
+    (ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips,       ppdtFlips));
 
+var
+   // Специфичные для парсера установки формата, где DecimalSeparator='.'
+  ParserFormatSettings: TFormatSettings;
+
+resourcestring
+  SPhoaParseError_NoExpression                = 'Missing expression';
+  SPhoaParseError_InvalidExpression           = 'Invalid expression';
+  SPhoaParseError_InvalidCharacter            = 'Invalid character: "%s"';
+  SPhoaParseError_InvalidOperator             = 'Invalid operator: "%s"';
+  SPhoaParseError_InvalidOperatorKind         = 'Invalid operator kind';
+  SPhoaParseError_InvalidProperty             = 'Invalid picture property: "%s"';
+  SPhoaParseError_StringLiteralNotTerminated  = 'Unterminated string literal';
+  SPhoaParseError_ListNotTerminated           = 'Unterminated list';
+  SPhoaParseError_ListItemExpected            = 'List item expected';
+  SPhoaParseError_SomethingExpected           = 'Expected: %s';
+  SPhoaParseError_DigitExpected               = 'Digit expected';
+  SPhoaParseError_OperatorExpected            = 'Operator expected';
+  SPhoaParseError_OperandExpected             = 'Operand expected';
+  SPhoaParseError_UnbalancedBrackets          = 'Unbalanced brackets';
+  SPhoaParseError_StackIsEmpty                = 'Element stack is empty';
+  SPhoaParseError_InvalidDatatype             = 'Invalid datatype';
+
+  procedure PhoaParseError(iPos: Integer; const sMsg: String);
+  begin
+    raise EPhoaParseError.Create(iPos, sMsg);
+  end;
+
+  procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const);
+  begin
+    raise EPhoaParseError.CreateFmt(iPos, sMsg, Params);
+  end;
+
+   //===================================================================================================================
+   // IPhoaParsedItem
+   //===================================================================================================================
+type
   IPhoaParsedItem      = interface;
   IPhoaParsedOperand   = interface;
   IPhoaParsedOperator  = interface;
   IPhoaParsedItemsList = interface;
-   //===================================================================================================================
-   // Not available
-   //===================================================================================================================
-
 
   IPhoaParsedItem = interface(IInterface)
     ['{947B9A40-35C8-11D9-8FCB-B07033DC0000}']
@@ -141,10 +201,10 @@ type
      // Возвращает значение-время элемента
     function  AsTime(Pic: IPhoaPic): Integer;
      // Prop handlers
-    function  GetDatatype: TDatatype;
+    function  GetDatatype: TPicPropDatatype;
      // Props
      // -- Основной тип данных
-    property Datatype: TDatatype read GetDatatype;
+    property Datatype: TPicPropDatatype read GetDatatype;
   end;
 
   IPhoaParsedOperator = interface(IPhoaParsedItem)
@@ -216,8 +276,9 @@ type
     function  AsInteger(Pic: IPhoaPic): Integer; virtual;
     function  AsFloat(Pic: IPhoaPic): Double; virtual;
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; virtual;
-    function  GetDatatype: TDatatype; virtual; abstract;
-    property Datatype: TDatatype read GetDatatype;
+    function  GetDatatype: TPicPropDatatype; virtual; abstract;
+     // Props
+    property Datatype: TPicPropDatatype read GetDatatype;
   end;
 
    // Абстрактный базовый класс оператора
@@ -249,12 +310,12 @@ type
   TPhoaParsedOperator = class(TPhoaParsedCustomOperator)
   protected
      // Вид оператора
-    FKind: TOperatorKind;
+    FKind: TPicFilterOperatorKind;
      // Сравнивают два значения с учётом вида оператора
     function  CompareValues(Val1, Val2: Integer): Boolean; overload;
     function  CompareValues(const Val1, Val2: Double): Boolean; overload;
     function  CompareValues(const Val1, Val2: String): Boolean; overload;
-    function  CompareValues(const Val1, Val2: Boolean): Boolean; overload;
+    function  CompareValues(Val1, Val2: Boolean): Boolean; overload;
     function  IsUnaryOperator: Boolean; override;
     function  GetDescription: String; override;
     function  GetPriority: Integer; override;
@@ -282,13 +343,13 @@ type
     function  AsString(Pic: IPhoaPic): String; override;
     function  AsDate(Pic: IPhoaPic): Integer; override;
     function  AsTime(Pic: IPhoaPic): Integer; override;
-    function  GetDatatype: TDatatype; override;
+    function  GetDatatype: TPicPropDatatype; override;
     function  GetDescription: String; override;
   public
     constructor Create(const sValue: String; iPos: Integer);
   end;
 
-  TPhoaParsedField = class(TPhoaParsedOperand)
+  TPhoaParsedPicProp = class(TPhoaParsedOperand)
   protected
      // Свойство изображения
     FProp: TPicProperty;
@@ -297,7 +358,7 @@ type
     function  AsTime(Pic: IPhoaPic): Integer; override;
     function  AsInteger(Pic: IPhoaPic): Integer; override;
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; override;
-    function  GetDatatype: TDatatype; override;
+    function  GetDatatype: TPicPropDatatype; override;
     function  GetDescription: String; override;
   public
     constructor Create(const sPropName: String; iPos: Integer);
@@ -308,10 +369,10 @@ type
      // Строковое представление значения
     FStringValue: String;
      // Текущий тип данных
-    FCurrentDatatype: TDatatype;
+    FCurrentDatatype: TPicPropDatatype;
     function  AsInteger(Pic: IPhoaPic): Integer; override;
     function  AsFloat(Pic: IPhoaPic): Double; override;
-    function  GetDatatype: TDatatype; override;
+    function  GetDatatype: TPicPropDatatype; override;
     function  GetDescription: String; override;
   public
     constructor Create(const sStringValue: String; iPos: Integer);
@@ -325,7 +386,7 @@ type
     function  GetItemList: IPhoaParsedItemsList;
   protected
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; override;
-    function  GetDatatype: TDatatype; override;
+    function  GetDatatype: TPicPropDatatype; override;
     function  GetDescription: String; override;
      // Props
      // -- Список элементов
@@ -337,73 +398,10 @@ type
      // Значение
     FValue: Boolean;
     function  AsBoolean(Pic: IPhoaPic): Boolean; override;
-    function  GetDatatype: TDatatype; override;
+    function  GetDatatype: TPicPropDatatype; override;
     function  GetDescription: String; override;
   public
     constructor Create(bValue: Boolean; iPos: Integer);
-  end;
-
-   //===================================================================================================================
-
-const
-  CSSpaceChars    = [#9, #10, #12, #13, ' '];
-  CSBrackets      = ['(', ')'];
-  CSDigits        = ['0'..'9'];
-  CSEngChars      = ['a'..'z', 'A'..'Z'];
-  CSMathCompChars = ['<', '>', '='];
-  CSIDStartChars  = CSEngChars+['_'];
-  CSIDChars       = CSIDStartChars+CSDigits;
-  CSValueChars    = CSDigits+['.', '-'];
-
-  ASOperatorKinds: Array [TOperatorKind] of String = (
-    'AND', 'OR', 'NOT', 'IN', 'STARTSWITH', 'ENDSWITH', 'CONTAINS', 'ISEMPTY',
-    '=', '<>', '<', '<=', '>', '>=');
-  OSUnaryOperators = [okNot, okIsEmpty];
-  PPStringProps  = [ppAuthor, ppDescription, ppFileName, ppFilmNumber, ppFrameNumber, ppMedia, ppNotes, ppPlace];
-  PPIntegerProps = [ppID, ppFileSize, ppPicWidth, ppPicHeight, ppThumbWidth, ppThumbHeight];
-  PPDateProps    = [ppDate];
-  PPTimeProps    = [ppTime];
-  PPListProps    = [ppKeywords];
-   // dtString, dtInteger, dtFloat, dtDate, dtTime, dtBoolean, dtList
-  DatatypeCastMap: Array [TDatatype, TDatatype] of TDatatype = (
-    (dtString,  dtInteger, dtFloat,   dtDate,    dtTime,    dtString,  dtString),
-    (dtInteger, dtInteger, dtFloat,   dtInteger, dtInteger, dtInteger, dtInteger),
-    (dtFloat,   dtFloat,   dtFloat,   dtFloat,   dtFloat,   dtFloat,   dtFloat),
-    (dtDate,    dtDate,    dtDate,    dtDate,    dtDate,    dtDate,    dtDate),
-    (dtTime,    dtTime,    dtTime,    dtTime,    dtTime,    dtTime,    dtTime),
-    (dtBoolean, dtBoolean, dtBoolean, dtBoolean, dtBoolean, dtBoolean, dtBoolean),
-    (dtList,    dtList,    dtList,    dtList,    dtList,    dtList,    dtList));
-
-var
-   // Специфичные для парсера установки формата, где DecimalSeparator='.'
-  ParserFormatSettings: TFormatSettings;
-
-resourcestring
-  SPhoaParseError_NoExpression                = 'Отсутствует выражение';
-  SPhoaParseError_InvalidExpression           = 'Недопустимое выражение';
-  SPhoaParseError_InvalidCharacter            = 'Недопустимый символ: %s';
-  SPhoaParseError_InvalidOperator             = 'Недопустимый оператор: %s';
-  SPhoaParseError_InvalidOperatorKind         = 'Недопустимый вид оператора';
-  SPhoaParseError_InvalidProperty             = 'Недопустимое свойство изображения: %s';
-  SPhoaParseError_StringLiteralNotTerminated  = 'Строковый литерал не завершён';
-  SPhoaParseError_ListNotTerminated           = 'Список не завершён';
-  SPhoaParseError_ListItemExpected            = 'Ожидался элемент списка';
-  SPhoaParseError_SomethingExpected           = 'Ожидалось: %s';
-  SPhoaParseError_DigitExpected               = 'Ожидалась цифра';
-  SPhoaParseError_OperatorExpected            = 'Ожидался оператор';
-  SPhoaParseError_OperandExpected             = 'Ожидался операнд';
-  SPhoaParseError_UnbalancedBrackets          = 'Несбалансированы скобки';
-  SPhoaParseError_StackIsEmpty                = 'Стек элементов пуст';
-  SPhoaParseError_InvalidDatatype             = 'Недопустимый тип данных';
-
-  procedure PhoaParseError(iPos: Integer; const sMsg: String);
-  begin
-    raise EPhoaParseError.Create(iPos, sMsg);
-  end;
-
-  procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const);
-  begin
-    raise EPhoaParseError.CreateFmt(iPos, sMsg, Params);
   end;
 
    //===================================================================================================================
@@ -688,9 +686,9 @@ resourcestring
     FValue := sValue;
   end;
 
-  function TPhoaParsedLiteral.GetDatatype: TDatatype;
+  function TPhoaParsedLiteral.GetDatatype: TPicPropDatatype;
   begin
-    Result := dtString;
+    Result := ppdtString;
   end;
 
   function TPhoaParsedLiteral.GetDescription: String;
@@ -699,108 +697,52 @@ resourcestring
   end;
 
    //===================================================================================================================
-   // TPhoaParsedField
+   // TPhoaParsedPicProp
    //===================================================================================================================
 
-  function TPhoaParsedField.AsDate(Pic: IPhoaPic): Integer;
+  function TPhoaParsedPicProp.AsDate(Pic: IPhoaPic): Integer;
   begin
-    Result := 0;
-    if FProp in PPDateProps then begin
-      if Pic<>nil then
-        case FProp of
-          ppDate: Result := Pic.Date;
-        end;
-    end else
-      InvalidDatatype;
+    if Datatype<>ppdtDate then InvalidDatatype;
+    if Pic=nil then Result := 0 else Result := Pic.PropValues[FProp];
   end;
 
-  function TPhoaParsedField.AsInteger(Pic: IPhoaPic): Integer;
+  function TPhoaParsedPicProp.AsInteger(Pic: IPhoaPic): Integer;
   begin
-    Result := 0;
-    if FProp in PPIntegerProps then begin
-      if Pic<>nil then
-        case FProp of
-          ppID:          Result := Pic.ID;
-          ppFileSize:    Result := Pic.FileSize;
-          ppPicWidth:    Result := Pic.ImageSize.cx;
-          ppPicHeight:   Result := Pic.ImageSize.cy;
-          ppThumbWidth:  Result := Pic.ThumbnailSize.cx;
-          ppThumbHeight: Result := Pic.ThumbnailSize.cy;
-        end;
-    end else
-      InvalidDatatype;
+    if Datatype<>ppdtInteger then InvalidDatatype;
+    if Pic=nil then Result := 0 else Result := Pic.PropValues[FProp];
   end;
 
-  function TPhoaParsedField.AsList(Pic: IPhoaPic): IPhoaKeywordList;
+  function TPhoaParsedPicProp.AsList(Pic: IPhoaPic): IPhoaKeywordList;
   begin
-    Result := nil;
-    if FProp in PPListProps then begin
-      if Pic<>nil then
-        case FProp of
-          ppKeywords: Result := Pic.Keywords;
-        end;
-    end else
-      InvalidDatatype;
+    if Datatype<>ppdtList then InvalidDatatype;
+    if (Pic=nil) or not VarSupports(Pic.PropValues[FProp], IPhoaKeywordList, Result) then Result := nil;
   end;
 
-  function TPhoaParsedField.AsString(Pic: IPhoaPic): String;
+  function TPhoaParsedPicProp.AsString(Pic: IPhoaPic): String;
   begin
-    Result := '';
-    if FProp in PPStringProps then begin
-      if Pic<>nil then
-        case FProp of
-          ppAuthor:      Result := Pic.Author;
-          ppDescription: Result := Pic.Description;
-          ppFileName:    Result := Pic.FileName;
-          ppFilmNumber:  Result := Pic.FilmNumber;
-          ppFrameNumber: Result := Pic.FrameNumber;
-          ppMedia:       Result := Pic.Media;
-          ppNotes:       Result := Pic.Notes;
-          ppPlace:       Result := Pic.Place;
-        end;
-    end else
-      InvalidDatatype;
+    if Datatype<>ppdtString then InvalidDatatype;
+    if Pic=nil then Result := '' else Result := Pic.PropValues[FProp];
   end;
 
-  function TPhoaParsedField.AsTime(Pic: IPhoaPic): Integer;
+  function TPhoaParsedPicProp.AsTime(Pic: IPhoaPic): Integer;
   begin
-    Result := 0;
-    if FProp in PPTimeProps then begin
-      if Pic<>nil then
-        case FProp of
-          ppTime: Result := Pic.Time;
-        end;
-    end else
-      InvalidDatatype;
+    if Datatype<>ppdtTime then InvalidDatatype;
+    if Pic=nil then Result := 0 else Result := Pic.PropValues[FProp];
   end;
 
-  constructor TPhoaParsedField.Create(const sPropName: String; iPos: Integer);
+  constructor TPhoaParsedPicProp.Create(const sPropName: String; iPos: Integer);
   begin
     inherited Create(iPos);
     FProp := StrToPicProp(sPropName, False);
     if not (FProp in [Low(FProp)..High(FProp)]) then PhoaParseError(iPos, SPhoaParseError_InvalidProperty, [sPropName]);
   end;
 
-  function TPhoaParsedField.GetDatatype: TDatatype;
+  function TPhoaParsedPicProp.GetDatatype: TPicPropDatatype;
   begin
-    if FProp in PPStringProps then
-      Result := dtString
-    else if FProp in PPListProps then
-      Result := dtList
-    else if FProp in PPIntegerProps then
-      Result := dtInteger
-    else if FProp in PPDateProps then
-      Result := dtDate
-    else if FProp in PPTimeProps then
-      Result := dtTime
-    else begin
-      InvalidDatatype;
-       // Заглушка от предупреждений
-      Result := dtString;
-    end;
+    Result := aPicPropDatatype[FProp];
   end;
 
-  function TPhoaParsedField.GetDescription: String;
+  function TPhoaParsedPicProp.GetDescription: String;
   begin
     Result := Format('[%d] property %s', [Position, PicPropToStr(FProp, True)]);
   end;
@@ -823,10 +765,10 @@ resourcestring
   begin
     inherited Create(iPos);
     FStringValue := sStringValue;
-    if Pos('.', FStringValue)>0 then FCurrentDatatype := dtFloat else FCurrentDatatype := dtInteger; 
+    if Pos('.', FStringValue)>0 then FCurrentDatatype := ppdtFloat else FCurrentDatatype := ppdtInteger; 
   end;
 
-  function TPhoaParsedValue.GetDatatype: TDatatype;
+  function TPhoaParsedValue.GetDatatype: TPicPropDatatype;
   begin
     Result := FCurrentDatatype;
   end;
@@ -845,9 +787,9 @@ resourcestring
     Result := ItemList as IPhoaKeywordList;
   end;
 
-  function TPhoaParsedList.GetDatatype: TDatatype;
+  function TPhoaParsedList.GetDatatype: TPicPropDatatype;
   begin
-    Result := dtList;
+    Result := ppdtList;
   end;
 
   function TPhoaParsedList.GetDescription: String;
@@ -884,9 +826,9 @@ resourcestring
     FValue := bValue;
   end;
 
-  function TPhoaParsedBoolean.GetDatatype: TDatatype;
+  function TPhoaParsedBoolean.GetDatatype: TPicPropDatatype;
   begin
-    Result := dtBoolean;
+    Result := ppdtBoolean;
   end;
 
   function TPhoaParsedBoolean.GetDescription: String;
@@ -968,7 +910,7 @@ resourcestring
          // Заглушка от предупреждений
         Result := False;
       end;
-    end; // case
+    end; 
   end;
 
   function TPhoaParsedOperator.CompareValues(const Val1, Val2: Double): Boolean;
@@ -985,7 +927,7 @@ resourcestring
          // Заглушка от предупреждений
         Result := False;
       end;
-    end; // case
+    end;
   end;
 
   function TPhoaParsedOperator.CompareValues(Val1, Val2: Integer): Boolean;
@@ -1002,10 +944,10 @@ resourcestring
          // Заглушка от предупреждений
         Result := False;
       end;
-    end; // case
+    end;
   end;
 
-  function TPhoaParsedOperator.CompareValues(const Val1, Val2: Boolean): Boolean;
+  function TPhoaParsedOperator.CompareValues(Val1, Val2: Boolean): Boolean;
   begin
     case FKind of
       okAnd:   Result := Val1 and Val2;
@@ -1021,20 +963,20 @@ resourcestring
          // Заглушка от предупреждений
         Result := False;
       end;
-    end; // case
+    end; 
   end;
 
   constructor TPhoaParsedOperator.Create(const sKind: String; iPos: Integer);
   var
     s: String;
     bFind: Boolean;
-    ok: TOperatorKind;
+    ok: TPicFilterOperatorKind;
   begin
     inherited Create(iPos);
     s := UpperCase(sKind);
     bFind := False;
-    for ok := Low(TOperatorKind) to High(TOperatorKind) do
-      if ASOperatorKinds[ok]=s then begin
+    for ok := Low(ok) to High(ok) do
+      if SameText(asPicFilterOperators[ok], s) then begin
         FKind := ok;
         bFind := True;
         Break;
@@ -1046,7 +988,7 @@ resourcestring
   var
     Op1, Op2: IPhoaParsedOperand;
     List: IPhoaKeywordList;
-    dt: TDatatype;
+    dt: TPicPropDatatype;
     bResult: Boolean;
     s: String;
   begin
@@ -1055,23 +997,23 @@ resourcestring
      // Заглушка от предупреждений
     bResult := False;
     case FKind of
-      okAnd, okOr:
-        bResult := CompareAsBoolean(Op1, Op2, Pic);
-      okNot:
-        bResult := not Op2.AsBoolean(Pic);
-      okStartsWith, okEndsWith, okContains:
-        bResult := CompareAsStrings(Op1, Op2, Pic);
+      okAnd,
+        okOr:       bResult := CompareAsBoolean(Op1, Op2, Pic);
+      okNot:        bResult := not Op2.AsBoolean(Pic);
+      okStartsWith,
+        okEndsWith,
+        okContains: bResult := CompareAsStrings(Op1, Op2, Pic);
       okEQ, okNotEQ, okLT, okLE, okGT, okGE: begin
         if Op1=nil then dt := Op2.Datatype else dt := DatatypeCastMap[Op1.Datatype, Op2.Datatype];
         case dt of
-          dtString:  bResult := CompareAsStrings(Op1, Op2, Pic);
-          dtBoolean: bResult := CompareAsBoolean(Op1, Op2, Pic);
-          dtInteger: bResult := CompareAsInteger(Op1, Op2, Pic);
-          dtFloat:   bResult := CompareAsFloat(Op1, Op2, Pic);
-          dtDate:    bResult := CompareAsDate(Op1, Op2, Pic);
-          dtTime:    bResult := CompareAsTime(Op1, Op2, Pic);
+          ppdtString:  bResult := CompareAsStrings(Op1, Op2, Pic);
+          ppdtBoolean: bResult := CompareAsBoolean(Op1, Op2, Pic);
+          ppdtInteger: bResult := CompareAsInteger(Op1, Op2, Pic);
+          ppdtFloat:   bResult := CompareAsFloat(Op1, Op2, Pic);
+          ppdtDate:    bResult := CompareAsDate(Op1, Op2, Pic);
+          ppdtTime:    bResult := CompareAsTime(Op1, Op2, Pic);
           else Op2.InvalidDatatype;
-        end; //case dt
+        end;
       end;
       okIsEmpty: begin
         List := Op2.AsList(Pic);
@@ -1083,24 +1025,21 @@ resourcestring
         bResult := (List<>nil) and (List.IndexOf(s)>=0);
       end;
       else InvalidOperatorKind;
-    end; // case Kind
+    end; 
     Stack.Add(TPhoaParsedBoolean.Create(bResult, Op2.Position) as IPhoaParsedItem);
   end;
 
   function TPhoaParsedOperator.GetDescription: String;
   begin
-    Result := Format('[%d] operator %s', [Position, ASOperatorKinds[FKind]]);
+    Result := Format('[%d] operator %s', [Position, asPicFilterOperators[FKind]]);
   end;
 
   function TPhoaParsedOperator.GetPriority: Integer;
   begin
     case FKind of
-      okNot, okIsEmpty:
-        Result := 4;
-      okAnd, okOr:
-        Result := 2;
-      else
-        Result := 3;
+      okNot, okIsEmpty: Result := 4;
+      okAnd, okOr:      Result := 2;
+      else              Result := 3;
     end;
   end;
 
@@ -1146,10 +1085,7 @@ type
     else begin
       CheckHasNoErrors;
        // Если нет ни одной лексемы - значит, выражение не содержит обрабатываемых символов
-      if FItems.Count=0 then
-        PhoaParseError(1, SPhoaParseError_NoExpression)
-      else
-        Matches(nil);
+      if FItems.Count=0 then PhoaParseError(1, SPhoaParseError_NoExpression) else Matches(nil);
     end;
   end;
 
@@ -1226,8 +1162,7 @@ type
      // Проверяет, что текущий символ выражения равен c; в противном случае генерируется EPhoaParseError
     procedure CheckCurrentChar(c: Char);
     begin
-      if FExpression[iCurrentPos]<>c then
-        PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [c]);
+      if FExpression[iCurrentPos]<>c then PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [c]);
     end;
 
      // Пропускает пробельные символы в выражении, начиная с текущей позиции
@@ -1316,13 +1251,13 @@ type
     function ExtractItem: IPhoaParsedItem; forward;
 
      // Извлекает из FExpression и возвращает очередной элемент-поле, начиная с текущей позиции
-    function ExtractField: TPhoaParsedField;
+    function ExtractField: TPhoaParsedPicProp;
     var iStartPos: Integer;
     begin
       CheckCurrentChar('$');
       iStartPos := iCurrentPos;
       Inc(iCurrentPos);
-      Result := TPhoaParsedField.Create(ExtractIdentifierString, iStartPos);
+      Result := TPhoaParsedPicProp.Create(ExtractIdentifierString, iStartPos);
     end;
 
      // Извлекает из FExpression и возвращает очередной элемент-оператор, начиная с текущей позиции
@@ -1403,7 +1338,7 @@ type
               bItemValid      := False;
               bSeparatorValid := True;
             end else
-              PhoaParseError(iCurrentPos, SPhoaParseError_SomethingExpected, [', или ]']);
+              PhoaParseError(iCurrentPos, SPhoaParseError_SomethingExpected, [', or ]']);
           end;
         end;
       except

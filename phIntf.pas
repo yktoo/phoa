@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.16 2004-11-19 13:01:05 dale Exp $
+//  $Id: phIntf.pas,v 1.17 2004-11-21 09:15:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -47,6 +47,11 @@ const
   PPAllProps = [Low(TPicProperty)..High(TPicProperty)];
 
 type
+   // Picture property data types
+  TPicPropDatatype = (
+    ppdtString, ppdtInteger, ppdtFloat, ppdtDate, ppdtTime, ppdtBoolean, ppdtList, ppdtSize, ppdtPixelFormat,
+    ppdtRotation, ppdtFlips);
+
    // Picture rotation angle (measured clockwise)
   TPicRotation = (pr0, pr90, pr180, pr270);
 
@@ -522,6 +527,34 @@ const
     SPicPropName_Keywords,      // ppKeywords
     SPicPropName_Rotation,      // ppRotation
     SPicPropName_Flips);        // ppFlips
+
+   // Picture property data types
+  aPicPropDatatype: Array[TPicProperty] of TPicPropDatatype = (
+    ppdtInteger,     // ppID
+    ppdtString,      // ppFileName
+    ppdtString,      // ppFullFileName
+    ppdtString,      // ppFilePath
+    ppdtInteger,     // ppFileSize
+    ppdtInteger,     // ppFileSizeBytes
+    ppdtInteger,     // ppPicWidth
+    ppdtInteger,     // ppPicHeight
+    ppdtSize,        // ppPicDims
+    ppdtInteger,     // ppThumbWidth
+    ppdtInteger,     // ppThumbHeight
+    ppdtSize,        // ppThumbDims
+    ppdtPixelFormat, // ppFormat
+    ppdtDate,        // ppDate
+    ppdtTime,        // ppTime
+    ppdtString,      // ppPlace
+    ppdtString,      // ppFilmNumber
+    ppdtString,      // ppFrameNumber
+    ppdtString,      // ppAuthor
+    ppdtString,      // ppDescription
+    ppdtString,      // ppNotes
+    ppdtString,      // ppMedia
+    ppdtList,        // ppKeywords
+    ppdtRotation,    // ppRotation
+    ppdtFlips);      // ppFlips
 
    // Translation TPicProperty<->Property name
   function  PicPropToStr(Prop: TPicProperty; bStrict: Boolean): String;
