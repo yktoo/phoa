@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.19 2004-10-19 15:03:31 dale Exp $
+//  $Id: udSearch.pas,v 1.20 2004-11-16 14:37:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,19 +10,23 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
-  phDlg, StdCtrls, VirtualTrees, ExtCtrls, DKLang;
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
+  phDlg, StdCtrls, VirtualTrees, ExtCtrls, ComCtrls, DKLang, SynEdit;
 
 type
   TdSearch = class(TPhoaDialog)
+    bReset: TButton;
     dklcMain: TDKLanguageController;
-    tvCriteria: TVirtualStringTree;
-    lCriteria: TLabel;
+    eExpression: TSynEdit;
     gbSearch: TGroupBox;
+    lCriteria: TLabel;
+    pcCriteria: TPageControl;
     rbAll: TRadioButton;
     rbCurGroup: TRadioButton;
     rbSearchResults: TRadioButton;
-    bReset: TButton;
+    tsExpression: TTabSheet;
+    tsSimple: TTabSheet;
+    tvCriteria: TVirtualStringTree;
     procedure bResetClick(Sender: TObject);
     procedure tvCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
@@ -43,6 +47,7 @@ type
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
+    function  GetDataValid: Boolean; override;
   end;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
@@ -51,7 +56,8 @@ implementation
 {$R *.dfm}
 uses
   TypInfo, StrUtils, Mask, ToolEdit,
-  phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox;
+  phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox,
+  phParsingPicFilter;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
@@ -112,6 +118,7 @@ var
   SLPhoaFilmNumbers: TStringList;
   SLPhoaAuthors: TStringList;
   SLPhoaMedia: TStringList;
+  sSearchExpression: String;
 
 const
    // Индексы отдельных критериев из aSearchCriteria[]
@@ -607,6 +614,13 @@ type
     inherited FinalizeDialog;
   end;
 
+  function TdSearch.GetDataValid: Boolean;
+  begin
+    Result :=
+      (pcCriteria.ActivePage=tsSimple) or
+      ((pcCriteria.ActivePage=tsExpression) and (eExpression.Lines.Count>0)); 
+  end;
+
   procedure TdSearch.InitializeDialog;
 
     function NewSL: TStringList;
@@ -633,10 +647,15 @@ type
      // Инициализируем дерево
     ApplyTreeSettings(tvCriteria);
     tvCriteria.RootNodeCount := High(aSearchCriteria)+1;
+     // Инициализируем выражение
+    eExpression.Highlighter := TSynPicFilterSyn.Create(Self); 
+    eExpression.Text        := sSearchExpression; 
   end;
 
   procedure TdSearch.PerformSearch;
-  type TSearchArea = (saAll, saCurGroup, saResults);
+  type
+    TSearchArea = (saAll, saCurGroup, saResults);
+    TSearchKind = (skSimple, skExpression);
   var
     iDate1, iDate2, iTime1, iTime2: Integer;
     Keywords: IPhotoAlbumKeywordList;
@@ -644,27 +663,45 @@ type
     i, iSrchCount, iID, iFSize, iPicWidth, iPicHeight: Integer;
     SearchArea: TSearchArea;
     Pic: IPhotoAlbumPic;
+    SearchKind: TSearchKind;
+    PicFilter: IPhoaParsingPicFilter;
 
+     // Возвращает True, если изображение подходит под указанные критерии
     function Matches(Pic: IPhotoAlbumPic): Boolean;
     var i: Integer;
     begin
-      for i := 0 to High(aSearchCriteria) do begin
-        with aSearchCriteria[i] do
-          case i of
-            ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                        iID);
-            ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.FileSize,                  iFSize);
-            ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.ImageSize.cx,              iPicWidth);
-            ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.ImageSize.cy,              iPicHeight);
-            ICritIdx_FileMasks: Result := MatchesCondition(MskCond, ExtractFileName(Pic.FileName), FMasks);
-            ICritIdx_Date1:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate1);
-            ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate2);
-            ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime1);
-            ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime2);
-            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.Keywords,                  Keywords);
-            else                Result := MatchesCondition(StrCond, Pic.PropStrValues[Prop],       sValue);
+      case SearchKind of
+         // Простой поиск
+        skSimple:
+          for i := 0 to High(aSearchCriteria) do begin
+            with aSearchCriteria[i] do
+              case i of
+                ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                        iID);
+                ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.FileSize,                  iFSize);
+                ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.ImageSize.cx,              iPicWidth);
+                ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.ImageSize.cy,              iPicHeight);
+                ICritIdx_FileMasks: Result := MatchesCondition(MskCond, ExtractFileName(Pic.FileName), FMasks);
+                ICritIdx_Date1:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate1);
+                ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate2);
+                ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime1);
+                ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime2);
+                ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.Keywords,                  Keywords);
+                else                Result := MatchesCondition(StrCond, Pic.PropStrValues[Prop],       sValue);
+              end;
+             // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
+            if not Result then Break;
           end;
-         // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
-        if not Result then Break;
+         // Поиск по выражению
+        skExpression:
+          try
+            Result := PicFilter.Matches(Pic);
+          except
+            on e: EPhoaParseError do begin
+              {!!! позиционировать курсор}
+              raise;
+            end;
+          end;
+        else Result := False;          
       end;
     end;
 
@@ -684,11 +721,50 @@ type
       if dt>=0 then Result := TimeToPhoaTime(dt) else Result := -1;
     end;
 
+     // Инициализирует поиск
+    procedure InitializeSearch;
+    begin
+      FMasks := nil;
+      case SearchKind of
+         // Простой поиск
+        skSimple: begin
+           // Инициализируем критерии
+          FMasks     := TPhoaMasks.Create(aSearchCriteria[ICritIdx_FileMasks].sValue);
+          iID        := StrToIntDef(aSearchCriteria[ICritIdx_ID].sValue,        -1);
+          iFSize     := StrToIntDef(aSearchCriteria[ICritIdx_FileSize].sValue,  -1);
+          iPicWidth  := StrToIntDef(aSearchCriteria[ICritIdx_PicWidth].sValue,  -1);
+          iPicHeight := StrToIntDef(aSearchCriteria[ICritIdx_PicHeight].sValue, -1);
+          iDate1     := GetCritDate(ICritIdx_Date1);
+          iDate2     := GetCritDate(ICritIdx_Date2);
+          iTime1     := GetCritTime(ICritIdx_Time1);
+          iTime2     := GetCritTime(ICritIdx_Time2);
+          Keywords := NewPhotoAlbumKeywordList;
+          Keywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
+        end;
+         // Поиск по выражению
+        skExpression: begin
+          sSearchExpression := eExpression.Text;
+          PicFilter := NewPhoaParsingPicFilter;
+          PicFilter.Expression := sSearchExpression;
+        end;
+      end;
+    end;
+
+     // Финализирует поиск
+    procedure FinalizeSearch;
+    begin
+      PicFilter := nil;
+      FMasks.Free;
+    end;
+
   begin
     StartWait;
     try
-      FMasks := TPhoaMasks.Create(aSearchCriteria[ICritIdx_FileMasks].sValue);
+       // Определяем вид поиска
+      if pcCriteria.ActivePage=tsSimple then SearchKind := skSimple else SearchKind := skExpression;
+       // Инициализируем поиск
       try
+        InitializeSearch;
          // Настраиваем область поиска
         if rbAll.Checked then begin
           SearchArea := saAll;
@@ -700,17 +776,6 @@ type
           SearchArea := saResults;
           iSrchCount := FResultsGroup.Pics.Count;
         end;
-         // Инициализируем критерии
-        iID        := StrToIntDef(aSearchCriteria[ICritIdx_ID].sValue,        -1);
-        iFSize     := StrToIntDef(aSearchCriteria[ICritIdx_FileSize].sValue,  -1);
-        iPicWidth  := StrToIntDef(aSearchCriteria[ICritIdx_PicWidth].sValue,  -1);
-        iPicHeight := StrToIntDef(aSearchCriteria[ICritIdx_PicHeight].sValue, -1);
-        iDate1     := GetCritDate(ICritIdx_Date1);
-        iDate2     := GetCritDate(ICritIdx_Date2);
-        iTime1     := GetCritTime(ICritIdx_Time1);
-        iTime2     := GetCritTime(ICritIdx_Time2);
-        Keywords := NewPhotoAlbumKeywordList;
-        Keywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
          // Ищем
         FLocalResults.Clear;
         for i := 0 to iSrchCount-1 do begin
@@ -722,7 +787,7 @@ type
           if Matches(Pic) then FLocalResults.Add(Pic, True);
         end;
       finally
-        FMasks.Free;
+        FinalizeSearch;
       end;
     finally
       StopWait;

@@ -7,58 +7,11 @@ inherited dSearch: TdSearch
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object lCriteria: TLabel [0]
-    Left = 12
-    Top = 52
-    Width = 73
-    Height = 13
-    Caption = '&Search criteria:'
-  end
   inherited bvBottom: TBevel
     Top = 398
     Width = 525
   end
-  object tvCriteria: TVirtualStringTree [2]
-    Left = 12
-    Top = 68
-    Width = 502
-    Height = 329
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Header.AutoSizeIndex = 2
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
-    Header.Font.Style = []
-    Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
-    Header.ParentFont = True
-    TabOrder = 1
-    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
-    TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-    TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
-    TreeOptions.SelectionOptions = [toExtendedFocus]
-    OnCreateEditor = tvCriteriaCreateEditor
-    OnFocusChanged = tvCriteriaFocusChanged
-    OnGetText = tvCriteriaGetText
-    OnPaintText = tvCriteriaPaintText
-    Columns = <
-      item
-        Color = 16250871
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coResizable, coShowDropMark, coVisible]
-        Position = 0
-        Width = 180
-      end
-      item
-        Position = 1
-        Width = 130
-      end
-      item
-        Position = 2
-        Width = 188
-      end>
-    WideDefaultText = ''
-  end
-  object gbSearch: TGroupBox [3]
+  object gbSearch: TGroupBox [1]
     Left = 12
     Top = 8
     Width = 502
@@ -99,7 +52,7 @@ inherited dSearch: TdSearch
   inherited pButtonsBottom: TPanel
     Top = 400
     Width = 525
-    TabOrder = 2
+    TabOrder = 1
     DesignSize = (
       525
       35)
@@ -123,14 +76,99 @@ inherited dSearch: TdSearch
       OnClick = bResetClick
     end
   end
+  object pcCriteria: TPageControl
+    Left = 12
+    Top = 56
+    Width = 501
+    Height = 333
+    ActivePage = tsExpression
+    TabOrder = 2
+    OnChange = DlgDataChange
+    object tsSimple: TTabSheet
+      Caption = 'Simple search'
+      DesignSize = (
+        493
+        305)
+      object lCriteria: TLabel
+        Left = 4
+        Top = 4
+        Width = 73
+        Height = 13
+        Caption = '&Search criteria:'
+      end
+      object tvCriteria: TVirtualStringTree
+        Left = 3
+        Top = 20
+        Width = 479
+        Height = 280
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Header.AutoSizeIndex = 2
+        Header.Font.Charset = DEFAULT_CHARSET
+        Header.Font.Color = clWindowText
+        Header.Font.Height = -11
+        Header.Font.Name = 'Tahoma'
+        Header.Font.Style = []
+        Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
+        Header.ParentFont = True
+        TabOrder = 0
+        TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+        TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+        TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
+        TreeOptions.SelectionOptions = [toExtendedFocus]
+        OnCreateEditor = tvCriteriaCreateEditor
+        OnFocusChanged = tvCriteriaFocusChanged
+        OnGetText = tvCriteriaGetText
+        OnPaintText = tvCriteriaPaintText
+        Columns = <
+          item
+            Color = 16250871
+            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coResizable, coShowDropMark, coVisible]
+            Position = 0
+            Width = 180
+          end
+          item
+            Position = 1
+            Width = 130
+          end
+          item
+            Position = 2
+            Width = 169
+          end>
+        WideDefaultText = ''
+      end
+    end
+    object tsExpression: TTabSheet
+      Caption = 'Expression search'
+      ImageIndex = 1
+      object eExpression: TSynEdit
+        Left = 0
+        Top = 0
+        Width = 493
+        Height = 305
+        Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        TabOrder = 0
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        OnChange = DlgDataChange
+      end
+    end
+  end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
       '*.SecondaryShortCuts')
-    Left = 20
-    Top = 76
+    Left = 116
+    Top = 400
     LangData = {
-      070064536561726368010100000003000000070043617074696F6E010C000000
+      070064536561726368010100000003000000070043617074696F6E0110000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
       6243616E63656C01010000000C000000070043617074696F6E000300624F4B01
       010000000F000000070043617074696F6E0005006248656C7001010000001200
@@ -140,6 +178,9 @@ inherited dSearch: TdSearch
       001E000000070043617074696F6E000A00726243757247726F75700101000000
       21000000070043617074696F6E000F007262536561726368526573756C747301
       0100000024000000070043617074696F6E000600625265736574010100000027
-      000000070043617074696F6E00}
+      000000070043617074696F6E000A007063437269746572696100000800747353
+      696D706C65010100000028000000070043617074696F6E000C00747345787072
+      657373696F6E010100000029000000070043617074696F6E000B006545787072
+      657373696F6E0000}
   end
 end
