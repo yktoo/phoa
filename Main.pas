@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.69 2004-11-10 10:35:24 dale Exp $
+//  $Id: Main.pas,v 1.70 2004-11-15 17:47:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1726,7 +1726,7 @@ uses
     if Sender=Source then begin
       Accept := False;
       Effect := DROPEFFECT_MOVE;
-      if (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
+      if (nTgt<>nil) and (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
         case Mode of
            // НАД узлом - нельзя вставлять над фотоальбомом и над следующим за nSrc узлом
           dmAbove:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
