@@ -260,6 +260,7 @@ inherited dSearch: TdSearch
     IgnoreList.Strings = (
       '*.Font.Name'
       '*.SecondaryShortCuts'
+      'mruExprOpen.Prefix'
       'scpMain.EndOfTokenChr'
       'scpMain.TitleFont.*'
       'scpMain.TriggerChars')
@@ -324,7 +325,7 @@ inherited dSearch: TdSearch
       7465676F72795E000000040048696E74000B0062457870725361766541730000
       090062457870724F70656E0000080062457870724E6577000011005442585365
       70617261746F724974656D3100000C00694D5255457870724F70656E00000B00
-      6D7275457870724F70656E01010000005F000000060050726566697800}
+      6D7275457870724F70656E0000}
   end
   object scpMain: TSynCompletionProposal
     Options = [scoLimitToMatchedText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
