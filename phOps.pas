@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.18 2004-12-10 13:45:12 dale Exp $
+//  $Id: phOps.pas,v 1.19 2004-12-27 19:15:11 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1477,13 +1477,26 @@ type
   var
     i: Integer;
     Pic: IPhotoAlbumPic;
+    UsedPics: IPhotoAlbumPicList;
+
+     // Рекурсивно добавляет в UsedPics все изображения группы и вложенных групп
+    procedure AddGroupPics(Group: IPhotoAlbumPicGroup);
+    var i: Integer;
+    begin
+      UsedPics.Add(Group.Pics, True);
+      for i := 0 to Group.Groups.Count-1 do AddGroupPics(Group.GroupsX[i]);
+    end;
+
   begin
     inherited Perform(Params, UndoStream, Changes);
+     // Составляем список используемых изображений
+    UsedPics := NewPhotoAlbumPicList(True);
+    AddGroupPics(Project.RootGroupX);
      // Цикл по всем изображениям фотоальбома
     for i := Project.Pics.Count-1 downto 0 do begin
       Pic := Project.PicsX[i];
        // Если изображение не связано ни с одной группой
-      if not Project.RootGroup.IsPicLinked(Pic.ID, True) then begin
+      if UsedPics.IndexOfID(Pic.ID)<0 then begin
          // Пишем флаг продолжения
         UndoStream.WriteBool(True);
          // Сохраняем данные изображения
