@@ -445,9 +445,25 @@
           <tranEntry langID="1058" value="Опис"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="gpGroupCount">
+        <tranEntries>
+          <tranEntry langID="1049" value="Количество вложенных групп"/>
+          <tranEntry langID="1033" value="Number of nested groups"/>
+          <tranEntry langID="1031" value="Number of nested groups"/>
+          <tranEntry langID="1046" value="Number of nested groups"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="gpID">
         <tranEntries>
           <tranEntry langID="1049" value="ID"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="gpPicCount">
+        <tranEntries>
+          <tranEntry langID="1049" value="Количество изображений"/>
+          <tranEntry langID="1033" value="Number of pictures"/>
+          <tranEntry langID="1031" value="Number of pictures"/>
+          <tranEntry langID="1046" value="Number of pictures"/>
         </tranEntries>
       </propEntry>
       <propEntry name="gpText">

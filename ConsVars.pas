@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.39 2004-06-09 12:18:15 dale Exp $
+//  $Id: ConsVars.pas,v 1.40 2004-06-09 14:49:02 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -25,7 +25,7 @@ const
 
 type
    // Свойства группы
-  TGroupProperty = (gpID, gpText, gpDescription);
+  TGroupProperty = (gpID, gpText, gpDescription, gpPicCount, gpGroupCount);
   TGroupProperties = set of TGroupProperty;
 
    // Режим отображения всплывающих подсказок для деревьев с группами
