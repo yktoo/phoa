@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
+//  $Id: udStats.pas,v 1.7 2004-08-30 18:45:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -190,6 +190,7 @@ uses phUtils, Main, phPhoa, phSettings;
     ApplyTreeSettings(tvMain);
      // Заполняем данные
     StartWait;
+    tvMain.BeginUpdate;
     try
        // -- Фотоальбом
       n0 := tvMain.AddChild(nil, NewStatData('@SStat_PhotoAlbum', '', iiPhoA));
@@ -206,6 +207,7 @@ uses phUtils, Main, phPhoa, phSettings;
        // Разворачиваем всё дерево
       tvMain.FullExpand;
     finally
+      tvMain.EndUpdate;
       StopWait;
     end;
   end;
@@ -213,7 +215,7 @@ uses phUtils, Main, phPhoa, phSettings;
   function TdStats.NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData;
   var s: String;
   begin
-     // Если строка начинается на '@' - это имя константы 
+     // Если строка начинается на '@' - это имя константы
     if sName[1]='@' then s := ConstVal(Copy(sName, 2, MaxInt)) else s := sName;
     New(Result);
     Result^.sName   := s;

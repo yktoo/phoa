@@ -112,7 +112,7 @@ inherited dPicProps: TdPicProps
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 116
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 400
     LangData = {
       09006450696350726F7073010100000003000000070043617074696F6E011200

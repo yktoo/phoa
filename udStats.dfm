@@ -66,8 +66,8 @@ inherited dStats: TdStats
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 64
-    Top = 388
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    Top = 400
     LangData = {
       0600645374617473010100000003000000070043617074696F6E010700000008
       006276426F74746F6D00000E0070427574746F6E73426F74746F6D0000070062
@@ -81,7 +81,7 @@ inherited dStats: TdStats
     IniFileName = '\\\'
     IniSection = '\\\'
     UseRegistry = True
-    Left = 36
-    Top = 388
+    Left = 32
+    Top = 400
   end
 end

@@ -97,8 +97,8 @@ inherited dPicOps: TdPicOps
     WideDefaultText = 'Photo Album'
   end
   inherited dklcMain: TDKLanguageController
-    Left = 48
-    Top = 76
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    Top = 400
     LangData = {
       0700645069634F7073010100000003000000070043617074696F6E0109000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700

@@ -1,5 +1,5 @@
 object PhoaDialog: TPhoaDialog
-  Left = 480
+  Left = 477
   Top = 237
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
@@ -72,6 +72,7 @@ object PhoaDialog: TPhoaDialog
     end
   end
   object dklcMain: TDKLanguageController
+    Options = [dklcoIgnoreEmptyProps]
     Left = 4
     Top = 136
     LangData = {

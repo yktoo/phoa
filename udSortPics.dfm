@@ -106,8 +106,9 @@ inherited dSortPics: TdSortPics
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 64
-    Top = 128
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    Left = 60
+    Top = 126
     LangData = {
       090064536F727450696373010100000003000000070043617074696F6E010A00
       000008006276426F74746F6D00000E0070427574746F6E73426F74746F6D0000

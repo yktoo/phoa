@@ -1,11 +1,5 @@
 LANGID=1046
 
-[PhoaDialog]
-00000003=PhoaDialog
-00000012=Cancel
-00000015=OK
-00000018=Help
-
 [frWzPageFileOps_SelTask]
 00000007=Copies the files of pictures you select, in the specified folder. Use this option to prepare photo album to write onto a CD or DVD
 00000010=Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately
@@ -434,14 +428,6 @@ LANGID=1046
 [dAbout]
 00000003=Sobre o PhoA
 00000012=OK
-
-[PhoaWizardForm]
-00000003=Adicionar imagem
-00000017=Cancelar
-00000020=Próxima >
-00000023=Ajuda
-00000026=< Voltar
-00000032=<heading>
 
 [fMain]
 00000003=PhoA

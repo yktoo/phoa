@@ -130,6 +130,7 @@ inherited dPhoAProps: TdPhoAProps
     OnChange = DlgDataChange
   end
   inherited dklcMain: TDKLanguageController
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 12
     Top = 260
     LangData = {

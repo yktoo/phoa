@@ -124,8 +124,9 @@ inherited dSearch: TdSearch
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 432
-    Top = 100
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    Left = 20
+    Top = 76
     LangData = {
       070064536561726368010100000003000000070043617074696F6E010C000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700

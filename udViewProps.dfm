@@ -138,7 +138,8 @@ inherited dViewProps: TdViewProps
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 112
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    Left = 76
     Top = 104
     LangData = {
       0A00645669657750726F7073010100000003000000070043617074696F6E0110

@@ -80,6 +80,7 @@ inherited dGroupProps: TdGroupProps
     OnChange = DlgDataChange
   end
   inherited dklcMain: TDKLanguageController
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 176
     LangData = {
       0B006447726F757050726F7073010100000003000000070043617074696F6E01

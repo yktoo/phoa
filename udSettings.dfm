@@ -68,7 +68,7 @@ inherited dSettings: TdSettings
     end
   end
   inherited dklcMain: TDKLanguageController
-    Left = 60
+    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 400
     LangData = {
       09006453657474696E6773010100000003000000070043617074696F6E010A00

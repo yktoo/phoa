@@ -127,6 +127,7 @@ object PhoaWizardForm: TPhoaWizardForm
     end
   end
   object dklcMain: TDKLanguageController
+    Options = [dklcoIgnoreEmptyProps]
     Left = 148
     Top = 360
     LangData = {

@@ -119,20 +119,6 @@ mruOpen.Prefix=00000201,MRU
 iPhoaView_SetDefault.Caption=00000204,&Picture groups
 iPhoaView_SetDefault.Hint=00000205,Picture groups|Display photo album picture group tree
 
-[PhoaDialog]
-Caption=00000003,PhoaDialog
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-
-[PhoaWizardForm]
-Caption=00000003,<wizard caption>
-bCancel.Caption=00000017,Cancel
-bNext.Caption=00000020,Next >
-bHelp.Caption=00000023,Help
-bBack.Caption=00000026,< Back
-lHeading.Caption=00000032,<heading>
-
 [dAbout]
 Caption=00000003,About
 lOK.Caption=00000012,OK
