@@ -1,57 +1,54 @@
-<!-- $Id: tasks-tools.html,v 1.2 2005-03-12 14:35:15 dale Exp $ -->
+<!-- $Id: tasks-tools.html,v 1.3 2005-03-24 14:36:13 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Using external tools]}
 
-<p align=justify>В <b>PhoA</b> есть возможность подключения внешних программ для обработки, просмотра или печати
-  изображений фотоальбома.
+<p align=justify><b>PhoA</b> is capable of attaching external programs to use for viewing, printing or processing of the
+  photo album pictures.
 
-<p align=justify>Это делается с помощью так называемых <b>инструментов</b>, которые создаются и настраиваются вами.
+<p align=justify>This is implemented with so-called <b>tools</b>, which you create and configure.
 
-<p align=justify>Существует несколько видов инструментов.
+<p align=justify>There is a variety of tool kinds.
 
-<p align=justify>Основной вид инструментов представляют собой так называемые <b>действия по умолчанию</b>. Кроме того,
-  есть возможность подключения любых программ в качестве пользовательских инструментов.
+<p align=justify>The major tool kind is represented by so-called <b>default actions</b>. Additionally, there's a
+  possibility of using an arbitrary program as a custom tool.
 
-{[%hh_h2:Действия по умолчанию]}
+{[%hh_h2:Default actions]}
 
-<p align=justify>Это, если можно так выразиться, набор &laquo;упрощённых&raquo; вариантов инструментов.
+<p align=justify>It is a sort of &quot;simplified&quot; tool kinds.
 
-<p align=justify>В Windows, как известно, существует понятие <i>типа файла</i>, которое однозначно связано с расширением
-  файла. Например, файлы с расширением <b>.doc</b> представляют собой тип &laquo;Документ Microsoft Word&raquo;, а файлы
-  <b>.html</b> &mdash; это документы Интернета.
+<p align=justify>As is known, Windows introduces a concept of <i>file type</i>, which unambiguously linked to the file's
+  extension. For instance, files with extension <b>.doc</b> are of type &quot;Microsoft Word document&quot;, while
+  <b>.html</b> files are Internet documents.
 
-<p align=justify>У большинства зарегистрированных типов файлов (во всяком случае, документов) в Windows есть связанное
-  <i>приложение</i>, открывающее файлы этого типа, когда вы запускаете их из Проводника. Это называется <i>действием по
-  умолчанию</i> для данного типа файлов. Так, файлы .doc открываются в Microsoft Word, а для файлов .html запускается
-  браузер по умолчанию.
+<p align=justify>Most registered file types (at least document types) in Windows have an associated <i>application</i>,
+  which opens the files of that type when you run them from the Explorer. This is how works the <i>default action</i>
+  for that type of file. So, .doc files are open in Microsoft Word, while .html files are handled by the default
+  browser.
 
-<p align=justify>Именно на такое поведение рассчитан вид инструмента <b>Стандартное действие по умолчанию</b>.
+<p align=justify>Just such a behaviour is implemented by the <b>Default action</b> tool kind.
 
-<p align=justify>Кроме него, есть еще некоторый набор стандартных действий, а именно:
+<p align=justify>Besides there's a number of other standard actions, namely:
 
 <ul>
-  <li>Открытие (open);
-  <li>Редактирование (edit);
-  <li>Печать (print).
+  <li>open;
+  <li>edit;
+  <li>print.
 </ul>
 
-<p align=justify>Для каждого из этих действий в программе предусмотрен вид инструмента.
+<p align=justify>Each of those actions has a corresponding tool kind.
 
-<p align=justify>Любое из вышеперечисленных действий может быть настроено пользователем по своему вкусу с помощью
-  стандартных средств Windows: делается это в диалоге, вызываемом выбором пункта меню <b>Проводника Сервис | Свойства
-  папки</b> на вкладке <b>Типы файлов</b>.
+<p align=justify>Any of the actions listed above may be customized by you using standard Windows tools. You do it by 
+  selecting the <b>Tools | Folder options..</b> Explorer menu item, on the <b>File types page</b>.
 
-<p align=justify>Многие программы для работы с графикой (такие как графические редакторы или средства просмотра; но
-  <b>PhoA</b> к ним не относится) очень любят переопределять ассоциации типов файлов &laquo;на себя&raquo;. Некоторые
-  программы предварительно об этом спрашивают.
+<p align=justify>Many graphic applications (such as graphic editors or viewers; but not <b>PhoA</b>) change file
+  associations to open with themselves. Some of them confirm before making such changes.
 
-<p align=justify>Таким образом, если вас устраивают текущие ассоциации типов файлов, вам проще и удобнее будет
-  воспользоваться именно такими стандартными видами инструментов.
+<p align=justify>Therefore if you are happy with your current file associations you will likely use just those standard
+  tool kinds.
 
-<p align=justify>Есть ещё одно, довольно неочевидное преимущество стандартных действий перед простым запуском
-  программ-инструментов (описываемых ниже). Дело в том, что зачастую стандартные действия в Windows выполняются с
-  помощью так называемых команд DDE (Dynamic Data Exchange), которые позволяют открывать несколько изображений в одном
-  приложении, в то время как при использовании программ-инструментов зачастую для каждого изображения запускается новый,
-  отдельный экземпляр программы, что менее удобно.
+<p align=justify>There's one more subtle advantage of standard actions over custom ones (described below). The point is
+  that standard actions in Windows often use so-called DDE (Dynamic Data Exchange) commands, which allow opening several
+  pictures by the same application at once, while custom tools often spawn a new application instance for each picture.
+  The latter case is less convenient.
 
 {[%hh_h2:Заданное действие]}
 
