@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.14 2004-11-08 19:23:36 dale Exp $
+rem $Id: _make_.bat,v 1.15 2004-11-09 14:50:30 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -110,12 +110,13 @@ if errorlevel == 1 goto err
 
 popd
 if "%1"=="help" goto success
+cd ..\..
 
 rem == Compile Installation ISS script ==
 :compsetup
 echo.
 echo == Compile Installation ISS script ==
-cd ..\..\IS-Install
+cd IS-Install
 %SETUP_COMPILER% phoa.iss
 if errorlevel == 1 goto err
 if "%1"=="setup" goto success
