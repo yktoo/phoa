@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.3 2004-05-21 14:15:10 dale Exp $
+//  $Id: udAbout.pas,v 1.4 2004-05-21 16:34:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -15,7 +15,7 @@ uses
 type
   TShowDetail = (sdTitle, sdAuthor, sdCredits, sdTranslation);
 
-  TdAbout = class(TForm, IProgressInfoViewer)
+  TdAbout = class(TForm)
     dtlsMain: TDTLanguageSwitcher;
     iMain: TImage32;
     lWebsite: TLabel;
@@ -64,24 +64,22 @@ type
     function  CurBitmap: TBitmap32;
      // Начинает закрытие окошка [в режиме DialogMode]
     procedure StartClosing;
-     // IProgressInfoViewer
-    procedure DisplayStage(const sStage: String);
-    procedure HideWindow;
-    function  GetHandle: HWND;
-    function  GetAnimateFadeout: Boolean;
-    procedure SetAnimateFadeout(bValue: Boolean);
   public
      // Создаёт диалог
     constructor Create(bDialogMode: Boolean); reintroduce;
+     // Отображает заданную стадию прогресса [НЕ в режиме DialogMode]
+    procedure DisplayStage(const sStage: String);
+     // Скрывает окно
+    procedure HideWindow;
      // Props
      // -- Если False - это диалог "О программе"; если True - индикатор прогресса загрузки
     property DialogMode: Boolean read FDialogMode;
      // -- Если True - диалог "плавно растворяется" при закрытии, иначе - закрывается сразу
-    property AnimateFadeout: Boolean read GetAnimateFadeout write SetAnimateFadeout;
+    property AnimateFadeout: Boolean read FAnimateFadeout write FAnimateFadeout;
   end;
 
    // Создаёт, отображает и возвращает окно отображения состояния прогресса
-  function  CreateProgressInfoViewer: IProgressInfoViewer;
+  procedure CreateProgressWnd;
    // Отображает модальный диалог "О программе"
   procedure ShowAbout(bAnimateFadeout: Boolean);
 
@@ -89,21 +87,22 @@ const
    // Высота области для отрисовки строки прогресса (в нижней части окна)
   IProgressAreaHeight = 16;
 
+var
+  ProgressWnd: TdAbout;  
+
 implementation
 {$R *.dfm}
 uses GraphicEx, phUtils;
 
-  function CreateProgressInfoViewer: IProgressInfoViewer;
-  var Dlg: TdAbout;
+  procedure CreateProgressWnd;
   begin
-    Dlg := TdAbout.Create(False);
+    ProgressWnd := TdAbout.Create(False);
     try
-      Dlg.Show;
+      ProgressWnd.Show;
     except
-      Dlg.Free;
+      ProgressWnd.Free;
       raise;
     end;
-    Result := Dlg;
   end;
 
   procedure ShowAbout(bAnimateFadeout: Boolean);
@@ -214,21 +213,12 @@ uses GraphicEx, phUtils;
     FBmpAuthor.Free;
     FBmpCredits.Free;
     FBmpTranslation.Free;
+    ProgressWnd := nil;
   end;
 
   procedure TdAbout.FormKeyPress(Sender: TObject; var Key: Char);
   begin
     if DialogMode and (Key in [#13, #27]) then StartClosing;
-  end;
-
-  function TdAbout.GetAnimateFadeout: Boolean;
-  begin
-    Result := FAnimateFadeout;
-  end;
-
-  function TdAbout.GetHandle: HWND;
-  begin
-    Result := Handle;
   end;
 
   procedure TdAbout.HideWindow;
@@ -286,11 +276,6 @@ uses GraphicEx, phUtils;
   begin
     bmp := CurBitmap;
     if bmp<>nil then Buffer.Draw((Width-bmp.Width) div 2, (Height-bmp.Height) div 2, bmp);
-  end;
-
-  procedure TdAbout.SetAnimateFadeout(bValue: Boolean);
-  begin
-    FAnimateFadeout := bValue;
   end;
 
   procedure TdAbout.StartClosing;

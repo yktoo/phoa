@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.24 2004-05-21 14:15:10 dale Exp $
+//  $Id: ConsVars.pas,v 1.25 2004-05-21 16:34:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -207,27 +207,6 @@ type
   TFileOpRepairMatchFlags = set of TFileOpRepairMatchFlag;
 
    //-------------------------------------------------------------------------------------------------------------------
-   // IProgressInfoViewer - интерфейс окна, отображающего информацию о процессе загрузки
-   //-------------------------------------------------------------------------------------------------------------------
-
-  IProgressInfoViewer = interface(IInterface)
-    ['{64ED8BDB-A188-4737-8767-CB8CE9464BF3}']
-     // Отображает указанную стадию в качестве состояния прогресса
-    procedure DisplayStage(const sStage: String);
-     // Скрывает окно
-    procedure HideWindow;
-     // Prop handlers
-    function  GetHandle: HWND;
-    function  GetAnimateFadeout: Boolean;
-    procedure SetAnimateFadeout(bValue: Boolean);
-     // Props
-     // -- Использовать ли плавное скрытие окна (Win2k+)
-    property AnimateFadeout: Boolean read GetAnimateFadeout write SetAnimateFadeout;
-     // -- Handle окна
-    property Handle: HWND read GetHandle;
-  end;
-
-   //-------------------------------------------------------------------------------------------------------------------
    // Предметные интерфейсы страниц мастеров
    //-------------------------------------------------------------------------------------------------------------------
 
@@ -346,6 +325,14 @@ const
 
    // Перевод строки
   S_CRLF                          = #13#10;
+
+   // Допустимые ключи командной строки
+   //   f        - полноэкранный режим просмотра (f- - НЕ полноэкранный режим просмотра)
+   //   s        - включить режим слайдшоу после запуска программы
+   //   g<group> - выделить в дереве группу <group>
+   //   w<view>  - перейти в режим отображения представления <view> (совместим с g)
+   //   i<id>    - отобразить изображение с ID=<id> (совместим с w и g)
+  CmdLine_ValidKeys               = ['f', 's', 'g', 'w', 'i'];
 
   MinInt                          = Low(Integer);
 
@@ -858,10 +845,13 @@ var
   cMainCodePage: Cardinal;
    // PhoA picture clipboard format identifier
   wClipbrdPicFormatID: Word;
-   // Окно для отображения процесса инициализации приложения (существует только при старте программы)
-  ProgressInfoViewer: IProgressInfoViewer = nil;
-   // Misc settings
-  ViewInfoPos: TRect;         // Границы информации при просмотре в 10-тысячных долях размера экрана [90, 9400, 9910, 9880]
+   // Границы информации при просмотре в 10-тысячных долях размера экрана [90, 9400, 9910, 9880]
+  ViewInfoPos: TRect;         
+
+   // Список файлов, переданных в командной строке
+  SLCommandLineFiles: TStringList;
+   // Список ключей (без символа '-', имя ключа всегда в lowercase) и их значений, переданных в командной строке
+  SLCommandLineKeys: TStringList;
 
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
@@ -870,14 +860,16 @@ var
    // Возвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии)
   function  ValidRevisionIndex(idxRev: Integer): Integer;
 
+   // Разбирает командную строку приложения. Возвращает True, если всё сделано успешно
+  function  ParseCommandLine: Boolean;
+
    // Применяет пользовательские настройки к TVirtualStringTree
   procedure ApplyTreeSettings(Tree: TVirtualStringTree);
    // Применяет пользовательские настройки к докам/панелям инструментов
   procedure ApplyToolbarSettings(Dock: TTBXDock);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting,
-  udAbout;
+uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -896,6 +888,61 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting,
   function ValidRevisionIndex(idxRev: Integer): Integer;
   begin
     Result := iif((idxRev>=0) and (idxRev<=High(aPhFileRevisions)), idxRev, 0);
+  end;
+
+  function ParseCommandLine: Boolean;
+  var
+    i: Integer;
+    s: String;
+    cKey: Char;
+
+    procedure MsgErr(const s: String);
+    begin
+      MessageBox(Application.Handle, PChar(s), 'Error', MB_OK or MB_ICONERROR);
+    end;
+
+    function ProcessKey(const s: String): Boolean;
+    begin
+      Result := False;
+       // Проверяем, что есть имя ключа
+      if s='' then
+        MsgErr('Key name missing in the command line')
+      else begin
+         // Преобразуем ключ к нижнему регистру
+        cKey := s[1];
+        if cKey in ['A'..'Z'] then Inc(cKey, Ord('a')-Ord('A')); 
+         // Проверяем допустимость ключа
+        if not (cKey in CmdLine_ValidKeys) then
+          MsgErr('Unknown command line key name: '+cKey)
+        else begin
+          SLCommandLineKeys.Add(cKey+'='+Copy(s, 2, MaxInt));
+          Result := True;
+        end;
+      end;
+    end;
+
+    function ProcessFile(const s: String): Boolean;
+    begin
+       // Проверяем существование файла
+      Result := FileExists(s);
+      if Result then SLCommandLineFiles.Add(s) else MsgErr('File does not exist: '+s);
+    end;
+
+  begin
+    Result := True;
+    SLCommandLineFiles.Clear;
+    SLCommandLineKeys.Clear;
+    for i := 1 to ParamCount do begin
+      s := Trim(ParamStr(i));
+      if s<>'' then
+        case s[1] of
+           // Ключ: обрабатываем его (без символа '-')
+          '-': Result := ProcessKey(Copy(s, 2, MaxInt));
+           // Файл
+          else Result := ProcessFile(s);
+        end;
+      if not Result then Break;
+    end;
   end;
 
    //===================================================================================================================
@@ -1163,8 +1210,6 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting,
   {$HINTS ON}
 
 initialization
-   // Отображаем окно прогресса
-  ProgressInfoViewer := CreateProgressInfoViewer;
    // Грузим курсоры
   with Screen do begin
     Cursors[crHand]     := LoadCursor(HInstance, 'CRHAND');
@@ -1177,7 +1222,12 @@ initialization
    // Создаём установки
   RootSetting := TPhoaSetting.Create(nil, 0, '');
   InitSettings;
+   // Создаём списки параметров командной строки
+  SLCommandLineFiles := TStringList.Create;
+  SLCommandLineKeys  := TStringList.Create;
 finalization
+  SLCommandLineKeys.Free;
+  SLCommandLineFiles.Free;
   RootSetting.Free;
 end.
 

@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=
+RunParams="Фотоальбом 2.phoa" "-wПо году" -g2002 -i164
 HostApplication=
 Launcher=
 UseLauncher=0

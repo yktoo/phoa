@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.16 2004-05-21 14:15:10 dale Exp $
+//  $Id: Main.pas,v 1.17 2004-05-21 16:34:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -263,6 +263,8 @@ type
      //   выделенным изображениям
     FGroupsPopupToolsValidated: Boolean;
     FPicsPopupToolsValidated: Boolean;
+     // Флаг того, что параметры командной строки обработаны
+    FCommandLineProcessed: Boolean;
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
@@ -278,6 +280,8 @@ type
     procedure LoadGroupTree;
      // Загружает фотоальбом из файла
     procedure DoLoad(const sFileName: String);
+     // Обрабатывает параметры командной строки
+    procedure ProcessCommandLine;
      // Настраивает разрешённость Actions и настраивает Caption формы
     procedure EnableActions;
      // Настраивает доступность инструментов
@@ -326,6 +330,8 @@ type
     function  GetFileName: String;
     function  GetDisplayFileName: String;
     function  GetCurGroup: TPhoaGroup;
+    procedure SetCurGroup(Value: TPhoaGroup);
+    function  GetCurRootGroup: TPhoaGroup;
   public
      // Выполняет операцию и обновляет визуальные объекты согласно флагам операции
     procedure PerformOperation(Op: TPhoaOperation);
@@ -340,7 +346,9 @@ type
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
     property FileName: String read GetFileName write SetFileName;
      // -- Текущая выбранная группа в дереве
-    property CurGroup: TPhoaGroup read GetCurGroup;
+    property CurGroup: TPhoaGroup read GetCurGroup write SetCurGroup;
+     // -- Текущая корневая группа в дереве (фотоальбома или представления)
+    property CurRootGroup: TPhoaGroup read GetCurRootGroup;
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
     property DisplayFileName: String read GetDisplayFileName;
      // -- Просмотрщик эскизов
@@ -398,7 +406,7 @@ uses
     if ActiveControl=tvGroups then begin
        // Корневой узел
       if tvGroups.FocusedNode=FRootNode then
-        if FViewIndex>=0 then aPhoaView_Edit.Execute else EditPhoA(FPhoA, FOperations)
+        if ViewIndex>=0 then aPhoaView_Edit.Execute else EditPhoA(FPhoA, FOperations)
        // Редактирование группы
       else if CurGroup<>nil then
         tvGroups.EditNode(tvGroups.FocusedNode, -1);
@@ -417,7 +425,7 @@ uses
     View: TPhoaView;
     bPhoaChanged: Boolean;
   begin
-    if FViewIndex>=0 then View := FPhoA.Views[FViewIndex] else View := nil;
+    if ViewIndex>=0 then View := FPhoA.Views[ViewIndex] else View := nil;
     if DoFileOperations(FPhoA, CurGroup, View, PicArrayToIDArray(Viewer.GetSelectedPicArray), ActiveControl=Viewer, bPhoaChanged) then
        // Если изменилось содержимое фотоальбома
       if bPhoaChanged then begin
@@ -546,7 +554,7 @@ uses
 
   procedure TfMain.aaPhoaView_Edit(Sender: TObject);
   begin
-    EditView(FPhoA.Views[FViewIndex], FPhoA, FOperations);
+    EditView(FPhoA.Views[ViewIndex], FPhoA, FOperations);
   end;
 
   procedure TfMain.aaPhoaView_MakeGroup(Sender: TObject);
@@ -669,12 +677,16 @@ uses
 
   procedure TfMain.AppIdle(Sender: TObject; var Done: Boolean);
   begin
+     // Обрабатываем параметры команлной строки
+    if not FCommandLineProcessed then begin
+      ProcessCommandLine;
+      FCommandLineProcessed := True;
+    end;
      // Уничтожаем окно прогресса, если оно есть
-    if ProgressInfoViewer<>nil then begin
-      ProgressInfoViewer.DisplayStage('');
-      ProgressInfoViewer.AnimateFadeout := SettingValueBool(ISettingID_Dlgs_SplashStartFade);
-      ProgressInfoViewer.HideWindow;
-      ProgressInfoViewer := nil;
+    if ProgressWnd<>nil then begin
+      ProgressWnd.DisplayStage('');
+      ProgressWnd.AnimateFadeout := SettingValueBool(ISettingID_Dlgs_SplashStartFade);
+      ProgressWnd.HideWindow;
     end;
   end;
 
@@ -883,7 +895,7 @@ uses
     bSrchNode  := n=FSearchedNode;
     bGrSel     := (n<>nil) and not bSrchNode;
     bPicSel    := Viewer.SelCount>0;
-    bPicGroups := FViewIndex<0;
+    bPicGroups := ViewIndex<0;
     aUndo.Caption := ConstVal(iif(FOperations.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FOperations.LastOpName]);
     aUndo.Enabled               := FOperations.CanUndo;
     smUndoHistory.Enabled       := FOperations.CanUndo;
@@ -927,7 +939,7 @@ uses
   procedure TfMain.FormActivate(Sender: TObject);
   begin
      // Если есть окошко прогресса, держим главное окно позади него  
-    if ProgressInfoViewer<>nil then SetWindowPos(Handle, ProgressInfoViewer.Handle, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+    if ProgressWnd<>nil then SetWindowPos(Handle, ProgressWnd.Handle, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
   end;
 
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -993,7 +1005,7 @@ uses
   end;
 
   procedure TfMain.fpMainRestorePlacement(Sender: TObject);
-  var sPhoaFile, sAutoLoadIniFile: String;
+  var sAutoLoadIniFile: String;
   begin
     ShowProgressInfo('SMsg_LoadingRegSettings', []);
      // Загружаем основные (определяемые пользователем) установки
@@ -1024,14 +1036,6 @@ uses
     RootSetting.Modified := True;
     ApplySettings;
     ApplyLanguage;
-     // If command line specifies a file, then load it; else load view list and select "Picture groups"
-    if ParamCount>0 then begin
-      sPhoaFile := ParamStr(1);
-      ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
-      DoLoad(sPhoaFile);
-    end else
-      LoadViewList(-1);
-    EnableActions;
   end;
 
   procedure TfMain.fpMainSavePlacement(Sender: TObject);
@@ -1057,6 +1061,11 @@ uses
   begin
     p := tvGroups.GetNodeData(tvGroups.FocusedNode);
     if p=nil then Result := nil else Result := p^;
+  end;
+
+  function TfMain.GetCurRootGroup: TPhoaGroup;
+  begin
+    if ViewIndex<0 then Result := FPhoA.RootGroup else Result := FPhoA.Views[ViewIndex].RootGroup;
   end;
 
   function TfMain.GetDisplayFileName: String;
@@ -1280,9 +1289,66 @@ uses
     end;
   end;
 
+  procedure TfMain.ProcessCommandLine;
+  var
+    sPhoaFile: String;
+
+     // Выбирает в качестве текущего заданное представление, если sViewName<>''
+    procedure SelectViewByName(const sViewName: String);
+    var idx: Integer;
+    begin
+      if sViewName<>'' then begin
+        idx := FPhoA.Views.IndexOfName(sViewName);
+        if idx>=0 then ViewIndex := idx;
+      end;
+    end;
+
+     // Выбирает в качестве текущей заданную группу в дереве, если sGroupPath<>''
+    procedure SelectGroupByPath(const sGroupPath: String);
+    begin
+      if sGroupPath<>'' then CurGroup := CurRootGroup.GroupByPath[sGroupPath];
+    end;
+
+     // Выбирает изображение с заданным ID
+    procedure SelectPicByID(iID: Integer);
+    begin
+      if (iID>0) and (CurGroup<>nil) then Viewer.ItemIndex := CurGroup.PicIDs.IndexOf(iID);
+    end;
+
+  begin
+     // Если указан файл - загружаем его
+    if SLCommandLineFiles.Count>0 then begin
+      sPhoaFile := SLCommandLineFiles[0];
+      ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
+      DoLoad(sPhoaFile);
+       // -- Если указано представление - выбираем его
+      SelectViewByName(SLCommandLineKeys.Values['w']);
+       // -- Если указана группа - ищем и выделяем её
+      SelectGroupByPath(SLCommandLineKeys.Values['g']);
+       // -- Если указан ID изображения - ищем и выделяем его
+      SelectPicByID(StrToIntDef(SLCommandLineKeys.Values['i'], 0));
+     // Иначе загружаем список представлений и выбираем "Группы изображений"
+    end else
+      LoadViewList(-1);
+    EnableActions;
+  end;
+
   procedure TfMain.RefreshViewer;
   begin
     Viewer.ViewGroup(CurGroup);
+  end;
+
+  procedure TfMain.SetCurGroup(Value: TPhoaGroup);
+  var n: PVirtualNode;
+  begin
+     // Перебираем узлы, пока не найдём
+    if Value<>nil then begin
+      n := tvGroups.GetFirst;
+      while (n<>nil) and (PPhoaGroup(tvGroups.GetNodeData(n))^<>Value) do n := tvGroups.GetNext(n);
+    end else
+      n := nil;
+     // Активизируем
+    ActivateVTNode(tvGroups, n);
   end;
 
   procedure TfMain.SetFileName(const Value: String);
@@ -1316,7 +1382,7 @@ uses
 
   procedure TfMain.ShowProgressInfo(const sConstName: String; const aParams: array of const);
   begin
-    if ProgressInfoViewer<>nil then ProgressInfoViewer.DisplayStage(ConstVal(sConstName, aParams));
+    if ProgressWnd<>nil then ProgressWnd.DisplayStage(ConstVal(sConstName, aParams));
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);
@@ -1369,7 +1435,7 @@ uses
   procedure TfMain.tvGroupsDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
   begin
      // Перетаскивать можно только при отображении групп и только сами группы
-    Allowed := (FViewIndex<0) and (Sender.NodeParent[Node]<>nil);
+    Allowed := (ViewIndex<0) and (Sender.NodeParent[Node]<>nil);
   end;
 
   procedure TfMain.tvGroupsDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
@@ -1479,10 +1545,10 @@ uses
   procedure TfMain.tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
   begin
     Allowed :=
-      ((FViewIndex>=0) xor (Node<>FRootNode)) and // Когда активно дерево групп, можно редактировать любую папку, кроме
-                                                  //   корневой. Иначе, когда активно представление, можно редактировать
-                                                  //   только корневой узел (само представление)
-      (Node<>FSearchedNode);                      // Узел результатов поиска редактировать нельзя вообще
+      ((ViewIndex>=0) xor (Node<>FRootNode)) and // Когда активно дерево групп, можно редактировать любую папку, кроме
+                                                 //   корневой. Иначе, когда активно представление, можно редактировать
+                                                 //   только корневой узел (само представление)
+      (Node<>FSearchedNode);                     // Узел результатов поиска редактировать нельзя вообще
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -1528,7 +1594,7 @@ uses
       p^ := pp^.Groups[Node.Index];
      // Узел фотоальбома/представления
     end else if Node.Index=0 then begin
-      if ViewIndex<0 then p^ := FPhoA.RootGroup else p^ := FPhoA.Views[ViewIndex].RootGroup;
+      p^ := CurRootGroup;
       Node.CheckType := ctButton;
      // Узел результатов поиска
     end else
@@ -1541,8 +1607,8 @@ uses
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
      // Редактировали представление?
-    if (FViewIndex>=0) and (tvGroups.FocusedNode=FRootNode) then
-      PerformOperation(TPhoaOp_ViewEdit.Create(FOperations, FPhoA.Views[FViewIndex], Self, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil))
+    if (ViewIndex>=0) and (tvGroups.FocusedNode=FRootNode) then
+      PerformOperation(TPhoaOp_ViewEdit.Create(FOperations, FPhoA.Views[ViewIndex], Self, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil))
      // Иначе редактировали группу
     else
       PerformOperation(TPhoaOp_GroupRename.Create(FOperations, FPhoA, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage)));

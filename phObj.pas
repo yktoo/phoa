@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
+//  $Id: phObj.pas,v 1.12 2004-05-21 16:34:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -157,6 +157,7 @@ type
     procedure SetIndex(Value: Integer);
     function  GetNestedGroupCount: Integer;
     function  GetPath(const sRootName: String): String;
+    function  GetGroupByPath(const sPath: String): TPhoaGroup;
   public
     constructor Create(_Owner: TPhoaGroup);
     destructor Destroy; override;
@@ -173,6 +174,9 @@ type
     property Expanded: Boolean read FExpanded write FExpanded;
      // -- Список групп, входящих в данную группу
     property Groups: TPhoaGroups read FGroups;
+     // -- Возвращает группу по заданному пути; nil, если нет такой (case-insensitive); начинает поиск среди детей с
+     //    самого первого элемента, если путь начинается с '/', отбрасывает этот символ
+    property GroupByPath[const sPath: String]: TPhoaGroup read GetGroupByPath;
      // -- Индекс группы в её владельце (Owner)
     property Index: Integer read GetIndex write SetIndex;
      // -- Количество подгрупп у группы (включая все вложенные)
@@ -440,6 +444,8 @@ type
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
+     // Возвращает индекс представления по его имени (case-insensitive); -1, если нет такого
+    function  IndexOfName(const sName: String): Integer;  
      // Props
     property Items[Index: Integer]: TPhoaView read GetItems; default;
   end;
@@ -2071,6 +2077,32 @@ type
     Result := ScanOwned(Self);
   end;
 
+  function TPhoaGroup.GetGroupByPath(const sPath: String): TPhoaGroup;
+  var
+    s, sFirst: String;
+    i: Integer;
+    g: TPhoaGroup;
+  begin
+    Result := nil;
+    s := sPath;
+    if s<>'' then begin
+       // Удаляем символ '/' в начале, если он есть
+      if s[1]='/' then Delete(s, 1, 1);
+       // Выделяем первую часть пути
+      sFirst := ExtractFirstWord(s, '/');
+       // Ищем ребёнка с именем, совпадающим с первой частью пути
+      for i := 0 to Groups.Count-1 do begin
+        g := Groups[i];
+         // Нашли
+        if AnsiSameText(g.Text, sFirst) then begin
+           // Если путь кончился, его мы и искали. Иначе ищем по остатку пути среди детей ребёнка
+          if s='' then Result := g else Result := g.GroupByPath[s];
+          Break; 
+        end;
+      end;
+    end;
+  end;
+
   function TPhoaGroup.GetIndex: Integer;
   begin
     if FOwner=nil then Result := -1 else Result := FOwner.FGroups.IndexOf(Self);
@@ -3364,6 +3396,13 @@ var
   function PhoaViewsSortCompare(Item1, Item2: Pointer): Integer;
   begin
     Result := AnsiCompareText(TPhoaView(Item1).Name, TPhoaView(Item2).Name);
+  end;
+
+  function TPhoaViews.IndexOfName(const sName: String): Integer;
+  begin
+    for Result := 0 to Count-1 do
+      if AnsiSameText(GetItems(Result).Name, sName) then Exit;
+    Result := -1;
   end;
 
   procedure TPhoaViews.Sort;

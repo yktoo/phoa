@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.12 2004-05-21 14:15:10 dale Exp $
+//  $Id: phoa.dpr,v 1.13 2004-05-21 16:34:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -61,12 +61,19 @@ uses
   udMsgBox in 'udMsgBox.pas' {dMsgBox},
   phKeySetting in 'phKeySetting.pas';
 
-  
 {$R *.res}
 
+var
+  hMtx: THandle;
+
 begin
-  CreateMutex(nil, False, 'PHOA_RUNNING_MUTEX');
-  Application.Initialize;
-  Application.CreateForm(TfMain, fMain);
-  Application.Run;
+  hMtx := CreateMutex(nil, False, 'PHOA_RUNNING_MUTEX');
+  if ParseCommandLine then begin
+     // Отображаем окно прогресса
+    CreateProgressWnd;
+    Application.Initialize;
+    Application.CreateForm(TfMain, fMain);
+    Application.Run;
+  end;
+  if hMtx<>0 then CloseHandle(hMtx);
 end.
