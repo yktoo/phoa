@@ -966,6 +966,22 @@
           <tranEntry langID="1058" value="Відразу розкривати мєтадані зображень"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="ISettingID_Dlgs_SplashAboutFade">
+        <tranEntries>
+          <tranEntry langID="1049" value="Анимированное скрытие диалога «О программе» (Windows 2000+)"/>
+          <tranEntry langID="1033" value="Animate About dialog fadeout (Windows 2000+)"/>
+          <tranEntry langID="1031" value="Animate About dialog fadeout (Windows 2000+)"/>
+          <tranEntry langID="1046" value="Animate About dialog fadeout (Windows 2000+)"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Dlgs_SplashStartFade">
+        <tranEntries>
+          <tranEntry langID="1049" value="Анимированное скрытие заставки при запуске (Windows 2000+)"/>
+          <tranEntry langID="1033" value="Animate startup splash fadeout (Windows 2000+)"/>
+          <tranEntry langID="1031" value="Animate startup splash fadeout (Windows 2000+)"/>
+          <tranEntry langID="1046" value="Animate startup splash fadeout (Windows 2000+)"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="ISettingID_Gen">
         <tranEntries>
           <tranEntry langID="1049" value="Общие"/>
@@ -2700,6 +2716,46 @@
           <tranEntry langID="1033" value="Total: %d records, errors: %d"/>
           <tranEntry langID="1031" value="Total: %d records, errors: %d"/>
           <tranEntry langID="1046" value="Total: %d records, errors: %d"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SMsg_ApplyingSettings">
+        <tranEntries>
+          <tranEntry langID="1049" value="Применение настроек..."/>
+          <tranEntry langID="1033" value="Applying settings..."/>
+          <tranEntry langID="1031" value="Applying settings..."/>
+          <tranEntry langID="1046" value="Applying settings..."/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SMsg_Initializing">
+        <tranEntries>
+          <tranEntry langID="1049" value="Инициализация..."/>
+          <tranEntry langID="1033" value="Initializing..."/>
+          <tranEntry langID="1031" value="Initializing..."/>
+          <tranEntry langID="1046" value="Initializing..."/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SMsg_LoadingIniSettings">
+        <tranEntries>
+          <tranEntry langID="1049" value="Загрузка настроек из ini-файла..."/>
+          <tranEntry langID="1033" value="Loading ini-settings..."/>
+          <tranEntry langID="1031" value="Loading ini-settings..."/>
+          <tranEntry langID="1046" value="Loading ini-settings..."/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SMsg_LoadingPhoa">
+        <tranEntries>
+          <tranEntry langID="1049" value="Загрузка фотоальбома %s..."/>
+          <tranEntry langID="1033" value="Loading photo album %s..."/>
+          <tranEntry langID="1031" value="Loading photo album %s..."/>
+          <tranEntry langID="1046" value="Loading photo album %s..."/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SMsg_LoadingRegSettings">
+        <tranEntries>
+          <tranEntry langID="1049" value="Загрузка настроек из реестра..."/>
+          <tranEntry langID="1033" value="Loading Registry settings..."/>
+          <tranEntry langID="1031" value="Loading Registry settings..."/>
+          <tranEntry langID="1046" value="Loading Registry settings..."/>
         </tranEntries>
       </propEntry>
       <propEntry name="SMsg_NoMetatagSelected">

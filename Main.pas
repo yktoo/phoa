@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.15 2004-05-20 11:50:54 dale Exp $
+//  $Id: Main.pas,v 1.16 2004-05-21 14:15:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -245,6 +245,7 @@ type
     procedure pmGroupsPopup(Sender: TObject);
     procedure pmPicsPopup(Sender: TObject);
     procedure aaHelpFAQ(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -297,6 +298,7 @@ type
      // Application events
     procedure AppHint(Sender: TObject);
     procedure AppException(Sender: TObject; E: Exception);
+    procedure AppIdle(Sender: TObject; var Done: Boolean); 
      // Clipboard messages
     procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
     procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
@@ -309,6 +311,8 @@ type
     procedure OperationsListChange(Sender: TObject);
      // Событие клика на пункте инструмента
     procedure ToolItemClick(Sender: TObject);
+     // Отображает прогресс загрузки
+    procedure ShowProgressInfo(const sConstName: String; const aParams: Array of const);
      // IPhoaViews
     function  GetViewIndex: Integer;
     procedure SetViewIndex(Value: Integer);
@@ -363,7 +367,7 @@ uses
 
   procedure TfMain.aaAbout(Sender: TObject);
   begin
-    ShowAbout;
+    ShowAbout(SettingValueBool(ISettingID_Dlgs_SplashAboutFade));
   end;
 
   procedure TfMain.aaCopy(Sender: TObject);
@@ -663,6 +667,17 @@ uses
     sbarMain.Panels[0].Caption := Application.Hint;
   end;
 
+  procedure TfMain.AppIdle(Sender: TObject; var Done: Boolean);
+  begin
+     // Уничтожаем окно прогресса, если оно есть
+    if ProgressInfoViewer<>nil then begin
+      ProgressInfoViewer.DisplayStage('');
+      ProgressInfoViewer.AnimateFadeout := SettingValueBool(ISettingID_Dlgs_SplashStartFade);
+      ProgressInfoViewer.HideWindow;
+      ProgressInfoViewer := nil;
+    end;
+  end;
+
   procedure TfMain.ApplyLanguage;
   begin
      // Настраиваем прочие свойства
@@ -739,7 +754,7 @@ uses
       end;
     end;
      // Применяем инструменты
-    if RootSetting.Settings[ISettingID_Tools].Modified then ApplyTools; 
+    if RootSetting.Settings[ISettingID_Tools].Modified then ApplyTools;
      // Помечаем все настройки как неизменённые
     RootSetting.Modified := False;
   end;
@@ -909,6 +924,12 @@ uses
     FPicsPopupToolsValidated   := False;
   end;
 
+  procedure TfMain.FormActivate(Sender: TObject);
+  begin
+     // Если есть окошко прогресса, держим главное окно позади него  
+    if ProgressInfoViewer<>nil then SetWindowPos(Handle, ProgressInfoViewer.Handle, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+  end;
+
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   begin
      // Если нет несохранённых данных - проверяем необходимость спрашивания подтверждения
@@ -921,6 +942,7 @@ uses
 
   procedure TfMain.FormCreate(Sender: TObject);
   begin
+    ShowProgressInfo('SMsg_Initializing', []);
     ShortTimeFormat := 'hh:nn';
     LongTimeFormat  := 'hh:nn:ss';
      // Настраиваем fpMain
@@ -935,6 +957,7 @@ uses
      // Настраиваем Application
     Application.OnHint      := AppHint;
     Application.OnException := AppException;
+    Application.OnIdle      := AppIdle;
      // Создаём список результатов поиска
     FSearchResults := TPhoaGroup.Create(nil);
      // Create undoable operations list
@@ -970,8 +993,9 @@ uses
   end;
 
   procedure TfMain.fpMainRestorePlacement(Sender: TObject);
-  var sAutoLoadIniFile: String;
+  var sPhoaFile, sAutoLoadIniFile: String;
   begin
+    ShowProgressInfo('SMsg_LoadingRegSettings', []);
      // Загружаем основные (определяемые пользователем) установки
     RootSetting.RegLoad(fpMain.RegIniFile);
     with fpMain.RegIniFile do begin
@@ -990,14 +1014,23 @@ uses
      // Если нужно и присутствует ini-файл, подгружаем настройки из него
     if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
       sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
-      if FileExists(sAutoLoadIniFile) then IniRestoreSettings(sAutoLoadIniFile);
+      if FileExists(sAutoLoadIniFile) then begin
+        ShowProgressInfo('SMsg_LoadingIniSettings', []);
+        IniRestoreSettings(sAutoLoadIniFile);
+      end;
     end;
      // Применяем настройки
+    ShowProgressInfo('SMsg_ApplyingSettings', []);
     RootSetting.Modified := True;
     ApplySettings;
     ApplyLanguage;
      // If command line specifies a file, then load it; else load view list and select "Picture groups"
-    if ParamCount>0 then DoLoad(ParamStr(1)) else LoadViewList(-1);
+    if ParamCount>0 then begin
+      sPhoaFile := ParamStr(1);
+      ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
+      DoLoad(sPhoaFile);
+    end else
+      LoadViewList(-1);
     EnableActions;
   end;
 
@@ -1279,6 +1312,11 @@ uses
     for i := 0 to gipmPhoaViewViews.Count-1 do gipmPhoaViewViews[i].Checked := i=Value;
      // Перегружаем дерево папок
     LoadGroupTree;
+  end;
+
+  procedure TfMain.ShowProgressInfo(const sConstName: String; const aParams: array of const);
+  begin
+    if ProgressInfoViewer<>nil then ProgressInfoViewer.DisplayStage(ConstVal(sConstName, aParams));
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.11 2004-05-20 13:45:05 dale Exp $
+//  $Id: phoa.dpr,v 1.12 2004-05-21 14:15:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -61,10 +61,11 @@ uses
   udMsgBox in 'udMsgBox.pas' {dMsgBox},
   phKeySetting in 'phKeySetting.pas';
 
+  
 {$R *.res}
 
 begin
-  CreateMutex(nil, False, 'PHOA_RUNNING_MUTEX'); 
+  CreateMutex(nil, False, 'PHOA_RUNNING_MUTEX');
   Application.Initialize;
   Application.CreateForm(TfMain, fMain);
   Application.Run;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udAbout.pas,v 1.3 2004-05-21 14:15:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,13 +9,13 @@ unit udAbout;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32, GR32_Layers,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32, GR32_Layers, ConsVars, 
   StdCtrls, GR32_Image, DTLangTools, ExtCtrls;
 
 type
   TShowDetail = (sdTitle, sdAuthor, sdCredits, sdTranslation);
 
-  TdAbout = class(TForm)
+  TdAbout = class(TForm, IProgressInfoViewer)
     dtlsMain: TDTLanguageSwitcher;
     iMain: TImage32;
     lWebsite: TLabel;
@@ -24,7 +24,6 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure lWebsiteClick(Sender: TObject);
     procedure lOKClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure TheTimerTick(Sender: TObject);
     procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
@@ -33,8 +32,12 @@ type
   private
      // Слой, на котором рисуется заголовок
     FTitleLayer: TPositionedLayer;
+     // Слой, на котором рисуется прогресс [при DialogMode=False]
+    FProgressLayer: TPositionedLayer;
      // Картинки заголовка
     FBmpTitle, FBmpAuthor, FBmpCredits, FBmpTranslation: TBitmap32;
+     // Строка состояния прогресса [при DialogMode=False]
+    FCurProgressStage: String;
      // Текущие отображаемые данные
     FShowDetail: TShowDetail;
      // Флаг отрисовки анимации
@@ -45,34 +48,80 @@ type
      // Поля для перетаскивания формы
     FTrackDrag: Boolean;
     FTrackPos: TPoint;
+     // Prop handlers
+    FAnimateFadeout: Boolean;
+    FDialogMode: Boolean;
+     // Инициализация диалога
+    procedure DoInitialize;
      // Зажигает или гасит заголовок
     procedure FadeTitle(bIn: Boolean);
-     // События слоя
+     // События слоёв
     procedure PaintTitleLayer(Sender: TObject; Buffer: TBitmap32);
-     // Плавно стирает окно
-    procedure Fadeout;
+    procedure PaintProgressLayer(Sender: TObject; Buffer: TBitmap32);
      // Создаёт TBitmap32 и загружает его из PNG-ресурса
     function  CreatePNGBitmap(const sResourceName: String; bAlpha: Byte): TBitmap32;
      // Возвращает текущий отображаемый Bitmap заголовка
     function  CurBitmap: TBitmap32;
-     // Начинает закрытие окошка
-    procedure StartClosing; 
+     // Начинает закрытие окошка [в режиме DialogMode]
+    procedure StartClosing;
+     // IProgressInfoViewer
+    procedure DisplayStage(const sStage: String);
+    procedure HideWindow;
+    function  GetHandle: HWND;
+    function  GetAnimateFadeout: Boolean;
+    procedure SetAnimateFadeout(bValue: Boolean);
+  public
+     // Создаёт диалог
+    constructor Create(bDialogMode: Boolean); reintroduce;
+     // Props
+     // -- Если False - это диалог "О программе"; если True - индикатор прогресса загрузки
+    property DialogMode: Boolean read FDialogMode;
+     // -- Если True - диалог "плавно растворяется" при закрытии, иначе - закрывается сразу
+    property AnimateFadeout: Boolean read GetAnimateFadeout write SetAnimateFadeout;
   end;
 
-  procedure ShowAbout;
+   // Создаёт, отображает и возвращает окно отображения состояния прогресса
+  function  CreateProgressInfoViewer: IProgressInfoViewer;
+   // Отображает модальный диалог "О программе"
+  procedure ShowAbout(bAnimateFadeout: Boolean);
+
+const
+   // Высота области для отрисовки строки прогресса (в нижней части окна)
+  IProgressAreaHeight = 16;
 
 implementation
 {$R *.dfm}
-uses ConsVars, GraphicEx, phUtils;
+uses GraphicEx, phUtils;
 
-  procedure ShowAbout;
+  function CreateProgressInfoViewer: IProgressInfoViewer;
+  var Dlg: TdAbout;
   begin
-    with TdAbout.Create(Application) do
+    Dlg := TdAbout.Create(False);
+    try
+      Dlg.Show;
+    except
+      Dlg.Free;
+      raise;
+    end;
+    Result := Dlg;
+  end;
+
+  procedure ShowAbout(bAnimateFadeout: Boolean);
+  begin
+    with TdAbout.Create(True) do
       try
+        AnimateFadeout := bAnimateFadeout;
         ShowModal;
       finally
         Free;
       end;
+  end;
+
+  constructor TdAbout.Create(bDialogMode: Boolean);
+  begin
+    inherited Create(Application);
+    FDialogMode := bDialogMode;
+    DoInitialize;
   end;
 
   function TdAbout.CreatePNGBitmap(const sResourceName: String; bAlpha: Byte): TBitmap32;
@@ -100,19 +149,42 @@ uses ConsVars, GraphicEx, phUtils;
     end;
   end;
 
-  procedure TdAbout.Fadeout;
-  var b: Byte;
+  procedure TdAbout.DisplayStage(const sStage: String);
   begin
-     // Enable fadeout effect on Win2K+
-    if (Win32Platform=VER_PLATFORM_WIN32_NT) and (Win32MajorVersion>=5) then begin
-      AlphaBlend := True;
-      Update;
-      for b := 12 downto 1 do begin
-        AlphaBlendValue := b*20;
-        Sleep(20);
-      end;
+    FCurProgressStage := sStage;
+    iMain.Invalidate;
+    Update;
+  end;
+
+  procedure TdAbout.DoInitialize;
+  var Png: TPNGGraphic;
+  begin
+    Png := TPNGGraphic.Create;
+    try
+       // Загружаем изображение фона
+      Png.LoadFromResourceName(HInstance, 'PNG_BACK');
+      iMain.Bitmap.Assign(Png);
+    finally
+      Png.Free;
     end;
-    Close;
+     // Создаём слой заголовка
+    FTitleLayer := TPositionedLayer.Create(iMain.Layers);
+    FTitleLayer.OnPaint := PaintTitleLayer;
+     // Создаём слой сообщений о прогрессе
+    if not DialogMode then begin
+      FProgressLayer := TPositionedLayer.Create(iMain.Layers);
+      FProgressLayer.OnPaint := PaintProgressLayer;
+    end;
+     // Загружаем изображения заголовков
+    FBmpTitle         := CreatePNGBitmap('PNG_TITLE',       255);
+    if DialogMode then begin
+      FBmpAuthor      := CreatePNGBitmap('PNG_AUTHOR',      0);
+      FBmpCredits     := CreatePNGBitmap('PNG_CREDITS',     0);
+      FBmpTranslation := CreatePNGBitmap('PNG_TRANSLATION', 0);
+    end;
+     // Разрешаем таймер смены заголовков для режима диалога "О программе"
+    TheTimer.Enabled := DialogMode;
+    lOK.Visible      := DialogMode;
   end;
 
   procedure TdAbout.FadeTitle(bIn: Boolean);
@@ -132,28 +204,8 @@ uses ConsVars, GraphicEx, phUtils;
       if iWait>0 then Sleep(iWait);
     end;
     FFading := False;
-    if FAnimationTerminated then Fadeout;
-  end;
-
-  procedure TdAbout.FormCreate(Sender: TObject);
-  var Png: TPNGGraphic;
-  begin
-    Png := TPNGGraphic.Create;
-    try
-       // Загружаем изображение фона
-      Png.LoadFromResourceName(HInstance, 'PNG_BACK');
-      iMain.Bitmap.Assign(Png);
-    finally
-      Png.Free;
-    end;
-     // Создаём слой заголовка
-    FTitleLayer := TPositionedLayer.Create(iMain.Layers);
-    FTitleLayer.OnPaint := PaintTitleLayer;
-     // Загружаем изображения заголовка
-    FBmpTitle       := CreatePNGBitmap('PNG_TITLE',       255);
-    FBmpAuthor      := CreatePNGBitmap('PNG_AUTHOR',      0);
-    FBmpCredits     := CreatePNGBitmap('PNG_CREDITS',     0);
-    FBmpTranslation := CreatePNGBitmap('PNG_TRANSLATION', 0);
+     // Если прервали анимацию - надо закрыть окно
+    if FAnimationTerminated then HideWindow;
   end;
 
   procedure TdAbout.FormDestroy(Sender: TObject);
@@ -166,13 +218,41 @@ uses ConsVars, GraphicEx, phUtils;
 
   procedure TdAbout.FormKeyPress(Sender: TObject; var Key: Char);
   begin
-    if Key in [#13, #27] then StartClosing;
+    if DialogMode and (Key in [#13, #27]) then StartClosing;
+  end;
+
+  function TdAbout.GetAnimateFadeout: Boolean;
+  begin
+    Result := FAnimateFadeout;
+  end;
+
+  function TdAbout.GetHandle: HWND;
+  begin
+    Result := Handle;
+  end;
+
+  procedure TdAbout.HideWindow;
+  var b: Byte;
+  begin
+     // Enable fadeout effect on Win2K+
+    if FAnimateFadeout and (Win32Platform=VER_PLATFORM_WIN32_NT) and (Win32MajorVersion>=5) then begin
+      AlphaBlend := True;
+      Update;
+      for b := 12 downto 1 do begin
+        AlphaBlendValue := b*20;
+        Sleep(20);
+      end;
+    end;
+    Close;
+    if not DialogMode then Release;
   end;
 
   procedure TdAbout.iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
   begin
-    FTrackDrag := True;
-    FTrackPos := Point(x, y);
+    if DialogMode then begin
+      FTrackDrag := True;
+      FTrackPos := Point(x, y);
+    end;
   end;
 
   procedure TdAbout.iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
@@ -196,6 +276,11 @@ uses ConsVars, GraphicEx, phUtils;
     OpenWebsite;
   end;
 
+  procedure TdAbout.PaintProgressLayer(Sender: TObject; Buffer: TBitmap32);
+  begin
+    Buffer.Textout(Rect(0, Height-IProgressAreaHeight, Width, Height), DT_CENTER or DT_VCENTER or DT_NOPREFIX, FCurProgressStage);
+  end;
+
   procedure TdAbout.PaintTitleLayer(Sender: TObject; Buffer: TBitmap32);
   var bmp: TBitmap32;
   begin
@@ -203,9 +288,14 @@ uses ConsVars, GraphicEx, phUtils;
     if bmp<>nil then Buffer.Draw((Width-bmp.Width) div 2, (Height-bmp.Height) div 2, bmp);
   end;
 
+  procedure TdAbout.SetAnimateFadeout(bValue: Boolean);
+  begin
+    FAnimateFadeout := bValue;
+  end;
+
   procedure TdAbout.StartClosing;
   begin
-    if FFading then FAnimationTerminated := True else Fadeout;
+    if FFading then FAnimationTerminated := True else HideWindow;
   end;
 
   procedure TdAbout.TheTimerTick(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.23 2004-05-20 11:50:54 dale Exp $
+//  $Id: ConsVars.pas,v 1.24 2004-05-21 14:15:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -205,6 +205,27 @@ type
     formfName,  // Совпадение по имени файла
     formfSize); // Совпадение по размеру файла
   TFileOpRepairMatchFlags = set of TFileOpRepairMatchFlag;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // IProgressInfoViewer - интерфейс окна, отображающего информацию о процессе загрузки
+   //-------------------------------------------------------------------------------------------------------------------
+
+  IProgressInfoViewer = interface(IInterface)
+    ['{64ED8BDB-A188-4737-8767-CB8CE9464BF3}']
+     // Отображает указанную стадию в качестве состояния прогресса
+    procedure DisplayStage(const sStage: String);
+     // Скрывает окно
+    procedure HideWindow;
+     // Prop handlers
+    function  GetHandle: HWND;
+    function  GetAnimateFadeout: Boolean;
+    procedure SetAnimateFadeout(bValue: Boolean);
+     // Props
+     // -- Использовать ли плавное скрытие окна (Win2k+)
+    property AnimateFadeout: Boolean read GetAnimateFadeout write SetAnimateFadeout;
+     // -- Handle окна
+    property Handle: HWND read GetHandle;
+  end;
 
    //-------------------------------------------------------------------------------------------------------------------
    // Предметные интерфейсы страниц мастеров
@@ -684,6 +705,8 @@ const
     ISettingID_View_SlideCyclic        = 2061; // Slideshow: Циклический просмотр
    //===================================================================================================================
   ISettingID_Dialogs                   = 3001; // Диалоги
+  ISettingID_Dlgs_SplashStartFade      = 3006; // Анимированное скрытие заставки
+  ISettingID_Dlgs_SplashAboutFade      = 3008; // Анимированное скрытие окна "О программе"
   ISettingID_Dlgs_Confms               = 0;    // Подтверждения
     ISettingID_Dlgs_ConfmDelGroup      = 3010; // Подтверждение: Перед удалением группы
     ISettingID_Dlgs_ConfmDelPics       = 3011; // Подтверждение: Перед удалением изображений
@@ -831,8 +854,12 @@ const
    Byte(gbpKeywords));     // 6  Keywords
 
 var
-  cMainCodePage: Cardinal;    // Кодовая страница ANSI для текущего основного шрифта программы
-  wClipbrdPicFormatID: Word;  // PhoA picture clipboard format identifier
+   // Кодовая страница ANSI для текущего основного шрифта программы
+  cMainCodePage: Cardinal;
+   // PhoA picture clipboard format identifier
+  wClipbrdPicFormatID: Word;
+   // Окно для отображения процесса инициализации приложения (существует только при старте программы)
+  ProgressInfoViewer: IProgressInfoViewer = nil;
    // Misc settings
   ViewInfoPos: TRect;         // Границы информации при просмотре в 10-тысячных долях размера экрана [90, 9400, 9910, 9880]
 
@@ -849,7 +876,8 @@ var
   procedure ApplyToolbarSettings(Dock: TTBXDock);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
+uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting,
+  udAbout;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -1095,6 +1123,8 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //=================================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
+      Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashStartFade,  '@ISettingID_Dlgs_SplashStartFade', True);
+      Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashAboutFade,  '@ISettingID_Dlgs_SplashAboutFade', True);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);
@@ -1133,6 +1163,8 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
   {$HINTS ON}
 
 initialization
+   // Отображаем окно прогресса
+  ProgressInfoViewer := CreateProgressInfoViewer;
    // Грузим курсоры
   with Screen do begin
     Cursors[crHand]     := LoadCursor(HInstance, 'CRHAND');

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phKeySetting.pas,v 1.1 2004-05-20 13:44:46 dale Exp $
+//  $Id: phKeySetting.pas,v 1.2 2004-05-21 14:15:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -7,10 +7,11 @@
 unit phKeySetting;
 
 interface
+(*
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ConsVars, phSettings, phObj;
 
-type  
+type
    //===================================================================================================================
    // TPhoaKeySetting - настройка, представл€юща€ собой запись сочетаний клавиш дл€ вызова команды
    //===================================================================================================================
@@ -98,8 +99,7 @@ type
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
   end;
-
+*)
 implementation
 
 end.
- 

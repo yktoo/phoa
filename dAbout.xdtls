@@ -72,11 +72,11 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="OK"/>
+              <tranEntry langID="1033" value="OK"/>
+              <tranEntry langID="1031" value="OK"/>
+              <tranEntry langID="1046" value="OK"/>
+              <tranEntry langID="1058" value="OK"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
