@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.16 2005-03-07 19:04:33 dale Exp $
+//  $Id: maps.h,v 1.17 2005-03-08 09:49:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -99,4 +99,4 @@
 #define IDH_setup_view_mode             04070
 #define IDH_tasks                       05000
 #define IDH_tasks_getting_started       05010
-
+#define IDH_tasks_media_preparing       05020

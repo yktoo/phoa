@@ -384,6 +384,10 @@
 			<param name="Local" value="tasks-getting-started.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Preparing for CD or DVD burning">
+			<param name="Local" value="tasks-media-preparing.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (Frequently Asked Questions)">
 			<param name="Local" value="info-faq.html">
 			</OBJECT>
