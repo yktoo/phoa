@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.17 2004-10-15 13:49:35 dale Exp $
+//  $Id: udSearch.pas,v 1.18 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -639,7 +639,7 @@ type
   type TSearchArea = (saAll, saCurGroup, saResults);
   var
     iDate1, iDate2, iTime1, iTime2: Integer;
-    Keywords: IPhoaMutableKeywordList;
+    Keywords: IPhotoAlbumKeywordList;
     FMasks: TPhoaMasks;
     i, iSrchCount, iID, iFSize, iPicWidth, iPicHeight: Integer;
     SearchArea: TSearchArea;
@@ -709,7 +709,7 @@ type
         iDate2     := GetCritDate(ICritIdx_Date2);
         iTime1     := GetCritTime(ICritIdx_Time1);
         iTime2     := GetCritTime(ICritIdx_Time2);
-        Keywords := NewPhoaMutableKeywordList;
+        Keywords := NewPhotoAlbumKeywordList;
         Keywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
          // »щем
         FLocalResults.Clear;

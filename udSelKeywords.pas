@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.8 2004-10-12 12:38:10 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.9 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -26,13 +26,14 @@ type
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
+     // Проект
     FProject: IPhotoAlbumProject;
      // Список ключевых слов
-    FKeywords: TKeywordList;
+    FKeywords: IPhotoAlbumKeywordList;
+     // Строка с ключевыми словами
     FKeywordStr: String;
   protected
     procedure InitializeDialog; override;
-    procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
   end;
 
@@ -69,18 +70,12 @@ uses phUtils, ConsVars, Main, phSettings;
     inherited ButtonClick_OK;
   end;
 
-  procedure TdSelKeywords.FinalizeDialog;
-  begin
-    FKeywords.Free;
-    inherited FinalizeDialog;
-  end;
-
   procedure TdSelKeywords.InitializeDialog;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_select_keywords;
      // Составляем список ключевых слов
-    FKeywords := TKeywordList.Create;
+    FKeywords := NewPhotoAlbumKeywordList;
     FKeywords.PopulateFromPicList(FProject.Pics, nil, 0);
     FKeywords.SelectedKeywords := FKeywordStr;
      // Настраиваем дерево
@@ -90,10 +85,10 @@ uses phUtils, ConsVars, Main, phSettings;
 
   procedure TdSelKeywords.tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    with FKeywords[Node.Index]^ do
+    with FKeywords.KWData[Node.Index]^ do
       case Node.CheckState of
-        csUncheckedNormal: State := ksOff;
-        csCheckedNormal:   State := ksOn;
+        csUncheckedNormal: State := pksOff;
+        csCheckedNormal:   State := pksOn;
       end;
     Modified := True;
   end;
@@ -105,16 +100,18 @@ uses phUtils, ConsVars, Main, phSettings;
 
   procedure TdSelKeywords.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
-    with FKeywords[Node.Index] ^ do
-      if TextType=ttNormal then CellText := AnsiToUnicodeCP(sKeyword, cMainCodePage) else CellText := AnsiToUnicodeCP(Format('(%d)', [iCount]), cMainCodePage);
+    case TextType of
+      ttNormal: CellText := AnsiToUnicodeCP(FKeywords[Node.Index], cMainCodePage);
+      ttStatic: CellText := AnsiToUnicodeCP(Format('(%d)', [FKeywords.KWData[Node.Index].iCount]), cMainCodePage);
+    end;
   end;
 
   procedure TdSelKeywords.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
     Node.CheckType := ctCheckBox;
-    case FKeywords[Node.Index].State of
-      ksOn: Node.CheckState := csCheckedNormal;
-      else  Node.CheckState := csUncheckedNormal;
+    case FKeywords.KWData[Node.Index].State of
+      pksOn: Node.CheckState := csCheckedNormal;
+      else   Node.CheckState := csUncheckedNormal;
     end;
   end;
 

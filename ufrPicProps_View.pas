@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.23 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.24 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -226,7 +226,11 @@ uses phUtils, Main, phSettings;
         GetRequiredTransform(Pic, Rotation, Flips);
          // Если оно не совпадает - создаём операцию
         if (Rotation<>Pic.Rotation) or (Flips<>Pic.Flips) then
-          TPhoaOp_StoreTransform.Create(AOperations, App.Project, Pic, Rotation, Flips, Changes);
+          TPhoaOp_StoreTransform.Create(
+            AOperations,
+            App.Project,
+            NewPhoaOperationParams(['Pic', Pic, 'Rotation', Byte(Rotation), 'Flips', Byte(Flips)]),
+            Changes);
       end;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.11 2004-10-15 13:49:35 dale Exp $
+//  $Id: udPicProps.pas,v 1.12 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -114,7 +114,7 @@ uses
           Exit;
         end;
        // Создаём операцию отката
-      Operation := TPhoaOp_PicEdit.Create(FUndoOperations, FApp.Project, Changes);
+      Operation := TPhoaOp_PicEdit.Create(FUndoOperations, FApp.Project, NewPhoaOperationParams([]), Changes);
        // Применяем последовательно все страницы
       for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations, Changes);
     finally

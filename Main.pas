@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.54 2004-10-18 12:25:49 dale Exp $
+//  $Id: Main.pas,v 1.55 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -468,7 +468,11 @@ uses
     TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics, TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats))));
     BeginOperation;
     try
-      TPhoaOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Changes);
+      TPhoaOp_PicDelete.Create(
+        FUndo,
+        FProject,
+        NewPhoaOperationParams(['Group', CurGroup, 'Pics', Viewer.SelectedPics]),
+        Changes);
     finally
       EndOperation(Changes);
     end;
@@ -486,7 +490,7 @@ uses
           if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then begin
             BeginOperation;
             try
-              TPhoaOp_GroupDelete.Create(FUndo, FProject, CurGroup, Changes);
+              TPhoaOp_GroupDelete.Create(FUndo, FProject, NewPhoaOperationParams(['Group', CurGroup]), Changes);
             finally
               EndOperation(Changes);
             end;
@@ -496,7 +500,11 @@ uses
           if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
             BeginOperation;
             try
-              TPhoaOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Changes);
+              TPhoaOp_PicDelete.Create(
+                FUndo,
+                FProject,
+                NewPhoaOperationParams(['Group', CurGroup, 'Pics', Viewer.SelectedPics]),
+                Changes);
             finally
               EndOperation(Changes);
             end;
@@ -663,8 +671,7 @@ uses
     NewGroup: IPhotoAlbumPicGroup;
   begin
     Changes := [];
-    Params  := NewPhoaOperationParams;
-    Params['Group'] := CurGroup;
+    Params  := NewPhoaOperationParams(['Group', CurGroup]);
     BeginOperation;
     try
       TPhoaOp_GroupNew.Create(FUndo, FProject, Params, Changes);
@@ -707,7 +714,7 @@ uses
     iCntBefore := CurGroup.Pics.Count;
     BeginOperation;
     try
-      TPhoaOp_PicPaste.Create(FUndo, FProject, CurGroup, Changes);
+      TPhoaOp_PicPaste.Create(FUndo, FProject, NewPhoaOperationParams(['Group', CurGroup]), Changes);
     finally
       EndOperation(Changes);
     end;
@@ -1842,8 +1849,21 @@ uses
     BeginOperation;
     try
       case GetNodeKind(Sender, Node) of
-        gnkView:      TPhoaOp_ViewEdit.Create(FUndo, FProject, FProject.CurrentViewX, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil, Changes);
-        gnkPhoaGroup: TPhoaOp_GroupRename.Create(FUndo, FProject, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage), Changes);
+        gnkView:
+          TPhoaOp_ViewEdit.Create(
+            FUndo,
+            FProject,
+            FProject.CurrentViewX,
+            UnicodetoAnsiCP(NewText, cMainCodePage),
+            nil,
+            nil,
+            Changes);
+        gnkPhoaGroup:
+          TPhoaOp_GroupRename.Create(
+            FUndo,
+            FProject,
+            NewPhoaOperationParams(['Group', CurGroup, 'NewText', UnicodetoAnsiCP(NewText, cMainCodePage)]),
+            Changes);
       end;
     finally
       EndOperation(Changes);

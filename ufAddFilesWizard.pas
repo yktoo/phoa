@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.19 2004-10-18 12:25:49 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.20 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,18 +29,14 @@ type
     FFileProcessingInterrupted: Boolean;
      // Главный буфер отката
     FUndoOperations: TPhoaOperations;
-     // Основная операция добавления
-    FOperation: TPhoaOperation;
-     // Изменения, накопленные операциями 
-    FOpChanges: TPhoaOperationChanges;
+     // Список изображений для добавления в проект
+    FPics: IPhotoAlbumPicList;
      // Протокол добавления
     FLog: TStrings;
      // Исходное количество добавляемых файлов
     FInitialFileCount: Integer;
      // Последнее добавленное изображение (nil, если нет)
     FLastProcessedPic: IPhoaPic;
-     // Счётчик успешно добавленных изображений
-    FCountSucceeded: Integer;
      // Счётчик сбойных изображений
     FCountFailed: Integer;
      // Prop storage
@@ -78,8 +74,6 @@ type
     function  IPhoaWizardPageHost_Process.GetProcessingActive = ProcPage_GetProcessingActive;
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
-     // Prop handlers
-    function  GetAddOperations: TPhoaOperations;
   protected
     procedure InitializeWizard; override;
     procedure FinalizeWizard; override;
@@ -97,8 +91,6 @@ type
      // Прерывает добавление файлов
     procedure InterruptFileProcessing;
      // Props
-     // -- Буфер отката операции
-    property AddOperations: TPhoaOperations read GetAddOperations;
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
      // -- Папка для добавления, выбираемая по умолчанию
@@ -139,7 +131,6 @@ type
     FXFormFilled: Boolean;
      // Prop storage
     FAddedPic: IPhotoAlbumPic;
-    FOpChanges: TPhoaOperationChanges;
      // Производит автозаполнение свойств изображения
     procedure AutofillPicProps(Pic: IPhotoAlbumPic);
   protected
@@ -149,8 +140,6 @@ type
      // Props
      // -- Последнее добавленное изображение (nil, если нет или была ошибка)
     property AddedPic: IPhotoAlbumPic read FAddedPic;
-     // -- Накопленные изменения, внесённые операциями
-    property OpChanges: TPhoaOperationChanges read FOpChanges;
   end;
 
    // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
@@ -167,8 +156,8 @@ uses
   begin
     with TfAddFilesWizard.Create(Application) do
       try
-        FApp             := AApp;
-        FUndoOperations  := AUndoOperations;
+        FApp            := AApp;
+        FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
         Free;
@@ -397,22 +386,30 @@ uses
   end;
 
   procedure TAddFilesThread.Execute;
+  var sFileName: String;
   begin
     try
       while not Terminated do
         with FWizard do begin
-           // Добавляем изображение
           try
-            FAddedPic := nil;
-      Pic.FileName := sFilename;
-      Pic.ReloadPicFileData(Project.ThumbnailSize, TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)), Project.ThumbnailQuality);
-            TPhoaOp_InternalPicAdd.Create(AddOperations, App.Project, App.CurGroup, FileList.Files[0], FAddedPic, FOpChanges);
+            sFileName := FileList.Files[0];
+             // Ищем изображение по имени файла
+            FAddedPic := FApp.Project.PicsX.ItemsByFileNameX[sFileName];
+             // Если не нашли - создаём новое и генерируем эскиз
+            if FAddedPic=nil then begin
+              FAddedPic := NewPhotoAlbumPic;
+              FAddedPic.FileName := sFileName;
+              FAddedPic.ReloadPicFileData(
+                App.Project.ThumbnailSize,
+                TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
+                App.Project.ThumbnailQuality);
+            end;
              // Производим автозаполнение свойств изображения
             AutofillPicProps(FAddedPic);
              // Пишем в протокол
             LogSuccess(
               'SLogEntry_AddingOK',
-              [FileList.Files[0],
+              [sFileName,
                DateTimeFillResultName(FDateFillResult),
                DateTimeFillResultName(FTimeFillResult),
                ConstVal(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
@@ -435,11 +432,24 @@ uses
    //===================================================================================================================
 
   procedure TfAddFilesWizard.FinalizeWizard;
+  var Changes: TPhoaOperationChanges;
   begin
     FFileList.Free;
     FLog.Free;
-     // Если есть операция, уведомляем главную форму
-    if FOperation<>nil then fMain.EndOperation(FOpChanges);
+     // Если есть добавленные изображения, выполняем операцию
+    if FPics<>nil then begin
+      Changes := [];
+      fMain.BeginOperation;
+      try
+        TPhoaOp_PicAdd.Create(
+          FUndoOperations,
+          FApp.Project,
+          NewPhoaOperationParams(['Group', FApp.CurGroup, 'Pics', FPics]),
+          Changes);
+      finally
+        fMain.EndOperation(Changes);
+      end;
+    end;
     inherited FinalizeWizard;
   end;
 
@@ -447,12 +457,6 @@ uses
   begin
      // Нельзя закрывать окошко, пока добавляются файлы
     CanClose := not FProcessingFiles;
-  end;
-
-  function TfAddFilesWizard.GetAddOperations: TPhoaOperations;
-  begin
-     // Добавления отдельных изображений будут дочерними операциями главной операции "Добавление изображений"
-    Result := FOperation.Operations;
   end;
 
   function TfAddFilesWizard.GetFormRegistrySection: String;
@@ -475,6 +479,7 @@ uses
   begin
     inherited InitializeWizard;
     FFileList := TFileList.Create;
+    FPics     := NewPhotoAlbumPicList(False);
      // Создаём страницы и отображаем первую страницу
     Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
     Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
@@ -542,7 +547,7 @@ uses
       Result := ConstVal('SWzAddFiles_Processing', [ProcPage_GetProgressCur+1, FInitialFileCount, FCountFailed, FFileList.Files[0]])
      // Иначе пишем информацию о возможности продолжения
     else
-      Result := ConstVal('SWzAddFiles_Paused', [FCountSucceeded, FCountFailed]);
+      Result := ConstVal('SWzAddFiles_Paused', [FPics.Count, FCountFailed]);
   end;
 
   function TfAddFilesWizard.ProcPage_GetProcessingActive: Boolean;
@@ -612,11 +617,6 @@ uses
     FProcessingFiles := True;
      // Создаём протокол
     if FLog=nil then FLog := TStringList.Create;
-     // Создаём операцию, если она ещё не создана
-    if FOperation=nil then begin
-      fMain.BeginOperation;
-      FOperation := TPhoaOp_PicAdd.Create(FUndoOperations, FApp.Project, FOpChanges);
-    end;
      // Удаляем неотмеченные файлы
     FFileList.DeleteUnchecked;
      // Запоминаем исходное количество файлов
@@ -635,15 +635,13 @@ uses
     if FAddFilesThread.AddedPic=nil then
       Inc(FCountFailed)
     else begin
-      Inc(FCountSucceeded);
+      FPics.Add(FAddFilesThread.AddedPic, False);
        // Обновляем статус диалога
       HasUpdates := True;
     end;
      // Удаляем обработанный файл
     FFileList.Delete(0);
     FLastProcessedPic := FAddFilesThread.AddedPic;
-     // Накапливаем изменения
-    FOpChanges := FOpChanges+FAddFilesThread.OpChanges;
      // Если обработан весь список, прерываем поток
     if (FFileList.Count=0) or FFileProcessingInterrupted then begin
       FProcessingFiles := False;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.13 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.14 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -60,6 +60,7 @@ type
     bChanges, bLinked: Boolean;
     Pics: IPhoaMutablePicList;
     Pic: IPhoaPic;
+    OpParams: IPhoaOperationParams;
     i: Integer;
   begin
      // Если страница инициализировалась, создаём операции добавления/удаления изображений
@@ -86,10 +87,11 @@ type
             if (n.CheckState=csCheckedNormal) <> bLinked then Pics.Add(Pic, False);
           end;
            // Выполняем (создаём) операцию
+          OpParams := NewPhoaOperationParams(['Group', pgd.Group, 'Pics', Pics]);
           if n.CheckState=csCheckedNormal then
-            TPhoaOp_InternalPicToGroupAdding.Create(AOperations, App.Project, pgd.Group, Pics, Changes)
+            TPhoaOp_InternalPicToGroupAdding.Create(AOperations, App.Project, OpParams, Changes)
           else
-            TPhoaOp_InternalPicFromGroupRemoving.Create(AOperations, App.Project, pgd.Group, Pics, Changes);
+            TPhoaOp_InternalPicFromGroupRemoving.Create(AOperations, App.Project, OpParams, Changes);
         end;
          // Переходим к следующей группе
         n := tvMain.GetNext(n);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.12 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.13 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -54,7 +54,7 @@ type
      // Флаг того, что страница проинициализирована
     FInitialized: Boolean;
      // Список ключевых слов
-    FKeywords: TKeywordList;
+    FKeywords: IPhotoAlbumKeywordList;
      // Индекс узла, который надо сфокусировать после окончания редактирования
     FNodeToFocusIndex: Integer;
      // Callback-процедура для определения выбранности изображения
@@ -69,7 +69,6 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure InitializePage; override;
-    procedure FinalizePage; override;
   public
     procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
   end;
@@ -143,7 +142,12 @@ uses phUtils, Main, phSettings;
   begin
     inherited Apply(AOperations, Changes);
      // Если страница инициализирована, создаём операцию изменения списка ключевых слов
-    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(AOperations, App.Project, EditedPics, FKeywords, Changes);
+    if FInitialized then
+      TPhoaOp_InternalEditPicKeywords.Create(
+        AOperations,
+        App.Project,
+        NewPhoaOperationParams(['Pics', EditedPics, 'KeywordList', FKeywords]),
+        Changes);
   end;
 
   procedure TfrPicProps_Keywords.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -163,11 +167,11 @@ uses phUtils, Main, phSettings;
   var i: Integer;
   begin
     for i := 0 to FKeywords.Count-1 do
-      with FKeywords[i]^ do
+      with FKeywords.KWData[i]^ do
         case Mode of
-          mcmAll:  State := ksOn;
-          mcmNone: State := ksOff;
-          else     if State=ksOff then State := ksOn else State := ksOff;
+          mcmAll:  State := pksOn;
+          mcmNone: State := pksOff;
+          else     if State=pksOff then State := pksOn else State := pksOff;
         end;
     tvMain.ReinitChildren(nil, False);
     tvMain.Invalidate;
@@ -177,12 +181,6 @@ uses phUtils, Main, phSettings;
   procedure TfrPicProps_Keywords.EnableActions;
   begin
     aEdit.Enabled := tvMain.FocusedNode<>nil;
-  end;
-
-  procedure TfrPicProps_Keywords.FinalizePage;
-  begin
-    FKeywords.Free;
-    inherited FinalizePage;
   end;
 
   procedure TfrPicProps_Keywords.FocusNode(Index: Integer);
@@ -207,7 +205,7 @@ uses phUtils, Main, phSettings;
     inherited InitializePage;
     ApplyTreeSettings(tvMain);
     pmMain.LinkSubitems := tbMain.Items;
-    FKeywords := TKeywordList.Create;
+    FKeywords := NewPhotoAlbumKeywordList;
   end;
 
   procedure TfrPicProps_Keywords.IsPicSelectedCallback(Pic: IPhoaPic; out bSelected: Boolean);
@@ -222,15 +220,15 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_Keywords.tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    with FKeywords[Node.Index]^ do
+    with FKeywords.KWData[Node.Index]^ do
       case Node.CheckState of
         csUncheckedNormal: begin
-          State := ksOff;
+          State := pksOff;
            // Скрываем узел, если стоит показ только отмеченных
           if aCheckedOnly.Checked then Sender.IsVisible[Node] := False;
         end;
-        csMixedNormal:     State := ksGrayed;
-        csCheckedNormal:   State := ksOn;
+        csMixedNormal:   State := pksGrayed;
+        csCheckedNormal: State := pksOn;
       end;
     Modified;
   end;
@@ -239,7 +237,7 @@ uses phUtils, Main, phSettings;
   begin
      // Выставляем тип птицы: если изначально было Grayed - после Unchecked идёт Grayed
     if (Node.CheckState=csUncheckedNormal) and (NewState=csCheckedNormal) then
-      with FKeywords[Node.Index]^ do
+      with FKeywords.KWData[Node.Index]^ do
         if (iSelCount>0) and (iSelCount<EditedPics.Count) then NewState := csMixedNormal;
   end;
 
@@ -255,32 +253,34 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_Keywords.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
-    case FKeywords[Node.Index].Change of
-      kcNone:    ImageIndex := iiKeyword;
-      kcAdd:     ImageIndex := iiAsterisk;
-      kcReplace: ImageIndex := iiEdit;
+    case FKeywords.KWData[Node.Index].Change of
+      pkcNone:    ImageIndex := iiKeyword;
+      pkcAdd:     ImageIndex := iiAsterisk;
+      pkcReplace: ImageIndex := iiEdit;
     end;
   end;
 
   procedure TfrPicProps_Keywords.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var p: PKeywordRec;
+  var p: PPhoaKeywordData;
   begin
-    p := FKeywords[Node.Index];
     case TextType of
        // Текст ключевого слова
-      ttNormal: CellText := AnsiToUnicodeCP(p.sKeyword, cMainCodePage);
+      ttNormal: CellText := AnsiToUnicodeCP(FKeywords[Node.Index], cMainCodePage);
        // Количество вхождений слова
-      ttStatic: if (p.Change=kcNone) and (p.iCount>0) then CellText := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.iCount]);
+      ttStatic: begin
+        p := FKeywords.KWData[Node.Index];
+        if (p.Change=pkcNone) and (p.iCount>0) then CellText := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.iCount]);
+      end
     end;
   end;
 
   procedure TfrPicProps_Keywords.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
     Node.CheckType := ctCheckBox;
-    case FKeywords[Node.Index].State of
-      ksOff:    Node.CheckState := csUncheckedNormal;
-      ksGrayed: Node.CheckState := csMixedNormal;
-      ksOn:     Node.CheckState := csCheckedNormal;
+    case FKeywords.KWData[Node.Index].State of
+      pksOff:    Node.CheckState := csUncheckedNormal;
+      pksGrayed: Node.CheckState := csMixedNormal;
+      pksOn:     Node.CheckState := csCheckedNormal;
     end;
      // Настраиваем видимость узла
     Sender.IsVisible[Node] := not aCheckedOnly.Checked or (Node.CheckState<>csUncheckedNormal);
@@ -297,7 +297,7 @@ uses phUtils, Main, phSettings;
   begin
     case TextType of
        // Вновь добавленные ключевые слова красим в синий цвет (если узел не выделен)
-      ttNormal: if not (vsSelected in Node.States) and (FKeywords[Node.Index].Change=kcAdd) then TargetCanvas.Font.Color := clNavy;
+      ttNormal: if not (vsSelected in Node.States) and (FKeywords.KWData[Node.Index].Change=pkcAdd) then TargetCanvas.Font.Color := clNavy;
        // Количество вхождений ключевого слова красим серым
       ttStatic: TargetCanvas.Font.Color := clGrayText;
     end;

@@ -55,7 +55,11 @@ uses ConsVars, phUtils, Main;
     Changes := [];
     fMain.BeginOperation;
     try
-      TPhoaOp_GroupEdit.Create(FUndoOperations, FApp.Project, FApp.CurGroup, eText.Text, mDescription.Lines.Text, Changes);
+      TPhoaOp_GroupEdit.Create(
+        FUndoOperations,
+        FApp.Project,
+        NewPhoaOperationParams(['Group', FApp.CurGroup, 'NewText', eText.Text, 'NewDescription', mDescription.Lines.Text]),
+        Changes);
     finally
       fMain.EndOperation(Changes);
     end;

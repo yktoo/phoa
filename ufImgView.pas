@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.38 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufImgView.pas,v 1.39 2004-10-18 19:27:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -748,7 +748,11 @@ uses
     Changes := [];
     fMain.BeginOperation;
     try
-      TPhoaOp_StoreTransform.Create(FUndoOperations, FApp.Project, FPic, FTransform.Rotation, FTransform.Flips, Changes);
+      TPhoaOp_StoreTransform.Create(
+        FUndoOperations,
+        FApp.Project,
+        NewPhoaOperationParams(['Pic', FPic, 'NewRotation', Byte(FTransform.Rotation), 'NewFlips', Byte(FTransform.Flips)]),
+        Changes);
     finally
       fMain.EndOperation(Changes);
     end;
