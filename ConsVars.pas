@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.49 2004-09-07 18:51:36 dale Exp $
+//  $Id: ConsVars.pas,v 1.50 2004-09-10 13:55:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,7 +9,8 @@ unit ConsVars;
 interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
-  Windows, SysUtils, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32;
+  Windows, SysUtils, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32,
+  dkWebUtils;
 
 type
   EPhoaException = class(Exception);
@@ -353,7 +354,9 @@ type
 
 const
    // Версия программы
+  SAppProductSID                  = 'phoa';
   SAppVersion                     = 'v1.1.6 beta';
+  SAppVersionSID                  = '116beta';
    // Расширение и имя файла фотоальбома по умолчанию
   SDefaultExt                     = 'phoa';
   SDefaultFName                   = 'untitled.'+SDefaultExt;
@@ -363,13 +366,10 @@ const
    // Имя исполняемого файла
   SPhoaExecutableFileName         = 'phoa.exe';
 
-   // Web-сайт
-  SWebsite                        = 'http://www.dk-soft.org/'; 
-
    // Путь к каталогу с языковыми файлами
   SRelativeLangFilesPath          = 'Language\';
    // Расширение языковых файлов
-  SLangFileExt                    = 'lng'; 
+  SLangFileExt                    = 'lng';
 
    // Перевод строки
   S_CRLF                          = #13#10;
@@ -934,7 +934,8 @@ var
   cMainCodePage: Cardinal;
    // PhoA picture clipboard format identifier
   wClipbrdPicFormatID: Word;
-  
+   // Глобальный экземпляр IDKWeb
+  DKWeb: IDKWeb;  
 
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
@@ -1310,7 +1311,10 @@ initialization
   wClipbrdPicFormatID := RegisterClipboardFormat(SClipbrdPicFormatName);
    // Создаём настройки
   RootSetting := TPhoaSetting.Create(nil, 0, '');
+   // Создаём глобальный экземпляр IDKWeb
+  DKWeb := DKCreateDKWeb(SAppProductSID, SAppVersionSID);
 finalization
+  DKWeb := nil;
   RootSetting.Free;
 end.
 

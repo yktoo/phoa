@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.35 2004-09-08 15:17:32 dale Exp $
+//  $Id: Main.pas,v 1.36 2004-09-10 13:55:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -153,8 +153,8 @@ type
     tbxlToolbarUndo: TTBXLabelItem;
     gismViewViews: TTBGroupItem;
     tbSepHelpWebsite: TTBXSeparatorItem;
-    aHelpWebsite: TAction;
-    iHelpWebsite: TTBXItem;
+    aHelpProductWebsite: TAction;
+    iHelpProductWebsite: TTBXItem;
     bFind: TTBXItem;
     gipmPhoaViewViews: TTBGroupItem;
     aFileOperations: TAction;
@@ -186,6 +186,13 @@ type
     dklcMain: TDKLanguageController;
     aFlatMode: TAction;
     iFlatMode: TTBXItem;
+    aHelpVendorWebsite: TAction;
+    aHelpCheckUpdates: TAction;
+    TBXSubmenuItem1: TTBXSubmenuItem;
+    iHelpVendorWebsite: TTBXItem;
+    iHelpCheckUpdates: TTBXItem;
+    aHelpSupport: TAction;
+    iHelpSupport: TTBXItem;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -241,7 +248,7 @@ type
     procedure bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
-    procedure aaHelpWebsite(Sender: TObject);
+    procedure aaHelpProductWebsite(Sender: TObject);
     procedure aaFileOperations(Sender: TObject);
     procedure aaIniSaveSettings(Sender: TObject);
     procedure aaIniLoadSettings(Sender: TObject);
@@ -252,6 +259,9 @@ type
     procedure aaRemoveSearchResults(Sender: TObject);
     procedure dklcMainLanguageChanged(Sender: TObject);
     procedure aaFlatMode(Sender: TObject);
+    procedure aaHelpCheckUpdates(Sender: TObject);
+    procedure aaHelpVendorWebsite(Sender: TObject);
+    procedure aaHelpSupport(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -524,6 +534,12 @@ uses
     ViewerRefresh;
   end;
 
+  procedure TfMain.aaHelpCheckUpdates(Sender: TObject);
+  begin
+    ResetMode;
+    DKWeb.Open_VerCheck;
+  end;
+
   procedure TfMain.aaHelpContents(Sender: TObject);
   begin
     ResetMode;
@@ -536,10 +552,22 @@ uses
     HtmlHelpContext(IDH_faq);
   end;
 
-  procedure TfMain.aaHelpWebsite(Sender: TObject);
+  procedure TfMain.aaHelpProductWebsite(Sender: TObject);
   begin
     ResetMode;
-    OpenWebsite;
+    DKWeb.Open_ViewInfo;
+  end;
+
+  procedure TfMain.aaHelpSupport(Sender: TObject);
+  begin
+    ResetMode;
+    DKWeb.Open_Support;
+  end;
+
+  procedure TfMain.aaHelpVendorWebsite(Sender: TObject);
+  begin
+    ResetMode;
+    DKWeb.Open_Index;
   end;
 
   procedure TfMain.aaIniLoadSettings(Sender: TObject);

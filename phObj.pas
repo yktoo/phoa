@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.31 2004-09-07 18:51:36 dale Exp $
+//  $Id: phObj.pas,v 1.32 2004-09-10 13:55:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -3913,7 +3913,7 @@ var
     end else begin
       with Streamer do begin
          // Write photo album 'metadata'
-        WriteChunkString(IPhChunk_Remark,           Format('Created by PhoA %s, %s', [SAppVersion, SWebsite]));
+        WriteChunkString(IPhChunk_Remark,           Format('Created by PhoA %s, %s', [SAppVersion, DKWeb.MainSiteURI]));
          // Write photo album properties
         WriteChunkString(IPhChunk_PhoaGenerator,    'PhoA '+SAppVersion);
         WriteChunkInt   (IPhChunk_PhoaSavedDate,    DateToPhoaDate(Date));

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.18 2004-08-30 14:10:07 dale Exp $
+//  $Id: phoa.dpr,v 1.19 2004-09-10 13:55:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,6 +9,7 @@ program phoa;
 uses
   Forms,
   Windows,
+  dkWebUtils in '..\dkWebUtils.pas',
   phObj in 'phObj.pas',
   phPhoa in 'phPhoa.pas',
   phMetadata in 'phMetadata.pas',

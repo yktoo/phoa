@@ -112,14 +112,24 @@ aPhoaView_MakeGroup.Hint=00000184,Make a group...|Transfer current view's folder
 aHelpFAQ.Caption=00000186,FA&Q
 aHelpFAQ.Category=00000185,Help
 aHelpFAQ.Hint=00000188,FAQ|View the PhoA FAQ (Frequently Asked Questions) topic
-aHelpWebsite.Caption=00000190,PhoA &Website
-aHelpWebsite.Category=00000189,Help
-aHelpWebsite.Hint=00000192,PhoA Website|Open program home site in the browser
+aHelpProductWebsite.Caption=00000190,PhoA ho&me site
+aHelpProductWebsite.Category=00000189,Help
+aHelpProductWebsite.Hint=00000192,PhoA home site|Open the program home site in the browser
 iPhoaView_SetDefault.Caption=00000204,&Picture groups
 iPhoaView_SetDefault.Hint=00000205,Picture groups|Display photo album picture group tree
 aFlatMode.Caption=00000207,&Flat mode
 aFlatMode.Category=00000206,View
 aFlatMode.Hint=00000208,Flat mode|Show thumbnails from the selected group and all its subgroups
+aHelpVendorWebsite.Caption=00000210,DK Software &Website
+aHelpVendorWebsite.Category=00000209,Help
+aHelpVendorWebsite.Hint=00000211,DK Software Website|Open the vendor home site in the browser
+aHelpCheckUpdates.Caption=00000213,Check for &updates
+aHelpCheckUpdates.Category=00000212,Help
+aHelpCheckUpdates.Hint=00000214,Check for updates|Check for program updates on the web
+TBXSubmenuItem1.Caption=00000215,Internet
+aHelpSupport.Caption=00000217,Product &support
+aHelpSupport.Category=00000216,Help
+aHelpSupport.Hint=00000218,Product support|Open the product support page in the browser
 
 [dAbout]
 Caption=00000003,About

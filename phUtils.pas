@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.22 2004-09-07 18:51:36 dale Exp $
+//  $Id: phUtils.pas,v 1.23 2004-09-10 13:55:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -149,9 +149,6 @@ uses
    // Показ/скрытие курсора HourGlass
   procedure StartWait;
   procedure StopWait;
-
-   // Запускает браузер с домашней страницей PhoA
-  procedure OpenWebsite;
 
 implementation
 uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
@@ -859,11 +856,6 @@ var
       Dec(iWaitCount);
       if iWaitCount=0 then Screen.Cursor := SaveCursor;
     end;
-  end;
-
-  procedure OpenWebsite;
-  begin
-    ShellExecute(Application.Handle, 'open', SWebsite, nil, nil, SW_SHOWNORMAL);
   end;
 
 end.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.7 2004-09-02 14:20:38 dale Exp $
+//  $Id: udAbout.pas,v 1.8 2004-09-10 13:55:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -288,7 +288,7 @@ var
 
   procedure TdAbout.lWebsiteClick(Sender: TObject);
   begin
-    OpenWebsite;
+    DKWeb.Open_Index;
   end;
 
   procedure TdAbout.PaintProgressLayer(Sender: TObject; Buffer: TBitmap32);
