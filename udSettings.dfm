@@ -1,6 +1,6 @@
 inherited dSettings: TdSettings
-  Left = 529
-  Top = 354
+  Left = 532
+  Top = 322
   Caption = 'Program settings'
   ClientHeight = 435
   ClientWidth = 592
@@ -723,5 +723,12 @@ inherited dSettings: TdSettings
       64466F726D61747304000000190400000704000016040000220400000B004865
       6C704B6579776F72640400000019040000070400001604000022040000040048
       696E7404000000190400000704000016040000220400000000000000000000}
+  end
+  object fpMain: TFormPlacement
+    IniFileName = '\\\'
+    IniSection = '\\\'
+    UseRegistry = True
+    Left = 32
+    Top = 400
   end
 end

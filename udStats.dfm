@@ -185,4 +185,11 @@ inherited dStats: TdStats
       0000040048696E74040000001904000007040000160400002204000000000000
       00000000}
   end
+  object fpMain: TFormPlacement
+    IniFileName = '\\\'
+    IniSection = '\\\'
+    UseRegistry = True
+    Left = 36
+    Top = 388
+  end
 end

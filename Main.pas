@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.9 2004-04-30 13:17:00 dale Exp $
+//  $Id: Main.pas,v 1.10 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -823,6 +823,9 @@ uses
   begin
     ShortTimeFormat := 'hh:nn';
     LongTimeFormat  := 'hh:nn:ss';
+     // Настраиваем fpMain
+    fpMain.IniFileName := SRegRoot;
+    fpMain.IniSection  := SRegMainWindow_Root;     
      // Создаём фотоальбом
     FPhoA := TPhotoAlbum.Create;
     FViewIndex := -1;
@@ -873,16 +876,16 @@ uses
     with fpMain.RegIniFile do begin
        // Load misc settings
       ViewInfoPos   := Rect(
-                       ReadInteger(SRegPrefs, 'ViewInfoPosL', 90),
-                       ReadInteger(SRegPrefs, 'ViewInfoPosT', 9400),
-                       ReadInteger(SRegPrefs, 'ViewInfoPosR', 9910),
-                       ReadInteger(SRegPrefs, 'ViewInfoPosB', 9880));
-      pGroups.Width := ReadInteger(SRegPrefs, 'GroupsWidth',  150);
+                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosL', 90),
+                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosT', 9400),
+                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosR', 9910),
+                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosB', 9880));
+      pGroups.Width := ReadInteger(SRegPrefs_Root, 'GroupsWidth',  150);
        // Load history
       mruOpen.LoadFromRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
     end;
      // Load toolbars
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegToolbars);
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
      // Если нужно и присутствует ini-файл, подгружаем настройки из него
     if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
       sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
@@ -902,13 +905,13 @@ uses
     RootSetting.RegSave(fpMain.RegIniFile);
     with fpMain.RegIniFile do begin
        // Save misc settings
-      WriteInteger(SRegPrefs, 'ViewInfoPosL', ViewInfoPos.Left);
-      WriteInteger(SRegPrefs, 'ViewInfoPosT', ViewInfoPos.Top);
-      WriteInteger(SRegPrefs, 'ViewInfoPosR', ViewInfoPos.Right);
-      WriteInteger(SRegPrefs, 'ViewInfoPosB', ViewInfoPos.Bottom);
-      WriteInteger(SRegPrefs, 'GroupsWidth',  pGroups.Width);
+      WriteInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left);
+      WriteInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top);
+      WriteInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right);
+      WriteInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom);
+      WriteInteger(SRegPrefs_Root, 'GroupsWidth',  pGroups.Width);
        // Save toolbars
-      TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegToolbars);
+      TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
        // Save history
       mruOpen.SaveToRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
     end;
@@ -951,10 +954,10 @@ uses
       RootSetting.IniLoad(fi);
        // Load misc settings
       ViewInfoPos := Rect(
-        fi.ReadInteger(SRegPrefs, 'ViewInfoPosL', ViewInfoPos.Left),
-        fi.ReadInteger(SRegPrefs, 'ViewInfoPosT', ViewInfoPos.Top),
-        fi.ReadInteger(SRegPrefs, 'ViewInfoPosR', ViewInfoPos.Right),
-        fi.ReadInteger(SRegPrefs, 'ViewInfoPosB', ViewInfoPos.Bottom));
+        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left),
+        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top),
+        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right),
+        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom));
     finally
       fi.Free;
     end;
@@ -971,10 +974,10 @@ uses
        // Сохраняем основные (определяемые пользователем) установки
       RootSetting.IniSave(fi);
        // Save misc settings
-      fi.WriteInteger(SRegPrefs, 'ViewInfoPosL', ViewInfoPos.Left);
-      fi.WriteInteger(SRegPrefs, 'ViewInfoPosT', ViewInfoPos.Top);
-      fi.WriteInteger(SRegPrefs, 'ViewInfoPosR', ViewInfoPos.Right);
-      fi.WriteInteger(SRegPrefs, 'ViewInfoPosB', ViewInfoPos.Bottom);
+      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left);
+      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top);
+      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right);
+      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom);
     finally
       fi.Free;
     end;

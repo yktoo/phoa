@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
+//  $Id: phValSetting.pas,v 1.5 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -285,25 +285,25 @@ type
 
   procedure TPhoaValSetting.IniLoad(IniFile: TIniFile);
   begin
-    if ID<>0 then AsString := IniFile.ReadString(SRegPrefs, Name, AsString);
+    if ID<>0 then AsString := IniFile.ReadString(SRegPrefs_Root, Name, AsString);
     inherited IniLoad(IniFile);
   end;
 
   procedure TPhoaValSetting.IniSave(IniFile: TIniFile);
   begin
-    if ID<>0 then IniFile.WriteString(SRegPrefs, Name, AsString);
+    if ID<>0 then IniFile.WriteString(SRegPrefs_Root, Name, AsString);
     inherited IniSave(IniFile);
   end;
 
   procedure TPhoaValSetting.RegLoad(RegIniFile: TRegIniFile);
   begin
-    if ID<>0 then AsString := RegIniFile.ReadString(SRegPrefs, Name, AsString);
+    if ID<>0 then AsString := RegIniFile.ReadString(SRegPrefs_Root, Name, AsString);
     inherited RegLoad(RegIniFile);
   end;
 
   procedure TPhoaValSetting.RegSave(RegIniFile: TRegIniFile);
   begin
-    if ID<>0 then RegIniFile.WriteString(SRegPrefs, Name, AsString);
+    if ID<>0 then RegIniFile.WriteString(SRegPrefs_Root, Name, AsString);
     inherited RegSave(RegIniFile);
   end;
 
@@ -565,9 +565,9 @@ type
     FDataOffset := AllocateInternalDataArea(SizeOf(Pointer));
     Align := alClient;
     with Header do begin
-      Columns.Add.Width := 300;
       Columns.Add;
-      AutoSizeIndex := 1;
+      Columns.Add.Width := 200;
+      AutoSizeIndex := 0;
       Options := Options+[hoAutoResize];
     end;
     with TreeOptions do begin

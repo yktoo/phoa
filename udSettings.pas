@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.8 2004-04-23 19:26:30 dale Exp $
+//  $Id: udSettings.pas,v 1.9 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,13 +10,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings,
-  phDlg, TB2Dock, TB2Toolbar, TBX, DTLangTools, StdCtrls, ExtCtrls;
+  phDlg, TB2Dock, TB2Toolbar, TBX, DTLangTools, StdCtrls, ExtCtrls,
+  Placemnt;
 
 type
   TdSettings = class(TPhoaDialog)
     pMain: TPanel;
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
+    fpMain: TFormPlacement;
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
@@ -115,6 +117,10 @@ uses phUtils, Main, TypInfo;
   procedure TdSettings.InitializeDialog;
   begin
     inherited InitializeDialog;
+    MakeSizeable;
+     // Настраиваем fpMain
+    fpMain.IniFileName := SRegRoot;
+    fpMain.IniSection  := SRegSettings_Root;
      // Копируем настройки
     FLocalRootSetting := TPhoaSetting.Create(nil, 0, '');
     FLocalRootSetting.Assign(RootSetting);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udPicProps.pas,v 1.3 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -134,10 +134,7 @@ uses
     FileInfo: TSHFileInfo;
   begin
     inherited InitializeDialog;
-    BorderStyle := bsSizeable;
-    AutoScroll := False;
-     // Создаём size gripper
-    TSizeGripper.Create(Self).Parent := pButtonsBottom;
+    MakeSizeable;
      // Настраиваем fpMain
     fpMain.IniFileName := SRegRoot;
     fpMain.IniSection  := SRegPicProps_Root;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.13 2004-04-30 13:17:00 dale Exp $
+//  $Id: ConsVars.pas,v 1.14 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -315,13 +315,19 @@ const
 
    // Ключи реестра для сохранения настроек
   SRegRoot                        = 'Software\DaleTech\PhoA';
-  SRegPrefs                       = 'Preferences';
-  SRegPrefTools                   = SRegPrefs+'\Tools';
-  SRegToolbars                    = SRegRoot+'\Toolbars';
+
+  SRegMainWindow_Root             = 'MainWindow';
+  SRegMainWindow_Toolbars         = SRegMainWindow_Root+'\Toolbars';
+
+  SRegPrefs_Root                  = 'Preferences';
+    SRegPrefs_Tools               = SRegPrefs_Root+'\Tools';
+
   SRegOpen_Root                   = 'Open';
   SRegOpen_FilesMRU               = SRegOpen_Root+'\FilesMRU';
 
   SRegDialogsRoot                 = 'Dialogs';
+
+  SRegSettings_Root               = SRegDialogsRoot+'\SettingsDialog';
 
   SRegAddFiles_Root               = SRegDialogsRoot+'\AddFilesWizard';
     SRegAddFiles_MaskMRU          = SRegAddFiles_Root+'\FileMaskMRU';
@@ -346,6 +352,8 @@ const
 
   SRegSort_Root                   = SRegDialogsRoot+'\Sort';
     SRegSort_LastSortings         = SRegSort_Root+'\LastSortings';
+
+  SRegStats_Root                  = SRegDialogsRoot+'\Stats';
 
    // Недопустимые в пути к файлу символы
   SInvalidPathChars               = '\/:*?"<>|';

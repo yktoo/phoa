@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.5 2004-04-23 19:26:29 dale Exp $
+//  $Id: phDlg.pas,v 1.6 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -48,6 +48,9 @@ type
     procedure ButtonClick_OK; virtual;
     procedure ButtonClick_Cancel; virtual;
     procedure ButtonClick_Help; virtual;
+     // Делает диалог окном изменяемого размера. Необходимо вызывать из InitializeDialog, иначе возникают проблемы при
+     //   использовании Large Fonts (если вызывать при создании диалога)
+    procedure MakeSizeable;
      // Prop handler. В базовом классе всегда возвращает True
     function  GetDataValid: Boolean; virtual;
   public
@@ -73,7 +76,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, ChmHlp, ConsVars, phSettings;
+uses phUtils, ChmHlp, ConsVars, phSettings, phObj;
 
    //===================================================================================================================
    // TPhoaDialog
@@ -165,6 +168,18 @@ uses phUtils, ChmHlp, ConsVars, phSettings;
   begin
     inherited Loaded;
     AutoScroll := False;
+  end;
+
+  procedure TPhoaDialog.MakeSizeable;
+  begin
+     // Делаем sizeable
+    BorderStyle := bsSizeable;
+    AutoScroll := False;
+     // Переписываем текущие размеры в качестве минимальных
+    Constraints.MinWidth  := Width;
+    Constraints.MinHeight := Height;
+     // Создаём size gripper
+    TSizeGripper.Create(Self).Parent := pButtonsBottom;
   end;
 
   procedure TPhoaDialog.SetHasUpdates(Value: Boolean);

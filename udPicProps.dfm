@@ -185,8 +185,8 @@ inherited dPicProps: TdPicProps
       0400000704000016040000220400000000000000000000}
   end
   object fpMain: TFormPlacement
-    IniFileName = 'Software\DaleTech\PhoA'
-    IniSection = 'PicPropsDialog'
+    IniFileName = '\\\'
+    IniSection = '\\\'
     UseRegistry = True
     Left = 32
     Top = 400

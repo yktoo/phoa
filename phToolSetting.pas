@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.5 2004-04-30 13:17:00 dale Exp $
+//  $Id: phToolSetting.pas,v 1.6 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -236,7 +236,7 @@ type
 
   function TPhoaToolSetting.GetStoreSection: String;
   begin
-    Result := Format('%s\Item%.3d', [SRegPrefTools, Index]);
+    Result := Format('%s\Item%.3d', [SRegPrefs_Tools, Index]);
   end;
 
   procedure TPhoaToolSetting.IniLoad(IniFile: TIniFile);
@@ -307,7 +307,7 @@ type
   var i, iCount: Integer;
   begin
      // Получаем количество детей
-    iCount := RegIniFile.ReadInteger(SRegPrefTools, 'Count', -1);
+    iCount := RegIniFile.ReadInteger(SRegPrefs_Tools, 'Count', -1);
      // Если сохранение не производилось, оставляем всё как есть. Иначе загружаем инструменты
     if iCount>=0 then begin
       ClearChildren;
@@ -318,9 +318,9 @@ type
   procedure TPhoaToolPageSetting.RegSave(RegIniFile: TRegIniFile);
   begin
      // Стираем секцию инструментов
-    RegIniFile.EraseSection(SRegPrefTools);
+    RegIniFile.EraseSection(SRegPrefs_Tools);
      // Пишем количество инструментов
-    RegIniFile.WriteInteger(SRegPrefTools, 'Count', ChildCount);
+    RegIniFile.WriteInteger(SRegPrefs_Tools, 'Count', ChildCount);
      // Сохраняем всех детей
     inherited RegSave(RegIniFile);
   end;
@@ -587,17 +587,17 @@ type
     with Header do begin
       with Columns.Add do begin
         Width := 150;
-        Text  := 'Name'{!!!};
+        Text  := ConstVal('SText_Name');
       end;
       with Columns.Add do begin
         Width := 70;
-        Text  := 'Kind'{!!!};
+        Text  := ConstVal('SText_Kind');
       end;
       with Columns.Add do begin
         Width := 80;
-        Text  := 'Masks'{!!!};
+        Text  := ConstVal('SText_Masks');
       end;
-      Columns.Add.Text := 'Application'{!!!};
+      Columns.Add.Text := ConstVal('SText_Application');
       AutoSizeIndex := 3;
       Options       := Options+[hoAutoResize, hoVisible];
     end;

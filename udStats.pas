@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.4 2004-04-28 04:33:19 dale Exp $
+//  $Id: udStats.pas,v 1.5 2004-05-01 04:03:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, PhObj, ConsVars, VirtualShellUtilities,
-  Dialogs, phDlg, DTLangTools, StdCtrls, VirtualTrees, ExtCtrls;
+  Dialogs, phDlg, DTLangTools, StdCtrls, VirtualTrees, ExtCtrls, Placemnt;
 
 type
   PPStatsData = ^PStatsData;
@@ -23,6 +23,7 @@ type
 
   TdStats = class(TPhoaDialog)
     tvMain: TVirtualStringTree;
+    fpMain: TFormPlacement;
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
@@ -106,7 +107,7 @@ uses phUtils, Main, phPhoa, phSettings;
         Inc(iCntPics, Group.PicIDs.Count);
          // Добавляем ID изображений в список
         for i := 0 to Group.PicIDs.Count-1 do IDs.Add(Group.PicIDs[i]);
-         // Рекурсивно вызываем для вложенных групп 
+         // Рекурсивно вызываем для вложенных групп
         for i := 0 to Group.Groups.Count-1 do begin
           gChild := Group.Groups[i];
           Inc(iCntNestedGroups);
@@ -180,6 +181,11 @@ uses phUtils, Main, phPhoa, phSettings;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_stats;
+    MakeSizeable;
+     // Настраиваем fpMain
+    fpMain.IniFileName := SRegRoot;
+    fpMain.IniSection  := SRegStats_Root;
+     // Настраиваем tvMain
     tvMain.NodeDataSize := SizeOf(Pointer);
     ApplyTreeSettings(tvMain);
      // Заполняем данные
@@ -195,7 +201,7 @@ uses phUtils, Main, phPhoa, phSettings;
        // -- Текущая группа
       if (FGroup<>nil) and (FGroup<>FPhoA.RootGroup) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));
-          AddGroupStats(FGroup, n0);
+        AddGroupStats(FGroup, n0);
       end;
        // Разворачиваем всё дерево
       tvMain.FullExpand;
