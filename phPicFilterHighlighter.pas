@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicFilterHighlighter.pas,v 1.5 2004-12-05 16:19:50 dale Exp $
+//  $Id: phPicFilterHighlighter.pas,v 1.6 2004-12-06 20:19:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -403,18 +403,22 @@ var
   procedure TSynPicFilterSyn.Proc_String;
   var c: Char;
   begin
-    FTokenID := tkString;
-    FRange := rsString;
-    repeat
-      Inc(Run);
-      c := FLine[Run];
-       // ƒве одинарных кавычки €вл€ютс€ частью литерала
-      if c='''' then
-        if FLine[Run+1]='''' then Inc(Run) else Break;
-    until c in [#0, #10, #13];
-    if c='''' then begin
-      Inc(Run); // «акрывающа€ кавычка тоже €вл€етс€ частью литерала
-      FRange := rsUnknown;
+    if FLine[Run]=#0 then
+      Proc_Null
+    else begin
+      FTokenID := tkString;
+      FRange := rsString;
+      repeat
+        Inc(Run);
+        c := FLine[Run];
+         // ƒве одинарных кавычки €вл€ютс€ частью литерала
+        if c='''' then
+          if FLine[Run+1]='''' then Inc(Run) else Break;
+      until c in [#0, #10, #13];
+      if c='''' then begin
+        Inc(Run); // «акрывающа€ кавычка тоже €вл€етс€ частью литерала
+        FRange := rsUnknown;
+      end;
     end;
   end;
 
