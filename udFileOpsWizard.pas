@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.13 2004-09-05 11:32:36 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.14 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -743,7 +743,7 @@ uses
     case SelPicMode of
       fospmSelPics:   FSelectedPics.AddFromPicIDs(FPhoA, FViewerSelPicIDs, False);
       fospmAll:       FSelectedPics.CopyFromPhoa(FPhoA);
-      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.AddFromGroup(FPhoA, TPhoaGroup(FSelectedGroups[i]), False);
+      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.AddFromGroup(FPhoA, TPhoaGroup(FSelectedGroups[i]), False, False);
     end;
      // Удаляем [не]существующие
     if FSelPicValidityFilter<>fospvfAny then
@@ -1061,7 +1061,7 @@ uses
            // Создаём файл, если он ещё не создан
           if FL=nil then FL := FRepair_FileLinks.Add(SRec.Name, sPath, SRec.Size, FileDateToDateTime(SRec.Time));
            // Добавляем ему ссылку
-          FL.PicLinks.Add(Pic); 
+          FL.PicLinks.Add(Pic, False); 
         end;
       end;
     end;

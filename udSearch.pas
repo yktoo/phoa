@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.7 2004-09-05 11:32:36 dale Exp $
+//  $Id: udSearch.pas,v 1.8 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -697,7 +697,7 @@ type
             saCurGroup: Pic := FPhoA.Pics.PicByID(FCurGroup.PicIDs[i]);
             else        Pic := FPhoA.Pics.PicByID(FResultsGroup.PicIDs[i]);
           end;
-          if Matches(Pic) then FLocalResults.Add(Pic);
+          if Matches(Pic) then FLocalResults.Add(Pic, True);
         end;
       finally
         FMasks.Free;

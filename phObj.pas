@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.30 2004-06-27 17:44:23 dale Exp $
+//  $Id: phObj.pas,v 1.31 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -69,14 +69,14 @@ type
      // Копирует ссылки на изображения с Src. Если RestrictLinks=nil, то копирует все изображения, иначе - только те,
      //   ID которых содержатся в RestrictLinks
     procedure Assign(Src: TPhoaPics; RestrictLinks: TPhoaPicLinks);
-     // Добавляет изображения в список. При сортированном списке дубликаты игнорируются
-    function Add(Pic: TPhoaPic): Integer;
+     // Добавляет изображения в список. При bSkipDuplicates=True дубликаты игнорируются
+    function Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer;
      // Ищет изображение по ID и возвращает True, если нашла, а в Index - позицию найденного изображения. Если
      //   изображения с таким ID не найдено, возвращает False, а в Index - позицию изображения с ближайшим бОльшим ID
     function FindID(iID: Integer; var Index: Integer): Boolean;
      // Копирует все ссылки на изображения с группы. При bReplace=True предварительно стирает список (если Group=nil,
-     //   просто очищает список)
-    procedure AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace: Boolean);
+     //   просто очищает список). При bRecurse также добавляет изображения из вложенных групп
+    procedure AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
      // Копирует все ссылки на изображения с массива ID изображений. При bReplace=True предварительно стирает список
     procedure AddFromPicIDs(PhoA: TPhotoAlbum; const aPicIDs: TIDArray; bReplace: Boolean);
      // Копирует все ссылки на изображения с фотоальбома
@@ -1312,7 +1312,7 @@ type
      //     iTopIndex задаёт желаемый индекс верхнего эскиза
     procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopIndex: Integer);
      // Устанавливает группу Group для просмотра в качестве текущей
-    procedure ViewGroup(Group: TPhoaGroup);
+    procedure ViewGroup(Group: TPhoaGroup; bRecurse: Boolean);
      // Снимает выделение со всех эскизов
     procedure SelectNone;
      // Выделяет все эскизы
@@ -1869,26 +1869,33 @@ type
    // TPhoaPicLinks
    //-------------------------------------------------------------------------------------------------------------------
 
-  function TPhoaPicLinks.Add(Pic: TPhoaPic): Integer;
+  function TPhoaPicLinks.Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer;
   begin
-    if not FSorted then Result := inherited Add(Pic)
-    else if not FindID(Pic.ID, Result) then Insert(Result, Pic);
+    if FSorted or bSkipDuplicates then begin
+      if not FindID(Pic.ID, Result) then Insert(Result, Pic);
+    end else
+      Result := inherited Add(Pic);
   end;
 
-  procedure TPhoaPicLinks.AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace: Boolean);
+  procedure TPhoaPicLinks.AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
   var i: Integer;
   begin
     if bReplace then Clear;
      // Копируем ссылки на изображения, принадлежащие группе
-    if Group<>nil then
-      for i := 0 to Group.PicIDs.Count-1 do Add(PhoA.Pics.PicByID(Group.PicIDs[i]));
+    if Group<>nil then begin
+       // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды
+      for i := 0 to Group.PicIDs.Count-1 do Add(PhoA.Pics.PicByID(Group.PicIDs[i]), bRecurse);
+       // Если рекурсивное добавление - повторяем то же для вложенных групп
+      if bRecurse then
+        for i := 0 to Group.Groups.Count-1 do AddFromGroup(PhoA, Group.Groups[i], False, True);
+    end;
   end;
 
   procedure TPhoaPicLinks.AddFromPicIDs(PhoA: TPhotoAlbum; const aPicIDs: TIDArray; bReplace: Boolean);
   var i: Integer;
   begin
     if bReplace then Clear;
-    for i := 0 to High(aPicIDs) do Add(PhoA.Pics.PicByID(aPicIDs[i]));
+    for i := 0 to High(aPicIDs) do Add(PhoA.Pics.PicByID(aPicIDs[i]), True);
   end;
 
   procedure TPhoaPicLinks.Assign(Src: TPhoaPics; RestrictLinks: TPhoaPicLinks);
@@ -1902,7 +1909,7 @@ type
       Clear;
       for i := 0 to Src.Count-1 do begin
         Pic := Src[i];
-        if RestrictLinks.IndexOfID(Pic.ID)>=0 then Add(Pic);
+        if RestrictLinks.IndexOfID(Pic.ID)>=0 then Add(Pic, False);
       end;
     end;
   end;
@@ -2820,7 +2827,7 @@ type
     if FList<>Value then begin
       if FList<>nil then FList.Remove(Self);
       FList := Value;
-      if FList<>nil then FList.Add(Self);
+      if FList<>nil then FList.Add(Self, False);
     end;
   end;
 
@@ -3906,7 +3913,7 @@ var
     end else begin
       with Streamer do begin
          // Write photo album 'metadata'
-        WriteChunkString(IPhChunk_Remark,           Format('Created by PhoA %s, %s', [SAppVersion, ConstVal('SWebsite')]));
+        WriteChunkString(IPhChunk_Remark,           Format('Created by PhoA %s, %s', [SAppVersion, SWebsite]));
          // Write photo album properties
         WriteChunkString(IPhChunk_PhoaGenerator,    'PhoA '+SAppVersion);
         WriteChunkInt   (IPhChunk_PhoaSavedDate,    DateToPhoaDate(Date));
@@ -6309,7 +6316,7 @@ var
       if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := nil;
       FPhoA := Value;
       if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := PhoaThumbDimensionsChanged;
-      ViewGroup(nil);
+      ViewGroup(nil, False);
     end;
   end;
 
@@ -6398,7 +6405,7 @@ var
     SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
   end;
 
-  procedure TThumbnailViewer.ViewGroup(Group: TPhoaGroup);
+  procedure TThumbnailViewer.ViewGroup(Group: TPhoaGroup; bRecurse: Boolean);
   var iItemIdx: Integer;
   begin
     BeginUpdate;
@@ -6406,7 +6413,7 @@ var
        // Находим новый GroupID
       if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
        // Копируем ссылки на изображения по их IDs из группы
-      FPicLinks.AddFromGroup(FPhoA, Group, True);
+      FPicLinks.AddFromGroup(FPhoA, Group, True, bRecurse);
        // Стираем кэш эскизов
       LimitCacheSize(0);
        // Стираем выделение

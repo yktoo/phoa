@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.23 2004-09-02 14:20:38 dale Exp $
+//  $Id: ufImgView.pas,v 1.24 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1198,7 +1198,7 @@ uses
       PicLinks := TPhoaPicLinks.Create(True);
       try
          // Добавляем просматриваемое изображение
-        if not FErroneous then PicLinks.Add(FPic);
+        if not FErroneous then PicLinks.Add(FPic, True);
         AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, PicLinks);
       finally
         PicLinks.Free;
@@ -1324,7 +1324,7 @@ uses
       PicLinks := TPhoaPicLinks.Create(True);
       try
          // Добавляем просматриваемое изображение
-        PicLinks.Add(FPic);
+        PicLinks.Add(FPic, True);
          // Выполняем инструмент
         (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
       finally

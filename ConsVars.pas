@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.48 2004-09-05 11:32:36 dale Exp $
+//  $Id: ConsVars.pas,v 1.49 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -362,6 +362,9 @@ const
   SDefaultIniFileName             = 'phoa.'+SDefaultIniFileExt;
    // Имя исполняемого файла
   SPhoaExecutableFileName         = 'phoa.exe';
+
+   // Web-сайт
+  SWebsite                        = 'http://www.dk-soft.org/'; 
 
    // Путь к каталогу с языковыми файлами
   SRelativeLangFilesPath          = 'Language\';

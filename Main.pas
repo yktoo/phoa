@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.33 2004-09-02 14:20:37 dale Exp $
+//  $Id: Main.pas,v 1.34 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -184,6 +184,8 @@ type
     aRemoveSearchResults: TAction;
     iRemoveSearchResults: TTBXItem;
     dklcMain: TDKLanguageController;
+    aFlatMode: TAction;
+    iFlatMode: TTBXItem;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -249,6 +251,7 @@ type
     procedure FormActivate(Sender: TObject);
     procedure aaRemoveSearchResults(Sender: TObject);
     procedure dklcMainLanguageChanged(Sender: TObject);
+    procedure aaFlatMode(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -487,6 +490,12 @@ uses
   begin
     ResetMode;
     if DoSearch(FPhoA, CurGroup, FSearchResults) then DisplaySearchResults(False, True);
+  end;
+
+  procedure TfMain.aaFlatMode(Sender: TObject);
+  begin
+    aFlatMode.Checked := not aFlatMode.Checked;
+    ViewerRefresh;
   end;
 
   procedure TfMain.aaHelpContents(Sender: TObject);
@@ -1104,7 +1113,7 @@ uses
       FViewer.BeginUpdate;
       try
         Group := CurGroup;
-        FViewer.ViewGroup(Group);
+        FViewer.ViewGroup(Group, aFlatMode.Checked);
          // Если группа не поменялась, восстанавливаем параметры отображения
         if (Group<>nil) and (Group.ID=FSavedGroupID) then
           FViewer.RestoreDisplay(FViewerSavedSelectedIDs, FViewerSavedFocusedID, FViewerSavedTopIndex);
@@ -1268,7 +1277,7 @@ uses
     try
        // Если активны группы - составляем список ссылок на изображения текущей группы
       if tvGroups.Focused then begin
-        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False);
+        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False, False);
        // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
       end else if Viewer.Focused then
         Result.AddFromPicIDs(FPhoA, PicArrayToIDArray(Viewer.GetSelectedPicArray), False);
@@ -1825,7 +1834,7 @@ uses
 
   procedure TfMain.ViewerRefresh;
   begin
-    FViewer.ViewGroup(CurGroup);
+    FViewer.ViewGroup(CurGroup, aFlatMode.Checked);
   end;
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);

@@ -7,8 +7,8 @@ inherited dFileOpsWizard: TdFileOpsWizard
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
-      'lHeading.Caption'
-      '*.SecondaryShortCuts')
+      '*.SecondaryShortCuts'
+      'lHeading.Caption')
     Left = 92
     Top = 368
     LangData = {

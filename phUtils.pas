@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.21 2004-09-02 14:20:38 dale Exp $
+//  $Id: phUtils.pas,v 1.22 2004-09-07 18:51:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -863,7 +863,7 @@ var
 
   procedure OpenWebsite;
   begin
-    ShellExecute(Application.Handle, 'open', PChar(ConstVal('SWebsite')), nil, nil, SW_SHOWNORMAL);
+    ShellExecute(Application.Handle, 'open', SWebsite, nil, nil, SW_SHOWNORMAL);
   end;
 
 end.
