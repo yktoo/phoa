@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.14 2004-09-22 15:12:33 dale Exp $
+;  $Id: phoa.dklang,v 1.15 2004-09-24 14:09:16 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -630,8 +630,6 @@ ISettingID_Browse_GT_HintTips=Display if item is truncated at window edge
 ISettingID_Browse_MaxUndoCount=Max. undo count
 ISettingID_Browse_Viewer=Thumbnail view window
 ISettingID_Browse_ViewerBkColor=Background color:
-ISettingID_Browse_ViewerCacheSze=Thumbnail cache size (number of thumbnails):
-ISettingID_Browse_ViewerCacheThs=Cache thumbnails while viewing
 ISettingID_Browse_ViewerDragDrop=Drag'n'Drop
 ISettingID_Browse_ViewerStchFilt=Resampling filter
 ISettingID_Browse_ViewerThBColor=Thumbnail background color:

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.11 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.12 2004-09-24 14:09:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -558,7 +558,7 @@ uses
 
   procedure TfAddFilesWizard.ProcPage_PaintThumbnail(Bitmap: TBitmap);
   begin
-    if FLastProcessedPic<>nil then FLastProcessedPic.PaintThumbnail(Bitmap);
+//!!!    if FLastProcessedPic<>nil then FLastProcessedPic.PaintThumbnail(Bitmap);
   end;
 
   procedure TfAddFilesWizard.SettingsRestore(rif: TRegIniFile);

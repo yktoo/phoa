@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.9 2004-09-23 14:36:15 dale Exp $
+//  $Id: phGUIObj.pas,v 1.10 2004-09-24 14:09:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -80,8 +80,6 @@ type
     FSelIndexes: TIntegerList;
      // Индекс активного эскиза
     FItemIndex: Integer;
-     // Кэш bmp-изображений эскизов
-    FThumbCache: TList;
      // Индекс эскиза, с которого началось поточное выделение (Shift+[стрелки] или Shift+[клик])
     FStreamSelStart: Integer;
      // Индекс эскиза, который будет выделен (ItemIndex), если пользователь отожмёт левую кнопку мыши, не сдвинув мышь
@@ -108,14 +106,12 @@ type
     FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
     FGroupID: Integer;
-    FCacheThumbnails: Boolean;
     FDragInsideEnabled: Boolean;
     FOnSelectionChange: TNotifyEvent;
     FBorderStyle: TBorderStyle;
     FDragEnabled: Boolean;
     FShowThumbTooltips: Boolean;
     FThumbTooltipProps: TPicProperties;
-    FThumbCacheSize: Integer;
     FThumbBackColor: TColor;
     FThumbFontColor: TColor;
     FOnStartViewMode: TNotifyEvent;
@@ -156,13 +152,6 @@ type
     procedure DoSelectionChange;
      // Вызывает OnStartViewMode
     procedure DoStartViewMode;
-     // Возвращает ссылку на кэшированный эскиз _Pic, если он есть в кэше, иначе возвращает nil
-    function  GetCachedThumb(_Pic: TPhoaPic): TBitmap;
-     // Помещает эскиз в кэш. После этого кэш становится владельцем Bitmap. Должна вызываться только в том случае, если
-     //   в кэше нет данного изображения!
-    procedure PutThumbToCache(Pic: TPhoaPic; Bitmap: TBitmap);
-     // Урезает размер кэша до iNumber изображений или совсем, если кэширование отключено
-    procedure LimitCacheSize(iNumber: Integer);
      // Настраивает ScrollBar
     procedure UpdateScrollBar;
      // Выделяет диапазон индексов эскизов и сдвигает ItemIndex в idxEnd. При bRectangular=False выделяет эскизы подряд
@@ -191,7 +180,6 @@ type
     procedure SetBorderStyle(Value: TBorderStyle);
     function  GetSelCount: Integer;
     procedure SetItemIndex(Value: Integer);
-    procedure SetCacheThumbnails(Value: Boolean);
     function  GetSelectedIndexes(Index: Integer): Integer;
     function  GetIDSelected(iID: Integer): Boolean;
     function  GetSelectedPics(Index: Integer): TPhoaPic;
@@ -200,7 +188,6 @@ type
     procedure SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
     procedure SetShowThumbTooltips(Value: Boolean);
     procedure SetThumbTooltipProps(Value: TPicProperties);
-    procedure SetThumbCacheSize(Value: Integer);
     procedure SetThumbBackColor(Value: TColor);
     procedure SetThumbFontColor(Value: TColor);
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
@@ -255,7 +242,7 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
      // Props
-    property DisplayMode: TThumbViewerDisplayMode read FDisplayMode write SetDisplayMode; 
+    property DisplayMode: TThumbViewerDisplayMode read FDisplayMode write SetDisplayMode;
      // -- Флаг, разрешающий перетаскивание эскизов
     property DragEnabled: Boolean read FDragEnabled write FDragEnabled;
      // -- Флаг, разрешающий перестановку эскизов внутри окна с помощью Drag'n'Drop. Если перестановка запрещена, а
@@ -278,8 +265,6 @@ type
     property SelectedPics[Index: Integer]: TPhoaPic read GetSelectedPics;
      // -- Если True, отображает всплывающие описания эскизов
     property ShowThumbTooltips: Boolean read FShowThumbTooltips write SetShowThumbTooltips;
-     // -- Размер кэша эскизов
-    property ThumbCacheSize: Integer read FThumbCacheSize write SetThumbCacheSize;
      // -- Данные, отображаемые на эскизах
     property ThumbCornerDetails[Corner: TThumbCorner]: TThumbCornerDetail read GetThumbCornerDetails write SetThumbCornerDetails;
      // -- Данные, отображаемые на всплывающих описаниях эскизов
@@ -297,8 +282,6 @@ type
     property BevelOuter;
     property BiDiMode;
     property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
-     // -- Кэшировать ли эскизы при просмотре
-    property CacheThumbnails: Boolean read FCacheThumbnails write SetCacheThumbnails default True;
     property Color default clBtnFace;
     property Constraints;
     property Ctl3D;
@@ -369,14 +352,6 @@ type
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses Math, Themes, phUtils;
-
-type
-   // Запись кэша эскиза
-  PThumbCacheRec = ^TThumbCacheRec;
-  TThumbCacheRec = record
-    Pic: TPhoaPic;
-    Thumb: TBitmap;
-  end;
 
    //===================================================================================================================
    // TThumbnailViewer
@@ -517,7 +492,6 @@ type
     Color                 := clBtnFace;
     FBorderStyle          := bsSingle;
     FColCount             := 1;
-    FCacheThumbnails      := True;
     FNoMoveItemIndex      := -1;
     FPicLinks             := TPhoaPicLinks.Create(False);
     FSelIndexes           := TIntegerList.Create(False);
@@ -525,7 +499,6 @@ type
     FThumbBackBorderStyle := tbbsXP;
     FThumbBackColor       := clBtnFace;
     FThumbFontColor       := clWindowText;
-    FThumbCache           := TList.Create;
     FThumbnailSize.cx     := IDefaultThumbWidth;
     FThumbnailSize.cy     := IDefaultThumbHeight;
   end;
@@ -562,8 +535,6 @@ type
   destructor TThumbnailViewer.Destroy;
   begin
     FSelIndexes.Free;
-    LimitCacheSize(0);
-    FThumbCache.Free;
     FPicLinks.Free;
     FBuffer.Free;
     FShadow.Free;
@@ -688,20 +659,6 @@ type
       Refresh;
       DoSelectionChange;
     end;
-  end;
-
-  function TThumbnailViewer.GetCachedThumb(_Pic: TPhoaPic): TBitmap;
-  var i: Integer;
-  begin
-    for i := 0 to FThumbCache.Count-1 do
-      with PThumbCacheRec(FThumbCache[i])^ do
-        if Pic=_Pic then begin
-          Result := Thumb;
-           // Перемещаем изображение в начало кэша
-          FThumbCache.Move(i, 0);
-          Exit;
-        end;
-    Result := nil;
   end;
 
   function TThumbnailViewer.GetDropTargetIndex: Integer;
@@ -832,20 +789,6 @@ type
           ScrollIntoView;
         end
       end;
-    end;
-  end;
-
-  procedure TThumbnailViewer.LimitCacheSize(iNumber: Integer);
-  var
-    i: Integer;
-    p: PThumbCacheRec;
-  begin
-    if not FCacheThumbnails then iNumber := 0;
-    for i := FThumbCache.Count-1 downto iNumber do begin
-      p := FThumbCache[i];
-      p.Thumb.Free;
-      Dispose(p);
-      FThumbCache.Delete(i);
     end;
   end;
 
@@ -1045,41 +988,13 @@ type
 
      // Отрисовывает эскиз в заданном прямоугольнике 
     procedure DrawThumbnail(const rThumb: TRect);
-    var
-      bCacheUsed: Boolean;
-      bmpThumb: TBitmap;
-      ix, iy: Integer;
+    var r: TRect;
     begin
-       // Ищем изображение в кэше
-      bmpThumb := GetCachedThumb(Pic);
-      bCacheUsed := bmpThumb<>nil;
-      try
-         // Если не нашли - создаём временный битмэп и переносим на него JPEG-изображение эскиза
-        if not bCacheUsed then begin
-          bmpThumb := TBitmap.Create;
-          Pic.PaintThumbnail(bmpThumb);
-        end;
-        ix := (rThumb.Left+rThumb.Right-bmpThumb.Width) div 2;
-        iy := (rThumb.Top+rThumb.Bottom-bmpThumb.Height) div 2;
-         // Рисуем эскиз
-        BitBlt(
-          Info.Bitmap.Canvas.Handle,
-          Max(ix, rThumb.Left),
-          Max(iy, rThumb.Top),
-          Min(bmpThumb.Width, rThumb.Right-rThumb.Left),
-          Min(bmpThumb.Height, rThumb.Bottom-rThumb.Top),
-          bmpThumb.Canvas.Handle,
-          0,
-          0,
-          SRCCOPY);
-         // Кэшируем эскиз при необходимости
-        if not bCacheUsed and FCacheThumbnails then begin
-          PutThumbToCache(Pic, bmpThumb);
-          bCacheUsed := True;
-        end;
-      finally
-        if not bCacheUsed then bmpThumb.Free;
-      end;
+       // Рисуем эскиз
+      r := rThumb;
+      PaintThumbnail(Pic.ThumbnailData, Pic.PicRotation, Pic.PicFlips, Info.Bitmap, r);
+       // Рисуем тень
+      DropShadow(Info.Bitmap, FShadow, r, 2, 2, clBlack{!!!});
     end;
 
   begin
@@ -1168,9 +1083,6 @@ type
           InflateRect(r, -iBorderWidth, -iBorderWidth);
         end;
         p^.FillRectS(r, Color32(iif(bSelected, aSelBackClr[Info.bFocused], FThumbBackColor)));
-
-         // Тень? !!!
-        p^.Draw(p^.Width-FShadow.Width, p^.Height-FShadow.Height, FShadow); 
       end;
       Result := p^;
     end;
@@ -1216,21 +1128,9 @@ type
   begin
     if not FShadowValid then begin
       if FShadow=nil then FShadow := TBitmap32.Create;
-      RenderShadow(FShadow, 10, 50, clBlack{!!!});
+      RenderShadowTemplate(FShadow, 8, 160, clBlack{!!!});
       FShadowValid := True;
     end;
-  end;
-
-  procedure TThumbnailViewer.PutThumbToCache(Pic: TPhoaPic; Bitmap: TBitmap);
-  var p: PThumbCacheRec;
-  begin
-     // Добавляем в кэш
-    New(p);
-    p^.Pic   := Pic;
-    p^.Thumb := Bitmap;
-    FThumbCache.Insert(0, p);
-     // Урезаем размер кэша
-    LimitCacheSize(FThumbCacheSize);
   end;
 
   procedure TThumbnailViewer.RemoveFromSelection(Index: Integer);
@@ -1350,14 +1250,6 @@ type
     end;  
   end;
 
-  procedure TThumbnailViewer.SetCacheThumbnails(Value: Boolean);
-  begin
-    if FCacheThumbnails<>Value then begin
-      FCacheThumbnails := Value;
-      LimitCacheSize(FThumbCacheSize);
-    end;
-  end;
-
   procedure TThumbnailViewer.SetDisplayMode(Value: TThumbViewerDisplayMode);
   begin
     if FDisplayMode<>Value then begin
@@ -1410,14 +1302,6 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.SetThumbCacheSize(Value: Integer);
-  begin
-    if FThumbCacheSize<>Value then begin
-      FThumbCacheSize := Value;
-      LimitCacheSize(Value);
-    end;
-  end;
-
   procedure TThumbnailViewer.SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
   begin
     FThumbCornerDetails[Corner] := Value;
@@ -1436,7 +1320,6 @@ type
   begin
     if (FThumbnailSize.cx<>Value.cx) or (FThumbnailSize.cy<>Value.cy) then begin
       FThumbnailSize := Value;
-      LimitCacheSize(0);
       CalcLayout;
     end;
   end;
@@ -1491,8 +1374,6 @@ type
       if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
        // Копируем ссылки на изображения по их IDs из группы
       FPicLinks.AddFromGroup(PhoA, Group, True, bRecurse);
-       // Стираем кэш эскизов
-      LimitCacheSize(0);
        // Стираем выделение
       ClearSelection;
       FTopOffset := 0;
@@ -1700,4 +1581,4 @@ type
   end;
 
 end.
- 
+

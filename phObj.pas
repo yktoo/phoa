@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.36 2004-09-17 14:07:32 dale Exp $
+//  $Id: phObj.pas,v 1.37 2004-09-24 14:09:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -283,12 +283,10 @@ type
     destructor Destroy; override;
      // Копирует все данные изображения
     procedure Assign(Src: TPhoaPic);
-     // Строит эскиз из файла и обновляет размер изображения и эскиза
-    procedure MakeThumbnail;
      // Распределяет новый ID, уникальный в списке
     procedure IDNeeded(List: TPhoaPics);
-     // Отрисовывает эскиз на битмэпе
-    procedure PaintThumbnail(Bitmap: TBitmap);
+     // Перестраивает эскиз и обновляет параметры эскиза, изображения и файла изображения
+    procedure ReloadPicFileData;
      // Составляет описание изображения из свойств Props, выбирая только указанные данные.
      //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
      //   sPropSep - разделительная строка между отдельными свойствами
@@ -309,7 +307,7 @@ type
      // -- Имя файла изображения
     property PicFileName: String read FPicFileName write FPicFileName;
      // -- Размер файла изображения
-    property PicFileSize: Integer read FPicFileSize write FPicFileSize;
+    property PicFileSize: Integer read FPicFileSize;
      // -- Номер или название плёнки
     property PicFilmNumber: String read FPicFilmNumber write FPicFilmNumber;
      // -- Флаги отражения изображения для вывода его на экран
@@ -319,7 +317,7 @@ type
      // -- Номер кадра
     property PicFrameNumber: String read FPicFrameNumber write FPicFrameNumber;
      // -- Высота изображения в пикселах
-    property PicHeight: Integer read FPicHeight write FPicHeight;
+    property PicHeight: Integer read FPicHeight;
      // -- Список ключевых слов
     property PicKeywords: TStrings read FPicKeywords;
      // -- Носитель с файлом изображения
@@ -331,7 +329,7 @@ type
      // -- Угол поворота изображения для вывода его на экран
     property PicRotation: TPicRotation read FPicRotation write FPicRotation;
      // -- Ширина изображения в пикселах
-    property PicWidth: Integer read FPicWidth write FPicWidth;
+    property PicWidth: Integer read FPicWidth;
      // -- Свойства по индексу
     property Props[PicProp: TPicProperty]: String read GetProps write SetProps;
      // -- Бинарные данные изображения (свойства, указанные в PProps)
@@ -1338,8 +1336,8 @@ resourcestring
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
-  TypInfo, Math, Registry, DateUtils, Clipbrd, ShellAPI, Themes, JPEG,
-  VirtualDataObject, GR32,  
+  TypInfo, Math, Registry, DateUtils, Clipbrd, ShellAPI, Themes,
+  VirtualDataObject, GR32,
   phUtils, phSettings, phGraphics;
 
   procedure PhoaWriteError;
@@ -2346,135 +2344,18 @@ type
     if FID=0 then FID := List.GetFreePicID;
   end;
 
-  procedure TPhoaPic.MakeThumbnail;
-  var
-    b: TBitmap32;
-    hF: THandle;
-    FindData: TWin32FindData;
-
-     // Осуществляет масштабирование картинки на битмэп bmp
-    procedure StretchGraphic(bmp: TBitmap32);
-    var
-      sScale: Single;
-      bmpFullSize: TBitmap32;
-    begin
-       // Создаём, загружаем картинку и превращаем её в Bitmap
-      bmpFullSize := LoadGraphicFromFile(FPicFileName);
-      try
-        bmpFullSize.StretchFilter := TStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt));
-        FPicWidth  := bmpFullSize.Width;
-        FPicHeight := bmpFullSize.Height;
-         // Определяем размеры эскиза
-        if (FPicWidth>0) and (FPicHeight>0) then
-          sScale := MinS(MinS(FPhoA.FThumbnailWidth/FPicWidth, FPhoA.FThumbnailHeight/FPicHeight), 1)
-        else
-          sScale := 1;
-         // Масштабируем изображение
-        with bmp do begin
-          Width  := Max(Round(FPicWidth*sScale), 1);
-          Height := Max(Round(FPicHeight*sScale), 1);
-          Draw(Rect(0, 0, Width, Height), Rect(0, 0, FPicWidth, FPicHeight), bmpFullSize);
-        end;
-      finally
-        bmpFullSize.Free;
-      end;
-    end;
-
-     // Превращает битмэп в JPEG и возвращает его данные в виде бинарной строки
-    function MakeRawJPEG(bmp32: TBitmap32): String;
-    var
-      Stream: TStringStream;
-      bmp: TBitmap;
-    begin
-       // Преобразуем TBitmap32 в TBitmap
-      bmp := TBitmap.Create;
-      try
-        bmp.Width  := bmp32.Width;
-        bmp.Height := bmp32.Height;
-        bmp.PixelFormat := pf24bit;
-        bmp32.DrawTo(bmp.Canvas.Handle, 0, 0);
-        with TJPEGImage.Create do
-          try
-             // Копируем эскиз
-            Assign(bmp);
-             // Сжимаем
-            CompressionQuality := FPhoA.FThumbnailQuality;
-            Compress;
-             // Сохраняем эскиз в поток
-            Stream := TStringStream.Create('');
-            try
-              SaveToStream(Stream);
-              Result := Stream.DataString;
-            finally
-              Stream.Free;
-            end;
-          finally
-            Free;
-          end;
-      finally
-        bmp.Free;
-      end;
-    end;
-
+  procedure TPhoaPic.ReloadPicFileData;
   begin
-     // Масштабируем изображение
-    b := TBitmap32.Create;
-    try
-      StretchGraphic(b);
-      FThumbWidth  := b.Width;
-      FThumbHeight := b.Height;
-      FThumbnailData := MakeRawJPEG(b);
-       // Получаем размер файла изображения
-      hF := FindFirstFile(PChar(FPicFileName), FindData);
-      if hF<>INVALID_HANDLE_VALUE then begin
-        Windows.FindClose(hF);
-        FPicFileSize := FindData.nFileSizeLow;
-      end else
-        FPicFileSize := 0;
-    finally
-      b.Free;
-    end;
-  end;
-
-  procedure TPhoaPic.PaintThumbnail(Bitmap: TBitmap);
-  var
-    Stream: TStringStream;
-    j: TJPEGImage;
-    Bmp32: TBitmap32;
-    Transform: TPicTransform;
-  begin
-    if FThumbnailData='' then Exit;
-    j := TJPEGImage.Create;
-    try
-       // Загружаем JPEG
-      Stream := TStringStream.Create(FThumbnailData);
-      try
-        j.LoadFromStream(Stream);
-      finally
-        Stream.Free;
-      end;
-       // Если есть, применяем преобразования
-      if (FPicRotation<>pr0) or (FPicFlips<>[]) then begin
-        Bmp32 := TBitmap32.Create;
-        try
-          Bmp32.Assign(j);
-          Transform := TPicTransform.Create(Bmp32);
-          try
-            Transform.Rotation := FPicRotation;
-            Transform.Flips    := FPicFlips;
-          finally
-            Transform.Free;
-          end;
-          Bitmap.Assign(Bmp32);
-        finally
-          Bmp32.Free;
-        end;
-       // Иначе просто отрисовываем изображение на битмэпе
-      end else
-        Bitmap.Assign(j);
-    finally
-      j.Free;
-    end;
+    FThumbnailData := GetThumbnailData(
+      FPicFileName,
+      FPhoA.FThumbnailWidth,
+      FPhoA.FThumbnailHeight,
+      TStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
+      FPhoA.FThumbnailQuality,
+      FPicWidth,
+      FPicHeight,
+      FThumbWidth,
+      FThumbHeight);
   end;
 
   procedure TPhoaPic.SetList(Value: TPhoaPics);
@@ -4342,7 +4223,7 @@ var
           IDNeeded(PhoA.Pics);
           Pic.List := PhoA.Pics;
           PicFileName := sFilename;
-          MakeThumbnail;
+          ReloadPicFileData;
         except
           Free;
           raise;
@@ -4575,22 +4456,22 @@ var
 
      // Копирует в буфер обмена bitmap-эскиз изображения Pic
     procedure CopyThumbBitmap(Pic: TPhoaPic);
-    var
-      bmp: TBitmap;
-      wFmt: Word;
-      hData: THandle;
-      hPal: HPALETTE;
+//!!!!!    var
+//      bmp: TBitmap;
+//      wFmt: Word;
+//      hData: THandle;
+//      hPal: HPALETTE;
     begin
-       // Отрисовываем эскиз
-      bmp := TBitmap.Create;
-      try
-        Pic.PaintThumbnail(bmp);
-         // Помещаем bitmap в clipboard
-        bmp.SaveToClipboardFormat(wFmt, hData, hPal);
-        Clipboard.SetAsHandle(wFmt, hData);
-      finally
-        bmp.Free;
-      end;
+//       // Отрисовываем эскиз
+//      bmp := TBitmap.Create;
+//      try
+//        Pic.PaintThumbnail(bmp);
+//         // Помещаем bitmap в clipboard
+//        bmp.SaveToClipboardFormat(wFmt, hData, hPal);
+//        Clipboard.SetAsHandle(wFmt, hData);
+//      finally
+//        bmp.Free;
+//      end;
     end;
 
   begin

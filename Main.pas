@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.40 2004-09-22 15:12:33 dale Exp $
+//  $Id: Main.pas,v 1.41 2004-09-24 14:09:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -893,8 +893,6 @@ uses
       try
         ThumbBackBorderStyle := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
         ThumbBackBorderColor := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
-        CacheThumbnails      := SettingValueBool(ISettingID_Browse_ViewerCacheThs);
-        ThumbCacheSize       := SettingValueInt (ISettingID_Browse_ViewerCacheSze);
         Color                := SettingValueInt (ISettingID_Browse_ViewerBkColor);
         ThumbBackColor       := SettingValueInt (ISettingID_Browse_ViewerThBColor);
         ThumbFontColor       := SettingValueInt (ISettingID_Browse_ViewerThFColor);

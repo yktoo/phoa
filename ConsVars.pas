@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.57 2004-09-23 04:08:53 dale Exp $
+//  $Id: ConsVars.pas,v 1.58 2004-09-24 14:09:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -755,8 +755,6 @@ const
     ISettingID_Browse_ViewerThRBProp   = 1124; // Viewer: Right bottom corner
     ISettingID_Browse_ViewerThBordSt   = 1130; // Viewer: Стиль границы эскиза
     ISettingID_Browse_ViewerThBordCl   = 1131; // Viewer: Цвет границы эскиза при стиле "Заданный цвет"
-    ISettingID_Browse_ViewerCacheThs   = 1140; // Viewer: Кэшировать эскизы при просмотре
-    ISettingID_Browse_ViewerCacheSze   = 1141; // Viewer: Размер кэша эскизов
     ISettingID_Browse_ViewerStchFilt   = 1150; // Viewer: Метод ресэмплинга эскизов
   ISettingID_Browse_MaxUndoCount       = 1260; // Макс. количество операций в буфере отмены
    //===================================================================================================================
@@ -1222,8 +1220,6 @@ type
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_ViewerThBordSt, '@ISettingID_Browse_ViewerThBordSt', Byte(tbbsXP), Byte(Low(TThumbBackBorderStyle)), Byte(High(TThumbBackBorderStyle)));
         AddThumbBorderStyleSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerThBordCl, '@ISettingID_Browse_ViewerThBordCl', clBtnShadow);
-        Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Browse_ViewerCacheThs, '@ISettingID_Browse_ViewerCacheThs', True);
-          Lvl4 := TPhoaIntEntrySetting.Create(Lvl3, ISettingID_Browse_ViewerCacheSze, '@ISettingID_Browse_ViewerCacheSze', 1000, 1, MaxInt);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest), Byte(Low(TStretchFilter)), Byte(High(TStretchFilter)));
         AddStretchFilterSettings(Lvl3 as TPhoaIntSetting);
       Lvl2 := TPhoaIntEntrySetting.Create    (Lvl1, ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount',   100, 1, MaxInt);

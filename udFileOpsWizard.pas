@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.16 2004-09-17 14:07:32 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.17 2004-09-24 14:09:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -593,7 +593,7 @@ uses
     iPrevThumbSize := Length(Pic.ThumbnailData);
     iPrevFileSize  := Pic.PicFileSize;
      // Перестраиваем эскиз
-    Pic.MakeThumbnail;
+    Pic.ReloadPicFileData;
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
@@ -1032,7 +1032,7 @@ uses
 
   procedure TdFileOpsWizard.ProcPage_PaintThumbnail(Bitmap: TBitmap);
   begin
-    if FSelectedPics.Count>0 then FSelectedPics[0].PaintThumbnail(Bitmap);
+//!!!    if FSelectedPics.Count>0 then FSelectedPics[0].PaintThumbnail(Bitmap);
   end;
 
   procedure TdFileOpsWizard.Repair_SelectFiles;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.25 2004-09-17 14:07:32 dale Exp $
+//  $Id: phUtils.pas,v 1.26 2004-09-24 14:09:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -116,6 +116,8 @@ uses
    // Разрешает или запрещает контрол, перекрашивая его в clWindow или clBtnFace соответственно
   procedure EnableWndCtl(Ctl: TWinControl; bEnable: Boolean);
 
+   // Возвращает размер указанного файла, или iDefault, если такого файла не существует
+  function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
    // -- Версия для существующего экземпляра TBitmap32
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap: TBitmap32); overload;
@@ -642,6 +644,19 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     Ctl.Enabled := bEnable;
     pi := GetPropInfo(Ctl, 'Color', [tkInteger]);
     if pi<>nil then SetOrdProp(Ctl, pi, iif(bEnable, clWindow, clBtnFace));
+  end;
+
+  function GetFileSize(const sFileName: String; iDefault: Integer): Integer;
+  var
+    hF: THandle;
+    FindData: TWin32FindData;
+  begin
+    hF := FindFirstFile(PChar(sFileName), FindData);
+    if hF<>INVALID_HANDLE_VALUE then begin
+      Windows.FindClose(hF);
+      Result := FindData.nFileSizeLow;
+    end else
+      Result := iDefault;
   end;
 
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap: TBitmap32);
