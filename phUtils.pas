@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.26 2004-09-24 14:09:17 dale Exp $
+//  $Id: phUtils.pas,v 1.27 2004-09-24 16:44:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,6 +31,8 @@ uses
   function  OrderRect(const r: TRect): TRect;
    // Возвращает True, если прямоугольники пересекаются
   function  RectsOverlap(const r1, r2: TRect): Boolean;
+   // Возвращает результат пересечения прямоугольников
+  function  GetRectIntersection(const r1, r2: TRect): TRect;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
@@ -291,6 +293,11 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     Result := (r1.Right>r2.Left) and (r1.Bottom>r2.Top) and (r2.Right>r1.Left) and (r2.Bottom>r1.Top);
   end;
 
+  function GetRectIntersection(const r1, r2: TRect): TRect;
+  begin
+    IntersectRect(Result, r1, r2);
+  end;
+  
    //-------------------------------------------------------------------------------------------------------------------
    // Fonts / chars
    //-------------------------------------------------------------------------------------------------------------------
