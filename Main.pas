@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.64 2004-10-26 13:51:18 dale Exp $
+//  $Id: Main.pas,v 1.65 2004-10-26 16:51:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -657,7 +657,7 @@ uses
 
   procedure TfMain.aaNewPic(Sender: TObject);
   begin
-    AddFiles(Self, FUndo, nil);
+    AddFiles(Self, CurGroup, FUndo, nil);
   end;
 
   procedure TfMain.aaOpen(Sender: TObject);
@@ -1701,7 +1701,7 @@ uses
              // Загружаем список файлов в SLFiles
             HDFiles.FileNames(SLFiles);
              // Запускаем Мастер добавления изображений
-            AddFiles(Self, FUndo, SLFiles);
+            AddFiles(Self, GetNodeGroup(nTgt), FUndo, SLFiles);
           finally
             SLFiles.Free;
           end;
@@ -1756,8 +1756,8 @@ uses
       end;
      // OLE Drag'n'Drop
     end else begin
-       // Перетаскивать [файлы] можно только в проект или его группу 
-      Accept := gnkTgt in [gnkProject, gnkPhoaGroup];
+       // Перетаскивать [файлы] можно только в проект или его группу
+      Accept := (Mode=dmOnNode) and (gnkTgt in [gnkProject, gnkPhoaGroup]);
       if Accept then begin
          // Поддерживается перетаскивание только файлов ОС
         HDFiles := THDrop.Create;

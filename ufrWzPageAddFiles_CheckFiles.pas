@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.9 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.10 2004-10-26 16:51:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -76,7 +76,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
   procedure TfrWzPageAddFiles_CheckFiles.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if ChangeMethod=pcmNextBtn then begin
+    if ChangeMethod in [pcmNextBtn, pcmForced] then begin
       tvFiles.RootNodeCount := FFiles.Count;
       tvFiles.ReinitChildren(nil, False);
       ilFiles.Handle := FFiles.SysImageListHandle;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.25 2004-10-26 13:51:18 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.26 2004-10-26 16:51:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -40,8 +40,10 @@ type
     FLastProcessedPic: IPhoaPic;
      // Счётчик сбойных изображений
     FCountFailed: Integer;
-     // Следующий свободный ID изображения 
+     // Следующий свободный ID изображения
     FFreePicID: Integer;
+     // Группа, в которую добавляются изображения
+    FGroup: IPhotoAlbumPicGroup;
      // Prop storage
     FAddList: TStrings;
     FApp: IPhotoAlbumApp;
@@ -55,8 +57,10 @@ type
     FFilter_TimeTo: TDateTime;
     FRecurseFolders: Boolean;
     FShowAdvancedOptions: Boolean;
-     // Загружает в FFileList список файлов (папок), имена которых перечислены в FAddList
-    procedure LoadFileList;
+     // Загружает в FFileList список файлов (папок), имена которых перечислены в FAddList. Возвращает True, если в
+     //   список попал хотя бы один файл. При bRecurse=True просматриваются подпапки папок; bUseFilter влияет на то,
+     //   используются ли значения свойств Filter_xxx для проверки файлов
+    function  LoadFileList(bRecurse, bUseFilter: Boolean): Boolean;
      // Обновляет информацию о добавлении файлов
     procedure UpdateProgressInfo;
      // Вызывается потоком, добавляющим файлы, для уведомления о том, что файл обработан
@@ -93,6 +97,8 @@ type
     function  PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
      // Запускает добавление файлов
     procedure StartFileProcessing;
      // Прерывает добавление файлов
@@ -153,7 +159,7 @@ type
 
    // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено. Если
    //   FileList<>nil, то пропускает страницу выбора файлов и сразу добавляет указанные файлы/папки
-  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
+  function AddFiles(AApp: IPhotoAlbumApp; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
 
 implementation
 {$R *.dfm}
@@ -162,14 +168,21 @@ uses
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
   phPhoa, phSettings, udMsgBox;
 
-  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
+  function AddFiles(AApp: IPhotoAlbumApp; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
+  var bShowWizard: Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try
         FApp            := AApp;
+        FGroup          := AGroup; 
         FUndoOperations := AUndoOperations;
-        if AAddList<>nil then FAddList.Assign(AAddList);
-        Result := Execute;
+         // Если задан список файлов, загружаем файлы и проверяем необходимость отображения Мастера
+        if AAddList<>nil then begin
+          FAddList.Assign(AAddList);
+          bShowWizard := LoadFileList(True, False);
+        end else
+          bShowWizard := True;
+        Result := bShowWizard and Execute;
       finally
         Free;
       end;
@@ -442,13 +455,25 @@ uses
    // TfAddFilesWizard
    //===================================================================================================================
 
+  constructor TfAddFilesWizard.Create(AOwner: TComponent);
+  begin
+    inherited Create(AOwner);
+    FAddList := TStringList.Create;
+    FFileList  := TFileList.Create;
+  end;
+
+  destructor TfAddFilesWizard.Destroy;
+  begin
+    FAddList.Free;
+    FFileList.Free;
+    inherited Destroy;
+  end;
+
   procedure TfAddFilesWizard.FinalizeWizard;
   begin
-    FFileList.Free;
-    FAddList.Free;
     FLog.Free;
      // Если есть добавленные изображения, выполняем операцию
-    if (FPics<>nil) and (FPics.Count>0) then FApp.PerformOperation('PicAdd', ['Group', FApp.CurGroup, 'Pics', FPics]);
+    if (FPics<>nil) and (FPics.Count>0) then FApp.PerformOperation('PicAdd', ['Group', FGroup, 'Pics', FPics]);
     inherited FinalizeWizard;
   end;
 
@@ -475,18 +500,23 @@ uses
   end;
 
   procedure TfAddFilesWizard.InitializeWizard;
+  var iPageID: Integer;
   begin
     inherited InitializeWizard;
-    FAddList   := TStringList.Create;
-    FFileList  := TFileList.Create;
     FPics      := NewPhotoAlbumPicList(False);
     FFreePicID := FApp.Project.PicsX.MaxPicID+1;
-     // Создаём страницы и отображаем первую страницу
+     // Создаём страницы
     Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
     Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
     Controller.CreatePage(TfrWzPage_Processing,         IWzAddFilesPageID_Processing, IDH_intf_pic_add_process,    ConstVal('SWzPageAddFiles_Processing'));
     Controller.CreatePage(TfrWzPage_Log,                IWzAddFilesPageID_Log,        IDH_intf_pic_add_log,        ConstVal('SWzPageAddFiles_Log'));
-    Controller.SetVisiblePageID(IWzAddFilesPageID_SelFiles, pcmForced);
+     // Если изначально список файлов не пуст, пропускаем страницу выбора файлов
+    if FFileList.Count>0 then
+      iPageID := iif(SettingValueBool(ISettingID_Dlgs_APW_SkipChkPage), IWzAddFilesPageID_Processing, IWzAddFilesPageID_CheckFiles)
+      // Иначе отображаем страницу выбора файлов
+    else
+      iPageID := IWzAddFilesPageID_SelFiles;
+    Controller.SetVisiblePageID(iPageID, pcmForced);
   end;
 
   procedure TfAddFilesWizard.InterruptFileProcessing;
@@ -505,9 +535,7 @@ uses
 
   function TfAddFilesWizard.IsBtnCancelEnabled: Boolean;
   begin
-    Result :=
-      inherited IsBtnCancelEnabled and
-      ((CurPageID<>IWzAddFilesPageID_Processing) or not FProcessingFiles);
+    Result := inherited IsBtnCancelEnabled and ((CurPageID<>IWzAddFilesPageID_Processing) or not FProcessingFiles);
   end;
 
   function TfAddFilesWizard.IsBtnNextEnabled: Boolean;
@@ -520,11 +548,10 @@ uses
       end;
   end;
 
-  procedure TfAddFilesWizard.LoadFileList;
-  var
-    Masks: TPhoaMasks;
+  function TfAddFilesWizard.LoadFileList(bRecurse, bUseFilter: Boolean): Boolean;
+  var Masks: TPhoaMasks;
 
-     // Добавляет файл к списку по его SearchRec, проверяя его соответствие фильтру
+     // Добавляет файл к списку по его SearchRec. Если bUseFilter=True, предварительно проверяет его соответствие фильтру
     procedure AddFile(const sPath: String; SRec: TSearchRec); overload;
     var
       d: TDateTime;
@@ -534,7 +561,7 @@ uses
       if FileFormatList.GraphicFromExtension(ExtractFileExt(SRec.Name))=nil then Exit;
       d := FileDateToDateTime(SRec.Time);
        // Если фильтр выключен
-      if not FShowAdvancedOptions then
+      if not bUseFilter or not FShowAdvancedOptions then
         bMatches := True
       else begin
          // Проверяем дату изменения файла
@@ -553,21 +580,7 @@ uses
       if bMatches then FFileList.Add(SRec.Name, sPath, SRec.Size, -2, d);
     end;
 
-     // Добавляет файл по его имени
-    procedure AddFile(const sFilename: String); overload;
-    var
-      sr: TSearchRec;
-      iRes: Integer;
-    begin
-      iRes := FindFirst(sFilename, faAnyFile, sr);
-      try
-        if (iRes=0) and (sr.Attr and faDirectory=0) then AddFile(ExtractFilePath(sFileName), sr);
-      finally
-        FindClose(sr);
-      end;
-    end;
-
-    procedure AddFolder(const sPath: String; bRecurse: Boolean);
+    procedure AddFolder(const sPath: String);
     var
       sr: TSearchRec;
       iRes: Integer;
@@ -582,7 +595,7 @@ uses
           if sr.Name[1]<>'.' then
              // Если каталог - рекурсивно сканируем
             if sr.Attr and faDirectory<>0 then begin
-              if bRecurse then AddFolder(sPath+sr.Name+'\', True);
+              if bRecurse then AddFolder(sPath+sr.Name+'\');
              // Если файл - добавляем к списку
             end else
               AddFile(sPath, sr);
@@ -596,18 +609,27 @@ uses
      // Добавляет в FFileList файлы/папки из FAddList
     procedure ProcessAddList;
     var
-      i: Integer;
+      i, iRes: Integer;
       sName: String;
+      sr: TSearchRec;
     begin
        // Стираем существующий список файлов
       FFileList.Clear;
        // Обрабатываем список выбранных файлов/папок
       for i := 0 to FAddList.Count-1 do begin
         sName := FAddList[i];
-         // Файл?
-        if FileExists(sName) then AddFile(sName)
-         // Каталог? (несуществующие пока игнорируем)
-        else if DirectoryExists(sName) then AddFolder(IncludeTrailingPathDelimiter(sName), FRecurseFolders);
+        iRes := FindFirst(sName, faAnyFile, sr);
+        try
+          if iRes=0 then
+             // Файл
+            if sr.Attr and faDirectory=0 then
+              AddFile(ExtractFilePath(sName), sr)
+             // Каталог
+            else
+              AddFolder(IncludeTrailingPathDelimiter(sName));
+        finally
+          FindClose(sr);
+        end;
       end;
     end;
 
@@ -629,6 +651,8 @@ uses
       pProcess.Hide;
       StopWait;
     end;
+    Result := FFileList.Count>0;
+    if not Result then PhoaInfo(False, 'SNoFilesSelected');
   end;
 
   procedure TfAddFilesWizard.LogFailure(const s: String; const aParams: array of const);
@@ -649,19 +673,15 @@ uses
   procedure TfAddFilesWizard.PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
   begin
     inherited PageChanged(ChangeMethod, iPrevPageID);
-    if (ChangeMethod=pcmNextBtn) and (CurPageID=IWzAddFilesPageID_Processing) then StartFileProcessing;
+    if (ChangeMethod in [pcmNextBtn, pcmForced]) and (CurPageID=IWzAddFilesPageID_Processing) then StartFileProcessing;
   end;
 
   function TfAddFilesWizard.PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;
   begin
     Result := inherited PageChanging(ChangeMethod, iNewPageID);
-    if Result and (ChangeMethod=pcmNextBtn) and (Controller.VisiblePageID=IWzAddFilesPageID_SelFiles) then begin
-       // Загружаем список файлов
-      LoadFileList;
-       // Если в списке есть файлы
-      Result := FFileList.Count>0;
-      if not Result then PhoaInfo(False, 'SNoFilesSelected');
-    end;
+     // После страницы выбора файлов/папок загружаем список файлов
+    if Result and (ChangeMethod=pcmNextBtn) and (CurPageID=IWzAddFilesPageID_SelFiles) then
+      Result := LoadFileList(FRecurseFolders, True);
   end;
 
   function TfAddFilesWizard.ProcPage_GetCurrentStatus: String;
