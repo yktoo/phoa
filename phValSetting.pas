@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.8 2004-05-06 10:13:26 dale Exp $
+//  $Id: phValSetting.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -239,6 +239,8 @@ type
      // ¬страивает соответствующий контрол дл€ текущего узла, если он нужен. ≈сли нет (в том числе при FocusedNode=nil),
      //   удал€ет текущий контрол
     procedure EmbedControl;
+     // ќбновл€ет положение контрола редактора, если он есть
+    procedure PositionEditorControl;
      // —обыти€ встроенного контрола
     procedure EmbeddedControlEnterExit(Sender: TObject);
     procedure EmbeddedControlChange(Sender: TObject);
@@ -250,6 +252,7 @@ type
     procedure SetRootSetting(Value: TPhoaPageSetting);
      // Message handlers
     procedure WMEmbedControl(var Msg: TMessage); message WM_EMBEDCONTROL;
+    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
   protected
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -769,8 +772,8 @@ type
         FEditorControl := CtlClass.Create(Self);
         FEditorControl.Parent := Self;
       end;
-       // Ќастраиваем размер
-      FEditorControl.BoundsRect := GetDisplayRect(CurNode, 1, False);
+       // Ќастраиваем размер/положение
+      PositionEditorControl;
        // Tag должен указывать на соответствующий узел
       FEditorControl.Tag := Integer(CurNode);
        // ѕрив€зываем событи€
@@ -953,6 +956,11 @@ type
     end;
   end;
 
+  procedure TPhoaValSettingEditor.PositionEditorControl;
+  begin
+    if FEditorControl<>nil then FEditorControl.BoundsRect := GetDisplayRect(FocusedNode, 1, False);
+  end;
+
   procedure TPhoaValSettingEditor.SetRootSetting(Value: TPhoaPageSetting);
   begin
     if FRootSetting<>Value then begin
@@ -964,6 +972,12 @@ type
   procedure TPhoaValSettingEditor.WMEmbedControl(var Msg: TMessage);
   begin
     EmbedControl;
+  end;
+
+  procedure TPhoaValSettingEditor.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
+  begin
+    inherited;
+    PositionEditorControl;
   end;
 
 end.

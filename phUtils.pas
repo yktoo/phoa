@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.9 2004-05-06 10:13:26 dale Exp $
+//  $Id: phUtils.pas,v 1.10 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -641,6 +641,9 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
       end;
   end;
 
+type
+  TVTColumnsCast = class(TVirtualTreeColumns);
+
   procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
   var
     i: Integer;
@@ -656,9 +659,9 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
           c.Width    := StrToIntDef(ExtractFirstWord(s, ','), c.Width);
           SetVTColumnVisible(c, StrToIntDef(ExtractFirstWord(s, ','), Byte(coVisible in c.Options))<>0);
         end;
-      finally
-        Free;
-      end;
+    finally
+      Free;
+    end;
   end;
 
   procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);

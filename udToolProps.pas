@@ -52,7 +52,7 @@ type
 
 implementation
 {$R *.dfm}
-uses FileCtrl, phUtils, Main, ImgList;
+uses FileCtrl, phUtils, Main, ImgList, ConsVars;
 
   function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
   begin
@@ -171,6 +171,7 @@ uses FileCtrl, phUtils, Main, ImgList;
   var k: TPhoaToolKind;
   begin
     inherited InitializeDialog;
+    HelpContext := IDH_intf_tool_props;
      // Заполняем cbKind
     for k := Low(k) to High(k) do cbKind.Items.Add(PhoaToolKindName(k)); 
      // Заполняем cbRunShowCommand

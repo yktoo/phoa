@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.8 2004-05-03 16:34:03 dale Exp $
+//  $Id: phObj.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1114,6 +1114,9 @@ type
     FThumbCornerDetails: TThumbCornerDetails;
      // Индекс пункта, для которого последний раз отображался Tooltip
     FLastTooltipIdx: Integer;
+     // True, если была нажата правая клавиша мыши вместе с Ctrl, и при её отпускании необходимо отобразить системное
+     //   контекстное меню
+    FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
     FPhoA: TPhotoAlbum;
     FCacheThumbnails: Boolean;
@@ -1167,6 +1170,7 @@ type
      // Настраивает всплывающие описания эскизов в виде Hint
     procedure AdjustTooltip(ix, iy: Integer);
      // Message handlers
+    procedure WMContextMenu(var Msg: TWMContextMenu);           message WM_CONTEXTMENU;
     procedure WMGetDlgCode(var Msg: TWMGetDlgCode);             message WM_GETDLGCODE;
     procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
     procedure WMVScroll(var Msg: TWMVScroll);                   message WM_VSCROLL;
@@ -5347,12 +5351,12 @@ var
       if Button=mbLeft then begin
         ToggleSelection(idx);
         MoveItemIndex(idx);
-       // Если правая кнопка - вызываем Shell Context Menu
+       // Если правая кнопка - готовим вызов Shell Context Menu
       end else if Button=mbRight then begin
         ClearSelection;
         SetItemIndex(idx);
         if idx>=0 then begin
-          ShowFileShellContextMenu(FPicLinks[idx].PicFileName);
+          FShellCtxMenuOnMouseUp := True;
           Exit;
         end;
       end;
@@ -5404,9 +5408,16 @@ var
 
   procedure TThumbnailViewer.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   begin
+     // Была рамка группового выделения
     if FMarqueing then
       MarqueingEnd
-    else begin
+     // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню 
+    else if FShellCtxMenuOnMouseUp then begin
+      FShellCtxMenuOnMouseUp := False;
+      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicLinks[FItemIndex].PicFileName);
+      Exit;
+     // Иначе завершаем Dragging
+    end else begin
       FDragPending := False;
       if FNoMoveItemIndex>=0 then begin
         if not Dragging then SetItemIndex(FNoMoveItemIndex);
@@ -5825,6 +5836,12 @@ var
      // Уведомляем
     SelectionChange;
     Invalidate;
+  end;
+
+  procedure TThumbnailViewer.WMContextMenu(var Msg: TWMContextMenu);
+  begin
+     // Вызываем context menu только если не был нажат Ctrl
+    if not FShellCtxMenuOnMouseUp then inherited; 
   end;
 
   procedure TThumbnailViewer.WMGetDlgCode(var Msg: TWMGetDlgCode);

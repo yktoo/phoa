@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.8 2004-05-05 13:58:04 dale Exp $
+//  $Id: ufImgView.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -117,8 +117,6 @@ type
     bShowInfo: TTBXItem;
     ipmSep5: TTBXSeparatorItem;
     gipmTools: TTBGroupItem;
-    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);
@@ -130,22 +128,25 @@ type
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure FormDestroy(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure aaFullScreen(Sender: TObject);
     procedure aaHelp(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaSlideShow(Sender: TObject);
+    procedure aaRelocateInfo(Sender: TObject);
+    procedure aaShowInfo(Sender: TObject);
     procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
-    procedure FormCreate(Sender: TObject);
-    procedure aaRelocateInfo(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure tbMainVisibleChanged(Sender: TObject);
     procedure iMainResize(Sender: TObject);
-    procedure aaShowInfo(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
   private
     FGroup: TPhoaGroup;
@@ -171,6 +172,9 @@ type
     FTrackDrag: Boolean;
     FTrackX: Integer;
     FTrackY: Integer;
+     // True, если была нажата правая клавиша мыши вместе с Ctrl, и при её отпускании необходимо отобразить системное
+     //   контекстное меню
+    FShellCtxMenuOnMouseUp: Boolean;
      // Флаг принудительного изменения размеров окна
     FForcedResize: Boolean;
      // Кэшированные настройки просмотра
@@ -873,6 +877,11 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     CommitInfoRelocation;
   end;
 
+  procedure TfImgView.FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+  begin
+    Handled := FShellCtxMenuOnMouseUp;
+  end;
+
   procedure TfImgView.FormCreate(Sender: TObject);
   begin
     HelpContext := IDH_intf_view_mode;
@@ -957,6 +966,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
           FTrackX := ViewOffset.x-x;
           FTrackY := ViewOffset.y-y;
         end;
+      mbRight: if not FErroneous and (ssCtrl in Shift) then FShellCtxMenuOnMouseUp := True;
       mbMiddle: aFullScreen.Execute;
     end;
   end;
@@ -972,6 +982,9 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
       FTrackDrag := False;
        // Возвращаем прежний курсор
       iMain.Cursor := FImageCursor;
+    end else if FShellCtxMenuOnMouseUp then begin  
+      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.PicFileName);
+      FShellCtxMenuOnMouseUp := False;
     end;
   end;
 

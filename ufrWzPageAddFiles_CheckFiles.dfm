@@ -87,7 +87,6 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     end
   end
   object pmFiles: TTBXPopupMenu
-    Alignment = paRight
     Images = fMain.ilActionsSmall
     Left = 36
     Top = 28

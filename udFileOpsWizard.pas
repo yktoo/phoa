@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.6 2004-04-23 19:26:30 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.7 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -110,8 +110,7 @@ type
     FSelectedGroups: TList;
     FSelectedPics: TPhoaPicLinks;
     FSelPicMode: TFileOpSelPicMode;
-    FSkipInvalidPics: Boolean;
-    FSkipValidPics: Boolean;
+    FSelPicValidityFilter: TFileOpSelPicValidityFilter;
     FViewerCurView: TPhoaView;
     FViewerSelGroup: TPhoaGroup;
     FViewerSelPicIDs: TIDArray;
@@ -247,11 +246,8 @@ type
     property SelectedPics: TPhoaPicLinks read FSelectedPics;
      // -- Режим выбора изображений
     property SelPicMode: TFileOpSelPicMode read FSelPicMode write FSelPicMode;
-     // -- True, если нужно пропустить изображения, ссылающиеся на НЕсуществующий файл
-    property SkipInvalidPics: Boolean read FSkipInvalidPics write FSkipInvalidPics;
-     // -- True, если нужно пропустить изображения, ссылающиеся на существующий файл (кроме операций копирования и
-     //    перестройки эскизов)
-    property SkipValidPics: Boolean read FSkipValidPics write FSkipValidPics;
+     // -- Фильтр выбора изображений по наличию соответствующего файла
+    property SelPicValidityFilter: TFileOpSelPicValidityFilter read FSelPicValidityFilter write FSelPicValidityFilter;
      // -- Текущая выбранная во вьюере группа
     property ViewerSelGroup: TPhoaGroup read FViewerSelGroup;
      // -- Количество выбранных во вьюере изображений
@@ -716,14 +712,8 @@ uses
   end;
 
   procedure TdFileOpsWizard.DoSelectPictures;
-  var
-    i: Integer;
-    bSkipVal: Boolean;
+  var i: Integer;
   begin
-     // bSkipVal - значение FSkipValidPics с учётом того, что эта опция неприменима для операций копирования и
-     //   перестройки эскизов
-    bSkipVal := (FFileOpKind in [fokMoveFiles, fokDeleteFiles, fokRepairFileLinks]) and FSkipValidPics;
-    Assert(not bSkipVal or not FSkipInvalidPics, 'Meaningless skipping of both valid and invalid pictures');
      // Добавляем изображения
     FSelectedPics.Clear;
     case SelPicMode of
@@ -732,9 +722,9 @@ uses
       fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.AddFromGroup(FPhoA, TPhoaGroup(FSelectedGroups[i]), False);
     end;
      // Удаляем [не]существующие
-    if bSkipVal or FSkipInvalidPics then
+    if FSelPicValidityFilter<>fospvfAny then
       for i := FSelectedPics.Count-1 downto 0 do
-        if FileExists(FSelectedPics[i].PicFileName)=bSkipVal then FSelectedPics.Delete(i);
+        if FileExists(FSelectedPics[i].PicFileName)<>(FSelPicValidityFilter=fospvfValidOnly) then FSelectedPics.Delete(i);
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
@@ -902,7 +892,7 @@ uses
     Controller.CreatePage(TfrWzPageFileOps_SelPics,        IWzFileOpsPageID_SelPics,        IDH_intf_file_ops_selpics,   ConstVal('SWzPageFileOps_SelPics'));
     Controller.CreatePage(TfrWzPageFileOps_SelFolder,      IWzFileOpsPageID_SelFolder,      IDH_intf_file_ops_selfolder, ConstVal('SWzPageFileOps_SelFolder'));
     Controller.CreatePage(TfrWzPageFileOps_MoveOptions,    IWzFileOpsPageID_MoveOptions,    IDH_intf_file_ops_moveopts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   0{!!!},                      sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   IDH_intf_file_ops_moveopts2, sOptPageTitle);
     Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    sOptPageTitle);
     Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   sOptPageTitle);
     Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  sOptPageTitle);
@@ -982,7 +972,7 @@ uses
       if Result then
         case CurPageID of
            // После выбора задачи настраиваем опции по умолчанию
-          IWzFileOpsPageID_SelTask: FSkipValidPics := FFileOpKind=fokRepairFileLinks;
+          IWzFileOpsPageID_SelTask: if FFileOpKind=fokRepairFileLinks then FSelPicValidityFilter := fospvfInvalidOnly;
            // При уходе со страницы выбора изображений строим список изображений
           IWzFileOpsPageID_SelPics: DoSelectPictures;
            // При уходе со страницы опций восстановления ссылок строим список файлов

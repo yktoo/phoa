@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.3 2004-05-11 03:36:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -29,8 +29,10 @@ type
     ipmGroupsCheckAll: TTBXItem;
     ipmGroupsUncheckAll: TTBXItem;
     ipmGroupsInvertChecks: TTBXItem;
-    cbSkipValid: TCheckBox;
-    cbSkipInvalid: TCheckBox;
+    gbValidity: TGroupBox;
+    rbValidityAny: TRadioButton;
+    rbValidityValid: TRadioButton;
+    rbValidityInvalid: TRadioButton;
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -54,11 +56,17 @@ type
     procedure UpdateCountInfo;
      // Ставит, снимает или инвертирует отметку у всех групп с изображениями
     procedure CheckFiles(Mode: TMassCheckMode);
+     // Prop handlers
+    function  GetValidityFilter: TFileOpSelPicValidityFilter;
+    procedure SetValidityFilter(Value: TFileOpSelPicValidityFilter);
   protected
     procedure InitializePage; override;
     function  GetDataValid: Boolean; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+     // Props
+     // -- Текущий фильтр выбора по наличию соответствующих файлов
+    property ValidityFilter: TFileOpSelPicValidityFilter read GetValidityFilter write SetValidityFilter;
   end;
 
 implementation
@@ -97,13 +105,12 @@ uses phUtils, udFileOpsWizard, Main, phObj;
     else
       rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInView', [Wiz.ViewerCurView.Name]);
      // Устанавливаем выбранную радиокнопку в зависимости от режима
-    rbSelPics.Checked     := Wiz.SelPicMode=fospmSelPics;
-    rbAllPics.Checked     := Wiz.SelPicMode=fospmAll;
-    rbSelGroups.Checked   := Wiz.SelPicMode=fospmSelGroups;
+    rbSelPics.Checked   := Wiz.SelPicMode=fospmSelPics;
+    rbAllPics.Checked   := Wiz.SelPicMode=fospmAll;
+    rbSelGroups.Checked := Wiz.SelPicMode=fospmSelGroups;
      // Прочие опции
-    cbSkipValid.Enabled   := Wiz.FileOpKind in [fokMoveFiles, fokDeleteFiles, fokRepairFileLinks];
-    cbSkipValid.Checked   := Wiz.SkipValidPics and (Wiz.FileOpKind in [fokMoveFiles, fokDeleteFiles, fokRepairFileLinks]);
-    cbSkipInvalid.Checked := Wiz.SkipInvalidPics;
+    ValidityFilter      := Wiz.SelPicValidityFilter;
+    rbValidityInvalid.Enabled := Wiz.FileOpKind in [fokMoveFiles, fokDeleteFiles, fokRepairFileLinks];
      // Настраиваем вторичные контролы
     AdjustPicControls;
   end;
@@ -138,6 +145,13 @@ uses phUtils, udFileOpsWizard, Main, phObj;
     Result := FSelPicCount>0;
   end;
 
+  function TfrWzPageFileOps_SelPics.GetValidityFilter: TFileOpSelPicValidityFilter;
+  begin
+    if rbValidityAny.Checked        then Result := fospvfAny
+    else if rbValidityValid.Checked then Result := fospvfValidOnly
+    else                                 Result := fospvfInvalidOnly;
+  end;
+
   procedure TfrWzPageFileOps_SelPics.InitializePage;
   begin
     inherited InitializePage;
@@ -170,14 +184,22 @@ uses phUtils, udFileOpsWizard, Main, phObj;
       end;
     end;
      // Сохраняем прочие опции
-    if Wiz.FileOpKind in [fokMoveFiles, fokDeleteFiles, fokRepairFileLinks] then Wiz.SkipValidPics := cbSkipValid.Checked;
-    Wiz.SkipInvalidPics := cbSkipInvalid.Checked;
+    Wiz.SelPicValidityFilter := ValidityFilter;
     Result := True;
   end;
 
   procedure TfrWzPageFileOps_SelPics.RBSelPicturesClick(Sender: TObject);
   begin
     AdjustPicControls;
+  end;
+
+  procedure TfrWzPageFileOps_SelPics.SetValidityFilter(Value: TFileOpSelPicValidityFilter);
+  var Wiz: TdFileOpsWizard;
+  begin
+    Wiz := TdFileOpsWizard(StorageForm);
+    rbValidityAny.Checked     := Wiz.SelPicValidityFilter=fospvfAny;
+    rbValidityValid.Checked   := Wiz.SelPicValidityFilter=fospvfValidOnly;
+    rbValidityInvalid.Checked := Wiz.SelPicValidityFilter=fospvfInvalidOnly;
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -219,14 +241,14 @@ uses phUtils, udFileOpsWizard, Main, phObj;
     FPicIDs: TIntegerList;
     i: Integer;
     Wiz: TdFileOpsWizard;
-    bSkipValid, bSkipInvalid: Boolean;
+    ValFilter: TFileOpSelPicValidityFilter;
 
      // Если validity изображения Pic соответствует выбору, увеличивает FSelPicCount на 1, а FSelPicFileTotalSize -
      //   на размер файла
     procedure AddPicInfo(Pic: TPhoaPic);
     begin
        // Если нужно учитывать валидность - проверяем наличие файла
-      if (not bSkipValid and not bSkipInvalid) or (FileExists(Pic.PicFileName)<>bSkipValid) then begin
+      if (ValFilter=fospvfAny) or (FileExists(Pic.PicFileName)=(ValFilter=fospvfValidOnly)) then begin
         Inc(FSelPicCount);
         Inc(FSelPicFileTotalSize, Pic.PicFileSize);
       end;
@@ -239,34 +261,30 @@ uses phUtils, udFileOpsWizard, Main, phObj;
       FSelGroupCount       := 0;
       FSelPicCount         := 0;
       FSelPicFileTotalSize := 0;
-      bSkipValid   := cbSkipValid.Checked;
-      bSkipInvalid := cbSkipInvalid.Checked;
-       // Если выбраны оба "Пропустить существующие" и "Пропустить НЕсуществующие" - выбирать нечего
-      if not bSkipValid or not bSkipInvalid then begin
-         // Выбранные изображения
-        if rbSelPics.Checked then begin
-          FSelGroupCount := 1;
-          for i := 0 to Wiz.ViewerSelPicCount-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(Wiz.ViewerSelPicIDs[i]));
-         // Все изображения фотоальбома
-        end else if rbAllPics.Checked then begin
-          FSelGroupCount := Wiz.PhoA.RootGroup.NestedGroupCount+1;
-          for i := 0 to Wiz.PhoA.Pics.Count-1 do AddPicInfo(Wiz.PhoA.Pics[i]);
-         // Изображения из выбранных групп
-        end else begin
-          FPicIDs := TIntegerList.Create(False);
-          try
-            n := tvGroups.GetFirst;
-            while n<>nil do begin
-              if n.CheckState=csCheckedNormal then begin
-                Inc(FSelGroupCount);
-                FPicIDs.AddAll(PPhoaGroup(tvGroups.GetNodeData(n))^.PicIDs);
-              end;
-              n := tvGroups.GetNext(n);
+      ValFilter := ValidityFilter;
+       // Выбранные изображения
+      if rbSelPics.Checked then begin
+        FSelGroupCount := 1;
+        for i := 0 to Wiz.ViewerSelPicCount-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(Wiz.ViewerSelPicIDs[i]));
+       // Все изображения фотоальбома
+      end else if rbAllPics.Checked then begin
+        FSelGroupCount := Wiz.PhoA.RootGroup.NestedGroupCount+1;
+        for i := 0 to Wiz.PhoA.Pics.Count-1 do AddPicInfo(Wiz.PhoA.Pics[i]);
+       // Изображения из выбранных групп
+      end else begin
+        FPicIDs := TIntegerList.Create(False);
+        try
+          n := tvGroups.GetFirst;
+          while n<>nil do begin
+            if n.CheckState=csCheckedNormal then begin
+              Inc(FSelGroupCount);
+              FPicIDs.AddAll(PPhoaGroup(tvGroups.GetNodeData(n))^.PicIDs);
             end;
-            for i := 0 to FPicIDs.Count-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(FPicIDs[i]));
-          finally
-            FPicIDs.Free;
+            n := tvGroups.GetNext(n);
           end;
+          for i := 0 to FPicIDs.Count-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(FPicIDs[i]));
+        finally
+          FPicIDs.Free;
         end;
       end;
       lCountInfo.Caption := ConstVal('SWzFileOps_PicGroupSelectedCount', [FSelPicCount, FSelGroupCount, HumanReadableSize(FSelPicFileTotalSize)]);

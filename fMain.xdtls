@@ -1975,14 +1975,6 @@
           <tranEntry langID="1046" value="&amp;Print"/>
         </tranEntries>
       </propEntry>
-      <propEntry name="SActionHint_EditPics">
-        <tranEntries>
-          <tranEntry langID="1049" value="Изменить|Редактировать выделенные изображения"/>
-          <tranEntry langID="1033" value="Edit|Edit the selected pictures"/>
-          <tranEntry langID="1031" value="Edit|Edit the selected pictures"/>
-          <tranEntry langID="1046" value="Edit|Edit the selected pictures"/>
-        </tranEntries>
-      </propEntry>
       <propEntry name="SActionHint_OpenPics">
         <tranEntries>
           <tranEntry langID="1049" value="Открыть|Открыть выделенные изображения"/>

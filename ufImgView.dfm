@@ -248,6 +248,7 @@ object fImgView: TfImgView
   Scaled = False
   ShowHint = True
   OnClose = FormClose
+  OnContextPopup = FormContextPopup
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown

@@ -126,50 +126,29 @@
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="cbSkipInvalid">
-        <propEntries>
-          <propEntry name="Caption">
-            <tranEntries>
-              <tranEntry langID="1033" value="Skip pictures having &amp;NO valid (existent) file linked"/>
-              <tranEntry langID="1049" value="Пропустить изображения, ссылающиеся на &amp;НЕсуществующий файл"/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="HelpKeyword">
-            <tranEntries>
-              <tranEntry langID="1033" value=""/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="Hint">
-            <tranEntries>
-              <tranEntry langID="1033" value=""/>
-            </tranEntries>
-          </propEntry>
-        </propEntries>
-        <compEntries/>
-      </compEntry>
-      <compEntry name="cbSkipValid">
-        <propEntries>
-          <propEntry name="Caption">
-            <tranEntries>
-              <tranEntry langID="1033" value="Skip pictures having &amp;valid (existent) file linked"/>
-              <tranEntry langID="1049" value="Пропустить изображения, ссылающиеся на су&amp;ществующий файл"/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="HelpKeyword">
-            <tranEntries>
-              <tranEntry langID="1033" value=""/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="Hint">
-            <tranEntries>
-              <tranEntry langID="1033" value=""/>
-            </tranEntries>
-          </propEntry>
-        </propEntries>
-        <compEntries/>
-      </compEntry>
       <compEntry name="dtlsMain">
         <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="gbValidity">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="File link validity filter"/>
+              <tranEntry langID="1049" value="Фильтр по существованию файла изображения"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
         <compEntries/>
       </compEntry>
       <compEntry name="ipmGroupsCheckAll">
@@ -188,7 +167,7 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1033" value="..."/>
+              <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
             </tranEntries>
           </propEntry>
@@ -262,7 +241,7 @@
           <propEntry name="Caption">
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Selected pictures"/>
-              <tranEntry langID="1049" value="В&amp;ыбранные изображения"/>
+              <tranEntry langID="1049" value="Вы&amp;бранные изображения"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -275,6 +254,69 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbValidityAny">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="All selected &amp;pictures"/>
+              <tranEntry langID="1049" value="Все в&amp;ыбранные изображения"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbValidityInvalid">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Only pictures having &amp;NO valid (existent) file linked"/>
+              <tranEntry langID="1049" value="Только изображения, ссылающиеся на &amp;НЕсуществующий файл"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbValidityValid">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Only pictures having &amp;valid (existent) file linked"/>
+              <tranEntry langID="1049" value="Только изображения, ссылающиеся на су&amp;ществующий файл"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

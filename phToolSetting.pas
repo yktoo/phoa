@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.10 2004-05-06 10:13:26 dale Exp $
+//  $Id: phToolSetting.pas,v 1.11 2004-05-11 03:36:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -241,6 +241,8 @@ type
     function  IsSettingNode(Node: PVirtualNode): Boolean;
      // Настраивает Header
     procedure SetupHeader;
+     // Делает главным всегда самый левый столбец
+    procedure UpdateMainColumn;
      // Создаёт PopupMenu
     procedure CreatePopupMenu;
      // Настраивает доступность пунктов PopupMenu 
@@ -250,6 +252,8 @@ type
     procedure EditToolClick(Sender: TObject);
     procedure MoveToolUpClick(Sender: TObject);
     procedure MoveToolDownClick(Sender: TObject);
+     // События Header Menu
+    procedure HeaderPopupMenuColumnChange(const Sender: TBaseVirtualTree; const Column: TColumnIndex; Visible: Boolean);
      // IPhoaSettingEditor
     procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
     function  GetRootSetting: TPhoaPageSetting;
@@ -261,6 +265,7 @@ type
     procedure DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates); override;
     procedure DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer); override;
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString); override;
+    procedure DoHeaderDragged(Column: TColumnIndex; OldPosition: TColumnPosition); override;
     function  DoBeforeDrag(Node: PVirtualNode; Column: TColumnIndex): Boolean; override;
     procedure DoDragDrop(Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode); override;
     function  DoDragOver(Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer): Boolean; override;
@@ -729,6 +734,12 @@ type
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
+  procedure TPhoaToolSettingEditor.DoHeaderDragged(Column: TColumnIndex; OldPosition: TColumnPosition);
+  begin
+     // Делаем главным всегда первый столбец
+    UpdateMainColumn; 
+  end;
+
   procedure TPhoaToolSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
      // Если это не последний "пустой" пункт, сохраняем пункт TPhoaToolSetting в Node.Data
@@ -774,6 +785,12 @@ type
   function TPhoaToolSettingEditor.GetSetting(Node: PVirtualNode): TPhoaToolSetting;
   begin
     if Node=nil then Result := nil else Result := PPhoaToolSetting(PChar(Node)+FDataOffset)^;
+  end;
+
+  procedure TPhoaToolSettingEditor.HeaderPopupMenuColumnChange(const Sender: TBaseVirtualTree; const Column: TColumnIndex; Visible: Boolean);
+  begin
+     // При скрытии/показе столбцов обновляем главный столбец (должен быть самым левым из видимых)
+    UpdateMainColumn;
   end;
 
   procedure TPhoaToolSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
@@ -841,22 +858,32 @@ type
     end;
 
   begin
-     // Запрещаем обновления столбцов (чтобы не получить 'Control has no parent window')
-//    Header.Columns.BeginUpdate;
-    try
-      AddColumn('SText_Masks',       80,  True);
-      AddColumn('SText_Kind',        200, True);
-      AddColumn('SText_Name',        150, True);
-      AddColumn('SText_Hint',        200, False);
-      AddColumn('SText_Application', 250, True);
-      AddColumn('SText_Folder',      150, False);
-      AddColumn('SText_Params',      150, False);
-      Header.Options   := Header.Options+[hoVisible];
-      Header.PopupMenu := TVTHeaderPopupMenu.Create(Self);
-       // Восстанавливаем столбцы
-      RegLoadVTColumns(SRegPrefs_ToolEditor, Self);
-    finally
-//      Header.Columns.EndUpdate;
+    AddColumn('SText_Masks',       80,  True);
+    AddColumn('SText_Kind',        200, True);
+    AddColumn('SText_Name',        150, True);
+    AddColumn('SText_Hint',        200, False);
+    AddColumn('SText_Application', 250, True);
+    AddColumn('SText_Folder',      150, False);
+    AddColumn('SText_Params',      150, False);
+    Header.Options   := Header.Options+[hoVisible];
+    Header.PopupMenu := TVTHeaderPopupMenu.Create(Self);
+    TVTHeaderPopupMenu(Header.PopupMenu).OnColumnChange := HeaderPopupMenuColumnChange;
+     // Восстанавливаем столбцы
+    RegLoadVTColumns(SRegPrefs_ToolEditor, Self);
+     // Делаем главным левый столбец
+    UpdateMainColumn;
+  end;
+
+  procedure TPhoaToolSettingEditor.UpdateMainColumn;
+  var i, idx: Integer;
+  begin
+     // Перебираем столбцы в порядке возрастания Position, пока не найдём видимый
+    for i := 0 to Header.Columns.Count-1 do begin
+      idx := Header.Columns.ColumnFromPosition(i);
+      if (idx>=0) and (coVisible in Header.Columns[idx].Options) then begin
+        Header.MainColumn := idx;
+        Break;
+      end;
     end;
   end;
 
