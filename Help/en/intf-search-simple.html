@@ -1,91 +1,47 @@
-<!-- $Id: intf-search-simple.html,v 1.1 2004-11-25 20:42:59 dale Exp $ -->
-{[%hh_hdr_en:Find pictures dialog]}
+<!-- $Id: intf-search-simple.html,v 1.2 2004-12-05 16:44:46 dale Exp $ -->
+{[%hh_hdr_en:Find pictures :: Simple search]}
 
-<p align=justify><b>PhoA</b> has a powerful tool for searching pictures. To display Find pictures dialog you select
-  <b>Tools | Find...</b> menu item or press <b>F3</b> key in the <a href="intf-browse-mode.html">Browse mode</a>.
+<p align=justify>Simple search allows you to visually construct the picture search criteria based on picture propertrty
+  values.
 
 {[%hh_h2:Controls]}
 
 <table class=plain border=0>
   <tr>
-    <td class=command>Search criteria list</td>
+    <td class=command>Delete</td>
+    <td>Deletes the criterion currently highlighted.</td>
+  </tr>
+  <tr>
+    <td class=command>Convert to expression</td>
+    <td>Compiles an expression for <a href="intf-search-expr.html">expression search</a> from the criteria already
+        entered, and places it to the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>Search criterion list</td>
     <td>
-      You enter search criteria in the table with the following data:
+      You enter search criteria in the criterion table using the following data:
       <ul>
-        <li><b>Picture property</b> - one of the <i>searchable</i> item from <a href="general-pic-data.html">picture
-            data</a>, for which the criterion is intended.</li>
-        <li><b>Criterion condition</b> - one of comparison conditions, list of possible values depends on property
+        <li><b>Picture property</b> - one of the <i>searchable</i> items from <a href="general-pic-data.html">picture
+            data</a>, for which the criterion is entered.</li>
+        <li><b>Condition</b> - one of comparison conditions, list of possible values depends on property
             <a href="intf-search-datatypes.html">data type</a>.</li>
-        <li><b>Criterion value</b> - a value to compare picture property with.</li>
+        <li><b>Value</b> - a value to compare picture property with.</li>
       </ul>
+      <p align=justify>To add new criterion simply select a property by clicking the dropdown button in the last (empty)
+        table row.
       <p align=justify>Use arrow keys no navigate through the table. To expand the dropdown list use <b>Alt+Down</b>
         keys.
       <p align=justify>Criterion values may be selected from the dropdown history list.
     </td>
   </tr>
-  <tr>
-    <td class=command>Find</td>
-    <td>Starts picture searching.<br>
-        Pictures found in search operation (if there are any) fill the <b>Search Results</b> folder that is displayed in
-        the root of the group tree. The Search Results folder implements the same functionality as regular picture group
-        folders except that you cannot add or remove its pictures.</td>
-  </tr>
-  <tr>
-    <td class=command>Reset</td>
-    <td>Clears all input fields and reverts all values to their defaults.</td>
-  </tr>
 </table>
 
-{[%hh_h2:<a name=datatypes>Picture properties data types</a>]}
-<p align=justify>According to the <a href="general-pic-data.html">picture data table</a>, <b>PhoA</b> uses the following
-  data types for property values:
-
-<table class=plain border=0>
-  <tr class=tblhdr>
-    <td nowrap>Data type</td>
-    <td nowrap>Description &amp; criteria</td>
-  </tr>
-  <tr>
-    <td class=command>Integer or Ordinal</td>
-    <td>An integer value can be compared for equality, inequality etc.</td>
-  </tr>
-  <tr>
-    <td class=command>Filename string</td>
-    <td>Data may be tested for matching the <i>mask</i>. The mask is written by the
-        <a href="info-file-masks.html">standard <b>PhoA</b> rules</a>.</td>
-  </tr>
-  <tr>
-    <td class=command>String</td>
-    <td>Any literal. Searching string or substring is implemented, case insensitive.</td>
-  </tr>
-  <tr>
-    <td class=command>Pixel format</td>
-    <td>Not a searchable type.</td>
-  </tr>
-  <tr>
-    <td class=command>Date</td>
-    <td>Criteria are similar to number ones.</td>
-  </tr>
-  <tr>
-    <td class=command>Time</td>
-    <td>Criteria are similar to number ones.</td>
-  </tr>
-  <tr>
-    <td class=command>String list</td>
-    <td>It is a list of keywords. Keywords may be entered manually or by clicking &quot;<b>...</b>&quot; button in the
-        entry field from the <a href="intf-select-keywords.html">list</a>.</td>
-  </tr>
-</table>
-
-<p align=justify>The program select those pictures that conform to all search conditions at once (ie, an <b>AND</b>
-  operator has effect here).
-<p align=justify>To disable a criterion simply delete its value.
+<p align=justify>The program select those pictures that conform to all search conditions at once (so conditions are
+  joined using <b>AND</b> operator).
 
 {[%hh_seealso_en]}
+  <a href="intf-search.html">Find pictures</a><br>
+  <a href="intf-search-expr.html">Find pictures :: Expression search</a><br>
   <a href="general-pic-data.html">Picture data</a><br>
-  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
-  <a href="intf-controls.html">Keyboard and mouse controls</a><br>
-  <a href="intf-pic-add.html">Add pictures wizard</a><br>
-  <a href="intf-pic-props.html">Edit pictures dialog</a><br>
 
 {[%hh_ftr_en]}

@@ -1,91 +1,70 @@
-<!-- $Id: intf-search-expr.html,v 1.1 2004-11-25 20:42:59 dale Exp $ -->
-{[%hh_hdr_en:Find pictures dialog]}
+<!-- $Id: intf-search-expr.html,v 1.2 2004-12-05 16:44:46 dale Exp $ -->
+{[%hh_hdr_en:Find pictures :: Expression search]}
 
-<p align=justify><b>PhoA</b> has a powerful tool for searching pictures. To display Find pictures dialog you select
-  <b>Tools | Find...</b> menu item or press <b>F3</b> key in the <a href="intf-browse-mode.html">Browse mode</a>.
+<p align=justify>Expression search is the most powerful <a href="intf-search.html">picture search</a> capability of
+  <b>PhoA</b>.
+<p align=justify>Detailed description of <i>search expression language</i> (or <i>picture filter expression
+  language</i>) is given <a href="info-filter-expr.html">here</a>.
 
 {[%hh_h2:Controls]}
 
 <table class=plain border=0>
   <tr>
-    <td class=command>Search criteria list</td>
-    <td>
-      You enter search criteria in the table with the following data:
-      <ul>
-        <li><b>Picture property</b> - one of the <i>searchable</i> item from <a href="general-pic-data.html">picture
-            data</a>, for which the criterion is intended.</li>
-        <li><b>Criterion condition</b> - one of comparison conditions, list of possible values depends on property
-            <a href="intf-search-datatypes.html">data type</a>.</li>
-        <li><b>Criterion value</b> - a value to compare picture property with.</li>
-      </ul>
-      <p align=justify>Use arrow keys no navigate through the table. To expand the dropdown list use <b>Alt+Down</b>
-        keys.
-      <p align=justify>Criterion values may be selected from the dropdown history list.
-    </td>
+    <td class=command>{[%hh_ii:New]} New</td>
+    <td>Clears the expression editor contents.</td>
   </tr>
   <tr>
-    <td class=command>Find</td>
-    <td>Starts picture searching.<br>
-        Pictures found in search operation (if there are any) fill the <b>Search Results</b> folder that is displayed in
-        the root of the group tree. The Search Results folder implements the same functionality as regular picture group
-        folders except that you cannot add or remove its pictures.</td>
+    <td class=command>{[%hh_ii:Open]} Open...</td>
+    <td>Displays the standard File open dialog which allows you to load text of expression from a file saved before. The
+        dropdown arrow button displays the MRU (most recently used) file list.</td>
   </tr>
   <tr>
-    <td class=command>Reset</td>
-    <td>Clears all input fields and reverts all values to their defaults.</td>
+    <td class=command>{[%hh_ii:SaveAs]} Save as...</td>
+    <td>Displays the standard File save dialog allowing to select a file to write the current expression to.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Something]} Insert property</td>
+    <td>Displays a menu containing the list of available <a href="info-filter-expr.html#pic_props">picture
+        properties</a>. When you select an item, property text is inserted at the current caret position in the
+        expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Something]} Insert operator</td>
+    <td>Displays a menu containing the list of available <a href="info-filter-expr.html#operators">operators</a>. When
+        you select an item, operator text is inserted at the current caret position in the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Cut]} Cut</td>
+    <td>Cuts text currently selected in the expression editor, to the clipboard.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Copy]} Copy</td>
+    <td>Copies text currently selected in the expression editor, to the clipboard.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Paste]} Paste</td>
+    <td>Pastes text from the clipboard into the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Undo]} Undo</td>
+    <td>Rolls back the last change made in the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Redo]} Redo</td>
+    <td>Redoes the last misundone change.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:OK]} Syntax check</td>
+    <td>Performs the syntax check of the entered expression and displays a message saying about check results.</td>
   </tr>
 </table>
 
-{[%hh_h2:<a name=datatypes>Picture properties data types</a>]}
-<p align=justify>According to the <a href="general-pic-data.html">picture data table</a>, <b>PhoA</b> uses the following
-  data types for property values:
-
-<table class=plain border=0>
-  <tr class=tblhdr>
-    <td nowrap>Data type</td>
-    <td nowrap>Description &amp; criteria</td>
-  </tr>
-  <tr>
-    <td class=command>Integer or Ordinal</td>
-    <td>An integer value can be compared for equality, inequality etc.</td>
-  </tr>
-  <tr>
-    <td class=command>Filename string</td>
-    <td>Data may be tested for matching the <i>mask</i>. The mask is written by the
-        <a href="info-file-masks.html">standard <b>PhoA</b> rules</a>.</td>
-  </tr>
-  <tr>
-    <td class=command>String</td>
-    <td>Any literal. Searching string or substring is implemented, case insensitive.</td>
-  </tr>
-  <tr>
-    <td class=command>Pixel format</td>
-    <td>Not a searchable type.</td>
-  </tr>
-  <tr>
-    <td class=command>Date</td>
-    <td>Criteria are similar to number ones.</td>
-  </tr>
-  <tr>
-    <td class=command>Time</td>
-    <td>Criteria are similar to number ones.</td>
-  </tr>
-  <tr>
-    <td class=command>String list</td>
-    <td>It is a list of keywords. Keywords may be entered manually or by clicking &quot;<b>...</b>&quot; button in the
-        entry field from the <a href="intf-select-keywords.html">list</a>.</td>
-  </tr>
-</table>
-
-<p align=justify>The program select those pictures that conform to all search conditions at once (ie, an <b>AND</b>
-  operator has effect here).
-<p align=justify>To disable a criterion simply delete its value.
+<p align=justify>The same commands are available in the expressin editor context menu displayed by a mouse right click
+  or using <b>Shift+F10</b> keys.
 
 {[%hh_seealso_en]}
-  <a href="general-pic-data.html">Picture data</a><br>
-  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
-  <a href="intf-controls.html">Keyboard and mouse controls</a><br>
-  <a href="intf-pic-add.html">Add pictures wizard</a><br>
-  <a href="intf-pic-props.html">Edit pictures dialog</a><br>
+  <a href="intf-search.html">Find pictures</a><br>
+  <a href="intf-search-simple.html">Find pictures :: Simple search</a><br>
+  <a href="info-filter-expr.html">Picture filter expressions</a><br>
 
 {[%hh_ftr_en]}
