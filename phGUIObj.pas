@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.11 2004-09-24 16:44:29 dale Exp $
+//  $Id: phGUIObj.pas,v 1.12 2004-09-27 04:14:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -994,7 +994,7 @@ uses Math, Themes, phUtils;
       r := rThumb;
       PaintThumbnail(Pic.ThumbnailData, Pic.PicRotation, Pic.PicFlips, Info.Bitmap, r);
        // Рисуем тень
-      DropShadow(Info.Bitmap, FShadow, r, rThumb, 2, 2, clBlack{!!!});
+      DropShadow(Info.Bitmap, FShadow, r, rThumb, 5, 5, clBlack{!!!});
     end;
 
   begin
@@ -1128,7 +1128,7 @@ uses Math, Themes, phUtils;
   begin
     if not FShadowValid then begin
       if FShadow=nil then FShadow := TBitmap32.Create;
-      RenderShadowTemplate(FShadow, 10, 120, clBlack{!!!});
+      RenderShadowTemplate(FShadow, 7, 140, clBlack{!!!});
       FShadowValid := True;
     end;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.7 2004-09-24 16:44:29 dale Exp $
+//  $Id: phGraphics.pas,v 1.8 2004-09-27 04:14:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -167,7 +167,7 @@ uses JPEG, phUtils;
   procedure DropShadow(Target, ShadowTemplate: TBitmap32; const rObject, rClipOuter: TRect; iOffsetX, iOffsetY: Integer; Color: TColor);
   var
     r, rTotal, rQuarter: TRect;
-    iRadius, iHalfRad: Integer;
+    iRadius: Integer;
     BMPObject: TBitmap32;
 
      // Рисует полоску тени высотой в iRadius и шириной с r, начиная с вертикальной координаты iy (пикселы берёт с
@@ -208,13 +208,12 @@ uses JPEG, phUtils;
       BMPObject.Draw(0, 0, rObject, Target); 
        // Уменьшаем сплошной регион тени на 1/2 радиуса с каждого края (весьма эмпирическое правило)
       iRadius := ShadowTemplate.Width div 2;
-      iHalfRad := iRadius div 2;
       r := rObject;
       with r do begin
-        Inc(Left,   iOffsetX+iHalfRad);
-        Inc(Top,    iOffsetY+iHalfRad);
-        Inc(Right,  iOffsetX-iHalfRad);
-        Inc(Bottom, iOffsetY-iHalfRad);
+        Inc(Left,   iOffsetX+iRadius);
+        Inc(Top,    iOffsetY+iRadius);
+        Inc(Right,  iOffsetX-iRadius);
+        Inc(Bottom, iOffsetY-iRadius);
       end;
        // Считаем общие размеры всей тени
       rTotal := r;
