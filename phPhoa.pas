@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.9 2004-12-06 20:22:45 dale Exp $
+//  $Id: phPhoa.pas,v 1.10 2004-12-22 14:27:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,9 +9,8 @@
 // PhoA file format description
 // The whole code (c)2002-2004 Dmitry Kann, except where otherwise explicitly
 // noted
-// Home sites:
-//   http://devtools.narod.ru/
-//   http://phoa.narod.ru/
+// Home site:
+//   http://www.dk-soft.org/
 //
 // ATTENTION! None of this code can be reproduced in any form without prior
 // permission issued by the author.
@@ -47,7 +46,7 @@ uses SysUtils, Windows, Classes;
    // ===============
    // Photo album files (phoa-files) are binary files accessible only with
    // special programs. Native creator of .phoa is PhoA - picture arranging
-   // tool, which is available for free download at http://phoa.narod.ru/en
+   // tool, which is available for free download at http://www.dk-soft.org/
    //
    // Phoa-files contain various data on how pictures are arranged in the
    // album. At the moment there are five major logical sections in the
@@ -517,6 +516,7 @@ type
     FTransferredBytes: Cardinal;
     FRevisionNumber: Integer;
     FBasePath: String;
+    FErrorsOccured: Boolean;
      // Prop handlers
     procedure SetRevisionNumber(Value: Integer);
     function  GetChunked: Boolean;
@@ -572,6 +572,8 @@ type
     property Chunked: Boolean read GetChunked;
      // -- Photo album file path (for translating relative picture file paths)
     property BasePath: String read FBasePath;
+     // -- True if there were errors while reading or writing using the streamer
+    property ErrorsOccured: Boolean read FErrorsOccured write FErrorsOccured;
      // -- Mode in which the object was created
     property Mode: TPhoaStreamingMode read FMode;
      // -- PhoA Revision Number, readonly in Read mode; can only be modified before any data are written
@@ -585,6 +587,9 @@ type
    // Class for storing/reading photo album data to/from a file
   TPhoaFiler = class(TPhoaStreamer)
   private
+     // Real name of the file used to save the data
+    FWriteFilename: String;
+     // Prop handlers
     FFilename: String;
   public
     constructor Create(AMode: TPhoaStreamingMode; const sFilename: String);
@@ -727,10 +732,15 @@ uses Math, Variants;
 
   procedure TPhoaStreamer.Read(var Buffer; iSize: Integer);
   begin
-    CheckMode(psmRead);
-    if FStream.Read(Buffer, iSize)<>iSize then
-      raise EPhoaStreamerError.CreateFmt(SPhStreamErr_CannotRead, [iSize], IPhStatus_CannotRead);
-    Inc(FTransferredBytes, iSize);
+    try
+      CheckMode(psmRead);
+      if FStream.Read(Buffer, iSize)<>iSize then
+        raise EPhoaStreamerError.CreateFmt(SPhStreamErr_CannotRead, [iSize], IPhStatus_CannotRead);
+      Inc(FTransferredBytes, iSize);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   function TPhoaStreamer.ReadByte: Byte;
@@ -741,73 +751,88 @@ uses Math, Variants;
   function TPhoaStreamer.ReadChunk(out Code: TPhChunkCode; out Datatype: TPhChunkDatatype): TPhReadingChunkResult;
   var pe: PPhChunkEntry;
   begin
-     // Check if there are data at all
-    if FStream.Position>=FStream.Size then begin
-      Code     := 0;
-      Datatype := pcdEmpty;
-      Result   := rcrEOF;
-     // Read the chunk and its datatype
-    end else begin
-      Code     := ReadWord;
-      Datatype := TPhChunkDatatype(ReadByte);
-       // Try to find a chunk
-      pe := FindChunk(Code);
-       // Validate Datatype
-      if not (Datatype in [Low(Datatype)..High(Datatype)]) then Result := rcrInvalidDatatype
-       // If not found
-      else if pe=nil then Result := rcrUnknown
-       // Compare Datatype
-      else if Datatype<>pe.Datatype then Result := rcrDatatypeMismatch
-       // Ok
-      else Result := rcrOK;
+    try
+       // Check if there are data at all
+      if FStream.Position>=FStream.Size then begin
+        Code     := 0;
+        Datatype := pcdEmpty;
+        Result   := rcrEOF;
+       // Read the chunk and its datatype
+      end else begin
+        Code     := ReadWord;
+        Datatype := TPhChunkDatatype(ReadByte);
+         // Try to find a chunk
+        pe := FindChunk(Code);
+         // Validate Datatype
+        if not (Datatype in [Low(Datatype)..High(Datatype)]) then Result := rcrInvalidDatatype
+         // If not found
+        else if pe=nil then Result := rcrUnknown
+         // Compare Datatype
+        else if Datatype<>pe.Datatype then Result := rcrDatatypeMismatch
+         // Ok
+        else Result := rcrOK;
+      end;
+    except
+      FErrorsOccured := True;
+      raise;
     end;
   end;
 
   function TPhoaStreamer.ReadChunkValue(out Code: TPhChunkCode; out Datatype: TPhChunkDatatype; var vValue: Variant; bSkipUnknown, bSkipUnmatched: Boolean): TPhReadingChunkResult;
   var pe: PPhChunkEntry;
   begin
-    vValue := Null;
-    repeat
-      Result := ReadChunk(Code, Datatype);
-      case Result of
-        rcrInvalidDatatype:  raise EPhoaStreamerError.CreateFmt(SPhStreamErr_InvalidDatatype, [Byte(Datatype)], IPhStatus_InvalidDatatype);
-        rcrEOF:              Break;
-      end;
-       // Read the value
-      case Datatype of
-        pcdByte:    vValue := ReadByte;
-        pcdWord:    vValue := ReadWord;
-        pcdInt:     vValue := ReadInt;
-        pcdStringB: vValue := ReadStringB;
-        pcdStringW: vValue := ReadStringW;
-        pcdStringI: vValue := ReadStringI;
-      end;
-       // Validate ranges for ordinal types. Outranged values assume unmatched
-      if (Result=rcrOK) and (Datatype in [pcdByte, pcdWord, pcdInt]) then begin
-        pe := FindChunk(Code);
-        if (vValue<pe.iRangeMin) or (vValue>pe.iRangeMax) then Result := rcrDatatypeMismatch;
-      end;
-       // Check the chunk for validity
-      case Result of
-        rcrOK:               Break;
-        rcrUnknown:          if not bSkipUnknown then Break;
-        rcrDatatypeMismatch: if not bSkipUnmatched then Break;
-      end;
-       // Chunk is to be skipped, if we're here. Check if it's nested one
-      SkipNestedChunks(Code);
-    until False;
+    try
+      vValue := Null;
+      repeat
+        Result := ReadChunk(Code, Datatype);
+        case Result of
+          rcrInvalidDatatype:  raise EPhoaStreamerError.CreateFmt(SPhStreamErr_InvalidDatatype, [Byte(Datatype)], IPhStatus_InvalidDatatype);
+          rcrEOF:              Break;
+        end;
+         // Read the value
+        case Datatype of
+          pcdByte:    vValue := ReadByte;
+          pcdWord:    vValue := ReadWord;
+          pcdInt:     vValue := ReadInt;
+          pcdStringB: vValue := ReadStringB;
+          pcdStringW: vValue := ReadStringW;
+          pcdStringI: vValue := ReadStringI;
+        end;
+         // Validate ranges for ordinal types. Outranged values assume unmatched
+        if (Result=rcrOK) and (Datatype in [pcdByte, pcdWord, pcdInt]) then begin
+          pe := FindChunk(Code);
+          if (vValue<pe.iRangeMin) or (vValue>pe.iRangeMax) then Result := rcrDatatypeMismatch;
+        end;
+         // Check the chunk for validity
+        case Result of
+          rcrOK:               Break;
+          rcrUnknown:          if not bSkipUnknown then Break;
+          rcrDatatypeMismatch: if not bSkipUnmatched then Break;
+        end;
+         // Chunk is to be skipped, if we're here. Check if it's nested one
+        SkipNestedChunks(Code);
+      until False;
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.ReadHeader;
   var s: String;
   begin
-     // Load and check signature
-    SetLength(s, Length(SPhoAFileSignature));
-    Read(s[1], Length(s));
-    ValidateSignature(s);
-     // Read Revision Number
-    FRevisionNumber := ReadInt;
-    ValidateRevision;
+    try
+       // Load and check signature
+      SetLength(s, Length(SPhoAFileSignature));
+      Read(s[1], Length(s));
+      ValidateSignature(s);
+       // Read Revision Number
+      FRevisionNumber := ReadInt;
+      ValidateRevision;
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   function TPhoaStreamer.ReadInt: Integer;
@@ -846,10 +871,15 @@ uses Math, Variants;
 
   procedure TPhoaStreamer.SetRevisionNumber(Value: Integer);
   begin
-    CheckMode(psmWrite);
-    if FTransferredBytes>0 then
-      raise EPhoaStreamerError.Create(SPhStreamErr_CannotAlterRevision, IPhStatus_CannotAlterRevision);
-    FRevisionNumber := Value;
+    try
+      CheckMode(psmWrite);
+      if FTransferredBytes>0 then
+        raise EPhoaStreamerError.Create(SPhStreamErr_CannotAlterRevision, IPhStatus_CannotAlterRevision);
+      FRevisionNumber := Value;
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.SkipNestedChunks(OpenCode: TPhChunkCode);
@@ -858,37 +888,57 @@ uses Math, Variants;
     Datatype: TPhChunkDatatype;
     vValue: Variant;
   begin
-    if IsOpenChunk(OpenCode) then
-      repeat
-        if ReadChunkValue(wCode, Datatype, vValue, True, True)=rcrEOF then Break;
-         // If nested-chunk-structure encountered, recurse it
-        SkipNestedChunks(wCode);
-      until IsCloseChunk(wCode, OpenCode);
+    try
+      if IsOpenChunk(OpenCode) then
+        repeat
+          if ReadChunkValue(wCode, Datatype, vValue, True, True)=rcrEOF then Break;
+           // If nested-chunk-structure encountered, recurse it
+          SkipNestedChunks(wCode);
+        until IsCloseChunk(wCode, OpenCode);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.ValidateRevision;
   begin
-     // Check that we are dealing with chunk-based file
-    if not Chunked then raise EPhoaStreamerError.Create(SPhStreamErr_NotAChunkedFile, IPhStatus_NotAChunkedFile);
-    {$IFDEF StrictRevision}
-     // Check that RevisionNumber is 'normal' for proper handling
-    if FRevisionNumber>IPhFileRevisionNumber then
-      raise EPhoaStreamerError.Create(SPhStreamErr_FileRevNewer, IPhStatus_FileRevNewer);
-    {$ENDIF StrictRevision}
+    try
+       // Check that we are dealing with chunk-based file
+      if not Chunked then raise EPhoaStreamerError.Create(SPhStreamErr_NotAChunkedFile, IPhStatus_NotAChunkedFile);
+      {$IFDEF StrictRevision}
+       // Check that RevisionNumber is 'normal' for proper handling
+      if FRevisionNumber>IPhFileRevisionNumber then
+        raise EPhoaStreamerError.Create(SPhStreamErr_FileRevNewer, IPhStatus_FileRevNewer);
+      {$ENDIF StrictRevision}
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.ValidateSignature(const sReadSignature: String);
   begin
-    if sReadSignature<>SPhoAFileSignature then
-      raise EPhoaStreamerError.Create(SPhStreamErr_InvalidSinature, IPhStatus_InvalidSignature);
+    try
+      if sReadSignature<>SPhoAFileSignature then
+        raise EPhoaStreamerError.Create(SPhStreamErr_InvalidSinature, IPhStatus_InvalidSignature);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.Write(const Buffer; iSize: Integer);
   begin
-    CheckMode(psmWrite);
-    if FStream.Write(Buffer, iSize)<>iSize then
-      raise EPhoaStreamerError.CreateFmt(SPhStreamErr_CannotWrite, [iSize], IPhStatus_CannotWrite);
-    Inc(FTransferredBytes, iSize);
+    try
+      CheckMode(psmWrite);
+      if FStream.Write(Buffer, iSize)<>iSize then
+        raise EPhoaStreamerError.CreateFmt(SPhStreamErr_CannotWrite, [iSize], IPhStatus_CannotWrite);
+      Inc(FTransferredBytes, iSize);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.WriteByte(b: Byte);
@@ -910,53 +960,73 @@ uses Math, Variants;
   procedure TPhoaStreamer.WriteChunkByte(Code: TPhChunkCode; b: Byte);
   var pe: PPhChunkEntry;
   begin
-     // Find chunk entry
-    pe := FindChunkStrict(Code);
-    if pe.Datatype<>pcdByte then WrongWriteChunkDatatype('Byte');
-     // Write chunk/datatype code
-    WriteChunk(Code, pcdByte);
-     // Write chunk data
-    WriteByte(b);
+    try
+       // Find chunk entry
+      pe := FindChunkStrict(Code);
+      if pe.Datatype<>pcdByte then WrongWriteChunkDatatype('Byte');
+       // Write chunk/datatype code
+      WriteChunk(Code, pcdByte);
+       // Write chunk data
+      WriteByte(b);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.WriteChunkInt(Code: TPhChunkCode; i: Integer);
   var pe: PPhChunkEntry;
   begin
-     // Find chunk entry
-    pe := FindChunkStrict(Code);
-    if pe.Datatype<>pcdInt then WrongWriteChunkDatatype('Int');
-     // Write chunk/datatype code
-    WriteChunk(Code, pcdInt);
-     // Write chunk data
-    WriteInt(i);
+    try
+       // Find chunk entry
+      pe := FindChunkStrict(Code);
+      if pe.Datatype<>pcdInt then WrongWriteChunkDatatype('Int');
+       // Write chunk/datatype code
+      WriteChunk(Code, pcdInt);
+       // Write chunk data
+      WriteInt(i);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.WriteChunkString(Code: TPhChunkCode; const s: String);
   var pe: PPhChunkEntry;
   begin
-     // Find chunk entry
-    pe := FindChunkStrict(Code);
-    if not (pe.Datatype in [pcdStringB, pcdStringW, pcdStringI]) then WrongWriteChunkDatatype('StringB, StringW or StringI');
-     // Write chunk/datatype code
-    WriteChunk(Code, pe.Datatype);
-     // Write chunk data
-    case pe.Datatype of
-      pcdStringB: WriteStringB(s);
-      pcdStringW: WriteStringW(s);
-      pcdStringI: WriteStringI(s);
+    try
+       // Find chunk entry
+      pe := FindChunkStrict(Code);
+      if not (pe.Datatype in [pcdStringB, pcdStringW, pcdStringI]) then WrongWriteChunkDatatype('StringB, StringW or StringI');
+       // Write chunk/datatype code
+      WriteChunk(Code, pe.Datatype);
+       // Write chunk data
+      case pe.Datatype of
+        pcdStringB: WriteStringB(s);
+        pcdStringW: WriteStringW(s);
+        pcdStringI: WriteStringI(s);
+      end;
+    except
+      FErrorsOccured := True;
+      raise;
     end;
   end;
 
   procedure TPhoaStreamer.WriteChunkWord(Code: TPhChunkCode; w: Word);
   var pe: PPhChunkEntry;
   begin
-     // Find chunk entry
-    pe := FindChunkStrict(Code);
-    if pe.Datatype<>pcdWord then WrongWriteChunkDatatype('Word');
-     // Write chunk/datatype code
-    WriteChunk(Code, pcdWord);
-     // Write chunk data
-    WriteWord(w);
+    try
+       // Find chunk entry
+      pe := FindChunkStrict(Code);
+      if pe.Datatype<>pcdWord then WrongWriteChunkDatatype('Word');
+       // Write chunk/datatype code
+      WriteChunk(Code, pcdWord);
+       // Write chunk data
+      WriteWord(w);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
   end;
 
   procedure TPhoaStreamer.WriteHeader;
@@ -1008,15 +1078,32 @@ uses Math, Variants;
    //-------------------------------------------------------------------------------------------------------------------
 
   constructor TPhoaFiler.Create(AMode: TPhoaStreamingMode; const sFilename: String);
-  const aFileMode: Array[TPhoaStreamingMode] of Word = (fmOpenRead or fmShareDenyWrite, fmCreate);
+  var AStream: TStream;
   begin
-    inherited Create(TFileStream.Create(sFilename, aFileMode[AMode]), AMode, ExtractFilePath(sFilename));
-    FFilename := sFilename;
+    try
+       // Determine the file to read from or write to and create a file stream
+      FFilename := sFilename;
+      if AMode=psmWrite then begin
+        FWriteFilename := FFilename+'.tmp';
+        AStream := TFileStream.Create(FWriteFilename, fmCreate);
+      end else
+        AStream := TFileStream.Create(FFilename, fmOpenRead or fmShareDenyWrite);
+       // Create the streamer
+      inherited Create(AStream, AMode, ExtractFilePath(FFilename));
+    except
+      ErrorsOccured := True;
+      raise;
+    end;
   end;
 
   destructor TPhoaFiler.Destroy;
   begin
     Stream.Free;
+     // On successful writing, replace the original file with new (.tmp)
+    if (Mode=psmWrite) and not ErrorsOccured then begin
+      DeleteFile(PChar(FFilename));
+      MoveFile(PChar(FWriteFilename), PChar(FFilename));
+    end;
     inherited Destroy;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.86 2004-12-10 13:45:12 dale Exp $
+//  $Id: ConsVars.pas,v 1.87 2004-12-22 14:27:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1309,6 +1309,8 @@ initialization
   RootSetting := TPhoaSetting.Create(nil, 0, '');
    // —оздаЄм глобальный экземпл€р IDKWeb
   DKWeb := DKCreateDKWeb(SAppProductSID, SAppVersionSID);
+   // –егистрируем формат DNG
+  FileFormatList.RegisterFileFormat('dng', 'Adobe Digital Negative', '', [ftRaster, ftMultiImage], False, TTIFFGraphic);
 finalization
   DKWeb := nil;
   RootSetting.Free;
