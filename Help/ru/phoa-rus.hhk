@@ -537,11 +537,6 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="&acirc;&icirc;&ntilde;&ntilde;&ograve;&agrave;&iacute;&icirc;&acirc;&euml;&aring;&iacute;&egrave;&aring; &ntilde;&ntilde;&ucirc;&euml;&icirc;&ecirc;">
-			<param name="Name" value="Мастер операций с файлами изображений :: Опции восстановления ссылок на файлы">
-			<param name="Local" value="intf-file-ops-repropts.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &acirc; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
 			<param name="Name" value="Мастер добавления изображений">
 			<param name="Local" value="intf-pic-add.html">

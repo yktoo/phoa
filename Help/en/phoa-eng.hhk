@@ -139,11 +139,6 @@
 			<param name="Local" value="intf-file-ops-task-rthumb.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="repairing links to">
-			<param name="Name" value="Мастер операций с файлами изображений :: Операция восстановления ссылок на файлы">
-			<param name="Local" value="intf-file-ops-task-repfl.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="setting files">
 			<param name="Name" value="Storing the program settings in a file">
 			<param name="Local" value="setup-storing.html">

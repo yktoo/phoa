@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.18 2004-12-31 13:38:58 dale Exp $
+;   $Id: phoa.iss,v 1.19 2005-01-21 09:52:07 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright DK Software, http://www.dk-soft.org/
@@ -31,9 +31,9 @@
   Compression            = lzma
 
 [Languages]
-  Name: "en"; MessagesFile: compiler:Default.isl;           LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.8-beta.en.rtf
-  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl; LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.8-beta.ru.rtf
-  Name: "de"; MessagesFile: compiler:Languages\German.isl;  LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.8-beta.en.rtf
+  Name: "en"; MessagesFile: compiler:Default.isl;           LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.en.rtf
+  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl; LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.ru.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;  LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.en.rtf
 
 [Tasks]
   Name: desktopicon;        Description: {cm:CreateDesktopIcon};             GroupDescription: {cm:AdditionalIcons};

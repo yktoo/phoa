@@ -275,10 +275,6 @@
 						<param name="Name" value="Rebuild thumbnails">
 						<param name="Local" value="intf-file-ops-task-rthumb.html">
 						</OBJECT>
-					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Repair file links">
-						<param name="Local" value="intf-file-ops-task-repfl.html">
-						</OBJECT>
 				</UL>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Wizard pages">
@@ -311,10 +307,6 @@
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Deletion options">
 						<param name="Local" value="intf-file-ops-delopts.html">
-						</OBJECT>
-					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="Repair file links options">
-						<param name="Local" value="intf-file-ops-repropts.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
 						<param name="Name" value="Operation process">
