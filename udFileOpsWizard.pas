@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.5 2004-04-18 16:13:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -307,7 +307,7 @@ uses
   ufrWzPage_Processing, ufrWzPageFileOps_SelTask, ufrWzPageFileOps_SelPics, ufrWzPageFileOps_SelFolder,
   ufrWzPageFileOps_MoveOptions, ufrWzPageFileOps_DelOptions, ufrWzPageFileOps_RepairOptions,
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
-  ufrWzPageFileOps_MoveOptions2;
+  ufrWzPageFileOps_MoveOptions2, phSettings;
 
   function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; const aViewerSelPicIDs: TIDArray; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
   begin

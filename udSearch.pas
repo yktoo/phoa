@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udSearch.pas,v 1.3 2004-04-18 16:13:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -49,7 +49,8 @@ type
 
 implementation
 {$R *.dfm}
-uses TypInfo, StrUtils, Mask, ToolEdit, phUtils, ConsVars, udSelKeywords;
+uses TypInfo, StrUtils, Mask, ToolEdit, phUtils, ConsVars, udSelKeywords,
+  phSettings;
 
   function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: TPhoaGroup): Boolean;
   begin

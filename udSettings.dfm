@@ -50,7 +50,7 @@ inherited dSettings: TdSettings
       Header.Font.Height = -11
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
-      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoVisible]
+      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
       HintMode = hmTooltip
       ParentBackground = False
       TabOrder = 1

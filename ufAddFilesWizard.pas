@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.4 2004-04-18 16:13:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -153,7 +153,7 @@ implementation
 uses
   phUtils, phMetadata, Main, VirtualShellUtilities,
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
-  phPhoa;
+  phPhoa, phSettings;
 
   function SelectFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
   begin

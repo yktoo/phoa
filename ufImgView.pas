@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
+//  $Id: ufImgView.pas,v 1.4 2004-04-18 16:13:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -293,7 +293,7 @@ type
 
 implementation
 {$R *.dfm}
-uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main;
+uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
 
   procedure ViewImage(Group: TPhoaGroup; PhoA: TPhotoAlbum; iPicIdx: Integer; UndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin

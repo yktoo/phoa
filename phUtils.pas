@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
+//  $Id: phUtils.pas,v 1.5 2004-04-18 16:13:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -126,7 +126,7 @@ uses
   procedure OpenWebsite;
 
 implementation
-uses Forms, Main, TypInfo, Registry, ShellAPI;
+uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
 
   procedure PhoaError(const sMsg: String; const aParams: Array of const);
 

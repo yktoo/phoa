@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
+//  $Id: udSettings.pas,v 1.5 2004-04-18 16:13:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,7 +9,7 @@ unit udSettings;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings,
   phDlg, VirtualTrees, TB2Dock, TB2Toolbar, TBX, ExtCtrls, DTLangTools,
   StdCtrls;
 
@@ -100,6 +100,13 @@ type
   begin
     Msg.Result := DLGC_WANTARROWS;
   end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // TSettingTree - потомок TVirtualStringTree для редактора свойств
+   //-------------------------------------------------------------------------------------------------------------------
+
+//!!!type
+
 
    //-------------------------------------------------------------------------------------------------------------------
    // TdSettings
