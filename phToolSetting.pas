@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.1 2004-04-24 18:48:31 dale Exp $
+//  $Id: phToolSetting.pas,v 1.2 2004-04-25 16:28:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -39,7 +39,6 @@ type
   TPhoaToolSetting = class(TPhoaSetting)
   private
      // Prop storage
-    FCaption: String;
     FHint: String;
     FKind: TPhoaToolKind;
     FMasks: String;
@@ -53,7 +52,7 @@ type
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
   public
-    constructor Create(AOwner: TPhoaSetting; const sCaption, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String;
+    constructor Create(AOwner: TPhoaSetting; const sName, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String;
                        AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
     procedure Assign(Source: TPhoaSetting); override;
     procedure RegLoad(RegIniFile: TRegIniFile); override;
@@ -61,12 +60,12 @@ type
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
      // Props
-     // -- Наименование инструмента
-    property Caption: String read FCaption write FCaption;
      // -- Подсказка
     property Hint: String read FHint write FHint;
      // -- Вид инструмента
     property Kind: TPhoaToolKind read FKind write FKind;
+     // -- Наименование, доступное для записи
+    property Name: String read FName write FName;
      // -- Команда запуска (для Kind=ptkCustom)
     property RunCommand: String read FRunCommand write FRunCommand;
      // -- Каталог запуска (для Kind=ptkCustom)
@@ -88,6 +87,11 @@ type
   TPhoaToolPageSetting = class(TPhoaPageSetting)
   protected
     function  GetEditorClass: TWinControlClass; override;
+  public
+    procedure RegLoad(RegIniFile: TRegIniFile); override;
+    procedure RegSave(RegIniFile: TRegIniFile); override;
+    procedure IniLoad(IniFile: TIniFile); override;
+    procedure IniSave(IniFile: TIniFile); override;
   end;
 
    // Преобразование TPhoaToolKind <-> String
@@ -98,7 +102,7 @@ type
   function PhoaToolUsagesFromStr(const sUsages: String): TPhoaToolUsages;
 
 implementation
-uses TypInfo, phUtils, TBX, Main;
+uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
 
   function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
   begin
@@ -137,6 +141,11 @@ type
   private
      // Смещение к данным узла (объекту настройки)
     FDataOffset: Cardinal;
+     // Пункты меню
+    FItemDelete: TTBXItem;
+    FItemEdit: TTBXItem;
+    FItemMoveUp: TTBXItem;
+    FItemMoveDown: TTBXItem;
      // Prop storage
     FOnSettingChange: TNotifyEvent;
     FOnDecodeText: TPhoaSettingDecodeTextEvent;
@@ -151,21 +160,24 @@ type
     procedure SetupHeader;
      // Создаёт PopupMenu
     procedure CreatePopupMenu;
+     // Настраивает доступность пунктов PopupMenu 
+    procedure EnablePopupMenuItems;
      // События меню
-    procedure AddToolClick(Sender: TObject);
     procedure DeleteToolClick(Sender: TObject);
     procedure EditToolClick(Sender: TObject);
+    procedure MoveToolUpClick(Sender: TObject);
+    procedure MoveToolDownClick(Sender: TObject);
      // IPhoaSettingEditor
     procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
     function  GetRootSetting: TPhoaPageSetting;
     procedure SetRootSetting(Value: TPhoaPageSetting);
   protected
-//    procedure DoAfterCellPaint(TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect); override;
+    procedure DblClick; override;
     procedure DoChecked(Node: PVirtualNode); override;
-//    procedure DoFocusChange(Node: PVirtualNode; Column: TColumnIndex); override;
+    procedure DoFocusChange(Node: PVirtualNode; Column: TColumnIndex); override;
     procedure DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates); override;
+    procedure DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer); override;
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString); override;
-//    procedure DoPaintText(Node: PVirtualNode; const Canvas: TCanvas; Column: TColumnIndex; TextType: TVSTTextType); override;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -178,7 +190,6 @@ type
   begin
     inherited Assign(Source);
     if Source is TPhoaToolSetting then begin
-      FCaption        := TPhoaToolSetting(Source).FCaption;
       FHint           := TPhoaToolSetting(Source).FHint;
       FKind           := TPhoaToolSetting(Source).FKind;
       FMasks          := TPhoaToolSetting(Source).FMasks;
@@ -190,10 +201,9 @@ type
     end;
   end;
 
-  constructor TPhoaToolSetting.Create(AOwner: TPhoaSetting; const sCaption, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String; AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
+  constructor TPhoaToolSetting.Create(AOwner: TPhoaSetting; const sName, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String; AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
   begin
-    inherited Create(AOwner, 0, '');
-    FCaption        := sCaption;
+    inherited Create(AOwner, 0, sName);
     FHint           := sHint;
     FRunCommand     := sRunCommand;
     FRunFolder      := sRunFolder;
@@ -218,45 +228,20 @@ type
   end;
 
   procedure TPhoaToolSetting.IniLoad(IniFile: TIniFile);
-  var sSection: String;
   begin
-    sSection := GetStoreSection;
-    FCaption        := IniFile.ReadString (sSection, 'Caption',    '');
-    FHint           := IniFile.ReadString (sSection, 'Hint',       '');
-    FKind           := PhoaToolKindFromStr(
-                       IniFile.ReadString (sSection, 'Kind',       ''),
-                       FKind);
-    FMasks          := IniFile.ReadString (sSection, 'Masks',      '');
-    FRunCommand     := IniFile.ReadString (sSection, 'RunCmd',     '');
-    FRunFolder      := IniFile.ReadString (sSection, 'RunFolder',  '');
-    FRunParameters  := IniFile.ReadString (sSection, 'RunParams',  '');
-    FRunShowCommand := IniFile.ReadInteger(sSection, 'RunShowCmd', SW_SHOWNORMAL);
-    FUsages         := PhoaToolUsagesFromStr(
-                       IniFile.ReadString (sSection, 'Usages',     'M'));
-    inherited IniLoad(IniFile);
+    { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
   procedure TPhoaToolSetting.IniSave(IniFile: TIniFile);
-  var sSection: String;
   begin
-    sSection := GetStoreSection;
-    IniFile.WriteString (sSection, 'Caption',    FCaption);
-    IniFile.WriteString (sSection, 'Hint',       FHint);
-    IniFile.WriteString (sSection, 'Kind',       PhoaToolKindToStr(FKind));
-    IniFile.WriteString (sSection, 'Masks',      FMasks);
-    IniFile.WriteString (sSection, 'RunCmd',     FRunCommand);
-    IniFile.WriteString (sSection, 'RunFolder',  FRunFolder);
-    IniFile.WriteString (sSection, 'RunParams',  FRunParameters);
-    IniFile.WriteInteger(sSection, 'RunShowCmd', FRunShowCommand);
-    IniFile.WriteString (sSection, 'Usages',     PhoaToolUsagesToStr(FUsages));
-    inherited IniSave(IniFile);
+    { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
   procedure TPhoaToolSetting.RegLoad(RegIniFile: TRegIniFile);
   var sSection: String;
   begin
     sSection := GetStoreSection;
-    FCaption        := RegIniFile.ReadString (sSection, 'Caption',    '');
+    FName           := RegIniFile.ReadString (sSection, 'Name',       '');
     FHint           := RegIniFile.ReadString (sSection, 'Hint',       '');
     FKind           := PhoaToolKindFromStr(
                        RegIniFile.ReadString (sSection, 'Kind',       ''),
@@ -275,7 +260,7 @@ type
   var sSection: String;
   begin
     sSection := GetStoreSection;
-    RegIniFile.WriteString (sSection, 'Caption',    FCaption);
+    RegIniFile.WriteString (sSection, 'Name',       FName);
     RegIniFile.WriteString (sSection, 'Hint',       FHint);
     RegIniFile.WriteString (sSection, 'Kind',       PhoaToolKindToStr(FKind));
     RegIniFile.WriteString (sSection, 'Masks',      FMasks);
@@ -296,14 +281,41 @@ type
     Result := TPhoaToolSettingEditor;
   end;
 
+  procedure TPhoaToolPageSetting.IniLoad(IniFile: TIniFile);
+  begin
+    { Инструменты не поддерживают хранение в Ini-файлах }
+  end;
+
+  procedure TPhoaToolPageSetting.IniSave(IniFile: TIniFile);
+  begin
+    { Инструменты не поддерживают хранение в Ini-файлах }
+  end;
+
+  procedure TPhoaToolPageSetting.RegLoad(RegIniFile: TRegIniFile);
+  var i, iCount: Integer;
+  begin
+     // Получаем количество детей
+    iCount := RegIniFile.ReadInteger(SRegPrefTools, 'Count', -1);
+     // Если сохранение не производилось, оставляем всё как есть. Иначе загружаем инструменты
+    if iCount>=0 then begin
+      ClearChildren;
+      for i := 0 to iCount-1 do TPhoaToolSetting.CreateNew(Self).RegLoad(RegIniFile);
+    end;
+  end;
+
+  procedure TPhoaToolPageSetting.RegSave(RegIniFile: TRegIniFile);
+  begin
+     // Стираем секцию инструментов
+    RegIniFile.EraseSection(SRegPrefTools);
+     // Пишем количество инструментов
+    RegIniFile.WriteInteger(SRegPrefTools, 'Count', ChildCount);
+     // Сохраняем всех детей
+    inherited RegSave(RegIniFile);
+  end;
+
    //===================================================================================================================
    // TPhoaToolSettingEditor
    //===================================================================================================================
-
-  procedure TPhoaToolSettingEditor.AddToolClick(Sender: TObject);
-  begin
-    //
-  end;
 
   constructor TPhoaToolSettingEditor.Create(AOwner: TComponent);
   begin
@@ -311,13 +323,14 @@ type
      // Каждый узел хранит TPhoaToolSetting
     FDataOffset := AllocateInternalDataArea(SizeOf(Pointer));
     Align := alClient;
+    Images := fMain.ilActionsSmall;
      // Настраиваем Header
     SetupHeader;
     with TreeOptions do begin
       AutoOptions      := [toAutoDropExpand, toAutoScroll, toAutoTristateTracking, toAutoDeleteMovedNodes];
       MiscOptions      := [toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning];
       PaintOptions     := [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages];
-      SelectionOptions := [toFullRowSelect];
+      SelectionOptions := [toFullRowSelect, toRightClickSelect];
     end;
     HintMode := hmTooltip;
      // Применяем опции
@@ -329,36 +342,70 @@ type
   procedure TPhoaToolSettingEditor.CreatePopupMenu;
   var pm: TTBXPopupMenu;
 
-    procedure NewItem(iImgIdx: Integer; const sCaption: String; const ClickEvent: TNotifyEvent);
-    var itm: TTBXItem;
+    function NewItem(iImgIdx: Integer; const sCaption, sShortcut: String; const ClickEvent: TNotifyEvent; bDefault: Boolean): TTBXItem;
     begin
-      itm := TTBXItem.Create(Self);
-      itm.ImageIndex := iImgIdx;
-      itm.Caption    := sCaption;
-      itm.OnClick    := ClickEvent;
-      pm.Items.Add(itm);
+      Result := TTBXItem.Create(Self);
+      Result.ImageIndex := iImgIdx;
+      Result.Caption    := sCaption;
+      if bDefault then Result.Options := Result.Options+[tboDefault];
+      Result.OnClick    := ClickEvent;
+      Result.ShortCut   := TextToShortCut(sShortcut);
+      pm.Items.Add(Result);
+    end;
+
+    procedure NewSeparator;
+    begin
+      pm.Items.Add(TTBXSeparatorItem.Create(Self));
     end;
 
   begin
+     // Создаём меню
     pm := TTBXPopupMenu.Create(Self);
-    NewItem(iiUp{!!!}, 'Add',        AddToolClick);
-    NewItem(iiDelete,  'Delete',     DeleteToolClick);
-    pm.Items.Add(TTBXSeparatorItem.Create(Self));
-    NewItem(iiEdit,    'Properties', EditToolClick);
+     // Наполняем пунктами
+    FItemDelete   := NewItem(iiDelete, ConstVal('SDelete'),   'Del',       DeleteToolClick,   False);
+    NewSeparator;
+    FItemEdit     := NewItem(iiEdit,   ConstVal('SEdit'),     'Alt+Enter', EditToolClick,     True);
+    NewSeparator;
+    FItemMoveUp   := NewItem(iiUp,     ConstVal('SMoveUp'),   'Ctrl+Up',   MoveToolUpClick,   False);
+    FItemMoveDown := NewItem(iiDown,   ConstVal('SMoveDown'), 'Ctrl+Down', MoveToolDownClick, False);
+     // Привязываем ImageList
     pm.Images := fMain.ilActionsSmall;
+     // Привязываем к дереву
     PopupMenu := pm;
   end;
 
-  procedure TPhoaToolSettingEditor.DeleteToolClick(Sender: TObject);
+  procedure TPhoaToolSettingEditor.DblClick;
   begin
-    //
+    inherited DblClick;
+    EditToolClick(nil);
+  end;
+
+  procedure TPhoaToolSettingEditor.DeleteToolClick(Sender: TObject);
+  var n: PVirtualNode;
+  begin
+    n := FocusedNode;
+    if n<>nil then begin
+      GetSetting(n).Free;
+      DeleteNode(n);
+    end;
   end;
 
   procedure TPhoaToolSettingEditor.DoChecked(Node: PVirtualNode);
   var p: TPoint;
   begin
+    ActivateVTVNode(Self, Node);
     with GetDisplayRect(Node, -1, False) do p := ClientToScreen(Point(Left, Bottom));
     PopupMenu.Popup(p.x, p.y);
+  end;
+
+  procedure TPhoaToolSettingEditor.DoFocusChange(Node: PVirtualNode; Column: TColumnIndex);
+  begin
+    EnablePopupMenuItems;
+  end;
+
+  procedure TPhoaToolSettingEditor.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer);
+  begin
+    if (Kind in [ikNormal, ikSelected]) and (Column=0) and (Integer(Node.Index)<FRootSetting.ChildCount) then Index := iiTool;
   end;
 
   procedure TPhoaToolSettingEditor.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -368,23 +415,24 @@ type
   begin
     s := '';
     Setting := GetSetting(Node);
-    case Column of
-       // Текст
-      0: s := Setting.Caption;
-       // Вид
-      1: s := GetEnumName(TypeInfo(TPhoaToolKind), Byte(Setting.Kind));
-       // Маски
-      2: s := Setting.Masks;
-       // Приложение
-      3: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
-    end;
+    if Setting<>nil then
+      case Column of
+         // Текст
+        0: s := Setting.Name;
+         // Вид
+        1: s := GetEnumName(TypeInfo(TPhoaToolKind), Byte(Setting.Kind));
+         // Маски
+        2: s := Setting.Masks;
+         // Приложение
+        3: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
+      end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   procedure TPhoaToolSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
-     // Сохраняем пункт в Node.Data
-    PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
+     // Если это не последний "пустой" пункт, сохраняем пункт TPhoaToolSetting в Node.Data
+    if Integer(Node.Index)<FRootSetting.ChildCount then PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
      // Настраиваем CheckType и CheckState - кнопку
     Node.CheckType := ctButton;
   end;
@@ -395,8 +443,27 @@ type
   end;
 
   procedure TPhoaToolSettingEditor.EditToolClick(Sender: TObject);
+  var n: PVirtualNode;
   begin
-    //
+    n := FocusedNode;
+    if (n<>nil) and EditTool(GetSetting(n), FRootSetting) then begin
+      DoSettingChange;
+      LoadTree;
+    end;
+  end;
+
+  procedure TPhoaToolSettingEditor.EnablePopupMenuItems;
+  var
+    n: PVirtualNode;
+    idx, idxMaxTool: Integer;
+  begin
+    n := FocusedNode;
+    if n=nil then idx := -1 else idx := n.Index;
+    idxMaxTool := RootNodeCount-2;
+    FItemDelete.Enabled   := (idx>=0) and (idx<=idxMaxTool);
+    FItemEdit.Enabled     := (idx>=0) and (idx<=idxMaxTool+1);
+    FItemMoveUp.Enabled   := (idx>0) and (idx<=idxMaxTool);
+    FItemMoveDown.Enabled := (idx>=0) and (idx<idxMaxTool);
   end;
 
   function TPhoaToolSettingEditor.GetRootSetting: TPhoaPageSetting;
@@ -422,8 +489,8 @@ type
     try
        // Удаляем все узлы
       Clear;
-       // Устанавливаем количество записей в корневом каталоге
-      RootNodeCount := FRootSetting.ChildCount;
+       // Устанавливаем количество записей в корневом каталоге (+1 - на пустую строку для добавления)
+      RootNodeCount := FRootSetting.ChildCount+1;
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Выделяем первый узел
@@ -431,6 +498,16 @@ type
     finally
       EndUpdate;
     end;
+  end;
+
+  procedure TPhoaToolSettingEditor.MoveToolDownClick(Sender: TObject);
+  begin
+    //!!!
+  end;
+
+  procedure TPhoaToolSettingEditor.MoveToolUpClick(Sender: TObject);
+  begin
+    //!!!
   end;
 
   procedure TPhoaToolSettingEditor.SetRootSetting(Value: TPhoaPageSetting);
@@ -445,15 +522,15 @@ type
   begin
     with Header do begin
       with Columns.Add do begin
-        Width := 200;
+        Width := 150;
         Text  := 'Name'{!!!};
       end;
       with Columns.Add do begin
-        Width := 100;
+        Width := 70;
         Text  := 'Kind'{!!!};
       end;
       with Columns.Add do begin
-        Width := 100;
+        Width := 80;
         Text  := 'Masks'{!!!};
       end;
       Columns.Add.Text := 'Application'{!!!};

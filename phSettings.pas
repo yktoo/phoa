@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.7 2004-04-24 18:48:31 dale Exp $
+//  $Id: phSettings.pas,v 1.8 2004-04-25 16:28:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -24,14 +24,11 @@ type
     FChildren: TList;
      // Prop storage
     FOwner: TPhoaSetting;
-    FName: String;
     FID: Integer;
      // ƒобавление / удаление пункта из списка дочерних пунктов
     procedure AddSetting(Item: TPhoaSetting);
     procedure RemoveSetting(Item: TPhoaSetting);
     procedure DeleteSetting(Index: Integer);
-     // ќчищает список дочерних пунктов
-    procedure ClearSettings;
      // »щет пункт по ID среди себ€ и своих детей. ≈сли не найден, возвращает nil
     function  FindID(iID: Integer): TPhoaSetting;
      // Prop handlers
@@ -41,12 +38,16 @@ type
     function  GetIndex: Integer;
     procedure SetIndex(Value: Integer);
   protected
+     // Prop storage
+    FName: String;
      // "ѕростой" конструктор, не инициализирующий свойств, кроме Owner (используетс€ в "нормальных" конструкторах и в
      //   Assign)
     constructor CreateNew(AOwner: TPhoaSetting); virtual;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String);
     destructor Destroy; override;
+     // —тирает все дочерние пункты
+    procedure ClearChildren;
      // «агрузка/сохранение в реестре значений с ID<>0. ¬ базовом классе не делают ничего, кроме каскадных вызовов
      //   методов дочерних настроек
     procedure RegLoad(RegIniFile: TRegIniFile); virtual;
@@ -212,7 +213,7 @@ const
     SrcChild: TPhoaSetting;
   begin
      // —тираем детей
-    ClearSettings;
+    ClearChildren;
      //  опируем настройки
     FID   := Source.FID;
     FName := Source.FName;
@@ -224,7 +225,7 @@ const
     end;
   end;
 
-  procedure TPhoaSetting.ClearSettings;
+  procedure TPhoaSetting.ClearChildren;
   begin
     if FChildren<>nil then begin
       while FChildren.Count>0 do DeleteSetting(FChildren.Count-1);
@@ -254,7 +255,7 @@ const
   destructor TPhoaSetting.Destroy;
   begin
      // —тираем и уничтожаем список дочерних пунктов
-    ClearSettings;
+    ClearChildren;
     if FOwner<>nil then FOwner.RemoveSetting(Self);
     inherited Destroy;
   end;

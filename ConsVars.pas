@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.10 2004-04-24 18:48:31 dale Exp $
+//  $Id: ConsVars.pas,v 1.11 2004-04-25 16:28:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -447,6 +447,7 @@ const
   iiDown                          = 56;
   iiOK                            = 57;
   iiError                         = 58;
+  iiTool                          = 59;
 
    // Help topics
   IDH_start                       = 00001;
@@ -1049,10 +1050,10 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_ShowHidden,   '@ISettingID_Dlgs_APW_ShowHidden',   False);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_SkipChkPage,  '@ISettingID_Dlgs_APW_SkipChkPage',  False);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_LogOnErrOnly, '@ISettingID_Dlgs_APW_LogOnErrOnly', True);
-        Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Dlgs_APW_AutofillDate, '@ISettingID_Dlgs_APW_AutofillDate', Byte(DTAP_DefaultDateProps), MinInt, MaxInt);
+        Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Dlgs_APW_AutofillDate, '@ISettingID_Dlgs_APW_AutofillDate', Byte(DTAP_DefaultDateProps), MinInt, MaxInt);
         AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_ReplaceDate,  '@ISettingID_Dlgs_APW_ReplaceDate',  False);
-        Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Dlgs_APW_AutofillTime, '@ISettingID_Dlgs_APW_AutofillTime', Byte(DTAP_DefaultTimeProps), MinInt, MaxInt);
+        Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Dlgs_APW_AutofillTime, '@ISettingID_Dlgs_APW_AutofillTime', Byte(DTAP_DefaultTimeProps), MinInt, MaxInt);
         AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_ReplaceTime,  '@ISettingID_Dlgs_APW_ReplaceTime',  False);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Dlgs_PicProps,         '@ISettingID_Dlgs_PicProps');
@@ -1066,10 +1067,10 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
      //=================================================================================================================
-    Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiAsterisk, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Open',  'Open pictures',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Edit',  'Edit pictures',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Print', 'Print pictures', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
+    Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Open'{!!!},  'Open pictures'{!!!},  '', '', '', '*.*', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Edit'{!!!},  'Edit pictures'{!!!},  '', '', '', '*.*', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Print'{!!!}, 'Print pictures'{!!!}, '', '', '', '*.*', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
   end;
   {$HINTS ON}
 
