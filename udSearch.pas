@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.4 2004-05-20 11:50:54 dale Exp $
+//  $Id: udSearch.pas,v 1.5 2004-06-11 14:42:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -331,7 +331,7 @@ type
         end;
         ppTime: begin
           if not CheckMaskedDateTime((FWControl as TMaskEdit).Text, True, d) then d := -1;
-          psce.sValue := iif(d<0, '', TimeToStr(d));
+          psce.sValue := iif(d<0, '', TimeToStrX(d));
         end;
         ppKeywords: psce.sValue := (FWControl as TComboEdit).Text;
         else begin

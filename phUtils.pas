@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.16 2004-06-08 13:43:07 dale Exp $
+//  $Id: phUtils.pas,v 1.17 2004-06-11 14:42:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -68,6 +68,9 @@ uses
    //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
    //   пустая маска, то в dtResult возвращается -1
   function  CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
+   // Преобразует время в строку вида '01:23:45'. Существует потому, что стандартная TimeToStr() глючит, иногда выдавая
+   //   время в 12-часовой нотации (по неизученным причинам)
+  function  TimeToStrX(const dTime: TDateTime): String;
 
    // Возвращает значение константы по её наименованию из fMain.dtlsMain
   function  ConstVal(const sConstName: String): String; overload;
@@ -470,6 +473,13 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
       Result := dt>=0;
       if Result then dtResult := dt else PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
     end;
+  end;
+
+  function TimeToStrX(const dTime: TDateTime): String;
+  var wh, wm, ws, wms: Word;
+  begin
+    DecodeTime(dTime, wh, wm, ws, wms);
+    if dTime=0 then Result := '' else Result := Format('%.2d:%.2d:%.2d', [wh, wm, ws]);
   end;
 
   function ConstVal(const sConstName: String): String;

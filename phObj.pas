@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.22 2004-06-09 14:50:58 dale Exp $
+//  $Id: phObj.pas,v 1.23 2004-06-11 14:42:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2601,7 +2601,7 @@ type
       ppPicDims:       if (FPicWidth>0) and (FPicHeight>0) then Result := Format('%dx%d', [FPicWidth, FPicHeight]);
       ppFormat:        Result := PixelFormatName(FPicFormat);
       ppDate:          if Trunc(FPicDateTime)>0 then Result := DateToStr(FPicDateTime);
-      ppTime:          if Frac(FPicDateTime)>0  then Result := TimeToStr(FPicDateTime);
+      ppTime:          if Frac(FPicDateTime)>0  then Result := TimeToStrX(FPicDateTime);
       ppPlace:         Result := FPicPlace;
       ppFilmNumber:    Result := FPicFilmNumber;
       ppFrameNumber:   Result := FPicFrameNumber;

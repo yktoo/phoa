@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.3 2004-06-03 20:33:39 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.4 2004-06-11 14:42:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -200,7 +200,7 @@ const
     pv := @FPropVals[Prop];
     case Prop of
       ppDate:     pv.sValue := DateToStr(StrToDateDef(eDate.Text, 0));
-      ppTime:     pv.sValue := TimeToStr(StrToTimeDef(eTime.Text, 0));
+      ppTime:     pv.sValue := TimeToStrX(StrToTimeDef(eTime.Text, 0));
       ppPlace,
         ppFilmNumber,
         ppFrameNumber,
