@@ -1151,8 +1151,8 @@ implementation /////////////////////////////////////////////////////////////////
        // Считаем, какие размеры будут у изображения
       iRealWidth  := (iWidth+iDivisor-1)  div iDivisor;
       iRealHeight := (iHeight+iDivisor-1) div iDivisor;
-       // Если устраивает - принимаем
-      Result := (iRealWidth>iDesiredWidth) and (iRealHeight>iDesiredHeight);
+       // Если эти размеры превышают требуемые как минимум вдвое (для качественного ресэмплинга) - принимаем
+      Result := (iRealWidth>iDesiredWidth*2) and (iRealHeight>iDesiredHeight*2);
       if Result then begin
         iWidth   := iRealWidth;
         iHeight  := iRealHeight;
@@ -1203,21 +1203,22 @@ implementation /////////////////////////////////////////////////////////////////
         end;
       end;
        // Определяем требуемые размеры битмэпа
-      iWidth   := jcprops.JPGWidth;
-      iHeight  := jcprops.JPGHeight;
-      ReadType := IJL_JFILE_READWHOLEIMAGE;
-      if (iDesiredWidth>0) and (iDesiredHeight>0) then
-         // Пробуем размер 1/8, потом 1/4, потом 1/2
-        if not TryUsePartialLoad(8, IJL_JFILE_READONEEIGHTH) and not TryUsePartialLoad(4, IJL_JFILE_READONEQUARTER) then
-          TryUsePartialLoad(2, IJL_JFILE_READONEHALF);
-       // Загружаем Bitmap   
+      iWidth  := jcprops.JPGWidth;
+      iHeight := jcprops.JPGHeight;
+       // Если жедаемые размеры заданы, пробуем размер 1/8, потом 1/4, потом 1/2
+      if (iDesiredWidth<=0) or
+         (iDesiredHeight<=0) or
+         (not TryUsePartialLoad(8, IJL_JFILE_READONEEIGHTH) and
+          not TryUsePartialLoad(4, IJL_JFILE_READONEQUARTER) and
+          not TryUsePartialLoad(2, IJL_JFILE_READONEHALF)) then ReadType := IJL_JFILE_READWHOLEIMAGE;
+       // Загружаем Bitmap
       Bitmap.Width  := iWidth;
       Bitmap.Height := iHeight;
       FillChar(DIB, SizeOf(DIB), 0);
       if GetObject(Bitmap.Handle, SizeOf(DIB), @DIB) = 0 then OutOfMemoryError;
       jcProps.DIBWidth    := iWidth;
       jcProps.DIBHeight   := -iHeight;
-      jcProps.DIBPadBytes := ((((jcProps.JPGWidth*jcProps.DIBChannels)+3) div 4)*4)-(jcProps.JPGWidth*jcProps.DIBChannels);
+      jcProps.DIBPadBytes := ((((iWidth*Integer(jcProps.DIBChannels))+3) div 4)*4)-(iWidth*Integer(jcProps.DIBChannels));
       jcProps.DIBBytes    := PByte(DIB.dsBm.bmBits);
       ret := ijlRead(@jcprops, ReadType);
       if ret<>IJL_OK then raise EIJLError.CreateFmt(SIJLError, ['reading', Filename, ijlErrorStr(ret), ret]);
