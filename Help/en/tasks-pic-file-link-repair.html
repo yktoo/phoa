@@ -1,55 +1,60 @@
-<!-- $Id: tasks-pic-file-link-repair.html,v 1.1 2005-03-09 15:20:05 dale Exp $ -->
+<!-- $Id: tasks-pic-file-link-repair.html,v 1.2 2005-03-15 14:24:47 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Picture file link repairing]}
 
-<p align=justify>Как известно, в группах фотоальбома <b>PhoA</b> содержатся ссылки на изображения, в то время как само
-  изображение ссылается на соответствующий дисковый файл.
+<p align=justify>As is well known, <b>PhoA</b> photo album groups contain links to pictures, while each picture refers a
+  corresponding image file.
 
-<p align=justify>В сохранённом файле фотоальбома хранятся <i>относительные</i> ссылки на файлы изображений: это
-  означает, что если вы перемещаете файл фотоальбома <i>вместе</i> с файлами изображений (сохраняя их взаимное
-  расположение неизменным), то ссылки на файлы изображений в фотоальбоме останутся верными.
+<p align=justify>A saved photo album file holds <i>relative</i> links to picture files whenever possible. This means, if
+  you move a photo album file <i>together</i> with image files (keeping their relative placement unchanged), all picture
+  file links will remain valid.
 
-<p align=justify>Для перемещения файлов изображений независимо от файла фотоальбома существует специальная
-  <a href="intf-file-ops-task-move.html">операция перемещения файлов изображений</a>.
+<p align=justify>To move image files independently from photo album file the program provides the special
+  <a href="intf-file-ops-task-move.html">move picture files operation</a>.
 
-<p align=justify>Если же вы переместили файл изображения <i>вне</i> программы, ссылка на него становится неактуальной,
-  &laquo;подвисшей&raquo;, т.е. указывает в никуда.
+<p align=justify>But when you move an image file <i>outside</i> the program, the corresponding link gets broken, or 
+  lost, i.&nbsp;e. points to nowhere.
 
-<p align=justify>Исправить это можно двумя способами:
+<p align=justify>You can fix this in the two ways:
 
 <ul>
-  <li>Индивидуальный подход: вы можете указать новое местоположение файла.
-  <li>Кардинальный способ: удалить все изображения, ссылающиеся на несуществующий файл. В этом случае вы, естественно,
-      теряете все введёнными вами для этих изображений данные. 
+  <li>A &quot;soft&quot; method: you indicate a new placement of the file.
+  <li>A &quot;hard&quot; method: you delete all the images linked to non-existent files. In that case you lose all the
+      information entered for those pictures.
 </ul>
 
-{[%hh_h2:Смена ссылки на файл изображения]}
+{[%hh_h2:Changing picture file link]}
 
 <ol>
-  <li>Выделите эскизы изображений, файлы которых нужно изменить.
-  <li>Выберите пункт меню <b>Правка | Изменить...</b>: откроется окно свойств изображений.
-  <li>Откройте страницу <b>Свойства файла</b> диалога свойств.
-  <li>Выберите один из файлов в списке и нажмите кнопку панели инструментов <b>Сменить файл...</b>.
-  <li>В появившемся окне открытия файла укажите новое местоположение файла изображения и нажмите <b>Открыть</b>.
-  <li>Повторите пункты <b>4</b> и <b>5</b> для каждого из &laquo;подвисших&raquo; файлов.
-  <li>Сохраните изменения файлов нажатием <b>ОК</b> в окне свойств изображений.
+  <li>Select thumbnails of the images you would like to relink.
+  <li>Select the <b>Edit | Edit...</b> menu item: this will show the Picture properties dialog.
+  <li>Open the <b>File properties</b> page of the dialog.
+  <li>Select a file in the list and click the <b>{[%hh_ii:Edit]} Change file...</b> toolbar button.
+  <li>In the appeared dialog select a new location of the picture file and click <b>Open</b>.
+  <li>Repeat items <b>4</b> and <b>5</b> for each of the broken links.
+  <li>Save changes to file links by clicking <b>OK</b> in the Picture properties dialog.
 </ol>
 
-{[%hh_h2:Операция удаления файлов изображений]}
+{[%hh_h2:Delete picture files operation]}
 
-<p align=justify>Для удаления изображений, ссылающихся на несуществующий файл, сделайте следующее.
+<p align=justify>To remove all images having no valid file linked perform the following steps.
 
 <ol>
-  <li>Запустите <b>Мастер операций с файлами изображений</b>. Делается это выбором пункта меню <b>Сервис | Операции с
-      файлами изображений</b>.
+  <li>Launch the <b>File operations wizard</b>. You do it by selecting the <b>Tools | File operations...</b> menu item.
 
-  <li>На первой странице Мастера выберите <b>Удалить изображения и файлы</b> и нажмите <b>Далее</b>.
+  <li>On the first page of the wizard select <b>Delete pictures and files</b> and click <b>Next</b>.
 
-  <li>Выберите <b>Все изображения фотоальбома</b>, а в <b>Фильтре по существованию файла изображения</b> выберите
-      <b>Только изображения, ссылающиеся на НЕсуществующий файл</b>.
-      <p align=justify><b>ВНИМАНИЕ!</b> Ошибка здесь может стоить вам всех ваших файлов, поэтому будьте внимательнее!
+  <li>Select <b>All pictures in the photo album</b>, and in the <b>File link validity filter</b> select <b>Only pictures
+      having NO valid (existent) file linked</b>.
+      <p align=justify><b>WARNING!</b> A little mistake here can cause that all of your files will be deleted so be
+      careful!
 
-  <li>Поскольку мы удаляем только изображения без соответствующего файла, опция удаления в Корзину не имеет никакого
-      значения. После нажатия <b>Далее</b> программа начнёт удаление изображений.
+  <li>As long as we are deleting only pictures with no existent file linked, option for removing to the Recycle Bin 
+      makes no sense. After clicking <b>Next</b> the program will start removing pictures.
 </ol>
+
+{[%hh_seealso_en]}
+  <a href="intf-file-ops-task-move.html">Move picture files operation</a><br>
+  <a href="intf-file-ops-task-del.html">Delete picture files operation</a><br>
+  <a href="intf-pic-props-fprops.html">Picture properties dialog :: File properties</a><br>
 
 {[%hh_ftr_en]}
