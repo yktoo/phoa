@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.28 2004-10-14 12:21:02 dale Exp $
+//  $Id: phoa.dpr,v 1.29 2004-10-21 12:42:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -67,8 +67,7 @@ uses
   phMutableIntf in 'phMutableIntf.pas',
   phOps in 'phOps.pas',
   phNativeIntf in 'phNativeIntf.pas',
-  phObjConst in 'phObjConst.pas',
-  HTMLRender in 'HTMLRender.pas';
+  phObjConst in 'phObjConst.pas';
 
 {$R *.res}
 

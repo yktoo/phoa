@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.57 2004-10-19 15:03:31 dale Exp $
+//  $Id: Main.pas,v 1.58 2004-10-21 12:42:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -379,6 +379,8 @@ type
     function  GetDisplayFileName: String;
     function  GetCurGroup: IPhotoAlbumPicGroup;
     procedure SetCurGroup(Value: IPhotoAlbumPicGroup);
+    function  GetCurGroupID: Integer;
+    procedure SetCurGroupID(Value: Integer);
   public
     function  IsShortCut(var Message: TWMKey): Boolean; override;
      // Применяет параметры настройки
@@ -386,8 +388,10 @@ type
      // Обновляет Viewer
     procedure RefreshViewer;
      // Props
-     // -- Текущая выбранная группа в дереве
+     // -- Текущая выбранная группа в дереве; nil, если нет
     property CurGroup: IPhotoAlbumPicGroup read GetCurGroup write SetCurGroup;
+     // -- ID текущей выбранной группы в дереве; 0, если нет
+    property CurGroupID: Integer read GetCurGroupID write SetCurGroupID;
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
     property DisplayFileName: String read GetDisplayFileName;
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
@@ -1096,8 +1100,12 @@ uses
 
   function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
   begin
-    Result := tvGroups.GetFirst;
-    while (Result<>nil) and (GetNodeGroup(Result).ID<>iGroupID) do Result := tvGroups.GetNext(Result);
+    if iGroupID=0 then
+      Result := nil
+    else begin
+      Result := tvGroups.GetFirst;
+      while (Result<>nil) and (GetNodeGroup(Result).ID<>iGroupID) do Result := tvGroups.GetNext(Result);
+    end;
   end;
 
   procedure TfMain.FormActivate(Sender: TObject);
@@ -1202,6 +1210,13 @@ uses
     Result := GetNodeGroup(tvGroups.FocusedNode);
   end;
 
+  function TfMain.GetCurGroupID: Integer;
+  var Group: IPhotoAlbumPicGroup;
+  begin
+    Group := GetCurGroup;
+    if Group=nil then Result := 0 else Result := Group.ID;
+  end;
+
   function TfMain.GetDisplayFileName: String;
   begin
     Result := FileName;
@@ -1300,22 +1315,43 @@ uses
   end;
 
   procedure TfMain.PerformOperation(const sOpName: String; OpParams: IPhoaOperationParams);
-  var Changes: TPhoaOperationChanges;
+  var
+    Changes: TPhoaOperationChanges;
+    ViewerData: IThumbnailViewerDisplayData;
+    iCurRoot, iCurGroupID: Integer;
+    pGroupOffset: TPoint;
   begin
     StartWait;
     try
+       // Сохраняем текущее состояние интерфейса
+      iCurRoot     := Integer(FProject.ViewRootGroupX); // Избегаем создания ссылки, он ведь нам только для проверки
+      iCurGroupID  := CurGroupID;
+      pGroupOffset := tvGroups.OffsetXY;
+      ViewerData   := Viewer.SaveDisplay;
+       // Создаём (выполняем операцию)
       Changes := [];
       try
-         // Создаём (выполняем операцию)
         OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
       finally
          // Отрабатываем результирущие изменения всех операций
         ProcessOpChanges(Changes);
-        //!!! Восстанавливаем параметры отображения
-        EnableActions;
+      end;
+       // Восстанавливаем состояние интерфейса
+      if iCurRoot=Integer(FProject.ViewRootGroupX) then begin
+         // Восстанавливаем текущую группу
+        tvGroups.BeginUpdate;
+        try
+          CurGroupID := iCurGroupID;
+          tvGroups.OffsetXY := pGroupOffset;
+        finally
+          tvGroups.EndUpdate;
+        end;
+         // Если получилось - восстанавливаем состояние вьюера
+        if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
       end;
     finally
       StopWait;
+      EnableActions;
     end;
   end;
 
@@ -1508,9 +1544,16 @@ uses
   end;
 
   procedure TfMain.SetCurGroup(Value: IPhotoAlbumPicGroup);
+  begin
+     // Переадресовываем поиску по ID
+    if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
+  end;
+
+  procedure TfMain.SetCurGroupID(Value: Integer);
   var n: PVirtualNode;
   begin
-    if Value=nil then n := nil else n := FindGroupNodeByID(Value.ID);
+    n := FindGroupNodeByID(Value);
+    if n=nil then n := tvGroups.GetFirst;
     ActivateVTNode(tvGroups, n);
   end;
 

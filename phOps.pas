@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.9 2004-10-19 15:03:31 dale Exp $
+//  $Id: phOps.pas,v 1.10 2004-10-21 12:42:00 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -108,10 +108,10 @@ type
      // -- Наименования параметров по индексу
     property Names[Index: Integer]: String read GetNames;
      // -- Типизированные значения параметров с проверкой на существование и тип
-    property ValBool[const sName: String]: Boolean                 read GetValBool;
-    property ValByte[const sName: String]: Byte                    read GetValByte;
-    property ValInt [const sName: String]: Integer                 read GetValInt;
-    property ValStr [const sName: String]: String                  read GetValStr;
+    property ValBool[const sName: String]: Boolean read GetValBool;
+    property ValByte[const sName: String]: Byte    read GetValByte;
+    property ValInt [const sName: String]: Integer read GetValInt;
+    property ValStr [const sName: String]: String  read GetValStr;
      // -- Значения параметров по имени (при присваивании Unassigned параметр удаляется)
     property Values[const sName: String]: Variant read GetValues write SetValues; default;
      // -- Значения параметров по индексу (при присваивании Unassigned параметр удаляется)
@@ -905,16 +905,24 @@ uses
    // TPhoaOperationParams
    //===================================================================================================================
 type
+  PPhoaOperationParam = ^TPhoaOperationParam;
+  TPhoaOperationParam = record
+    sName: String;
+    vValue: Variant;
+  end;
+
   TPhoaOperationParams = class(TInterfacedObject, IPhoaOperationParams)
   private
-     // Сам список
-    FList: TStringList;
+     // Список параметров
+    FParams: Array of TPhoaOperationParam;
      // Удаляет параметр по индексу
     procedure Delete(iIndex: Integer);
      // Возвращает значение параметра по имени. Если такого параметра нет, вызывает Exception
     function  GetValueStrict(const sName: String): Variant;
      // Проверяет тип значения. При несоответствии вызывает Exception
     procedure CheckVarType(const sName: String; const v: Variant; RequiredType: TVarType);
+     // Возвращает индекс записи по имени параметра, или -1, если нет такой
+    function  IndexOfName(const sName: String): Integer;
      // IPhoaOperationParams
     procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
     function  GetCount: Integer;
@@ -928,7 +936,6 @@ type
     procedure SetValues(const sName: String; const Value: Variant);
     procedure SetValuesByIndex(Index: Integer; const Value: Variant);
   public
-    constructor Create;
     destructor Destroy; override;
   end;
 
@@ -937,36 +944,35 @@ type
     if VarType(v)<>RequiredType then PhoaException(SPhoaOpErrMsg_ParamTypeMismatch, [sName, VarTypeAsText(RequiredType), VarTypeAsText(VarType(v))]);
   end;
 
-  constructor TPhoaOperationParams.Create;
-  begin
-    inherited Create;
-    FList := TStringList.Create;
-    FList.Sorted := True;
-  end;
-
   procedure TPhoaOperationParams.Delete(iIndex: Integer);
+  var iNewCount: Integer;
   begin
-    Dispose(PVariant(FList.Objects[iIndex]));
-    FList.Delete(iIndex);
+    iNewCount := High(FParams);
+     // Финализируем удаляемый элемент
+    Finalize(FParams[iIndex]);
+     // Сдвигаем элементы
+    Move(FParams[iIndex+1], FParams[iIndex], SizeOf(TPhoaOperationParam)*(iNewCount-iIndex));
+     // Зануляем последний элемент, чтобы его "не финализировало"
+    FillChar(FParams[iNewCount], SizeOf(TPhoaOperationParam), 0);
+     // Урезаем массив параметров
+    SetLength(FParams, iNewCount); 
   end;
 
   destructor TPhoaOperationParams.Destroy;
-  var i: Integer;
   begin
      // Стираем список
-    for i := FList.Count-1 downto 0 do Delete(i);
-    FList.Free;
+    FParams := nil;
     inherited Destroy;
   end;
 
   function TPhoaOperationParams.GetCount: Integer;
   begin
-    Result := FList.Count;
+    Result := Length(FParams);
   end;
 
   function TPhoaOperationParams.GetNames(Index: Integer): String;
   begin
-    Result := FList[Index];
+    Result := FParams[Index].sName;
   end;
 
   function TPhoaOperationParams.GetValBool(const sName: String): Boolean;
@@ -1004,19 +1010,26 @@ type
   function TPhoaOperationParams.GetValues(const sName: String): Variant;
   var idx: Integer;
   begin
-    idx := FList.IndexOf(sName);
-    if idx<0 then Result := Unassigned else Result := GetValuesByIndex(idx);
+    idx := IndexOfName(sName);
+    if idx<0 then Result := Unassigned else Result := FParams[idx].vValue;
   end;
 
   function TPhoaOperationParams.GetValuesByIndex(Index: Integer): Variant;
   begin
-    Result := PVariant(FList.Objects[Index])^;
+    Result := FParams[Index].vValue;
   end;
 
   function TPhoaOperationParams.GetValueStrict(const sName: String): Variant;
   begin
     Result := GetValues(sName);
     if VarIsEmpty(Result) then PhoaException(SPhoaOpErrMsg_ParamNotFound, [sName]);
+  end;
+
+  function TPhoaOperationParams.IndexOfName(const sName: String): Integer;
+  begin
+    for Result := 0 to High(FParams) do
+      if SameText(FParams[Result].sName, sName) then Exit;
+    Result := -1;
   end;
 
   procedure TPhoaOperationParams.ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
@@ -1028,15 +1041,15 @@ type
   end;
 
   procedure TPhoaOperationParams.SetValues(const sName: String; const Value: Variant);
-  var
-    idx: Integer;
-    p: PVariant;
+  var idx: Integer;
   begin
-    idx := FList.IndexOf(sName);
+    idx := IndexOfName(sName);
     if idx<0 then begin
       if not VarIsEmpty(Value) then begin
-        New(p);
-        SetValuesByIndex(FList.AddObject(sName, Pointer(p)), Value);
+        idx := Length(FParams);
+        SetLength(FParams, idx+1);
+        FParams[idx].sName  := sName;
+        FParams[idx].vValue := Value;
       end;
     end else
       SetValuesByIndex(idx, Value);
@@ -1044,7 +1057,7 @@ type
 
   procedure TPhoaOperationParams.SetValuesByIndex(Index: Integer; const Value: Variant);
   begin
-    if VarIsEmpty(Value) then Delete(Index) else PVariant(FList.Objects[Index])^ := Value;
+    if VarIsEmpty(Value) then Delete(Index) else FParams[Index].vValue := Value;
   end;
 
    //===================================================================================================================
