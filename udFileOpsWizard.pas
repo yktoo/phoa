@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.32 2005-03-06 19:04:38 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.33 2005-03-08 09:47:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -491,7 +491,7 @@ uses
     sSrcPath         := ExtractFilePath(sSrcFullFileName);
     sDestPath        := IncludeTrailingPathDelimiter(FWizard.DestinationFolder);
     sTargetPath      := '';
-    sTargetFileName  := GetFormattedTargetFileName;
+    if FWizard.MoveFile_RenameFiles then sTargetFileName := GetFormattedTargetFileName else sTargetFileName := sSrcFileName;
     case FWizard.MoveFile_Arranging of
        // ¬се в один каталог - каталог назначени€
       fomfaPutFlatly: begin
