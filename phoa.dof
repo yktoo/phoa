@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=1
 Release=4
-Build=227
+Build=228
 Debug=0
 PreRelease=1
 Special=0
@@ -126,7 +126,7 @@ CodePage=1251
 [Version Info Keys]
 CompanyName=Dmitry Kann
 FileDescription=PhoA - A Picture Arranging Tool
-FileVersion=1.1.4.227
+FileVersion=1.1.4.228
 InternalName=PhoA
 LegalCopyright=©2002-2004 Dmitry Kann
 LegalTrademarks=

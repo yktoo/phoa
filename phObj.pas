@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
+//  $Id: phObj.pas,v 1.10 2004-05-16 11:34:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2398,22 +2398,22 @@ type
 
   function TPhoaPic.GetRawData(PProps: TPicProperties): String;
   var
-    ms: TMemoryStream;
+    Stream: TStringStream;
     Streamer: TPhoaStreamer;
   begin
      // Сохраняем данные изображения во временный поток
-    ms := TMemoryStream.Create;
+    Stream := TStringStream.Create('');
     try
-      Streamer := TPhoaStreamer.Create(ms, psmWrite, '');
+      Streamer := TPhoaStreamer.Create(Stream, psmWrite, '');
       try
         StreamerSave(Streamer, False, PProps);
       finally
         Streamer.Free;
       end;
        // Сохраняем поток в строку
-      SetString(Result, PChar(ms.Memory), ms.Size);
+      Result := Stream.DataString;
     finally
-      ms.Free;
+      Stream.Free;
     end;
   end;
 
@@ -2459,7 +2459,7 @@ type
      // Превращает битмэп в JPEG и возвращает его данные в виде бинарной строки
     function MakeRawJPEG(bmp32: TBitmap32): String;
     var
-      ms: TMemoryStream;
+      Stream: TStringStream;
       bmp: TBitmap;
     begin
        // Преобразуем TBitmap32 в TBitmap
@@ -2477,13 +2477,12 @@ type
             CompressionQuality := FPhoA.FThumbnailQuality;
             Compress;
              // Сохраняем эскиз в поток
-            ms := TMemoryStream.Create;
+            Stream := TStringStream.Create('');
             try
-              SaveToStream(ms);
-               // Получаем raw-данные потока
-              SetString(Result, PChar(ms.Memory), ms.Size);
+              SaveToStream(Stream);
+              Result := Stream.DataString;
             finally
-              ms.Free;
+              Stream.Free;
             end;
           finally
             Free;
@@ -2515,21 +2514,18 @@ type
 
   procedure TPhoaPic.PaintThumbnail(Bitmap: TBitmap);
   var
-    ms: TMemoryStream;
+    Stream: TStringStream;
     j: TJPEGImage;
   begin
     if FThumbnailData='' then Exit;
     j := TJPEGImage.Create;
     try
-       // Переписываем JPEG-данные эскиза во временный поток
-      ms := TMemoryStream.Create;
+       // Загружаем JPEG
+      Stream := TStringStream.Create(FThumbnailData);
       try
-        ms.Write(FThumbnailData[1], Length(FThumbnailData));
-        ms.Position := 0;
-         // Загружаем JPEG из потока
-        j.LoadFromStream(ms);
+        j.LoadFromStream(Stream);
       finally
-        ms.Free;
+        Stream.Free;
       end;
        // Отрисовываем изображение на битмэпе
       Bitmap.Assign(j);
@@ -2567,23 +2563,19 @@ type
 
   procedure TPhoaPic.SetRawData(PProps: TPicProperties; const Value: String);
   var
-    ms: TMemoryStream;
+    Stream: TStringStream;
     Streamer: TPhoaStreamer;
   begin
-     // Сохраняем строку во временном потоке
-    ms := TMemoryStream.Create;
+    Stream := TStringStream.Create(Value);
     try
-      ms.Write(Value[1], Length(Value));
-      ms.Position := 0;
-       // Загружаем данные изображения
-      Streamer := TPhoaStreamer.Create(ms, psmRead, '');
+      Streamer := TPhoaStreamer.Create(Stream, psmRead, '');
       try
         StreamerLoad(Streamer, False, PProps);
       finally
         Streamer.Free;
       end;
     finally
-      ms.Free;
+      Stream.Free;
     end;
   end;
 
