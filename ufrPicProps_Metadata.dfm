@@ -4,7 +4,7 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
     Left = 0
     Top = 0
     Width = 576
-    Height = 258
+    Height = 256
     Align = alClient
     Header.AutoSizeIndex = 2
     Header.Font.Charset = DEFAULT_CHARSET
@@ -46,9 +46,9 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
   end
   object dkBottom: TTBXDock
     Left = 0
-    Top = 258
+    Top = 256
     Width = 576
-    Height = 42
+    Height = 44
     Position = dpBottom
     object dpDesc: TTBXDockablePanel
       Left = 0
@@ -58,7 +58,7 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
       Caption = 'Description'
       CaptionRotation = dpcrAlwaysHorz
       Color = clInfoBk
-      DockedHeight = 38
+      DockedHeight = 40
       DockMode = dmCannotFloatOrChangeDocks
       DockPos = 0
       SupportedDocks = [dkStandardDock, dkMultiDock]
@@ -67,11 +67,10 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
         Left = 0
         Top = 0
         Width = 572
-        Height = 20
+        Height = 22
         Align = alClient
         Margins.Left = 10
         Margins.Right = 10
-        PaintOptions = []
       end
     end
   end
