@@ -1,4 +1,8 @@
 LANGID=1046
+TargetApplication=PhoA 1.1.4 beta
+Author=Cesar Boschetti <cesar@las.inpe.br>
+Generator=DKLang Translation Editor v2.1
+LastModified=2004-09-03 19:55:09
 
 [frWzPageAddFiles_SelFiles]
 00000007=Filtro de seleção
@@ -9,9 +13,9 @@ LANGID=1046
 00000023=*.*
 00000029=Descartar\nSomente arquivos ausentes no álbum\nSomente arquivos presentes no álbum\n
 00000042=!99:99;1;…
-00000044=  :  
+00000044=:
 00000047=!99:99;1;…
-00000049=  :  
+00000049=:
 00000055=Incluir &subdiretórios
 
 [frWzPageAddFiles_CheckFiles]
@@ -37,7 +41,7 @@ LANGID=1046
 00000077=Tamanho Re&al
 00000079=Ajustar zoom 1:1
 00000081=&Melhor tamanho
-00000083=Ajustar zoom para caber na janela 
+00000083=Ajustar zoom para caber na janela
 
 [frPicProps_Metadata]
 00000053=Descrição
@@ -70,7 +74,7 @@ LANGID=1046
 00000028=&Hora:
 00000031=Número ou código da &Mídia:
 00000066=!99:99:99;1;…
-00000068=  :  :  
+00000068=:  :
 
 [fImgView]
 00000130=E&ditar...
@@ -319,6 +323,30 @@ LANGID=1046
 00000204=&Grupos de imagens
 00000205=Grupos de imagens|Mostra a árvore dos grupos de imagens
 
+[dGroupProps]
+
+[dMsgBox]
+
+[dToolProps]
+
+[frWzPageFileOps_CDOptions]
+
+[frWzPageFileOps_DelOptions]
+
+[frWzPageFileOps_MoveOptions]
+
+[frWzPageFileOps_MoveOptions2]
+
+[frWzPageFileOps_RepairOptions]
+
+[frWzPageFileOps_RepairSelLinks]
+
+[frWzPageFileOps_SelFolder]
+
+[frWzPageFileOps_SelPics]
+
+[frWzPageFileOps_SelTask]
+
 [$CONSTANTS]
 dfpArchive=Arquivo
 dfpCompressed=Compactado
@@ -334,7 +362,7 @@ dfpSizeOfFileDiskUsage=Tamanho em disco
 dfpSystemFile=Sistema
 dfpTemporary=Temporñrio
 dpcEqual=igual a
-dpcGreater=após 
+dpcGreater=após
 dpcGreaterEqual=após ou igual a
 dpcLess=antes
 dpcLessEqual=antes ou igual a
@@ -432,7 +460,7 @@ ISettingID_Gen_ToolbarBSz32=Grande (32x32)
 ISettingID_Gen_ToolbarBtnSize=Botões da barra de ferramentas principal
 ISettingID_Gen_ToolbarDragStyle=Estilo de arraste da barra de ferramentas
 ISettingID_Gen_ToolbarDrgFree=Dentro e fora da moldura (flutuante)
-ISettingID_Gen_ToolbarDrgNoFloat=Deslizante na moldura 
+ISettingID_Gen_ToolbarDrgNoFloat=Deslizante na moldura
 ISettingID_Gen_ToolbarDrgNone=Desabilitado
 ISettingID_Gen_ToolbarDrgOneDock=Na moldura
 ISettingID_Gen_Toolbars=Barra de ferramentas
@@ -544,7 +572,7 @@ SDlgTitle_ConfirmWarning=PhoA: Confirmar
 SDlgTitle_Error=PhoA: Erro
 SDlgTitle_Info=PhoA: Informa÷óo
 SDlgTitle_OpenPhoa=Abrir Ñlbum
-SDlgTitle_SavePhoa=Salvar ñlbum como 
+SDlgTitle_SavePhoa=Salvar ñlbum como
 SErrCannotDecodePicture=Erro ao decodificar arquivo de imagem "%s":\n%s
 SErrCannotLoadPicture=Erro ao carregar arquivo de imagem "%s":\n%s
 SErrCannotRead=Erro durante leitura
@@ -596,6 +624,8 @@ SSizeMBytes=%.2f Mbytes
 SSort_Ascending=Ascendente
 SSort_Descending=Descendente
 SSort_Direction=Ordem de classifica÷óo
+SStats_DistinctPics=Número de imagens distintas
+SStats_PhoaFileRevision=Revisão do arquivo do álbum
 SStat_AvgFileSize=Tamanho médio do arquivo de imagem
 SStat_AvgThumbSize=Tamanho médio da miniatura
 SStat_CntDistinctPics=Total de imagens distintas
@@ -611,8 +641,6 @@ SStat_PhoaFilename=Arquivo do álbum
 SStat_PhotoAlbum=Álbum
 SStat_TotalFileSize=Tamanho total dos arquivos
 SStat_TotalThumbSize=Tamanho total das miniaturas
-SStats_DistinctPics=Número de imagens distintas
-SStats_PhoaFileRevision=Revisão do arquivo do álbum
 SUnclassified_Author=Nenhum autor
 SUnclassified_Date=Nenhuma data
 SUnclassified_FilmNumber=Nenhum número de filme
