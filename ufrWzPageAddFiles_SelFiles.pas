@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.19 2004-11-23 12:51:41 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.20 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,35 +9,41 @@ unit ufrWzPageAddFiles_SelFiles;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualShellUtilities, GraphicEx,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualShellUtilities, GraphicEx, GR32,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, VirtualTrees, VirtualExplorerTree, StdCtrls,
-  ExtCtrls, Mask, ToolEdit, DKLang;
+  ExtCtrls, Mask, ToolEdit, DKLang, TB2Dock, TB2ToolWindow, TBX, GR32_Image,
+  TBXDkPanels;
 
 type
-  TfrWzPageAddFiles_SelFiles = class(TWizardPage)
-    gbFilter: TGroupBox;
-    lFileDateFrom: TLabel;
-    lFileMasks: TLabel;
-    lPresence: TLabel;
-    lFileDateTo: TLabel;
+  TfrWzPageAddFiles_SelFiles = class(TWizardPage, IPhoaWizardPage_PreviewInfo)
+    bAdvanced: TButton;
     cbFileMasks: TComboBox;
-    eFileDateFrom: TDateEdit;
     cbPresence: TComboBox;
+    cbRecurseFolders: TCheckBox;
+    cbShowPreview: TCheckBox;
+    dklcMain: TDKLanguageController;
+    eFileDateFrom: TDateEdit;
     eFileDateTo: TDateEdit;
     eFileTimeFrom: TMaskEdit;
     eFileTimeTo: TMaskEdit;
+    gbFilter: TGroupBox;
+    lFileDateFrom: TLabel;
+    lFileDateTo: TLabel;
+    lFileMasks: TLabel;
+    lPresence: TLabel;
     pMain: TPanel;
-    cbRecurseFolders: TCheckBox;
-    bAdvanced: TButton;
     tvMain: TVirtualExplorerTree;
-    dklcMain: TDKLanguageController;
-    procedure tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);
     procedure bAdvancedClick(Sender: TObject);
+    procedure cbShowPreviewClick(Sender: TObject);
     procedure tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);
   private
      // Настраивает кнопку и панель расширенных опций
     procedure AdjustAdvancedCtls(bShowAdvanced: Boolean);
+     // IPhoaWizardPage_PreviewInfo
+    procedure PreviewVisibilityChanged(bVisible: Boolean);
+    function  GetCurrentFileName: String;
   protected
     function  GetDataValid: Boolean; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
@@ -47,7 +53,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  phUtils, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
+  phUtils, ufAddFilesWizard, phSettings, udMsgBox, phGraphics;
 
   procedure TfrWzPageAddFiles_SelFiles.AdjustAdvancedCtls(bShowAdvanced: Boolean);
   begin
@@ -65,8 +71,8 @@ uses
   var Wiz: TfAddFilesWizard;
   begin
     inherited BeforeDisplay(ChangeMethod);
+    Wiz := TfAddFilesWizard(StorageForm);
     if ChangeMethod<>pcmBackBtn then begin
-      Wiz := TfAddFilesWizard(StorageForm);
        // Настраиваем браузер
        // -- Скрытые файлы/папки
       if SettingValueBool(ISettingID_Dlgs_APW_ShowHidden) then
@@ -89,6 +95,24 @@ uses
        // Настраиваем расширенные опции
       AdjustAdvancedCtls(Wiz.ShowAdvancedOptions);
     end;
+     // Настраиваем опции просмотра
+    cbShowPreview.Checked := Wiz.ShowPreview;
+  end;
+
+  procedure TfrWzPageAddFiles_SelFiles.cbShowPreviewClick(Sender: TObject);
+  begin
+    TfAddFilesWizard(StorageForm).ShowPreview := cbShowPreview.Checked;
+  end;
+
+  function TfrWzPageAddFiles_SelFiles.GetCurrentFileName: String;
+  var
+    Namespace: TNamespace;
+    Node: PVirtualNode;
+  begin
+    Result := '';
+    Node := tvMain.FocusedNode;
+    if (Node<>nil) and tvMain.ValidateNamespace(Node, Namespace) and Namespace.FileSystem and not Namespace.Folder then
+      Result := Namespace.NameParseAddress
   end;
 
   function TfrWzPageAddFiles_SelFiles.GetDataValid: Boolean;
@@ -119,15 +143,16 @@ uses
      // Сохраняем критерии
     Wiz.Filter_Presence     := TAddFilePresenceFilter(cbPresence.ItemIndex);
     Wiz.Filter_Masks        := cbFileMasks.Text;
-    Wiz.Filter_DateFrom     := StrToDateDef(eFileDateFrom.Text, -1);
-    Wiz.Filter_DateTo       := StrToDateDef(eFileDateTo.Text,   -1);
-    Wiz.Filter_TimeFrom     := StrToTimeDef(eFileTimeFrom.Text, -1);
-    Wiz.Filter_TimeTo       := StrToTimeDef(eFileTimeTo.Text,   -1);
+    Wiz.Filter_DateFrom     := StrToDateDef(eFileDateFrom.Text, -1, AppFormatSettings);
+    Wiz.Filter_DateTo       := StrToDateDef(eFileDateTo.Text,   -1, AppFormatSettings);
+    Wiz.Filter_TimeFrom     := StrToTimeDef(eFileTimeFrom.Text, -1, AppFormatSettings);
+    Wiz.Filter_TimeTo       := StrToTimeDef(eFileTimeTo.Text,   -1, AppFormatSettings);
     Wiz.RecurseFolders      := cbRecurseFolders.Checked;
     Wiz.DefaultPath         := tvMain.SelectedPath;
     Wiz.ShowAdvancedOptions := bAdvanced.Tag<>0;
+    Wiz.ShowPreview         := cbShowPreview.Checked;
      // Записываем в Мастер список выбранных файлов/папок
-    Wiz.AddList.Clear; 
+    Wiz.AddList.Clear;
     Node := tvMain.GetFirstSelected;
     while Assigned(Node) do begin
       if tvMain.ValidateNamespace(Node, Namespace) and Namespace.FileSystem then Wiz.AddList.Add(Namespace.NameParseAddress);
@@ -137,9 +162,15 @@ uses
     RegSaveHistory(SRegAddFiles_MaskMRU, cbFileMasks, True);
   end;
 
+  procedure TfrWzPageAddFiles_SelFiles.PreviewVisibilityChanged(bVisible: Boolean);
+  begin
+    cbShowPreview.Checked := bVisible;
+  end;
+
   procedure TfrWzPageAddFiles_SelFiles.tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
     StatusChanged;
+    TfAddFilesWizard(StorageForm).UpdatePreview;
   end;
 
   procedure TfrWzPageAddFiles_SelFiles.tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);

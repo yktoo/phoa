@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.4 2004-11-22 18:47:40 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.5 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -69,7 +69,7 @@ const
   procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const); overload;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses phPhoa, Variants;
+uses phPhoa, Variants, ConsVars;
 
 type
   TChars = set of Char;
@@ -667,7 +667,7 @@ type
 
   function TPhoaParsedLiteral.AsDate(Pic: IPhoaPic): Integer;
   begin
-    Result := DateToPhoaDate(StrToDate(FValue));
+    Result := DateToPhoaDate(StrToDate(FValue, AppFormatSettings));
   end;
 
   function TPhoaParsedLiteral.AsString(Pic: IPhoaPic): String;
@@ -677,7 +677,7 @@ type
 
   function TPhoaParsedLiteral.AsTime(Pic: IPhoaPic): Integer;
   begin
-    Result := TimeToPhoaTime(StrToTime(FValue));
+    Result := TimeToPhoaTime(StrToTime(FValue, AppFormatSettings));
   end;
 
   constructor TPhoaParsedLiteral.Create(const sValue: String; iPos: Integer);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.70 2004-11-15 17:47:04 dale Exp $
+//  $Id: Main.pas,v 1.71 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1092,9 +1092,6 @@ uses
   begin
     BeginUpdate;
     try
-       // Настраиваем формат времени
-      ShortTimeFormat := 'hh:nn';
-      LongTimeFormat  := 'hh:nn:ss';
        // Настраиваем fpMain
       fpMain.IniFileName := SRegRoot;
       fpMain.IniSection  := SRegMainWindow_Root;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.17 2004-10-23 14:05:08 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.18 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -187,19 +187,21 @@ const
   end;
 
   procedure TfrPicProps_Data.PropValEdited(Prop: TPicProperty);
-  var pv: PPicEditorPropValue;
+  var
+    pv: PPicEditorPropValue;
+    dt: TDateTime;
   begin
     pv := @FPropVals[Prop];
     case Prop of
-      ppDate:     pv.vValue := DateToPhoaDate(StrToDateDef(eDate.Text, 0));
-      ppTime:     pv.vValue := TimeToPhoaTime(StrToTimeDef(eTime.Text, 0));
+      ppDate: if TryStrToDate(eDate.Text, dt, AppFormatSettings) then pv.vValue := DateToPhoaDate(dt) else pv.vValue := Null;
+      ppTime: if TryStrToTime(eTime.Text, dt, AppFormatSettings) then pv.vValue := TimeToPhoaTime(dt) else pv.vValue := Null;
       ppPlace,
         ppFilmNumber,
         ppFrameNumber,
         ppAuthor,
-        ppMedia:  pv.vValue := GetStrProp(pv.Control, 'Text');
+        ppMedia: pv.vValue := GetStrProp(pv.Control, 'Text');
       ppDescription,
-        ppNotes:  pv.vValue := (pv.Control as TMemo).Text;
+        ppNotes: pv.vValue := (pv.Control as TMemo).Text;
     end;
     pv.State := pvsModified;
     SetPropEditor(Prop, True);
@@ -215,8 +217,8 @@ const
        // Настраиваем значение
       if not bStateOnly then
         case Prop of
-          ppDate: if VarIsEmpty(pv.vValue) then eDate.Clear else eDate.Date := PhoaDateToDate(pv.vValue);
-          ppTime: if VarIsEmpty(pv.vValue) then eTime.Clear else eTime.Text := TimeToStr(PhoaTimeToTime(pv.vValue));
+          ppDate: if VarIsNull(pv.vValue) then eDate.Clear else eDate.Date := PhoaDateToDate(pv.vValue);
+          ppTime: if VarIsNull(pv.vValue) then eTime.Clear else eTime.Text := TimeToStr(PhoaTimeToTime(pv.vValue), AppFormatSettings);
           ppPlace,
             ppFilmNumber,
             ppFrameNumber,

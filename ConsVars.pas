@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.77 2004-11-21 13:18:24 dale Exp $
+//  $Id: ConsVars.pas,v 1.78 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -232,6 +232,18 @@ type
     property ProgressCur: Integer read GetProgressCur;
      // -- Максимальное (конечное) состовние прогресса
     property ProgressMax: Integer read GetProgressMax;
+  end;
+
+   // Интерфейс предоставления информации для просмотра файла изображения (для страницы, отображающей файлы изображений)
+  IPhoaWizardPage_PreviewInfo = interface(IInterface)
+    ['{D9449CC9-8418-4A9E-A5BB-4C43F3B8AE3B}']
+     // Вызывается Мастером при изменении видимости окна просмотра
+    procedure PreviewVisibilityChanged(bVisible: Boolean);
+     // Prop handlers
+    function  GetCurrentFileName: String;
+     // Props
+     // -- Имя текущего отображаемого на странице файла изображения. Пустая строка, если нет текущего файла
+    property CurrentFileName: String read GetCurrentFileName;
   end;
 
   {=====================================================================================================================
@@ -813,7 +825,7 @@ const
    // Сообщение о необходимости обновить статус страницы
   WM_PAGEUPDATE                 = WM_USER+$1100;
    // Сообщение для редактора настроек - о необходимости встроить в дерево редактор текущей настройки
-  WM_EMBEDCONTROL               = WM_USER+$1101;
+  WM_EMBEDCONTROL               = WM_USER+$1120;
 
    // PhoA picture clipboard format name
   SClipbrdPicFormatName         = 'PHOA_INT_PICTURE_BUCKET';
@@ -828,6 +840,8 @@ var
   wClipbrdPicFormatID: Word;
    // Глобальный экземпляр IDKWeb
   DKWeb: IDKWeb;
+   // Специфичные для программы установки формата
+  AppFormatSettings: TFormatSettings;
 
    // Составляет описание изображения Pic из свойств Props, выбирая только указанные данные.
    //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
@@ -1271,6 +1285,11 @@ initialization
   end;
    // Регистрируем формат буфера обмена
   wClipbrdPicFormatID := RegisterClipboardFormat(SClipbrdPicFormatName);
+   // Инициализируем AppFormatSettings
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, AppFormatSettings);
+  AppFormatSettings.ShortTimeFormat := 'hh:nn';
+  AppFormatSettings.LongTimeFormat  := 'hh:nn:ss';
+  AppFormatSettings.TimeSeparator   := ':';
    // Подменяем HintWindowClass
   HintWindowClass := TPhoAHintWindow;
    // Создаём настройки

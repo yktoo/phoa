@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.10 2004-10-26 16:51:42 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.11 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,25 +12,28 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phObj, ConsVars,
   phWizard, ImgList, TB2Item, TBX, Menus, ActnList, ExtCtrls, VirtualTrees,
-  DKLang;
+  DKLang, StdCtrls;
 
 type
-  TfrWzPageAddFiles_CheckFiles = class(TWizardPage)
-    tvFiles: TVirtualStringTree;
-    alMain: TActionList;
+  TfrWzPageAddFiles_CheckFiles = class(TWizardPage, IPhoaWizardPage_PreviewInfo)
     aFilesCheckAll: TAction;
-    aFilesUncheckAll: TAction;
     aFilesInvertChecks: TAction;
-    pBottom: TPanel;
-    pmFiles: TTBXPopupMenu;
+    aFilesUncheckAll: TAction;
+    alMain: TActionList;
+    cbShowPreview: TCheckBox;
+    dklcMain: TDKLanguageController;
     ilFiles: TImageList;
+    ipmFilesCheckAll: TTBXItem;
     ipmFilesInvertChecks: TTBXItem;
     ipmFilesUncheckAll: TTBXItem;
-    ipmFilesCheckAll: TTBXItem;
-    dklcMain: TDKLanguageController;
+    pBottom: TPanel;
+    pmFiles: TTBXPopupMenu;
+    tvFiles: TVirtualStringTree;
     procedure aaFilesCheckAll(Sender: TObject);
     procedure aaFilesInvertChecks(Sender: TObject);
     procedure aaFilesUncheckAll(Sender: TObject);
+    procedure cbShowPreviewClick(Sender: TObject);
+    procedure tvFilesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvFilesChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvFilesGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -48,6 +51,9 @@ type
     procedure CheckFiles(Mode: TMassCheckMode);
      // Настраивает разрешённость Actions
     procedure EnableActions;
+     // IPhoaWizardPage_PreviewInfo
+    procedure PreviewVisibilityChanged(bVisible: Boolean);
+    function  GetCurrentFileName: String;
   protected
     function  GetDataValid: Boolean; override;
     procedure InitializePage; override;
@@ -82,6 +88,13 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
       ilFiles.Handle := FFiles.SysImageListHandle;
       UpdateFileListInfo;
     end;
+     // Настраиваем опции просмотра
+    cbShowPreview.Checked := TfAddFilesWizard(StorageForm).ShowPreview;
+  end;
+
+  procedure TfrWzPageAddFiles_CheckFiles.cbShowPreviewClick(Sender: TObject);
+  begin
+    TfAddFilesWizard(StorageForm).ShowPreview := cbShowPreview.Checked;
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.CheckFiles(Mode: TMassCheckMode);
@@ -118,6 +131,13 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
     StatusChanged;
   end;
 
+  function TfrWzPageAddFiles_CheckFiles.GetCurrentFileName: String;
+  var Node: PVirtualNode;
+  begin
+    Node := tvFiles.FocusedNode;
+    if Node=nil then Result := '' else Result := FFiles.Files[Node.Index];
+  end;
+
   function TfrWzPageAddFiles_CheckFiles.GetDataValid: Boolean;
   begin
     Result := FCheckedFilesCount>0;
@@ -128,6 +148,16 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
     inherited InitializePage;
     ApplyTreeSettings(tvFiles);
     FFiles := TfAddFilesWizard(StorageForm).FileList;
+  end;
+
+  procedure TfrWzPageAddFiles_CheckFiles.PreviewVisibilityChanged(bVisible: Boolean);
+  begin
+    cbShowPreview.Checked := bVisible;
+  end;
+
+  procedure TfrWzPageAddFiles_CheckFiles.tvFilesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    TfAddFilesWizard(StorageForm).UpdatePreview;
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.tvFilesChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -150,7 +180,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
       0: s := p.sName;
       1: s := p.sPath;
       2: s := HumanReadableSize(p.iSize);
-      3: s := DateTimeToStr(p.dModified);
+      3: s := DateTimeToStr(p.dModified, AppFormatSettings);
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;

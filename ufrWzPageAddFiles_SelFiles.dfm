@@ -24,7 +24,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Top = 44
       Width = 139
       Height = 13
-      Caption = '&File masks (delimited with '#39';'#39'):'
+      Caption = 'File &masks (delimited with '#39';'#39'):'
       FocusControl = cbFileMasks
     end
     object lPresence: TLabel
@@ -36,7 +36,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       FocusControl = cbPresence
     end
     object lFileDateTo: TLabel
-      Left = 352
+      Left = 324
       Top = 68
       Width = 14
       Height = 13
@@ -74,40 +74,40 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     object eFileDateFrom: TDateEdit
       Left = 184
       Top = 64
-      Width = 109
+      Width = 89
       Height = 21
-      BlanksChar = #8230
+      BlanksChar = '_'
       NumGlyphs = 2
       TabOrder = 2
       OnChange = PageDataChange
     end
     object eFileDateTo: TDateEdit
-      Left = 372
+      Left = 348
       Top = 64
-      Width = 109
+      Width = 89
       Height = 21
-      BlanksChar = #8230
+      BlanksChar = '_'
       NumGlyphs = 2
       TabOrder = 4
       OnChange = PageDataChange
     end
     object eFileTimeFrom: TMaskEdit
-      Left = 296
+      Left = 276
       Top = 64
-      Width = 53
+      Width = 41
       Height = 21
-      EditMask = '!99:99;1;'#8230
+      EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 3
       Text = '  :  '
       OnChange = PageDataChange
     end
     object eFileTimeTo: TMaskEdit
-      Left = 484
+      Left = 440
       Top = 64
-      Width = 53
+      Width = 41
       Height = 21
-      EditMask = '!99:99;1;'#8230
+      EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 5
       Text = '  :  '
@@ -127,7 +127,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       24)
     object cbRecurseFolders: TCheckBox
       Left = 4
-      Top = 3
+      Top = 4
       Width = 221
       Height = 17
       Caption = '&Recurse subfolders'
@@ -140,8 +140,17 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Width = 119
       Height = 23
       Anchors = [akTop, akRight]
-      TabOrder = 1
+      TabOrder = 2
       OnClick = bAdvancedClick
+    end
+    object cbShowPreview: TCheckBox
+      Left = 228
+      Top = 4
+      Width = 221
+      Height = 17
+      Caption = 'Show pre&view'
+      TabOrder = 1
+      OnClick = cbShowPreviewClick
     end
   end
   object tvMain: TVirtualExplorerTree
@@ -154,7 +163,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     AnimationDuration = 100
     AutoScrollDelay = 200
     AutoScrollInterval = 100
-    ChangeDelay = 50
+    ChangeDelay = 200
     ColumnDetails = cdUser
     ColumnMenuItemCount = 8
     DefaultNodeHeight = 17
@@ -228,7 +237,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     Left = 8
     Top = 24
     LangData = {
-      19006672577A5061676541646446696C65735F53656C46696C657300010F0000
+      19006672577A5061676541646446696C65735F53656C46696C65730001100000
       000800676246696C746572010100000007000000070043617074696F6E000D00
       6C46696C654461746546726F6D01010000000A000000070043617074696F6E00
       0A006C46696C654D61736B7301010000000D000000070043617074696F6E0009
@@ -242,6 +251,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       65640000060074764D61696E01030000003800000016004865616465722E436F
       6C756D6E735B305D2E546578743900000016004865616465722E436F6C756D6E
       735B315D2E546578743A00000016004865616465722E436F6C756D6E735B325D
-      2E5465787400}
+      2E54657874000D00636253686F775072657669657701010000003B0000000700
+      43617074696F6E00}
   end
 end

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.58 2004-11-19 13:01:06 dale Exp $
+//  $Id: phObj.pas,v 1.59 2004-11-24 11:42:17 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -245,7 +245,7 @@ resourcestring
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
   TypInfo, Math, Registry, DateUtils, Clipbrd, ShellAPI, Themes,
-  phUtils, phSettings, phGraphics, Variants, phObjConst;
+  phUtils, phSettings, phGraphics, Variants, phObjConst, ConsVars;
 
   procedure PhoaWriteError;
   begin
@@ -570,8 +570,8 @@ type
       ppThumbHeight:   if FThumbnailSize.cy>0 then Result := IntToStr(FThumbnailSize.cy);
       ppThumbDims:     if (FThumbnailSize.cx>0) and (FThumbnailSize.cy>0) then Result := Format('%dx%d', [FThumbnailSize.cx, FThumbnailSize.cy]);
       ppFormat:        Result := PixelFormatName(FImageFormat);
-      ppDate:          if FDate>0 then Result := DateToStr (PhoaDateToDate(FDate));
-      ppTime:          if FTime>0 then Result := TimeToStrX(PhoaTimeToTime(FTime));
+      ppDate:          if FDate>0 then Result := DateToStr(PhoaDateToDate(FDate), AppFormatSettings);
+      ppTime:          if FTime>0 then Result := TimeToStr(PhoaTimeToTime(FTime), AppFormatSettings);
       ppPlace:         Result := FPlace;
       ppFilmNumber:    Result := FFilmNumber;
       ppFrameNumber:   Result := FFrameNumber;

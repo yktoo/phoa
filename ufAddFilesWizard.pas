@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.26 2004-10-26 16:51:42 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.27 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,7 +12,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   GR32, GraphicEx,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
-  Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
+  Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang, GR32_Image, TB2Dock,
+  TBXDkPanels;
 
 type
   TAddFilesThread = class;
@@ -20,7 +21,11 @@ type
   TfAddFilesWizard = class(TPhoaWizardForm, IPhoaWizardPageHost_Log, IPhoaWizardPageHost_Process)
     dklcMain: TDKLanguageController;
     pProcess: TPanel;
+    dpPreview: TTBXDockablePanel;
+    iPreview: TImage32;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure dpPreviewResize(Sender: TObject);
+    procedure dpPreviewVisibleChanged(Sender: TObject);
   private
      // Поток, добавляющий файлы
     FAddFilesThread: TAddFilesThread;
@@ -44,6 +49,8 @@ type
     FFreePicID: Integer;
      // Группа, в которую добавляются изображения
     FGroup: IPhotoAlbumPicGroup;
+     // Флаг принудительного обновления видимости окна просмотра
+    FUpdatingPreviewVisibility: Boolean;
      // Prop storage
     FAddList: TStrings;
     FApp: IPhotoAlbumApp;
@@ -57,6 +64,7 @@ type
     FFilter_TimeTo: TDateTime;
     FRecurseFolders: Boolean;
     FShowAdvancedOptions: Boolean;
+    FShowPreview: Boolean;
      // Загружает в FFileList список файлов (папок), имена которых перечислены в FAddList. Возвращает True, если в
      //   список попал хотя бы один файл. При bRecurse=True просматриваются подпапки папок; bUseFilter влияет на то,
      //   используются ли значения свойств Filter_xxx для проверки файлов
@@ -68,6 +76,10 @@ type
      // Добавление строки в протокол
     procedure LogSuccess(const s: String; const aParams: Array of const);
     procedure LogFailure(const s: String; const aParams: Array of const);
+     // Обновляет видимость окна просмотра и вызывает UpdatePreview
+    procedure UpdatePreviewVisibility;
+     // Обновляет масштаб, используемый для просмотра
+    procedure UpdatePreviewScale;
      // IPhoaWizardPageHost_Log
     function  LogPage_GetLog(iPageID: Integer): TStrings;
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
@@ -84,6 +96,8 @@ type
     function  IPhoaWizardPageHost_Process.GetProcessingActive = ProcPage_GetProcessingActive;
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
+     // Prop handlers
+    procedure SetShowPreview(Value: Boolean);
   protected
     procedure InitializeWizard; override;
     procedure FinalizeWizard; override;
@@ -99,6 +113,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Загружает файл для просмотра
+    procedure UpdatePreview;
      // Запускает добавление файлов
     procedure StartFileProcessing;
      // Прерывает добавление файлов
@@ -128,6 +144,8 @@ type
     property RecurseFolders: Boolean read FRecurseFolders write FRecurseFolders;
      // -- True, если включены расширенные опции фильтра
     property ShowAdvancedOptions: Boolean read FShowAdvancedOptions write FShowAdvancedOptions;
+     // -- True, если отображается окно предварительного просмотра
+    property ShowPreview: Boolean read FShowPreview write SetShowPreview;
   end;
 
   TAddFilesThread = class(TThread)
@@ -469,6 +487,21 @@ uses
     inherited Destroy;
   end;
 
+  procedure TfAddFilesWizard.dpPreviewResize(Sender: TObject);
+  begin
+     // Обновляем масштаб просматриваемого изображения
+    UpdatePreviewScale;
+  end;
+
+  procedure TfAddFilesWizard.dpPreviewVisibleChanged(Sender: TObject);
+  var PreviewInfoIntf: IPhoaWizardPage_PreviewInfo;
+  begin
+    if FUpdatingPreviewVisibility then Exit;
+    if not dpPreview.Visible then FShowPreview := False;
+    if Supports(Controller.VisiblePage, IPhoaWizardPage_PreviewInfo, PreviewInfoIntf) then
+      PreviewInfoIntf.PreviewVisibilityChanged(FShowPreview);
+  end;
+
   procedure TfAddFilesWizard.FinalizeWizard;
   begin
     FLog.Free;
@@ -503,8 +536,10 @@ uses
   var iPageID: Integer;
   begin
     inherited InitializeWizard;
-    FPics      := NewPhotoAlbumPicList(False);
-    FFreePicID := FApp.Project.PicsX.MaxPicID+1;
+    FPics       := NewPhotoAlbumPicList(False);
+    FFreePicID  := FApp.Project.PicsX.MaxPicID+1;
+     // Настраиваем окно просмотра
+    dpPreview.Floating := True;
      // Создаём страницы
     Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
     Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
@@ -673,6 +708,9 @@ uses
   procedure TfAddFilesWizard.PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
   begin
     inherited PageChanged(ChangeMethod, iPrevPageID);
+     // Обновляем окно просмотра
+    UpdatePreviewVisibility;
+     // На странице прогресса запускаем обработку файлов
     if (ChangeMethod in [pcmNextBtn, pcmForced]) and (CurPageID=IWzAddFilesPageID_Processing) then StartFileProcessing;
   end;
 
@@ -714,21 +752,35 @@ uses
     if FLastProcessedPic<>nil then PaintThumbnail(FLastProcessedPic, Bitmap32);
   end;
 
+  procedure TfAddFilesWizard.SetShowPreview(Value: Boolean);
+  begin
+    if FShowPreview<>Value then begin
+      FShowPreview := Value;
+      UpdatePreviewVisibility;
+    end;
+  end;
+
   procedure TfAddFilesWizard.SettingsRestore(rif: TRegIniFile);
   begin
     inherited SettingsRestore(rif);
-    FDefaultPath         := rif.ReadString ('', 'DefaultFolder',       '');
-    FRecurseFolders      := rif.ReadBool   ('', 'RecurseFolders',      True);
-    FShowAdvancedOptions := rif.ReadBool   ('', 'ShowAdvancedOptions', False);
-    FFilter_Presence     := TAddFilePresenceFilter(
-                            rif.ReadInteger('', 'FilterPresence',      0));
-    FFilter_Masks        := rif.ReadString ('', 'FilterMasks',         '*.*');
-    FFilter_DateFrom     := rif.ReadInteger('', 'FilterDateFrom',      -1);
-    FFilter_DateTo       := rif.ReadInteger('', 'FilterDateTo',        -1);
-    FFilter_TimeFrom     := StrToTimeDef(
-                            rif.ReadString ('', 'FilterTimeFrom',      ''), -1);
-    FFilter_TimeTo       := StrToTimeDef(
-                            rif.ReadString ('', 'FilterTimeTo',        ''), -1);
+    FDefaultPath             := rif.ReadString ('', 'DefaultFolder',       '');
+    FRecurseFolders          := rif.ReadBool   ('', 'RecurseFolders',      True);
+    FShowAdvancedOptions     := rif.ReadBool   ('', 'ShowAdvancedOptions', False);
+    FFilter_Presence         := TAddFilePresenceFilter(
+                                rif.ReadInteger('', 'FilterPresence',      0));
+    FFilter_Masks            := rif.ReadString ('', 'FilterMasks',         '*.*');
+    FFilter_DateFrom         := rif.ReadInteger('', 'FilterDateFrom',      -1);
+    FFilter_DateTo           := rif.ReadInteger('', 'FilterDateTo',        -1);
+    FFilter_TimeFrom         := StrToTimeDef(
+                                rif.ReadString ('', 'FilterTimeFrom',      ''), -1, AppFormatSettings);
+    FFilter_TimeTo           := StrToTimeDef(
+                                rif.ReadString ('', 'FilterTimeTo',        ''), -1, AppFormatSettings);
+    FShowPreview             := rif.ReadBool   ('', 'ShowPreview',         False);
+    dpPreview.FloatingPosition := Point(
+                                rif.ReadInteger('', 'PreviewLeft',         Left+100),
+                                rif.ReadInteger('', 'PreviewTop',          Top+100));
+    dpPreview.FloatingWidth  := rif.ReadInteger('', 'PreviewWidth',        150);
+    dpPreview.FloatingHeight := rif.ReadInteger('', 'PreviewHeight',       200);
   end;
 
   procedure TfAddFilesWizard.SettingsStore(rif: TRegIniFile);
@@ -754,6 +806,11 @@ uses
     PutDate(FFilter_DateTo,   'FilterDateTo');
     PutTime(FFilter_TimeFrom, 'FilterTimeFrom');
     PutTime(FFilter_TimeTo,   'FilterTimeTo');
+    rif.WriteBool   ('', 'ShowPreview',         FShowPreview);   
+    rif.WriteInteger('', 'PreviewLeft',         dpPreview.FloatingPosition.x);
+    rif.WriteInteger('', 'PreviewTop',          dpPreview.FloatingPosition.y);
+    rif.WriteInteger('', 'PreviewWidth',        dpPreview.FloatingWidth);
+    rif.WriteInteger('', 'PreviewHeight',       dpPreview.FloatingHeight);
   end;
 
   procedure TfAddFilesWizard.StartFileProcessing;
@@ -808,6 +865,54 @@ uses
     end;
      // Уведомляем страницу прогресса
     UpdateProgressInfo;
+  end;
+
+  procedure TfAddFilesWizard.UpdatePreview;
+  var
+    bLoaded: Boolean;
+    sFile: String;
+    PreviewInfoIntf: IPhoaWizardPage_PreviewInfo;
+  begin
+    bLoaded := False;
+     // Если окно просмотра отображается, получаем предметный интерфейс информации для просмотра и имя текущего файла
+    if dpPreview.Visible and Supports(Controller.VisiblePage, IPhoaWizardPage_PreviewInfo, PreviewInfoIntf) then begin
+      sFile := PreviewInfoIntf.CurrentFileName;
+       // Если файл задан, загружаем изображение
+      if sFile<>'' then
+        try
+          LoadGraphicFromFile(sFile, iPreview.Bitmap, iPreview.Width, iPreview.Height, nil);
+          bLoaded := True;
+        except
+        end;
+    end;
+     // Если реального изображения не было загружено, стираем Bitmap
+    if not bLoaded then iPreview.Bitmap := nil;
+     // Обновляем масштаб
+    if dpPreview.Visible then UpdatePreviewScale;
+  end;
+
+  procedure TfAddFilesWizard.UpdatePreviewScale;
+  var sScale: Single;
+  begin
+    if iPreview.Bitmap.Empty then
+      sScale := 1
+    else
+      sScale := MinS(1, MinS(iPreview.Width/iPreview.Bitmap.Width, iPreview.Height/iPreview.Bitmap.Height));
+    iPreview.Scale := sScale;
+  end;
+
+  procedure TfAddFilesWizard.UpdatePreviewVisibility;
+  begin
+     // Окно просмотра видимо при включенном ShowPreview на страницах, поддерживающих интерфейс
+     //   IPhoaWizardPage_PreviewInfo
+    FUpdatingPreviewVisibility := True;
+    try
+      dpPreview.Visible := FShowPreview and Supports(Controller.VisiblePage, IPhoaWizardPage_PreviewInfo);
+    finally
+      FUpdatingPreviewVisibility := False;
+    end;
+     // Загружаем или стираем изображение
+    UpdatePreview;
   end;
 
   procedure TfAddFilesWizard.UpdateProgressInfo;

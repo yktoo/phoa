@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.11 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -101,7 +101,7 @@ uses phUtils, udFileOpsWizard, Main;
 //        0: s := FL.FileName;
 //        1: s := FL.FilePath;
 //        2: s := HumanReadableSize(FL.FileSize);
-//        3: s := DateTimeToStr(FL.FileTime);
+//        3: s := DateTimeToStr(FL.FileTime, AppFormatSettings);
 //      end;
 //    end;
 //    CellText := AnsiToUnicodeCP(s, cMainCodePage);

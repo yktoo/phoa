@@ -3,8 +3,9 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Left = 0
     Top = 0
     Width = 576
-    Height = 266
+    Height = 260
     Align = alClient
+    ChangeDelay = 200
     Header.AutoSizeIndex = 1
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
@@ -21,6 +22,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
+    OnChange = tvFilesChange
     OnChecked = tvFilesChecked
     OnGetText = tvFilesGetText
     OnGetImageIndex = tvFilesGetImageIndex
@@ -55,13 +57,22 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
   end
   object pBottom: TPanel
     Left = 0
-    Top = 266
+    Top = 260
     Width = 576
-    Height = 18
+    Height = 24
     Align = alBottom
     Alignment = taLeftJustify
     BevelOuter = bvNone
     TabOrder = 1
+    object cbShowPreview: TCheckBox
+      Left = 352
+      Top = 4
+      Width = 221
+      Height = 17
+      Caption = 'Show pre&view'
+      TabOrder = 0
+      OnClick = cbShowPreviewClick
+    end
   end
   object alMain: TActionList
     Images = fMain.ilActionsSmall
@@ -117,7 +128,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Left = 124
     Top = 28
     LangData = {
-      1B006672577A5061676541646446696C65735F436865636B46696C657300010B
+      1B006672577A5061676541646446696C65735F436865636B46696C657300010C
       0000000600616C4D61696E00000700747646696C657301040000001700000016
       004865616465722E436F6C756D6E735B305D2E54657874180000001600486561
       6465722E436F6C756D6E735B315D2E546578741900000016004865616465722E
@@ -129,6 +140,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
       74436865636B73010200000014000000070043617074696F6E16000000040048
       696E74000700706D46696C65730000100069706D46696C6573436865636B416C
       6C0000120069706D46696C6573556E636865636B416C6C0000140069706D4669
-      6C6573496E76657274436865636B7300000700696C46696C65730000}
+      6C6573496E76657274436865636B7300000700696C46696C657300000D006362
+      53686F775072657669657701010000001B000000070043617074696F6E00}
   end
 end

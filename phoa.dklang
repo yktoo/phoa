@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.32 2004-11-22 18:47:40 dale Exp $
+;  $Id: phoa.dklang,v 1.33 2004-11-24 11:42:17 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -385,11 +385,12 @@ bCancel.Caption=00000017,Cancel
 bNext.Caption=00000020,Next >
 bHelp.Caption=00000023,Help
 bBack.Caption=00000026,< Back
+dpPreview.Caption=00000027,Preview
 
 [frWzPageAddFiles_SelFiles]
 gbFilter.Caption=00000007,File selection filter
 lFileDateFrom.Caption=00000010,&File modified from:
-lFileMasks.Caption=00000013,&File masks (delimited with ';'):
+lFileMasks.Caption=00000013,File &masks (delimited with ';'):
 lPresence.Caption=00000016,&Photo album presence:
 lFileDateTo.Caption=00000019,&to:
 cbPresence.Items=00000029,Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n
@@ -397,6 +398,7 @@ cbRecurseFolders.Caption=00000055,&Recurse subfolders
 tvMain.Header.Columns[0].Text=00000056,Name
 tvMain.Header.Columns[1].Text=00000057,Size
 tvMain.Header.Columns[2].Text=00000058,Modified
+cbShowPreview.Caption=00000059,Show pre&view
 
 [frWzPageAddFiles_CheckFiles]
 tvFiles.Header.Columns[0].Text=00000023,File
@@ -409,6 +411,7 @@ aFilesUncheckAll.Caption=00000016,&Uncheck all files
 aFilesUncheckAll.Hint=00000018,Remove check from all the files
 aFilesInvertChecks.Caption=00000020,&Invert file checks
 aFilesInvertChecks.Hint=00000022,Toggle each file's check
+cbShowPreview.Caption=00000027,Show pre&view
 
 [frPicProps_Metadata]
 dpDesc.Caption=00000053,Description

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.39 2004-11-23 12:51:41 dale Exp $
+//  $Id: phUtils.pas,v 1.40 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -93,11 +93,8 @@ uses
    //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
    //   пустая маска, то в dtResult возвращается -1
   function  CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
-   // Преобразует время в строку вида '01:23:45'. Существует потому, что стандартная TimeToStr() глючит, иногда выдавая
-   //   время в 12-часовой нотации (по неизученным причинам)
-  function  TimeToStrX(const dTime: TDateTime): String;
 
-   // Возвращает локализованное значение константы по её наименованию 
+   // Возвращает локализованное значение константы по её наименованию
   function  ConstVal(const sConstName: String): String; overload;
   function  ConstVal(const sConstName: String; const aParams: Array of const): String; overload;
    // Возвращает sText, если он начинается на символ, отличный от '@'. Иначе - трактует текст после '@' как имя
@@ -646,17 +643,10 @@ var
     if LastDelimiter('0123456789', sText)=0 then
       dtResult := -1
     else begin
-      if bTime then dt := StrToTimeDef(sText, -1) else dt := StrToDateDef(sText, -1);
+      if bTime then dt := StrToTimeDef(sText, -1, AppFormatSettings) else dt := StrToDateDef(sText, -1, AppFormatSettings);
       Result := dt>=0;
       if Result then dtResult := dt else PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
     end;
-  end;
-
-  function TimeToStrX(const dTime: TDateTime): String;
-  var wh, wm, ws, wms: Word;
-  begin
-    DecodeTime(dTime, wh, wm, ws, wms);
-    if dTime=0 then Result := '' else Result := Format('%.2d:%.2d:%.2d', [wh, wm, ws]);
   end;
 
   function ConstVal(const sConstName: String): String;

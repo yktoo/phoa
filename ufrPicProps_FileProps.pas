@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.9 2004-11-23 12:51:41 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.10 2004-11-24 11:42:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit ufrPicProps_FileProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phWizard, VirtualTrees, phPicPropsDlgPage, ActnList, Menus, TB2Item, TBX;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
+  phWizard, VirtualTrees, phPicPropsDlgPage;
 
 type
   TfrPicProps_FileProps = class(TPicPropsDialogPage)
@@ -33,7 +33,7 @@ type
 
 implementation
 {$R *.dfm}
-uses TypInfo, VirtualShellUtilities, ConsVars, phUtils, phObj, phSettings;
+uses TypInfo, VirtualShellUtilities, phUtils, phObj, phSettings;
 
 type
   PNamespace = ^TNamespace;

@@ -1,7 +1,7 @@
 inherited frPicProps_Data: TfrPicProps_Data
   Height = 298
   object lPlace: TLabel
-    Left = 192
+    Left = 164
     Top = 8
     Width = 29
     Height = 13
@@ -58,7 +58,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     FocusControl = eDate
   end
   object lTime: TLabel
-    Left = 120
+    Left = 100
     Top = 8
     Width = 26
     Height = 13
@@ -75,9 +75,9 @@ inherited frPicProps_Data: TfrPicProps_Data
     FocusControl = cbMedia
   end
   object cbPlace: TComboBox
-    Left = 192
+    Left = 164
     Top = 24
-    Width = 374
+    Width = 402
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     DropDownCount = 16
@@ -142,19 +142,19 @@ inherited frPicProps_Data: TfrPicProps_Data
   object eDate: TDateEdit
     Left = 8
     Top = 24
-    Width = 108
+    Width = 89
     Height = 21
-    BlanksChar = #8230
+    BlanksChar = '_'
     NumGlyphs = 2
     TabOrder = 0
     OnChange = PicPropEditorChange
   end
   object eTime: TMaskEdit
-    Left = 120
+    Left = 100
     Top = 24
-    Width = 69
+    Width = 61
     Height = 21
-    EditMask = '!99:99:99;1;'#8230
+    EditMask = '!99:99:99;1;_'
     MaxLength = 8
     TabOrder = 1
     Text = '  :  :  '
