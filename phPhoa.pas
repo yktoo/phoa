@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.7 2004-11-19 13:01:06 dale Exp $
+//  $Id: phPhoa.pas,v 1.8 2004-11-24 11:41:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,6 +31,7 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   Nov 24, 2004 - dale - Fixes to TimeToPhoaTime() (now rounds the time value to minimize the errors)
 //   Nov 19, 2004 - dale - added new sorting properties (thumbnail width, height and dimensions) and sorting prop constants
 //   Jun 06, 2004 - dale - added a chunk for Group Description property
 //   Jun 02, 2004 - dale - added a chunk for Group ID property
@@ -663,7 +664,7 @@ uses Math, Variants;
 
   function TimeToPhoaTime(const Time: TDateTime): Integer;
   begin
-    Result := Trunc(24*60*60*Frac(Time));
+    Result := Trunc(Frac(Time)*24*60*60+0.5);
   end;
 
   function PhoaDateToDate(iDate: Integer): TDateTime;
