@@ -1709,6 +1709,22 @@
           <tranEntry langID="1058" value="Визначаєтся пристроєм"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="pflHorz">
+        <tranEntries>
+          <tranEntry langID="1049" value="Горизонтально"/>
+          <tranEntry langID="1033" value="Horizontally"/>
+          <tranEntry langID="1031" value="Horizontally"/>
+          <tranEntry langID="1046" value="Horizontally"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="pflVert">
+        <tranEntries>
+          <tranEntry langID="1049" value="Вертикально"/>
+          <tranEntry langID="1033" value="Vertically"/>
+          <tranEntry langID="1031" value="Vertically"/>
+          <tranEntry langID="1046" value="Vertically"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="ppAuthor">
         <tranEntries>
           <tranEntry langID="1033" value="Author"/>
@@ -1779,6 +1795,14 @@
           <tranEntry langID="1031" value="Filmnummer/-name"/>
           <tranEntry langID="1046" value="Nъmero/nome do filme"/>
           <tranEntry langID="1058" value="Номер/назва плівки"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ppFlips">
+        <tranEntries>
+          <tranEntry langID="1049" value="Отражения"/>
+          <tranEntry langID="1033" value="Flips"/>
+          <tranEntry langID="1031" value="Flips"/>
+          <tranEntry langID="1046" value="Flips"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ppFormat">
@@ -1878,6 +1902,14 @@
           <tranEntry langID="1031" value="Ort"/>
           <tranEntry langID="1046" value="Lugar"/>
           <tranEntry langID="1058" value="Місце"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ppRotation">
+        <tranEntries>
+          <tranEntry langID="1049" value="Поворот"/>
+          <tranEntry langID="1033" value="Rotation"/>
+          <tranEntry langID="1031" value="Rotation"/>
+          <tranEntry langID="1046" value="Rotation"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ppTime">
@@ -3456,6 +3488,14 @@
           <tranEntry langID="1031" value="Bilder hinzufьgen"/>
           <tranEntry langID="1046" value="Adicionar imagens"/>
           <tranEntry langID="1058" value="Додавання зображень"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="TPhoaOp_StoreTransform">
+        <tranEntries>
+          <tranEntry langID="1049" value="Сохранение преобразований"/>
+          <tranEntry langID="1033" value="Store transformations"/>
+          <tranEntry langID="1031" value="Store transformations"/>
+          <tranEntry langID="1046" value="Store transformations"/>
         </tranEntries>
       </propEntry>
       <propEntry name="TPhoaOp_ViewDelete">

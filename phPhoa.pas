@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phPhoa.pas,v 1.3 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -30,6 +30,8 @@
 // Target OS:       Windows
 // Language:        Object Pascal
 //
+// Change log:
+//   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties 
 //**********************************************************************************************************************
 unit phPhoa;
 
@@ -251,6 +253,8 @@ const
   IPhChunk_Pic_Desc                = $1137; // StringW  Description
   IPhChunk_Pic_Notes               = $1138; // StringW  Notes
   IPhChunk_Pic_Keywords            = $1139; // StringW  Keywords: Comma-separated list. Single entries containing spaces or commas must be double-quoted
+  IPhChunk_Pic_Rotation            = $1140; // Byte     Image Rotation ID (see below)
+  IPhChunk_Pic_Flips               = $1141; // Byte     Image Flip flags (see below)
    // Picture group properties
   IPhChunk_Group_Text              = $1201; // StringW  Group text (name)
   IPhChunk_Group_Expanded          = $1202; // Byte     Group-node expanded flag (0/1)
@@ -299,7 +303,7 @@ type
 
    // List of chunks known for the moment, and their datatypes and ranges
 const
-  aPhChunks: Array[0..56] of TPhChunkEntry = (
+  aPhChunks: Array[0..58] of TPhChunkEntry = (
     (wCode: IPhChunk_Remark;                 Datatype: pcdStringW),
     (wCode: IPhChunk_PhoaGenerator;          Datatype: pcdStringB),
     (wCode: IPhChunk_PhoaSavedDate;          Datatype: pcdInt;    iRangeMin: 0;  iRangeMax: 3652058 {Dec 31, 9999}),
@@ -327,13 +331,15 @@ const
     (wCode: IPhChunk_Pic_Desc;               Datatype: pcdStringW),
     (wCode: IPhChunk_Pic_Notes;              Datatype: pcdStringW),
     (wCode: IPhChunk_Pic_Keywords;           Datatype: pcdStringW),
+    (wCode: IPhChunk_Pic_Rotation;           Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 3),
+    (wCode: IPhChunk_Pic_Flips;              Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 3),
     (wCode: IPhChunk_Group_Text;             Datatype: pcdStringW),
     (wCode: IPhChunk_Group_Expanded;         Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_View_Name;              Datatype: pcdStringW),
     (wCode: IPhChunk_ViewGrouping_Prop;      Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 10),
     (wCode: IPhChunk_ViewGrouping_Unclass;   Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
-    (wCode: IPhChunk_ViewSorting_Prop;       Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 19),
+    (wCode: IPhChunk_ViewSorting_Prop;       Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 21),
     (wCode: IPhChunk_ViewSorting_Order;      Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_Pics_Open;              Datatype: pcdEmpty),
     (wCode: IPhChunk_Pic_Open;               Datatype: pcdEmpty),
@@ -371,6 +377,24 @@ const
    //   6             24-bit
    //   7             32-bit
    //   8       *     Custom or unknown
+   //
+   // Possible values for Image Rotation are (see note below):
+   //
+   // Value  Default  Description
+   // -----  -------  --------------
+   //   0       *     No rotation (0 degrees)
+   //   1             90 degrees clockwise rotation
+   //   2             180 degrees rotation
+   //   3             270 degrees clockwise rotation (=90 degrees counter-clockwise rotation)
+   //
+   // Possible values for Image Flip flags are (see note below):
+   //
+   // Value  Default  Description
+   // -----  -------  --------------
+   //   0       *     No flips applied
+   //   1             Apply horizontal flip to the image
+   //   2             Apply vertical flip to the image
+   //   3             Apply both horizontal and vertical flips to the image
    //
    // Possible values for Grouping Property are (see note below):
    //
@@ -412,6 +436,8 @@ const
    //  17    Notes
    //  18    Media
    //  19    Keywords (keywords are always ordered alphabetically, case-insensitively)
+   //  20    Rotation
+   //  21    Flips
    //
    // --------
    // * Note on 'enumerated' values: the Reader should IGNORE values with

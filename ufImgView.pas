@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.14 2004-05-28 13:30:13 dale Exp $
+//  $Id: ufImgView.pas,v 1.15 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -142,6 +142,11 @@ type
     itbToolsSep1: TTBXSeparatorItem;
     bFlipHorz: TTBXItem;
     bFlipVert: TTBXItem;
+    aStoreTransform: TAction;
+    ipmToolsSep3: TTBXSeparatorItem;
+    ipmStoreTransform: TTBXItem;
+    itbToolsSep2: TTBXSeparatorItem;
+    bStoreTransform: TTBXItem;
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);
@@ -178,6 +183,7 @@ type
     procedure aaRotate270(Sender: TObject);
     procedure aaFlipHorz(Sender: TObject);
     procedure aaFlipVert(Sender: TObject);
+    procedure aaStoreTransform(Sender: TObject);
   private
     FGroup: TPhoaGroup;
     FPhoA: TPhotoAlbum;
@@ -257,6 +263,10 @@ type
     FErroneous: Boolean;
      // Флаг блокировки перегрузки изображения
     FDisplayLock: Integer;
+     // Текущий поворот изображения относительно исходного
+    FCurRotation: TPicRotation;
+     // Текущие отражения изображения относительно исходного
+    FCurFlips: TPicFlips; 
      // Текущая карта каналов
     FColorMap: TColor32Map;
      // Prop storage
@@ -271,15 +281,20 @@ type
     procedure ApplyTools; 
      // Настраивает видимость курсора мыши
     procedure AdjustCursorVisibility(bForceShow: Boolean);
-     // Загружает и буферизирует изображение; рассчитывает коэффициенты масштабирования
-    procedure DisplayPic(bReload: Boolean);
+     // Загружает и буферизирует изображение; рассчитывает коэффициенты масштабирования.
+     //   bReload контролирует, перегружать ли изображение из файла
+     //   bApplyTransforms контролирует, применять ли преобразования к изображению (при bReload=True преобразования
+     //     применяются всегда)
+    procedure DisplayPic(bReload, bApplyTransforms: Boolean);
      // Перегружает текущее изображение
-    procedure RedisplayPic(bReload: Boolean);
+    procedure RedisplayPic(bReload, bApplyTransforms: Boolean);
      // Установка/снятие блокировки перегрузки изображения
     procedure RedisplayLock;
-    procedure RedisplayUnlock(bReload: Boolean);
+    procedure RedisplayUnlock(bReload, bApplyTransforms: Boolean);
      // Вызывается из DisplayPic. Загружает изображение в iMain
     procedure DP_LoadImage;
+     // Вызывается из DisplayPic. Применяет преобразования к iMain
+    procedure DP_ApplyTransforms;
      // Вызывается из DisplayPic. Рассчитывает параметры (размеры) изображения
     procedure DP_ComputeDimensions;
      // Вызывается из DisplayPic. Инициализирует описания изображения (заголовок окна, текст информации, счётчик)
@@ -288,6 +303,8 @@ type
     procedure DP_EnqueueNext;
      // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bCanResize=True
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
+     // Применяет заданные преобразования к отображаемому битмэпу, обновляя переменные текущих преобразований
+    procedure ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
@@ -464,7 +481,7 @@ uses
      // Скрываем курсор
     AdjustCursorVisibility(False);
      // Обновляем свойства изображения
-    if bEdited then RedisplayPic(False);
+    if bEdited then RedisplayPic(False, True);
   end;
 
   procedure TfImgView.aaFirstPic(Sender: TObject);
@@ -475,14 +492,12 @@ uses
 
   procedure TfImgView.aaFlipHorz(Sender: TObject);
   begin
-    iMain.Bitmap.FlipHorz;
-    DisplayPic(False);
+    ApplyTransform(pr0, [pflHorz]);
   end;
 
   procedure TfImgView.aaFlipVert(Sender: TObject);
   begin
-    iMain.Bitmap.FlipVert;
-    DisplayPic(False);
+    ApplyTransform(pr0, [pflVert]);
   end;
 
   procedure TfImgView.aaFullScreen(Sender: TObject);
@@ -519,7 +534,7 @@ uses
 
   procedure TfImgView.aaRefresh(Sender: TObject);
   begin
-    RedisplayPic(True);
+    RedisplayPic(True, True);
   end;
 
   procedure TfImgView.aaRelocateInfo(Sender: TObject);
@@ -546,20 +561,17 @@ uses
 
   procedure TfImgView.aaRotate180(Sender: TObject);
   begin
-    iMain.Bitmap.Rotate180;
-    DisplayPic(False);
+    ApplyTransform(pr180, []);
   end;
 
   procedure TfImgView.aaRotate270(Sender: TObject);
   begin
-    iMain.Bitmap.Rotate270;
-    DisplayPic(False);
+    ApplyTransform(pr270, []);
   end;
 
   procedure TfImgView.aaRotate90(Sender: TObject);
   begin
-    iMain.Bitmap.Rotate90;
-    DisplayPic(False);
+    ApplyTransform(pr90, []);
   end;
 
   procedure TfImgView.aaSettings(Sender: TObject);
@@ -591,6 +603,12 @@ uses
   procedure TfImgView.aaSlideShow(Sender: TObject);
   begin
     SlideShow := not SlideShow;
+  end;
+
+  procedure TfImgView.aaStoreTransform(Sender: TObject);
+  begin
+    fMain.PerformOperation(TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FCurRotation, FCurFlips));
+    EnableActions;
   end;
 
   procedure TfImgView.aaZoomActual(Sender: TObject);
@@ -671,7 +689,7 @@ uses
       FullScreen := bFullscreen;
     finally
        // Этот вызов загружает изображение
-      RedisplayUnlock(True);
+      RedisplayUnlock(True, True);
     end;
      // Если нужно включить режим показа слайдов, переданный при инициализации
     if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
@@ -689,6 +707,13 @@ uses
       Tool := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
       if ptuViewModePopupMenu in Tool.Usages then AddToolItem(Tool, gipmTools, ToolItemClick);
     end;
+  end;
+
+  procedure TfImgView.ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
+  begin
+    ApplyBitmapTransform(iMain.Bitmap, Rotation, Flips);
+    IncTransformValues(FCurRotation, Rotation, FCurFlips, Flips);
+    DisplayPic(False, False);
   end;
 
   procedure TfImgView.ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
@@ -771,13 +796,15 @@ uses
     if FRBLayer<>nil then aRelocateInfo.Execute;
   end;
 
-  procedure TfImgView.DisplayPic(bReload: Boolean);
+  procedure TfImgView.DisplayPic(bReload, bApplyTransforms: Boolean);
   begin
     if FDisplayLock>0 then Exit;
     CommitInfoRelocation;
     FTrackDrag := False;
      // Загружаем изображение
     if bReload then DP_LoadImage;
+     // Применяем преобразования к изображению
+    if bReload or bApplyTransforms then DP_ApplyTransforms;
      // Рассчитываем размеры окна и изображения
     DP_ComputeDimensions;
      // Настраиваем описания
@@ -788,6 +815,16 @@ uses
     DP_EnqueueNext;
      // Перезапускаем таймер
     RestartShowTimer;
+  end;
+
+  procedure TfImgView.DP_ApplyTransforms;
+  begin
+     // Сообщение об ошибке не преобразовываем
+    if not FErroneous then begin
+      ApplyBitmapTransform(iMain.Bitmap, FCurRotation, FPic.PicRotation, FCurFlips, FPic.PicFlips);
+      FCurRotation := FPic.PicRotation;
+      FCurFlips    := FPic.PicFlips;
+    end;
   end;
 
   procedure TfImgView.DP_ComputeDimensions;
@@ -934,6 +971,9 @@ uses
         StopWait;
       end;
     end;
+     // Сбрасываем текущие параметры преобразования
+    FCurRotation := pr0;
+    FCurFlips    := []; 
      // Настраиваем фильтр ресэмплинга
     iMain.Bitmap.StretchFilter := FStretchFilter;
      // !!!
@@ -942,17 +982,26 @@ uses
   end;
 
   procedure TfImgView.EnableActions;
-  var iCnt: Integer;
+  var
+    iCnt: Integer;
+    bNoErr: Boolean;
   begin
+    bNoErr := not FErroneous;
     iCnt := FGroup.PicIDs.Count;
-    aLastPic.Enabled    := FPicIdx<iCnt-1;
-    aFirstPic.Enabled   := FPicIdx>0;
-    aNextPic.Enabled    := (iCnt>1) and (FCyclicViewing or aLastPic.Enabled);
-    aPrevPic.Enabled    := (iCnt>1) and (FCyclicViewing or aFirstPic.Enabled);
-    aZoomIn.Enabled     := not FErroneous and (ZoomFactor<SMaxPicZoom);
-    aZoomOut.Enabled    := not FErroneous and (ZoomFactor>SMinPicZoom);
-    aZoomFit.Enabled    := not FErroneous and (ZoomFactor<>FBestFitZoomFactor);
-    aZoomActual.Enabled := not FErroneous and (ZoomFactor<>1.0);
+    aLastPic.Enabled        := FPicIdx<iCnt-1;
+    aFirstPic.Enabled       := FPicIdx>0;
+    aNextPic.Enabled        := (iCnt>1) and (FCyclicViewing or aLastPic.Enabled);
+    aPrevPic.Enabled        := (iCnt>1) and (FCyclicViewing or aFirstPic.Enabled);
+    aZoomIn.Enabled         := bNoErr and (ZoomFactor<SMaxPicZoom);
+    aZoomOut.Enabled        := bNoErr and (ZoomFactor>SMinPicZoom);
+    aZoomFit.Enabled        := bNoErr and (ZoomFactor<>FBestFitZoomFactor);
+    aZoomActual.Enabled     := bNoErr and (ZoomFactor<>1.0);
+    aRotate90.Enabled       := bNoErr;
+    aRotate180.Enabled      := bNoErr;
+    aRotate270.Enabled      := bNoErr;
+    aFlipHorz.Enabled       := bNoErr;
+    aFlipVert.Enabled       := bNoErr;
+    aStoreTransform.Enabled := bNoErr and ((FPic.PicRotation<>FCurRotation) or (FPic.PicFlips<>FCurFlips));
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1137,19 +1186,19 @@ uses
     Inc(FDisplayLock);
   end;
 
-  procedure TfImgView.RedisplayPic(bReload: Boolean);
+  procedure TfImgView.RedisplayPic(bReload, bApplyTransforms: Boolean);
   begin
      // Очищаем очередь (чтобы поток потом перегрузил изображение вновь)
     if bReload then FDecodeThread.QueuedFileName := '';
      // Вновь отображаем изображение
-    DisplayPic(bReload);
+    DisplayPic(bReload, bApplyTransforms);
   end;
 
-  procedure TfImgView.RedisplayUnlock(bReload: Boolean);
+  procedure TfImgView.RedisplayUnlock(bReload, bApplyTransforms: Boolean);
   begin
     if FDisplayLock>0 then begin
       Dec(FDisplayLock);
-      if FDisplayLock=0 then RedisplayPic(bReload);
+      if FDisplayLock=0 then RedisplayPic(bReload, bApplyTransforms);
     end;
   end;
 
@@ -1173,14 +1222,14 @@ uses
      // Настраиваем видимость курсора
     AdjustCursorVisibility(False);
      // Перегружаем картинку
-    RedisplayPic(False);
+    RedisplayPic(False, False);
   end;
 
   procedure TfImgView.SetPicIdx(Value: Integer);
   begin
     if (FPicIdx<>Value) and (Value>=0) and (Value<FGroup.PicIDs.Count) then begin
       FPicIdx := Value;
-      DisplayPic(True);
+      DisplayPic(True, True);
     end;
   end;
 

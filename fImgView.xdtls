@@ -636,9 +636,9 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW &amp;180°"/>
-              <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;180°"/>
-              <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;180°"/>
+              <tranEntry langID="1033" value="Rotate by &amp;180°"/>
+              <tranEntry langID="1049" value="Повернуть на &amp;180°"/>
+              <tranEntry langID="1058" value="Повернуть на &amp;180°"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -653,9 +653,9 @@
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW 180°|Rotate the image clockwise by 180°"/>
-              <tranEntry langID="1049" value="Повернуть по часовой стрелке на 180°|Повернуть изображение по часовой стрелке на 180°"/>
-              <tranEntry langID="1058" value="Повернуть по часовой стрелке на 180°|Повернуть изображение по часовой стрелке на 180°"/>
+              <tranEntry langID="1033" value="Rotate by 180°|Rotate the image by 180°"/>
+              <tranEntry langID="1049" value="Повернуть на 180°|Повернуть изображение на 180°"/>
+              <tranEntry langID="1058" value="Повернуть на 180°|Повернуть изображение на 180°"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -670,9 +670,9 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW &amp;270°"/>
-              <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;270°"/>
-              <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;270°"/>
+              <tranEntry langID="1033" value="Rotate CCW by 9&amp;0°"/>
+              <tranEntry langID="1049" value="Повернуть против часовой стрелки на 9&amp;0°"/>
+              <tranEntry langID="1058" value="Повернуть против часовой стрелки на 9&amp;0°"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -687,9 +687,9 @@
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW 270°|Rotate the image clockwise by 270° (or counter-clockwise by 90°)"/>
-              <tranEntry langID="1049" value="Повернуть по часовой стрелке на 270°|Повернуть изображение по часовой стрелке на 270°"/>
-              <tranEntry langID="1058" value="Повернуть по часовой стрелке на 270°|Повернуть изображение по часовой стрелке на 270°"/>
+              <tranEntry langID="1033" value="Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)"/>
+              <tranEntry langID="1049" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
+              <tranEntry langID="1058" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -704,7 +704,7 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW &amp;90°"/>
+              <tranEntry langID="1033" value="Rotate CW by &amp;90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;90°"/>
             </tranEntries>
@@ -721,7 +721,7 @@
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1033" value="Rotate CW 90°|Rotate the image clockwise by 90°"/>
+              <tranEntry langID="1033" value="Rotate CW by 90°|Rotate the image clockwise by 90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
             </tranEntries>

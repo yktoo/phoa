@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.28 2004-05-25 14:05:07 dale Exp $
+//  $Id: ConsVars.pas,v 1.29 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -17,7 +17,7 @@ type
   TPicProperty = (
     ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
     ppFormat, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia,
-    ppKeywords);
+    ppKeywords, ppRotation, ppFlips);
   TPicProperties = set of TPicProperty;
 const
   PPAllProps = [Low(TPicProperty)..High(TPicProperty)];
@@ -25,6 +25,15 @@ const
 type
    // Типы данных свойств изображения
   TPicPropertyDatatype = (ppdInteger, ppdString, ppdPixelFormat, ppdDate, ppdTime, ppdStrings);
+
+   // Угол поворота изображения (по часовой стрелке)
+  TPicRotation = (pr0, pr90, pr180, pr270);
+const
+  asPicRotationText: Array[TPicRotation] of String = ('0°', '90°', '180°', '270°');
+type
+   // Флаги отражения изображения (используется префикс pfl, чтобы не путать с TPixelFormat)
+  TPicFlip = (pflHorz, pflVert);
+  TPicFlips = set of TPicFlip;
 
    // Свойства для автоматического заполнения даты/времени изображения
   TDateTimeAutofillProp = (
@@ -527,11 +536,13 @@ const
   iiSaveSettings                  = 63;
   iiLoadSettings                  = 64;
   iiRemoveSearchResults           = 65;
-  iiRotate90                      = 66;
-  iiRotate180                     = 67;
-  iiRotate270                     = 68;
-  iiFlipHorz                      = 69;
-  iiFlipVert                      = 70;
+  iiRotate0                       = 66;
+  iiRotate90                      = 67;
+  iiRotate180                     = 68;
+  iiRotate270                     = 69;
+  iiFlipHorz                      = 70;
+  iiFlipVert                      = 71;
+  iiStoreTransform                = 72;
 
    // Help topics
   IDH_start                       = 00001;
@@ -798,8 +809,10 @@ const
     16,  // ppDescription
     17,  // ppNotes
     18,  // ppMedia
-    19); // ppKeywords
-  aXlat_ChunkSortingPropToPicProperty: Array[0..19] of TPicProperty = (
+    19,  // ppKeywords
+    20,  // ppRotation
+    21); // ppFlips
+  aXlat_ChunkSortingPropToPicProperty: Array[0..21] of TPicProperty = (
     ppID,            //  0  ID
     ppFileName,      //  1  Picture filename
     ppFullFileName,  //  2  Picture filename with path
@@ -819,7 +832,9 @@ const
     ppDescription,   // 16  Description
     ppNotes,         // 17  Notes
     ppMedia,         // 18  Media
-    ppKeywords);     // 19  Keywords (keywords are alw
+    ppKeywords,      // 19  Keywords
+    ppRotation,      // 20  Rotation
+    ppFlips);        // 21  Flips
 
    // TGroupByProperty <-> Chunked sorting prop
   aXlat_GBPropertyToChunkGroupingProp: Array[TGroupByProperty] of Word = (

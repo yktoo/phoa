@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.13 2004-05-23 13:23:09 dale Exp $
+//  $Id: phObj.pas,v 1.14 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -229,17 +229,19 @@ type
     FPicFileName: String;
     FPicFileSize: Integer;
     FPicFilmNumber: String;
+    FPicFlips: TPicFlips;
     FPicFormat: TPixelFormat;
     FPicFrameNumber: String;
+    FPicHeight: Integer;
     FPicKeywords: TStrings;
+    FPicMedia: String;
     FPicNotes: String;
     FPicPlace: String;
+    FPicRotation: TPicRotation;
+    FPicWidth: Integer;
     FThumbHeight: Integer;
     FThumbnailData: String;
     FThumbWidth: Integer;
-    FPicHeight: Integer;
-    FPicWidth: Integer;
-    FPicMedia: String;
      // Загрузка/сохранение с помощью Streamer
      //   -- Параметр bEx...Relative контролирует, осуществлять ли преобразование относительного <-> абсолютного пути
      //      к файлу изображения
@@ -287,6 +289,8 @@ type
     property PicFileSize: Integer read FPicFileSize write FPicFileSize;
      // -- Номер или название плёнки
     property PicFilmNumber: String read FPicFilmNumber write FPicFilmNumber;
+     // -- Флаги отражения изображения для вывода его на экран
+    property PicFlips: TPicFlips read FPicFlips write FPicFlips;
      // -- Формат файла изображения
     property PicFormat: TPixelFormat read FPicFormat;
      // -- Номер кадра
@@ -301,6 +305,8 @@ type
     property PicNotes: String read FPicNotes write FPicNotes;
      // -- Место изображения
     property PicPlace: String read FPicPlace write FPicPlace;
+     // -- Угол поворота изображения для вывода его на экран
+    property PicRotation: TPicRotation read FPicRotation write FPicRotation;
      // -- Ширина изображения в пикселах
     property PicWidth: Integer read FPicWidth write FPicWidth;
      // -- Свойства по индексу
@@ -779,6 +785,22 @@ type
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; Keywords: TKeywordList);
     destructor Destroy; override;
+    procedure Undo; override;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // Операция применения преобразований изображения
+   //-------------------------------------------------------------------------------------------------------------------
+
+  TPhoaOp_StoreTransform = class(TPhoaOperation)
+  private
+     // ID изображения
+    FPicID: Integer; 
+     // Прежние значения свойств преобразования
+    FSavedRotation: TPicRotation;
+    FSavedFlips: TPicFlips;
+  public
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic; NewRotation: TPicRotation; NewFlips: TPicFlips);
     procedure Undo; override;
   end;
 
@@ -2000,6 +2022,8 @@ type
         ppNotes:           Result := AnsiCompareText(Pic1.PicNotes,         Pic2.PicNotes);
         ppMedia:           Result := AnsiCompareText(Pic1.PicMedia,         Pic2.PicMedia);
         ppKeywords:        Result := AnsiCompareText(Pic1.PicKeywords.Text, Pic2.PicKeywords.Text);
+        ppRotation:        Result := Ord(Pic1.PicRotation)-Ord(Pic2.PicRotation);
+        ppFlips:           Result := Byte(Pic1.PicFlips)-Byte(Pic2.PicFlips);
       end;
       if Result<>0 then begin
         if ps.Order=soDesc then Result := -Result;
@@ -2436,6 +2460,8 @@ type
     if ppDescription in Props                  then FPicDesc            := '';
     if ppNotes       in Props                  then FPicNotes           := '';
     if ppKeywords    in Props                  then FPicKeywords.Clear; 
+    if ppRotation    in Props                  then FPicRotation        := pr0;
+    if ppFlips       in Props                  then FPicFlips           := [];
   end;
 
   constructor TPhoaPic.Create(PhoA: TPhotoAlbum);
@@ -2479,6 +2505,8 @@ type
       ppNotes:         Result := FPicNotes;
       ppMedia:         Result := FPicMedia;
       ppKeywords:      Result := FPicKeywords.CommaText;
+      ppRotation:      Result := asPicRotationText[FPicRotation];
+      ppFlips:         Result := PicFlipsText(FPicFlips);
     end;
   end;
 
@@ -2736,6 +2764,8 @@ type
             IPhChunk_Pic_Desc:          if ppDescription in PProps                  then FPicDesc               := vValue;
             IPhChunk_Pic_Notes:         if ppNotes       in PProps                  then FPicNotes              := vValue;
             IPhChunk_Pic_Keywords:      if ppKeywords    in PProps                  then FPicKeywords.CommaText := vValue;
+            IPhChunk_Pic_Rotation:      if ppRotation    in PProps                  then Byte(FPicRotation)     := vValue;
+            IPhChunk_Pic_Flips:         if ppFlips       in PProps                  then Byte(FPicFlips)        := vValue;
              // Close-chunk
             IPhChunk_Pic_Close: Break;
              // Ensure unknown nested structures are skipped whole
@@ -2789,6 +2819,8 @@ type
         if (ppDescription in PProps)                  and (FPicDesc<>'')           then WriteChunkString(IPhChunk_Pic_Desc,          FPicDesc);
         if (ppNotes       in PProps)                  and (FPicNotes<>'')          then WriteChunkString(IPhChunk_Pic_Notes,         FPicNotes);
         if (ppKeywords    in PProps)                  and (FPicKeywords.Count>0)   then WriteChunkString(IPhChunk_Pic_Keywords,      FPicKeywords.CommaText);
+        if (ppRotation    in PProps)                  and (FPicRotation<>pr0)      then WriteChunkByte  (IPhChunk_Pic_Rotation,      Byte(FPicRotation));
+        if (ppFlips       in PProps)                  and (FPicFlips<>[])          then WriteChunkByte  (IPhChunk_Pic_Flips,         Byte(FPicFlips));
       end;
   end;
 
@@ -4236,6 +4268,31 @@ var
      // Возвращаем КС изменённым изображениям
     for i := 0 to FSavedKeywords.Count-1 do
       FPhoA.Pics.PicByID(Integer(FSavedKeywords.Objects[i])).PicKeywords.CommaText := FSavedKeywords[i];
+    inherited Undo;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // TPhoaOp_StoreTransform
+   //-------------------------------------------------------------------------------------------------------------------
+
+  constructor TPhoaOp_StoreTransform.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic; NewRotation: TPicRotation; NewFlips: TPicFlips);
+  begin
+    inherited Create(List, PhoA);
+     // Сохраняем прежние свойства
+    FPicID         := Pic.ID;
+    FSavedRotation := Pic.PicRotation;
+    FSavedFlips    := Pic.PicFlips;
+     // Применяем новые свойства
+    Pic.PicRotation := NewRotation;
+    Pic.PicFlips    := NewFlips; 
+  end;
+
+  procedure TPhoaOp_StoreTransform.Undo;
+  var Pic: TPhoaPic;
+  begin
+    Pic := PhoA.Pics.PicByID(FPicID);
+    Pic.PicRotation := FSavedRotation;
+    Pic.PicFlips    := FSavedFlips;
     inherited Undo;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.6 2004-05-29 06:20:51 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.7 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -40,6 +40,13 @@ type
     TBXSeparatorItem1: TTBXSeparatorItem;
     TBXItem4: TTBXItem;
     TBXItem5: TTBXItem;
+    TBXItem6: TTBXItem;
+    aRotate0: TAction;
+    aRotate90: TAction;
+    aRotate180: TAction;
+    aRotate270: TAction;
+    aFlipHorz: TAction;
+    aFlipVert: TAction;
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);
@@ -51,6 +58,12 @@ type
     procedure cbViewFileChange(Sender: TObject; const Text: String);
     procedure cbViewFileAdjustImageIndex(Sender: TTBXComboBoxItem; const AText: String; AIndex: Integer; var ImageIndex: Integer);
     procedure FrameMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure aaRotate0(Sender: TObject);
+    procedure aaRotate90(Sender: TObject);
+    procedure aaRotate180(Sender: TObject);
+    procedure aaRotate270(Sender: TObject);
+    procedure aaFlipHorz(Sender: TObject);
+    procedure aaFlipVert(Sender: TObject);
   private
      // Кэшированное изменение масштаба
     FZoomFactorChange: Single;
@@ -96,6 +109,36 @@ type
 implementation
 {$R *.dfm}
 uses phUtils, phObj, ConsVars, Main, phSettings;
+
+  procedure TfrPicProps_View.aaFlipHorz(Sender: TObject);
+  begin
+    //
+  end;
+
+  procedure TfrPicProps_View.aaFlipVert(Sender: TObject);
+  begin
+    //
+  end;
+
+  procedure TfrPicProps_View.aaRotate0(Sender: TObject);
+  begin
+    //
+  end;
+
+  procedure TfrPicProps_View.aaRotate180(Sender: TObject);
+  begin
+    //
+  end;
+
+  procedure TfrPicProps_View.aaRotate270(Sender: TObject);
+  begin
+    //
+  end;
+
+  procedure TfrPicProps_View.aaRotate90(Sender: TObject);
+  begin
+    //
+  end;
 
   procedure TfrPicProps_View.aaZoomActual(Sender: TObject);
   begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.12 2004-05-23 13:23:09 dale Exp $
+//  $Id: phUtils.pas,v 1.13 2004-05-30 18:41:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -81,6 +81,10 @@ uses
   function  IntToPicProps(i: Integer): TPicProperties;
    // Возвращает наименование свойства изображения
   function  PicPropName(PicProp: TPicProperty): String;
+   // Возвращает текст отражения изображения
+  function  PicFlipText(PicFlip: TPicFlip): String;
+   // Возвращает текст отражений изображения
+  function  PicFlipsText(PicFlips: TPicFlips): String;
    // Возвращает наименование свойства изображения для группировки
   function  GroupByPropName(GBProp: TGroupByProperty): String;
    // Возвращает наименование пиксельного формата изображения
@@ -102,6 +106,12 @@ uses
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap: TBitmap32); overload;
    // -- Версия, создающая новый экземпляр TBitmap32
   function  LoadGraphicFromFile(const sFileName: String): TBitmap32; overload;
+   // Применяет поворот и отражение к битмэпу
+  procedure ApplyBitmapTransform(Bitmap: TBitmap32; Rotation: TPicRotation; Flips: TPicFlips); overload;
+   // То же самое, но учитывает также текущие значения поворота и отражений
+  procedure ApplyBitmapTransform(Bitmap: TBitmap32; CurRotation, NewRotation: TPicRotation; CurFlips, NewFlips: TPicFlips); overload;
+   // Изменяет переменные Rotation и Flips на заданные величины
+  procedure IncTransformValues(var Rotation: TPicRotation; IncRotation: TPicRotation; var Flips: TPicFlips; IncFlips: TPicFlips);
 
    // Фокусирует и выделяет узел и проматывает дерево так, чтобы он был виден. Возвращает True, если Node<>nil
   function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
@@ -496,6 +506,19 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
     Result := ConstVal(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
   end;
 
+  function PicFlipText(PicFlip: TPicFlip): String;
+  begin
+    Result := ConstVal(GetEnumName(TypeInfo(TPicFlip), Byte(PicFlip)));
+  end;
+
+  function PicFlipsText(PicFlips: TPicFlips): String;
+  var fl: TPicFlip;
+  begin
+    Result := '';
+    for fl := Low(fl) to High(fl) do AccumulateStr(Result, ', ', PicFlipText(fl));
+    Result := '['+Result+']';
+  end;
+
   function GroupByPropName(GBProp: TGroupByProperty): String;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TGroupByProperty), Byte(GBProp)));
@@ -592,6 +615,47 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
         FreeAndNil(Result); // set to nil to satisfy the compiler
         raise;
       end;
+    end;
+  end;
+
+  procedure ApplyBitmapTransform(Bitmap: TBitmap32; Rotation: TPicRotation; Flips: TPicFlips);
+  begin
+     // Поворот на 180° и оба флипа дают исходное изображение
+    if (Rotation<>pr180) or (Flips<>[pflHorz, pflVert]) then begin
+      case Rotation of
+        pr90:  Bitmap.Rotate90;
+        pr180: Bitmap.Rotate180;
+        pr270: Bitmap.Rotate270;
+      end;
+      if pflHorz in Flips then Bitmap.FlipHorz;
+      if pflVert in Flips then Bitmap.FlipVert;
+    end;
+  end;
+
+  procedure ApplyBitmapTransform(Bitmap: TBitmap32; CurRotation, NewRotation: TPicRotation; CurFlips, NewFlips: TPicFlips);
+  var fl: TPicFlip;
+  begin
+     // Вычисляем разницу в повороте и кладём её в NewRotation
+    if NewRotation<CurRotation then Inc(NewRotation, Byte(Succ(High(NewRotation))));
+    Dec(NewRotation, Byte(CurRotation));
+     // Вычисляем разницу в отражениях и кладём её в NewFlips
+    for fl := Low(fl) to High(fl) do
+      if (fl in CurFlips)=(fl in NewFlips) then Exclude(NewFlips, fl) else Include(NewFlips, fl);
+     // Применяем разницу в преобразованиях 
+    ApplyBitmapTransform(Bitmap, NewRotation, NewFlips);
+  end;
+
+  procedure IncTransformValues(var Rotation: TPicRotation; IncRotation: TPicRotation; var Flips: TPicFlips; IncFlips: TPicFlips);
+  var fl: TPicFlip;
+  begin
+    Byte(Rotation) := (Byte(Rotation)+Byte(IncRotation)) mod Byte(Succ(High(Rotation)));
+    for fl := Low(fl) to High(fl) do
+      if fl in IncFlips then
+        if fl in Flips then Exclude(Flips, fl) else Include(Flips, fl);
+     // Поворот на 180° и оба флипа дают исходное изображение
+    if (Rotation=pr180) and (Flips=[pflHorz, pflVert]) then begin
+      Rotation := pr0;
+      Flips := [];
     end;
   end;
 
