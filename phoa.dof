@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams="Фотоальбом 2.phoa" -g "Фотографии по местам/г. Тюмень/г. Заводоуковск"
+RunParams=
 HostApplication=
 Launcher=
 UseLauncher=0

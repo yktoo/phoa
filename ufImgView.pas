@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.13 2004-05-26 15:44:33 dale Exp $
+//  $Id: ufImgView.pas,v 1.14 2004-05-28 13:30:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,7 +9,8 @@ unit ufImgView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, ConsVars, phObj, GR32_Layers,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, ConsVars, phObj,
+  GR32_Layers, phGraphics,
   DTLangTools, TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
   TB2Toolbar, TB2ExtItems, TBXExtItems;
 
@@ -256,6 +257,8 @@ type
     FErroneous: Boolean;
      // Флаг блокировки перегрузки изображения
     FDisplayLock: Integer;
+     // Текущая карта каналов
+    FColorMap: TColor32Map;
      // Prop storage
     FFullScreen: Boolean;
     FPicIdx: Integer;
@@ -294,9 +297,10 @@ type
     procedure TopmostRestore;
      // Событие клика на пункте инструмента
     procedure ToolItemClick(Sender: TObject);
-     // События слоёв
+     // События слоёв и битмэпов
     procedure PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
     procedure RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
+    procedure BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
      // Если активен режим ресайзинга информации, завершает его
     procedure CommitInfoRelocation;
      // Message handlers
@@ -757,6 +761,11 @@ uses
     EnableActions;
   end;
 
+  procedure TfImgView.BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
+  begin
+    B := FColorMap.ApplyToColor(F);
+  end;
+
   procedure TfImgView.CommitInfoRelocation;
   begin
     if FRBLayer<>nil then aRelocateInfo.Execute;
@@ -927,6 +936,9 @@ uses
     end;
      // Настраиваем фильтр ресэмплинга
     iMain.Bitmap.StretchFilter := FStretchFilter;
+     // !!!
+    iMain.Bitmap.DrawMode := dmCustom;
+    iMain.Bitmap.OnPixelCombine := BitmapPixelCombine;
   end;
 
   procedure TfImgView.EnableActions;
@@ -962,11 +974,14 @@ uses
     FDescLayer := TPositionedLayer.Create(iMain.Layers);
     FDescLayer.OnPaint := PaintDescLayer;
      // Восстанавливаем положение и видимость панелей инструментов
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars); 
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+     // Создаём карту цветов
+    FColorMap := TColor32Map.Create;
   end;
 
   procedure TfImgView.FormDestroy(Sender: TObject);
   begin
+    FColorMap.Free;
      // Сохраняем положение и видимость панелей инструментов
     TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
      // Уведомляем фоновый поток о необходимости завершиться
