@@ -4,7 +4,7 @@ object dMsgBox: TdMsgBox
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = '<>'
-  ClientHeight = 87
+  ClientHeight = 83
   ClientWidth = 312
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,17 +16,17 @@ object dMsgBox: TdMsgBox
   Position = poMainFormCenter
   DesignSize = (
     312
-    87)
+    83)
   PixelsPerInch = 96
   TextHeight = 13
   object iIcon: TImage
-    Left = 20
-    Top = 20
+    Left = 11
+    Top = 11
     Width = 32
     Height = 32
   end
   object lMessage: TLabel
-    Left = 68
+    Left = 60
     Top = 20
     Width = 16
     Height = 13
@@ -35,8 +35,8 @@ object dMsgBox: TdMsgBox
     WordWrap = True
   end
   object cbDontShowAgain: TCheckBox
-    Left = 20
-    Top = 62
+    Left = 11
+    Top = 54
     Width = 277
     Height = 17
     Anchors = [akLeft, akRight, akBottom]

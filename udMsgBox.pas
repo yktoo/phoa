@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.4 2004-06-02 08:20:04 dale Exp $
+//  $Id: udMsgBox.pas,v 1.5 2004-06-06 13:26:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -27,6 +27,8 @@ type
     FButtons: TMessageBoxButtons;
      // Если True, то дополнительно отображает checkbox 'Больше не показывать данное сообщение'
     FDiscardable: Boolean;
+     // Кнопки диалога
+    FButtonCtls: Array of TButton;
      // Ширина кнопок с учётом всех границ и зазоров, инициализируется в AdjustButtons()
     FButtonWidths: Integer;
      // Набор флагов - результат выполнения
@@ -39,9 +41,9 @@ type
     procedure AdjustIcon;
      // Настраивает текст сообщения
     procedure AdjustMessage;
-     // Настраивает кнопки и переключатель "Больше не показывать..."
+     // Создаёт и настраивает кнопки и переключатель "Больше не показывать..."
     procedure AdjustButtons;
-     // Настраивает размер/положение окна
+     // Настраивает размер/положение окна и позиционирует кнопки (центрируя) 
     procedure AdjustBounds;
      // Выдаёт звук, соответствующий виду диалога
     procedure AdjustSound;
@@ -88,9 +90,11 @@ const
    // Минимальная ширина клиентской части диалога
   IMsgBox_MinClientWidth       = 300;
    // Расстояние от правого края надписи (текста сообщения) до правого края окна
-  IMsgBox_LabelRightMargin     = 20;
+  IMsgBox_LabelRightMargin     = 11;
+   // Расстояние от верхнего края чекбокса "Больше не показывать..." до контролов (надписи или значка)
+  IMsgBox_CBDontShowTopMargin  = 11;
    // Левый отступ чекбокса "Больше не показывать..."
-  IMsgBox_CBDontShowLeftMargin = 12;
+  IMsgBox_CBDontShowLeftMargin = 11;
    // Ширина чекбокса "Больше не показывать..."
   IMsgBox_CBDontShowWidth      = 280;
    // Ширина кнопки диалога
@@ -98,15 +102,15 @@ const
    // Высота кнопки диалога
   IMsgBox_ButtonHeight         = 23;
    // Расстояние от верхнего края кнопок до контролов
-  IMsgBox_ButtonTopMargin      = 20;
+  IMsgBox_ButtonTopMargin      = 11;
    // Расстояние от нижнего края кнопок до края окна
-  IMsgBox_ButtonBottomMargin   = 8;
+  IMsgBox_ButtonBottomMargin   = 11;
    // Расстояние от правого края самой правой кнопки до правого края окна
-  IMsgBox_ButtonRightMargin    = 12;
+  IMsgBox_ButtonRightMargin    = 11;
    // Минимальное расстояние от левого края самой левой кнопки до левого края окна
-  IMsgBox_ButtonLeftMargin     = 12;
+  IMsgBox_ButtonLeftMargin     = 11;
    // Расстояние между кнопками по горизонтали
-  IMsgBox_ButtonGap            = 8;
+  IMsgBox_ButtonGap            = 6;
 
 implementation
 {$R *.dfm}
@@ -193,13 +197,14 @@ uses phUtils, phSettings, ChmHlp;
    //===================================================================================================================
 
   procedure TdMsgBox.AdjustBounds;
-  var iCWidth, iCHeight: Integer;
+  var i, iBtnX, iBtnY, iCWidth, iCHeight: Integer;
   begin
      // Учитываем размеры надписи
     iCWidth  := lMessage.Left+lMessage.Width+IMsgBox_LabelRightMargin;
     iCHeight := iIcon.Top+Max(iIcon.Height, lMessage.Height);
      // Добавляем размеры кнопок / cbDontShowAgain
     Inc(iCHeight, IMsgBox_ButtonTopMargin+IMsgBox_ButtonHeight+IMsgBox_ButtonBottomMargin);
+    if FDiscardable then Inc(iCHeight, IMsgBox_CBDontShowTopMargin+cbDontShowAgain.Height);
     iCWidth := Max(iCWidth, FButtonWidths+iif(FDiscardable, IMsgBox_CBDontShowWidth, 0));
      // Проверяем, что ширина не меньше минимальной
     iCWidth := Max(iCWidth, IMsgBox_MinClientWidth);
@@ -209,72 +214,73 @@ uses phUtils, phSettings, ChmHlp;
       0,
       Min(iCWidth+(Width-ClientWidth), Screen.WorkAreaWidth-IMsgBox_ScreenWidthGap),
       Min(iCHeight+(Height-ClientHeight), Screen.WorkAreaHeight-IMsgBox_ScreenHeightGap));
+     // Позиционируем кнопки по центру диалога
+    iBtnX := (ClientWidth-FButtonWidths) div 2 + IMsgBox_ButtonLeftMargin;
+    iBtnY := ClientHeight-IMsgBox_ButtonBottomMargin-IMsgBox_ButtonHeight;
+    for i := 0 to High(FButtonCtls) do begin
+      FButtonCtls[i].SetBounds(iBtnX, iBtnY, IMsgBox_ButtonWidth, IMsgBox_ButtonHeight);
+      Inc(iBtnX, IMsgBox_ButtonWidth+IMsgBox_ButtonGap);
+    end;
   end;
 
   procedure TdMsgBox.AdjustButtons;
   var
-    iBtnRightX: Integer;
+    iBtnCount: Integer;
     btn: TMessageBoxButton;
 
-     // Создаёт кнопку, если она требуется, и уменьшает FButtonRightX на размер кнопки + зазор между кнопками
-    procedure MakeButton(mbb: TMessageBoxButton);
+     // Создаёт возвращает кнопку
+    function MakeButton(mbb: TMessageBoxButton): TButton;
     const
       aBtnCaptionConsts: Array[TMessageBoxButton] of String = (
-        'SBtn_Help',     // mbbHelp
-        'SBtn_Cancel',   // mbbCancel
-        'SBtn_OK',       // mbbOK
-        'SBtn_NoToAll',  // mbbNoToAll
-        'SBtn_No',       // mbbNo
+        'SBtn_Yes',      // mbbYes
         'SBtn_YesToAll', // mbbYesToAll
-        'SBtn_Yes');     // mbbYes
+        'SBtn_No',       // mbbNo
+        'SBtn_NoToAll',  // mbbNoToAll
+        'SBtn_OK',       // mbbOK
+        'SBtn_Cancel',   // mbbCancel
+        'SBtn_Help');    // mbbHelp
       aBtnResults: Array[TMessageBoxButton] of TMessageBoxResult = (
-        TMessageBoxResult(-1), // mbbHelp
-        mbrCancel,             // mbbCancel
-        mbrOK,                 // mbbOK
-        mbrNoToAll,            // mbbNoToAll
-        mbrNo,                 // mbbNo
-        mbrYesToAll,           // mbbYesToAll
-        mbrYes);               // mbbYes
-    var Button: TButton;
+        mbrYes,                 // mbbYes
+        mbrYesToAll,            // mbbYesToAll
+        mbrNo,                  // mbbNo
+        mbrNoToAll,             // mbbNoToAll
+        mbrOK,                  // mbbOK
+        mbrCancel,              // mbbCancel
+        TMessageBoxResult(-1)); // mbbHelp
     begin
-      Button := TButton.Create(Self);
-      with Button do begin
-        Parent  := Self;
-        SetBounds(
-          iBtnRightX-IMsgBox_ButtonWidth,
-          Self.ClientHeight-IMsgBox_ButtonHeight-IMsgBox_ButtonBottomMargin,
-          IMsgBox_ButtonWidth,
-          IMsgBox_ButtonHeight);
-        Anchors := [akRight, akBottom];
-        Cancel  := (mbb=mbbCancel) or ((mbb=mbbOK) and not (mbbCancel in FButtons)) or ((mbb=mbbNo) and (FButtons*[mbbOK, mbbCancel]=[]));
-        Caption := ConstVal(aBtnCaptionConsts[mbb]);
-        Default := (mbb=mbbOK) or ((mbb=mbbYes) and not (mbbOK in FButtons));
-        if Default then Self.ActiveControl := Button;
+      Result := TButton.Create(Self);
+      with Result do begin
+        Parent   := Self;
+        Cancel   := (mbb=mbbCancel) or ((mbb=mbbOK) and not (mbbCancel in FButtons)) or ((mbb=mbbNo) and (FButtons*[mbbOK, mbbCancel]=[]));
+        Caption  := ConstVal(aBtnCaptionConsts[mbb]);
+        Default  := (mbb=mbbOK) or ((mbb=mbbYes) and not (mbbOK in FButtons));
+        if Default then Self.ActiveControl := Result;
         if mbb=mbbHelp then OnClick := BtnHelpClick else OnClick := BtnClick;
-        Tag     := Byte(aBtnResults[mbb]);
+        Tag      := Byte(aBtnResults[mbb]);
+        TabOrder := iBtnCount-1;
       end;
     end;
 
   begin
-    iBtnRightX := ClientWidth-IMsgBox_ButtonRightMargin;
-    if FButtons<>[] then begin
-       // Перебираем и создаём кнопки
-      for btn := Low(btn) to High(btn) do
-        if btn in FButtons then begin
-          MakeButton(btn);
-          Dec(iBtnRightX, IMsgBox_ButtonWidth);
-          if btn<High(btn) then Dec(iBtnRightX, IMsgBox_ButtonGap);
-        end;
-    end;
-     // !!! Настраиваем TabOrder
-    //??? 
+     // Перебираем и создаём кнопки
+    iBtnCount := 0;
+    for btn := Low(btn) to High(btn) do
+      if btn in FButtons then begin
+        Inc(iBtnCount);
+        SetLength(FButtonCtls, iBtnCount);
+        FButtonCtls[iBtnCount-1] := MakeButton(btn);
+      end;
      // Считаем ширину
-    FButtonWidths := ClientWidth-iBtnRightX+IMsgBox_ButtonLeftMargin;
+    FButtonWidths :=
+      IMsgBox_ButtonLeftMargin+
+      iBtnCount*IMsgBox_ButtonWidth+
+      (iBtnCount-1)*IMsgBox_ButtonGap+
+      IMsgBox_ButtonRightMargin;
      // Настраиваем переключатель
     if FDiscardable then
       cbDontShowAgain.SetBounds(
         IMsgBox_CBDontShowLeftMargin,
-        Self.ClientHeight-IMsgBox_ButtonBottomMargin-((IMsgBox_ButtonHeight+cbDontShowAgain.Height) div 2),
+        Self.ClientHeight-IMsgBox_ButtonBottomMargin-IMsgBox_ButtonHeight-IMsgBox_ButtonTopMargin-cbDontShowAgain.Height,
         IMsgBox_CBDontShowWidth,
         cbDontShowAgain.Height);
     cbDontShowAgain.Visible := FDiscardable;
