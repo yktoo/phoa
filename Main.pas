@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.8 2004-04-24 18:48:31 dale Exp $
+//  $Id: Main.pas,v 1.9 2004-04-30 13:17:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -322,7 +322,8 @@ uses
   GraphicStrings, Clipbrd, Math, Registry, jpeg, TypInfo, ChmHlp, // GraphicStrings => GraphicEx constants
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udPhoAProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
-  ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting;
+  ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
+  phToolSetting;
 
    //===================================================================================================================
    //  TfMain

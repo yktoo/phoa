@@ -3,7 +3,7 @@ unit udToolProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phToolSetting,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phSettings, phToolSetting,
   Dialogs, phDlg, DTLangTools, StdCtrls, ExtCtrls;
 
 type
@@ -38,23 +38,26 @@ type
     FTool: TPhoaToolSetting;
      // Страничная настройка - владелец инструментов
     FPage: TPhoaToolPageSetting;
+     // Событие дял декодирования текста пункта
+    FOnDecodeText: TPhoaSettingDecodeTextEvent;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
   end;
 
-  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
+  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting; const AOnDecodeText: TPhoaSettingDecodeTextEvent): Boolean;
 
 implementation
 {$R *.dfm}
 uses FileCtrl, phUtils;
 
-  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
+  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting; const AOnDecodeText: TPhoaSettingDecodeTextEvent): Boolean;
   begin
     with TdToolProps.Create(Application) do
       try
-        FTool := ATool;
-        FPage := APage;
+        FTool         := ATool;
+        FPage         := APage;
+        FOnDecodeText := AOnDecodeText;
         Result := Execute;
       finally
         Free;
@@ -103,18 +106,30 @@ uses FileCtrl, phUtils;
   end;
 
   procedure TdToolProps.InitializeDialog;
+  var k: TPhoaToolKind;
+
+    function DoDecode(const s: String): String;
+    begin
+      FOnDecodeText(s, Result);
+    end;
+
   begin
     inherited InitializeDialog;
+     // Заполняем cbKind
+    for k := Low(k) to High(k) do cbKind.Items.Add(PhoaToolKindName(k)); 
+     // Заполняем cbRunShowCommand
     with cbRunShowCommand.Items do begin
       Objects[0] := Pointer(SW_SHOWNORMAL);
       Objects[1] := Pointer(SW_SHOWMINIMIZED);
       Objects[2] := Pointer(SW_SHOWMAXIMIZED);
     end;
-    if FTool<>nil then begin
+    if FTool=nil then
+      cbKind.ItemIndex           := Byte(ptkOpen)
+    else begin
       cbKind.ItemIndex           := Byte(FTool.Kind);
-      eName.Text                 := FTool.Name;
+      eName.Text                 := DoDecode(FTool.Name);
       eMasks.Text                := FTool.Masks;
-      eHint.Text                 := FTool.Hint;
+      eHint.Text                 := DoDecode(FTool.Hint);
       eRunCommand.Text           := FTool.RunCommand;
       eRunParams.Text            := FTool.RunParameters;
       eRunFolder.Text            := FTool.RunFolder;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.12 2004-04-26 09:33:18 dale Exp $
+//  $Id: ConsVars.pas,v 1.13 2004-04-30 13:17:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1068,9 +1068,9 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
      //=================================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Open'{!!!},  'Open pictures'{!!!},  '', '', '', '*.*', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Edit'{!!!},  'Edit pictures'{!!!},  '', '', '', '*.*', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Print'{!!!}, 'Print pictures'{!!!}, '', '', '', '*.*', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Open',  '#SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Edit',  '#SActionHint_EditPics',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Print', '#SActionHint_PrintPics', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
   end;
   {$HINTS ON}
 

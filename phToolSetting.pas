@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.4 2004-04-30 04:38:39 dale Exp $
+//  $Id: phToolSetting.pas,v 1.5 2004-04-30 13:17:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -60,11 +60,11 @@ type
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
      // Props
-     // -- Подсказка
+     // -- Подсказка. Закодирована по правилам TPhoaSetting.Name
     property Hint: String read FHint write FHint;
      // -- Вид инструмента
     property Kind: TPhoaToolKind read FKind write FKind;
-     // -- Наименование, доступное для записи
+     // -- Наименование, доступное для записи. Закодировано по правилам TPhoaSetting.Name
     property Name: String read FName write FName;
      // -- Команда запуска (для Kind=ptkCustom)
     property RunCommand: String read FRunCommand write FRunCommand;
@@ -100,6 +100,8 @@ type
    // Преобразование TPhoaToolUsages <-> String
   function PhoaToolUsagesToStr(Usages: TPhoaToolUsages): String;
   function PhoaToolUsagesFromStr(const sUsages: String): TPhoaToolUsages;
+   // Возвращает название вида инструмента
+  function PhoaToolKindName(Kind: TPhoaToolKind): String;
 
 implementation
 uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
@@ -130,6 +132,11 @@ uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
     if AnsiStrScan(PChar(sUsages), 'M')<>nil then Include(Result, ptuToolsMenu);
     if AnsiStrScan(PChar(sUsages), 'G')<>nil then Include(Result, ptuGroupPopupMenu);
     if AnsiStrScan(PChar(sUsages), 'V')<>nil then Include(Result, ptuThViewerPopupMenu);
+  end;
+
+  function PhoaToolKindName(Kind: TPhoaToolKind): String;
+  begin
+    Result := ConstVal(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)));
   end;
 
 type
@@ -367,12 +374,12 @@ type
      // Создаём меню
     pm := TTBXPopupMenu.Create(Self);
      // Наполняем пунктами
-    FItemDelete   := NewItem(iiDelete, ConstVal('SDelete'),   'Del',       DeleteToolClick,   False);
+    FItemDelete   := NewItem(iiDelete, ConstVal('SAction_Delete'),       'Del',       DeleteToolClick,   False);
     NewSeparator;
-    FItemEdit     := NewItem(iiEdit,   ConstVal('SEdit'),     'Alt+Enter', EditToolClick,     True);
+    FItemEdit     := NewItem(iiEdit,   ConstVal('SAction_EditEllipsis'), 'Alt+Enter', EditToolClick,     True);
     NewSeparator;
-    FItemMoveUp   := NewItem(iiUp,     ConstVal('SMoveUp'),   'Ctrl+Up',   MoveToolUpClick,   False);
-    FItemMoveDown := NewItem(iiDown,   ConstVal('SMoveDown'), 'Ctrl+Down', MoveToolDownClick, False);
+    FItemMoveUp   := NewItem(iiUp,     ConstVal('SAction_MoveUp'),       'Ctrl+Up',   MoveToolUpClick,   False);
+    FItemMoveDown := NewItem(iiDown,   ConstVal('SAction_MoveDown'),     'Ctrl+Down', MoveToolDownClick, False);
      // Привязываем ImageList
     pm.Images := fMain.ilActionsSmall;
      // Привязываем к дереву
@@ -464,9 +471,9 @@ type
     if Setting<>nil then
       case Column of
          // Текст
-        0: s := Setting.Name;
+        0: FOnDecodeText(Setting.Name, s);
          // Вид
-        1: s := GetEnumName(TypeInfo(TPhoaToolKind), Byte(Setting.Kind));
+        1: s := PhoaToolKindName(Setting.Kind);
          // Маски
         2: s := Setting.Masks;
          // Приложение
@@ -492,7 +499,7 @@ type
   var n: PVirtualNode;
   begin
     n := FocusedNode;
-    if (n<>nil) and EditTool(GetSetting(n), FRootSetting) then begin
+    if (n<>nil) and EditTool(GetSetting(n), FRootSetting, FOnDecodeText) then begin
       DoSettingChange;
       LoadTree;
     end;
@@ -508,7 +515,7 @@ type
     idxMaxTool := RootNodeCount-2;
     FItemDelete.Enabled   := (idx>=0) and (idx<=idxMaxTool);
     FItemEdit.Enabled     := (idx>=0) and (idx<=idxMaxTool+1);
-    FItemMoveUp.Enabled   := (idx>0) and (idx<=idxMaxTool);
+    FItemMoveUp.Enabled   := (idx>0)  and (idx<=idxMaxTool);
     FItemMoveDown.Enabled := (idx>=0) and (idx<idxMaxTool);
   end;
 
