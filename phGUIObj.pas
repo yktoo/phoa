@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.22 2004-10-12 12:38:09 dale Exp $
+//  $Id: phGUIObj.pas,v 1.23 2004-10-14 08:12:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -93,6 +93,8 @@ type
     FItemCount: Integer;
      // Количество эскизов, целиком отображающихся в окне контрола
     FVisibleItems: Integer;
+     // Количество строк эскизов, целиком отображающихся в окне контрола
+    FVisibleRows: Integer;
      // Количество столбцов с эскизами
     FColCount: Integer;
      // Высота одной строки текста, нарисованного шрифтом контрола
@@ -199,15 +201,18 @@ type
      // Настраивает всплывающие описания эскизов в виде Hint
     procedure AdjustTooltip(ix, iy: Integer);
      // Message handlers
-    procedure WMContextMenu(var Msg: TWMContextMenu);           message WM_CONTEXTMENU;
-    procedure WMGetDlgCode(var Msg: TWMGetDlgCode);             message WM_GETDLGCODE;
-    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
-    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd);             message WM_ERASEBKGND;
-    procedure WMVScroll(var Msg: TWMVScroll);                   message WM_VSCROLL;
-    procedure WMNCPaint(var Msg: TWMNCPaint);                   message WM_NCPAINT;
     procedure CMDrag(var Msg: TCMDrag);                         message CM_DRAG;
     procedure CMFontChanged(var Msg: TMessage);                 message CM_FONTCHANGED;
     procedure CMInvalidate(var Msg: TMessage);                  message CM_INVALIDATE;
+    procedure CMMouseWheel(var Msg: TCMMouseWheel);             message CM_MOUSEWHEEL;
+    procedure WMContextMenu(var Msg: TWMContextMenu);           message WM_CONTEXTMENU;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd);             message WM_ERASEBKGND;
+    procedure WMGetDlgCode(var Msg: TWMGetDlgCode);             message WM_GETDLGCODE;
+    procedure WMKillFocus(var Msg: TWMKillFocus);               message WM_KILLFOCUS;
+    procedure WMNCPaint(var Msg: TWMNCPaint);                   message WM_NCPAINT;
+    procedure WMSetFocus(var Msg: TWMSetFocus);                 message WM_SETFOCUS;
+    procedure WMVScroll(var Msg: TWMVScroll);                   message WM_VSCROLL;
+    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
      // Prop handlers
     function  GetDropTargetIndex: Integer;
     function  GetIDSelected(iID: Integer): Boolean;
@@ -536,6 +541,21 @@ type
   procedure TThumbnailViewer.CMInvalidate(var Msg: TMessage);
   begin
     if HandleAllocated then InvalidateRect(Handle, nil, True);
+  end;
+
+  procedure TThumbnailViewer.CMMouseWheel(var Msg: TCMMouseWheel);
+  var iAmount: Integer;
+  begin
+    inherited;
+    if Msg.Result=0 then begin
+      Msg.Result := 1;
+       // Высота строки * количество щелчков прокрутки
+      iAmount := FItemSize.cy*(Msg.WheelDelta div WHEEL_DELTA);
+       // Если нажат Ctrl - скроллим сразу на видимое число строк
+      if ssCtrl in Msg.ShiftState then iAmount := iAmount*FVisibleRows;
+       // Скроллим
+      TopOffset := TopOffset-iAmount;
+    end;
   end;
 
   constructor TThumbnailViewer.Create(AOwner: TComponent);
@@ -878,7 +898,8 @@ type
         end;
       end;
        // Обновляем значения
-      FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
+      FVisibleRows  := ClientHeight div FItemSize.cy;
+      FVisibleItems := FVisibleRows*FColCount;
       FVRange       := Ceil(FItemCount/FColCount)*FItemSize.cy;
       FTopOffset    := GetValidTopOffset(FTopOffset);
        // Обновляем отображаемые данные при наличии изменений
@@ -890,34 +911,38 @@ type
   end;
 
   procedure TThumbnailViewer.MarqueingEnd;
-//  var
-//    i: Integer;
-//    r, rThumb: TRect;
+  var
+    i: Integer;
+    r, rItem: TRect;
   begin
-//    ReleaseCapture;
-//    FMarqueing := False;
-//    PaintMarquee;
-//    ReleaseDC(Handle, FTempDC);
-//     // Если не был нажат Shift, очищаем Selection (выделяем с нуля)
-//    if GetKeyState(VK_SHIFT) and $80=0 then ClearSelection;
-//     // Select thumbnails that do intersect with marquee
-//    r := OrderRect(Rect(FStartPos, FMarqueeCur));
-//    i := FTopIndex;
-//    while (i<FTopIndex+FVisibleItems+FColCount) and (i<FItemCount) do begin
-//      rThumb := ItemRect(i);
-//      IntersectRect(rThumb, rThumb, r);
-//      if not IsRectEmpty(rThumb) then AddToSelection(i);
-//      Inc(i);
-//    end;
-//    DoSelectionChange;
+    ReleaseCapture;
+    FMarqueing := False;
+     // Стираем Marquee
+    PaintMarquee;
+    ReleaseDC(Handle, FTempDC);
+     // Создаём выделение
+    BeginUpdate;
+    try
+       // Если не был нажат Shift, очищаем Selection (выделяем с нуля)
+      if GetKeyState(VK_SHIFT) and $80=0 then ClearSelection;
+       // Select thumbnails that do intersect with marquee
+      r := OrderRect(Rect(FStartPos, FMarqueeCur));
+      for i := GetFirstVisibleIndex to FItemCount-1 do begin
+        rItem := ItemRect(i, False);
+        if IsRectEmpty(rItem) then Break;
+        if RectsOverlap(r, rItem) then AddToSelection(i);
+      end;
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TThumbnailViewer.MarqueingStart;
   begin
-//    SetCapture(Handle);
-//    FTempDC := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
-//    FMarqueing := True;
-//    FMarqueeCur := FStartPos;
+    SetCapture(Handle);
+    FTempDC := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
+    FMarqueing := True;
+    FMarqueeCur := FStartPos;
   end;
 
   procedure TThumbnailViewer.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1577,10 +1602,26 @@ type
     Msg.Result := DLGC_WANTARROWS;
   end;
 
+  procedure TThumbnailViewer.WMKillFocus(var Msg: TWMKillFocus);
+  begin
+     // Перерисовываем выделение при потере фокуса
+    InvalidateSelection;
+     // Сфокусированный эскиз тоже надо перерисовать
+    InvalidateItem(FItemIndex);
+  end;
+
   procedure TThumbnailViewer.WMNCPaint(var Msg: TWMNCPaint);
   begin
     DefaultHandler(Msg);
     if ThemeServices.ThemesEnabled then ThemeServices.PaintBorder(Self, False);
+  end;
+
+  procedure TThumbnailViewer.WMSetFocus(var Msg: TWMSetFocus);
+  begin
+     // Перерисовываем выделение при установке фокуса
+    InvalidateSelection;
+     // Сфокусированный эскиз тоже надо перерисовать
+    InvalidateItem(FItemIndex);
   end;
 
   procedure TThumbnailViewer.WMVScroll(var Msg: TWMVScroll);
@@ -1620,17 +1661,9 @@ type
   procedure TThumbnailViewer.WndProc(var Msg: TMessage);
   begin
     case Msg.Msg of
-       // On (un)gaining focus repaint selection
-      WM_KILLFOCUS, WM_SETFOCUS: begin
-        InvalidateSelection;
-        if (FItemIndex>=0) and not IndexSelected[FItemIndex] then InvalidateItem(FItemIndex);
-      end;
+       // Перехватываем DoubleClick, чтобы по нему не начинался AutoDrag 
       WM_LBUTTONDBLCLK: begin
         DblClick;
-        Exit;
-      end;
-      WM_MOUSEWHEEL: begin
-        if TWMMouseWheel(Msg).WheelDelta>0 then TopOffset := TopOffset-FItemSize.cy else TopOffset := TopOffset+FItemSize.cy;
         Exit;
       end;
     end;
