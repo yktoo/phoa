@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.42 2004-09-27 17:07:22 dale Exp $
+//  $Id: Main.pas,v 1.43 2004-09-28 18:23:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -474,7 +474,7 @@ uses
           end;
         end;
        // Удаление изображения
-      end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
+      end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
         BeginOperation;
         try
           Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FPhoA, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
@@ -495,7 +495,7 @@ uses
         gnkPhoaGroup: EditPicGroup(FPhoA, CurGroup, FUndo);
       end;
      // Редактирование изображения
-    end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) then
+    end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) then
       EditPic(Viewer.GetSelectedPicArray, FPhoA, FUndo);
   end;
 
@@ -765,7 +765,7 @@ uses
   procedure TfMain.aaSelectNone(Sender: TObject);
   begin
     ResetMode;
-    Viewer.SelectNone;
+    Viewer.ClearSelection;
   end;
 
   procedure TfMain.aaSettings(Sender: TObject);
@@ -1086,7 +1086,7 @@ uses
     bGr     := ActiveControl=tvGroups;
     bPic    := ActiveControl=Viewer;
     bPics   := FPhoA.Pics.Count>0;
-    bPicSel := Viewer.SelCount>0;
+    bPicSel := Viewer.SelectedPics.Count>0;
     bView   := ViewIndex>=0;
     aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
     aUndo.Enabled                := FUndo.CanUndo;
@@ -1099,7 +1099,7 @@ uses
     aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
     aPaste.Enabled               := (gnk in [gnkPhoA, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
     aSortPics.Enabled            := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and bPics;
-    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelCount<CurGroup.PicIDs.Count);
+    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.PicIDs.Count);
     aSelectNone.Enabled          := bPicSel;
     aView.Enabled                := Viewer.ItemIndex>=0;
     aRemoveSearchResults.Enabled := FSearchNode<>nil;
@@ -1729,7 +1729,7 @@ uses
     end else if Source=Viewer then begin
       bCopy := (GetKeyState(VK_CONTROL) and $80<>0) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
       gTgt := PPhoaGroup(Sender.GetNodeData(nTgt))^;
-      iCnt := Viewer.SelCount;
+      iCnt := Viewer.SelectedPics.Count;
       iCntBefore := gTgt.PicIDs.Count;
       BeginOperation;
       try
@@ -1778,7 +1778,7 @@ uses
     end else if Source=Viewer then begin
       Accept :=
         (Mode=dmOnNode) and
-        (Viewer.SelCount>0) and
+        (Viewer.SelectedPics.Count>0) and
         (nTgt<>nil) and
         (nTgt<>nSrc) and
         (gnkTgt<>gnkSearch);

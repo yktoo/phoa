@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.14 2004-09-28 13:37:11 dale Exp $
+//  $Id: phGUIObj.pas,v 1.15 2004-09-28 18:23:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,7 +15,10 @@ type
    // TThumbnailViewer - средство просмотра эскизов изображений
    //===================================================================================================================
 
-  TThumbnailViewerState = (tvsLayoutChangePending);
+  TThumbnailViewerState = (
+    tvsLayoutChangePending,     // Layout change pending
+    tvsSelectionChangePending); // Selection change pending
+
   TThumbnailViewerStates = set of TThumbnailViewerState;
 
    // Информация для отрисовки окна 
@@ -77,7 +80,7 @@ type
      // Битмэп тени эскиза (nil, если нет валидной рассчитанной тени)
     FThumbShadow: TBitmap32;
      // Выделенные эскизы
-    FSelectedPics: TPhoaPicLinks;
+    FSelectedPics: IPhoaMutablePicList;
      // Индекс активного эскиза
     FItemIndex: Integer;
      // Индекс эскиза, с которого началось поточное выделение (Shift+[стрелки] или Shift+[клик])
@@ -137,19 +140,19 @@ type
      // Рассчитывает параметры шрифта
     procedure CalcFontParams;
      // Уничтожает FShadowBitmap
-    procedure InvalidateShadow;
+    procedure ResetShadow;
      // Готовит FShadowBitmap
     procedure PrepareShadow;
-     // Вызывает пересчёт параметров отображения
+     // Вызывает [отложенный] пересчёт параметров отображения
     procedure LayoutChanged;
-     // Рассчитывает основные параметры отображения эскизов
-    procedure CalcLayout;
+     // Вызывает [отложенное] событие смены выделения
+    procedure SelectionChanged;
      // Возвращает индекс самого верхнего отображаемого эскиза
     function  GetFirstVisibleIndex: Integer;
 
 
-     // Убирает выделение со всех эскизов и возвращает True, если оно было
-    function  ClearSelection: Boolean;
+     // Invalidates all the selected thumbnails
+    procedure InvalidateSelection;
      // Ставит или убирает выделение с эскиза
     procedure ToggleSelection(Index: Integer);
     function  AddToSelection(Index: Integer): Boolean;
@@ -157,8 +160,6 @@ type
      // Перемещает ItemIndex на новое место, не трогая выделения. При bUpdateStreamSelStart=True также обновляет
      //   FStreamSelStart
     procedure MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
-     // Вызывает OnSelectionChange
-    procedure DoSelectionChange;
      // Вызывает OnStartViewMode
     procedure DoStartViewMode;
      // Настраивает ScrollBar
@@ -186,30 +187,29 @@ type
     procedure CMFontChanged(var Msg: TMessage);                 message CM_FONTCHANGED;
     procedure CMInvalidate(var Msg: TMessage);                  message CM_INVALIDATE;
      // Prop handlers
-    procedure SetBorderStyle(Value: TBorderStyle);
-    function  GetSelCount: Integer;
-    procedure SetItemIndex(Value: Integer);
-    function  GetSelectedIndexes(Index: Integer): Integer;
-    function  GetIDSelected(iID: Integer): Boolean;
-    function  GetSelectedPics(Index: Integer): IPhoaPic;
     function  GetDropTargetIndex: Integer;
+    function  GetIDSelected(iID: Integer): Boolean;
+    function  GetIndexSelected(iIndex: Integer): Boolean;
+    function  GetSelectedIndexes(Index: Integer): Integer;
+    function  GetSelectedPics: IPhoaPicList;
     function  GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
-    procedure SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
-    procedure SetShowThumbTooltips(Value: Boolean);
-    procedure SetThumbTooltipProps(Value: TPicProperties);
-    procedure SetThumbBackColor(Value: TColor);
-    procedure SetThumbFontColor(Value: TColor);
+    procedure SetBorderStyle(Value: TBorderStyle);
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
-    procedure SetTopOffset(Value: Integer);
-    procedure SetThumbnailSize(const Value: TSize);
-    procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
+    procedure SetItemIndex(Value: Integer);
+    procedure SetShowThumbTooltips(Value: Boolean);
     procedure SetThumbBackBorderColor(Value: TColor);
+    procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
+    procedure SetThumbBackColor(Value: TColor);
+    procedure SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
+    procedure SetThumbFontColor(Value: TColor);
+    procedure SetThumbnailSize(const Value: TSize);
     procedure SetThumbShadowBlurRadius(Value: Integer);
     procedure SetThumbShadowColor(Value: TColor);
     procedure SetThumbShadowOffset(const Value: TPoint);
     procedure SetThumbShadowOpacity(Value: Byte);
     procedure SetThumbShadowVisible(Value: Boolean);
-    function GetIndexSelected(iIndex: Integer): Boolean;
+    procedure SetThumbTooltipProps(Value: TPicProperties);
+    procedure SetTopOffset(Value: Integer);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -238,8 +238,8 @@ type
      //     Если iFocusedID>0, устанавливает ItemIndex на изображение с заданным ID
      //     iTopOffset задаёт желаемый индекс верхнего эскиза
     procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
-     // Снимает выделение со всех эскизов
-    procedure SelectNone;
+     // Убирает выделение со всех эскизов и возвращает True, если оно было
+    function  ClearSelection: Boolean;
      // Выделяет все эскизы
     procedure SelectAll;
      // Возвращает массив выделенных изображений
@@ -272,13 +272,11 @@ type
     property IndexSelected[iIndex: Integer]: Boolean read GetIndexSelected;
      // -- Индекс сфокусированного изображения
     property ItemIndex: Integer read FItemIndex write SetItemIndex;
-     // -- Количество выделенных изображений
-    property SelCount: Integer read GetSelCount;
      // -- Индексы выделенных изображений в общем списке изображений viewer'а (Index - индекс выделенного изображения,
      //    0..SelCount-1)
     property SelectedIndexes[Index: Integer]: Integer read GetSelectedIndexes;
-     // -- Выделенные изображения (Index - индекс выделенного изображения, 0..SelCount-1)
-    property SelectedPics[Index: Integer]: IPhoaPic read GetSelectedPics;
+     // -- Выделенные изображения (read-only)
+    property SelectedPics: IPhoaPicList read GetSelectedPics;
      // -- Если True, отображает всплывающие описания эскизов
     property ShowThumbTooltips: Boolean read FShowThumbTooltips write SetShowThumbTooltips;
      // -- Состояния контрола
@@ -389,7 +387,10 @@ uses Math, Themes, phUtils;
   begin
     if (Index>=0) and (Index<FItemCount) then begin
       FSelectedPics.Add(FPicList[Index], True, Result);
-      if Result then InvalidateItem(Index);
+      if Result then begin
+        InvalidateItem(Index);
+        SelectionChanged;
+      end;
     end else
       Result := False;
   end;
@@ -411,7 +412,7 @@ uses Math, Themes, phUtils;
 
   procedure TThumbnailViewer.BeginUpdate;
   begin
-    if FUpdateLock=0 then Perform(WM_SETREDRAW, 0, 0);
+//    if FUpdateLock=0 then Perform(WM_SETREDRAW, 0, 0);
     Inc(FUpdateLock);
   end;
 
@@ -435,63 +436,15 @@ uses Math, Themes, phUtils;
     end;
   end;
 
-  procedure TThumbnailViewer.CalcLayout;
-  var iPrevColCount, iPrevTopOffset: Integer;
-  begin
-    if (FUpdateLock>0) or not HandleAllocated then Exit;
-     // Сбрасываем Tooltip/Hint
-    FLastTooltipIdx := -1;
-    Hint := '';
-     // Сохраняем старые параметры
-    iPrevColCount  := FColCount;
-    iPrevTopOffset := FTopOffset;
-     // Если параметры шрифта не валидны, инициализируем их
-    if not FFontParamsValid then CalcFontParams;
-     // Находим размеры ячейки и количество столбцов
-    FItemSize := FThumbnailSize;
-    case FDisplayMode of
-      tvdmTile: begin
-         // -- Прибавляем отступы на краях эскиза
-        Inc(FItemSize.cx, IThumbMarginH*2+IThumbPaddingL+IThumbPaddingR);
-        Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
-         // -- Прибавляем отступы на данные изображений
-        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FItemSize.cy, FTextLineHeight);
-        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FItemSize.cy, FTextLineHeight);
-         // Считаем количество столбцов
-        FColCount := Max(1, ClientWidth div FItemSize.cx);
-      end;
-      else {tvdmDetail} begin
-        FColCount := 1;
-        FItemSize.cx := Max(FThumbnailSize.cx+IThumbPaddingL+IThumbPaddingR, ClientWidth);
-        Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
-      end;
-    end;
-     // Обновляем значения
-    FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
-    FVRange       := Ceil(FItemCount/FColCount)*FItemSize.cy;
-    FTopOffset    := GetValidTopOffset(FTopOffset);
-     // Обновляем отображаемые данные при наличии изменений
-    if (tvsLayoutChangePending in FStates) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
-     // Обновляем флаги состояния
-    FStates := FStates-[tvsLayoutChangePending];
-    UpdateScrollBar;
-  end;
-
   function TThumbnailViewer.ClearSelection: Boolean;
-  var i: Integer;
   begin
      // Если есть выделение
     Result := FSelectedPics.Count>0;
-    if Result then
-       // Если обновление не блокировано, invalidate thumbnails selected
-      if FUpdateLock=0 then
-        for i := FSelectedPics.Count-1 downto 0 do begin
-          InvalidateItem(FSelectedPics[i]);
-          FSelectedPics.Delete(i);
-        end
-       // Иначе просто очищаем
-      else
-        FSelectedPics.Clear;
+    if Result then begin
+      InvalidateSelection;
+      FSelectedPics.Clear;
+      SelectionChanged;
+    end;
   end;
 
   procedure TThumbnailViewer.CMDrag(var Msg: TCMDrag);
@@ -522,7 +475,7 @@ uses Math, Themes, phUtils;
     FBorderStyle           := bsSingle;
     FColCount              := 1;
     FNoMoveItemIndex       := -1;
-    FSelectedPics          := TPhoaPicLinks.Create(True);
+    FSelectedPics          := TPhoaMutablePicList.Create(True);
     FThumbBackBorderColor  := clGray;
     FThumbBackBorderStyle  := tbbsXP;
     FThumbBackColor        := clBtnFace;
@@ -565,16 +518,11 @@ uses Math, Themes, phUtils;
 
   destructor TThumbnailViewer.Destroy;
   begin
-    FSelectedPics.Free;
+    FSelectedPics := nil;
     FBuffer.Free;
     FThumbShadow.Free;
     FPicList := nil;
     inherited Destroy;
-  end;
-
-  procedure TThumbnailViewer.DoSelectionChange;
-  begin
-    if (FUpdateLock=0) and Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
   end;
 
   procedure TThumbnailViewer.DoStartViewMode;
@@ -675,7 +623,7 @@ uses Math, Themes, phUtils;
        //   изображение или место вставки не совпадает с положением этого изображения
       Accept := (FDragTargetCoord.iIndex>=0) and (FSelectedPics.Count<FItemCount);
       if Accept and (FSelectedPics.Count=1) then begin
-        idxSingleSel := FPicList.IndexOfID(FSelectedPics[0].ID);
+        idxSingleSel := SelectedIndexes[0];
         Accept := (idxSingleSel<>FDragTargetCoord.iIndex) and (idxSingleSel<>FDragTargetCoord.iIndex-1);
       end;
     end else
@@ -686,10 +634,9 @@ uses Math, Themes, phUtils;
   begin
     if FUpdateLock>0 then Dec(FUpdateLock);
     if FUpdateLock=0 then begin
-      Perform(WM_SETREDRAW, 1, 0);
-      CalcLayout;
-      Refresh;
-      DoSelectionChange;
+//      Perform(WM_SETREDRAW, 1, 0);
+      if tvsLayoutChangePending    in FStates then LayoutChanged;
+      if tvsSelectionChangePending in FStates then SelectionChanged;
     end;
   end;
 
@@ -713,11 +660,6 @@ uses Math, Themes, phUtils;
     Result := FSelectedPics.IndexOfID(FPicList[iIndex].ID)>=0;
   end;
 
-  function TThumbnailViewer.GetSelCount: Integer;
-  begin
-    Result := FSelectedPics.Count;
-  end;
-
   function TThumbnailViewer.GetSelectedIndexes(Index: Integer): Integer;
   begin
     Result := FPicList.IndexOfID(FSelectedPics[Index].ID);
@@ -731,9 +673,9 @@ result := nil;
 //!!!    for i := 0 to FSelIndexes.Count-1 do Result[i] := GetSelectedPics(i);
   end;
 
-  function TThumbnailViewer.GetSelectedPics(Index: Integer): IPhoaPic;
+  function TThumbnailViewer.GetSelectedPics: IPhoaPicList;
   begin
-    Result := FSelectedPics[Index];
+    Result := FSelectedPics;
   end;
 
   function TThumbnailViewer.GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
@@ -749,7 +691,7 @@ result := nil;
   procedure TThumbnailViewer.InvalidateItem(Index: Integer);
   var r: TRect;
   begin
-    if (Index>=0) and (Index<FItemCount) and (FUpdateLock=0) and HandleAllocated then begin
+    if (Index>=0) and (Index<FItemCount) and HandleAllocated then begin
       r := ItemRect(Index, False);
       if not IsRectEmpty(r) then InvalidateRect(Handle, @r, False);
     end;
@@ -760,12 +702,10 @@ result := nil;
     InvalidateItem(FPicList.IndexOfID(Pic.ID));
   end;
 
-  procedure TThumbnailViewer.InvalidateShadow;
+  procedure TThumbnailViewer.InvalidateSelection;
+  var i: Integer;
   begin
-    if FThumbShadow<>nil then begin
-      FreeAndNil(FThumbShadow);
-      Invalidate;
-    end;
+    for i := 0 to FSelectedPics.Count-1 do InvalidateItem(FSelectedPics[i]);
   end;
 
   function TThumbnailViewer.ItemAtPos(ix, iy: Integer): Integer;
@@ -819,8 +759,10 @@ result := nil;
     case Key of
        // Enter - входим в режим просмотра
       VK_RETURN: if Shift=[] then DoStartViewMode;
-       // Пробел - переключаем выделение
-      VK_SPACE: if Shift=[] then ToggleSelection(FItemIndex);
+       // Пробел - включаем выделение; Ctrl+Пробел - переключаем выделение
+      VK_SPACE:
+        if Shift=[] then AddToSelection(FItemIndex)
+        else if Shift=[ssCtrl] then ToggleSelection(FItemIndex);
        // Стрелки - обрабатываем движения
       VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_HOME, VK_END, VK_PRIOR, VK_NEXT: begin
          // Без модификаторов или с Shift, но нет поточного выделения
@@ -841,9 +783,51 @@ result := nil;
   end;
 
   procedure TThumbnailViewer.LayoutChanged;
+  var iPrevColCount, iPrevTopOffset: Integer;
   begin
-    Include(FStates, tvsLayoutChangePending);
-    CalcLayout;
+    if not HandleAllocated then Exit;
+     // Если обновления заблокированы, просто взводим флаг изменения
+    if FUpdateLock>0 then
+      Include(FStates, tvsLayoutChangePending)
+     // Иначе пересчитываем параметры отображения
+    else begin
+       // Сбрасываем Tooltip/Hint
+      FLastTooltipIdx := -1;
+      Hint := '';
+       // Сохраняем старые параметры
+      iPrevColCount  := FColCount;
+      iPrevTopOffset := FTopOffset;
+       // Если параметры шрифта не валидны, инициализируем их
+      if not FFontParamsValid then CalcFontParams;
+       // Находим размеры ячейки и количество столбцов
+      FItemSize := FThumbnailSize;
+      case FDisplayMode of
+        tvdmTile: begin
+           // -- Прибавляем отступы на краях эскиза
+          Inc(FItemSize.cx, IThumbMarginH*2+IThumbPaddingL+IThumbPaddingR);
+          Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
+           // -- Прибавляем отступы на данные изображений
+          if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FItemSize.cy, FTextLineHeight);
+          if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FItemSize.cy, FTextLineHeight);
+           // Считаем количество столбцов
+          FColCount := Max(1, ClientWidth div FItemSize.cx);
+        end;
+        else {tvdmDetail} begin
+          FColCount := 1;
+          FItemSize.cx := Max(FThumbnailSize.cx+IThumbPaddingL+IThumbPaddingR, ClientWidth);
+          Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
+        end;
+      end;
+       // Обновляем значения
+      FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
+      FVRange       := Ceil(FItemCount/FColCount)*FItemSize.cy;
+      FTopOffset    := GetValidTopOffset(FTopOffset);
+       // Обновляем отображаемые данные при наличии изменений
+      if (tvsLayoutChangePending in FStates) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
+      UpdateScrollBar;
+       // Обновляем флаги состояния
+      FStates := FStates-[tvsLayoutChangePending];
+    end;
   end;
 
   procedure TThumbnailViewer.MarqueingEnd;
@@ -894,14 +878,18 @@ result := nil;
         MoveItemIndex(idx, True);
        // Если правая кнопка - готовим вызов Shell Context Menu
       end else if Button=mbRight then begin
-        ClearSelection;
-        SetItemIndex(idx);
+        BeginUpdate;
+        try
+          ClearSelection;
+          SetItemIndex(idx);
+        finally
+          EndUpdate;
+        end;
         if idx>=0 then begin
           FShellCtxMenuOnMouseUp := True;
           Exit;
         end;
       end;
-      DoSelectionChange;
      // Если нажат Shift - выделяем подряд идущие эскизы
     end else if ssShift in Shift then
       if FStreamSelStart>=0 then SelectRange(FStreamSelStart, idx, False) else SetItemIndex(idx)
@@ -950,7 +938,7 @@ result := nil;
      // Была рамка группового выделения
     if FMarqueing then
       MarqueingEnd
-     // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню 
+     // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню
     else if FShellCtxMenuOnMouseUp then begin
       FShellCtxMenuOnMouseUp := False;
       if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName);
@@ -1041,7 +1029,7 @@ result := 30;
       DrawDetail(LeftCorner, rText);
     end;
 
-     // Отрисовывает эскиз в заданном прямоугольнике 
+     // Отрисовывает эскиз в заданном прямоугольнике
     procedure DrawThumbnail(const rThumb: TRect);
     var
       r: TRect;
@@ -1066,7 +1054,7 @@ result := 30;
      // Определяем внутренние границы эскиза
     rInner := Rect(ItemRect.Left+IThumbPaddingL, ItemRect.Top+IThumbPaddingT, ItemRect.Right-IThumbPaddingR, ItemRect.Bottom-IThumbPaddingB);
      // Отрисовываем изображение эскиза
-    r := rInner; 
+    r := rInner;
     case FDisplayMode of
       tvdmTile: begin
         if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    FTextLineHeight);
@@ -1106,7 +1094,7 @@ result := 30;
         DrawFocusRect(r);
       end;
     end;
-    
+
      // Возвращает битмэп с "подложкой" эскиза: выделенного или обычного (в зависимости от bSelected); кэширует
      //   созданный битмэп
     function GetThBackBitmap: TBitmap32;
@@ -1215,7 +1203,18 @@ result := 30;
 
   procedure TThumbnailViewer.RemoveFromSelection(Index: Integer);
   begin
-    if FSelectedPics.Remove(FPicList[Index])>=0 then InvalidateItem(Index);
+    if FSelectedPics.Remove(FPicList[Index].ID)>=0 then begin
+      InvalidateItem(Index);
+      SelectionChanged;
+    end;
+  end;
+
+  procedure TThumbnailViewer.ResetShadow;
+  begin
+    if FThumbShadow<>nil then begin
+      FreeAndNil(FThumbShadow);
+      Invalidate;
+    end;
   end;
 
   procedure TThumbnailViewer.Resize;
@@ -1227,23 +1226,27 @@ result := 30;
   procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
   var i, iItemIdx: Integer;
   begin
-    ClearSelection;
-     // Добавляем в выделение изображения с заданными ID
-    if SelectedIDs<>nil then
-      for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicList.IndexOfID(SelectedIDs[i]));
-     // Если нет выделения, выделяем первое изображение (если оно есть)
-    if FSelectedPics.Count=0 then AddToSelection(0);
-     // Находим сфокусированное изображение
-    if iFocusedID>0 then iItemIdx := FPicList.IndexOfID(iFocusedID) else iItemIdx := -1;
-     // Если так и не нашлось
-    if iItemIdx<0 then
-       // Фокусируем последнее из выделенных, если они есть
-      if FSelectedPics.Count>0 then iItemIdx := SelectedIndexes[FSelectedPics.Count-1]
-       // Иначе пытаемся выделить самое первое изображение, если оно есть
-      else if FItemCount>0 then iItemIdx := 0;
-    TopOffset := iTopOffset;
-    MoveItemIndex(iItemIdx, True);
-    DoSelectionChange;
+    BeginUpdate;
+    try
+      ClearSelection;
+       // Добавляем в выделение изображения с заданными ID
+      if SelectedIDs<>nil then
+        for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicList.IndexOfID(SelectedIDs[i]));
+       // Если нет выделения, выделяем первое изображение (если оно есть)
+      if FSelectedPics.Count=0 then AddToSelection(0);
+       // Находим сфокусированное изображение
+      if iFocusedID>0 then iItemIdx := FPicList.IndexOfID(iFocusedID) else iItemIdx := -1;
+       // Если так и не нашлось
+      if iItemIdx<0 then
+         // Фокусируем последнее из выделенных, если они есть
+        if FSelectedPics.Count>0 then iItemIdx := SelectedIndexes[FSelectedPics.Count-1]
+         // Иначе пытаемся выделить самое первое изображение, если оно есть
+        else if FItemCount>0 then iItemIdx := 0;
+      TopOffset := iTopOffset;
+      MoveItemIndex(iItemIdx, True);
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TThumbnailViewer.SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopOffset: Integer);
@@ -1275,16 +1278,28 @@ result := 30;
   var i: Integer;
   begin
     if FSelectedPics.Count<FItemCount then begin
-      ClearSelection;
-      for i := 0 to FItemCount-1 do FSelectedPics.Add(FPicList[i]);
-      Invalidate;
-      DoSelectionChange;
+      BeginUpdate;
+      try
+        ClearSelection;
+        for i := 0 to FItemCount-1 do AddToSelection(i);
+      finally
+        EndUpdate;
+      end;
     end;
   end;
 
-  procedure TThumbnailViewer.SelectNone;
+  procedure TThumbnailViewer.SelectionChanged;
   begin
-    if ClearSelection then DoSelectionChange;
+    if not HandleAllocated then Exit;
+     // Если обновления заблокированы, просто взводим флаг изменения
+    if FUpdateLock>0 then
+      Include(FStates, tvsSelectionChangePending)
+     // Иначе вызываем событие смены выделения
+    else begin
+      if Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
+       // Обновляем флаги состояния
+      FStates := FStates-[tvsSelectionChangePending];
+    end;
   end;
 
   procedure TThumbnailViewer.SelectRange(idxStart, idxEnd: Integer; bRectangular: Boolean);
@@ -1304,22 +1319,26 @@ result := 30;
     end;
 
   begin
-    ClearSelection;
-    MoveItemIndex(idxEnd, False);
-     // Прямоугольное выделение
-    if bRectangular then begin
-      pStart := Point(idxStart mod FColCount, idxStart div FColCount);
-      pEnd   := Point(idxEnd   mod FColCount, idxEnd   div FColCount);
-      OrderCoord(pStart.x, pEnd.x);
-      OrderCoord(pStart.y, pEnd.y);
-      for iy := pStart.y to pEnd.y do
-        for ix := pStart.x to pEnd.x do AddToSelection(iy*FColCount+ix);
-     // Поточное выделение
-    end else begin
-      OrderCoord(idxStart, idxEnd);
-      for i := idxStart to idxEnd do AddToSelection(i);
+    BeginUpdate;
+    try
+      ClearSelection;
+      MoveItemIndex(idxEnd, False);
+       // Прямоугольное выделение
+      if bRectangular then begin
+        pStart := Point(idxStart mod FColCount, idxStart div FColCount);
+        pEnd   := Point(idxEnd   mod FColCount, idxEnd   div FColCount);
+        OrderCoord(pStart.x, pEnd.x);
+        OrderCoord(pStart.y, pEnd.y);
+        for iy := pStart.y to pEnd.y do
+          for ix := pStart.x to pEnd.x do AddToSelection(iy*FColCount+ix);
+       // Поточное выделение
+      end else begin
+        OrderCoord(idxStart, idxEnd);
+        for i := idxStart to idxEnd do AddToSelection(i);
+      end;
+    finally
+      EndUpdate;
     end;
-    DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.SetBorderStyle(Value: TBorderStyle);
@@ -1342,10 +1361,14 @@ result := 30;
   begin
      // Если меняется индекс, или нет выделения, а оно нужно, или наоборот
     if (FItemIndex<>Value) or ((FSelectedPics.Count=0)<>(Value<0)) then begin
-      ClearSelection;
-      AddToSelection(Value);
-      MoveItemIndex(Value, True);
-      DoSelectionChange;
+      BeginUpdate;
+      try
+        ClearSelection;
+        AddToSelection(Value);
+        MoveItemIndex(Value, True);
+      finally
+        EndUpdate;
+      end;
     end;
   end;
 
@@ -1408,7 +1431,7 @@ result := 30;
   begin
     if FThumbShadowBlurRadius<>Value then begin
       FThumbShadowBlurRadius := Value;
-      InvalidateShadow;
+      ResetShadow;
     end;
   end;
 
@@ -1416,7 +1439,7 @@ result := 30;
   begin
     if FThumbShadowColor<>Value then begin
       FThumbShadowColor := Value;
-      InvalidateShadow;
+      ResetShadow;
     end;
   end;
 
@@ -1424,7 +1447,7 @@ result := 30;
   begin
     if Int64(FThumbShadowOffset)<>Int64(Value) then begin
       FThumbShadowOffset := Value;
-      InvalidateShadow;
+      ResetShadow;
     end;
   end;
 
@@ -1432,7 +1455,7 @@ result := 30;
   begin
     if FThumbShadowOpacity<>Value then begin
       FThumbShadowOpacity := Value;
-      InvalidateShadow;
+      ResetShadow;
     end;
   end;
 
@@ -1440,7 +1463,7 @@ result := 30;
   begin
     if FThumbShadowVisible<>Value then begin
       FThumbShadowVisible := Value;
-      InvalidateShadow;
+      ResetShadow;
     end;
   end;
 
@@ -1546,12 +1569,11 @@ result := 30;
   end;
 
   procedure TThumbnailViewer.WndProc(var Msg: TMessage);
-  var i: Integer;
   begin
     case Msg.Msg of
        // On (un)gaining focus repaint selection
       WM_KILLFOCUS, WM_SETFOCUS: begin
-        for i := 0 to FSelectedPics.Count-1 do InvalidateItem(FSelectedPics[i]);
+        InvalidateSelection;
         if (FItemIndex>=0) and not IndexSelected[FItemIndex] then InvalidateItem(FItemIndex);
       end;
       WM_LBUTTONDBLCLK: begin
