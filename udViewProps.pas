@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.15 2004-12-31 13:38:58 dale Exp $
+//  $Id: udViewProps.pas,v 1.16 2005-01-14 08:55:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -166,7 +166,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
 
   function TdViewProps.GetDataValid: Boolean;
   begin
-    Result := (Trim(eName.Text)<>'') and (FGroupings.Count>0);
+    Result := Trim(eName.Text)<>'';
   end;
 
   function TdViewProps.GroupingNode(Node: PVirtualNode): Boolean;
