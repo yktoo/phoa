@@ -80,6 +80,11 @@
 		<param name="Local" value="general-pic-data.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&ccedil;&agrave;&auml;&agrave;&divide;&egrave;, &ntilde;&igrave;. &ograve;&egrave;&iuml;&egrave;&divide;&iacute;&ucirc;&aring; &ccedil;&agrave;&auml;&agrave;&divide;&egrave;">
+		<param name="Name" value="типичные задачи">
+		<param name="See Also" value="типичные задачи">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
 		<param name="Name" value="изображения">
 		<param name="See Also" value="изображения">
@@ -546,6 +551,11 @@
 		<param name="Name" value="&ntilde;&ograve;&agrave;&ograve;&egrave;&ntilde;&ograve;&egrave;&ecirc;&agrave; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;&agrave;">
 		<param name="Name" value="Статистика фотоальбома">
 		<param name="Local" value="intf-stats.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&ograve;&egrave;&iuml;&egrave;&divide;&iacute;&ucirc;&aring; &ccedil;&agrave;&auml;&agrave;&divide;&egrave;">
+		<param name="Name" value="Типичные задачи">
+		<param name="Local" value="tasks.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ocirc;&agrave;&eacute;&euml;&ucirc;">

@@ -59,6 +59,11 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="common tasks">
+		<param name="Name" value="Common tasks">
+		<param name="Local" value="tasks.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="copyright">
 		<param name="Name" value="License Agreement">
 		<param name="Local" value="general-license.html">
@@ -547,6 +552,11 @@
 		<param name="Name" value="system requirements">
 		<param name="Name" value="System requirements">
 		<param name="Local" value="general-requirements.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="tasks, see common tasks">
+		<param name="Name" value="common tasks">
+		<param name="See Also" value="common tasks">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="thumbnails">

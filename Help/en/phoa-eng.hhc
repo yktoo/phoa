@@ -380,45 +380,64 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="FAQ (Frequently Asked Questions)">
+			<param name="Local" value="info-faq.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Getting started">
 			<param name="Local" value="tasks-getting-started.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Preparing for CD or DVD burning">
-			<param name="Local" value="tasks-media-preparing.html">
+			<param name="Name" value="Editing photo albums">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Configuring thumbnail dimensions and quality">
+				<param name="Local" value="tasks-thumb-adjusting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Rotating pictures">
+				<param name="Local" value="tasks-pic-rotating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture deletion">
+				<param name="Local" value="tasks-pic-deletion.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Sorting pictures">
+				<param name="Local" value="tasks-sorting.html">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Picture deletion">
-			<param name="Local" value="tasks-pic-deletion.html">
+			<param name="Name" value="Using photo albums">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Viewing pictures">
+				<param name="Local" value="tasks-viewing.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Slide show">
+				<param name="Local" value="tasks-slide-show.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Using external tools">
+				<param name="Local" value="tasks-tools.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Preparing for CD or DVD burning">
+				<param name="Local" value="tasks-media-preparing.html">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Picture file link repairing">
-			<param name="Local" value="tasks-pic-file-link-repair.html">
+			<param name="Name" value="Troubleshooting">
 			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Slide show">
-			<param name="Local" value="tasks-slide-show.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Sorting pictures">
-			<param name="Local" value="tasks-sorting.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Configuring thumbnail dimensions and quality">
-			<param name="Local" value="tasks-thumb-adjusting.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Using external tools">
-			<param name="Local" value="tasks-tools.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Viewing pictures">
-			<param name="Local" value="tasks-viewing.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="FAQ (Frequently Asked Questions)">
-			<param name="Local" value="info-faq.html">
-			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture file link repairing">
+				<param name="Local" value="tasks-pic-file-link-repair.html">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Program settings">
