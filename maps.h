@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.5 2004-05-23 13:23:09 dale Exp $
+//  $Id: maps.h,v 1.6 2004-06-06 18:12:27 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -51,6 +51,7 @@
 #define IDH_intf_file_ops_task_move     00620
 #define IDH_intf_file_ops_task_repfl    00630
 #define IDH_intf_file_ops_task_rthumb   00640
+#define IDH_intf_group_props            00650
 #define IDH_setup                       00700
 #define IDH_setup_dialogs               00710
 #define IDH_setup_general               00720
@@ -74,4 +75,5 @@
 #define IDH_theory_metadata             01130
 #define IDH_theory_resampling           01140
 #define IDH_theory_tools                01150
-#define IDH_thumbnails                  01160
+#define IDH_theory_transform            01160
+#define IDH_thumbnails                  01170

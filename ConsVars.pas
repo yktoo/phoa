@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.36 2004-06-06 13:29:45 dale Exp $
+//  $Id: ConsVars.pas,v 1.37 2004-06-06 18:12:27 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -605,6 +605,7 @@ const
   IDH_intf_file_ops_task_move     = 00620;
   IDH_intf_file_ops_task_repfl    = 00630;
   IDH_intf_file_ops_task_rthumb   = 00640;
+  IDH_intf_group_props            = 00650;
   IDH_setup                       = 00700;
   IDH_setup_dialogs               = 00710;
   IDH_setup_general               = 00720;
@@ -628,7 +629,8 @@ const
   IDH_theory_metadata             = 01130;
   IDH_theory_resampling           = 01140;
   IDH_theory_tools                = 01150;
-  IDH_thumbnails                  = 01160;
+  IDH_theory_transform            = 01160;
+  IDH_thumbnails                  = 01170;
 
    // ID страниц Мастера добавления файлов
   IWzAddFilesPageID_SelFiles      = 1;

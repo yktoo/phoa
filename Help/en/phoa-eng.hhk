@@ -170,6 +170,11 @@
 		<param name="Local" value="file-formats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="group (see picture group)">
+		<param name="Name" value="picture group">
+		<param name="See Also" value="picture group">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="keyboard shortcuts">
 		<param name="Name" value="Keyboard and mouse controls">
 		<param name="Local" value="intf-key-mouse-controls.html">
@@ -299,6 +304,13 @@
 		<param name="Name" value="How it works">
 		<param name="Local" value="how-it-works.html">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="properties">
+			<param name="Name" value="Group properties dialog">
+			<param name="Local" value="intf-group-props.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="pictures">
 		<param name="Name" value="pictures">
@@ -386,6 +398,11 @@
 			<param name="Name" value="autofilling">
 			<param name="Name" value="Autofilling the picture properties">
 			<param name="Local" value="pic-prop-autofill.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="group">
+			<param name="Name" value="Group properties dialog">
+			<param name="Local" value="intf-group-props.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="photo album">
@@ -579,6 +596,23 @@
 			<param name="Name" value="usage">
 			<param name="Name" value="Tools">
 			<param name="Local" value="theory-tools.html#usages">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="transformations">
+		<param name="Name" value="Transformations">
+		<param name="Local" value="theory-transform.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="flips">
+			<param name="Name" value="Transformations">
+			<param name="Local" value="theory-transform.html#flips">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="rotation">
+			<param name="Name" value="Transformations">
+			<param name="Local" value="theory-transform.html#rotation">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

@@ -101,6 +101,11 @@
 				<param name="Local" value="intf-album-props.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc; &atilde;&eth;&oacute;&iuml;&iuml;&ucirc;">
+				<param name="Local" value="intf-group-props.html">
+				<param name="New" value="1">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Igrave;&agrave;&ntilde;&ograve;&aring;&eth; &auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&yuml; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 				<param name="Local" value="intf-pic-add.html">
 				</OBJECT>
@@ -136,7 +141,7 @@
 					<param name="Local" value="intf-pic-props-metadata.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="&Iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
+					<param name="Name" value="&Iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth; &egrave; &iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave;">
 					<param name="Local" value="intf-pic-props-view.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -264,6 +269,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ntilde;&icirc;&divide;&aring;&ograve;&agrave;&iacute;&egrave;&yuml; &ecirc;&euml;&agrave;&acirc;&egrave;&oslash; &egrave; &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &igrave;&ucirc;&oslash;&uuml;&thorn;">
 			<param name="Local" value="intf-key-mouse-controls.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&acirc;&agrave;&iacute;&egrave;&yuml;">
+			<param name="Local" value="theory-transform.html">
+			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc; &ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&icirc;&eacute; &ntilde;&ograve;&eth;&icirc;&ecirc;&egrave;">

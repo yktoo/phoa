@@ -60,6 +60,13 @@
 		<param name="Name" value="Как это работает">
 		<param name="Local" value="how-it-works.html">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
+			<param name="Name" value="Окно свойств группы">
+			<param name="Local" value="intf-group-props.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&auml;&agrave;&iacute;&iacute;&ucirc;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 		<param name="Name" value="Данные изображений">
@@ -383,6 +390,23 @@
 		<param name="Local" value="advantages.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
+		<param name="Name" value="Преобразования">
+		<param name="Local" value="theory-transform.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&ograve;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
+			<param name="Name" value="Преобразования :: Отражения">
+			<param name="Local" value="theory-transform.html#flips">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&icirc;&acirc;&icirc;&eth;&icirc;&ograve;">
+			<param name="Name" value="Преобразования :: Поворот">
+			<param name="Local" value="theory-transform.html#rotation">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iuml;&eth;&egrave;&iacute;&ouml;&egrave;&iuml;&ucirc; &eth;&agrave;&aacute;&icirc;&ograve;&ucirc; PhoA">
 		<param name="Name" value="Как это работает">
 		<param name="Local" value="how-it-works.html">
@@ -423,6 +447,11 @@
 			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring;">
 			<param name="Name" value="Автозаполнение свойств изображений">
 			<param name="Local" value="pic-prop-autofill.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&atilde;&eth;&oacute;&iuml;&iuml;&ucirc;">
+			<param name="Name" value="Окно свойств группы">
+			<param name="Local" value="intf-group-props.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
