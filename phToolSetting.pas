@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.14 2004-09-18 19:44:23 dale Exp $
+//  $Id: phToolSetting.pas,v 1.15 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phToolSetting;
 interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ActiveX, TB2Item, TBX,
-  ConsVars, phSettings, phObj;
+  ConsVars, phSettings, phIntf, phObj;
 
 type
    // Вид инструмента
@@ -78,10 +78,10 @@ type
     procedure RegSave(RegIniFile: TRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
-     // Возвращает True, если инструмент подходит всем файлам из PicLinks
-    function  MatchesFiles(PicLinks: TPhoaPicLinks): Boolean;
-     // Выполняет инструмент для заданных изображений
-    procedure Execute(PicLinks: TPhoaPicLinks);
+     // Возвращает True, если инструмент подходит всем файлам из Pics (Pics может быть nil)
+    function  MatchesFiles(Pics: IPhoaPicList): Boolean;
+     // Выполняет инструмент для заданных изображений (Pics может быть nil)
+    procedure Execute(Pics: IPhoaPicList);
      // Props
      // -- Подсказка. Закодирована по правилам ConstValEx()
     property Hint: String read FHint write SetHint;
@@ -134,7 +134,7 @@ type
    // Создаёт пункт меню инструмента Tool и добавляет его в состав дочерних пунктов пункта Item
   procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
    // Настраивает видимость инструментов по их доступности (применимости) к набору ссылок на изображения
-  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; Pics: IPhoaPicList);
 
 const
    // Соответствие значков виду инструмента
@@ -203,14 +203,14 @@ uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
     Item.Add(ti);
   end;
 
-  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; Pics: IPhoaPicList);
   var
     i: Integer;
     ti: TTBCustomItem;
   begin
     for i := 0 to Item.Count-1 do begin
       ti := Item[i];
-      ti.Visible := (Page[ti.Tag] as TPhoaToolSetting).MatchesFiles(PicLinks);
+      ti.Visible := (Page[ti.Tag] as TPhoaToolSetting).MatchesFiles(Pics);
     end;
   end;
 
@@ -328,15 +328,15 @@ type
     inherited Destroy;
   end;
 
-  procedure TPhoaToolSetting.Execute(PicLinks: TPhoaPicLinks);
+  procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
   var
     i, iRes: Integer;
     sFileName, sQFileName: String;
   begin
-    if FKind<>ptkSeparator then begin
+    if (FKind<>ptkSeparator) and (Pics<>nil) then begin
       iRes := 0; // Satisfy the compiler
-      for i := 0 to PicLinks.Count-1 do begin
-        sFileName  := PicLinks[i].PicFileName;
+      for i := 0 to Pics.Count-1 do begin
+        sFileName  := Pics[i].FileName;
         sQFileName := AnsiQuotedStr(sFileName, '"');
         case FKind of
           ptkDefault: iRes := ShellExecute(Application.Handle, nil,     PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
@@ -371,11 +371,11 @@ type
     { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
-  function TPhoaToolSetting.MatchesFiles(PicLinks: TPhoaPicLinks): Boolean;
+  function TPhoaToolSetting.MatchesFiles(Pics: IPhoaPicList): Boolean;
   var i: Integer;
   begin
      // Если выбранных изображений нет - не подходит
-    if PicLinks.Count=0 then
+    if (Pics=nil) or (Pics.Count=0) then
       Result := False
     else begin
        // Создаём маски, если нужно
@@ -385,8 +385,8 @@ type
        // Иначе перебираем все файлы: должны подходить все
       if not Result then begin
         Result := True;
-        for i := 0 to PicLinks.Count-1 do
-          if not FMaskObj.Matches(PicLinks[i].PicFileName) then begin
+        for i := 0 to Pics.Count-1 do
+          if not FMaskObj.Matches(Pics[i].FileName) then begin
             Result := False;
             Break;
           end;

@@ -160,8 +160,8 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
-      'rbAllPics.Caption'
-      '*.SecondaryShortCuts')
+      '*.SecondaryShortCuts'
+      'rbAllPics.Caption')
     Left = 136
     Top = 72
     LangData = {

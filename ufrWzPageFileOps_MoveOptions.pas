@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -125,7 +125,7 @@ uses phUtils, udFileOpsWizard, phObj;
        // Ищем самый длинный общий путь
       sPath := '';
       for i := 0 to TdFileOpsWizard(StorageForm).SelectedPics.Count-1 do begin
-        sPicPath := ExtractFilePath(TdFileOpsWizard(StorageForm).SelectedPics[i].PicFileName);
+        sPicPath := ExtractFilePath(TdFileOpsWizard(StorageForm).SelectedPics[i].FileName);
         if i=0 then sPath := sPicPath else sPath := LongestCommonPart(sPath, sPicPath);
          // Если строка уже пустая, выходим
         if sPath='' then Break;

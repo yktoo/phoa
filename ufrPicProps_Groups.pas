@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -202,7 +202,7 @@ type
     p := Sender.GetNodeData(Node);
     if p<>nil then
       if TextType=ttStatic then begin
-        if p.Group.PicIDs.Count>0 then s := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.PicIDs.Count]);
+        if p.Group.Pics.Count>0 then s := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.Pics.Count]);
       end else if Sender.NodeParent[Node]<>nil then s := p.Group.Text
       else s := ConstVal('SPhotoAlbumNode');
     CellText := AnsiToUnicodeCP(s, cMainCodePage);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.44 2004-10-04 12:44:36 dale Exp $
+//  $Id: Main.pas,v 1.45 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -268,7 +268,7 @@ type
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
      // Просматриваемые в настоящий момент изображения (с учётом режима Flat)
-    FViewedPics: IPhoaMutablePicList;
+    FViewedPics: IPhoaPicList;
      // Узел результатов поиска
     FSearchNode: PVirtualNode;
      // Список изображений - результаты поиска
@@ -318,8 +318,8 @@ type
      // Создаёт список изображений:
      //   если активно дерево групп - то всех изображений группы
      //   если активен вьюер - то выделенных во вьюере изображений
-     //   иначе возвращает пустой список
-//    function  GetSelectedPicLinks: TPhoaPicLinks;
+     //   иначе возвращает nil
+    function GetSelectedPics: IPhoaPicList;
      // Отображает результаты поиска. Если bForceRemove=True, удаляет узел результатов, иначе, при bDoSelectNode=True,
      //   выделяет узел
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
@@ -512,7 +512,7 @@ uses
   begin
     ResetMode;
     if ViewIndex>=0 then View := FPhoA.Views[ViewIndex] else View := nil;
-    if DoFileOperations(FPhoA, CurGroup, View, PicArrayToIDArray(Viewer.GetSelectedPicArray), ActiveControl=Viewer, bPhoaChanged) then
+    if DoFileOperations(FPhoA, CurGroup, View, Viewer.SelectedPics, ActiveControl=Viewer, bPhoaChanged) then
        // Если изменилось содержимое фотоальбома
       if bPhoaChanged then begin
          // Помечаем текущее состояние как изменённое без возможности отката
@@ -676,7 +676,7 @@ uses
     iCntBefore: Integer;
     Operation: TPhoaOperation;
   begin
-    iCntBefore := CurGroup.PicIDs.Count;
+    iCntBefore := CurGroup.Pics.Count;
     Operation := nil;
     BeginOperation;
     try
@@ -684,7 +684,7 @@ uses
     finally
       EndOperation(Operation);
     end;
-    PhoaInfo(False, 'SNotify_Paste', [CurGroup.PicIDs.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
+    PhoaInfo(False, 'SNotify_Paste', [CurGroup.Pics.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
   end;
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
@@ -982,9 +982,9 @@ uses
 
   procedure TfMain.DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
   begin
-    if bForceRemove then FSearchResults.PicIDs.Clear;
+    if bForceRemove then FSearchResults.Pics.Clear;
      // Если есть результаты, следим, чтобы узел поиска существовал
-    if FSearchResults.PicIDs.Count>0 then begin
+    if FSearchResults.Pics.Count>0 then begin
       if FSearchNode=nil then FSearchNode := tvGroups.AddChild(nil);
        // Если надо выделить узел
       if bDoSelectNode then ActivateVTNode(tvGroups, FSearchNode);
@@ -1014,19 +1014,11 @@ uses
   end;
 
   procedure TfMain.DoEnableTools(Item: TTBCustomItem);
-//  var PicLinks: TPhoaPicLinks;
   begin
-//     // Если пункт содержит подпункты-инструменты
-//    if Item.Count>0 then begin
-//       // Создаём список ссылок на изображения
-//      PicLinks := GetSelectedPicLinks;
-//      try
-//         // Настраиваем доступность инструментов
-//        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, PicLinks);
-//      finally
-//        PicLinks.Free;
-//      end;
-//    end;
+     // Если пункт содержит подпункты-инструменты
+    if Item.Count>0 then
+       // Создаём список ссылок на изображения и настраиваем доступность инструментов
+      AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, GetSelectedPics);
   end;
 
   procedure TfMain.DoLoad(const sFileName: String);
@@ -1099,7 +1091,7 @@ uses
     aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
     aPaste.Enabled               := (gnk in [gnkPhoA, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
     aSortPics.Enabled            := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and bPics;
-    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.PicIDs.Count);
+    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.Pics.Count);
     aSelectNone.Enabled          := bPicSel;
     aView.Enabled                := Viewer.ItemIndex>=0;
     aRemoveSearchResults.Enabled := FSearchNode<>nil;
@@ -1231,7 +1223,6 @@ uses
       fpMain.IniSection  := SRegMainWindow_Root;
        // Создаём фотоальбом
       FPhoA := TPhotoAlbum.Create;
-      FViewedPics := TPhoaMutablePicList.Create(False);
       FViewIndex := -1;
        // Настраиваем Application
       Application.OnHint      := AppHint;
@@ -1344,21 +1335,17 @@ uses
     end;
   end;
 
-//!!!  function TfMain.GetSelectedPicLinks: TPhoaPicLinks;
-//  begin
-//    Result := TPhoaPicLinks.Create(True);
-//    try
-//       // Если активны группы - составляем список ссылок на изображения текущей группы
-//      if tvGroups.Focused then begin
-//        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False, False);
-//       // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
-//      end else if Viewer.Focused then
-//        Result.AddFromPicIDs(FPhoA, PicArrayToIDArray(Viewer.GetSelectedPicArray), False);
-//    except
-//      Result.Free;
-//      raise;
-//    end;
-//  end;
+  function TfMain.GetSelectedPics: IPhoaPicList;
+  begin
+     // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
+    if Viewer.Focused then
+      Result := Viewer.SelectedPics
+     // Если активны группы - составляем список ссылок на изображения текущей группы
+    else if tvGroups.Focused and (CurGroup<>nil) then begin
+      Result := TPhoaMutablePicList.Create(True);
+      //!!!Result.AddFromGroup(FPhoA, CurGroup, False, False);
+    end;
+  end;
 
   function TfMain.GetViewIndex: Integer;
   begin
@@ -1478,7 +1465,7 @@ uses
     procedure SelectPicByID(iID: Integer);
     begin
       if (iID>0) and (CurGroup<>nil) then begin
-        Viewer.ItemIndex := CurGroup.PicIDs.IndexOf(iID);
+        Viewer.ItemIndex := CurGroup.Pics.IndexOfID(iID);
         Viewer.ScrollIntoView;
       end;
     end;
@@ -1522,40 +1509,44 @@ uses
   end;
 
   procedure TfMain.RefreshViewer;
-  var
-    UniquePics: IPhoaMutablePicList;
-    bRecurse: Boolean;
+  var UniquePics, ViewPics: IPhoaMutablePicList;
 
-    procedure DoAddPics(Group: TPhoaGroup);
+    procedure RecursivelyAddPics(Group: TPhoaGroup);
     var
-      i, iID: Integer;
+      i: Integer;
       bDoAdd: Boolean;
       Pic: IPhoaPic;
     begin
        // Добавляем ссылки на изображения группы
-      for i := 0 to Group.PicIDs.Count-1 do begin
-        iID := Group.PicIDs[i];
-         // Проверяем на дубликаты, если надо
-        Pic := FPhoA.Pics.PicByID(iID);
-        if UniquePics=nil then bDoAdd := True else UniquePics.Add(Pic, True, bDoAdd);
-         // Добавляем
-        if bDoAdd then FViewedPics.Add(Pic, False);
+      for i := 0 to Group.Pics.Count-1 do begin
+        Pic := Group.Pics[i];
+         // Проверяем на дубликаты
+        UniquePics.Add(Pic, True, bDoAdd);
+         // Добавляем (на дубликаты уже проверено)
+        if bDoAdd then ViewPics.Add(Pic, False);
       end;
-       // Если рекурсивное добавление - повторяем то же для вложенных групп
-      if bRecurse then
-        for i := 0 to Group.Groups.Count-1 do DoAddPics(Group.Groups[i]);
+       // Повторяем то же для вложенных групп
+      for i := 0 to Group.Groups.Count-1 do RecursivelyAddPics(Group.Groups[i]);
     end;
 
   begin
-    FViewedPics.Clear;
+    FViewedPics := nil;
      // Если есть текущая группа
-    if CurGroup<>nil then begin
-       // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды.
-       //   Иначе создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
-      bRecurse := aFlatMode.Checked;
-      if bRecurse then UniquePics := TPhoaMutablePicList.Create(True) else UniquePics := nil;
-      DoAddPics(CurGroup);
-    end;
+    if CurGroup<>nil then
+       // Не рекурсивный режим
+      if not aFlatMode.Checked then
+        FViewedPics := CurGroup.Pics
+       // Рекурсивный режим
+      else begin
+         // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
+        UniquePics := TPhoaMutablePicList.Create(True);
+         // Создаём список изображений для просмотра
+        ViewPics := TPhoaMutablePicList.Create(False);
+         // Рекурсивно наполняем список
+        RecursivelyAddPics(CurGroup);
+         // Сохраняем список 
+        FViewedPics := ViewPics;
+      end;
      // Обновляем вьюер
     FViewer.ReloadPicList(FViewedPics);
   end;
@@ -1619,16 +1610,9 @@ uses
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);
-//!!!  var PicLinks: TPhoaPicLinks;
   begin
-//     // Создаём массив ссылок на изображения
-//    PicLinks := GetSelectedPicLinks;
-//    try
-//       // Выполняем инструмент
-//      (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
-//    finally
-//      PicLinks.Free;
-//    end;
+     // Создаём массив ссылок на изображения и выполняем инструмент
+    (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(GetSelectedPics);
   end;
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -1725,7 +1709,7 @@ uses
       bCopy := (GetKeyState(VK_CONTROL) and $80<>0) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
       gTgt := PPhoaGroup(Sender.GetNodeData(nTgt))^;
       iCnt := Viewer.SelectedPics.Count;
-      iCntBefore := gTgt.PicIDs.Count;
+      iCntBefore := gTgt.Pics.Count;
       BeginOperation;
       try
         Operation := TPhoaMultiOp_PicDragAndDropToGroup.Create(FUndo, FPhoA, CurGroup, gTgt, PicArrayToIDArray(Viewer.GetSelectedPicArray), bCopy);
@@ -1735,7 +1719,7 @@ uses
       PhoaInfo(
         False,
         iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'),
-        [iCnt, gTgt.PicIDs.Count-iCntBefore, iCnt-(gTgt.PicIDs.Count-iCntBefore)],
+        [iCnt, gTgt.Pics.Count-iCntBefore, iCnt-(gTgt.Pics.Count-iCntBefore)],
         iif(bCopy, ISettingID_Dlgs_NotifyDragCopy, ISettingID_Dlgs_NotifyDragMove));
     end;
   end;
@@ -1837,7 +1821,7 @@ uses
           gnkPhoaGroup,
             gnkViewGroup: s := p^.Text;
         end;
-      ttStatic: if p^.PicIDs.Count>0 then s := Format('(%d)', [p^.PicIDs.Count]);
+      ttStatic: if p^.Pics.Count>0 then s := Format('(%d)', [p^.Pics.Count]);
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;

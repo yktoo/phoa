@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.8 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.9 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit ufrWzPageFileOps_SelPics;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, VirtualTrees, TB2Item, TBX, Menus,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, ConsVars,
+  phWizard, StdCtrls, VirtualTrees, TB2Item, TBX, Menus,
   ActnList, DKLang;
 
 type
@@ -101,7 +101,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
   begin
     inherited BeforeDisplay(ChangeMethod);
     Wiz := TdFileOpsWizard(StorageForm);
-    rbSelPics.Enabled  := Wiz.ViewerSelPicCount>0;
+    rbSelPics.Enabled  := Wiz.ViewerSelPics.Count>0;
     if Wiz.ViewerCurView=nil then
       rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInPhoa')
     else
@@ -238,7 +238,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
      // Получаем группу, с которой ассоциирован узел
     Group := PPhoaGroup(Sender.GetNodeData(Node))^;
      // Запрещаем узел, если у него нет изображений
-    if Group.PicIDs.Count=0 then Include(InitialStates, ivsDisabled);
+    if Group.Pics.Count=0 then Include(InitialStates, ivsDisabled);
      // Настраиваем птицу узла
     Node.CheckType := ctCheckBox;
     Node.CheckState := aCheckStates[not (ivsDisabled in InitialStates) and (TdFileOpsWizard(StorageForm).IndexOfSelectedGroup(Group)>=0)];
@@ -252,55 +252,52 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
   procedure TfrWzPageFileOps_SelPics.UpdateCountInfo;
   var
     n: PVirtualNode;
-    FPicIDs: TIntegerList;
+    Pic: IPhoaPic;
+    Pics: IPhoaPicList;
+    GroupPics: IPhoaMutablePicList;
     i: Integer;
     Wiz: TdFileOpsWizard;
     ValFilter: TFileOpSelPicValidityFilter;
-
-     // Если validity изображения Pic соответствует выбору, увеличивает FSelPicCount на 1, а FSelPicFileTotalSize -
-     //   на размер файла
-    procedure AddPicInfo(Pic: TPhoaPic);
-    begin
-       // Если нужно учитывать валидность - проверяем наличие файла
-      if (ValFilter=fospvfAny) or (FileExists(Pic.PicFileName)=(ValFilter=fospvfValidOnly)) then begin
-        Inc(FSelPicCount);
-        Inc(FSelPicFileTotalSize, Pic.PicFileSize);
-      end;
-    end;
-
   begin
     StartWait;
     try
       Wiz := TdFileOpsWizard(StorageForm);
-      FSelGroupCount       := 0;
       FSelPicCount         := 0;
       FSelPicFileTotalSize := 0;
       ValFilter := ValidityFilter;
        // Выбранные изображения
       if rbSelPics.Checked then begin
         FSelGroupCount := 1;
-        for i := 0 to Wiz.ViewerSelPicCount-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(Wiz.ViewerSelPicIDs[i]));
+        Pics := Wiz.ViewerSelPics;
        // Все изображения фотоальбома
       end else if rbAllPics.Checked then begin
         FSelGroupCount := Wiz.PhoA.RootGroup.NestedGroupCount+1;
-        for i := 0 to Wiz.PhoA.Pics.Count-1 do AddPicInfo(Wiz.PhoA.Pics[i]);
-       // Изображения из выбранных групп
+        Pics := Wiz.PhoA.Pics;
+       // Изображения из выбранных групп. Создаём уникальный список изображений и добавляем в него изображения из
+       //   отмеченных в дереве групп
       end else begin
-        FPicIDs := TIntegerList.Create(False);
-        try
-          n := tvGroups.GetFirst;
-          while n<>nil do begin
-            if n.CheckState=csCheckedNormal then begin
-              Inc(FSelGroupCount);
-              FPicIDs.AddAll(PPhoaGroup(tvGroups.GetNodeData(n))^.PicIDs);
-            end;
-            n := tvGroups.GetNext(n);
+        FSelGroupCount := 0;
+        GroupPics := TPhoaMutablePicList.Create(True);
+        n := tvGroups.GetFirst;
+        while n<>nil do begin
+          if n.CheckState=csCheckedNormal then begin
+            Inc(FSelGroupCount);
+            GroupPics.Add(PPhoaGroup(tvGroups.GetNodeData(n))^.Pics, True);
           end;
-          for i := 0 to FPicIDs.Count-1 do AddPicInfo(Wiz.PhoA.Pics.PicByID(FPicIDs[i]));
-        finally
-          FPicIDs.Free;
+          n := tvGroups.GetNext(n);
+        end;
+        Pics := GroupPics;
+      end;
+       // Добавляем изображения 
+      for i := 0 to Pics.Count-1 do begin
+        Pic := Pics[i];
+         // Если нужно учитывать валидность - проверяем наличие файла
+        if (ValFilter=fospvfAny) or (FileExists(Pic.FileName)=(ValFilter=fospvfValidOnly)) then begin
+          Inc(FSelPicCount);
+          Inc(FSelPicFileTotalSize, Pic.FileSize);
         end;
       end;
+       // Обновляем информацию
       lCountInfo.Caption := ConstVal('SWzFileOps_PicGroupSelectedCount', [FSelPicCount, FSelGroupCount, HumanReadableSize(FSelPicFileTotalSize)]);
       StatusChanged;
     finally

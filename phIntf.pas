@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.6 2004-10-04 12:44:36 dale Exp $
+//  $Id: phIntf.pas,v 1.7 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -18,6 +18,8 @@ type
   TPicFlip = (pflHorz, pflVert);
   TPicFlips = set of TPicFlip;
 
+  TPhoaHandle = Cardinal;
+
    //-------------------------------------------------------------------------------------------------------------------
    // PhoA picture interface
    //-------------------------------------------------------------------------------------------------------------------
@@ -34,6 +36,7 @@ type
     function  GetFileSize: Integer; stdcall;
     function  GetFilmNumber: PAnsiChar; stdcall;
     function  GetFlips: TPicFlips; stdcall;
+    function  GetHandle: TPhoaHandle; stdcall;
     function  GetFrameNumber: PAnsiChar; stdcall;
     function  GetImageSize: TSize; stdcall;
     function  GetKeywords: PAnsiChar; stdcall;
@@ -66,6 +69,8 @@ type
     property Flips: TPicFlips read GetFlips;
      // -- Frame number
     property FrameNumber: PAnsiChar read GetFrameNumber;
+     // -- An internal handle to the picture
+    property Handle: TPhoaHandle read GetHandle;
      // -- Image dimensions in pixels
     property ImageSize: TSize read GetImageSize;
      // -- Comma-delimited list of keywords. Ones having commas or spaces within are enclosed in double quotes

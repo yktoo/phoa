@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.28 2004-09-27 17:07:23 dale Exp $
+//  $Id: phUtils.pas,v 1.29 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -138,9 +138,6 @@ uses
 
    // Возвращает True, если iID содержится в массиве aIDs
   function  IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
-   // Запись/чтение содержимого списка TIntegerList в/из Undo-файла
-  procedure UndoWriteIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
-  procedure UndoReadIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
    // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
   procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
   procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
@@ -782,22 +779,6 @@ type
         Exit;
       end;
     Result:= False;
-  end;
-
-  procedure UndoWriteIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
-  var i: Integer;
-  begin
-    UndoFile.WriteInt(List.Count);
-    for i := 0 to List.Count-1 do UndoFile.WriteInt(List[i]);
-  end;
-
-  procedure UndoReadIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
-  var i, iCnt: Integer;
-  begin
-    iCnt := UndoFile.ReadInt;
-    List.Clear;
-    List.Capacity := iCnt;
-    for i := 0 to iCnt-1 do List.Add(UndoFile.ReadInt);
   end;
 
   procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);

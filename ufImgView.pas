@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.27 2004-10-04 12:44:36 dale Exp $
+//  $Id: ufImgView.pas,v 1.28 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
-  phIntf, ConsVars, phObj,
+  phIntf, phMutableIntf, ConsVars, phObj,
   GR32_Layers, phGraphics,
   TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
   TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;
@@ -530,13 +530,13 @@ uses
   procedure TfImgView.aaLastPic(Sender: TObject);
   begin
     FLastPicChangeBackwards := True;
-    PicIdx := FGroup.PicIDs.Count-1;
+    PicIdx := FGroup.Pics.Count-1;
   end;
 
   procedure TfImgView.aaNextPic(Sender: TObject);
   begin
     FLastPicChangeBackwards := False;
-    if PicIdx<FGroup.PicIDs.Count-1 then PicIdx := PicIdx+1
+    if PicIdx<FGroup.Pics.Count-1 then PicIdx := PicIdx+1
     else if FCyclicViewing then PicIdx := 0;
   end;
 
@@ -544,7 +544,7 @@ uses
   begin
     FLastPicChangeBackwards := True;
     if PicIdx>0 then PicIdx := PicIdx-1
-    else if FCyclicViewing then PicIdx := FGroup.PicIDs.Count-1;
+    else if FCyclicViewing then PicIdx := FGroup.Pics.Count-1;
   end;
 
   procedure TfImgView.aaRefresh(Sender: TObject);
@@ -888,7 +888,7 @@ uses
 //    end;
     if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик
-    eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.PicIDs.Count]);
+    eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.Pics.Count]);
   end;
 
   procedure TfImgView.DP_EnqueueNext;
@@ -900,11 +900,11 @@ uses
       idxNextPic := FPicIdx+iif(FLastPicChangeBackwards, -1, 1);
        // Проверяем границы / цикличность просмотра
       if idxNextPic<0 then
-        if FCyclicViewing then idxNextPic := FGroup.PicIDs.Count-1 else idxNextPic := -1
-      else if idxNextPic>=FGroup.PicIDs.Count then
+        if FCyclicViewing then idxNextPic := FGroup.Pics.Count-1 else idxNextPic := -1
+      else if idxNextPic>=FGroup.Pics.Count then
         if FCyclicViewing then idxNextPic := 0 else idxNextPic := -1;
        // Ставим файл в очередь 
-      if idxNextPic>=0 then FDecodeThread.QueuedFileName := FPhoA.Pics.PicByID(FGroup.PicIDs[idxNextPic]).PicFileName;
+      if idxNextPic>=0 then FDecodeThread.QueuedFileName := FGroup.Pics[idxNextPic].FileName;
     end;
   end;
 
@@ -951,7 +951,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FPhoA.Pics.PicByID(FGroup.PicIDs[FPicIdx]);
+    FPic := FGroup.Pics[FPicIdx];
      // Определяем, есть ли изображение в кэше 
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
@@ -1018,7 +1018,7 @@ uses
     bNoErr: Boolean;
   begin
     bNoErr := not FErroneous;
-    iCnt := FGroup.PicIDs.Count;
+    iCnt := FGroup.Pics.Count;
     aLastPic.Enabled        := FPicIdx<iCnt-1;
     aFirstPic.Enabled       := FPicIdx>0;
     aNextPic.Enabled        := (iCnt>1) and (FCyclicViewing or aLastPic.Enabled);
@@ -1192,19 +1192,15 @@ uses
   end;
 
   procedure TfImgView.pmMainPopup(Sender: TObject);
-//!!!  var PicLinks: TPhoaPicLinks;
+  var Pics: IPhoaMutablePicList;
   begin
-//     // Настраиваем доступность инструментов в pmMain
-//    if gipmTools.Count>0 then begin
-//      PicLinks := TPhoaPicLinks.Create(True);
-//      try
-//         // Добавляем просматриваемое изображение
-//        if not FErroneous then PicLinks.Add(FPic, True);
-//        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, PicLinks);
-//      finally
-//        PicLinks.Free;
-//      end;
-//    end;
+     // Настраиваем доступность инструментов в pmMain
+    if gipmTools.Count>0 then begin
+       // Добавляем просматриваемое изображение
+      Pics := TPhoaMutablePicList.Create(False);
+      if not FErroneous then Pics.Add(FPic, False);
+      AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, Pics);
+    end;
   end;
 
   procedure TfImgView.RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
@@ -1266,7 +1262,7 @@ uses
 
   procedure TfImgView.SetPicIdx(Value: Integer);
   begin
-    if (FPicIdx<>Value) and (Value>=0) and (Value<FGroup.PicIDs.Count) then begin
+    if (FPicIdx<>Value) and (Value>=0) and (Value<FGroup.Pics.Count) then begin
       FPicIdx := Value;
       DisplayPic(True, True);
     end;
@@ -1318,20 +1314,16 @@ uses
   end;
 
   procedure TfImgView.ToolItemClick(Sender: TObject);
-//!!!  var PicLinks: TPhoaPicLinks;
+  var Pics: IPhoaMutablePicList;
   begin
-//!!!    if not FErroneous then begin
-//       // Создаём массив ссылок на изображения
-//      PicLinks := TPhoaPicLinks.Create(True);
-//      try
-//         // Добавляем просматриваемое изображение
-//        PicLinks.Add(FPic, True);
-//         // Выполняем инструмент
-//        (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
-//      finally
-//        PicLinks.Free;
-//      end;
-//    end;
+    if not FErroneous then begin
+       // Создаём массив ссылок на изображения
+      Pics := TPhoaMutablePicList.Create(True);
+       // Добавляем просматриваемое изображение
+      Pics.Add(FPic, True);
+       // Выполняем инструмент
+      (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(Pics);
+    end;
   end;
 
   procedure TfImgView.TopmostCancel;
@@ -1368,7 +1360,7 @@ uses
   procedure TfImgView.WMTimer(var Msg: TWMTimer);
   begin
     FLastPicChangeBackwards := False;
-    if PicIdx<FGroup.PicIDs.Count-1 then PicIdx := PicIdx+1
+    if PicIdx<FGroup.Pics.Count-1 then PicIdx := PicIdx+1
     else if FSlideCyclic then PicIdx := 0
     else SlideShow := False;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.11 2004-09-27 17:07:23 dale Exp $
+//  $Id: udStats.pas,v 1.12 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -103,9 +103,9 @@ uses phUtils, Main, phPhoa, phSettings;
         i: Integer;
         gChild: TPhoaGroup;
       begin
-        Inc(iCntPics, Group.PicIDs.Count);
+        Inc(iCntPics, Group.Pics.Count);
          // Добавляем ID изображений в список
-        for i := 0 to Group.PicIDs.Count-1 do IDs.Add(Group.PicIDs[i]);
+        for i := 0 to Group.Pics.Count-1 do IDs.Add(Group.Pics[i].ID);
          // Рекурсивно вызываем для вложенных групп
         for i := 0 to Group.Groups.Count-1 do begin
           gChild := Group.Groups[i];
@@ -121,7 +121,7 @@ uses phUtils, Main, phPhoa, phSettings;
       i64TotalThumbSize := 0;
       IDs := TIntegerList.Create(False);
       try
-        iCntPicsInGroup  := Group.PicIDs.Count;
+        iCntPicsInGroup  := Group.Pics.Count;
          // Рекурсивно прогоняем группы
         ProcessGroup(Group);
         iCntDistinctPics := IDs.Count;

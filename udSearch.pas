@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.9 2004-09-11 17:52:36 dale Exp $
+//  $Id: udSearch.pas,v 1.10 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phIntf, phMutableIntf, phObj,
   phDlg, StdCtrls, VirtualTrees, ExtCtrls, DKLang;
 
 type
@@ -28,8 +28,8 @@ type
     procedure tvCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
     procedure tvCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
-     // Локальниый список результатов поиска (ссылок на изображения)
-    FLocalResults: TPhoaPicLinks;
+     // Локальный список результатов поиска (ссылок на изображения)
+    FLocalResults: IPhoaMutablePicList;
      // Фотоальбом
     FPhoA: TPhotoAlbum;
      // Группа, в которую помещать результаты
@@ -593,14 +593,14 @@ type
       PhoaInfo(False, 'SPicsNotFound')
     else begin
        // Fill search results
-      FLocalResults.CopyToGroup(FResultsGroup);
+      FResultsGroup.Pics.Assign(FLocalResults);
       inherited ButtonClick_OK;
     end;
   end;
 
   procedure TdSearch.FinalizeDialog;
   begin
-    FLocalResults.Free;
+    FLocalResults := nil;
     SLPhoaPlaces.Free;
     SLPhoaFilmNumbers.Free;
     SLPhoaAuthors.Free;
@@ -613,7 +613,7 @@ type
     inherited InitializeDialog;
     HelpContext := IDH_intf_search;
     OKIgnoresModified := True;
-    FLocalResults     := TPhoaPicLinks.Create(False);
+    FLocalResults     := TPhoaMutablePicList.Create(False);
      // Загружаем списки мест, номеров плёнок, авторов
     SLPhoaPlaces      := TStringList.Create;
     SLPhoaFilmNumbers := TStringList.Create;
@@ -621,8 +621,8 @@ type
     SLPhoaMedia       := TStringList.Create;
     StringsLoadPFAM(FPhoA, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
      // Настраиваем контролы
-    rbCurGroup.Enabled      := (FCurGroup<>nil) and (FCurGroup.PicIDs.Count>0);
-    rbSearchResults.Enabled := FResultsGroup.PicIDs.Count>0;
+    rbCurGroup.Enabled      := (FCurGroup<>nil) and (FCurGroup.Pics.Count>0);
+    rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
      // Инициализируем дерево
     ApplyTreeSettings(tvCriteria);
     tvCriteria.RootNodeCount := High(aSearchCriteria)+1;
@@ -674,10 +674,10 @@ type
           iSrchCount := FPhoA.Pics.Count;
         end else if rbCurGroup.Checked then begin
           SearchArea := saCurGroup;
-          iSrchCount := FCurGroup.PicIDs.Count;
+          iSrchCount := FCurGroup.Pics.Count;
         end else begin
           SearchArea := saResults;
-          iSrchCount := FResultsGroup.PicIDs.Count;
+          iSrchCount := FResultsGroup.Pics.Count;
         end;
          // Инициализируем критерии
         iID        := StrToIntDef (aSearchCriteria[ICritIdx_ID].sValue,        -1);
@@ -694,8 +694,8 @@ type
         for i := 0 to iSrchCount-1 do begin
           case SearchArea of
             saAll:      Pic := FPhoA.Pics[i];
-            saCurGroup: Pic := FPhoA.Pics.PicByID(FCurGroup.PicIDs[i]);
-            else        Pic := FPhoA.Pics.PicByID(FResultsGroup.PicIDs[i]);
+            saCurGroup: Pic := TPhoaPic(FCurGroup.Pics[i].Handle);
+            else        Pic := TPhoaPic(FResultsGroup.Pics[i].Handle);
           end;
           if Matches(Pic) then FLocalResults.Add(Pic, True);
         end;

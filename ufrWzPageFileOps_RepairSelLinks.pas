@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -117,12 +117,12 @@ uses phUtils, udFileOpsWizard, phObj, Main;
      // *** Исходное изображение
     if ParentNode=nil then begin
        // Node.Data = ссылка на изображение из SelectedPics
-      Pic := Wiz.SelectedPics[Node.Index];
+      Pic := TPhoaPic(Wiz.SelectedPics[Node.Index].Handle);
       PPhoaPic(Sender.GetNodeData(Node))^ := Pic;
        // Добавляем дочерние узлы файлов, ссылающихся на изображение. Их Node.Data = ссылка на файл из Repair_FileLinks
       for i := 0 to Wiz.Repair_FileLinks.Count-1 do begin
         FL := Wiz.Repair_FileLinks[i];
-        if FL.PicLinks.IndexOfID(Pic.ID)>=0 then tvMain.AddChild(Node, FL);
+        if FL.Pics.IndexOfID(Pic.ID)>=0 then tvMain.AddChild(Node, FL);
       end;
        // Ставим изображению CheckBox
       if Node.ChildCount>0 then begin

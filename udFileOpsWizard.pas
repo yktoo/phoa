@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.18 2004-09-27 17:07:23 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.19 2004-10-05 13:16:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udFileOpsWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, Registry, GraphicEx,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phIntf, phMutableIntf, phObj,
+  phWizard, Registry, GraphicEx,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
@@ -26,11 +27,10 @@ type
     FFileName: String;
     FFilePath: String;
     FFileSize: Integer;
-    FPicLinks: TPhoaPicLinks;
+    FPics: IPhoaMutablePicList;
     FFileTime: TDateTime;
   public
     constructor Create(const sFileName, sFilePath: String; iFileSize: Integer; const dFileTime: TDateTime);
-    destructor Destroy; override;
      // Props
      // -- Имя файла
     property FileName: String read FFileName;
@@ -41,7 +41,7 @@ type
      // -- Дата/время модификации файла
     property FileTime: TDateTime read FFileTime;
      // -- Список ссылок на изображения, для которых файл является подходящим вариантом ссылки
-    property PicLinks: TPhoaPicLinks read FPicLinks; 
+    property Pics: IPhoaMutablePicList read FPics; 
   end;
 
    // Список объектов TFileLink
@@ -80,10 +80,10 @@ type
     FCountErrors: Integer;
      // Prop storage
     FCDOpt_CopyExecutable: Boolean;
-    FCDOpt_IncludeViews: Boolean;
-    FCDOpt_CreatePhoa: Boolean;
-    FCDOpt_CreateAutorun: Boolean;
     FCDOpt_CopyIniSettings: Boolean;
+    FCDOpt_CreateAutorun: Boolean;
+    FCDOpt_CreatePhoa: Boolean;
+    FCDOpt_IncludeViews: Boolean;
     FCDOpt_MediaLabel: String;
     FCDOpt_PhoaDesc: String;
     FCDOpt_PhoaFileName: String;
@@ -91,10 +91,10 @@ type
     FDestinationFolder: String;
     FExportedPhoA: TPhotoAlbum;
     FFileOpKind: TFileOperationKind;
-    FMoveFile_Arranging: TFileOpMoveFileArranging;
     FMoveFile_AllowDuplicating: Boolean;
-    FMoveFile_BasePath: String;
+    FMoveFile_Arranging: TFileOpMoveFileArranging;
     FMoveFile_BaseGroup: TPhoaGroup;
+    FMoveFile_BasePath: String;
     FMoveFile_DeleteOriginal: Boolean;
     FMoveFile_DeleteToRecycleBin: Boolean;
     FMoveFile_NoOriginalMode: TFileOpMoveFileNoOriginalMode;
@@ -109,12 +109,12 @@ type
     FRepair_MatchFlags: TFileOpRepairMatchFlags;
     FRepair_RelinkFilesInUse: Boolean;
     FSelectedGroups: TList;
-    FSelectedPics: TPhoaPicLinks;
+    FSelectedPics: IPhoaMutablePicList;
     FSelPicMode: TFileOpSelPicMode;
     FSelPicValidityFilter: TFileOpSelPicValidityFilter;
     FViewerCurView: TPhoaView;
     FViewerSelGroup: TPhoaGroup;
-    FViewerSelPicIDs: TIDArray;
+    FViewerSelPics: IPhoaPicList;
      // Отбирает изображения для операции в FSelectedPics - на основании выбранного режима и выбранных групп
     procedure DoSelectPictures;
      // Начинает обработку операции
@@ -151,10 +151,9 @@ type
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
      // Prop handlers
-    function  GetViewerSelPicCount: Integer;
-    function  GetViewerSelPicIDs(Index: Integer): Integer;
     function  GetSelectedGroupCount: Integer;
     function  GetSelectedGroups(Index: Integer): TPhoaGroup;
+    function  GetSelectedPics: IPhoaPicList;
   protected
     procedure InitializeWizard; override;
     procedure FinalizeWizard; override;
@@ -243,18 +242,16 @@ type
     property Repair_DeleteUnmatchedPics: Boolean read FRepair_DeleteUnmatchedPics write FRepair_DeleteUnmatchedPics;
      // -- Восстановление ссылок: список найденных файлов и ссылок на изображения
     property Repair_FileLinks: TFileLinks read FRepair_FileLinks;
-     // -- Отобранные для операции изображения
-    property SelectedPics: TPhoaPicLinks read FSelectedPics;
+     // -- Отобранные для операции изображения (снаружи видны, как immutable)
+    property SelectedPics: IPhoaPicList read GetSelectedPics;
      // -- Режим выбора изображений
     property SelPicMode: TFileOpSelPicMode read FSelPicMode write FSelPicMode;
      // -- Фильтр выбора изображений по наличию соответствующего файла
     property SelPicValidityFilter: TFileOpSelPicValidityFilter read FSelPicValidityFilter write FSelPicValidityFilter;
      // -- Текущая выбранная во вьюере группа
     property ViewerSelGroup: TPhoaGroup read FViewerSelGroup;
-     // -- Количество выбранных во вьюере изображений
-    property ViewerSelPicCount: Integer read GetViewerSelPicCount;
      // -- Выбранные во вьюере изображения
-    property ViewerSelPicIDs[Index: Integer]: Integer read GetViewerSelPicIDs;
+    property ViewerSelPics: IPhoaPicList read FViewerSelPics;
      // -- Текущее выбранное во вьюере представление; nil, если отображаются группы изображений
     property ViewerCurView: TPhoaView read FViewerCurView;
   end;
@@ -271,16 +268,16 @@ type
     FOverwriteFileName: String;
     FOverwriteResults: TMessageBoxResults;
      // Процедуры, выполняющие операцию для отдельного изображения
-    procedure DoCopyMovePic(Pic: TPhoaPic);
-    procedure DoDelPicAndFile(Pic: TPhoaPic);
-    procedure DoRebuildThumb(Pic: TPhoaPic);
-    procedure DoRepairFileLink(Pic: TPhoaPic);
+    procedure DoCopyMovePic(Pic: IPhoaPic);
+    procedure DoDelPicAndFile(Pic: IPhoaPic);
+    procedure DoRebuildThumb(Pic: IPhoaPic);
+    procedure DoRepairFileLink(Pic: IPhoaPic);
      // Процедура удаления файла
     procedure DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
      // Удаляет изображение из фотоальбома (также ссылки на него из групп)
-    procedure DoDeletePic(Pic: TPhoaPic);
+    procedure DoDeletePic(Pic: IPhoaPic);
      // Обновляет ссылку на файл (предварительно проверяя допустимость этого)
-    procedure DoUpdateFileLink(Pic: TPhoaPic; const sNewFileName: String);
+    procedure DoUpdateFileLink(Pic: IPhoaPic; const sNewFileName: String);
      // Спрашивает возможность перезаписи файла (вызывается в Synchronize())
     procedure AskOverwrite;
   protected
@@ -296,10 +293,10 @@ type
 
    // Показывает мастер операций с файлами изображений. Возвращает True, если что-то в фотоальбоме было изменено
    //   AViewerSelGroup   - текущая выбранная во вьюере группа
-   //   ViewerCurView     - текущее выбранное во вьюере представление; nil, если отображаются группы изображений
-   //   aViewerSelPicIDs  - массив ID выделенных во вьюере изображений
+   //   AViewerCurView    - текущее выбранное во вьюере представление; nil, если отображаются группы изображений
+   //   AViewerSelPics    - список выделенных во вьюере изображений
    //   bSelPicsByDefault - если True, по умолчанию выбирать "Выбранные изображения"
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; const aViewerSelPicIDs: TIDArray; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
@@ -311,14 +308,14 @@ uses
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
   ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
 
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; const aViewerSelPicIDs: TIDArray; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
   begin
     with TdFileOpsWizard.Create(Application) do
       try
         FPhoA             := APhoA;
         FViewerSelGroup   := AViewerSelGroup;
         FViewerCurView    := AViewerCurView;
-        FViewerSelPicIDs  := aViewerSelPicIDs;
+        FViewerSelPics    := AViewerSelPics;
         FSelPicsByDefault := bSelPicsByDefault;
         Result := Execute;
         bPhoaChanged := PhoaChanged;
@@ -344,13 +341,7 @@ uses
     FFilePath := sFilePath;
     FFileSize := iFileSize;
     FFileTime := dFileTime;
-    FPicLinks := TPhoaPicLinks.Create(True);
-  end;
-
-  destructor TFileLink.Destroy;
-  begin
-    FPicLinks.Free;
-    inherited Destroy;
+    FPics     := TPhoaMutablePicList.Create(True);
   end;
 
    //===================================================================================================================
@@ -390,7 +381,7 @@ uses
     Resume;
   end;
 
-  procedure TFileOpThread.DoCopyMovePic(Pic: TPhoaPic);
+  procedure TFileOpThread.DoCopyMovePic(Pic: IPhoaPic);
   var
     sFile, sSrcPath, sDestPath, sTargetPath: String;
     SLRelTargetPaths: TStringList;
@@ -412,7 +403,7 @@ uses
         else {fospmSelGroups} bGroupSelected := FWizard.IndexOfSelectedGroup(Group)>=0;
       end;
        // Если группа выбрана, ищем изображение в группе
-      if bGroupSelected and (Group.PicIDs.IndexOf(Pic.ID)>=0) then begin
+      if bGroupSelected and (Group.Pics.IndexOfID(Pic.ID)>=0) then begin
          // Вычисляем путь изображения относительно MoveFile_BaseGroup
         g := Group;
         sRelPath := '';
@@ -478,8 +469,8 @@ uses
 
   begin
      // Получаем имя/путь исходного файла
-    sFile       := ExtractFileName(Pic.PicFileName);
-    sSrcPath    := ExtractFilePath(Pic.PicFileName);
+    sFile       := ExtractFileName(Pic.FileName);
+    sSrcPath    := ExtractFilePath(Pic.FileName);
     sDestPath   := IncludeTrailingPathDelimiter(FWizard.DestinationFolder);
     sTargetPath := '';
     case FWizard.MoveFile_Arranging of
@@ -510,7 +501,7 @@ uses
           else
             AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup);
            // Если что-то есть (по идее, должно быть всегда)
-          if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.PicFileName]);
+          if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];
           for i := 0 to iif(FWizard.MoveFile_AllowDuplicating, SLRelTargetPaths.Count-1, 0) do PerformCopying(sDestPath+SLRelTargetPaths[i]);
         finally
@@ -556,13 +547,14 @@ uses
           FileOpError('SLogEntry_FileDeletingError', [sFileName]);
   end;
 
-  procedure TFileOpThread.DoDeletePic(Pic: TPhoaPic);
+  procedure TFileOpThread.DoDeletePic(Pic: IPhoaPic);
+  var pTPic: TPhoaPic;
 
      // Рекурсивно удаляет изображение из группы Group и её подгрупп
     procedure DelID(Group: TPhoaGroup; iID: Integer);
     var i: Integer;
     begin
-      Group.PicIDs.Remove(iID);
+      Group.Pics.Remove(iID);
       for i := 0 to Group.Groups.Count-1 do DelID(Group.Groups[i], iID);
     end;
 
@@ -570,15 +562,17 @@ uses
      // Удаляем все ссылки на изображения
     DelID(FWizard.PhoA.RootGroup, Pic.ID);
      // Удаляем изображение
-    Pic.Free;
+    pTPic := TPhoaPic(Pic.Handle);
+    Pic := nil;
+    pTPic.Free;
     FChangesMade := True;
   end;
 
-  procedure TFileOpThread.DoDelPicAndFile(Pic: TPhoaPic);
+  procedure TFileOpThread.DoDelPicAndFile(Pic: IPhoaPic);
   var sFileName: String;
   begin
      // Удаляем файл
-    sFileName := Pic.PicFileName;
+    sFileName := Pic.FileName;
     DoDeleteFile(sFileName, FWizard.DelFile_DeleteToRecycleBin);
      // Удаляем изображение
     DoDeletePic(Pic);
@@ -586,36 +580,36 @@ uses
     FWizard.LogSuccess('SLogEntry_PicDeletedOK', [sFileName]);
   end;
 
-  procedure TFileOpThread.DoRebuildThumb(Pic: TPhoaPic);
+  procedure TFileOpThread.DoRebuildThumb(Pic: IPhoaPic);
   var iPrevThumbSize, iPrevFileSize: Integer;
   begin
      // Запоминаем прежние размеры эскиза и файла
-    iPrevThumbSize := Length(Pic.ThumbnailData);
-    iPrevFileSize  := Pic.PicFileSize;
+    iPrevThumbSize := Pic.ThumbnailDataSize;
+    iPrevFileSize  := Pic.FileSize;
      // Перестраиваем эскиз
-    Pic.ReloadPicFileData;
+    TPhoaPic(Pic.Handle).ReloadPicFileData;
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
-      [Pic.PicFileName, iPrevThumbSize, Length(Pic.ThumbnailData), iPrevFileSize, Pic.PicFileSize]);
+      [Pic.FileName, iPrevThumbSize, Pic.ThumbnailDataSize, iPrevFileSize, Pic.FileSize]);
     FChangesMade := True;
   end;
 
-  procedure TFileOpThread.DoRepairFileLink(Pic: TPhoaPic);
+  procedure TFileOpThread.DoRepairFileLink(Pic: IPhoaPic);
   begin
     //!!! Написать repair routine
   end;
 
-  procedure TFileOpThread.DoUpdateFileLink(Pic: TPhoaPic; const sNewFileName: String);
+  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhoaPic; const sNewFileName: String);
   var sPrevFileName: String;
   begin
      // Проверяем, можно ли исправить путь
-    if not AnsiSameText(Pic.PicFileName, sNewFileName) and (FWizard.PhoA.Pics.PicByFileName(sNewFileName)<>nil) then
+    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.PicByFileName(sNewFileName)<>nil) then
       FileOpError('SLogEntry_PicRelinkingError', [sNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
-    sPrevFileName := Pic.PicFileName;
+    sPrevFileName := Pic.FileName;
     if sPrevFileName<>sNewFileName then begin
-      Pic.PicFileName := sNewFileName;
+      TPhoaPic(Pic.Handle).PicFileName := sNewFileName;
       FWizard.LogSuccess('SLogEntry_PicRelinkedOK', [sPrevFileName, sNewFileName]);
       FChangesMade := True;
     end;
@@ -623,13 +617,13 @@ uses
 
   procedure TFileOpThread.Execute;
   var
-    Pic: TPhoaPic;
+    Pic: IPhoaPic;
     sFileName: String;
   begin
     while not Terminated do begin
        // Обрабатываем изображение
       Pic := FWizard.SelectedPics[0];
-      sFileName := Pic.PicFileName;
+      sFileName := Pic.FileName;
       FErrorOccured := False;
       FChangesMade := False;
       try
@@ -705,14 +699,13 @@ uses
 
      // Добавляет одиночную группу в фотоальбом
     procedure AddSingleGroup(TgtGroup, SrcGroup: TPhoaGroup; bUseTgtAsOwnerGroup: Boolean);
-    var i: Integer;
     begin
        // Если это не корневая группа, создаём соотв. target-группу
       if bUseTgtAsOwnerGroup then TgtGroup := TPhoaGroup.Create(TgtGroup, 0);
        // Копируем свойства исходной группы
       TgtGroup.Assign(SrcGroup, True, False, False);
-       // Добавляем ID выбранных изображений
-      for i := 0 to FSelectedPics.Count-1 do TgtGroup.PicIDs.Add(FSelectedPics[i].ID);
+       // Добавляем выбранные изображения
+      TgtGroup.Pics.Add(FSelectedPics, True);
     end;
 
   begin
@@ -739,16 +732,17 @@ uses
   var i: Integer;
   begin
      // Добавляем изображения
-    FSelectedPics.Clear;
+    FSelectedPics := TPhoaMutablePicList.Create(True);
     case SelPicMode of
-      fospmSelPics:   FSelectedPics.AddFromPicIDs(FPhoA, FViewerSelPicIDs, False);
-      fospmAll:       FSelectedPics.CopyFromPhoa(FPhoA);
-      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.AddFromGroup(FPhoA, TPhoaGroup(FSelectedGroups[i]), False, False);
+      fospmSelPics:   FSelectedPics.Assign(FViewerSelPics);
+      fospmAll:       FSelectedPics.Assign(FPhoA.Pics);
+      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.Add(TPhoaGroup(FSelectedGroups[i]).Pics, True);
+      else            FSelectedPics := nil;
     end;
      // Удаляем [не]существующие
     if FSelPicValidityFilter<>fospvfAny then
       for i := FSelectedPics.Count-1 downto 0 do
-        if FileExists(FSelectedPics[i].PicFileName)<>(FSelPicValidityFilter=fospvfValidOnly) then FSelectedPics.Delete(i);
+        if FileExists(FSelectedPics[i].FileName)<>(FSelPicValidityFilter=fospvfValidOnly) then FSelectedPics.Delete(i);
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
@@ -817,7 +811,7 @@ uses
   begin
     FRepair_FileLinks.Free;
     FExportedPhoA.Free;
-    FSelectedPics.Free;
+    FSelectedPics := nil;
     FSelectedGroups.Free;
     FLog.Free;
     inherited FinalizeWizard;
@@ -867,14 +861,9 @@ uses
     Result := TPhoaGroup(FSelectedGroups[Index]);
   end;
 
-  function TdFileOpsWizard.GetViewerSelPicCount: Integer;
+  function TdFileOpsWizard.GetSelectedPics: IPhoaPicList;
   begin
-    Result := Length(FViewerSelPicIDs);
-  end;
-
-  function TdFileOpsWizard.GetViewerSelPicIDs(Index: Integer): Integer;
-  begin
-    Result := FViewerSelPicIDs[Index];
+    Result := FSelectedPics;
   end;
 
   function TdFileOpsWizard.IndexOfSelectedGroup(AGroup: TPhoaGroup): Integer;
@@ -887,13 +876,12 @@ uses
   begin
     inherited InitializeWizard;
     FSelectedGroups := TList.Create;
-    FSelectedPics   := TPhoaPicLinks.Create(True);
      // Если во вьюере выбрана группа, заносим её в список
     if FViewerSelGroup<>nil then FSelectedGroups.Add(FViewerSelGroup);
      // Настраиваем режим выбора изображений по умолчанию
-    if FSelPicsByDefault and (Length(FViewerSelPicIDs)>0) then FSelPicMode := fospmSelPics
-    else if FSelectedGroups.Count>0 then                       FSelPicMode := fospmSelGroups
-    else                                                       FSelPicMode := fospmAll;
+    if FSelPicsByDefault and (FViewerSelPics.Count>0) then FSelPicMode := fospmSelPics
+    else if FSelectedGroups.Count>0 then                   FSelPicMode := fospmSelGroups
+    else                                                   FSelPicMode := fospmAll;
      // Инициализируем опции
     FCDOpt_CopyExecutable        := True;
     FCDOpt_IncludeViews          := True;
@@ -985,7 +973,7 @@ uses
     if Result and (ChangeMethod=pcmNextBtn) then begin
       case iNewPageID of
          // При попадании на страницу выбора изображений освобождаем память, стирая прежние выбранные
-        IWzFileOpsPageID_SelPics: FSelectedPics.Clear;
+        IWzFileOpsPageID_SelPics: FSelectedPics := nil;
          // При попадании на страницу опций восстановления ссылок освобождаем память, стирая прежние файлы
         IWzFileOpsPageID_RepairOptions: FreeAndNil(FRepair_FileLinks);
          // При попадании на страницу выбора ссылок сначала производим выборку файлов
@@ -1009,7 +997,7 @@ uses
   begin
      // Если процесс активен, отображаем прогресс
     if FProcessing then
-      Result := ConstVal('SWzFileOps_Processing', [ProcPage_GetProgressCur+1, FInitialPicCount, FCountErrors, FSelectedPics[0].PicFileName])
+      Result := ConstVal('SWzFileOps_Processing', [ProcPage_GetProgressCur+1, FInitialPicCount, FCountErrors, FSelectedPics[0].FileName])
      // Иначе пишем информацию о возможности продолжения
     else
       Result := ConstVal('SWzFileOps_Paused', [FCountSucceeded, FCountErrors]);
@@ -1044,7 +1032,7 @@ uses
       FL: TFileLink;
       i: Integer;
       bMatches: Boolean;
-      Pic: TPhoaPic;
+      Pic: IPhoaPic;
     begin
       FL := nil;
        // Перебираем все изображения, выбирая подходящие
@@ -1052,8 +1040,8 @@ uses
         Pic := FSelectedPics[i];
          // Проверяем совпадение - сначала по размеру, потом по имени файла (так быстрее)
         bMatches := True;
-        if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.PicFileSize;
-        if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.PicFileName));
+        if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.FileSize;
+        if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.FileName));
          // Проверяем доступность по "занятости" другим изображением
         if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.PicByFileName(sPath+SRec.Name)=nil;
          // Если подходит
@@ -1061,7 +1049,7 @@ uses
            // Создаём файл, если он ещё не создан
           if FL=nil then FL := FRepair_FileLinks.Add(SRec.Name, sPath, SRec.Size, FileDateToDateTime(SRec.Time));
            // Добавляем ему ссылку
-          FL.PicLinks.Add(Pic, False); 
+          FL.Pics.Add(Pic, True);
         end;
       end;
     end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.40 2004-10-04 12:44:36 dale Exp $
+//  $Id: phObj.pas,v 1.41 2004-10-05 13:16:34 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -72,12 +72,17 @@ type
     function  GetItems(Index: Integer): IPhoaPic; stdcall;
      // IPhoaMutablePicList
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean): Integer; overload; stdcall;
-    function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload; stdcall; 
+    function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload; stdcall;
+    function  Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer; overload; stdcall; 
+    function  Insert(Index: Integer; Pic: IPhoaPic; bSkipDuplicates: Boolean): Boolean; stdcall;
     function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
-    procedure Clear; stdcall;
-    procedure Delete(Index: Integer); stdcall;
-    function  Remove(iID: Integer): Integer; stdcall;
     function  GetSorted: Boolean; stdcall;
+    function  Remove(iID: Integer): Integer; stdcall;
+    procedure Assign(Source: IPhoaPicList); stdcall;
+    procedure Clear; stdcall;
+    procedure CustomSort(CompareFunc: TPhoaPicListSortCompareFunc; dwData: Cardinal); stdcall;
+    procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
+    procedure Delete(Index: Integer); stdcall;
   public
      // Конструктор. При bSorted список является сортированным по ID изображения
     constructor Create(bSorted: Boolean);
@@ -115,9 +120,9 @@ type
      // При bSorted=True список является сортированным, использует бинарный поиск и игнорирует дубликаты изображений (т.е.
      //   с повторяющимися ID)
     constructor Create(bSorted: Boolean);
-     // Копирует ссылки на изображения с Src. Если RestrictLinks=nil, то копирует все изображения, иначе - только те,
-     //   ID которых содержатся в RestrictLinks
-    procedure Assign(Src: TPhoaPics; RestrictLinks: TPhoaPicLinks);
+     // Копирует ссылки на изображения с Src. Если RestrictPics=nil, то копирует все изображения, иначе - только те,
+     //   ID которых содержатся в RestrictPics
+    procedure Assign(Src: TPhoaPics; RestrictPics: IPhoaPicList);
      // Добавляет изображения в список. При bSkipDuplicates=True дубликаты игнорируются. Версия с bAdded возвращает в
      //   bAdded True, если изображение было добавлено; False, если пропущено
     function  Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer; overload;
@@ -127,7 +132,7 @@ type
     function  FindID(iID: Integer; var Index: Integer): Boolean;
      // Копирует все ссылки на изображения с группы. При bReplace=True предварительно стирает список (если Group=nil,
      //   просто очищает список). При bRecurse также добавляет изображения из вложенных групп
-    procedure AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
+    procedure AddFromGroup(Group: TPhoaGroup; bReplace, bRecurse: Boolean);
      // Копирует все ссылки на изображения с массива ID изображений. При bReplace=True предварительно стирает список
     procedure AddFromPicIDs(PhoA: TPhotoAlbum; const aPicIDs: TIDArray; bReplace: Boolean);
      // Копирует все ссылки на изображения с фотоальбома
@@ -167,7 +172,7 @@ type
      // Ищет индекс сортировки по свойству. Если не найден, возвращает -1
     function  IndexOf(Prop: TPicProperty): Integer;
      // Сравнивает два изображения (для сортировки)
-    function  SortComparePics(Pic1, Pic2: TPhoaPic): Integer;
+    function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer;
      // Возвращает True, если содержимое списка идентично списку Sortings
     function  IdenticalWith(Sortings: TPhoaSortings): Boolean;
      // Переключает направление сортировки с индексом Index
@@ -193,12 +198,14 @@ type
   PPhoaGroup = ^TPhoaGroup;
   TPhoaGroup = class(TObject)
   private
+     // ID изображений в группе для загрузки из Streamer-a (существует только между StreamerLoad и Loaded)
+    FStreamerPicIDs: TIntegerList;
      // Prop storage
     FExpanded: Boolean;
     FText: String;
     FGroups: TPhoaGroups;
     FOwner: TPhoaGroup;
-    FPicIDs: TIntegerList;
+    FPics: IPhoaMutablePicList;
     FID: Integer;
     FDescription: String;
      // Загрузка/сохранение с помощью Streamer
@@ -220,13 +227,15 @@ type
   public
     constructor Create(_Owner: TPhoaGroup; iID: Integer);
     destructor Destroy; override;
+     // Вызывается после загрузки иерархии групп из Streamer-а
+    procedure Loaded(PhoA: TPhotoAlbum);
      // Возвращает True, если ID изображения присутствует в списке группы (или любой её подгруппы при bRecursive=True)
     function  IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean;
      // Копирует свойства группы: наименование, Expanded;
      //   при bCopyIDs=True       - также и ID
      //   при bCopyPicIDs=True    - также список ID изображений;
      //   при bCopySubgroups=True - рекурсивно повторяет всё для вложенных групп
-    procedure Assign(Src: TPhoaGroup; bCopyIDs, bCopyPicIDs, bCopySubgroups: Boolean);
+    procedure Assign(Src: TPhoaGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean);
      // Сортирует изображения по заданным сортировкам
     procedure SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
      // Рекурсивно просматривает группу и все подгруппы, назначая ID группам, его не имеющим
@@ -259,8 +268,8 @@ type
     property Owner: TPhoaGroup read FOwner write SetOwner;
      // -- Путь группы в виде '<sRootName>/Группа1/Группа2/.../ТекущаяГруппа'
     property Path[const sRootName: String]: String read GetPath;
-     // -- Список ID изображений, входящих в группу
-    property PicIDs: TIntegerList read FPicIDs;
+     // -- Список изображений, входящих в группу
+    property Pics: IPhoaMutablePicList read FPics;
      // -- Свойства по индексу
     property Props[GroupProp: TGroupProperty]: String read GetProps;
      // -- Возвращает окончательного владельца всех групп иерархии
@@ -342,6 +351,7 @@ type
     function  IPhoaPic.GetFilmNumber        = IPP_GetFilmNumber;
     function  IPhoaPic.GetFlips             = IPP_GetFlips;
     function  IPhoaPic.GetFrameNumber       = IPP_GetFrameNumber;
+    function  IPhoaPic.GetHandle            = IPP_GetHandle;
     function  IPhoaPic.GetImageSize         = IPP_GetImageSize;
     function  IPhoaPic.GetKeywords          = IPP_GetKeywords;
     function  IPhoaPic.GetMedia             = IPP_GetMedia;
@@ -362,6 +372,7 @@ type
     function  IPP_GetFilmNumber: PAnsiChar; stdcall;
     function  IPP_GetFlips: TPicFlips; stdcall;
     function  IPP_GetFrameNumber: PAnsiChar; stdcall;
+    function  IPP_GetHandle: TPhoaHandle; stdcall;
     function  IPP_GetImageSize: TSize; stdcall;
     function  IPP_GetKeywords: PAnsiChar; stdcall;
     function  IPP_GetMedia: PAnsiChar; stdcall;
@@ -457,8 +468,8 @@ type
     procedure Delete(Index: Integer);
     procedure Clear; override;
      // Копирует изображения с Src. Если bCopyLinksOnly=True, копирует только ссылки, иначе создаёт копии изображений.
-     //   Если RestrictLinks=nil, то копирует все изображения, иначе - только те, ID которых содержатся в RestrictLinks
-    procedure Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictLinks: TPhoaPicLinks);
+     //   Если RestrictPics=nil, то копирует все изображения, иначе - только те, ID которых содержатся в RestrictPics
+    procedure Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictPics: IPhoaPicList);
      // Возвращает следующий свободный ID изображения
     function GetFreePicID: Integer;
   end;
@@ -1419,12 +1430,14 @@ const
      (ValueMode: clkvmOptional; cChar: 'f')); // clkFullScreen
 
 resourcestring
-  SCmdLineErrMsg_UnknownKey             = 'Unknown command line key: "%s"';
-  SCmdLineErrMsg_DuplicateKey           = 'Duplicate key "%s" in the command line';
-  SCmdLineErrMsg_KeyNameInvalid         = 'Key name invalid in the command line ("%s")';
-  SCmdLineErrMsg_DuplicateOpenPhoaValue = 'Duplicate .phoa file to open specified in the command line';
-  SCmdLineErrMsg_DuplicateKeyValue      = 'Duplicate value for key "%s" specified in the command line';
-  SCmdLineErrMsg_KeyValueMissing        = 'Value for key "%s" is missing in the command line';
+  SPhObjErrMsg_InvalidSortedPicListMethodCall = 'Cannot invoke %s on sorted TPhoaMutablePicList';
+
+  SCmdLineErrMsg_UnknownKey                   = 'Unknown command line key: "%s"';
+  SCmdLineErrMsg_DuplicateKey                 = 'Duplicate key "%s" in the command line';
+  SCmdLineErrMsg_KeyNameInvalid               = 'Key name invalid in the command line ("%s")';
+  SCmdLineErrMsg_DuplicateOpenPhoaValue       = 'Duplicate .phoa file to open specified in the command line';
+  SCmdLineErrMsg_DuplicateKeyValue            = 'Duplicate value for key "%s" specified in the command line';
+  SCmdLineErrMsg_KeyValueMissing              = 'Value for key "%s" is missing in the command line';
 
    //===================================================================================================================
 
@@ -1639,6 +1652,25 @@ uses
     end;
   end;
 
+  function TPhoaMutablePicList.Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer;
+  var
+    bAdded: Boolean;
+    i: Integer;
+  begin
+    Result := 0;
+    for i := 0 to PicList.Count-1 do begin
+      Add(PicList[i], bSkipDuplicates, bAdded);
+      if bAdded then Inc(Result);
+    end;
+  end;
+
+  procedure TPhoaMutablePicList.Assign(Source: IPhoaPicList);
+  var i: Integer;
+  begin
+    FList.Clear;
+    for i := 0 to Source.Count-1 do FList.Add(Source[i]);
+  end;
+
   procedure TPhoaMutablePicList.Clear;
   begin
     FList.Clear;
@@ -1649,6 +1681,36 @@ uses
     inherited Create;
     FSorted := bSorted;
     FList := TInterfaceList.Create;
+  end;
+
+  procedure TPhoaMutablePicList.CustomSort(CompareFunc: TPhoaPicListSortCompareFunc; dwData: Cardinal);
+
+    procedure QuickSort(iL, iR: Integer);
+    var
+      i1, i2: Integer;
+      p: IPhoaPic;
+    begin
+      repeat
+        i1 := iL;
+        i2 := iR;
+        p := GetItems((iL+iR) shr 1);
+        repeat
+          while CompareFunc(GetItems(i1), p, dwData)<0 do Inc(i1);
+          while CompareFunc(GetItems(i2), p, dwData)>0 do Dec(i2);
+          if i1<=i2 then begin
+            FList.Exchange(i1, i2);
+            Inc(i1);
+            Dec(i2);
+          end;
+        until i1>i2;
+        if iL<i2 then QuickSort(iL, i2);
+        iL := i1;
+      until i1>=iR;
+    end;
+
+  begin
+    if FSorted then PhoaException(SPhObjErrMsg_InvalidSortedPicListMethodCall, ['CustomSort']);
+    if FList.Count>0 then QuickSort(0, FList.Count-1);
   end;
 
   procedure TPhoaMutablePicList.Delete(Index: Integer);
@@ -1739,6 +1801,22 @@ uses
     if not FindID(iID, Result) then Result := -1;
   end;
 
+  function TPhoaMutablePicList.Insert(Index: Integer; Pic: IPhoaPic; bSkipDuplicates: Boolean): Boolean;
+  begin
+    if FSorted then PhoaException(SPhObjErrMsg_InvalidSortedPicListMethodCall, ['Insert']);
+    Result := not bSkipDuplicates or (IndexOfID(Pic.ID)<0);
+    if Result then FList.Insert(Index, Pic);
+  end;
+
+  procedure TPhoaMutablePicList.Move(iCurIndex, iNewIndex: Integer);
+  var Pic: IPhoaPic;
+  begin
+    if FSorted then PhoaException(SPhObjErrMsg_InvalidSortedPicListMethodCall, ['Move']);
+    Pic := GetItems(iCurIndex);
+    FList.Delete(iCurIndex);
+    FList.Insert(iNewIndex, Pic);
+  end;
+
   function TPhoaMutablePicList.Remove(iID: Integer): Integer;
   begin
     if FindID(iID, Result) then FList.Delete(Result) else Result := -1;
@@ -1765,17 +1843,17 @@ uses
     end;
   end;
 
-  procedure TPhoaPicLinks.AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
+  procedure TPhoaPicLinks.AddFromGroup(Group: TPhoaGroup; bReplace, bRecurse: Boolean);
   var i: Integer;
   begin
     if bReplace then Clear;
      // Копируем ссылки на изображения, принадлежащие группе
     if Group<>nil then begin
        // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды
-      for i := 0 to Group.PicIDs.Count-1 do Add(PhoA.Pics.PicByID(Group.PicIDs[i]), bRecurse);
+      for i := 0 to Group.Pics.Count-1 do Add(TPhoaPic(Group.Pics[i].Handle), bRecurse);
        // Если рекурсивное добавление - повторяем то же для вложенных групп
       if bRecurse then
-        for i := 0 to Group.Groups.Count-1 do AddFromGroup(PhoA, Group.Groups[i], False, True);
+        for i := 0 to Group.Groups.Count-1 do AddFromGroup(Group.Groups[i], False, True);
     end;
   end;
 
@@ -1786,19 +1864,15 @@ uses
     for i := 0 to High(aPicIDs) do Add(PhoA.Pics.PicByID(aPicIDs[i]), True);
   end;
 
-  procedure TPhoaPicLinks.Assign(Src: TPhoaPics; RestrictLinks: TPhoaPicLinks);
+  procedure TPhoaPicLinks.Assign(Src: TPhoaPics; RestrictPics: IPhoaPicList);
   var
     i: Integer;
     Pic: TPhoaPic;
   begin
-    if RestrictLinks=nil then
-      inherited Assign(Src)
-    else begin
-      Clear;
-      for i := 0 to Src.Count-1 do begin
-        Pic := Src[i];
-        if RestrictLinks.IndexOfID(Pic.ID)>=0 then Add(Pic, False);
-      end;
+    Clear;
+    for i := 0 to Src.Count-1 do begin
+      Pic := Src[i];
+      if (RestrictPics=nil) or (RestrictPics.IndexOfID(Pic.ID)>=0) then Add(Pic, False);
     end;
   end;
 
@@ -1810,8 +1884,8 @@ uses
   procedure TPhoaPicLinks.CopyToGroup(Group: TPhoaGroup);
   var i: Integer;
   begin
-    Group.PicIDs.Clear;
-    for i := 0 to Count-1 do Group.PicIDs.Add(GetItems(i).ID);
+    Group.Pics.Clear;
+    for i := 0 to Count-1 do Group.Pics.Add(GetItems(i), False);
   end;
 
   constructor TPhoaPicLinks.Create(bSorted: Boolean);
@@ -2023,7 +2097,7 @@ uses
     inherited Items[Index] := Pointer(ps);
   end;
 
-  function TPhoaSortings.SortComparePics(Pic1, Pic2: TPhoaPic): Integer;
+  function TPhoaSortings.SortComparePics(Pic1, Pic2: IPhoaPic): Integer;
   var
     i: Integer;
     ps: TPhoaSorting;
@@ -2033,27 +2107,27 @@ uses
       ps := GetItems(i);
       case ps.Prop of
         ppID:              Result := Pic1.ID-Pic2.ID;
-        ppFileName:        Result := AnsiCompareText(ExtractFileName(Pic1.PicFileName), ExtractFileName(Pic2.PicFileName));
-        ppFullFileName:    Result := AnsiCompareText(Pic1.PicFileName, Pic2.PicFileName);
-        ppFilePath:        Result := AnsiCompareText(ExtractFilePath(Pic1.PicFileName), ExtractFilePath(Pic2.PicFileName));
+        ppFileName:        Result := AnsiCompareText(ExtractFileName(Pic1.FileName), ExtractFileName(Pic2.FileName));
+        ppFullFileName:    Result := AnsiCompareText(Pic1.FileName, Pic2.FileName);
+        ppFilePath:        Result := AnsiCompareText(ExtractFilePath(Pic1.FileName), ExtractFilePath(Pic2.FileName));
         ppFileSize,
-          ppFileSizeBytes: Result := Pic1.PicFileSize-Pic2.PicFileSize;
-        ppPicWidth:        Result := Pic1.PicWidth-Pic2.PicWidth;
-        ppPicHeight:       Result := Pic1.PicHeight-Pic2.PicHeight;
-        ppPicDims:         Result := (Pic1.PicWidth*Pic1.PicHeight)-(Pic2.PicWidth*Pic2.PicHeight);
-        ppFormat:          Result := Byte(Pic1.PicFormat)-Byte(Pic2.PicFormat);
-        ppDate:            Result := Trunc(Pic1.PicDateTime)-Trunc(Pic2.PicDateTime);
-        ppTime:            Result := Sign(Frac(Pic1.PicDateTime)-Frac(Pic2.PicDateTime));
-        ppPlace:           Result := AnsiCompareText(Pic1.PicPlace,         Pic2.PicPlace);
-        ppFilmNumber:      Result := AnsiCompareText(Pic1.PicFilmNumber,    Pic2.PicFilmNumber);
-        ppFrameNumber:     Result := AnsiCompareText(Pic1.PicFrameNumber,   Pic2.PicFrameNumber);
-        ppAuthor:          Result := AnsiCompareText(Pic1.PicAuthor,        Pic2.PicAuthor);
-        ppDescription:     Result := AnsiCompareText(Pic1.PicDesc,          Pic2.PicDesc);
-        ppNotes:           Result := AnsiCompareText(Pic1.PicNotes,         Pic2.PicNotes);
-        ppMedia:           Result := AnsiCompareText(Pic1.PicMedia,         Pic2.PicMedia);
-        ppKeywords:        Result := AnsiCompareText(Pic1.PicKeywords.Text, Pic2.PicKeywords.Text);
-        ppRotation:        Result := Ord(Pic1.PicRotation)-Ord(Pic2.PicRotation);
-        ppFlips:           Result := Byte(Pic1.PicFlips)-Byte(Pic2.PicFlips);
+          ppFileSizeBytes: Result := Pic1.FileSize-Pic2.FileSize;
+        ppPicWidth:        Result := Pic1.ImageSize.cx-Pic2.ImageSize.cx;
+        ppPicHeight:       Result := Pic1.ImageSize.cy-Pic2.ImageSize.cy;
+        ppPicDims:         Result := (Pic1.ImageSize.cx*Pic1.ImageSize.cy)-(Pic2.ImageSize.cx*Pic2.ImageSize.cy);
+//!!!!        ppFormat:          Result := Byte(Pic1.PicFormat)-Byte(Pic2.PicFormat);
+        ppDate:            Result := Pic1.Date-Pic2.Date;
+        ppTime:            Result := Pic1.Time-Pic2.Time;
+        ppPlace:           Result := AnsiCompareText(Pic1.Place,       Pic2.Place);
+        ppFilmNumber:      Result := AnsiCompareText(Pic1.FilmNumber,  Pic2.FilmNumber);
+        ppFrameNumber:     Result := AnsiCompareText(Pic1.FrameNumber, Pic2.FrameNumber);
+        ppAuthor:          Result := AnsiCompareText(Pic1.Author,      Pic2.Author);
+        ppDescription:     Result := AnsiCompareText(Pic1.Description, Pic2.Description);
+        ppNotes:           Result := AnsiCompareText(Pic1.Notes,       Pic2.Notes);
+        ppMedia:           Result := AnsiCompareText(Pic1.Media,       Pic2.Media);
+        ppKeywords:        Result := AnsiCompareText(Pic1.Keywords,    Pic2.Keywords);
+        ppRotation:        Result := Ord(Pic1.Rotation)-Ord(Pic2.Rotation);
+        ppFlips:           Result := Byte(Pic1.Flips)-Byte(Pic2.Flips);
       end;
       if Result<>0 then begin
         if ps.Order=soDesc then Result := -Result;
@@ -2127,7 +2201,7 @@ uses
    // TPhoaGroup
    //===================================================================================================================
 
-  procedure TPhoaGroup.Assign(Src: TPhoaGroup; bCopyIDs, bCopyPicIDs, bCopySubgroups: Boolean);
+  procedure TPhoaGroup.Assign(Src: TPhoaGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean);
   var i: Integer;
   begin
     if bCopyIDs then FID := Src.FID;
@@ -2135,11 +2209,11 @@ uses
     FDescription := Src.FDescription;
     FExpanded    := Src.FExpanded;
      // Копируем список ID изображений
-    if bCopyPicIDs then FPicIDs.Assign(Src.FPicIDs);
+    if bCopyPics then FPics.Assign(Src.FPics);
      // Копируем подчинённые группы
     if bCopySubgroups then begin
       FGroups.Clear;
-      for i := 0 to Src.FGroups.Count-1 do TPhoaGroup.Create(Self, 0).Assign(Src.FGroups[i], bCopyIDs, bCopyPicIDs, True);
+      for i := 0 to Src.FGroups.Count-1 do TPhoaGroup.Create(Self, 0).Assign(Src.FGroups[i], bCopyIDs, bCopyPics, True);
     end;
   end;
 
@@ -2147,7 +2221,7 @@ uses
   begin
     inherited Create;
     FGroups := TPhoaGroups.Create(Self);
-    FPicIDs := TIntegerList.Create(False);
+    FPics   := TPhoaMutablePicList.Create(False);
     Owner   := _Owner;
     FID     := iID;
   end;
@@ -2155,8 +2229,9 @@ uses
   destructor TPhoaGroup.Destroy;
   begin
     Owner := nil;
+    FStreamerPicIDs.Free;
     FGroups.Free;
-    FPicIDs.Free;
+    FPics := nil;
     inherited Destroy;
   end;
 
@@ -2253,7 +2328,7 @@ uses
       gpID:          Result := IntToStr(FID);
       gpText:        Result := FText;
       gpDescription: Result := FDescription;
-      gpPicCount:    Result := IntToStrPositive(FPicIDs.Count);
+      gpPicCount:    Result := IntToStrPositive(FPics.Count);
       gpGroupCount:  Result := IntToStrPositive(NestedGroupCount);
     end;
   end;
@@ -2294,7 +2369,7 @@ uses
   function TPhoaGroup.IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean;
   var i: Integer;
   begin
-    Result := FPicIDs.IndexOf(iID)>=0;
+    Result := FPics.IndexOfID(iID)>=0;
     if bRecursive then begin
       i := 0;
       while not Result and (i<FGroups.Count) do begin
@@ -2302,6 +2377,27 @@ uses
         Inc(i);
       end;
     end;
+  end;
+
+  procedure TPhoaGroup.Loaded(PhoA: TPhotoAlbum);
+  var
+    i: Integer;
+    Pic: IPhoaPic;
+  begin
+     // Если корневая группа - запускаем назначение ID группам, его не имеющим (нужно, если фотоальбом сохранён версией
+     //   PhoA раньше 1.1.5)
+    if FOwner=nil then FixupIDs;
+     // Превращаем ID изображений в ссылки на изображения
+    if FStreamerPicIDs<>nil then begin
+      for i := 0 to FStreamerPicIDs.Count-1 do begin
+        Pic := PhoA.Pics.PicByID(FStreamerPicIDs[i]);
+        if Pic<>nil then FPics.Add(Pic, False);
+      end;
+       // Убиваем список ID изображений для загрузки
+      FreeAndNil(FStreamerPicIDs);
+    end;
+     // Рекурсивно вызываем для подчинённых групп
+    for i := 0 to FGroups.Count-1 do FGroups[i].Loaded(PhoA);
   end;
 
   procedure TPhoaGroup.SetIndex(Value: Integer);
@@ -2322,108 +2418,104 @@ uses
     end;
   end;
 
-type
-  PGroupSortRec = ^TGroupSortRec;
-  TGroupSortRec = record
-    Sortings: TPhoaSortings;
-    Pics: TPhoaPics;
-  end;
-
-  function GroupPicSortCompare(i1, i2: Integer; pData: Pointer): Integer; near;
+  function __GroupPicSortCompare(Pic1, Pic2: IPhoaPic; dwData: Cardinal): Integer; stdcall;
   begin
-    Result :=
-      PGroupSortRec(pData).Sortings.SortComparePics(
-        PGroupSortRec(pData).Pics.PicByID(i1),
-        PGroupSortRec(pData).Pics.PicByID(i2));
+    Result := TPhoaSortings(dwData).SortComparePics(Pic1, Pic2);
   end;
 
   procedure TPhoaGroup.SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
-  var gsr: TGroupSortRec;
   begin
-    gsr.Sortings := Sortings;
-    gsr.Pics     := Pics;
-    FPicIDs.Sort(GroupPicSortCompare, @gsr);
+    FPics.CustomSort(__GroupPicSortCompare, Cardinal(Sortings));
   end;
 
   procedure TPhoaGroup.StreamerLoad(Streamer: TPhoaStreamer);
   var
-    i: Integer;
+    i, iPicCount: Integer;
     Code: TPhChunkCode;
     Datatype: TPhChunkDatatype;
     vValue: Variant;
   begin
-    FPicIDs.Clear;
-    with Streamer do
-       // *** Old format
-      if not Chunked then begin
-         // Read group properties
-        FText     := ReadStringI;
-        FExpanded := ReadByte<>0;
-         // Read picture IDs
-        for i := 0 to ReadInt-1 do FPicIDs.Add(ReadInt);
-         // Read nested groups
-        FGroups.StreamerLoad(Streamer);
-       // *** New format
-      end else
-        while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
-          case Code of
-             // Group properties
-            IPhChunk_Group_ID:          FID          := vValue;
-            IPhChunk_Group_Text:        FText        := vValue;
-            IPhChunk_Group_Expanded:    FExpanded    := vValue<>Byte(0);
-            IPhChunk_Group_Description: FDescription := vValue;
-             // Picture IDs
-            IPhChunk_GroupPics_Open:
-              while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
-                case Code of
-                   // Picture ID
-                  IPhChunk_GroupPic_ID: FPicIDs.Add(vValue);
-                   // Close-chunk
-                  IPhChunk_GroupPics_Close: Break;
-                   // Ensure unknown nested structures are skipped whole
-                  else Streamer.SkipNestedChunks(Code);
+     // Стираем список подчинённых групп
+    FGroups.Clear; 
+     // Стираем список изображений
+    FPics.Clear;
+    FreeAndNil(FStreamerPicIDs);
+     // *** Old format
+    if not Streamer.Chunked then begin
+       // Read group properties
+      FText     := Streamer.ReadStringI;
+      FExpanded := Streamer.ReadByte<>0;
+       // Read picture IDs
+      iPicCount := Streamer.ReadInt;
+      if iPicCount>0 then begin
+        FStreamerPicIDs := TIntegerList.Create(False);
+        for i := 0 to iPicCount-1 do FStreamerPicIDs.Add(Streamer.ReadInt);
+      end;
+       // Read nested groups
+      FGroups.StreamerLoad(Streamer);
+     // *** New format
+    end else
+      while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
+        case Code of
+           // Group properties
+          IPhChunk_Group_ID:          FID          := vValue;
+          IPhChunk_Group_Text:        FText        := vValue;
+          IPhChunk_Group_Expanded:    FExpanded    := vValue<>Byte(0);
+          IPhChunk_Group_Description: FDescription := vValue;
+           // Picture IDs
+          IPhChunk_GroupPics_Open:
+            while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
+              case Code of
+                 // Picture ID
+                IPhChunk_GroupPic_ID: begin
+                  if FStreamerPicIDs=nil then FStreamerPicIDs := TIntegerList.Create(False);
+                  FStreamerPicIDs.Add(vValue);
                 end;
-             // Nested groups
-            IPhChunk_Groups_Open: FGroups.StreamerLoad(Streamer);
-             // Close-chunk
-            IPhChunk_Group_Close: Break;
-             // Ensure unknown nested structures are skipped whole
-            else Streamer.SkipNestedChunks(Code);
-          end;
+                 // Close-chunk
+                IPhChunk_GroupPics_Close: Break;
+                 // Ensure unknown nested structures are skipped whole
+                else Streamer.SkipNestedChunks(Code);
+              end;
+           // Nested groups
+          IPhChunk_Groups_Open: FGroups.StreamerLoad(Streamer);
+           // Close-chunk
+          IPhChunk_Group_Close: Break;
+           // Ensure unknown nested structures are skipped whole
+          else Streamer.SkipNestedChunks(Code);
+        end;
   end;
 
   procedure TPhoaGroup.StreamerSave(Streamer: TPhoaStreamer);
   var i: Integer;
   begin
-    with Streamer do
-       // *** Old format
-      if not Chunked then begin
-         // Write group properties
-        WriteStringI(FText);
-        WriteByte   (Byte(FExpanded));
-         // Write picture IDs
-        WriteInt    (FPicIDs.Count);
-        for i := 0 to FPicIDs.Count-1 do WriteInt(FPicIDs[i]);
-         // Write nested groups
-        FGroups.StreamerSave(Streamer);
-       // *** New format
-      end else begin
-         // Write open-chunk
-        WriteChunk(IPhChunk_Group_Open);
-         // Write group props
-        WriteChunkInt   (IPhChunk_Group_ID,          FID);
-        WriteChunkString(IPhChunk_Group_Text,        FText);
-        WriteChunkByte  (IPhChunk_Group_Expanded,    Byte(FExpanded));
-        WriteChunkString(IPhChunk_Group_Description, FDescription);
-         // Write picture IDs
-        WriteChunk(IPhChunk_GroupPics_Open);
-        for i := 0 to FPicIDs.Count-1 do WriteChunkInt(IPhChunk_GroupPic_ID, FPicIDs[i]);
-        WriteChunk(IPhChunk_GroupPics_Close);
-         // Write nested groups
-        FGroups.StreamerSave(Streamer);
-         // Write close-chunk
-        WriteChunk(IPhChunk_Group_Close);
-      end;
+     // *** Old format
+    if not Streamer.Chunked then begin
+       // Write group properties
+      Streamer.WriteStringI(FText);
+      Streamer.WriteByte   (Byte(FExpanded));
+       // Write picture IDs
+      Streamer.WriteInt    (FPics.Count);
+      for i := 0 to FPics.Count-1 do Streamer.WriteInt(FPics[i].ID);
+       // Write nested groups
+      FGroups.StreamerSave(Streamer);
+     // *** New format
+    end else begin
+       // Write open-chunk
+      Streamer.WriteChunk(IPhChunk_Group_Open);
+       // Write group props
+      Streamer.WriteChunkInt   (IPhChunk_Group_ID,          FID);
+      Streamer.WriteChunkString(IPhChunk_Group_Text,        FText);
+      Streamer.WriteChunkByte  (IPhChunk_Group_Expanded,    Byte(FExpanded));
+      Streamer.WriteChunkString(IPhChunk_Group_Description, FDescription);
+       // Write picture IDs
+      Streamer.WriteChunk(IPhChunk_GroupPics_Open);
+      for i := 0 to FPics.Count-1 do Streamer.WriteChunkInt(IPhChunk_GroupPic_ID, FPics[i].ID);
+      Streamer.WriteChunk(IPhChunk_GroupPics_Close);
+       // Write nested groups
+      FGroups.StreamerSave(Streamer);
+       // Write close-chunk
+      Streamer.WriteChunk(IPhChunk_Group_Close);
+    end;
   end;
 
    //===================================================================================================================
@@ -2465,22 +2557,21 @@ type
     vValue: Variant;
   begin
     Clear;
-    with Streamer do
-       // *** Old format
-      if not Chunked then
-         // Read nested groups
-        for i := 0 to ReadInt-1 do TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer)
-       // *** New format
-      else
-        while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
-          case Code of
-             // Nested group
-            IPhChunk_Group_Open: TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer);
-             // Close-chunk
-            IPhChunk_Groups_Close: Break;
-             // Ensure unknown nested structures are skipped whole
-            else Streamer.SkipNestedChunks(Code);
-          end;
+     // *** Old format
+    if not Streamer.Chunked then
+       // Read nested groups
+      for i := 0 to Streamer.ReadInt-1 do TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer)
+     // *** New format
+    else
+      while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
+        case Code of
+           // Nested group
+          IPhChunk_Group_Open: TPhoaGroup.Create(FOwner, 0).StreamerLoad(Streamer);
+           // Close-chunk
+          IPhChunk_Groups_Close: Break;
+           // Ensure unknown nested structures are skipped whole
+          else Streamer.SkipNestedChunks(Code);
+        end;
   end;
 
   procedure TPhoaGroups.StreamerSave(Streamer: TPhoaStreamer);
@@ -2637,7 +2728,7 @@ type
 
   function TPhoaPic.IPP_GetDate: Integer;
   begin
-    Result := DateToPhoaDate(FPicDateTime);
+    if Trunc(FPicDateTime)=0 then Result := 0 else Result := DateToPhoaDate(FPicDateTime);
   end;
 
   function TPhoaPic.IPP_GetDescription: PAnsiChar;
@@ -2668,6 +2759,11 @@ type
   function TPhoaPic.IPP_GetFrameNumber: PAnsiChar;
   begin
     Result := PAnsiChar(FPicFrameNumber);
+  end;
+
+  function TPhoaPic.IPP_GetHandle: TPhoaHandle;
+  begin
+    Result := TPhoaHandle(Self);
   end;
 
   function TPhoaPic.IPP_GetID: Integer;
@@ -2929,20 +3025,20 @@ type
    // TPhoaPics
    //===================================================================================================================
 
-  procedure TPhoaPics.Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictLinks: TPhoaPicLinks);
+  procedure TPhoaPics.Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictPics: IPhoaPicList);
   var
     i: Integer;
     Pic, SrcPic: TPhoaPic;
   begin
      // Копирование ссылок реализуется методом предка
     if bCopyLinksOnly then
-      inherited Assign(Src, RestrictLinks)
+      inherited Assign(Src, RestrictPics)
      // Копирование с созданием новых экземпляров изображений 
     else begin
       Clear;
       for i := 0 to Src.Count-1 do begin
         SrcPic := Src[i];
-        if (RestrictLinks=nil) or (RestrictLinks.IndexOfID(SrcPic.ID)>=0) then begin
+        if (RestrictPics=nil) or (RestrictPics.IndexOfID(SrcPic.ID)>=0) then begin
           Pic := TPhoaPic.Create(FPhoA);
           try
             Pic.Assign(SrcPic);
@@ -3261,18 +3357,18 @@ var
     iGpg, iGrp, iPic: Integer;
     Gpg: TPhoaGrouping;
     Grp, GUnclassified: TPhoaGroup;
-    Pic: TPhoaPic;
+    Pic: IPhoaPic;
     GroupWithPics: TList;
     bClassified: Boolean;
 
      // Создаёт дерево по пути к изображению
-    procedure ProcessFilePathTree(ParentGroup: TPhoaGroup; Pic: TPhoaPic);
+    procedure ProcessFilePathTree(ParentGroup: TPhoaGroup; Pic: IPhoaPic);
     var
       iSlashPos: Integer;
       sDir, sOneDir: String;
       Group, GParent: TPhoaGroup;
     begin
-      sDir := ExtractFileDir(Pic.PicFileName);
+      sDir := ExtractFileDir(Pic.FileName);
        // Начинаем с корня
       Group := ParentGroup;
       repeat
@@ -3294,11 +3390,11 @@ var
         end;
         Group := GParent;
       until sDir='';
-      Group.PicIDs.Add(Pic.ID);
+      Group.Pics.Add(Pic, True);
     end;
 
      // Создаёт дерево по компонентам даты (one level)
-    procedure ProcessDateTree(Prop: TGroupByProperty; ParentGroup: TPhoaGroup; Pic: TPhoaPic);
+    procedure ProcessDateTree(Prop: TGroupByProperty; ParentGroup: TPhoaGroup; Pic: IPhoaPic);
     var
       sDatePart: String;
       Group: TPhoaGroup;
@@ -3309,7 +3405,7 @@ var
         gbpDateByMonth: sDatePart := 'mmmm';
         gbpDateByDay:   sDatePart := 'd';
       end;
-      sDatePart := FormatDateTime(sDatePart, Pic.PicDateTime);
+      sDatePart := FormatDateTime(sDatePart, PhoaDateToDate(Pic.Date));
        // Получаем последнего ребёнка текущей группы
       with ParentGroup.Groups do
         if Count=0 then Group := nil else Group := Items[Count-1];
@@ -3319,17 +3415,17 @@ var
         Group.Text     := sDatePart;
         Group.Expanded := True;
       end;
-      Group.PicIDs.Add(Pic.ID);
+      Group.Pics.Add(Pic, True);
     end;
 
      // Создаёт дерево по компонентам времени (one level)
-    procedure ProcessTimeTree(Prop: TGroupByProperty; ParentGroup: TPhoaGroup; Pic: TPhoaPic);
+    procedure ProcessTimeTree(Prop: TGroupByProperty; ParentGroup: TPhoaGroup; Pic: IPhoaPic);
     var
       sTimePart: String;
       Group: TPhoaGroup;
     begin
        // Находим наименование компонента времени
-      sTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), Pic.PicDateTime);
+      sTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), PhoaTimeToTime(Pic.Time));
        // Получаем последнего ребёнка текущей группы
       with ParentGroup.Groups do
         if Count=0 then Group := nil else Group := Items[Count-1];
@@ -3339,11 +3435,11 @@ var
         Group.Text     := sTimePart;
         Group.Expanded := True;
       end;
-      Group.PicIDs.Add(Pic.ID);
+      Group.Pics.Add(Pic, True);
     end;
 
      // Создаёт дерево по простому строковому свойству (one level)
-    procedure ProcessPlainPropTree(PicProp: TPicProperty; ParentGroup: TPhoaGroup; Pic: TPhoaPic);
+    procedure ProcessPlainPropTree(PicProp: TPicProperty; ParentGroup: TPhoaGroup; Pic: IPhoaPic);
     var
       Group: TPhoaGroup;
       sPropVal: String;
@@ -3352,17 +3448,17 @@ var
       with ParentGroup.Groups do
         if Count=0 then Group := nil else Group := Items[Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      sPropVal := Pic.Props[PicProp];
+      sPropVal := TPhoaPic(Pic.Handle).Props[PicProp];
       if (Group=nil) or not AnsiSameText(Group.Text, sPropVal) then begin
         Group := TPhoaGroup.Create(ParentGroup, 0);
         Group.Text := sPropVal;
       end;
        // Добавляем изображение к группе
-      Group.PicIDs.Add(Pic.ID);
+      Group.Pics.Add(Pic, True);
     end;
 
      // Создаёт дерево по ключевым словам (one level)
-    procedure ProcessKeywordTree(ParentGroup: TPhoaGroup; Pic: TPhoaPic);
+    procedure ProcessKeywordTree(ParentGroup: TPhoaGroup; Pic: IPhoaPic);
     var ikw: Integer;
 
        // Ищет группу для ключевого слова, если нет такой - создаёт; при этом сохраняет сортированную последовательность
@@ -3405,14 +3501,14 @@ var
 
     begin
        // Сканируем для каждого ключевого слова
-      for ikw := 0 to Pic.PicKeywords.Count-1 do GetKWGroup(Pic.PicKeywords[ikw]).PicIDs.Add(Pic.ID);
+      for ikw := 0 to TPhoaPic(Pic.Handle).PicKeywords.Count-1 do GetKWGroup(TPhoaPic(Pic.Handle).PicKeywords[ikw]).Pics.Add(Pic, True);
     end;
 
      // Рекурсивная процедура наполнения списка группами, содержащими изображения
     procedure MakeListOfGroupsWithPics(GList: TList; Group: TPhoaGroup);
     var i: Integer;
     begin
-      if Group.PicIDs.Count>0 then GList.Add(Group);
+      if Group.Pics.Count>0 then GList.Add(Group);
       for i := 0 to Group.Groups.Count-1 do MakeListOfGroupsWithPics(GList, Group.Groups[i]);
     end;
 
@@ -3444,21 +3540,21 @@ var
             GUnclassified := nil;
              // Цикл по всем изображениям группы
             iPic := 0;
-            while iPic<Grp.PicIDs.Count do begin
-              Pic := FList.FPhoA.Pics.PicByID(Grp.PicIDs[iPic]);
+            while iPic<Grp.Pics.Count do begin
+              Pic := Grp.Pics[iPic];
                // Проверяем, классифицировано ли изображение
               case Gpg.Prop of
                 gbpFilePath:       bClassified := True;
                 gbpDateByYear,
                   gbpDateByMonth,
-                  gbpDateByDay:    bClassified := Trunc(Pic.PicDateTime)<>0;
+                  gbpDateByDay:    bClassified := Pic.Date>0;
                 gbpTimeHour,
-                  gbpTimeMinute:   bClassified := Frac(Pic.PicDateTime)<>0;
-                gbpPlace:          bClassified := Pic.PicPlace<>'';
-                gbpFilmNumber:     bClassified := Pic.PicFilmNumber<>'';
-                gbpAuthor:         bClassified := Pic.PicAuthor<>'';
-                gbpMedia:          bClassified := Pic.PicMedia<>'';
-                else {gbpKeywords} bClassified := Pic.PicKeywords.Count>0;
+                  gbpTimeMinute:   bClassified := Pic.Time>0;
+                gbpPlace:          bClassified := Pic.Place<>'';
+                gbpFilmNumber:     bClassified := Pic.FilmNumber<>'';
+                gbpAuthor:         bClassified := Pic.Author<>'';
+                gbpMedia:          bClassified := Pic.Media<>'';
+                else {gbpKeywords} bClassified := Pic.Keywords<>'';
               end;
                // Если классифицировано - помещаем в иерархию групп
               if bClassified then
@@ -3483,14 +3579,14 @@ var
                   GUnclassified.Index := 0;
                   GUnclassified.Text := ConstVal(asUnclassifiedConsts[Gpg.Prop]);
                 end;
-                GUnclassified.PicIDs.Add(Pic.ID);
+                GUnclassified.Pics.Add(Pic, True);
                // Иначе - переходим к следующему изображению
               end else begin
                 Inc(iPic);
                 Continue;
               end;
                // Удаляем изображение из старой группы
-              Grp.PicIDs.Remove(Pic.ID);
+              Grp.Pics.Remove(Pic.ID);
             end;
           end;
         end;
@@ -3681,7 +3777,6 @@ var
   begin
     inherited Create;
     FRootGroup        := TPhoaGroup.Create(nil, 1);
-    FRootGroup.FixupIDs;
     FPics             := TPhoaPics.Create(Self);
     FViews            := TPhoaViews.Create(Self);
     FFileRevision     := IPhFileRevisionNumber;
@@ -3722,7 +3817,7 @@ var
 
   procedure TPhotoAlbum.New(Undo: TPhoaUndo);
   begin
-    FRootGroup.PicIDs.Clear;
+    FRootGroup.Pics.Clear;
     FRootGroup.Groups.Clear;
     FPics.Clear;
     FViews.Clear;
@@ -3791,41 +3886,44 @@ var
     Datatype: TPhChunkDatatype;
     vValue: Variant;
   begin
-     // *** Old format
-    if not Streamer.Chunked then begin
-       // Read photo album properties
-      with Streamer do begin
-        FDescription      := ReadStringI;
-        FThumbnailQuality := ReadInt;
-        FThumbnailWidth   := ReadInt;
-        FThumbnailHeight  := ReadInt;
-      end;
-       // Read groups
-      FRootGroup.StreamerLoad(Streamer);
-       // Read pictures
-      FPics.StreamerLoad(Streamer);
-       // If revision 2+, read views
-      if Streamer.RevisionNumber>=2 then FViews.StreamerLoad(Streamer);
-     // *** New format
-    end else
-      while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
-        case Code of
-           // Photo album properties
-          IPhChunk_PhoaDescription:  FDescription      := vValue;
-          IPhChunk_PhoaThumbQuality: FThumbnailQuality := vValue;
-          IPhChunk_PhoaThumbWidth:   FThumbnailWidth   := vValue;
-          IPhChunk_PhoaThumbHeight:  FThumbnailHeight  := vValue;
-           // Pictures
-          IPhChunk_Pics_Open:        FPics.StreamerLoad(Streamer);
-           // Root group
-          IPhChunk_Group_Open:       FRootGroup.StreamerLoad(Streamer);
-           // Views
-          IPhChunk_Views_Open:       FViews.StreamerLoad(Streamer);
-           // Ensure unknown nested structures are skipped whole
-          else Streamer.SkipNestedChunks(Code);
+    try
+       // *** Old format
+      if not Streamer.Chunked then begin
+         // Read photo album properties
+        with Streamer do begin
+          FDescription      := ReadStringI;
+          FThumbnailQuality := ReadInt;
+          FThumbnailWidth   := ReadInt;
+          FThumbnailHeight  := ReadInt;
         end;
-     // Запускаем назначение ID группам, его не имеющим (нужно, если фотоальбом сохранён версией PhoA раньше 1.1.5)
-    FRootGroup.FixupIDs; 
+         // Read groups
+        FRootGroup.StreamerLoad(Streamer);
+         // Read pictures
+        FPics.StreamerLoad(Streamer);
+         // If revision 2+, read views
+        if Streamer.RevisionNumber>=2 then FViews.StreamerLoad(Streamer);
+       // *** New format
+      end else
+        while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
+          case Code of
+             // Photo album properties
+            IPhChunk_PhoaDescription:  FDescription      := vValue;
+            IPhChunk_PhoaThumbQuality: FThumbnailQuality := vValue;
+            IPhChunk_PhoaThumbWidth:   FThumbnailWidth   := vValue;
+            IPhChunk_PhoaThumbHeight:  FThumbnailHeight  := vValue;
+             // Pictures
+            IPhChunk_Pics_Open:        FPics.StreamerLoad(Streamer);
+             // Root group
+            IPhChunk_Group_Open:       FRootGroup.StreamerLoad(Streamer);
+             // Views
+            IPhChunk_Views_Open:       FViews.StreamerLoad(Streamer);
+             // Ensure unknown nested structures are skipped whole
+            else Streamer.SkipNestedChunks(Code);
+          end;
+    finally
+       // Завершаем загрузку для иерархии групп
+      FRootGroup.Loaded(Self);
+    end;
   end;
 
   procedure TPhotoAlbum.StreamerSave(Streamer: TPhoaStreamer);
@@ -4355,9 +4453,9 @@ var
     UndoFile.WriteInt (Group.Index);
     UndoFile.WriteBool(Group.Expanded);
      // Запоминаем содержимое (ID изображений)
-    if Group.PicIDs.Count>0 then begin
+    if Group.Pics.Count>0 then begin
       FPicIDs := TIntegerList.Create(False);
-      FPicIDs.Assign(Group.PicIDs);
+      for i := 0 to Group.Pics.Count-1 do FPicIDs.Add(Group.Pics[i].ID);
     end;
      // Запоминаем список каскадно удаляемых узлов
     if Group.Groups.Count>0 then begin
@@ -4400,7 +4498,8 @@ var
     g.Description := UndoFile.ReadStr;
     g.Index       := UndoFile.ReadInt;
     g.Expanded    := UndoFile.ReadBool;
-    if FPicIDs<>nil then g.PicIDs.Assign(FPicIDs);
+    if FPicIDs<>nil then
+      for i := 0 to FPicIDs.Count-1 do g.Pics.Add(PhoA.Pics.PicByID(FPicIDs[i]), False);
      // Восстанавливаем каскадно удалённые группы
     if FCascadedDeletes<>nil then
       for i := 0 to FCascadedDeletes.Count-1 do TPhoaOp_GroupDelete(FCascadedDeletes[i]).InternalRollback(g);
@@ -4665,9 +4764,11 @@ var
   end;
 
   procedure TPhoaOp_InternalPicAdd.RegisterPic(Group: TPhoaGroup; Pic: TPhoaPic);
+  var bAdded: Boolean;
   begin
      // Добавляем изображение в группу, если его не было
-    if Group.PicIDs.Add(Pic.ID) then begin
+    Group.Pics.Add(Pic, True, bAdded);
+    if bAdded then begin
        // Сохраняем данные для отката
       OpGroup := Group;
       UndoFile.WriteInt(Pic.ID);
@@ -4683,7 +4784,7 @@ var
     iPicID := UndoFile.ReadInt;
     if iPicID>0 then begin
        // Удаляем из группы
-      OpGroup.PicIDs.Remove(iPicID);
+      OpGroup.Pics.Remove(iPicID);
        // Если было добавлено новое изображение, удаляем и из фотоальбома
       if not FExisting then FPhoA.Pics.PicByID(iPicID).Free;
     end;
@@ -4702,7 +4803,7 @@ var
      // Запоминаем ID и индексы
     for i := 0 to High(aPicIDs) do begin
        // Если есть такой ID в группе, записываем и удаляем
-      idx := Group.PicIDs.IndexOf(aPicIDs[i]);
+      idx := Group.Pics.IndexOfID(aPicIDs[i]);
       if idx>=0 then begin
          // Пишем флаг продолжения
         UndoFile.WriteBool(True);
@@ -4711,7 +4812,7 @@ var
          // Пишем индекс
         UndoFile.WriteInt(idx);
          // Удаляем изображение
-        Group.PicIDs.Delete(idx);
+        Group.Pics.Delete(idx);
       end;
     end;
      // Пишем стоп-флаг
@@ -4736,7 +4837,7 @@ var
        // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
       i := IIs.Count-2; // i указывает на ID, i+1 - на индекс
       while i>=0 do begin
-        g.PicIDs.Insert(IIs[i+1], IIs[i]);
+        g.Pics.Insert(IIs[i+1], PhoA.Pics.PicByID(IIs[i]), False);
         Dec(i, 2);
       end;
     finally
@@ -4749,16 +4850,20 @@ var
    //===================================================================================================================
 
   constructor TPhoaOp_InternalPicToGroupAdding.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
-  var i: Integer;
+  var
+    i: Integer;
+    bAdded: Boolean;
   begin
     inherited Create(List, PhoA);
     OpGroup := Group;
      // Добавляем изображения в группу и в undo-файл
-    for i := 0 to High(aPicIDs) do
-      if Group.PicIDs.Add(aPicIDs[i]) then begin
+    for i := 0 to High(aPicIDs) do begin
+      Group.Pics.Add(PhoA.Pics.PicByID(aPicIDs[i]), True, bAdded);
+      if bAdded then begin
         UndoFile.WriteBool(True); // Флаг продолжения
         UndoFile.WriteInt (aPicIDs[i]);
       end;
+    end;
      // Пишем стоп-флаг
     UndoFile.WriteBool(False); 
   end;
@@ -4769,7 +4874,7 @@ var
     inherited RollbackChanges;
      // Удаляем добавленные изображения (считываем ID добавленных изображений из файла, пока не встретим стоп-флаг)
     g := OpGroup;
-    while UndoFile.ReadBool do g.PicIDs.Remove(UndoFile.ReadInt);
+    while UndoFile.ReadBool do g.Pics.Remove(UndoFile.ReadInt);
   end;
 
    //===================================================================================================================
@@ -5029,8 +5134,8 @@ var
      // Оставить только выделенные изображения в указанной группе
     if PicOperation=popIntersectTarget then begin
       aIDs := nil;
-      for i := 0 to TargetGroup.PicIDs.Count-1 do begin
-        iID := TargetGroup.PicIDs[i];
+      for i := 0 to TargetGroup.Pics.Count-1 do begin
+        iID := TargetGroup.Pics[i].ID;
         if not IDInArray(iID, aSelPicIDs) then begin
           SetLength(aIDs, High(aIDs)+2);
           aIDs[High(aIDs)] := iID;
@@ -5048,21 +5153,25 @@ var
    //===================================================================================================================
 
   constructor TPhoaOp_InternalGroupPicSort.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Sortings: TPhoaSortings);
+  var i: Integer;
   begin
     inherited Create(List, PhoA);
      // Запоминаем группу
     OpGroup := Group;
      // Запоминаем порядок следования ID изображений в группе
-    UndoWriteIntList(UndoFile, Group.PicIDs);
+    UndoFile.WriteInt(Group.Pics.Count);
+    for i := 0 to Group.Pics.Count-1 do UndoFile.WriteInt(Group.Pics[i].ID);
      // Сортируем изображения в группе
     Group.SortPics(Sortings, PhoA.Pics);
   end;
 
   procedure TPhoaOp_InternalGroupPicSort.RollbackChanges;
+  var i: Integer;
   begin
     inherited RollbackChanges;
      // Восстанавливаем старый порядок следования ID изображений в группе
-    UndoReadIntList(UndoFile, OpGroup.PicIDs);
+    OpGroup.Pics.Clear;
+    for i := 0 to UndoFile.ReadInt-1 do OpGroup.Pics.Add(PhoA.Pics.PicByID(UndoFile.ReadInt), False);
   end;
 
    //===================================================================================================================
@@ -5147,12 +5256,12 @@ var
        // -- Пишем признак продолжения
       UndoFile.WriteBool(True);
        // -- Запоминаем индексы
-      idxOld := Group.PicIDs.IndexOf(aPicIDs[i]);
+      idxOld := Group.Pics.IndexOfID(aPicIDs[i]);
       if idxOld<idxNew then Dec(idxNew);
       UndoFile.WriteInt(idxOld);
       UndoFile.WriteInt(idxNew);
        // -- Перемещаем изображение на новое место
-      Group.PicIDs.Move(idxOld, idxNew);
+      Group.Pics.Move(idxOld, idxNew);
       Inc(idxNew);
     end;
      // Пишем стоп-флаг
@@ -5177,7 +5286,7 @@ var
        // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
       i := Indexes.Count-2; // i указывает на старый индекс, i+1 - на новый
       while i>=0 do begin
-        g.PicIDs.Move(Indexes[i+1], Indexes[i]);
+        g.Pics.Move(Indexes[i+1], Indexes[i]);
         Dec(i, 2);
       end;
     finally

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -91,7 +91,7 @@ uses phUtils, ConsVars, Main, phSettings;
     p := Sender.GetNodeData(Node);
     if p<>nil then
       if TextType=ttStatic then begin
-        if p^.PicIDs.Count>0 then s := Format('(%d)', [p^.PicIDs.Count]);
+        if p^.Pics.Count>0 then s := Format('(%d)', [p^.Pics.Count]);
       end else if Sender.NodeParent[Node]<>nil then s := p^.Text
       else s := ConstVal('SPhotoAlbumNode');
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
