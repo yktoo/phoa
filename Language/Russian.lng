@@ -1,8 +1,8 @@
 LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
-Generator=DKLang Translation Editor v2.3
-LastModified=2004-12-07 00:44:17
+Generator=DKLang Translation Editor v2.4
+LastModified=2004-12-10 18:20:59
 SourceLANGID=1033
 
 [fMain]
@@ -634,6 +634,10 @@ SourceLANGID=1033
 00000034=Проверить синтаксис выражения
 00000038=Свойства
 
+[frPicProps_FileProps]
+00000001=С&менить файл...
+00000002=Сменить файл...|Изменить файл выбранного изображения
+
 [$CONSTANTS]
 dfpArchive=Архивный
 dfpCompressed=Сжатый
@@ -910,6 +914,7 @@ SDlgTitle_SaveIni=Сохранить файл настроек
 SDlgTitle_SavePhoa=Сохранить файл фотоальбома как
 SDlgTitle_SaveSearchExprAs=Сохранить поисковое выражение как
 SDlgTitle_SelectFolder=Выберите папку
+SDlgTitle_SelectPicFile=Выберите файл изображения
 SDlgTitle_Warning=PhoA: Внимание
 SErrCannotCreateFolder=Ошибка при создании папки «%s»
 SErrCannotDecodePicture=Ошибка при декодировании файла изображения «%s»:\n%s
@@ -925,6 +930,7 @@ SErrInvalidPicFileName=Неверное имя файла изображения: «%s»
 SErrNotAllPicsLinked=%d из %d выбранных изображений не будут находиться ни в одной группе, что недопустимо. Необходимо, чтобы каждое изображение было связано как минимум с одной группой.
 SErrNoTargetPathDetermined=Не удалось определить путь назначения для файла «%s»
 SError=Ошибка
+SErrPicFileAlreadyInUse=Файл "%s" уже используется другим изображением (ID=%d) текущего фотоальбома
 SErrSrcAndDestFoldersAreSame=Исходная папка и папка назначения совпадают («%s») для файла «%s»
 SErrTargetFileExists=Файл назначения «%s» уже существует
 SErrUnknownPicFileExtension=Неизвестное расширение у файла изображения «%s»

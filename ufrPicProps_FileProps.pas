@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.12 2004-12-10 04:46:00 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.13 2004-12-10 13:45:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phWizard, VirtualTrees, phPicPropsDlgPage, TB2Dock, TB2Toolbar, TBX,
-  ActnList, TB2Item;
+  ActnList, TB2Item, DKLang;
 
 type
   TfrPicProps_FileProps = class(TPicPropsDialogPage)
@@ -21,6 +21,7 @@ type
     bChangeFile: TTBXItem;
     tbMain: TTBXToolbar;
     tvMain: TVirtualStringTree;
+    dklcMain: TDKLanguageController;
     procedure aaChangeFile(Sender: TObject);
     procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
@@ -75,13 +76,25 @@ type
   end;
 
   procedure TfrPicProps_FileProps.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
-  var i: Integer;
+  var
+    i: Integer;
+    ChgList: IPhoaPicFileChangeList;
+    Pic: IPhotoAlbumPic;
+    sFileName: String;
   begin
      // Если страница посещалась/есть файлы
     if tvMain.RootNodeCount>0 then begin
        // Составляем список изменений файлов
+      ChgList := NewPhoaPicFileChangeList;
       for i := 0 to EditedPics.Count-1 do begin
-        //!!!
+        Pic       := EditedPics[i];
+        sFileName := Dialog.PictureFiles[i];
+        if Pic.FileName<>sFileName then ChgList.Add(Pic, sFileName);
+      end;
+       // Если есть изменения - возвращаем параметры подоперации
+      if ChgList.Count>0 then begin
+        sOpParamName := 'EditFilesOpParams';
+        OpParams     := NewPhoaOperationParams(['FileChangeList', ChgList]);
       end;
     end;
   end;

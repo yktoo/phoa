@@ -63,4 +63,16 @@ inherited frPicProps_FileProps: TfrPicProps_FileProps
       OnExecute = aaChangeFile
     end
   end
+  object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
+    Left = 36
+    Top = 32
+    LangData = {
+      1400667250696350726F70735F46696C6550726F707300010500000006007476
+      4D61696E0000060074624D61696E00000B00624368616E676546696C65000006
+      00616C4D61696E00000B00614368616E676546696C6501020000000100000007
+      0043617074696F6E02000000040048696E7400}
+  end
 end

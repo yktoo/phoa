@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.17 2004-12-06 20:22:45 dale Exp $
+//  $Id: phOps.pas,v 1.18 2004-12-10 13:45:12 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -88,6 +88,30 @@ type
     property Count: Integer read GetCount;
      // -- Элементы списка по индексу
     property Items[Index: Integer]: PPicPropertyChange read GetItems; default;
+  end;
+
+   //===================================================================================================================
+   // Список [требуемых] изменений файлов изображений
+   //===================================================================================================================
+
+  PPicFileChange = ^TPicFileChange;
+  TPicFileChange = record
+    Pic:       IPhotoAlbumPic; // Изображение
+    sFileName: String;         // Имя нового файла, сопоставляемого Pic
+  end;
+
+  IPhoaPicFileChangeList = interface(IInterface)
+    ['{9B327389-E6BC-4297-845C-563002068720}']
+     // Добавляет новую запись
+    function  Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+     // Prop handlers
+    function  GetCount: Integer;
+    function  GetItems(Index: Integer): PPicFileChange;
+     // Props
+     // -- Количество элементов в списке
+    property Count: Integer read GetCount;
+     // -- Элементы списка по индексу
+    property Items[Index: Integer]: PPicFileChange read GetItems; default;
   end;
 
    //===================================================================================================================
@@ -349,10 +373,13 @@ type
 
    //===================================================================================================================
    // Комплексная операция редактирования изображений, служит контейнером для операций:
+   //  - TPhoaOp_InternalEditPicFiles
    //  - TPhoaOp_InternalEditPicProps
    //  - TPhoaOp_InternalEditPicKeywords
    //  - TPhoaOp_InternalEditPicToGroupBelonging
    //   Params:
+   //     EditFilesOpParams:    IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
+   //                                                  [свойств] файлов
    //     EditViewOpParams:     IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
    //                                                  просмотра
    //     EditDataOpParams:     IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
@@ -366,6 +393,18 @@ type
   TPhoaOp_PicEdit = class(TPhoaOperation)
   protected
     procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+  end;
+
+   //===================================================================================================================
+   // Внутренняя операция изменения файлов изображений
+   //   Params:
+   //     FileChangeList: IPhoaPicFileChangeList - список требуемых изменений файлов
+   //===================================================================================================================
+
+  TPhoaOp_InternalEditPicFiles = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -662,6 +701,7 @@ resourcestring
    //   парами: [имя1, значение1, имя2, значение2, ...])
   function  NewPhoaOperationParams(const Params: Array of Variant): IPhoaOperationParams;
   function  NewPhoaPicPropertyChangeList: IPhoaPicPropertyChangeList;
+  function  NewPhoaPicFileChangeList: IPhoaPicFileChangeList;
   function  NewPhoaUndoDataStream: IPhoaUndoDataStream;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -915,8 +955,8 @@ type
   begin
     New(p);
     Result := FList.Add(p);
-    p^.vNewValue := vNewValue;
-    p^.Prop      := Prop;
+    p.vNewValue := vNewValue;
+    p.Prop      := Prop;
   end;
 
   constructor TPhoaPicPropertyChangeList.Create;
@@ -952,6 +992,64 @@ type
   end;
 
   function TPhoaPicPropertyChangeList.GetItems(Index: Integer): PPicPropertyChange;
+  begin
+    Result := FList[Index];
+  end;
+
+   //===================================================================================================================
+   // TPhoaPicFileChangeList
+   //===================================================================================================================
+type
+  TPhoaPicFileChangeList = class(TInterfacedObject, IPhoaPicFileChangeList)
+  private
+     // Собственно список
+    FList: TList;
+     // Удаляет элемент из списка
+    procedure Delete(Index: Integer);
+     // IPhoaPicFileChangeList
+    function  Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+    function  GetCount: Integer;
+    function  GetItems(Index: Integer): PPicFileChange;
+  public
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+  function TPhoaPicFileChangeList.Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+  var p: PPicFileChange;
+  begin
+    New(p);
+    Result := FList.Add(p);
+    p.Pic       := Pic;
+    p.sFileName := sFileName;
+  end;
+
+  constructor TPhoaPicFileChangeList.Create;
+  begin
+    inherited Create;
+    FList := TList.Create;
+  end;
+
+  procedure TPhoaPicFileChangeList.Delete(Index: Integer);
+  begin
+    Dispose(GetItems(Index));
+    FList.Delete(Index);
+  end;
+
+  destructor TPhoaPicFileChangeList.Destroy;
+  var i: Integer;
+  begin
+    for i := FList.Count-1 downto 0 do Delete(i);
+    FList.Free;
+    inherited Destroy;
+  end;
+
+  function TPhoaPicFileChangeList.GetCount: Integer;
+  begin
+    Result := FList.Count;
+  end;
+
+  function TPhoaPicFileChangeList.GetItems(Index: Integer): PPicFileChange;
   begin
     Result := FList[Index];
   end;
@@ -1434,10 +1532,52 @@ type
   begin
     inherited Perform(Params, UndoStream, Changes);
      // Выполняем требуемые дочерние операции
+    PerformIfSpecified('EditFilesOpParams',    TPhoaOp_InternalEditPicFiles);
     PerformIfSpecified('EditViewOpParams',     TPhoaOp_InternalEditPicProps);
     PerformIfSpecified('EditDataOpParams',     TPhoaOp_InternalEditPicProps);
     PerformIfSpecified('EditKeywordsOpParams', TPhoaOp_InternalEditPicKeywords);
     PerformIfSpecified('EditGroupOpParams',    TPhoaOp_InternalEditPicToGroupBelonging);
+  end;
+
+   //===================================================================================================================
+   // TPhoaOp_InternalEditPicFiles
+   //===================================================================================================================
+
+  procedure TPhoaOp_InternalEditPicFiles.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
+  var
+    FileChangeList: IPhoaPicFileChangeList;
+    Pic: IPhotoAlbumPic;
+    i: Integer;
+  begin
+    inherited Perform(Params, UndoStream, Changes);
+     // Получаем параметры
+    Params.ObtainValIntf('FileChangeList', IPhoaPicFileChangeList, FileChangeList);
+     // Пишем количество изменений
+    UndoStream.WriteInt(FileChangeList.Count);
+     // Цикл по списку требуемых изменений
+    for i := 0 to FileChangeList.Count-1 do begin
+      Pic := FileChangeList[i].Pic;
+       // Сохраняем ID и прежний файл изображения
+      UndoStream.WriteInt(Pic.ID);
+      UndoStream.WriteStr(Pic.FileName);
+       // Применяем новый файл
+      Pic.FileName := FileChangeList[i].sFileName;
+       // Добавляем флаги изменений
+      Include(Changes, pocPicProps);
+    end;
+  end;
+
+  procedure TPhoaOp_InternalEditPicFiles.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
+  var i, iPicID: Integer;
+  begin
+     // Возвращаем имена файлов изменённым изображениям обратно
+    for i := 0 to UndoStream.ReadInt-1 do begin
+      iPicID   := UndoStream.ReadInt;
+      Project.PicsX.ItemsByIDX[iPicID].FileName := UndoStream.ReadStr;
+       // Добавляем флаги изменений
+      Include(Changes, pocPicProps);
+    end;
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
@@ -2701,6 +2841,11 @@ type
     Result := TPhoaPicPropertyChangeList.Create;
   end;
 
+  function NewPhoaPicFileChangeList: IPhoaPicFileChangeList;
+  begin
+    Result := TPhoaPicFileChangeList.Create;
+  end;
+
   function  NewPhoaUndoDataStream: IPhoaUndoDataStream;
   begin
     Result := TPhoaUndoDataStream.Create;
@@ -2714,6 +2859,7 @@ initialization
     RegisterOpClass('GroupEdit',                       TPhoaOp_GroupEdit);
     RegisterOpClass('GroupNew',                        TPhoaOp_GroupNew);
     RegisterOpClass('GroupRename',                     TPhoaOp_GroupRename);
+    RegisterOpClass('InternalEditPicFiles',            TPhoaOp_InternalEditPicFiles);
     RegisterOpClass('InternalEditPicKeywords',         TPhoaOp_InternalEditPicKeywords);
     RegisterOpClass('InternalEditPicProps',            TPhoaOp_InternalEditPicProps);
     RegisterOpClass('InternalEditPicToGroupBelonging', TPhoaOp_InternalEditPicToGroupBelonging);

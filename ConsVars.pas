@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.85 2004-12-07 14:09:31 dale Exp $
+//  $Id: ConsVars.pas,v 1.86 2004-12-10 13:45:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -315,8 +315,8 @@ type
 const
    // Версия программы
   SAppProductSID                  = 'phoa';
-  SAppVersion                     = 'v1.1.7 beta';
-  SAppVersionSID                  = '117beta';
+  SAppVersion                     = 'v1.1.8 beta';
+  SAppVersionSID                  = '118beta';
 
   SProject_Generator              = 'PhoA '+SAppVersion;
   SProject_Remark                 = 'Created by PhoA '+SAppVersion+', '+SWeb_MainSite;
