@@ -61,7 +61,7 @@ uses ConsVars, phUtils, Main;
   procedure TdGroupProps.InitializeDialog;
   begin
     inherited InitializeDialog;
-    HelpContext := {!!!}IDH_intf_browse_mode;
+    HelpContext := IDH_intf_group_props;
     eID.Text                := IntToStr(FGroup.ID);
     eText.Text              := FGroup.Text;
     mDescription.Lines.Text := FGroup.Description;

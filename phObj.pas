@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.18 2004-06-06 13:29:46 dale Exp $
+//  $Id: phObj.pas,v 1.19 2004-06-06 18:10:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2349,9 +2349,10 @@ type
         while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
           case Code of
              // Group properties
-            IPhChunk_Group_ID:       FID       := vValue;
-            IPhChunk_Group_Text:     FText     := vValue;
-            IPhChunk_Group_Expanded: FExpanded := vValue<>Byte(0);
+            IPhChunk_Group_ID:          FID          := vValue;
+            IPhChunk_Group_Text:        FText        := vValue;
+            IPhChunk_Group_Expanded:    FExpanded    := vValue<>Byte(0);
+            IPhChunk_Group_Description: FDescription := vValue;
              // Picture IDs
             IPhChunk_GroupPics_Open:
               while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
@@ -2391,9 +2392,10 @@ type
          // Write open-chunk
         WriteChunk(IPhChunk_Group_Open);
          // Write group props
-        WriteChunkInt   (IPhChunk_Group_ID,       FID);
-        WriteChunkString(IPhChunk_Group_Text,     FText);
-        WriteChunkByte  (IPhChunk_Group_Expanded, Byte(FExpanded));
+        WriteChunkInt   (IPhChunk_Group_ID,          FID);
+        WriteChunkString(IPhChunk_Group_Text,        FText);
+        WriteChunkByte  (IPhChunk_Group_Expanded,    Byte(FExpanded));
+        WriteChunkString(IPhChunk_Group_Description, FDescription);
          // Write picture IDs
         WriteChunk(IPhChunk_GroupPics_Open);
         for i := 0 to FPicIDs.Count-1 do WriteChunkInt(IPhChunk_GroupPic_ID, FPicIDs[i]);
