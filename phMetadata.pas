@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.4 2004-06-09 12:59:48 dale Exp $
+//  $Id: phMetadata.pas,v 1.5 2004-06-12 08:56:02 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -18,18 +18,20 @@
 //
 // Based on info from http://www.ba.wakwak.com/~tsuruzoh/
 //
-// History:
-//   Sep 08, 2003
-//     The first open source release of the unit
+// Change log:
+//   Sep 08, 2003 - dale - The first open source release of the unit
+//   Sep 17, 2003 - dale - Added some tags. Many tags became documented thanks to JEIDA specifications
+//                         Added support for non-regular tags: Unicode, raw binary, Version etc.
+//                         The code officially became covered with GPL 2 License, either supplied along with this unit,
+//                         or available at http://www.gnu.org/copyleft/gpl.html
+//                         PLEASE NOTE:
+//                           The GPL 2 License does not permit incorporating this code into proprietary programs. If you
+//                           find the unit useful and wish to compile it within a non-opensource code, please contact me
+//                           at devtools@narod.ru
 //
-//   Sep 17, 2003
-//     Added some tags. Many tags became documented thanks to JEIDA specifications
-//     Added support for non-regular tags: Unicode, raw binary, Version etc.
-//     The code officially became covered with GPL 2 License, either supplied along with this unit, or available at
-//       http://www.gnu.org/copyleft/gpl.html
-//     PLEASE NOTE:
-//       The GPL 2 License does not permit incorporating this code into proprietary programs. If you find the unit
-//       useful and wish to compile it within a non-opensource code, please contact me at devtools@narod.ru
+//   Jun 09, 2004 - dale - Removed dependency from the phUtils unit
+//   Jun 11, 2004 - dale - Fixed a stupid error when an IFD with zero component count supplied. Fixed rational value
+//                         representation (was presented as a reciprocal before)
 //
 // Disclaimer:
 //   The software included comes with ABSOLUTELY NO WARRANTY. You may use it only at your own risk.
@@ -1032,11 +1034,11 @@ implementation
         iedAscii:           if i64Value and $ff<>0 then Result := Char(i64Value); // Skip terminating char (#0)
         iedUShort:          Result := IntToStr(Word(i64Value));
         iedULong:           Result := IntToStr(Cardinal(i64Value));
-        iedURational:       Result := Format('%d/%d', [Cardinal(i64Value shr 32), Cardinal(i64Value)]);
+        iedURational:       Result := Format('%d/%d', [Cardinal(i64Value), Cardinal(i64Value shr 32)]);
         iedSByte:           Result := IntToStr(ShortInt(i64Value));
         iedSShort:          Result := IntToStr(SmallInt(i64Value));
         iedSLong:           Result := IntToStr(Integer(i64Value));
-        iedSRational:       Result := Format('%d/%d', [Integer(i64Value shr 32), Integer(i64Value)]);
+        iedSRational:       Result := Format('%d/%d', [Integer(i64Value), Integer(i64Value shr 32)]);
         iedSingleFloat:     Result := FloatToStr(sValue);
         iedDoubleFloat:     Result := FloatToStr(dValue);
       end;
@@ -1108,6 +1110,7 @@ implementation
     if iDataLen-iOffset<2 then Exit;
     Move(sData[iOffset+1], wEntCount, 2);
     if bMotorola then wEntCount := IMTranslateWord(wEntCount);
+    if wEntCount=0 then Exit;
      // Check data size. If offset points outside the data, just skip this IFD
     if iDataLen-iOffset<2+wEntCount*12+4 then Exit;
      // Iterate thru IFD's entries
