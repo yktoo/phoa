@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: udStats.pas,v 1.4 2004-04-28 04:33:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -85,15 +85,16 @@ uses phUtils, Main, phPhoa, phSettings;
       iCntPicsInGroup: Integer;   // Количество изображений в группе
       iCntPics: Integer;          // Общее количество изображений (в группе и вложенных подгруппах)
       iCntDistinctPics: Integer;  // Количество различных изображений в группе и вложенных подгруппах
-      iTotalFileSize: Integer;    // Суммарный размер файлов изображений
-      iAverageFileSize: Integer;  // Средний размер файлов изображений
-      iTotalThumbSize: Integer;   // Суммарный размер эскизов
-      iAverageThumbSize: Integer; // Средний размер эскизов
-      iMaxFileSize: Integer;      // Размер самого большого файла
-      iMinFileSize: Integer;      // Размер самого маленького файла
+      i64TotalFileSize: Int64;    // Суммарный размер файлов изображений
+      i64AverageFileSize: Int64;  // Средний размер файлов изображений
+      i64TotalThumbSize: Int64;   // Суммарный размер эскизов
+      i64AverageThumbSize: Int64; // Средний размер эскизов
+      i64MaxFileSize: Int64;      // Размер самого большого файла
+      i64MinFileSize: Int64;      // Размер самого маленького файла
       sMaxFileName: String;       // Имя самого большого файла
       sMinFileName: String;       // Имя самого маленького файла
-      i, iFSize: Integer;
+      i: Integer;
+      i64FSize: Int64;
       IDs: TIntegerList;
       Pic: TPhoaPic;
 
@@ -114,10 +115,10 @@ uses phUtils, Main, phPhoa, phSettings;
       end;
 
     begin
-      iCntNestedGroups := 0;
-      iCntPics         := 0;
-      iTotalFileSize   := 0;
-      iTotalThumbSize  := 0;
+      iCntNestedGroups  := 0;
+      iCntPics          := 0;
+      i64TotalFileSize  := 0;
+      i64TotalThumbSize := 0;
       IDs := TIntegerList.Create(False);
       try
         iCntPicsInGroup  := Group.PicIDs.Count;
@@ -125,33 +126,33 @@ uses phUtils, Main, phPhoa, phSettings;
         ProcessGroup(Group);
         iCntDistinctPics := IDs.Count;
          // Считаем размеры файлов/эскизов
-        iMaxFileSize := 0;
-        iMinFileSize := MaxInt;
-        sMaxFileName := '';
-        sMinFileName := '';
+        i64MaxFileSize := 0;
+        i64MinFileSize := MaxInt;
+        sMaxFileName   := '';
+        sMinFileName   := '';
         for i := 0 to IDs.Count-1 do begin
           Pic := FPhoA.Pics.PicByID(IDs[i]);
-          iFSize := Pic.PicFileSize;
-          Inc(iTotalFileSize,  iFSize);
-          Inc(iTotalThumbSize, Length(Pic.ThumbnailData));
+          i64FSize := Pic.PicFileSize;
+          Inc(i64TotalFileSize,  i64FSize);
+          Inc(i64TotalThumbSize, Length(Pic.ThumbnailData));
            // -- Ищем самый большой файл
-          if iFSize>iMaxFileSize then begin
-            iMaxFileSize := iFSize;
-            sMaxFileName := Pic.PicFileName;
+          if i64FSize>i64MaxFileSize then begin
+            i64MaxFileSize := i64FSize;
+            sMaxFileName   := Pic.PicFileName;
           end;
            // -- Ищем самый маленький файл
-          if iFSize<iMinFileSize then begin
-            iMinFileSize := iFSize;
-            sMinFileName := Pic.PicFileName;
+          if i64FSize<i64MinFileSize then begin
+            i64MinFileSize := i64FSize;
+            sMinFileName   := Pic.PicFileName;
           end;
         end;
          // -- Находим средние значения
         if iCntDistinctPics=0 then begin
-          iAverageFileSize  := 0;
-          iAverageThumbSize := 0;
+          i64AverageFileSize  := 0;
+          i64AverageThumbSize := 0;
         end else begin
-          iAverageFileSize  := iTotalFileSize  div iCntDistinctPics;
-          iAverageThumbSize := iTotalThumbSize div iCntDistinctPics;
+          i64AverageFileSize  := i64TotalFileSize  div iCntDistinctPics;
+          i64AverageThumbSize := i64TotalThumbSize div iCntDistinctPics;
         end;
       finally
         IDs.Free;
@@ -161,17 +162,17 @@ uses phUtils, Main, phPhoa, phSettings;
         AddChild(nParent, NewStatData('@SStat_CntPicsInGroup',  iCntPicsInGroup));
         AddChild(nParent, NewStatData('@SStat_CntPics',         iCntPics));
         AddChild(nParent, NewStatData('@SStat_CntDistinctPics', iCntDistinctPics));
-        AddChild(nParent, NewStatData('@SStat_TotalFileSize',   HumanReadableSize(iTotalFileSize)));
-        AddChild(nParent, NewStatData('@SStat_AvgFileSize',     HumanReadableSize(iAverageFileSize)));
-        AddChild(nParent, NewStatData('@SStat_TotalThumbSize',  HumanReadableSize(iTotalThumbSize)));
-        AddChild(nParent, NewStatData('@SStat_AvgThumbSize',    HumanReadableSize(iAverageThumbSize)));
+        AddChild(nParent, NewStatData('@SStat_TotalFileSize',   HumanReadableSize(i64TotalFileSize)));
+        AddChild(nParent, NewStatData('@SStat_AvgFileSize',     HumanReadableSize(i64AverageFileSize)));
+        AddChild(nParent, NewStatData('@SStat_TotalThumbSize',  HumanReadableSize(i64TotalThumbSize)));
+        AddChild(nParent, NewStatData('@SStat_AvgThumbSize',    HumanReadableSize(i64AverageThumbSize)));
         if sMaxFileName<>'' then begin
           AddChild(nParent, NewStatData('@SStat_MaxFileName',   sMaxFileName));
-          AddChild(nParent, NewStatData('@SStat_MaxFileSize',   HumanReadableSize(iMaxFileSize)));
+          AddChild(nParent, NewStatData('@SStat_MaxFileSize',   HumanReadableSize(i64MaxFileSize)));
         end;
         if sMinFileName<>'' then begin
           AddChild(nParent, NewStatData('@SStat_MinFileName',   sMinFileName));
-          AddChild(nParent, NewStatData('@SStat_MinFileSize',   HumanReadableSize(iMinFileSize)));
+          AddChild(nParent, NewStatData('@SStat_MinFileSize',   HumanReadableSize(i64MinFileSize)));
         end;
       end;
     end;

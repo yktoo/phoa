@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.6 2004-04-23 19:26:30 dale Exp $
+//  $Id: phUtils.pas,v 1.7 2004-04-28 04:33:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -66,7 +66,8 @@ uses
   function  iif(b: Boolean; sTrue, sFalse: Single): Single; overload;
 
    // Преобразует размер файла в удобочитаемую форму
-  function  HumanReadableSize(iSize: Integer): String;
+  function  HumanReadableSize(iSize: Integer): String; overload;
+  function  HumanReadableSize(i64Size: Int64): String; overload;
 
    // Проверяет ввод текста, представляющего из себя дату (bTime=False) или время (bTime=True). В случае удачи результат
    //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
@@ -431,13 +432,23 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
     if b then Result := sTrue else Result := sFalse;
   end;
 
-  function HumanReadableSize(iSize: Integer): String;
+  function  HumanReadableSize(iSize: Integer): String;
   begin
     case iSize of
       0..1023:             Result := ConstVal('SSizeBytes',  [iSize]);
       1024..1048575:       Result := ConstVal('SSizeKBytes', [iSize/1024]);
       1048576..1073741823: Result := ConstVal('SSizeMBytes', [iSize/1048576]);
       else                 Result := ConstVal('SSizeGBytes', [iSize/1073741824]);
+    end;
+  end;
+
+  function HumanReadableSize(i64Size: Int64): String;
+  begin
+    case i64Size of
+      0..1023:             Result := ConstVal('SSizeBytes',  [i64Size]);
+      1024..1048575:       Result := ConstVal('SSizeKBytes', [i64Size/1024]);
+      1048576..1073741823: Result := ConstVal('SSizeMBytes', [i64Size/1048576]);
+      else                 Result := ConstVal('SSizeGBytes', [i64Size/1073741824]);
     end;
   end;
 
