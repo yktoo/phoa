@@ -1,65 +1,99 @@
-<!-- $Id: setup-browse-mode.html,v 1.6 2004-06-14 06:15:29 dale Exp $ -->
+<!-- $Id: setup-browse-mode.html,v 1.7 2004-11-08 10:16:39 dale Exp $ -->
 {[%hh_hdr_en:Program settings :: Browse mode]}
 
-{[%hh_h2:Picture group trees]}
-
-  <h3>Tooltips</h3>
-  <p align=justify>Configures usage and appearance of tooltips in the trees displaying picture groups:
-  <ul>
-    <li><b>None</b> - tooltips disabled.</li>
-    <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that you are able to view it whole.</li>
-    <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below). Additionally, the photo album
-        description is displayed for the photo album node when you hover it.</li>
-  </ul>
-  
-  <h3>Display in tooltips</h3>
-  <p align=justify>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected properties</b> mode.
-
-{[%hh_h2:Thumbnail view window]}
-
-  <h3>Background color</h3>
-  <p align=justify>Determines the thumbnail pane background color.
-
-  <h3>Thumbnail background color</h3>
-  <p align=justify>Determines the background color for single thumbnails.
-
-  <h3>Thumbnail font color</h3>
-  <p align=justify>Determines the font color for thumbnail labels.
-
-  <h3>Drag'n'Drop</h3>
-  <p align=justify>Enables or disables drag'n'drop operations with the thumbnails.
-
-  <h3>Show thumbnail tooltips</h3>
-  <p align=justify>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
-    These tooltips display picture properties (see below). Being generally useful, this function may irritate someone persons.
-
-  <h3>Display in tooltips</h3>
-  <p align=justify>The list of <a href="pic-data.html">properties</a> from which you can choose those to display in thumbnail tooltips.
-
-  <h3>Picture details displayed on the thumbnails</h3>
-  <p align=justify>By using these options you can select whether to display, and which <a href="pic-data.html">picture properties</a> in each
-    thumbnail corner.
-
-  <h3>Thick thumbnail border</h3>
-  <p align=justify>When enabled, thumbnail boundaries are being drawn more plain.
-
-  <h3>Cache thumbnails while viewing</h3>
-  <p align=justify>Since thumbnails are stored in the <a href="file-formats.html">JPEG format</a>, they must be decoded to be drawn, and it may take
-    sensible time to repaint them each time they need to (particularly when displaying many thumbnails at one time while PC is not so powerful).
-    To amend this caching function enables storing decode thumbnails in the special cache (after they had been painted once). Although it takes a bit
-    more memory.
-
-  <h3>Thumbnail cache size</h3>
-  <p align=justify>Maximum number of thumbnails in the cache.
-
-  <h3>Resampling filter</h3>
-  <p align=justify>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> source images when creating thumbnails.
-  
-<h3>Max. undo count</h3>
-<p align=justify>Determines size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done to the photo album.
-  You can undo no more than specified number of sequential changes (when undo buffer gets full, the least recent changes' data are erased).
-  Large buffer requested may result in large need of room (memory) to store it (the most memory-consuming operations are picture deleting and
-  editing).
+<table class=plain border=0>
+<tr class=tblhdr><td colspan=2><b>Picture group trees</b></td></tr>
+<tr>
+  <td><b>Tooltips</b></td>
+  <td>Configures usage and appearance of tooltips in the trees displaying picture groups:
+    <ul>
+      <li><b>None</b> - tooltips disabled.</li>
+      <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that
+          you are able to view it whole.</li>
+      <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below).
+          Additionally, the photo album description is displayed for the photo album node when you hover it.</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><b>Display in tooltips</b></td>
+  <td>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected
+      properties</b> mode.</td>
+</tr>
+<tr class=tblhdr><td colspan=2><b>Thumbnail view window</b></td></tr>
+<tr>
+  <td><b>Background color</b></td>
+  <td>Determines the thumbnail pane background color.</td>
+</tr>
+<tr>
+  <td><b>Thumbnail background color</b></td>
+  <td>Determines the background color for single thumbnails.</td>
+</tr>
+<tr>
+  <td><b>Thumbnail font color</b></td>
+  <td>Determines the font color for thumbnail labels.</td>
+</tr>
+<tr>
+  <td><b>Drag'n'Drop</b></td>
+  <td>Enables or disables drag'n'drop operations with the thumbnails.</td>
+</tr>
+<tr>
+  <td><b>Show thumbnail tooltips</b></td>
+  <td>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
+      The tooltips display picture properties as configured below.</td>
+</tr>
+<tr>
+  <td><b>Display in tooltips</b></td>
+  <td>The list of <a href="pic-data.html">properties</a> from which you can choose those to display in thumbnail
+      tooltips.</td>
+</tr>
+<tr>
+  <td><b>Picture details displayed on the thumbnails</b></td>
+  <td>By using these options you can select whether to display, and which <a href="pic-data.html">picture properties</a>
+      in each thumbnail corner.</td>
+</tr>
+<tr>
+  <td><b>Thumbnail background border style</b></td>
+  <td>Determines the style used to draw the frame of the thumbnail background rectangle.</td>
+</tr>
+<tr>
+  <td><b>Thumbnail background border custom color</b></td>
+  <td>When the option <b>Thumbnail background border style</b> is set to <i>Custom color</i>, the value of this setting
+      is used to draw the frame of the thumbnail background rectangle.</td>
+</tr>
+<tr>
+  <td><b>Show thumbnail shadow</b></td>
+  <td>If on, a shadow is painted behind the thumbnail image using the settings below.</td>
+</tr>
+<tr>
+  <td><b>Shadow blur radius</b></td>
+  <td>The radius of a blur used for painting the thumbnail shadow, in pixels.</td>
+</tr>
+<tr>
+  <td><b>Horizontal/vertical shadow offset</b></td>
+  <td>Offset of the thumbnail shadow relative to the thumbnail image, in pixels.</td>
+</tr>
+<tr>
+  <td><b>Shadow color</b></td>
+  <td>A color used to paint the thumbnail shadow. The default is black.</td>
+</tr>
+<tr>
+  <td><b>Shadow opacity</b></td>
+  <td>A value ranged 0 to 255 specifying the opacity of the thumbnail shadow.</td>
+</tr>
+<tr>
+  <td><b>Resampling filter</b></td>
+  <td>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> source images when
+      creating thumbnails.</td>
+</tr>
+<tr>
+  <td><b>Max. undo count</b></td>
+  <td>Determines the size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done
+      to the photo album. You can undo no more than specified number of sequential changes (when undo buffer gets full,
+      the least recent changes' data are unrolled). Large buffer requested may result in large need of room (memory) to
+      store it (the most memory-consuming operations are picture deleting and editing).</td>
+</tr>
+</table>
 
 {[%hh_seealso_en]}
   <a href="setup-general.html">Program settings :: General</a><br>

@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.9 2004-09-11 17:52:37 dale Exp $
+;   $Id: phoa.iss,v 1.10 2004-11-08 10:16:39 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,16 +9,16 @@
   AppName                = PhoA
   AppVersion             = 1.1.6 beta
   AppVerName             = PhoA v1.1.6 beta
-  AppCopyright           = Copyright ©2002-2004 Dmitry Kann
-  AppPublisher           = DaleTech
-  AppPublisherURL        = http://phoa.narod.ru/
-  AppSupportURL          = mailto:phoa@narod.ru
-  AppUpdatesURL          = http://phoa.narod.ru/
+  AppCopyright           = Copyright ©2002-2004 DK Software
+  AppPublisher           = DK Software
+  AppPublisherURL        = http://www.dk-soft.org/
+  AppSupportURL          = http://www.dk-soft.org/forum/
+  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=116beta
   AppMutex               = PHOA_RUNNING_MUTEX
   AllowNoIcons           = yes
   ChangesAssociations    = yes
   DisableStartupPrompt   = yes
-  DefaultDirName         = {pf}\DaleTech\PhoA
+  DefaultDirName         = {pf}\DK Software\PhoA
   DefaultGroupName       = PhoA (Photo Album)
   OutputDir              = .
   OutputBaseFilename     = phoa-setup-1.1.6beta
@@ -33,9 +33,9 @@
 [Languages]
   Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf
   Name: "ru"; MessagesFile: compiler:Languages\Russian.isl;   LicenseFile: eula-rus.rtf
-  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-deu.rtf
-  Name: "br"; MessagesFile: compiler:BrazilianPortuguese.isl; LicenseFile: eula-brp.rtf
-  Name: "ua"; MessagesFile: compiler:Ukrainian.isl;           LicenseFile: eula-ukr.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-eng.rtf
+  Name: "br"; MessagesFile: compiler:BrazilianPortuguese.isl; LicenseFile: eula-eng.rtf
+  Name: "ua"; MessagesFile: compiler:Ukrainian.isl;           LicenseFile: eula-eng.rtf
   
 [Tasks]
   Name: desktopicon;        Description: {cm:CreateDesktopIcon};             GroupDescription: {cm:AdditionalIcons};
@@ -55,6 +55,7 @@
 [Files]
 ;Application files
   Source: "..\phoa.exe";                DestDir: "{app}";              Components: main
+  Source: "..\Language\Russian.lng";    DestDir: "{app}\Language";     Components: main
   Source: "..\phoa-eng.chm";            DestDir: "{app}";              Components: help\en
   Source: "..\phoa-rus.chm";            DestDir: "{app}";              Components: help\ru
 ;Sample content
@@ -67,8 +68,7 @@
   Source: "..\phPhoa.pas";              DestDir: "{app}\API";          Components: api
 
 [INI]
-  Filename: "{app}\phoa.url"; Languages: en de br; Section: "InternetShortcut"; Key: "URL"; String: "http://phoa.narod.ru/en/"
-  Filename: "{app}\phoa.url"; Languages: ru ua;    Section: "InternetShortcut"; Key: "URL"; String: "http://phoa.narod.ru/"
+  Filename: "{app}\phoa.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.dk-soft.org/"
 
 [Icons]
   Name: "{group}\PhoA";                       Filename: "{app}\phoa.exe";     Components: main;   Comment: {cm:PhoaDesc}
@@ -82,11 +82,11 @@
   Name: "{group}\{cm:HelpEn}";                Filename: "{app}\phoa-eng.chm"; Components: help\en;
 
 [Registry]
-  Root: HKCR; Subkey: ".phoa";                                                                     ValueType: string; ValueData: "phoa.photoalbum";           Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum";                                                           ValueType: string; ValueData: {cm:PhoaFmtName};            Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum\shell\open\command";                                        ValueType: string; ValueData: """{app}\phoa.exe"" ""%1"""; Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum\DefaultIcon";                                               ValueType: string; ValueData: """{app}\phoa.exe"",1";      Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCU; Subkey: "Software\DaleTech\PhoA\Preferences"; ValueName: "@ISettingID_Gen_Language"; ValueType: string; ValueData: {cm:LangID};                 Flags: uninsdeletevalue uninsdeletekeyifempty
+  Root: HKCR; Subkey: ".phoa";                                                                        ValueType: string; ValueData: "phoa.photoalbum";           Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum";                                                              ValueType: string; ValueData: {cm:PhoaFmtName};            Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum\shell\open\command";                                           ValueType: string; ValueData: """{app}\phoa.exe"" ""%1"""; Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum\DefaultIcon";                                                  ValueType: string; ValueData: """{app}\phoa.exe"",1";      Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCU; Subkey: "Software\DK Software\PhoA\Preferences"; ValueName: "@ISettingID_Gen_Language"; ValueType: string; ValueData: {cm:LangID};                 Flags: uninsdeletevalue uninsdeletekeyifempty
 
 [Run]
   Filename: "{app}\phoa.exe"; Parameters: {code:PhoaStartupParams|}; Description: {cm:LaunchProgram,PhoA}; Flags: nowait postinstall skipifsilent
@@ -96,7 +96,7 @@
   Type: dirifempty; Name: "{app}"
 
 [Messages]
-BeveledLabel=http://phoa.narod.ru
+BeveledLabel=DK Software
 
 [CustomMessages]
 #include "SetupMessages.txt"

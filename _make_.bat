@@ -1,12 +1,12 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.12 2004-11-02 21:17:48 dale Exp $
+rem $Id: _make_.bat,v 1.13 2004-11-08 10:16:39 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 
-rem DaleTech Text Preprocessor defines
+rem DK Software Text Preprocessor defines
 set PREPROCESSOR="C:\Delphi\CVS projects\dale\txpproc\txpproc.exe"
 set PREPROCESSOR_CFG="C:\Delphi\CVS projects\dale\phoa\phoa-txpproc.ini"
 set PREPROCESSOR_OUT="C:\Delphi\CVS projects\dale\phoa\help\processed"

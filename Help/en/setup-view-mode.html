@@ -1,88 +1,115 @@
-<!-- $Id: setup-view-mode.html,v 1.5 2004-06-14 06:15:29 dale Exp $ -->
+<!-- $Id: setup-view-mode.html,v 1.6 2004-11-08 10:16:39 dale Exp $ -->
 {[%hh_hdr_en:Program settings :: View mode]}
 
-<h3>View window always on top</h3>
-<p align=justify>Does not allow the window to fall behind other windows when it's inactive. Affects only the window mode.
-
-<h3>Fullscreen mode</h3>
-<p align=justify>When entering view mode the program will set up the fullscreen mode when all other screen elements are hidden
-  (including the Taskbar). This can be overriden with the <b>F</b> key or by clicking middle mouse button.
-
-<h3>Keep mouse cursor over the toolbar button on window resize</h3>
-<p align=justify>If on, the mouse cursor stays at the same point of the viewer toolbar when the window resizes. This allows you to
-  click buttons (such as <b>Next picture</b> or <b>Zoom out</b>) multiple times without having to move the mouse.
-
-<h3>Hide mouse cursor in fullscreen</h3>
-<p align=justify>When entering fullscreen mode the program will turn off mouse pointer.
-
-<h3>Window background color</h3>
-<p align=justify>Determines color for filling the viewing window background. The default is black.
-
-<h3>Show toolbar</h3>
-<p align=justify>Enables or disables view mode toolbar.
-
-{[%hh_h2:Picture advancing]}
-
-  <h3>Fit window to image</h3>
-  <p align=justify>Resizes window so that it fits the picture (considering current scale). Affects only the window mode.
-
-  <h3>Center window on the desktop</h3>
-  <p align=justify>Places viewing window in the center of the desktop. Affects only the window mode.
-
-  <h3>Shrink image to fit</h3>
-  <p align=justify>If a picture is larger than the viewing window, it will be proportionally reduced (to fit the window).
-
-  <h3>Zoom image to fit</h3>
-  <p align=justify>If a picture is smaller than the viewing window, it will be proportionally enlarged (to fit the window).
-
-  <h3>Cyclic viewing</h3>
-  <p align=justify>If on, the viewing sequence wraps around.
-
-  <h3>Predecode next picture in advance</h3>
-  <p align=justify>This option enables background picture decoding thus allowing quick advancing to the next picture (next picture is being decoded
-    while viewing current one). This mode requires more memory for storing predecoded image data.
-
-  <h3>Cache behind viewed pictures</h3>
-  <p align=justify>If this option is enabled, last viewed picture is not removed from the memory thus allowing you to quckly revert to previous
-    picture. This mode requires more memory for storing cached image data.
-
-<h3>Scale by</h3>
-<p align=justify>Determines the one step of scaling change (with <b>+</b> and <b>-</b> keys on numeric keypad or with mouse wheel when <b>Ctrl</b>
-  depressed).
-
-<h3>Display in window caption</h3>
-<p align=justify>Allows you to choose which <a href="pic-data.html">picture properties</a> are to be displayed in the window caption bar.
-
-<h3>Picture resampling filter</h3>
-<p align=justify>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> (scaling) source images when viewing them.
-
-{[%hh_h2:View info]}
-
-  <h3>Show picture info</h3>
-  <p align=justify>Enables or disables displaying the information from the properties described below. Can be overriden in the view mode by pressing
-    the <b>F2</b> key.
-
-  <h3>Picture properties</h3>
-  <p align=justify>Specifies which <a href="pic-data.html">picture properties</a> will be shown in the view mode.
-
-  <h3>Font</h3>
-  <p align=justify>Determines which font will be used for drawing the picture info.
-
-  <h3>Background color</h3>
-  <p align=justify>Specifies the color of information bar background. See the next option.
-
-  <h3>Background opacity</h3>
-  <p align=justify>Value ranging from 0 (transparent) to 255 (opaque). Allows to adjust the translucence of information bar background.
-
-{[%hh_h2:Slide show]}
-
-  <h3>Display time</h3>
-  <p align=justify>Determines time intervals (in milliseconds) between picture changes in Slide Show mode (this mode is activated
-    by pressing the <b>Pause</b> key in the view mode, with the toolbar button or by context menu).
-
-  <h3>Cyclic</h3>
-  <p align=justify>When on, <b>PhoA</b> automatically rewinds to the first picture in the group after showing the last in Slide Show mode,
-    else Slide Show is deactivated once the last picture is reached.
+<table class=plain border=0><tr>
+  <td><b>View window always on top</b></td>
+  <td>Does not allow the window to fall behind other windows when it's inactive. Affects only the window mode.</td>
+</tr>
+<tr>
+  <td><b>Fullscreen mode</b></td>
+  <td>When entering view mode the program will set up the fullscreen mode when all other screen elements are hidden
+      (including the Taskbar). This can be overriden with the <b>F</b> key or by clicking middle mouse button.</td>
+</tr>
+<tr>
+  <td><b>Keep mouse cursor over the toolbar button on window resize</b></td>
+  <td>If on, the mouse cursor stays at the same point of the viewer toolbar when the window resizes. This allows you to
+      click buttons (such as <b>Next picture</b> or <b>Zoom out</b>) multiple times without having to move the
+      mouse.</td>
+</tr>
+<tr>
+  <td><b>Hide mouse cursor in fullscreen</b></td>
+  <td>When entering fullscreen mode the program will turn off mouse pointer.</td>
+</tr>
+<tr>
+  <td><b>Window background color</b></td>
+  <td>Determines color for filling the viewing window background. The default is black.</td>
+</tr>
+<tr>
+  <td><b>Show toolbar</b></td>
+  <td>Enables or disables view mode toolbar.</td>
+</tr>
+<tr class=tblhdr><td colspan=2><b>Picture advancing</b></td></tr>
+<tr>
+  <td><b>Fit window to image</b></td>
+  <td>Resizes window so that it fits the picture (considering current scale). Affects only the window mode.</td>
+</tr>
+<tr>
+  <td><b>Center window on the desktop</b></td>
+  <td>Places viewing window in the center of the desktop. Affects only the window mode.</td>
+</tr>
+<tr>
+  <td><b>Shrink image to fit</b></td>
+  <td>If a picture is larger than the viewing window, it will be proportionally reduced (to fit the window).</td>
+</tr>
+<tr>
+  <td><b>Zoom image to fit</b></td>
+  <td>If a picture is smaller than the viewing window, it will be proportionally enlarged (to fit the window).</td>
+</tr>
+<tr>
+  <td><b>Cyclic viewing</b></td>
+  <td>If on, the viewing sequence wraps around.</td>
+</tr>
+<tr>
+  <td><b>Predecode next picture in advance</b></td>
+  <td>This option enables background picture decoding thus allowing quick advancing to the next picture (next picture is
+      being decoded while viewing current one). This mode requires more memory for storing predecoded image data.</td>
+</tr>
+<tr>
+  <td><b>Cache behind viewed pictures</b></td>
+  <td>If this option is enabled, last viewed picture is not removed from the memory thus allowing you to quckly revert
+      to previous picture. This mode requires more memory for storing cached image data.</td>
+</tr>
+<tr>
+  <td><b>Scale by</b></td>
+  <td>Determines the one step of scaling change (with <b>+</b> and <b>-</b> keys on numeric keypad or with mouse wheel
+      when <b>Ctrl</b> depressed).</td>
+</tr>
+<tr>
+  <td><b>Display in window caption</b></td>
+  <td>Allows you to choose which <a href="pic-data.html">picture properties</a> are to be displayed in the window
+      caption bar.</td>
+</tr>
+<tr>
+  <td><b>Picture resampling filter</b></td>
+  <td>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> (scaling) source images
+      when viewing them.</td>
+</tr>
+<tr class=tblhdr><td colspan=2><b>View info</b></td></tr>
+<tr>
+  <td><b>Show picture info</b></td>
+  <td>Enables or disables displaying the information from the properties described below. Can be overriden in the view
+      mode by pressing the <b>F2</b> key.</td>
+</tr>
+<tr>
+  <td><b>Picture properties</b></td>
+  <td>Specifies which <a href="pic-data.html">picture properties</a> will be shown in the view mode.</td>
+</tr>
+<tr>
+  <td><b>Font</b></td>
+  <td>Determines which font will be used for drawing the picture info.</td>
+</tr>
+<tr>
+  <td><b>Background color</b></td>
+  <td>Specifies the color of information bar background. See the next option.</td>
+</tr>
+<tr>
+  <td><b>Background opacity</b></td>
+  <td>Value ranging from 0 (transparent) to 255 (opaque). Allows to adjust the translucence of information bar
+      background.</td>
+</tr>
+<tr class=tblhdr><td colspan=2><b>Slide show</b></td>
+</tr>
+<tr>
+  <td><b>Display time</b></td>
+  <td>Determines time intervals (in milliseconds) between picture changes in Slide Show mode (this mode is activated
+      by pressing the <b>Pause</b> key in the view mode, with the toolbar button or by context menu).</td>
+</tr>
+<tr>
+  <td><b>Cyclic</b></td>
+  <td>When on, <b>PhoA</b> automatically rewinds to the first picture in the group after showing the last in Slide Show
+      mode, else Slide Show is deactivated once the last picture is reached.</td>
+</tr>
+</table>
 
 {[%hh_seealso_en]}
   <a href="setup-general.html">Program settings :: General</a><br>

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.72 2004-11-07 17:31:16 dale Exp $
+//  $Id: ConsVars.pas,v 1.73 2004-11-08 10:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -370,7 +370,7 @@ const
   IKeyQuickScrollStep             = 200; // [Ctrl]+[Arrow Keys]
 
    // Ключи реестра для сохранения настроек
-  SRegRoot                        = 'Software\DaleTech\PhoA';
+  SRegRoot                        = 'Software\DK Software\PhoA';
 
   SRegMainWindow_Root             = 'MainWindow';
     SRegMainWindow_Toolbars       = SRegMainWindow_Root+'\Toolbars';
