@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.11 2004-10-13 11:03:33 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.12 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,8 +25,8 @@ type
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
-     // Проект
-    FProject: IPhotoAlbumProject;
+     // Приложение
+    FApp: IPhotoAlbumApp;
      // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
@@ -35,17 +35,17 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+  function MakeGroupFromView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, phSettings;
 
-  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+  function MakeGroupFromView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdSelPhoaGroup.Create(Application) do
       try
-        FProject        := AProject;
+        FApp            := AApp;
         FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
@@ -54,9 +54,19 @@ uses phUtils, ConsVars, Main, phSettings;
   end;
 
   procedure TdSelPhoaGroup.ButtonClick_OK;
+  var Changes: TPhoaOperationChanges;
   begin
-     // Создаём операцию
-    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FProject, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^);
+    Changes := [];
+    fMain.BeginOperation;
+    try
+      TPhoaOp_ViewMakeGroup.Create(
+        FUndoOperations,
+        FApp.Project,
+        PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
+        Changes);
+    finally
+      fMain.EndOperation(Changes);
+    end;
     inherited ButtonClick_OK;
   end;
 
@@ -109,7 +119,7 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p^ := FProject.RootGroupX 
+      p^ := FApp.Project.RootGroupX 
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p^ := pp^.GroupsX[Node.Index];

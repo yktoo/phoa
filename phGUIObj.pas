@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.24 2004-10-14 12:21:02 dale Exp $
+//  $Id: phGUIObj.pas,v 1.25 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -236,6 +236,7 @@ type
     procedure SetThumbShadowVisible(Value: Boolean);
     procedure SetThumbTooltipProps(Value: TPicProperties);
     procedure SetTopOffset(Value: Integer);
+    function GetUpdateLocked: Boolean;
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -326,6 +327,8 @@ type
     property ThumbnailSize: TSize read FThumbnailSize write SetThumbnailSize;
      // -- Смещение верхнего края окна относительно начала списка эскизов, в пикселах
     property TopOffset: Integer read FTopOffset write SetTopOffset;
+     // -- True, если FUpdateLock>0
+    property UpdateLocked: Boolean read GetUpdateLocked;
   published
     property Align;
     property Anchors;
@@ -766,6 +769,11 @@ type
     Result := FThumbCornerDetails[Corner];
   end;
 
+  function TThumbnailViewer.GetUpdateLocked: Boolean;
+  begin
+    Result := FUpdateLock>0;
+  end;
+
   function TThumbnailViewer.GetValidTopOffset(iOffset: Integer): Integer;
   begin
     Result := Max(0, Min(iOffset, FVRange-ClientHeight));
@@ -1025,7 +1033,7 @@ type
      // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню
     else if FShellCtxMenuOnMouseUp then begin
       FShellCtxMenuOnMouseUp := False;
-      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName);
+      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName, Self);
       Exit;
      // Иначе завершаем Dragging
     end else begin
@@ -1096,11 +1104,10 @@ type
         sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
         if sProp<>'' then begin
           Result := Info.Bitmap.TextWidth(sProp)+2;
-HTMLDrawText(Info.Bitmap.Canvas, sProp, rText, []);
-//          Info.Bitmap.Textout(
-//            rText,
-//            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
-//            sProp);
+          Info.Bitmap.Textout(
+            rText,
+            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
+            sProp);
         end;
       end;
     end;

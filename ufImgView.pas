@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.37 2004-10-13 16:34:38 dale Exp $
+//  $Id: ufImgView.pas,v 1.38 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -236,10 +236,8 @@ type
     procedure tbMainVisibleChanged(Sender: TObject);
     procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
   private
-     // Список просматриваемых изображений
-    FPics: IPhotoAlbumPicList;
-     // Текущий проект
-    FProject: IPhotoAlbumProject;
+     // Приложение
+    FApp: IPhotoAlbumApp;
      // Количество изображений в FPics
     FPicCount: Integer;
      // Инициализационные флаги
@@ -425,30 +423,27 @@ type
 
    // Переход в режим просмотра изображений
    //   AInitFlags      - флаги инициализации режима просмотра
-   //   APics           - список изображений для просмотра
-   //   APhoA           - фотоальбом
+   //   AApp            - приложение
    //   iPicIdx         - индекс изображения в группе, с которого начинать просмотр. В него же возвращается индекс
    //                     последнего просмотренного изображения
    //   AUndoOperations - буфер отката
-   //   bPhGroups       - True, если отображается дерево папок фотоальбома (не представление)
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AApp: IPhotoAlbumApp; var iPicIdx: Integer; AUndoOperations: TPhoaOperations);
 
 implementation
 {$R *.dfm}
 uses
   Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AApp: IPhotoAlbumApp; var iPicIdx: Integer; AUndoOperations: TPhoaOperations);
   begin
     with TfImgView.Create(Application) do
       try
         FInitFlags      := AInitFlags;
-        FPics           := APics;
-        FPicCount       := FPics.Count;
-        FProject        := AProject;
+        FApp            := AApp;
+        FPicCount       := FApp.ViewedPics.Count;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
-        aEdit.Enabled   := bPhGroups;
+        aEdit.Enabled   := FApp.Project.ViewIndex<0;
         ApplySettings(True);
         ShowModal;
         if FReturnUpdatedPicIdx then iPicIdx := FPicIdx;
@@ -592,7 +587,7 @@ uses
      // Редактируем изображение
     Pics := NewPhotoAlbumPicList(False);
     Pics.Add(FPic, False);
-    bEdited := EditPics(Pics, FProject, FUndoOperations);
+    bEdited := EditPics(FApp, Pics, FUndoOperations);
      // Возвращаем topmost-положение окну
     TopmostRestore;
      // Скрываем курсор
@@ -748,16 +743,16 @@ uses
   end;
 
   procedure TfImgView.aaStoreTransform(Sender: TObject);
-//  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-//    Operation := nil;
-//    fMain.BeginOperation;
-//    try
-//      Operation := TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips);
-//    finally
-//      fMain.EndOperation(Operation);
-//    end;
-//    EnableActions;
+    Changes := [];
+    fMain.BeginOperation;
+    try
+      TPhoaOp_StoreTransform.Create(FUndoOperations, FApp.Project, FPic, FTransform.Rotation, FTransform.Flips, Changes);
+    finally
+      fMain.EndOperation(Changes);
+    end;
+    EnableActions;
   end;
 
   procedure TfImgView.aaZoomActual(Sender: TObject);
@@ -1027,7 +1022,7 @@ uses
         if FCyclicViewing then idxNextPic := 0 else idxNextPic := -1;
        // Ставим файл в очередь 
       if idxNextPic>=0 then begin
-        FDecodeThread.QueuedFileName := FPics[idxNextPic].FileName;
+        FDecodeThread.QueuedFileName := FApp.ViewedPics[idxNextPic].FileName;
         UpdateCursor;
       end;
     end;
@@ -1076,7 +1071,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FPics[FPicIdx];
+    FPic := FApp.ViewedPics[FPicIdx];
      // Определяем, есть ли изображение в кэше
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
@@ -1296,7 +1291,7 @@ uses
        // Возвращаем прежний курсор
       UpdateCursor;
     end else if FShellCtxMenuOnMouseUp then begin
-      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.FileName);
+      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.FileName, Self);
       FShellCtxMenuOnMouseUp := False;
     end;
   end;

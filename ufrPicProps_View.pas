@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.22 2004-10-13 14:29:09 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.23 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -126,7 +126,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
-    procedure Apply(FOperations: TPhoaOperations); override;
+    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
      // Props
      // -- Масштаб просматриваемого изображения
     property ViewZoomFactor: Single read GetViewZoomFactor write SetViewZoomFactor;
@@ -210,14 +210,14 @@ uses phUtils, Main, phSettings;
     StorageForm.ActiveControl := iMain;
   end;
 
-  procedure TfrPicProps_View.Apply(FOperations: TPhoaOperations);
+  procedure TfrPicProps_View.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     Pic: IPhotoAlbumPic;
     Rotation: TPicRotation;
     Flips: TPicFlips;
   begin
-    inherited Apply(FOperations);
+    inherited Apply(AOperations, Changes);
      // Если страница инициализирована, создаём операции применения преобразований
     if FInitialized and not (FNoRotation and FNoFlipHorz and FNoFlipVert) then
       for i := 0 to EditedPics.Count-1 do begin
@@ -226,7 +226,7 @@ uses phUtils, Main, phSettings;
         GetRequiredTransform(Pic, Rotation, Flips);
          // Если оно не совпадает - создаём операцию
         if (Rotation<>Pic.Rotation) or (Flips<>Pic.Flips) then
-          TPhoaOp_StoreTransform.Create(FOperations, Project, Pic, Rotation, Flips);
+          TPhoaOp_StoreTransform.Create(AOperations, App.Project, Pic, Rotation, Flips, Changes);
       end;
   end;
 

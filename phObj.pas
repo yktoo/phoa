@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.49 2004-10-14 12:21:02 dale Exp $
+//  $Id: phObj.pas,v 1.50 2004-10-15 13:49:35 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1745,8 +1745,12 @@ type
   begin
     if GetOwner<>Value then begin
       if FList<>nil then (IInterface(FList) as IPhoaMutablePicGroupList).Remove(FID);
-      FList := Pointer(Value.Groups);
-      if Value<>nil then (Value.Groups as IPhoaMutablePicGroupList).Add(Self);
+      if Value=nil then
+        FList := nil
+      else begin
+        FList := Pointer(Value.Groups);
+        (IInterface(FList) as IPhoaMutablePicGroupList).Add(Self);
+      end;
     end;
   end;
 

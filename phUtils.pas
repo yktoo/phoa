@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.34 2004-10-14 12:21:03 dale Exp $
+//  $Id: phUtils.pas,v 1.35 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phUtils;
 
 interface
 uses
-  SysUtils, Windows, Messages, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities,
+  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities,
   phIntf, ConsVars, phObj;
 
    // Exception raising
@@ -135,14 +135,14 @@ uses
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
 
    // Отображает системное контекстное меню для заданного файла. Возвращает True, если удалось
-  function  ShowFileShellContextMenu(const sFileName: String): Boolean;
+  function  ShowFileShellContextMenu(const sFileName: String; Owner: TWinControl): Boolean;
 
    // Показ/скрытие курсора HourGlass
   procedure StartWait;
   procedure StopWait;
 
 implementation
-uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
+uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang;
 
   procedure PhoaException(const sMsg: String);
 
@@ -725,7 +725,7 @@ type
     Result := aBuf;
   end;
 
-  function ShowFileShellContextMenu(const sFileName: String): Boolean;
+  function ShowFileShellContextMenu(const sFileName: String; Owner: TWinControl): Boolean;
   var NS: TNamespace;
   begin
     Result := False;
@@ -736,7 +736,7 @@ type
       except
         PhoaError('SErrFileNotFoundFmt', [sFileName]);
       end;
-      if NS<>nil then Result := NS.ShowContextMenu(fMain, nil, nil, nil);
+      if NS<>nil then Result := NS.ShowContextMenu(Owner, nil, nil, nil);
     finally
       NS.Free;
     end;

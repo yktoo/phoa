@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.12 2004-10-12 12:38:10 dale Exp $
+//  $Id: udPicOps.pas,v 1.13 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,10 +29,10 @@ type
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
-    FProject : IPhotoAlbumProject;
+     // Приложение
+    FApp: IPhotoAlbumApp;
+     // Буфер отката
     FUndoOperations: TPhoaOperations;
-    FSourceGroup: IPhotoAlbumPicGroup;
-    FPics: IPhoaPicList;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
@@ -40,22 +40,18 @@ type
   end;
 
    // Отображает диалог операций с изображениями.
-   //   ASourceGroup - текущая выбранная группа.
-   //   APics        - список выделенных изображений
-  function DoPicOps(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phSettings;
 
-  function DoPicOps(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPicOps.Create(Application) do
       try
-        FProject        := AProject;
+        FApp            := AApp;
         FUndoOperations := AUndoOperations;
-        FSourceGroup    := ASourceGroup;
-        FPics           := APics;
         Result := Execute;
       finally
         Free;
@@ -63,20 +59,21 @@ uses phUtils, Main, phSettings;
   end;
 
   procedure TdPicOps.ButtonClick_OK;
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     fMain.BeginOperation;
     try
-      Operation := TPhoaMultiOp_PicOperation.Create(
+      TPhoaOp_PicOperation.Create(
         FUndoOperations,
-        FProject,
-        FSourceGroup,
+        FApp.Project,
+        FApp.CurGroup,
         PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
-        FPics,
-        TPictureOperation(cbOp.ItemIndex))
+        FApp.SelectedPics,
+        TPictureOperation(cbOp.ItemIndex),
+        Changes)
     finally
-      fMain.EndOperation(Operation);
+      fMain.EndOperation(Changes);
     end;
     inherited ButtonClick_OK;
   end;
@@ -88,7 +85,7 @@ uses phUtils, Main, phSettings;
     Result :=
       (cbOp.ItemIndex>=0) and
       (n<>nil) and
-      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FSourceGroup);
+      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FApp.CurGroup);
   end;
 
   procedure TdPicOps.InitializeDialog;
@@ -133,7 +130,7 @@ uses phUtils, Main, phSettings;
   procedure TdPicOps.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
      // Операции группы с самой собой делать бессмысленно
-    if (Kind in [ikNormal, ikSelected]) and (PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^=FSourceGroup) then
+    if (Kind in [ikNormal, ikSelected]) and (PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^=FApp.CurGroup) then
       ImageIndex := iiNo
     else
       fMain.tvGroupsGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex);

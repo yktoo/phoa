@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
+//  $Id: udPicProps.pas,v 1.11 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -35,14 +35,13 @@ type
   private
      // Контроллер страниц
     FController: TWizardController;
-     // Список редактируемых изображений
-    FEditedPics: IPhotoAlbumPicList;
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
      // Список операций для отмены редактирования/добавления
     FUndoOperations: TPhoaOperations;
      // Prop storage
-    FProject: IPhotoAlbumProject;
+    FApp: IPhotoAlbumApp;
+    FEditedPics: IPhotoAlbumPicList;
      // IWizardHostForm
     function  WizHost_PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;
     procedure WizHost_PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
@@ -63,15 +62,16 @@ type
     procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
   public
-     // -- Ссылки на редактируемые изображения
+     // Props
+     // -- Приложение
+    property App: IPhotoAlbumApp read FApp;
+     // -- Редактируемые изображения
     property EditedPics: IPhotoAlbumPicList read FEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
-     // -- Фотоальбом
-    property Project: IPhotoAlbumProject read FProject;
   end;
 
-  function EditPics(APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(AApp: IPhotoAlbumApp; AEditedPics: IPhotoAlbumPicList; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -81,12 +81,12 @@ uses
   phPicPropsDlgPage, ufrPicProps_FileProps, ufrPicProps_Metadata, ufrPicProps_View, ufrPicProps_Data,
   ufrPicProps_Keywords, ufrPicProps_Groups;
 
-  function EditPics(APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(AApp: IPhotoAlbumApp; AEditedPics: IPhotoAlbumPicList; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPicProps.Create(Application) do
       try
-        FEditedPics     := APics;
-        FProject        := AProject;
+        FApp            := AApp;
+        FEditedPics     := AEditedPics;
         FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
@@ -101,9 +101,10 @@ uses
   procedure TdPicProps.ButtonClick_OK;
   var
     i: Integer;
-    Operation: TPhoaMultiOp_PicEdit;
+    Operation: TPhoaOp_PicEdit;
+    Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     fMain.BeginOperation;
     try
        // Проверяем последовательно все страницы
@@ -113,11 +114,11 @@ uses
           Exit;
         end;
        // Создаём операцию отката
-      Operation := TPhoaMultiOp_PicEdit.Create(FUndoOperations, FProject);
+      Operation := TPhoaOp_PicEdit.Create(FUndoOperations, FApp.Project, Changes);
        // Применяем последовательно все страницы
-      for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations);
+      for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations, Changes);
     finally
-      fMain.EndOperation(Operation);
+      fMain.EndOperation(Changes);
     end;
     inherited ButtonClick_OK;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.12 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.13 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -32,7 +32,7 @@ type
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
-    procedure Apply(FOperations: TPhoaOperations); override;
+    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
   end;
 
 implementation
@@ -53,7 +53,7 @@ type
     StorageForm.ActiveControl := tvMain;
   end;
 
-  procedure TfrPicProps_Groups.Apply(FOperations: TPhoaOperations);
+  procedure TfrPicProps_Groups.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
   var
     n: PVirtualNode;
     pgd: PGroupData;
@@ -87,9 +87,9 @@ type
           end;
            // Выполняем (создаём) операцию
           if n.CheckState=csCheckedNormal then
-            TPhoaOp_InternalPicToGroupAdding.Create(FOperations, Project, pgd.Group, Pics)
+            TPhoaOp_InternalPicToGroupAdding.Create(AOperations, App.Project, pgd.Group, Pics, Changes)
           else
-            TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, Project, pgd.Group, Pics);
+            TPhoaOp_InternalPicFromGroupRemoving.Create(AOperations, App.Project, pgd.Group, Pics, Changes);
         end;
          // Переходим к следующей группе
         n := tvMain.GetNext(n);
@@ -218,7 +218,7 @@ type
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p.Group := Project.RootGroupX
+      p.Group := App.Project.RootGroupX
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p.Group := pp.Group.GroupsX[Node.Index];

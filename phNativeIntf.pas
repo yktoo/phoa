@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.2 2004-10-13 11:03:33 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.3 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,9 +8,12 @@ unit phNativeIntf;
 
 interface
 
-uses Windows, phIntf, phMutableIntf, phPhoa;
+uses Windows, ImgList, phIntf, phMutableIntf, phPhoa;
 
 type
+   // Контрол, сфокусированный в приложении
+  TPhoaAppFocusedControl = (pafcNone, pafcGroupTree, pafcThumbViewer);
+
    //===================================================================================================================
    // IPhotoAlbumPic - изображение фотоальбома
    //===================================================================================================================
@@ -42,7 +45,7 @@ type
    // IPhotoAlbumPicList - сортированный по ID список изображений фотоальбома
    //===================================================================================================================
 
-  IPhotoAlbumProject = interface; 
+  IPhotoAlbumProject = interface;
 
   IPhotoAlbumPicList = interface(IPhoaMutablePicList)
     ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB632}']
@@ -259,7 +262,35 @@ type
     property ViewsX: IPhotoAlbumViewList read GetViewsX;
   end;
 
+   //===================================================================================================================
+   // IPhotoAlbumApp - интерфейс самого приложения
+   //===================================================================================================================
+
+  IPhotoAlbumApp = interface(IInterface)
+    ['{328D859C-8CDA-494B-B5E8-6AF9AB5E51FD}']
+     // Prop handlers
+    function  GetCurGroup: IPhotoAlbumPicGroup;
+    function  GetFocusedControl: TPhoaAppFocusedControl;
+    function  GetImageList: TCustomImageList;
+    function  GetProject: IPhotoAlbumProject;
+    function  GetSelectedPics: IPhotoAlbumPicList;
+    function  GetViewedPics: IPhotoAlbumPicList;
+    procedure SetCurGroup(Value: IPhotoAlbumPicGroup);
+     // Props
+     // -- Текущая выбранная группа
+    property CurGroup: IPhotoAlbumPicGroup read GetCurGroup write SetCurGroup;
+     // -- Текущий сфокусированный контрол
+    property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
+     // -- Стандартный ImageList приложения
+    property ImageList: TCustomImageList read GetImageList;
+     // -- Активный проект
+    property Project: IPhotoAlbumProject read GetProject;
+     // -- Текущие выбранные изображения (эскизы)
+    property SelectedPics: IPhotoAlbumPicList read GetSelectedPics;
+     // -- Текущие отображаемые изображения (эскизы)
+    property ViewedPics: IPhotoAlbumPicList read GetViewedPics;
+  end;
+
 implementation
 
 end.
- 

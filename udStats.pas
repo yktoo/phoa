@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.16 2004-10-12 12:38:10 dale Exp $
+//  $Id: udStats.pas,v 1.17 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -32,10 +32,8 @@ type
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
-     // Проект
-    FProject: IPhotoAlbumProject;
-     // Текущая группа
-    FGroup: IPhotoAlbumPicGroup;
+     // Приложение
+    FApp: IPhotoAlbumApp;
      // Создаёт в памяти новый объект данных статистики
     function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
     function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
@@ -43,18 +41,17 @@ type
     procedure InitializeDialog; override;
   end;
 
-  procedure ShowProjectStats(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup);
+  procedure ShowProjectStats(AApp: IPhotoAlbumApp);
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phPhoa, phSettings;
 
-  procedure ShowProjectStats(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup);
+  procedure ShowProjectStats(AApp: IPhotoAlbumApp);
   begin
     with TdStats.Create(Application) do
       try
-        FProject := AProject;
-        FGroup   := AGroup;
+        FApp := AApp;
         Execute;
       finally
         Free;
@@ -70,9 +67,9 @@ uses phUtils, Main, phPhoa, phSettings;
       ns: TNamespace;
       DFProp: TDiskFileProp;
     begin
-      if FProject.FileName<>'' then
+      if FApp.Project.FileName<>'' then
         try
-          ns := TNamespace.CreateFromFileName(FProject.FileName);
+          ns := TNamespace.CreateFromFileName(FApp.Project.FileName);
           for DFProp := Low(DFProp) to High(DFProp) do tvMain.AddChild(nParent, NewStatData(DiskFilePropName(DFProp), DiskFilePropValue(DFProp, ns)));
         except
           on EVSTInvalidFileName do {ignore};
@@ -132,7 +129,7 @@ uses phUtils, Main, phPhoa, phSettings;
         sMaxFileName   := '';
         sMinFileName   := '';
         for i := 0 to IDs.Count-1 do begin
-          Pic := FProject.Pics.ItemsByID[IDs[i]];
+          Pic := FApp.Project.Pics.ItemsByID[IDs[i]];
           i64FSize := Pic.FileSize;
           Inc(i64TotalFileSize,  i64FSize);
           Inc(i64TotalThumbSize, Length(Pic.ThumbnailData));
@@ -194,15 +191,15 @@ uses phUtils, Main, phPhoa, phSettings;
     try
        // -- Фотоальбом
       n0 := tvMain.AddChild(nil, NewStatData('@SStat_PhotoAlbum', '', iiPhoA));
-        n1 := tvMain.AddChild(n0, NewStatData('@SStat_PhoaFilename', FProject.FileName));
+        n1 := tvMain.AddChild(n0, NewStatData('@SStat_PhoaFilename', FApp.Project.FileName));
           AddPhoaFileProps(n1);
-          tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FProject.FileRevision))].sName));
-        tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FProject.Pics.Count));
-        AddGroupStats(FProject.RootGroupX, n0);
+          tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FApp.Project.FileRevision))].sName));
+        tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FApp.Project.Pics.Count));
+        AddGroupStats(FApp.Project.RootGroupX, n0);
        // -- Текущая группа
-      if (FGroup<>nil) and (FGroup.ID<>FProject.RootGroup.ID) then begin
+      if (FApp.CurGroup<>nil) and (FApp.CurGroup.ID<>FApp.Project.RootGroup.ID) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));
-        AddGroupStats(FGroup, n0);
+        AddGroupStats(FApp.CurGroup, n0);
       end;
        // Разворачиваем всё дерево
       tvMain.FullExpand;

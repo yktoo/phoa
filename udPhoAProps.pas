@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.7 2004-10-12 12:38:10 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.8 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -16,35 +16,37 @@ uses
 type
   TdPhoAProps = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
-    lDesc: TLabel;
-    lThumbSize: TLabel;
-    lThumbSizeX: TLabel;
-    lThumbQuality: TLabel;
-    lThQuality1: TLabel;
-    lThQuality2: TLabel;
-    mDesc: TMemo;
-    tbThumbQuality: TTrackBar;
     eThumbSizeX: TRxSpinEdit;
     eThumbSizeY: TRxSpinEdit;
+    lDesc: TLabel;
+    lThQuality1: TLabel;
+    lThQuality2: TLabel;
+    lThumbQuality: TLabel;
+    lThumbSize: TLabel;
+    lThumbSizeX: TLabel;
+    mDesc: TMemo;
+    tbThumbQuality: TTrackBar;
   private
-    FProject: IPhotoAlbumProject;
+     // Приложение
+    FApp: IPhotoAlbumApp;
+     // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
   end;
 
-  function EditPhoA(AProject: IPhotoAlbumProject; UndoOperations: TPhoaOperations): Boolean;
+  function EditPhoA(AApp: IPhotoAlbumApp; UndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.DFM}
 uses ConsVars, phUtils, Main;
 
-  function EditPhoA(AProject: IPhotoAlbumProject; UndoOperations: TPhoaOperations): Boolean;
+  function EditPhoA(AApp: IPhotoAlbumApp; UndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPhoAProps.Create(Application) do
       try
-        FProject        := AProject;
+        FApp            := AApp;
         FUndoOperations := UndoOperations;
         Result := Execute;
       finally
@@ -52,32 +54,40 @@ uses ConsVars, phUtils, Main;
       end;
   end;
 
+   //===================================================================================================================
+   // TdPhoAProps
+   //===================================================================================================================
+
   procedure TdPhoAProps.ButtonClick_OK;
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     fMain.BeginOperation;
     try
-      Operation := TPhoaOp_PhoAEdit.Create(
+      TPhoaOp_ProjectEdit.Create(
         FUndoOperations,
-        FProject,
+        FApp.Project,
         Size(eThumbSizeX.AsInteger, eThumbSizeY.AsInteger),
         tbThumbQuality.Position,
-        mDesc.Lines.Text);
+        mDesc.Lines.Text,
+        Changes);
     finally
-      fMain.EndOperation(Operation);
+      fMain.EndOperation(Changes);
     end;
     inherited ButtonClick_OK;
   end;
 
   procedure TdPhoAProps.InitializeDialog;
+  var Project: IPhotoAlbumProject;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_album_props;
-    eThumbSizeX.AsInteger   := FProject.ThumbnailSize.cx;
-    eThumbSizeY.AsInteger   := FProject.ThumbnailSize.cy;
-    tbThumbQuality.Position := FProject.ThumbnailQuality;
-    mDesc.Lines.Text        := FProject.Description;
+     // Настраиваем контролы
+    Project := FApp.Project;
+    eThumbSizeX.AsInteger   := Project.ThumbnailSize.cx;
+    eThumbSizeY.AsInteger   := Project.ThumbnailSize.cy;
+    tbThumbQuality.Position := Project.ThumbnailQuality;
+    mDesc.Lines.Text        := Project.Description;
   end;
 
 end.

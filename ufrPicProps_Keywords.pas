@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.11 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.12 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -71,7 +71,7 @@ type
     procedure InitializePage; override;
     procedure FinalizePage; override;
   public
-    procedure Apply(FOperations: TPhoaOperations); override;
+    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
   end;
 
 implementation
@@ -139,11 +139,11 @@ uses phUtils, Main, phSettings;
     StorageForm.ActiveControl := tvMain;
   end;
 
-  procedure TfrPicProps_Keywords.Apply(FOperations: TPhoaOperations);
+  procedure TfrPicProps_Keywords.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
   begin
-    inherited Apply(FOperations);
+    inherited Apply(AOperations, Changes);
      // Если страница инициализирована, создаём операцию изменения списка ключевых слов
-    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(FOperations, Project, EditedPics, FKeywords);
+    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(AOperations, App.Project, EditedPics, FKeywords, Changes);
   end;
 
   procedure TfrPicProps_Keywords.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -151,7 +151,7 @@ uses phUtils, Main, phSettings;
     inherited BeforeDisplay(ChangeMethod);
     if not FInitialized then begin
        // Составляем список ключевых слов
-      FKeywords.PopulateFromPicList(Project.Pics, IsPicSelectedCallback, EditedPics.Count);
+      FKeywords.PopulateFromPicList(App.Project.Pics, IsPicSelectedCallback, EditedPics.Count);
        // Настраиваем дерево
       tvMain.RootNodeCount := FKeywords.Count;
       FInitialized := True;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.14 2004-10-13 11:03:33 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.15 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -105,9 +105,9 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
   begin
     inherited BeforeDisplay(ChangeMethod);
     Wiz := TdFileOpsWizard(StorageForm);
-    rbSelPics.Enabled  := Wiz.ViewerSelPics.Count>0;
+    rbSelPics.Enabled  := Wiz.App.SelectedPics.Count>0;
      // Настраиваем название радиокнопки "Все изображения фотоальбома/представления"
-    View := Wiz.Project.CurrentViewX;
+    View := Wiz.App.Project.CurrentViewX;
     if View=nil then
       rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInPhoa')
     else
@@ -279,11 +279,11 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
        // Выбранные изображения
       if rbSelPics.Checked then begin
         FSelGroupCount := 1;
-        Pics := Wiz.ViewerSelPics;
+        Pics := Wiz.App.SelectedPics;
        // Все изображения фотоальбома
       end else if rbAllPics.Checked then begin
-        FSelGroupCount := Wiz.Project.RootGroup.NestedGroupCount+1;
-        Pics := Wiz.Project.Pics;
+        FSelGroupCount := Wiz.App.Project.RootGroup.NestedGroupCount+1;
+        Pics := Wiz.App.Project.Pics;
        // Изображения из выбранных групп. Создаём уникальный список изображений и добавляем в него изображения из
        //   отмеченных в дереве групп
       end else begin

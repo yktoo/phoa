@@ -17,8 +17,9 @@ type
     lDesc: TLabel;
     mDescription: TMemo;
   private
-    FProject: IPhotoAlbumProject;
-    FGroup: IPhotoAlbumPicGroup;
+     // Приложение
+    FApp: IPhotoAlbumApp;
+     // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
     procedure InitializeDialog; override;
@@ -26,18 +27,17 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-  function EditPicGroup(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses ConsVars, phUtils, Main;
 
-  function EditPicGroup(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdGroupProps.Create(Application) do
       try
-        FProject        := AProject;
-        FGroup          := AGroup;
+        FApp            := AApp;
         FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
@@ -50,14 +50,14 @@ uses ConsVars, phUtils, Main;
    //===================================================================================================================
 
   procedure TdGroupProps.ButtonClick_OK;
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     fMain.BeginOperation;
     try
-      Operation := TPhoaOp_GroupEdit.Create(FUndoOperations, FProject, FGroup, eText.Text, mDescription.Lines.Text);
+      TPhoaOp_GroupEdit.Create(FUndoOperations, FApp.Project, FApp.CurGroup, eText.Text, mDescription.Lines.Text, Changes);
     finally
-      fMain.EndOperation(Operation);
+      fMain.EndOperation(Changes);
     end;
     inherited ButtonClick_OK;
   end;
@@ -68,12 +68,14 @@ uses ConsVars, phUtils, Main;
   end;
 
   procedure TdGroupProps.InitializeDialog;
+  var Group: IPhotoAlbumPicGroup;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_group_props;
-    eID.Text                := IntToStr(FGroup.ID);
-    eText.Text              := FGroup.Text;
-    mDescription.Lines.Text := FGroup.Description;
+    Group := FApp.CurGroup;
+    eID.Text                := IntToStr(Group.ID);
+    eText.Text              := Group.Text;
+    mDescription.Lines.Text := Group.Description;
   end;
 
 end.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.10 2004-10-13 11:03:33 dale Exp $
+//  $Id: udViewProps.pas,v 1.11 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -43,10 +43,10 @@ type
     procedure ipmMoveUpClick(Sender: TObject);
     procedure ipmMoveDownClick(Sender: TObject);
   private
-     // Редактируемое представление
-    FView: IPhotoAlbumView;
-     // Проект
-    FProject: IPhotoAlbumProject;
+     // True, если режим добавления представления
+    FIsAdding: Boolean;
+     // Приложение
+    FApp: IPhotoAlbumApp;
      // Буфер отката
     FUndoOperations: TPhoaOperations;
      // Редактируемые группировки
@@ -69,20 +69,34 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-   // Редактирует/добавляет представление
-  function EditView(AView: IPhotoAlbumView; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+   // Редактирует представление
+  function EditView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
+   // Добавляет представление
+  function AddView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
 
-  function EditView(AView: IPhotoAlbumView; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
+  function EditView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdViewProps.Create(Application) do
       try
-        FView           := AView;
-        FProject        := AProject;
+        FApp            := AApp;
         FUndoOperations := AUndoOperations;
+        Result := Execute;
+      finally
+        Free;
+      end;
+  end;
+
+  function AddView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
+  begin
+    with TdViewProps.Create(Application) do
+      try
+        FApp            := AApp;
+        FUndoOperations := AUndoOperations;
+        FIsAdding       := True;
         Result := Execute;
       finally
         Free;
@@ -94,12 +108,19 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
    //===================================================================================================================
 
   procedure TdViewProps.ButtonClick_OK;
-  begin
+  var Changes: TPhoaOperationChanges;
+  begin        
      // Запоминаем данные отката/выполняем операцию
-    if FView=nil then
-      TPhoaOp_ViewNew.Create(FUndoOperations, FProject, eName.Text, FGroupings, frSorting.Sortings)
-    else
-      TPhoaOp_ViewEdit.Create(FUndoOperations, FProject, FView, eName.Text, FGroupings, frSorting.Sortings);
+    Changes := [];
+    fMain.BeginOperation;
+    try      
+      if FIsAdding then
+        TPhoaOp_ViewNew.Create(FUndoOperations, FApp.Project, eName.Text, FGroupings, frSorting.Sortings, Changes)
+      else
+        TPhoaOp_ViewEdit.Create(FUndoOperations, FApp.Project, FApp.Project.CurrentViewX, eName.Text, FGroupings, frSorting.Sortings, Changes);
+    finally
+      fMain.EndOperation(Changes);
+    end;
     inherited ButtonClick_OK;
   end;
 
@@ -160,6 +181,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   var
     tbi: TTBCustomItem;
     gbp: TPicGroupByProperty;
+    View: IPhotoAlbumView;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_view_props;
@@ -175,10 +197,11 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
       end;
       ipmsmProp.Add(tbi);
     end;
-    if FView<>nil then begin
-      eName.Text := FView.Name;
-      FGroupings.Assign(FView.Groupings);
-      frSorting.Sortings.Assign(FView.Sortings);
+    if not FIsAdding then begin
+      View := FApp.Project.CurrentViewX;
+      eName.Text := View.Name;
+      FGroupings.Assign(View.Groupings);
+      frSorting.Sortings.Assign(View.Sortings);
       frSorting.SyncSortings;
       frSorting.OnChange := frSortingChange;
     end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.16 2004-10-14 11:05:17 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.17 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -191,7 +191,7 @@ uses
     Wiz := TfAddFilesWizard(StorageForm);
      // Получаем объекты
     Files   := Wiz.FileList;
-    Project := Wiz.Project;
+    Project := Wiz.App.Project;
      // Стираем существующий список файлов
     Files.Clear;
      // Отображаем панель процесса

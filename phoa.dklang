@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.20 2004-10-14 12:21:02 dale Exp $
+;  $Id: phoa.dklang,v 1.21 2004-10-15 13:49:35 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -88,7 +88,7 @@ aSelectNone.Category=00000141,Edit
 aSelectNone.Hint=00000144,Select none|Select none of the pictures
 aView.Caption=00000146,&View
 aView.Category=00000145,Edit
-aView.Hint=00000148,View|Open picture in view mode
+aView.Hint=00000148,View|Start view mode from the current picture
 aSettings.Caption=00000150,Pro&gram settings...
 aSettings.Category=00000149,Tools
 aSettings.Hint=00000152,Program settings...|View/edit program settings
@@ -137,6 +137,9 @@ smHelpInternet.Caption=00000215,&Internet
 aHelpSupport.Caption=00000217,Product &support
 aHelpSupport.Category=00000216,Help
 aHelpSupport.Hint=00000218,Product support|Open the product support page in the browser
+aViewSlideShow.Caption=00000220,Vie&w slide show
+aViewSlideShow.Category=00000219,Edit
+aViewSlideShow.Hint=00000221,View slide show|Start view mode with slide show
 
 [dAbout]
 Caption=00000003,About
@@ -1012,21 +1015,21 @@ tbbsPlain=Plain
 tbbsRaised=Raised
 tbbsSunken=Sunken
 tbbsXP=XP
-TPhoaMultiOp_PicAdd=Add pictures
-TPhoaMultiOp_PicDelete=Delete pictures
-TPhoaMultiOp_PicDragAndDropToGroup=Drag pictures
-TPhoaMultiOp_PicEdit=Edit picture properties
-TPhoaMultiOp_PicOperation=Picture operations
-TPhoaMultiOp_PicPaste=Paste pictures from clipboard
-TPhoaMultiOp_PicSort=Sort pictures
 TPhoaOp_GroupDelete=Delete group
 TPhoaOp_GroupDragAndDrop=Drag group
 TPhoaOp_GroupEdit=Edit group properties
 TPhoaOp_GroupNew=New group
 TPhoaOp_GroupRename=Rename group
-TPhoaOp_PhoAEdit=Edit photo album properties
+TPhoaOp_PicAdd=Add pictures
+TPhoaOp_PicDelete=Delete pictures
 TPhoaOp_PicDragAndDropInsideGroup=Drag pictures
+TPhoaOp_PicDragAndDropToGroup=Drag pictures
+TPhoaOp_PicEdit=Edit picture properties
 TPhoaOp_PicEditGroupAdd=Add picture
+TPhoaOp_PicOperation=Picture operations
+TPhoaOp_PicPaste=Paste pictures from clipboard
+TPhoaOp_PicSort=Sort pictures
+TPhoaOp_ProjectEdit=Edit photo album properties
 TPhoaOp_StoreTransform=Store transformations
 TPhoaOp_ViewDelete=Delete view
 TPhoaOp_ViewEdit=Edit view

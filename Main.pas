@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.52 2004-10-13 14:29:09 dale Exp $
+//  $Id: Main.pas,v 1.53 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -19,7 +19,7 @@ uses
   TB2Dock, TB2Toolbar;
 
 type
-  TfMain = class(TForm)
+  TfMain = class(TForm, IPhotoAlbumApp)
     aAbout: TAction;
     aCopy: TAction;
     aCut: TAction;
@@ -58,7 +58,7 @@ type
     aStats: TAction;
     aUndo: TAction;
     aView: TAction;
-    bAbout: TTBXItem;
+    aViewSlideShow: TAction;
     bCopy: TTBXItem;
     bCut: TTBXItem;
     bDelete: TTBXItem;
@@ -195,6 +195,8 @@ type
     tbxlToolbarUndo: TTBXLabelItem;
     tvGroups: TVirtualStringTree;
     ulToolbarUndo: TTBXUndoList;
+    iEditSep5: TTBXSeparatorItem;
+    iViewSlideShow: TTBXItem;
     procedure aaAbout(Sender: TObject);
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
@@ -266,6 +268,7 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
+    procedure aaViewSlideShow(Sender: TObject);
   private
      // Активный проект
     FProject: IPhotoAlbumProject;
@@ -289,6 +292,8 @@ type
     FInitialized: Boolean;
      // Счётчик вызовов BeginOperation/EndOperation
     FOpLockCounter: Integer;
+     // Результирующий набор изменений, произведённых операциями между вызовами BeginOperation/EndOperation
+    FOpChanges: TPhoaOperationChanges;
      // Сохранённый на время выполнения операции ID последней выделенной группы
     FSavedGroupID: Integer;
      // Сохранённые на время выполнения операции параметры отображения Viewer
@@ -332,20 +337,10 @@ type
     procedure UpdateFlatModeAction;
      // Возвращает вид узла
     function  GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
-     // Viewer events
-    procedure ViewerSelectionChange(Sender: TObject);
-    procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
-     // Application events
-    procedure AppHint(Sender: TObject);
-    procedure AppException(Sender: TObject; E: Exception);
-    procedure AppIdle(Sender: TObject; var Done: Boolean);
+     // Отрабатывает флаги изменения операций путём обновления соответствующих частей приложения
+    procedure ProcessOpChanges(Changes: TPhoaOperationChanges);
      // Откатывает все операции с последней до Index и обновляет визуальные объекты согласно флагам операций
     procedure UndoOperations(Index: Integer);
-     // Откатывает индивидуальную операцию (for internal use only)
-    procedure UndoOperation(Op: TPhoaOperation);
-     // События списка операций
-    procedure OperationsStatusChange(Sender: TObject);
-    procedure OperationsListChange(Sender: TObject);
      // Событие клика на пункте инструмента
     procedure ToolItemClick(Sender: TObject);
      // Вводит в режим просмотра, начиная с текущего изображения. InitFlags задаёт опции инициализации
@@ -354,6 +349,25 @@ type
     procedure ResetMode;
      // Находит и возвращает узел в tvGroups по ID группы; nil, если нет такого
     function  FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
+     // Application events
+    procedure AppHint(Sender: TObject);
+    procedure AppException(Sender: TObject; E: Exception);
+    procedure AppIdle(Sender: TObject; var Done: Boolean);
+     // Viewer events
+    procedure ViewerSelectionChange(Sender: TObject);
+    procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
+     // IPhotoAlbumApp
+    function  IPhotoAlbumApp.GetCurGroup       = GetCurGroup;
+    function  IPhotoAlbumApp.GetFocusedControl = GetFocusedControl;
+    function  IPhotoAlbumApp.GetImageList      = IApp_GetImageList;
+    function  IPhotoAlbumApp.GetProject        = IApp_GetProject;
+    function  IPhotoAlbumApp.GetSelectedPics   = IApp_GetSelectedPics;
+    function  IPhotoAlbumApp.GetViewedPics     = IApp_GetViewedPics;
+    procedure IPhotoAlbumApp.SetCurGroup       = SetCurGroup;
+    function  IApp_GetImageList: TCustomImageList;
+    function  IApp_GetProject: IPhotoAlbumProject;
+    function  IApp_GetSelectedPics: IPhotoAlbumPicList;
+    function  IApp_GetViewedPics: IPhotoAlbumPicList;
      // Message handlers
     procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
     procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
@@ -363,6 +377,7 @@ type
      // Property handlers
     procedure SetFileName(const Value: String);
     function  GetFileName: String;
+    function  GetFocusedControl: TPhoaAppFocusedControl;
     function  GetDisplayFileName: String;
     function  GetCurGroup: IPhotoAlbumPicGroup;
     procedure SetCurGroup(Value: IPhotoAlbumPicGroup);
@@ -370,19 +385,22 @@ type
     function  IsShortCut(var Message: TWMKey): Boolean; override;
      // Должна вызываться перед началом выполнения любой операции
     procedure BeginOperation;
-     // Должна вызываться после выполнения операции. После последнего вызова обновляет отображаемые данные
-    procedure EndOperation(Operation: TPhoaOperation);
+     // Должна вызываться после выполнения операции. После последнего вызова обновляет отображаемые данные на основании
+     //   флагов Changes
+    procedure EndOperation(Changes: TPhoaOperationChanges);
      // Применяет параметры настройки
     procedure ApplySettings;
      // Обновляет Viewer
     procedure RefreshViewer;
      // Props
-     // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
-    property FileName: String read GetFileName write SetFileName;
      // -- Текущая выбранная группа в дереве
     property CurGroup: IPhotoAlbumPicGroup read GetCurGroup write SetCurGroup;
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
     property DisplayFileName: String read GetDisplayFileName;
+     // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
+    property FileName: String read GetFileName write SetFileName;
+     // -- Текущий сфокусированный контрол
+    property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
      // -- Просмотрщик эскизов
     property Viewer: TThumbnailViewer read FViewer;
   end;
@@ -442,58 +460,62 @@ uses
   end;
 
   procedure TfMain.aaCut(Sender: TObject);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
+    Changes := [];
     TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics, TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats))));
-    Operation := nil;
     BeginOperation;
     try
-      Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics);
+      TPhoaOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Changes);
     finally
-      EndOperation(Operation);
+      EndOperation(Changes);
     end;
   end;
 
   procedure TfMain.aaDelete(Sender: TObject);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
+    Changes := [];
     ResetMode;
-    Operation := nil;
     if CurGroup<>nil then
-       // Удаление группы
-      if ActiveControl=tvGroups then begin
-        if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then begin
-          BeginOperation;
-          try
-            Operation := TPhoaOp_GroupDelete.Create(FUndo, FProject, CurGroup, True);
-          finally
-            EndOperation(Operation);
+      case FocusedControl of
+         // Удаление группы
+        pafcGroupTree:
+          if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then begin
+            BeginOperation;
+            try
+              TPhoaOp_GroupDelete.Create(FUndo, FProject, CurGroup, Changes);
+            finally
+              EndOperation(Changes);
+            end;
           end;
-        end;
-       // Удаление изображения
-      end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
-        BeginOperation;
-        try
-          Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics);
-        finally
-          EndOperation(Operation);
-        end;
+         // Удаление изображения
+        pafcThumbViewer:
+          if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
+            BeginOperation;
+            try
+              TPhoaOp_PicDelete.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Changes);
+            finally
+              EndOperation(Changes);
+            end;
+          end;
       end;
   end;
 
   procedure TfMain.aaEdit(Sender: TObject);
   begin
     ResetMode;
-     // Редактирование групп
-    if ActiveControl=tvGroups then begin
-      case GetNodeKind(tvGroups, tvGroups.FocusedNode) of
-        gnkPhoA:      EditPhoA(FProject, FUndo);
-        gnkView:      EditView(FProject.CurrentViewX, FProject, FUndo);
-        gnkPhoaGroup: EditPicGroup(FProject, CurGroup, FUndo);
-      end;
-     // Редактирование изображения
-    end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) then
-      EditPics(Viewer.SelectedPics, FProject, FUndo);
+    case FocusedControl of
+       // Редактирование групп
+      pafcGroupTree:
+        case GetNodeKind(tvGroups, tvGroups.FocusedNode) of
+          gnkPhoA:      EditPhoA    (Self, FUndo);
+          gnkView:      EditView    (Self, FUndo);
+          gnkPhoaGroup: EditPicGroup(Self, FUndo);
+        end;
+       // Редактирование изображения
+      pafcThumbViewer: if Viewer.SelectedPics.Count>0 then EditPics(Self, Viewer.SelectedPics, FUndo);
+    end;
   end;
 
   procedure TfMain.aaExit(Sender: TObject);
@@ -506,7 +528,7 @@ uses
   var bProjectChanged: Boolean;
   begin
     ResetMode;
-    if DoFileOperations(FProject, CurGroup, Viewer.SelectedPics, ActiveControl=Viewer, bProjectChanged) then
+    if DoFileOperations(Self, bProjectChanged) then
        // Если изменилось содержимое фотоальбома
       if bProjectChanged then begin
          // Помечаем текущее состояние как изменённое без возможности отката
@@ -523,7 +545,7 @@ uses
   procedure TfMain.aaFind(Sender: TObject);
   begin
     ResetMode;
-    if DoSearch(FProject, CurGroup, FSearchResults) then DisplaySearchResults(False, True);
+    if DoSearch(Self, FSearchResults) then DisplaySearchResults(False, True);
   end;
 
   procedure TfMain.aaFlatMode(Sender: TObject);
@@ -617,42 +639,38 @@ uses
     if not CheckSave then Exit;
     tvGroups.BeginUpdate;
     try
-      FUndo.BeginUpdate;
-      try
-         // Стираем результаты поиска
-        DisplaySearchResults(True, False);
-         // Инициализируем фотоальбом 
-        FProject.New;
-        UpdateThumbnailSize;
-         // Очищаем буфер отката
-        FUndo.Clear;
-        FUndo.SetSavepoint;
-         // Загружаем список представлений
-        ReloadViewList;
-      finally
-        FUndo.EndUpdate;
-      end;
+       // Стираем результаты поиска
+      DisplaySearchResults(True, False);
+       // Инициализируем проект
+      FProject.New;
+      UpdateThumbnailSize;
+       // Очищаем буфер отката
+      FUndo.Clear;
+      FUndo.SetSavepoint;
+       // Загружаем список представлений
+      ReloadViewList;
     finally
       tvGroups.EndUpdate;
     end;
   end;
 
   procedure TfMain.aaNewGroup(Sender: TObject);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     BeginOperation;
     try
-      Operation := TPhoaOp_GroupNew.Create(FUndo, FProject, CurGroup);
+      TPhoaOp_GroupNew.Create(FUndo, FProject, CurGroup, Changes);
     finally
-      EndOperation(Operation);
+      EndOperation(Changes);
     end;
+    //!!! Входить в режим редактирования имени добавленной группы
   end;
 
   procedure TfMain.aaNewPic(Sender: TObject);
   begin
     ResetMode;
-    AddFiles(FProject, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FUndo);
+    AddFiles(Self, FUndo);
   end;
 
   procedure TfMain.aaOpen(Sender: TObject);
@@ -673,30 +691,30 @@ uses
   procedure TfMain.aaPaste(Sender: TObject);
   var
     iCntBefore: Integer;
-    Operation: TPhoaOperation;
+    Changes: TPhoaOperationChanges;
   begin
+    Changes := [];
     iCntBefore := CurGroup.Pics.Count;
-    Operation := nil;
     BeginOperation;
     try
-      Operation := TPhoaMultiOp_PicPaste.Create(FUndo, FProject, CurGroup);
+      TPhoaOp_PicPaste.Create(FUndo, FProject, CurGroup, Changes);
     finally
-      EndOperation(Operation);
+      EndOperation(Changes);
     end;
     PhoaInfo(False, 'SNotify_Paste', [CurGroup.Pics.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
   end;
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
+    Changes := [];
     ResetMode;
-    Operation := nil;
     if PhoaConfirm(False, 'SConfirm_DelView', ISettingID_Dlgs_ConfmDelView) then begin
       BeginOperation;
       try
-        Operation := TPhoaOp_ViewDelete.Create(FUndo, FProject);
+        TPhoaOp_ViewDelete.Create(FUndo, FProject, Changes);
       finally
-        EndOperation(Operation);
+        EndOperation(Changes);
       end;
     end;
   end;
@@ -704,25 +722,25 @@ uses
   procedure TfMain.aaPhoaView_Edit(Sender: TObject);
   begin
     ResetMode;
-    EditView(FProject.CurrentViewX, FProject, FUndo);
+    EditView(Self, FUndo);
   end;
 
   procedure TfMain.aaPhoaView_MakeGroup(Sender: TObject);
   begin
     ResetMode;
-    MakeGroupFromView(FProject, FUndo);
+    MakeGroupFromView(Self, FUndo);
   end;
 
   procedure TfMain.aaPhoaView_New(Sender: TObject);
   begin
     ResetMode;
-    EditView(nil, FProject, FUndo);
+    AddView(Self, FUndo);
   end;
 
   procedure TfMain.aaPicOps(Sender: TObject);
   begin
     ResetMode;
-    DoPicOps(FProject, FUndo, CurGroup, Viewer.SelectedPics);
+    DoPicOps(Self, FUndo);
   end;
 
   procedure TfMain.aaRemoveSearchResults(Sender: TObject);
@@ -781,25 +799,28 @@ uses
   procedure TfMain.aaSortPics(Sender: TObject);
   begin
     ResetMode;
-    DoSortPics(FProject, CurGroup, FUndo, CurGroup=FSearchResults);
+    DoSortPics(Self, FUndo, CurGroup=FSearchResults);
   end;
 
   procedure TfMain.aaStats(Sender: TObject);
   begin
     ResetMode;
-    ShowProjectStats(FProject, CurGroup);
+    ShowProjectStats(Self);
   end;
 
   procedure TfMain.aaUndo(Sender: TObject);
   begin
-    ResetMode;
     UndoOperations(FUndo.Count-1);
   end;
 
   procedure TfMain.aaView(Sender: TObject);
   begin
-    ResetMode;
     StartViewMode([]);
+  end;
+
+  procedure TfMain.aaViewSlideShow(Sender: TObject);
+  begin
+    StartViewMode([ivifSlideShow]);
   end;
 
   procedure TfMain.AppException(Sender: TObject; E: Exception);
@@ -864,6 +885,8 @@ uses
     cMainCodePage := CharsetToCP(Font.Charset);
      // Настраиваем список последних открывавшихся файлов
     mruOpen.MaxItems := SettingValueInt(ISettingID_Gen_OpenMRUCount);
+     // Настраиваем максимальное количество операций в буфере отмены
+    FUndo.MaxCount := SettingValueInt(ISettingID_Browse_MaxUndoCount); 
      // Настраиваем подсказки
     Application.HintHidePause := SettingValueInt(ISettingID_Gen_TooltipDisplTime);
      // Настраиваем доки/панели инструментов
@@ -943,7 +966,8 @@ uses
   begin
     if FOpLockCounter=0 then begin
       ResetMode;
-      tvGroups.BeginUpdate;
+       // Сбрасываем накопитель изменений операций
+      FOpChanges := [];
        // Сохраняем ID текущей группы
       Group := CurGroup;
       if Group=nil then FSavedGroupID := 0 else FSavedGroupID := Group.ID;
@@ -1026,7 +1050,6 @@ uses
   begin
     tvGroups.BeginSynch;
     try
-      FUndo.BeginUpdate;
       tvGroups.BeginUpdate;
       StartWait;
       try
@@ -1048,7 +1071,6 @@ uses
       finally
         StopWait;
         tvGroups.EndUpdate;
-        FUndo.EndUpdate;
       end;
     finally
       tvGroups.EndSynch;
@@ -1059,14 +1081,12 @@ uses
   begin
      // Предупреждаем пользователя, если он сохраняет в более старую ревизию
     if (iRevisionNumber<IPhFileRevisionNumber) and not PhoaConfirm(True, 'SConfirm_SavingOldFormatFile', ISettingID_Dlgs_ConfmOldFile) then Exit;
-    FUndo.BeginUpdate;
     StartWait;
     try
       FProject.SaveToFile(sFileName, SProject_Generator, SProject_Remark, iRevisionNumber);
       FUndo.SetSavepoint;
     finally
       StopWait;
-      FUndo.EndUpdate;
     end;
      // Регистрируем имя файла в списке MRU
     mruOpen.Add(sFileName);
@@ -1077,15 +1097,20 @@ uses
   const asUnmod: Array[Boolean] of String[1] = ('*', '');
   var
     bGr, bPic, bPics, bPicSel, bView: Boolean;
+    FCtl: TPhoaAppFocusedControl;
     gnk: TGroupNodeKind;
   begin
-    if not FInitialized or (csDestroying in ComponentState) then Exit;
+    if not FInitialized or (csDestroying in ComponentState) or (tsUpdating in tvGroups.TreeStates) or Viewer.UpdateLocked then Exit;
+     // Определяем сфокусированный контрол
+    FCtl := FocusedControl;
+    bGr  := FCtl=pafcGroupTree;
+    bPic := FCtl=pafcThumbViewer;
+     // Определяем текущие выделенные элементы
     gnk := GetNodeKind(tvGroups, tvGroups.FocusedNode);
-    bGr     := ActiveControl=tvGroups;
-    bPic    := ActiveControl=Viewer;
     bPics   := FProject.Pics.Count>0;
     bPicSel := Viewer.SelectedPics.Count>0;
     bView   := FProject.ViewIndex>=0;
+     // Настраиваем Actions/Menus
     aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
     aUndo.Enabled                := FUndo.CanUndo;
     smUndoHistory.Enabled        := FUndo.CanUndo;
@@ -1100,14 +1125,15 @@ uses
     aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.Pics.Count);
     aSelectNone.Enabled          := bPicSel;
     aView.Enabled                := Viewer.ItemIndex>=0;
+    aViewSlideShow.Enabled       := Viewer.ItemIndex>=0;
     aRemoveSearchResults.Enabled := FSearchNode<>nil;
     aPicOps.Enabled              := (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel;
     aFileOperations.Enabled      := bPics;
     aFind.Enabled                := bPics;
      // Views
-    aPhoaView_Delete.Enabled    := bView;
-    aPhoaView_Edit.Enabled      := bView;
-    aPhoaView_MakeGroup.Enabled := bView;
+    aPhoaView_Delete.Enabled     := bView;
+    aPhoaView_Edit.Enabled       := bView;
+    aPhoaView_MakeGroup.Enabled  := bView;
      // Drag-and-drop
     Viewer.DragEnabled       := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
     Viewer.DragInsideEnabled := gnk in [gnkPhoA, gnkPhoaGroup];
@@ -1129,77 +1155,19 @@ uses
     FPicsPopupToolsValidated   := False;
   end;
 
-  procedure TfMain.EndOperation(Operation: TPhoaOperation);
-  var
-    IFlags: TUndoInvalidationFlags;
-    GetOpGroupNode_Cache, GetOpParentGroupNode_Cache: PVirtualNode;
-    Group: IPhotoAlbumPicGroup;
-
-     // Получает узел в tvGroups, соответствующий группе GroupAbsIdx операции, кэшируя результат
-    function GetOpGroupNode: PVirtualNode;
-    begin
-      if GetOpGroupNode_Cache=nil then GetOpGroupNode_Cache := FindGroupNodeByID(Operation.OpGroupID);
-      Result := GetOpGroupNode_Cache;
-      Assert(Result<>nil, 'Failed to locate Operation Group Node in TfMain.EndOperation()');
-    end;
-
-     // Получает узел в tvGroups, соответствующий группе ParentGroupAbsIdx операции, кэшируя результат
-    function GetOpParentGroupNode: PVirtualNode;
-    begin
-      if GetOpParentGroupNode_Cache=nil then GetOpParentGroupNode_Cache := FindGroupNodeByID(Operation.OpParentGroupID);
-      Result := GetOpParentGroupNode_Cache;
-      Assert(Result<>nil, 'Failed to locate Operation Parent Group Node in TfMain.EndOperation()');
-    end;
-
+  procedure TfMain.EndOperation(Changes: TPhoaOperationChanges);
   begin
     Assert(FOpLockCounter>0, 'Excessive TfMain.EndOperation() call');
     Dec(FOpLockCounter);
-    try
-       // Operation будет nil в случае неудачной попытки выполнения (при вызове EndOperation() в секции finally)
-      if Operation<>nil then begin
-         // Initialize cache
-        GetOpGroupNode_Cache       := nil;
-        GetOpParentGroupNode_Cache := nil;
-         // Отрабатываем изменения, вносимые операцией
-        IFlags := Operation.InvalidationFlags;
-         // -- Перегрузить список представлений
-        if uifXReloadViews in IFlags then
-          ReloadViewList
-         // -- Обновить индекс текущего представления
-        else if uifXUpdateViewIndex in IFlags then
-          UpdateViewIndex
-        else begin
-           // -- Переинициализация родителя
-          if uifXReinitParent in IFlags then tvGroups.ReinitNode(GetOpParentGroupNode, uifXReinitRecursive in IFlags);
-           // -- Переинициализация братьев
-          if uifXReinitSiblings in IFlags then tvGroups.ReinitChildren(GetOpParentGroupNode, uifXReinitRecursive in IFlags);
-        end;
-         // -- Обновить параметры эскизов
-        if uifXUpdateThumbParams in IFlags then UpdateThumbnailSize;
-      end;
-    finally
-      if FOpLockCounter=0 then tvGroups.EndUpdate;
-    end;
-     // Уничтожаем результаты поиска
-    DisplaySearchResults(True, False);
-     // Редактирование текста узла, соответствующего группе операции: выполняем после снятия блокировки перерисовки
-    if uifXEditGroup in IFlags then begin
-      tvGroups.Selected[GetOpGroupNode] := True;
-      tvGroups.FocusedNode := GetOpGroupNode;
-      tvGroups.EditNode(GetOpGroupNode, -1);
-    end;
-     // Обновляем Viewer (после возможной смены выделения из-за редактирования текста узла)
+     // Накапливаем изменения, внесённые операцией
+    FOpChanges := FOpChanges+Changes;
     if FOpLockCounter=0 then begin
-      FViewer.BeginUpdate;
-      try
-        Group := CurGroup;
-        RefreshViewer;
-         // Если группа не поменялась, восстанавливаем параметры отображения
-        if (Group<>nil) and (Group.ID=FSavedGroupID) then FViewer.RestoreDisplay(FViewerDisplayData);
-      finally
-        FViewer.EndUpdate;
-        FViewerDisplayData := nil;
-      end;
+       // Отрабатываем результирущие изменения всех операций
+      ProcessOpChanges(FOpChanges);
+       // Если группа не поменялась, восстанавливаем параметры отображения
+      if (CurGroup<>nil) and (CurGroup.ID=FSavedGroupID) then FViewer.RestoreDisplay(FViewerDisplayData);
+      FViewerDisplayData := nil;
+      EnableActions;
     end;
   end;
 
@@ -1232,6 +1200,7 @@ uses
   procedure TfMain.FormCreate(Sender: TObject);
   begin
     try
+       // Настраиваем формат времени
       ShortTimeFormat := 'hh:nn';
       LongTimeFormat  := 'hh:nn:ss';
        // Настраиваем fpMain
@@ -1247,9 +1216,6 @@ uses
       FSearchResults := NewPhotoAlbumPicGroup(nil, IGroupID_SearchResults);
        // Create undoable operations list
       FUndo := TPhoaUndo.Create;
-      FUndo.OnStatusChange := OperationsStatusChange;
-      FUndo.OnOpDone       := OperationsListChange;
-      FUndo.OnOpUndone     := OperationsListChange;
        // Create viewer
       FViewer := TThumbnailViewer.Create(Self);
       with FViewer do begin
@@ -1330,6 +1296,13 @@ uses
     Result := FProject.FileName;
   end;
 
+  function TfMain.GetFocusedControl: TPhoaAppFocusedControl;
+  begin
+    if tvGroups.Focused     then Result := pafcGroupTree
+    else if FViewer.Focused then Result := pafcThumbViewer
+    else                         Result := pafcNone;
+  end;
+
   function TfMain.GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
   var g: IPhotoAlbumPicGroup;
   begin
@@ -1347,9 +1320,31 @@ uses
 
   function TfMain.GetSelectedPics: IPhoaPicList;
   begin
-    if Viewer.Focused then        Result := Viewer.SelectedPics
-    else if tvGroups.Focused then Result := FViewedPics
-    else                          Result := nil;
+    case FocusedControl of
+      pafcGroupTree:   Result := FViewedPics;
+      pafcThumbViewer: Result := Viewer.SelectedPics;
+      else             Result := nil;
+    end;
+  end;
+
+  function TfMain.IApp_GetImageList: TCustomImageList;
+  begin
+    Result := ilActionsSmall;
+  end;
+
+  function TfMain.IApp_GetProject: IPhotoAlbumProject;
+  begin
+    Result := FProject;
+  end;
+
+  function TfMain.IApp_GetSelectedPics: IPhotoAlbumPicList;
+  begin
+    Result := FViewer.SelectedPics;
+  end;
+
+  function TfMain.IApp_GetViewedPics: IPhotoAlbumPicList;
+  begin
+    Result := FViewedPics;
   end;
 
   function TfMain.IsShortCut(var Message: TWMKey): Boolean;
@@ -1375,25 +1370,6 @@ uses
   begin
     ResetMode;
     if CheckSave then DoLoad(FileName);
-  end;
-
-  procedure TfMain.OperationsListChange(Sender: TObject);
-  var i: Integer;
-  begin
-     // Invalidate all views except current
-    for i := 0 to FProject.Views.Count-1 do
-      if i<>FProject.ViewIndex then FProject.Views[i].Invalidate;
-  end;
-
-  procedure TfMain.OperationsStatusChange(Sender: TObject);
-  var iMaxCnt: Integer;
-  begin
-    if tsUpdating in tvGroups.TreeStates then Exit;
-     // Ограничиваем количество операций в буфере
-    iMaxCnt := SettingValueInt(ISettingID_Browse_MaxUndoCount);
-    with FUndo do
-      while Count>iMaxCnt do Delete(0);
-    EnableActions;
   end;
 
   procedure TfMain.pmGroupsPopup(Sender: TObject);
@@ -1471,13 +1447,45 @@ uses
            // ---- Отправляем отложенное сообщение о необходимости входа в режим просмотра
           PostMessage(Handle, WM_STARTVIEWMODE, Byte(ImgViewInitFlags), 0);
         end;
-       // Иначе загружаем список представлений
+       // Иначе создаём новый проект
       end else
-        ReloadViewList;
+        aNew.Execute;
     finally
       CmdLine.Free;
     end;
     EnableActions;
+  end;
+
+  procedure TfMain.ProcessOpChanges(Changes: TPhoaOperationChanges);
+  begin
+     // Изменились свойства проекта - нас интересуют только размерэ эскизов
+    if pocProjectProps in Changes then UpdateThumbnailSize;
+     // Изменился список изображений проекта - уничтожаем результаты поиска
+    if pocProjectPicList in Changes then DisplaySearchResults(True, False);
+     // Изменился список представлений - перегружаем его, обновляем индекс представления и перегружаем группы/Viewer
+    if pocViewList in Changes then
+      ReloadViewList
+     // Изменился индекс представления - обновляем его и перегружаем группы/Viewer
+    else if pocViewIndex in Changes then
+      UpdateViewIndex
+     // Изменилась структура групп - перегружаем дерево и Viewer
+    else if pocGroupStructure in Changes then
+      LoadGroupTree
+    else begin
+       // Изменения свойств группы/списка изображений - надо просто обновить каждый узел дерева
+      if [pocGroupProps, pocGroupPicList]*Changes<>[] then tvGroups.InvalidateChildren(nil, True);
+       // Изменился список изображений группы - перегружаем Viewer
+      if pocGroupPicList in Changes then
+        RefreshViewer
+       // Изменились только свойства изображений
+      else if pocPicProps in Changes then begin
+         // Перерисовываем Viewer
+        FViewer.Invalidate;
+         // Сбрасываем представления (закладываемся исключительно на то, что менять св-ва изображений при отображении
+         //   представления нельзя! Иначе нужно перегружать также и дерево)
+        FProject.Views.Invalidate;
+      end;
+    end;
   end;
 
   procedure TfMain.RefreshViewer;
@@ -1521,6 +1529,7 @@ uses
       end;
      // Обновляем вьюер
     FViewer.ReloadPicList(FViewedPics);
+    EnableActions;
   end;
 
   procedure TfMain.ReloadViewList;
@@ -1588,7 +1597,8 @@ uses
   begin
     iPicIndex := Viewer.ItemIndex;
     if (FViewedPics<>nil) and (iPicIndex>=0) then begin
-      ViewImage(InitFlags, FViewedPics, FProject, iPicIndex, FUndo, FProject.ViewIndex<0);
+      ResetMode;
+      ViewImage(InitFlags, Self, iPicIndex, FUndo);
       Viewer.ItemIndex := iPicIndex;
     end;
   end;
@@ -1644,12 +1654,11 @@ uses
   var
     nSrc, nTgt: PVirtualNode;
     gTgt: IPhotoAlbumPicGroup;
-    AM: TVTNodeAttachMode;
     iNewIndex, iCnt, iCntBefore: Integer;
     bCopy: Boolean;
-    Operation: TPhoaOperation;
+    Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
      // Перетаскивание группы
@@ -1659,46 +1668,40 @@ uses
         dmAbove: begin
           iNewIndex := nTgt.Index;
           nTgt := nTgt.Parent;
-          AM := amInsertBefore;
         end;
         dmBelow: begin
           iNewIndex := nTgt.Index+1;
           nTgt := nTgt.Parent;
-          AM := amInsertAfter;
         end;
-        else {dmOnNode} begin
-          iNewIndex := -1;
-          AM := amAddChildLast;
-        end;
+        else {dmOnNode} iNewIndex := -1;
       end;
        // Если перемещаем ближе к концу среди детей того же родителя, уменьшаем индекс на 1
       if (Mode in [dmAbove, dmBelow]) and (nTgt=nSrc.Parent) and (iNewIndex>Integer(nSrc.Index)) then Dec(iNewIndex);
        // Перемещаем
       BeginOperation;
       try
-        Operation := TPhoaOp_GroupDragAndDrop.Create(
+        TPhoaOp_GroupDragAndDrop.Create(
           FUndo,
           FProject,
           PPhotoAlbumPicGroup(Sender.GetNodeData(nSrc))^, // Group being dragged
           PPhotoAlbumPicGroup(Sender.GetNodeData(nTgt))^, // New parent group
-          iNewIndex);
+          iNewIndex,
+          Changes);
       finally
-        EndOperation(Operation);
+        EndOperation(Changes);
       end;
-      Sender.MoveTo(nSrc, Sender.DropTargetNode, AM, False);
-      Sender.FullyVisible[nSrc] := True;
       Effect := DROPEFFECT_NONE;
      // Перетаскивание изображений
     end else if Source=Viewer then begin
-      bCopy := (GetKeyState(VK_CONTROL) and $80<>0) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
+      bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
       gTgt := PPhotoAlbumPicGroup(Sender.GetNodeData(nTgt))^;
       iCnt := Viewer.SelectedPics.Count;
       iCntBefore := gTgt.Pics.Count;
       BeginOperation;
       try
-        Operation := TPhoaMultiOp_PicDragAndDropToGroup.Create(FUndo, FProject, CurGroup, gTgt, Viewer.SelectedPics, bCopy);
+        TPhoaOp_PicDragAndDropToGroup.Create(FUndo, FProject, CurGroup, gTgt, Viewer.SelectedPics, bCopy, Changes);
       finally
-        EndOperation(Operation);
+        EndOperation(Changes);
       end;
       PhoaInfo(
         False,
@@ -1836,17 +1839,17 @@ uses
   end;
 
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     BeginOperation;
     try
       case GetNodeKind(Sender, Node) of
-        gnkView:      Operation := TPhoaOp_ViewEdit.Create(FUndo, FProject, FProject.CurrentViewX, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil);
-        gnkPhoaGroup: Operation := TPhoaOp_GroupRename.Create(FUndo, FProject, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage));
+        gnkView:      TPhoaOp_ViewEdit.Create(FUndo, FProject, FProject.CurrentViewX, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil, Changes);
+        gnkPhoaGroup: TPhoaOp_GroupRename.Create(FUndo, FProject, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage), Changes);
       end;
     finally
-      EndOperation(Operation);
+      EndOperation(Changes);
     end;
   end;
 
@@ -1866,48 +1869,17 @@ uses
     UndoOperations(FUndo.Count-ulToolbarUndo.ItemIndex-1);
   end;
 
-  procedure TfMain.UndoOperation(Op: TPhoaOperation);
-  var
-    IFlags: TUndoInvalidationFlags;
-    OpParentGroupNode: PVirtualNode;
-  begin
-     // Получаем данные до уничтожения объекта операции
-    IFlags := Op.InvalidationFlags;
-    OpParentGroupNode := nil;
-    if uifUReinitParent in IFlags then OpParentGroupNode := FindGroupNodeByID(Op.OpParentGroupID);
-     // Откатываем (и уничтожаем) операцию
-    Op.Undo;
-     // Проверяем флаги требуемых обновлений
-     // -- Перегрузить список представлений
-    if uifUReloadViews in IFlags then
-      ReloadViewList
-     // -- Обновить индекс текущего представления
-    else if uifUUpdateViewIndex in IFlags then
-      UpdateViewIndex
-    else begin
-       // -- Переинициализация всего дерева
-      if uifUReinitAll    in IFlags then tvGroups.ReinitChildren(nil, True);
-       // -- Переинициализация родителя
-      if uifUReinitParent in IFlags then tvGroups.ReinitNode(OpParentGroupNode, uifUReinitRecursive in IFlags);
-    end;
-     // -- Обновить параметры эскизов
-    if uifUUpdateThumbParams in IFlags then UpdateThumbnailSize;
-  end;
-
   procedure TfMain.UndoOperations(Index: Integer);
-  var i: Integer;
+  var
+    i: Integer;
+    Changes: TPhoaOperationChanges;
   begin
     ResetMode;
-    tvGroups.BeginUpdate;
-    try
-       // Крутим цикл с конца до указанного индекса
-      for i := FUndo.Count-1 downto Index do UndoOperation(FUndo[i]);
-       // Уничтожаем результаты поиска
-      DisplaySearchResults(True, False);
-    finally
-      tvGroups.EndUpdate;
-    end;
-    RefreshViewer;
+     // Крутим цикл по операциям (с конца до указанного индекса), накапливая изменения
+    Changes := [];
+    for i := FUndo.Count-1 downto Index do FUndo[i].Undo(Changes);
+     // Отрабатываем результирущие изменения всех операций
+    ProcessOpChanges(Changes);
   end;
 
   procedure TfMain.UpdateFlatModeAction;
@@ -1932,14 +1904,14 @@ uses
   end;
 
   procedure TfMain.ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
-  var Operation: TPhoaOperation;
+  var Changes: TPhoaOperationChanges;
   begin
-    Operation := nil;
+    Changes := [];
     BeginOperation;
     try
-      Operation := TPhoaOp_PicDragAndDropInsideGroup.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Viewer.DropTargetIndex);
+      TPhoaOp_PicDragAndDropInsideGroup.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Viewer.DropTargetIndex, Changes);
     finally
-      EndOperation(Operation);
+      EndOperation(Changes);
     end;
   end;
 

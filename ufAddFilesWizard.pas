@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.17 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.18 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -30,7 +30,9 @@ type
      // Главный буфер отката
     FUndoOperations: TPhoaOperations;
      // Основная операция добавления
-    FOperation: TPhoaMultiOp;
+    FOperation: TPhoaOperation;
+     // Изменения, накопленные операциями 
+    FOpChanges: TPhoaOperationChanges;
      // Протокол добавления
     FLog: TStrings;
      // Исходное количество добавляемых файлов
@@ -43,8 +45,7 @@ type
     FCountFailed: Integer;
      // Prop storage
     FFileList: TFileList;
-    FProject: IPhotoAlbumProject;
-    FGroup: IPhotoAlbumPicGroup;
+    FApp: IPhotoAlbumApp;
     FRecurseFolders: Boolean;
     FDefaultPath: String;
     FShowAdvancedOptions: Boolean;
@@ -98,6 +99,8 @@ type
      // Props
      // -- Буфер отката операции
     property AddOperations: TPhoaOperations read GetAddOperations;
+     // -- Приложение
+    property App: IPhotoAlbumApp read FApp;
      // -- Папка для добавления, выбираемая по умолчанию
     property DefaultPath: String read FDefaultPath write FDefaultPath;
      // -- Список файлов
@@ -114,10 +117,6 @@ type
     property Filter_TimeFrom: TDateTime read FFilter_TimeFrom write FFilter_TimeFrom;
      // -- Фильтр: время модификации файла "По" фильтра
     property Filter_TimeTo: TDateTime read FFilter_TimeTo write FFilter_TimeTo;
-     // -- Группа, куда добавляются изображения
-    property Group: IPhotoAlbumPicGroup read FGroup;
-     // -- Фотоальбом
-    property Project: IPhotoAlbumProject read FProject;
      // -- True, если включен просмотр вложенных папок
     property RecurseFolders: Boolean read FRecurseFolders write FRecurseFolders;
      // -- True, если включены расширенные опции фильтра
@@ -140,6 +139,7 @@ type
     FXFormFilled: Boolean;
      // Prop storage
     FAddedPic: IPhotoAlbumPic;
+    FOpChanges: TPhoaOperationChanges;
      // Производит автозаполнение свойств изображения
     procedure AutofillPicProps(Pic: IPhotoAlbumPic);
   protected
@@ -149,10 +149,12 @@ type
      // Props
      // -- Последнее добавленное изображение (nil, если нет или была ошибка)
     property AddedPic: IPhotoAlbumPic read FAddedPic;
+     // -- Накопленные изменения, внесённые операциями
+    property OpChanges: TPhoaOperationChanges read FOpChanges;
   end;
 
    // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
-  function AddFiles(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -161,12 +163,11 @@ uses
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
   phPhoa, phSettings;
 
-  function AddFiles(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try
-        FProject         := AProject;
-        FGroup           := AGroup;
+        FApp             := AApp;
         FUndoOperations  := AUndoOperations;
         Result := Execute;
       finally
@@ -403,7 +404,7 @@ uses
            // Добавляем изображение
           try
             FAddedPic := nil;
-            TPhoaOp_InternalPicAdd.Create(AddOperations, Project, Group, FileList.Files[0], FAddedPic);
+            TPhoaOp_InternalPicAdd.Create(AddOperations, App.Project, App.CurGroup, FileList.Files[0], FAddedPic, FOpChanges);
              // Производим автозаполнение свойств изображения
             AutofillPicProps(FAddedPic);
              // Пишем в протокол
@@ -436,7 +437,7 @@ uses
     FFileList.Free;
     FLog.Free;
      // Если есть операция, уведомляем главную форму
-    if FOperation<>nil then fMain.EndOperation(FOperation);
+    if FOperation<>nil then fMain.EndOperation(FOpChanges);
     inherited FinalizeWizard;
   end;
 
@@ -612,7 +613,7 @@ uses
      // Создаём операцию, если она ещё не создана
     if FOperation=nil then begin
       fMain.BeginOperation;
-      FOperation := TPhoaMultiOp_PicAdd.Create(FUndoOperations, FProject);
+      FOperation := TPhoaOp_PicAdd.Create(FUndoOperations, FApp.Project, FOpChanges);
     end;
      // Удаляем неотмеченные файлы
     FFileList.DeleteUnchecked;
@@ -639,6 +640,8 @@ uses
      // Удаляем обработанный файл
     FFileList.Delete(0);
     FLastProcessedPic := FAddFilesThread.AddedPic;
+     // Накапливаем изменения
+    FOpChanges := FOpChanges+FAddFilesThread.OpChanges;
      // Если обработан весь список, прерываем поток
     if (FFileList.Count=0) or FFileProcessingInterrupted then begin
       FProcessingFiles := False;

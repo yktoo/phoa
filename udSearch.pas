@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.16 2004-10-12 12:38:10 dale Exp $
+//  $Id: udSearch.pas,v 1.17 2004-10-15 13:49:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,12 +31,10 @@ type
   private
      // Локальный список результатов поиска (ссылок на изображения)
     FLocalResults: IPhoaMutablePicList;
-     // Фотоальбом
-    FProject: IPhotoAlbumProject;
+     // Приложение
+    FApp: IPhotoAlbumApp;
      // Группа, в которую помещать результаты
     FResultsGroup: IPhotoAlbumPicGroup;
-     // Текущая выбранная группа, nil, если нет
-    FCurGroup: IPhotoAlbumPicGroup;
      // Основная процедура поиска
     procedure PerformSearch;
      // Сбрасывает критерии в первоначальное состояние
@@ -47,7 +45,7 @@ type
     procedure ButtonClick_OK; override;
   end;
 
-  function DoSearch(AProject: IPhotoAlbumProject; CurGroup, ResultsGroup: IPhotoAlbumPicGroup): Boolean;
+  function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
 
 implementation
 {$R *.dfm}
@@ -55,13 +53,12 @@ uses
   TypInfo, StrUtils, Mask, ToolEdit,
   phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox;
 
-  function DoSearch(AProject: IPhotoAlbumProject; CurGroup, ResultsGroup: IPhotoAlbumPicGroup): Boolean;
+  function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
     with TdSearch.Create(Application) do
       try
-        FProject      := AProject;
+        FApp          := AApp;
         FResultsGroup := ResultsGroup;
-        FCurGroup     := CurGroup;
         Result := Execute;
       finally
         Free;
@@ -573,7 +570,7 @@ type
     FPreserveEndEdit := True;
     try
       s := (Sender as TComboEdit).Text;
-      if SelectPhoaKeywords((FTree.Owner as TdSearch).FProject, s) then TComboEdit(Sender).Text := s;
+      if SelectPhoaKeywords((FTree.Owner as TdSearch).FApp.Project, s) then TComboEdit(Sender).Text := s;
     finally
       FPreserveEndEdit := False;
     end;
@@ -629,9 +626,9 @@ type
     SLPhoaFilmNumbers := NewSL;
     SLPhoaAuthors     := NewSL;
     SLPhoaMedia       := NewSL;
-    StringsLoadPFAM(FProject, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
+    StringsLoadPFAM(FApp.Project, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
      // Настраиваем контролы
-    rbCurGroup.Enabled      := (FCurGroup<>nil) and (FCurGroup.Pics.Count>0);
+    rbCurGroup.Enabled      := (FApp.CurGroup<>nil) and (FApp.CurGroup.Pics.Count>0);
     rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
      // Инициализируем дерево
     ApplyTreeSettings(tvCriteria);
@@ -695,10 +692,10 @@ type
          // Настраиваем область поиска
         if rbAll.Checked then begin
           SearchArea := saAll;
-          iSrchCount := FProject.Pics.Count;
+          iSrchCount := FApp.Project.Pics.Count;
         end else if rbCurGroup.Checked then begin
           SearchArea := saCurGroup;
-          iSrchCount := FCurGroup.Pics.Count;
+          iSrchCount := FApp.CurGroup.Pics.Count;
         end else begin
           SearchArea := saResults;
           iSrchCount := FResultsGroup.Pics.Count;
@@ -718,8 +715,8 @@ type
         FLocalResults.Clear;
         for i := 0 to iSrchCount-1 do begin
           case SearchArea of
-            saAll:      Pic := FProject.PicsX[i];
-            saCurGroup: Pic := FCurGroup.PicsX[i];
+            saAll:      Pic := FApp.Project.PicsX[i];
+            saCurGroup: Pic := FApp.CurGroup.PicsX[i];
             else        Pic := FResultsGroup.PicsX[i];
           end;
           if Matches(Pic) then FLocalResults.Add(Pic, True);
