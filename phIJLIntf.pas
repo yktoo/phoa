@@ -1176,36 +1176,36 @@ implementation /////////////////////////////////////////////////////////////////
       case jcprops.JPGChannels of
          // Grayscale JPEG
         1: begin
-          jcprops.JPGColor := IJL_G;
+          jcprops.JPGColor    := IJL_G;
           jcprops.DIBChannels := 3;
-          jcprops.DIBColor := IJL_BGR;
+          jcprops.DIBColor    := IJL_BGR;
           Bitmap.PixelFormat := pf24bit;
         end;
          // 24 bit color (most common format)
         3: begin
-          jcprops.JPGColor := IJL_YCBCR;
+          jcprops.JPGColor    := IJL_YCBCR;
           jcprops.DIBChannels := 3;
-          jcprops.DIBColor := IJL_BGR;
+          jcprops.DIBColor    := IJL_BGR;
           Bitmap.PixelFormat := pf24bit;
         end;
          // 32 bit 4 channel JPEG. UNTESTED!
         4: begin
-          jcprops.JPGColor := IJL_YCBCRA_FPX;
+          jcprops.JPGColor    := IJL_YCBCRA_FPX;
           jcprops.DIBChannels := 4;
-          jcprops.DIBColor := IJL_RGBA_FPX;
+          jcprops.DIBColor    := IJL_RGBA_FPX;
           Bitmap.PixelFormat := pf32bit;
         end;
          // unknown type - no 'Color Twist' is performed, whatever that is...
         else begin
-          jcprops.DIBColor := TIJL_COLOR(IJL_OTHER);
-          jcprops.JPGColor := TIJL_COLOR(IJL_OTHER);
+          jcprops.DIBColor    := TIJL_COLOR(IJL_OTHER);
+          jcprops.JPGColor    := TIJL_COLOR(IJL_OTHER);
           jcprops.DIBChannels := jcprops.JPGChannels;
         end;
       end;
        // Определяем требуемые размеры битмэпа
       iWidth  := jcprops.JPGWidth;
       iHeight := jcprops.JPGHeight;
-       // Если жедаемые размеры заданы, пробуем размер 1/8, потом 1/4, потом 1/2
+       // Если желаемые размеры заданы, пробуем размер 1/8, потом 1/4, потом 1/2
       if (iDesiredWidth<=0) or
          (iDesiredHeight<=0) or
          (not TryUsePartialLoad(8, IJL_JFILE_READONEEIGHTH) and
