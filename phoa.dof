@@ -112,7 +112,7 @@ IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=1
 MinorVer=1
-Release=9
+Release=10
 Build=275
 Debug=0
 PreRelease=0
@@ -124,17 +124,17 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=PhoA image arranging and searching tool
-FileVersion=1.1.9.275
+FileVersion=1.1.10.275
 InternalName=PhoA
 LegalCopyright=©2002-2005 DK Software
 LegalTrademarks=
 OriginalFilename=phoa.exe
 ProductName=PhoA
-ProductVersion=1.1.9
+ProductVersion=1.1.10
 Comments=All rights reserved. Refer to http://www.dk-soft.org/ for detailed info or distribution terms.
 VendorWebsite=http://www.dk-soft.org/
 [Excluded Packages]
-C:\Progra~1\Borland\Delphi7\Bpl\tbx_d7.bpl=Toolbar2000 -- TBX Extensions (Alex Denisov)
+C:\Program Files\Borland\Delphi7\Bpl\dclsznrtl7.bpl=iSZN v1.x.x designtime package
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;

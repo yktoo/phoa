@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.19 2005-01-21 09:52:07 dale Exp $
+;   $Id: phoa.iss,v 1.20 2005-02-08 15:08:05 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright DK Software, http://www.dk-soft.org/
@@ -7,13 +7,13 @@
 [Setup]
   MinVersion             = 4.0,4.0sp6
   AppName                = PhoA
-  AppVersion             = 1.1.9
-  AppVerName             = PhoA v1.1.9
+  AppVersion             = 1.1.10
+  AppVerName             = PhoA v1.1.10
   AppCopyright           = Copyright ©2002-2005 DK Software
   AppPublisher           = DK Software
   AppPublisherURL        = http://www.dk-soft.org/
   AppSupportURL          = http://www.dk-soft.org/forum/
-  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=119
+  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=1.1.10
   AppMutex               = PHOA_RUNNING_MUTEX
   AllowNoIcons           = yes
   ChangesAssociations    = yes
@@ -21,9 +21,9 @@
   DefaultDirName         = {pf}\DK Software\PhoA
   DefaultGroupName       = PhoA (Photo Album)
   OutputDir              = .
-  OutputBaseFilename     = phoa-setup-1.1.9
-  VersionInfoVersion     = 1.1.9
-  VersionInfoTextVersion = 1.1.9
+  OutputBaseFilename     = phoa-setup-1.1.10
+  VersionInfoVersion     = 1.1.10
+  VersionInfoTextVersion = 1.1.10
   WizardImageFile        = SetupImage.bmp
   WizardSmallImageFile   = SetupSmallImage.bmp
   ; -- Compression
@@ -31,9 +31,9 @@
   Compression            = lzma
 
 [Languages]
-  Name: "en"; MessagesFile: compiler:Default.isl;           LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.en.rtf
-  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl; LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.ru.rtf
-  Name: "de"; MessagesFile: compiler:Languages\German.isl;  LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.9.en.rtf
+  Name: "en"; MessagesFile: compiler:Default.isl;           LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.10.en.rtf
+  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl; LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.10.ru.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;  LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.10.en.rtf
 
 [Tasks]
   Name: desktopicon;        Description: {cm:CreateDesktopIcon};             GroupDescription: {cm:AdditionalIcons};
