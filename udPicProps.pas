@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.15 2004-12-09 17:35:36 dale Exp $
+//  $Id: udPicProps.pas,v 1.16 2004-12-31 13:03:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -74,6 +74,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Ищет изображение по имени файла и возвращает его ID, если нашла, иначе возвращает 0. Поиск осуществляется с
+     //   учётом новых имён файлов, заданных в диалоге, но среди ВСЕХ изображений проекта
+    function  FindPicIDByFileName(const sFileName: String): Integer;
      // Props
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
@@ -172,6 +175,31 @@ uses
   end;
 
 type TWinControlCast = class(TWinControl);
+
+  function TdPicProps.FindPicIDByFileName(const sFileName: String): Integer;
+  var
+    i, iPicID: Integer;
+    ProjPics: IPhotoAlbumPicList;
+  begin
+     // Сначала ищем среди редактируемых изображений
+    for i := 0 to FPictureFiles.Count-1 do
+      if ReverseCompare(FPictureFiles[i], sFileName) then begin
+        Result := EditedPics[i].ID;
+        Exit;
+      end;
+     // Если не нашли - ищем среди всех изображений фотоальбома
+    Result := 0;
+    ProjPics := App.Project.PicsX;
+    for i := 0 to ProjPics.Count-1 do
+       // Нашли такой файл
+      if ReverseCompare(ProjPics[i].FileName, sFileName) then begin
+         // Если изображение находится в числе редактируемых, значит, файл ему изменили (иначе мы нашли бы его ранее
+         //   поиском по редактируемым изображениям) и изображения с таким файлом более не существует
+        iPicID := ProjPics[i].ID;
+        if EditedPics.IndexOfID(iPicID)<0 then Result := iPicID;
+        Break;
+      end;
+  end;
 
   procedure TdPicProps.FocusFirstPageControl;
   begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.14 2004-12-28 10:50:48 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.15 2004-12-31 13:03:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -52,26 +52,29 @@ type
   PNamespace = ^TNamespace;
 
   procedure TfrPicProps_FileProps.aaChangeFile(Sender: TObject);
-  var
-    idx: Integer;
-    Pic: IPhoaPic;
+  var idx: Integer;
+
+    procedure UpdatePicFile(const sFileName: String);
+    var iPicID: Integer;
+    begin
+       // Ищем изображение с таким файлом
+      iPicID := Dialog.FindPicIDByFileName(sFileName);
+       // Не нашли - изменяем файл
+      if iPicID=0 then Dialog.PictureFiles[idx] := sFileName
+       // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
+      else if iPicID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [sFileName, iPicID]));
+    end;
+
   begin
     idx := GetCurFileIndex;
     if idx>=0 then begin
       with TOpenDialog.Create(Self) do
         try
-          FileName   := Dialog.PictureFiles[idx];
-          Filter     := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
-          Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-          Title      := ConstVal('SDlgTitle_SelectPicFile');
-          if Execute then begin
-             // Ищем изображение с таким файлом
-            Pic := App.Project.Pics.ItemsByFileName[FileName];
-             // Не нашли - изменяем файл
-            if Pic=nil then Dialog.PictureFiles[idx] := FileName
-             // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
-            else if Pic.ID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [FileName, Pic.ID]));
-          end;
+          FileName := Dialog.PictureFiles[idx];
+          Filter   := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
+          Options  := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
+          Title    := ConstVal('SDlgTitle_SelectPicFile');
+          if Execute then UpdatePicFile(FileName);
         finally
           Free;
         end;
