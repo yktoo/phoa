@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.24 2004-06-15 14:01:13 dale Exp $
+//  $Id: phObj.pas,v 1.25 2004-06-16 14:44:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1147,6 +1147,11 @@ type
 
   TThumbCornerDetails = Array[TThumbCorner] of TThumbCornerDetail;
 
+   // Режим отображения TThumbnailViewer
+  TThumbViewerDisplayMode = (
+    tvdmTile,    // Обычный - в виде сетки из эскизов
+    tvdmDetail); // Детальный - слева значок, справа описание
+
   TThumbnailViewer = class(TCustomControl)
   private
      // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
@@ -1209,6 +1214,7 @@ type
     FThumbBackColor: TColor;
     FThumbFontColor: TColor;
     FOnStartViewMode: TNotifyEvent;
+    FDisplayMode: TThumbViewerDisplayMode;
      // Определяет количество эскизов в строчке
     procedure CalcLayout;
      // Отрисовывает один эскиз
@@ -1275,7 +1281,8 @@ type
     procedure SetThumbTooltipProps(Value: TPicProperties);
     procedure SetThumbCacheSize(Value: Integer);
     procedure SetThumbBackColor(Value: TColor);
-    procedure SetThumbFontColor(const Value: TColor);
+    procedure SetThumbFontColor(Value: TColor);
+    procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -1310,11 +1317,12 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
      // Props
+    property DisplayMode: TThumbViewerDisplayMode read FDisplayMode write SetDisplayMode; 
      // -- Флаг, разрешающий перетаскивание эскизов
     property DragEnabled: Boolean read FDragEnabled write FDragEnabled;
      // -- Флаг, разрешающий перестановку эскизов внутри окна с помощью Drag'n'Drop. Если перестановка запрещена, а
      //    DragEnabled=True, то можно только "вытаскивать" эскизы наружу
-    property DragInsideEnabled: Boolean read FDragInsideEnabled write FDragInsideEnabled; 
+    property DragInsideEnabled: Boolean read FDragInsideEnabled write FDragInsideEnabled;
      // -- Индекс последнего места вставки при Drag'n'Drop. -1, если не было подходящего
     property DropTargetIndex: Integer read GetDropTargetIndex;
      // -- ID группы, отображаемой в данный момент (0, если нет)
@@ -5262,11 +5270,13 @@ var
     iItemCount, iColCount, idxTop, iLineHeight: Integer;
     bChg: Boolean;
     dc: HDC;
+    PrevDisplayMode: TThumbViewerDisplayMode;
   begin
-    if FUpdateLock>0 then Exit;
+    if (FUpdateLock>0) or not HandleAllocated then Exit;
+    PrevDisplayMode := FDisplayMode;
     FLastTooltipIdx := -1;
     Hint := '';
-     // Находим размеры ячейки
+     // Находим размеры ячейки и количество столбцов
     if FPhoA=nil then begin
       FWCell := 0;
       FHCell := 0;
@@ -5274,24 +5284,33 @@ var
       FWCell := FPhoA.FThumbnailWidth;
       FHCell := FPhoA.FThumbnailHeight;
     end;
-     // -- Прибавляем отступы на краях эскиза
-    Inc(FWCell, ILThumbMargin+IRThumbMargin);
-    Inc(FHCell, ITThumbMargin+IBThumbMargin);
-     // -- Находим высоту строки текста
-    dc := GetDC(0);
-    Canvas.Handle := dc;
-    Canvas.Font.Assign(Font);
-    iLineHeight := Canvas.TextHeight('Wg');
-    Canvas.Handle := 0;
-    ReleaseDC(0, dc);
-     // -- Прибавляем отступы на данные изображений
-    if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FHCell, iLineHeight);
-    if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FHCell, iLineHeight);
-     // Считаем количество столбцов
-    iItemCount := FPicLinks.Count;
-    iColCount  := Max(1, ClientWidth div FWCell);
+    case FDisplayMode of
+      tvdmTile: begin
+         // -- Прибавляем отступы на краях эскиза
+        Inc(FWCell, ILThumbMargin+IRThumbMargin);
+        Inc(FHCell, ITThumbMargin+IBThumbMargin);
+         // -- Находим высоту строки текста
+        dc := GetDC(0);
+        Canvas.Handle := dc;
+        Canvas.Font.Assign(Font);
+        iLineHeight := Canvas.TextHeight('Wg');
+        Canvas.Handle := 0;
+        ReleaseDC(0, dc);
+         // -- Прибавляем отступы на данные изображений
+        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FHCell, iLineHeight);
+        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FHCell, iLineHeight);
+         // Считаем количество столбцов
+        iColCount := Max(1, ClientWidth div FWCell);
+      end;
+      else {tvdmDetail} begin
+        iColCount := 1;
+        FWCell := ClientWidth;
+        Inc(FHCell, ITThumbMargin+IBThumbMargin);
+      end;
+    end;
      // Проверяем наличие изменений
-    bChg := (FItemCount<>iItemCount) or (FColCount<>iColCount);
+    iItemCount := FPicLinks.Count;
+    bChg := (FItemCount<>iItemCount) or (PrevDisplayMode<>FDisplayMode) or (FColCount<>iColCount);
     FItemCount := iItemCount;
     FColCount  := iColCount;
     FVisibleItems := (ClientHeight div FHCell)*FColCount;
@@ -5888,17 +5907,13 @@ var
       DrawDetail(LeftCorner, rText);
     end;
 
-    procedure DoPaintThumbnail;
+     // Отрисовывает эскиз в заданном прямоугольнике 
+    procedure DoPaintThumbnail(const rThumb: TRect);
     var
       bCacheUsed: Boolean;
       bmpThumb: TBitmap;
-      rThumb: TRect;
       ix, iy: Integer;
     begin
-       // Находим границы эскиза
-      rThumb := r;
-      if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(rThumb.Top,    iLineHeight);
-      if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(rThumb.Bottom, iLineHeight);
        // Ищем изображение в кэше
       bmpThumb := GetCachedThumb(Pic);
       bCacheUsed := bmpThumb<>nil;
@@ -5964,11 +5979,23 @@ var
       iLineHeight := TextHeight('Wg');
     end;
      // Отрисовываем изображение эскиза
-    r := Rect(ILThumbMargin, ITThumbMargin, FWCell-IRThumbMargin, FHCell-IBThumbMargin);
-    DoPaintThumbnail;
+    case FDisplayMode of
+      tvdmTile: begin
+        r := Rect(ILThumbMargin, ITThumbMargin, FWCell-IRThumbMargin, FHCell-IBThumbMargin);
+        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    iLineHeight);
+        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, iLineHeight);
+      end;
+      tvdmDetail: r := Rect(ILThumbMargin, ITThumbMargin, ILThumbMargin+FPhoA.FThumbnailWidth, FHCell-IBThumbMargin);
+    end;
+    DoPaintThumbnail(r);
      // Рисуем описание
-    DrawDetailsLR(tcLeftTop,    tcRightTop,    Rect(r.Left, r.Top, r.Right, r.Top+iLineHeight));
-    DrawDetailsLR(tcLeftBottom, tcRightBottom, Rect(r.Left, r.Bottom-iLineHeight, r.Right, r.Bottom));
+    case FDisplayMode of
+      tvdmTile: begin
+        DrawDetailsLR(tcLeftTop,    tcRightTop,    Rect(ILThumbMargin, ITThumbMargin,                    FWCell-IRThumbMargin, ITThumbMargin+iLineHeight));
+        DrawDetailsLR(tcLeftBottom, tcRightBottom, Rect(ILThumbMargin, FHCell-IBThumbMargin-iLineHeight, FWCell-IRThumbMargin, FHCell-IBThumbMargin));
+      end;
+      tvdmDetail: {!!!};
+    end;
   end;
 
   procedure TThumbnailViewer.PhoaThumbDimensionsChanged(Sender: TObject);
@@ -6103,6 +6130,14 @@ var
     DoSelectionChange;
   end;
 
+  procedure TThumbnailViewer.SetDisplayMode(Value: TThumbViewerDisplayMode);
+  begin
+    if FDisplayMode<>Value then begin
+      FDisplayMode := Value;
+      CalcLayout;
+    end;
+  end;
+
   procedure TThumbnailViewer.SetItemIndex(Value: Integer);
   begin
      // Если меняется индекс, или нет выделения, а оно нужно, или наоборот
@@ -6163,7 +6198,7 @@ var
     CalcLayout;
   end;
 
-  procedure TThumbnailViewer.SetThumbFontColor(const Value: TColor);
+  procedure TThumbnailViewer.SetThumbFontColor(Value: TColor);
   begin
     if FThumbFontColor<>Value then begin
       FThumbFontColor := Value;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.27 2004-06-15 14:01:13 dale Exp $
+//  $Id: Main.pas,v 1.28 2004-06-16 14:44:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1049,6 +1049,7 @@ uses
       with FViewer do begin
         Parent            := Self;
         Align             := alClient;
+//!!!DisplayMode       := tvdmDetail;
         DragCursor        := crDragMove;
         PhoA              := FPhoA;
         PopupMenu         := pmPics;
