@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.8 2004-05-20 11:50:54 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.9 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -784,7 +784,7 @@ uses
         else
           LogFailure('SLogEntry_ExecutableCopyingError', [FDestinationFolder, SysErrorMessage(GetLastError)]);
          // Записываем текущие настройки в phoa.ini
-        if FCDOpt_CopyIniSettings then fMain.IniStoreSettings(sDestPath+SDefaultIniFileName);
+        if FCDOpt_CopyIniSettings then IniSaveSettings(sDestPath+SDefaultIniFileName);
       end;
        // Создаём autorun.inf
       if (FExportedPhoA<>nil) and FCDOpt_CreateAutorun then

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.17 2004-05-21 16:34:53 dale Exp $
+//  $Id: Main.pas,v 1.18 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,14 +11,13 @@ interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, phObj, ConsVars,
-  ActiveX,
-  TB2Item, Placemnt, DTLangTools, XPMan, TB2MRU, IniFiles,
-  Menus, TBX, ImgList, ActnList, VirtualTrees, ExtCtrls, TBXStatusBars,
-  TB2Dock, TB2Toolbar, TBXExtItems, TBXLists;
+  ActiveX, XPMan,
+  VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt, DTLangTools,
+  TB2MRU, TBXExtItems, Menus, TBX, ActnList, TBXStatusBars, TBXLists,
+  TB2Dock, TB2Toolbar;
 
 type
   TfMain = class(TForm, IPhoaViews)
-    sMain: TSplitter;
     alMain: TActionList;
     aNew: TAction;
     aOpen: TAction;
@@ -97,7 +96,6 @@ type
     aStats: TAction;
     bStats: TTBXItem;
     pmView: TTBXPopupMenu;
-    pGroups: TPanel;
     aFind: TAction;
     iFind: TTBXItem;
     iToolsSep1: TTBXSeparatorItem;
@@ -142,7 +140,6 @@ type
     aPhoaView_Edit: TAction;
     aPhoaView_Delete: TAction;
     aPhoaView_MakeGroup: TAction;
-    tvGroups: TVirtualStringTree;
     pmPhoaView: TTBXPopupMenu;
     iPhoaView_SetDefault: TTBXItem;
     iPhoaViewSep1: TTBXSeparatorItem;
@@ -183,6 +180,10 @@ type
     giTools_PicsMenu: TTBGroupItem;
     aHelpFAQ: TAction;
     iHelpFAQ: TTBXItem;
+    dpGroups: TTBXDockablePanel;
+    tvGroups: TVirtualStringTree;
+    aRemoveSearchResults: TAction;
+    iRemoveSearchResults: TTBXItem;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -246,6 +247,7 @@ type
     procedure pmPicsPopup(Sender: TObject);
     procedure aaHelpFAQ(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure aaRemoveSearchResults(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -263,8 +265,8 @@ type
      //   выделенным изображениям
     FGroupsPopupToolsValidated: Boolean;
     FPicsPopupToolsValidated: Boolean;
-     // Флаг того, что параметры командной строки обработаны
-    FCommandLineProcessed: Boolean;
+     // Флаг того, что инициализация формы окончена
+    FInitialized: Boolean; 
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
@@ -317,6 +319,8 @@ type
     procedure ToolItemClick(Sender: TObject);
      // Отображает прогресс загрузки
     procedure ShowProgressInfo(const sConstName: String; const aParams: Array of const);
+     // Вводит в режим просмотра, начиная с текущего изображения
+    procedure StartViewMode(InitFlags: TImgViewInitFlags);
      // IPhoaViews
     function  GetViewIndex: Integer;
     procedure SetViewIndex(Value: Integer);
@@ -325,6 +329,7 @@ type
      // Message handlers
     procedure CMFocusChanged(var Msg: TCMFocusChanged); message CM_FOCUSCHANGED;
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
+    procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
      // Property handlers
     procedure SetFileName(const Value: String);
     function  GetFileName: String;
@@ -339,9 +344,6 @@ type
     procedure ApplySettings;
      // Переписывает во Viewer текущую выбранную группу
     procedure RefreshViewer;
-     // Процедуры сохранения/восстановления настроек из ini-файла
-    procedure IniStoreSettings(const sIniFileName: String);
-    procedure IniRestoreSettings(const sIniFileName: String);
      // Props
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
     property FileName: String read GetFileName write SetFileName;
@@ -464,6 +466,16 @@ uses
   end;
 
   procedure TfMain.aaIniLoadSettings(Sender: TObject);
+
+    procedure DoIniLoad(const sFileName: String);
+    begin
+       // Загружаем настройки
+      IniLoadSettings(sFileName); 
+       // Применяем настройки
+      ApplySettings;
+      ApplyLanguage;
+    end;
+
   begin
     with TOpenDialog.Create(Self) do
       try
@@ -472,7 +484,7 @@ uses
         Filter     := ConstVal('SFileFilter_Ini');
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
         Title      := ConstVal('SDlgTitle_OpenIni');
-        if Execute then IniRestoreSettings(FileName);
+        if Execute then DoIniLoad(FileName);
       finally
         Free;
       end;
@@ -487,7 +499,7 @@ uses
         Filter     := ConstVal('SFileFilter_Ini');
         Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
         Title      := ConstVal('SDlgTitle_SaveIni');
-        if Execute then IniStoreSettings(FileName);
+        if Execute then IniSaveSettings(FileName);
       finally
         Free;
       end;
@@ -570,6 +582,11 @@ uses
   procedure TfMain.aaPicOps(Sender: TObject);
   begin
     DoPicOps(FPhoA, FOperations, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
+  end;
+
+  procedure TfMain.aaRemoveSearchResults(Sender: TObject);
+  begin
+    DisplaySearchResults(True, False);
   end;
 
   procedure TfMain.aaSave(Sender: TObject);
@@ -657,7 +674,7 @@ uses
 
   procedure TfMain.aaView(Sender: TObject);
   begin
-    if Viewer.ItemIndex>=0 then ViewImage(CurGroup, FPhoA, Viewer.ItemIndex, FOperations, ViewIndex<0);
+    StartViewMode([]);
   end;
 
   procedure TfMain.AppException(Sender: TObject; E: Exception);
@@ -677,11 +694,6 @@ uses
 
   procedure TfMain.AppIdle(Sender: TObject; var Done: Boolean);
   begin
-     // Обрабатываем параметры команлной строки
-    if not FCommandLineProcessed then begin
-      ProcessCommandLine;
-      FCommandLineProcessed := True;
-    end;
      // Уничтожаем окно прогресса, если оно есть
     if ProgressWnd<>nil then begin
       ProgressWnd.DisplayStage('');
@@ -853,25 +865,30 @@ uses
 
   procedure TfMain.DoLoad(const sFileName: String);
   begin
-    FOperations.BeginUpdate;
-    tvGroups.BeginUpdate;
-    StartWait;
+    tvGroups.BeginSynch;
     try
+      FOperations.BeginUpdate;
+      tvGroups.BeginUpdate;
+      StartWait;
       try
-         // Уничтожаем результаты поиска
-        DisplaySearchResults(True, False);
-         // Загружаем файл и очищаем буфер отката
-        FPhoA.FileLoad(ExpandUNCFileName(sFileName), FOperations);
-         // Регистрируем файл в списке MRU
-        mruOpen.Add(FileName);
+        try
+           // Уничтожаем результаты поиска
+          DisplaySearchResults(True, False);
+           // Загружаем файл и очищаем буфер отката
+          FPhoA.FileLoad(ExpandUNCFileName(sFileName), FOperations);
+           // Регистрируем файл в списке MRU
+          mruOpen.Add(FileName);
+        finally
+           // Загружаем список представлений и по умолчанию выбираем "Группы изображений"
+          LoadViewList(-1);
+        end;
       finally
-         // Загружаем список представлений и по умолчанию выбираем "Группы изображений"
-        LoadViewList(-1);
+        StopWait;
+        tvGroups.EndUpdate;
+        FOperations.EndUpdate;
       end;
     finally
-      StopWait;
-      tvGroups.EndUpdate;
-      FOperations.EndUpdate;
+      tvGroups.EndSynch;
     end;
   end;
 
@@ -886,7 +903,7 @@ uses
     bGr, bPic, bPics, bGrSel, bPicSel, bPhoANode, bSrchNode, bPicGroups: Boolean;
     n: PVirtualNode;
   begin
-    if csDestroying in ComponentState then Exit;
+    if not FInitialized or (csDestroying in ComponentState) then Exit;
     n := tvGroups.FocusedNode;
     bGr        := ActiveControl=tvGroups;
     bPic       := ActiveControl=Viewer;
@@ -897,22 +914,23 @@ uses
     bPicSel    := Viewer.SelCount>0;
     bPicGroups := ViewIndex<0;
     aUndo.Caption := ConstVal(iif(FOperations.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FOperations.LastOpName]);
-    aUndo.Enabled               := FOperations.CanUndo;
-    smUndoHistory.Enabled       := FOperations.CanUndo;
-    aNewGroup.Enabled           := bPicGroups and bGrSel;
-    aNewPic.Enabled             := bPicGroups and bGrSel;
-    aDelete.Enabled             := bPicGroups and ((bGr and bGrSel and not bPhoANode) or (bPic and bPicSel and not bSrchNode));
-    aEdit.Enabled               := (not bPicGroups and bGr and bPhoANode) or (bPicGroups and bGr and bGrSel) or (bPicGroups and bPic and bPicSel);
-    aCut.Enabled                := bPicGroups and bPicSel and (wClipbrdPicFormatID<>0);
-    aCopy.Enabled               := bPicSel and (wClipbrdPicFormatID<>0);
-    aPaste.Enabled              := bPicGroups and bGrSel and Clipboard.HasFormat(wClipbrdPicFormatID);
-    aSortPics.Enabled           := bPicGroups and bPics;
-    aSelectAll.Enabled          := (CurGroup<>nil) and (Viewer.SelCount<CurGroup.PicIDs.Count);
-    aSelectNone.Enabled         := bPicSel;
-    aView.Enabled               := bPicSel;
-    aPicOps.Enabled             := bPicGroups and bPicSel;
-    aFileOperations.Enabled     := bPics and ((bGr and bGrSel) or (bPic and bPicSel));
-    aFind.Enabled               := bPics;
+    aUndo.Enabled                := FOperations.CanUndo;
+    smUndoHistory.Enabled        := FOperations.CanUndo;
+    aNewGroup.Enabled            := bPicGroups and bGrSel;
+    aNewPic.Enabled              := bPicGroups and bGrSel;
+    aDelete.Enabled              := bPicGroups and ((bGr and bGrSel and not bPhoANode) or (bPic and bPicSel and not bSrchNode));
+    aEdit.Enabled                := (not bPicGroups and bGr and bPhoANode) or (bPicGroups and bGr and bGrSel) or (bPicGroups and bPic and bPicSel);
+    aCut.Enabled                 := bPicGroups and bPicSel and (wClipbrdPicFormatID<>0);
+    aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
+    aPaste.Enabled               := bPicGroups and bGrSel and Clipboard.HasFormat(wClipbrdPicFormatID);
+    aSortPics.Enabled            := bPicGroups and bPics;
+    aSelectAll.Enabled           := (CurGroup<>nil) and (Viewer.SelCount<CurGroup.PicIDs.Count);
+    aSelectNone.Enabled          := bPicSel;
+    aView.Enabled                := bPicSel;
+    aRemoveSearchResults.Enabled := FSearchedNode<>nil;
+    aPicOps.Enabled              := bPicGroups and bPicSel;
+    aFileOperations.Enabled      := bPics and ((bGr and bGrSel) or (bPic and bPicSel));
+    aFind.Enabled                := bPics;
      // Views
     aPhoaView_Delete.Enabled    := not bPicGroups;
     aPhoaView_Edit.Enabled      := not bPicGroups;
@@ -954,45 +972,62 @@ uses
 
   procedure TfMain.FormCreate(Sender: TObject);
   begin
-    ShowProgressInfo('SMsg_Initializing', []);
-    ShortTimeFormat := 'hh:nn';
-    LongTimeFormat  := 'hh:nn:ss';
-     // Настраиваем fpMain
-    fpMain.IniFileName := SRegRoot;
-    fpMain.IniSection  := SRegMainWindow_Root;     
-     // Создаём фотоальбом
-    FPhoA := TPhotoAlbum.Create;
-    FViewIndex := -1;
-     // Настраиваем дерево папок
-    tvGroups.RootNodeCount := 1;
-    FRootNode := tvGroups.GetFirst;
-     // Настраиваем Application
-    Application.OnHint      := AppHint;
-    Application.OnException := AppException;
-    Application.OnIdle      := AppIdle;
-     // Создаём список результатов поиска
-    FSearchResults := TPhoaGroup.Create(nil);
-     // Create undoable operations list
-    FOperations := TPhoaOperations.Create;
-    FOperations.OnStatusChange := OperationsStatusChange;
-    FOperations.OnOpDone       := OperationsListChange;
-    FOperations.OnOpUndone     := OperationsListChange;
-     // Create viewer
-    FViewer := TThumbnailViewer.Create(Self);
-    with FViewer do begin
-      Parent            := Self;
-      Align             := alClient;
-      DragCursor        := crDragMove;
-      PhoA              := FPhoA;
-      PopupMenu         := pmPics;
-      OnDblClick        := aaView;
-      OnDragDrop        := ViewerDragDrop;
-      OnSelectionChange := ViewerSelectionChange;
+    try
+      ShowProgressInfo('SMsg_Initializing', []);
+      ShortTimeFormat := 'hh:nn';
+      LongTimeFormat  := 'hh:nn:ss';
+       // Настраиваем fpMain
+      fpMain.IniFileName := SRegRoot;
+      fpMain.IniSection  := SRegMainWindow_Root;     
+       // Создаём фотоальбом
+      FPhoA := TPhotoAlbum.Create;
+      FViewIndex := -1;
+       // Настраиваем Application
+      Application.OnHint      := AppHint;
+      Application.OnException := AppException;
+      Application.OnIdle      := AppIdle;
+       // Создаём список результатов поиска
+      FSearchResults := TPhoaGroup.Create(nil);
+       // Create undoable operations list
+      FOperations := TPhoaOperations.Create;
+      FOperations.OnStatusChange := OperationsStatusChange;
+      FOperations.OnOpDone       := OperationsListChange;
+      FOperations.OnOpUndone     := OperationsListChange;
+       // Create viewer
+      FViewer := TThumbnailViewer.Create(Self);
+      with FViewer do begin
+        Parent            := Self;
+        Align             := alClient;
+        DragCursor        := crDragMove;
+        PhoA              := FPhoA;
+        PopupMenu         := pmPics;
+        OnDblClick        := aaView;
+        OnDragDrop        := ViewerDragDrop;
+        OnSelectionChange := ViewerSelectionChange;
+      end;
+       // Load language list
+      LoadLanguageSettings;
+       // Add self to the clipboard viewer chain
+      FHNextClipbrdViewer := SetClipboardViewer(Handle);
+       // Применяем настройки
+      ShowProgressInfo('SMsg_ApplyingSettings', []);
+      RootSetting.Modified := True;
+      ApplySettings;
+      ApplyLanguage;
+       // Настраиваем дерево папок
+      tvGroups.BeginSynch;
+      try
+        tvGroups.NodeDataSize := SizeOf(Pointer);
+        tvGroups.RootNodeCount := 1;
+        FRootNode := tvGroups.GetFirst;
+         // Обрабатываем параметры командной строки
+        ProcessCommandLine;
+      finally
+        tvGroups.EndSynch;
+      end;
+    finally
+      FInitialized := True;
     end;
-     // Load language list
-    LoadLanguageSettings;
-     // Add self to the clipboard viewer chain
-    FHNextClipbrdViewer := SetClipboardViewer(Handle);
   end;
 
   procedure TfMain.FormDestroy(Sender: TObject);
@@ -1005,55 +1040,19 @@ uses
   end;
 
   procedure TfMain.fpMainRestorePlacement(Sender: TObject);
-  var sAutoLoadIniFile: String;
   begin
-    ShowProgressInfo('SMsg_LoadingRegSettings', []);
-     // Загружаем основные (определяемые пользователем) установки
-    RootSetting.RegLoad(fpMain.RegIniFile);
-    with fpMain.RegIniFile do begin
-       // Load misc settings
-      ViewInfoPos   := Rect(
-                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosL', 90),
-                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosT', 9400),
-                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosR', 9910),
-                       ReadInteger(SRegPrefs_Root, 'ViewInfoPosB', 9880));
-      pGroups.Width := ReadInteger(SRegPrefs_Root, 'GroupsWidth',  150);
-       // Load history
-      mruOpen.LoadFromRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
-    end;
+     // Load history
+    mruOpen.LoadFromRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
      // Load toolbars
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
-     // Если нужно и присутствует ini-файл, подгружаем настройки из него
-    if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
-      sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
-      if FileExists(sAutoLoadIniFile) then begin
-        ShowProgressInfo('SMsg_LoadingIniSettings', []);
-        IniRestoreSettings(sAutoLoadIniFile);
-      end;
-    end;
-     // Применяем настройки
-    ShowProgressInfo('SMsg_ApplyingSettings', []);
-    RootSetting.Modified := True;
-    ApplySettings;
-    ApplyLanguage;
   end;
 
   procedure TfMain.fpMainSavePlacement(Sender: TObject);
   begin
-     // Сохраняем основные (определяемые пользователем) установки
-    RootSetting.RegSave(fpMain.RegIniFile);
-    with fpMain.RegIniFile do begin
-       // Save misc settings
-      WriteInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left);
-      WriteInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top);
-      WriteInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right);
-      WriteInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom);
-      WriteInteger(SRegPrefs_Root, 'GroupsWidth',  pGroups.Width);
-       // Save toolbars
-      TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
-       // Save history
-      mruOpen.SaveToRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
-    end;
+     // Save toolbars
+    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
+     // Save history
+    mruOpen.SaveToRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
   end;
 
   function TfMain.GetCurGroup: TPhoaGroup;
@@ -1105,55 +1104,14 @@ uses
     Result := FPhoA.Views;
   end;
 
-  procedure TfMain.IniRestoreSettings(const sIniFileName: String);
-  var fi: TIniFile;
-  begin
-    fi := TIniFile.Create(sIniFileName);
-    try
-       // Загружаем установки
-      RootSetting.IniLoad(fi);
-       // Load misc settings
-      ViewInfoPos := Rect(
-        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left),
-        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top),
-        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right),
-        fi.ReadInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom));
-    finally
-      fi.Free;
-    end;
-     // Применяем настройки
-    ApplySettings;
-    ApplyLanguage;
-  end;
-
-  procedure TfMain.IniStoreSettings(const sIniFileName: String);
-  var fi: TIniFile;
-  begin
-    fi := TIniFile.Create(sIniFileName);
-    try
-       // Сохраняем основные (определяемые пользователем) установки
-      RootSetting.IniSave(fi);
-       // Save misc settings
-      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosL', ViewInfoPos.Left);
-      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosT', ViewInfoPos.Top);
-      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosR', ViewInfoPos.Right);
-      fi.WriteInteger(SRegPrefs_Root, 'ViewInfoPosB', ViewInfoPos.Bottom);
-    finally
-      fi.Free;
-    end;
-  end;
-
   procedure TfMain.LoadGroupTree;
   begin
-    with tvGroups do begin
-      BeginUpdate;
-      try
-        ReinitNode(FRootNode, True);
-        tvGroups.Selected[FRootNode] := True;
-        tvGroups.FocusedNode := FRootNode;
-      finally
-        EndUpdate;
-      end;
+    tvGroups.BeginUpdate;
+    try
+      tvGroups.ReinitNode(FRootNode, True);
+      ActivateVTNode(tvGroups, FRootNode);
+    finally
+      tvGroups.EndUpdate;
     end;
     RefreshViewer;
   end;
@@ -1292,6 +1250,8 @@ uses
   procedure TfMain.ProcessCommandLine;
   var
     sPhoaFile: String;
+    CmdLine: TPhoaCommandLine;
+    ImgViewInitFlags: TImgViewInitFlags;
 
      // Выбирает в качестве текущего заданное представление, если sViewName<>''
     procedure SelectViewByName(const sViewName: String);
@@ -1312,24 +1272,47 @@ uses
      // Выбирает изображение с заданным ID
     procedure SelectPicByID(iID: Integer);
     begin
-      if (iID>0) and (CurGroup<>nil) then Viewer.ItemIndex := CurGroup.PicIDs.IndexOf(iID);
+      if (iID>0) and (CurGroup<>nil) then begin
+        Viewer.ItemIndex := CurGroup.PicIDs.IndexOf(iID);
+        Viewer.ScrollIntoView;
+      end;
     end;
 
   begin
-     // Если указан файл - загружаем его
-    if SLCommandLineFiles.Count>0 then begin
-      sPhoaFile := SLCommandLineFiles[0];
-      ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
-      DoLoad(sPhoaFile);
-       // -- Если указано представление - выбираем его
-      SelectViewByName(SLCommandLineKeys.Values['w']);
-       // -- Если указана группа - ищем и выделяем её
-      SelectGroupByPath(SLCommandLineKeys.Values['g']);
-       // -- Если указан ID изображения - ищем и выделяем его
-      SelectPicByID(StrToIntDef(SLCommandLineKeys.Values['i'], 0));
-     // Иначе загружаем список представлений и выбираем "Группы изображений"
-    end else
-      LoadViewList(-1);
+     // Разбираем параметры командной строки
+    CmdLine := TPhoaCommandLine.Create;
+    try
+       // Если указан файл - загружаем его
+      if clkOpenPhoa in CmdLine.Keys then begin
+        sPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
+        ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
+        DoLoad(sPhoaFile);
+         // -- Если указано представление - выбираем его
+        if clkSelectView  in CmdLine.Keys then SelectViewByName(CmdLine.KeyValues[clkSelectView]);
+         // -- Если указана группа - ищем и выделяем её
+        if clkSelectGroup in CmdLine.Keys then SelectGroupByPath(CmdLine.KeyValues[clkSelectGroup]);
+         // -- Если указан ID изображения - ищем и выделяем его
+        if clkSelectPicID in CmdLine.Keys then SelectPicByID(StrToIntDef(CmdLine.KeyValues[clkSelectPicID], 0));
+         // -- Если указан режим просмотра, готовим инициализационные флаги
+        if clkViewMode in CmdLine.Keys then begin
+          ImgViewInitFlags := [];
+           // ---- Просмотр слайдов
+          if clkSlideShow   in CmdLine.Keys then Include(ImgViewInitFlags, ivifSlideShow);
+           // ---- Полноэкранный режим
+          if clkFullScreen  in CmdLine.Keys then
+            if CmdLine.KeyValues[clkFullScreen]='0' then
+              Include(ImgViewInitFlags, ivifForceWindow)
+            else
+              Include(ImgViewInitFlags, ivifForceFullscreen);
+           // ---- Отправляем отложенное сообщение о необходимости входа в режим просмотра
+          PostMessage(Handle, WM_STARTVIEWMODE, Byte(ImgViewInitFlags), 0);
+        end;
+       // Иначе загружаем список представлений и выбираем "Группы изображений"
+      end else
+        LoadViewList(-1);
+    finally
+      CmdLine.Free;
+    end;
     EnableActions;
   end;
 
@@ -1383,6 +1366,12 @@ uses
   procedure TfMain.ShowProgressInfo(const sConstName: String; const aParams: array of const);
   begin
     if ProgressWnd<>nil then ProgressWnd.DisplayStage(ConstVal(sConstName, aParams));
+  end;
+
+  procedure TfMain.StartViewMode(InitFlags: TImgViewInitFlags);
+  begin
+    if (CurGroup<>nil) and (Viewer.ItemIndex>=0) then
+      ViewImage(InitFlags, CurGroup, FPhoA, Viewer.ItemIndex, FOperations, ViewIndex<0);
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);
@@ -1706,6 +1695,11 @@ uses
   procedure TfMain.WMHelp(var Msg: TWMHelp);
   begin
     HtmlHelpShowContents;
+  end;
+
+  procedure TfMain.WMStartViewMode(var Msg: TWMStartViewMode);
+  begin
+    StartViewMode(Msg.InitFlags);
   end;
 
 initialization

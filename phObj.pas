@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.12 2004-05-21 16:34:53 dale Exp $
+//  $Id: phObj.pas,v 1.13 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1158,8 +1158,6 @@ type
     procedure LimitCacheSize(iNumber: Integer);
      // Возвращает допустимый TopIndex на основе предлагаемого
     function  GetValidTopIndex(idxOffered: Integer): Integer;
-     // Прокручивает содержимое, чтобы было видно ItemIndex
-    procedure ScrollIntoView;
      // Callback-обработчик изменения размеров эскиза фотоальбома
     procedure PhoaThumbDimensionsChanged;
      // Настраивает ScrollBar
@@ -1226,7 +1224,8 @@ type
     function  ItemRect(Index: Integer): TRect;
      // Ставит эскиз в очередь на обновление
     procedure InvalidateItem(Index: Integer);
-     // Работа с буфером обмена
+     // Прокручивает содержимое, чтобы было видно ItemIndex
+    procedure ScrollIntoView;
      // Загружает и отображает в viewer'е все изображения группы
     procedure ViewGroup(Group: TPhoaGroup);
      // Блокировка перерисовки
@@ -1475,6 +1474,76 @@ type
     property Empty: Boolean read GetEmpty;
   end;
 
+   //-------------------------------------------------------------------------------------------------------------------
+   // Командная строка PhoA
+   //-------------------------------------------------------------------------------------------------------------------
+
+  TCmdLineKey = (
+    clkOpenPhoa,    // Открыть фотоальбом <значение>
+    clkSelectView,  // Перейти в режим отображения представления <значение>
+    clkSelectGroup, // Выделить в дереве группу <значение>
+    clkSelectPicID, // Отобразить изображение с ID=<значение>
+    clkViewMode,    // Перейти в режим просмотра
+    clkSlideShow,   // Включить режим слайдшоу после запуска программы
+    clkFullScreen); // Полноэкранный режим просмотра (<значение>=1. При <значение>=0 - НЕ полноэкранный режим просмотра)
+  TCmdLineKeys = set of TCmdLineKey;
+
+   // Потребность ключа в значении
+  TCmdLineKeyValueMode = (
+    clkvmNo,        // У ключа не бывает значения
+    clkvmOptional,  // У ключа может быть, а может и не быть значения
+    clkvmRequired); // У ключа должно быть значение
+
+   // Exception
+  EPhoaCommandLineError = class(EPhoaException);
+
+  TPhoaCommandLine = class(TObject)
+  private
+     // Список ключей/значений (Strings[] - значения, Objects[] - ключи)
+    FKeyValues: TStringList;
+     // Prop storage
+    FKeys: TCmdLineKeys;
+     // Разбирает текущую командную строку
+    procedure ParseCmdLine;
+     // Возвращает индекс значения для ключа в FKeyValues или -1, если нет такого
+    function  KeyValIndex(Key: TCmdLineKey): Integer;
+     // Prop handlers
+    function  GetKeyValues(Key: TCmdLineKey): String;
+  public
+    constructor Create;
+    destructor Destroy; override;
+     // Props
+     // -- Набор ключей, указанных в командной строке
+    property Keys: TCmdLineKeys read FKeys;
+     // -- Значения ключей, указанные в командной строке
+    property KeyValues[Key: TCmdLineKey]: String read GetKeyValues;
+  end;
+
+   // Параметры ключей
+const
+   aCmdLineKeys: Array[TCmdLineKey] of
+     record
+       ValueMode: TCmdLineKeyValueMode; // Потребность ключа в значении
+       cChar:     Char;                 // Символ (имя) ключа
+     end = (
+     (ValueMode: clkvmOptional; cChar: #0),   // clkOpenPhoa
+     (ValueMode: clkvmRequired; cChar: 'w'),  // clkSelectView
+     (ValueMode: clkvmRequired; cChar: 'g'),  // clkSelectGroup
+     (ValueMode: clkvmRequired; cChar: 'i'),  // clkSelectPicID
+     (ValueMode: clkvmNo;       cChar: 'v'),  // clkViewMode
+     (ValueMode: clkvmNo;       cChar: 's'),  // clkSlideShow
+     (ValueMode: clkvmOptional; cChar: 'f')); // clkFullScreen
+
+resourcestring
+  SCmdLineErrMsg_UnknownKey             = 'Unknown command line key: "%s"';
+  SCmdLineErrMsg_DuplicateKey           = 'Duplicate key "%s" in the command line';
+  SCmdLineErrMsg_KeyNameInvalid         = 'Key name invalid in the command line ("%s")';
+  SCmdLineErrMsg_DuplicateOpenPhoaValue = 'Duplicate .phoa file to open specified in the command line';
+  SCmdLineErrMsg_DuplicateKeyValue      = 'Duplicate value for key "%s" specified in the command line';
+  SCmdLineErrMsg_KeyValueMissing        = 'Value for key "%s" is missing in the command line';
+
+   //-------------------------------------------------------------------------------------------------------------------
+
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
   procedure StringsLoadPFAM(PhoA: TPhotoAlbum; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
 
@@ -1482,8 +1551,9 @@ type
   function PicArrayToIDArray(const Pics: TPicArray): TIDArray;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses JPEG, phUtils, StrUtils, Clipbrd, TypInfo, Math, Registry, DateUtils, ShellAPI, Themes,
-  Variants, VirtualDataObject, phSettings, udMsgBox;
+uses
+  TypInfo, Variants, Math, Registry, DateUtils, StrUtils, Clipbrd, ShellAPI, Themes, JPEG, VirtualDataObject,
+  phUtils, phSettings, udMsgBox;
 
 type
    // Запись кэша эскиза
@@ -6406,6 +6476,113 @@ var
         Result := TPhoaMask(FMasks[i]).Matches(sFilename);
         if Result then Break;
       end;
+  end;
+
+   //===================================================================================================================
+   // TPhoaCommandLine
+   //===================================================================================================================
+
+  procedure PhoaCommandLineError(const sMsg: String; const aParams: Array of const);
+  begin
+    raise EPhoaCommandLineError.CreateFmt(sMsg, aParams);
+  end;
+
+  constructor TPhoaCommandLine.Create;
+  begin
+    inherited Create;
+    FKeyValues := TStringList.Create;
+    ParseCmdLine;
+  end;
+
+  destructor TPhoaCommandLine.Destroy;
+  begin
+    FKeyValues.Free;
+    inherited Destroy;
+  end;
+
+  function TPhoaCommandLine.GetKeyValues(Key: TCmdLineKey): String;
+  var idx: Integer;
+  begin
+    idx := FKeyValues.IndexOfObject(Pointer(Key));
+    if idx<0 then Result := '' else Result := FKeyValues[idx];
+  end;
+
+  function TPhoaCommandLine.KeyValIndex(Key: TCmdLineKey): Integer;
+  begin
+    Result := FKeyValues.IndexOfObject(Pointer(Key));
+  end;
+
+  procedure TPhoaCommandLine.ParseCmdLine;
+  var
+    i: Integer;
+    sParam, sPhoaName: String;
+    k, kLast: TCmdLineKey;
+
+     // Находит и возвращает TCmdLineKey, соответствующий символу c (case insensitive). Если не находит, вызывает
+     //   EPhoaCommandLineError
+    function GetKeyByChar(c: Char): TCmdLineKey;
+    begin
+       // Convert to lowercase
+      if c in ['A'..'Z'] then Inc(c, Ord('a')-Ord('A'));
+       // Iterate through known chars
+      for Result := Low(Result) to High(Result) do
+        if aCmdLineKeys[Result].cChar=c then Exit;
+      Result := clkOpenPhoa; // Satisfy the compiler  
+      PhoaCommandLineError(SCmdLineErrMsg_UnknownKey, [c]);
+    end;
+
+     // Устанавливает значение sValue для ключа Key. Если у этого ключа уже есть значение, вызывает
+     //   EPhoaCommandLineError
+    procedure SetKeyValue(Key: TCmdLineKey; sValue: String);
+    begin
+       // Ищем такой ключ
+      if KeyValIndex(Key)>=0 then
+        if Key=clkOpenPhoa then
+          PhoaCommandLineError(SCmdLineErrMsg_DuplicateOpenPhoaValue, [])
+        else
+          PhoaCommandLineError(SCmdLineErrMsg_DuplicateKeyValue, [aCmdLineKeys[Key].cChar]);
+       // Нет ещё такого
+      FKeyValues.AddObject(sValue, Pointer(Key)); 
+    end;
+
+  begin
+    FKeys := [];
+    FKeyValues.Clear;
+    kLast := clkOpenPhoa;
+    sPhoaName := '';
+     // Перебираем все параметры
+    for i := 1 to ParamCount do begin
+      sParam := Trim(ParamStr(i));
+      if sParam<>'' then
+        case sParam[1] of
+           // Ключ. Проверяем его формат
+          '-':
+            if Length(sParam)=2 then begin
+              k := GetKeyByChar(sParam[2]);
+              if k in FKeys then PhoaCommandLineError(SCmdLineErrMsg_DuplicateKey, [aCmdLineKeys[k].cChar]);
+              Include(FKeys, k);
+              kLast := k;
+            end else
+              PhoaCommandLineError(SCmdLineErrMsg_KeyNameInvalid, [sParam]);
+           // Значение. Проверяем потребность предыдущего ключа в значении
+          else begin
+            case aCmdLineKeys[kLast].ValueMode of
+               // Нет значения. Трактуем значение как файл фотоальбома для открытия
+              clkvmNo: SetKeyValue(clkOpenPhoa, sParam);
+               // Есть значение. Связываем его с ключом
+              else SetKeyValue(kLast, sParam);
+            end;
+             // Если значение попало в ключ по умолчанию, включаем его в набор (т.к. явно он не указывается)
+            if kLast=clkOpenPhoa then Include(FKeys, clkOpenPhoa);
+             // Сбрасываем ключ в режим по умолчанию
+            kLast := clkOpenPhoa;
+          end;
+        end;
+    end;
+     // Проверяем обязательные значения параметров
+    for k := Low(k) to High(k) do
+      if (k in FKeys) and (aCmdLineKeys[k].ValueMode=clkvmRequired) and (KeyValIndex(k)<0) then
+        PhoaCommandLineError(SCmdLineErrMsg_KeyValueMissing, [aCmdLineKeys[k].cChar]);
   end;
 
 initialization

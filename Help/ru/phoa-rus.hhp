@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-rus.hhp,v 1.5 2004-05-16 11:33:07 dale Exp $
+;   $Id: phoa-rus.hhp,v 1.6 2004-05-23 13:23:09 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -24,6 +24,7 @@ eula-rus.html
 faq.html
 file-formats.html
 how-it-works.html
+info-cmd-line.html
 intf-album-props.html
 intf-browse-mode.html
 intf-browse-mode-menu.html

@@ -266,6 +266,10 @@
 			<param name="Local" value="intf-key-mouse-controls.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc; &ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&icirc;&eacute; &ntilde;&ograve;&eth;&icirc;&ecirc;&egrave;">
+			<param name="Local" value="info-cmd-line.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
 			<param name="Local" value="theory-metadata.html">
 			</OBJECT>

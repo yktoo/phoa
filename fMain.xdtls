@@ -2734,28 +2734,12 @@
           <tranEntry langID="1046" value="Initializing..."/>
         </tranEntries>
       </propEntry>
-      <propEntry name="SMsg_LoadingIniSettings">
-        <tranEntries>
-          <tranEntry langID="1049" value="Загрузка настроек из ini-файла..."/>
-          <tranEntry langID="1033" value="Loading ini-settings..."/>
-          <tranEntry langID="1031" value="Loading ini-settings..."/>
-          <tranEntry langID="1046" value="Loading ini-settings..."/>
-        </tranEntries>
-      </propEntry>
       <propEntry name="SMsg_LoadingPhoa">
         <tranEntries>
           <tranEntry langID="1049" value="Загрузка фотоальбома %s..."/>
           <tranEntry langID="1033" value="Loading photo album %s..."/>
           <tranEntry langID="1031" value="Loading photo album %s..."/>
           <tranEntry langID="1046" value="Loading photo album %s..."/>
-        </tranEntries>
-      </propEntry>
-      <propEntry name="SMsg_LoadingRegSettings">
-        <tranEntries>
-          <tranEntry langID="1049" value="Загрузка настроек из реестра..."/>
-          <tranEntry langID="1033" value="Loading Registry settings..."/>
-          <tranEntry langID="1031" value="Loading Registry settings..."/>
-          <tranEntry langID="1046" value="Loading Registry settings..."/>
         </tranEntries>
       </propEntry>
       <propEntry name="SMsg_NoMetatagSelected">
@@ -4592,6 +4576,40 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="aRemoveSearchResults">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Remove Searc&amp;h Results"/>
+              <tranEntry langID="1049" value="Убрать ре&amp;зультаты поиска"/>
+              <tranEntry langID="1058" value="Убрать ре&amp;зультаты поиска"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="View"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Remove Search results|Remove the Search Results folder from the group tree"/>
+              <tranEntry langID="1049" value="Убрать результаты поиска|Убрать папку результатов поиска из дерева групп"/>
+              <tranEntry langID="1058" value="Убрать результаты поиска|Убрать папку результатов поиска из дерева групп"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="aSave">
         <propEntries>
           <propEntry name="Caption">
@@ -5214,6 +5232,30 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="dpGroups">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Picture Groups"/>
+              <tranEntry langID="1049" value="Группы изображений"/>
+              <tranEntry langID="1031" value="Bildgruppen"/>
+              <tranEntry langID="1046" value="Grupos de imagens"/>
+              <tranEntry langID="1058" value="Групи зображень"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="dtlsMain">
         <propEntries/>
         <compEntries/>
@@ -5803,38 +5845,6 @@
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="pGroups">
-        <propEntries>
-          <propEntry name="Caption">
-            <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="HelpKeyword">
-            <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="Hint">
-            <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-            </tranEntries>
-          </propEntry>
-        </propEntries>
-        <compEntries/>
-      </compEntry>
       <compEntry name="pmGroups">
         <propEntries/>
         <compEntries/>
@@ -5852,29 +5862,6 @@
         <compEntries/>
       </compEntry>
       <compEntry name="sbarMain">
-        <propEntries>
-          <propEntry name="HelpKeyword">
-            <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="Hint">
-            <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-            </tranEntries>
-          </propEntry>
-        </propEntries>
-        <compEntries/>
-      </compEntry>
-      <compEntry name="sMain">
         <propEntries>
           <propEntry name="HelpKeyword">
             <tranEntries>

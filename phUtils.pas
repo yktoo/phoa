@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
+//  $Id: phUtils.pas,v 1.12 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -23,6 +23,10 @@ uses
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
   procedure RegisterCBHistory(cb: TComboBox);
 
+   // Преобразование TRect<->Строка вида '1,2,3,4'
+  function  RectToStr(const r: TRect): String;
+  function  StrToRect(const s: String; const rDefault: TRect): TRect;
+  
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
   procedure FontFromStr(Font: TFont; const sFont: String);
@@ -212,6 +216,29 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
         while Count>IMaxHistoryEntries do Delete(IMaxHistoryEntries);
       end;
     cb.Text := s;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // Rectangles
+   //-------------------------------------------------------------------------------------------------------------------
+
+  function  RectToStr(const r: TRect): String;
+  begin
+    Result := Format('%d,%d,%d,%d', [r.Left, r.Top, r.Right, r.Bottom]);
+  end;
+
+  function  StrToRect(const s: String; const rDefault: TRect): TRect;
+  var ss: String;
+  begin
+    ss := s;
+    try
+      Result.Left   := StrToInt(ExtractFirstWord(ss, ','));
+      Result.Top    := StrToInt(ExtractFirstWord(ss, ','));
+      Result.Right  := StrToInt(ExtractFirstWord(ss, ','));
+      Result.Bottom := StrToInt(ExtractFirstWord(ss, ','));
+    except
+      on EConvertError do Result := rDefault;
+    end;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

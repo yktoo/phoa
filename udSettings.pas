@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.12 2004-05-06 10:13:26 dale Exp $
+//  $Id: udSettings.pas,v 1.13 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -85,14 +85,16 @@ uses phUtils, Main, TypInfo;
   begin
     for i := 0 to FLocalRootSetting.ChildCount-1 do begin
       PPS := FLocalRootSetting.Children[i] as TPhoaPageSetting;
-      tbi := TTBXItem.Create(Self);
-      tbi.Caption     := ConstValEx(PPS.Name);
-      tbi.HelpContext := PPS.HelpContext;
-      tbi.ImageIndex  := PPS.ImageIndex;
-      tbi.Tag         := Integer(PPS);
-      tbi.OnClick     := NavBarButtonClick;
-      if i<9 then tbi.ShortCut := 16433+i; // Ctrl+1..9 keys
-      tbNav.Items.Add(tbi);
+      if PPS.Visible then begin
+        tbi := TTBXItem.Create(Self);
+        tbi.Caption     := ConstValEx(PPS.Name);
+        tbi.HelpContext := PPS.HelpContext;
+        tbi.ImageIndex  := PPS.ImageIndex;
+        tbi.Tag         := Integer(PPS);
+        tbi.OnClick     := NavBarButtonClick;
+        if i<9 then tbi.ShortCut := 16433+i; // Ctrl+1..9 keys
+        tbNav.Items.Add(tbi);
+      end;
     end;
   end;
 

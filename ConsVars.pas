@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.25 2004-05-21 16:34:53 dale Exp $
+//  $Id: ConsVars.pas,v 1.26 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -80,6 +80,21 @@ const
     gbpFilePath, gbpDateByYear, gbpDateByMonth, gbpDateByDay, gbpPlace, gbpFilmNumber, gbpKeywords];
 
 type
+   // Инициализационные флаги режима просмотра
+  TImgViewInitFlag = (
+    ivifForceFullscreen, // Принудительно задать полноэкранный режим (несовместим с ivifForceWindow)
+    ivifForceWindow,     // Принудительно задать оконный режим (несовместим с ivifForceFullscreen)
+    ivifSlideShow);      // Начать показ слайдов
+  TImgViewInitFlags = set of TImgViewInitFlag;
+
+   // Структура сообщения для WM_STARTVIEWMODE
+  TWMStartViewMode = packed record
+    Msg:       Cardinal;
+    InitFlags: TImgViewInitFlags;
+    Unused:    Array[0..6] of Byte;
+    Result:    Longint;
+  end;
+
    // Режим массовой простановки отметки
   TMassCheckMode = (mcmAll, mcmNone, mcmInvert);
 
@@ -508,9 +523,11 @@ const
   iiAction                        = 62;
   iiSaveSettings                  = 63;
   iiLoadSettings                  = 64;
+  iiRemoveSearchResults           = 65;
 
    // Help topics
   IDH_start                       = 00001;
+  IDH_info_cmd_line               = 00010;
   IDH_intf_album_props            = 00060;
   IDH_intf_browse_mode_menu       = 00070;
   IDH_intf_browse_mode_tasks      = 00080;
@@ -725,6 +742,10 @@ const
    //===================================================================================================================
   ISettingID_Tools                     = 4001; // Инструменты
 
+   //===================================================================================================================
+  ISettingID_Hidden                    = 9001; // Невидимые настройки
+  ISettingID_Hidden_ViewInfoPos        = 9010; // Положение информационного блока режима просмотра в 10-тысячных долях размера экрана 
+
    // Соответствие между операциями с файлами изображений и опциями на их подтверждения
   aFileOpConfirmSettingIDs: Array[TFileOperationKind] of Integer = (
     ISettingID_Dlgs_FOW_CfmCopyFiles,
@@ -733,6 +754,8 @@ const
     ISettingID_Dlgs_FOW_CfmRebuildTh,
     ISettingID_Dlgs_FOW_CfmRepairFLs);
 
+   // Сообщение о необходимости запуска режима просмотра. wParam = флаги инициализации, TImgViewInitFlags
+  WM_STARTVIEWMODE              = WM_USER+$1090;
    // Сообщение о необходимости обновить статус страницы
   WM_PAGEUPDATE                 = WM_USER+$1100;
    // Сообщение для редактора настроек - о необходимости встроить в дерево редактор текущей настройки
@@ -845,13 +868,6 @@ var
   cMainCodePage: Cardinal;
    // PhoA picture clipboard format identifier
   wClipbrdPicFormatID: Word;
-   // Границы информации при просмотре в 10-тысячных долях размера экрана [90, 9400, 9910, 9880]
-  ViewInfoPos: TRect;         
-
-   // Список файлов, переданных в командной строке
-  SLCommandLineFiles: TStringList;
-   // Список ключей (без символа '-', имя ключа всегда в lowercase) и их значений, переданных в командной строке
-  SLCommandLineKeys: TStringList;
 
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
@@ -860,13 +876,13 @@ var
    // Возвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии)
   function  ValidRevisionIndex(idxRev: Integer): Integer;
 
-   // Разбирает командную строку приложения. Возвращает True, если всё сделано успешно
-  function  ParseCommandLine: Boolean;
-
    // Применяет пользовательские настройки к TVirtualStringTree
   procedure ApplyTreeSettings(Tree: TVirtualStringTree);
    // Применяет пользовательские настройки к докам/панелям инструментов
   procedure ApplyToolbarSettings(Dock: TTBXDock);
+
+   // Создаёт иерархию настроек (со значениями по умолчанию)
+  procedure InitSettings;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
@@ -888,61 +904,6 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
   function ValidRevisionIndex(idxRev: Integer): Integer;
   begin
     Result := iif((idxRev>=0) and (idxRev<=High(aPhFileRevisions)), idxRev, 0);
-  end;
-
-  function ParseCommandLine: Boolean;
-  var
-    i: Integer;
-    s: String;
-    cKey: Char;
-
-    procedure MsgErr(const s: String);
-    begin
-      MessageBox(Application.Handle, PChar(s), 'Error', MB_OK or MB_ICONERROR);
-    end;
-
-    function ProcessKey(const s: String): Boolean;
-    begin
-      Result := False;
-       // Проверяем, что есть имя ключа
-      if s='' then
-        MsgErr('Key name missing in the command line')
-      else begin
-         // Преобразуем ключ к нижнему регистру
-        cKey := s[1];
-        if cKey in ['A'..'Z'] then Inc(cKey, Ord('a')-Ord('A')); 
-         // Проверяем допустимость ключа
-        if not (cKey in CmdLine_ValidKeys) then
-          MsgErr('Unknown command line key name: '+cKey)
-        else begin
-          SLCommandLineKeys.Add(cKey+'='+Copy(s, 2, MaxInt));
-          Result := True;
-        end;
-      end;
-    end;
-
-    function ProcessFile(const s: String): Boolean;
-    begin
-       // Проверяем существование файла
-      Result := FileExists(s);
-      if Result then SLCommandLineFiles.Add(s) else MsgErr('File does not exist: '+s);
-    end;
-
-  begin
-    Result := True;
-    SLCommandLineFiles.Clear;
-    SLCommandLineKeys.Clear;
-    for i := 1 to ParamCount do begin
-      s := Trim(ParamStr(i));
-      if s<>'' then
-        case s[1] of
-           // Ключ: обрабатываем его (без символа '-')
-          '-': Result := ProcessKey(Copy(s, 2, MaxInt));
-           // Файл
-          else Result := ProcessFile(s);
-        end;
-      if not Result then Break;
-    end;
   end;
 
    //===================================================================================================================
@@ -1052,6 +1013,9 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
     end;
   end;
 
+type
+  TTBDockWndCast = class(TTBCustomDockableWindow);
+
   procedure ApplyToolbarSettings(Dock: TTBXDock);
   var i, iMode: Integer;
   begin
@@ -1061,7 +1025,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
      // Настраиваем панели в доке
     if iMode>0 then
       for i := 0 to Dock.ToolbarCount-1 do
-        with Dock.Toolbars[i] as TTBXToolbar do
+        with TTBDockWndCast(Dock.Toolbars[i]) do
           case iMode of
             1: DockMode := dmCannotFloatOrChangeDocks;
             2: DockMode := dmCannotFloat;
@@ -1075,7 +1039,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
   procedure InitSettings;
   var Lvl1, Lvl2, Lvl3, Lvl4: TPhoaSetting;
   begin
-     //=================================================================================================================
+     //== Общие ========================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Gen, iiProps, '@ISettingID_Gen', IDH_setup_general);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US}, MinInt, MaxInt);
@@ -1110,7 +1074,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1, 0, 1);
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
-     //=================================================================================================================
+     //== Режим обзора =================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiFolder, '@ISettingID_Browse', IDH_setup_browse_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
@@ -1135,7 +1099,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest), Byte(Low(TStretchFilter)), Byte(High(TStretchFilter)));
         AddStretchFilterSettings(Lvl3 as TPhoaIntSetting);
       Lvl2 := TPhoaIntEntrySetting.Create(Lvl1, ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount', 32, 1, MaxInt);
-     //=================================================================================================================
+     //== Режим просмотра ==============================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_View, iiViewMode, '@ISettingID_View', IDH_setup_view_mode);
       Lvl2 := TPhoaBoolSetting.Create (Lvl1, ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
       Lvl2 := TPhoaBoolSetting.Create (Lvl1, ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
@@ -1168,7 +1132,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_View_Slideshow,        '@ISettingID_View_Slideshow');
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_View_SlideInterval,    '@ISettingID_View_SlideInterval', 5000, 0, 600*1000);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
-     //=================================================================================================================
+     //== Диалоги ======================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
       Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashStartFade,  '@ISettingID_Dlgs_SplashStartFade', True);
       Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashAboutFade,  '@ISettingID_Dlgs_SplashAboutFade', True);
@@ -1202,10 +1166,13 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_CfmRebuildTh, '@ISettingID_Dlgs_FOW_CfmRebuildTh', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
-     //=================================================================================================================
+     //== Инструменты ==================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_tools);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Print', '@SActionHint_PrintPics', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
+     //== (Скрытые настройки) ==========================================================================================
+    Lvl1 := TPhoaInvisiblePageSetting.Create(RootSetting, ISettingID_Hidden);
+      Lvl2 := TPhoaRectSetting.Create(Lvl1, ISettingID_Hidden_ViewInfoPos, '@ISettingID_Hidden_ViewInfoPos', Rect(90, 9400, 9910, 9880));
   end;
   {$HINTS ON}
 
@@ -1219,15 +1186,9 @@ initialization
   end;
    // Регистрируем формат буфера обмена
   wClipbrdPicFormatID := RegisterClipboardFormat(SClipbrdPicFormatName);
-   // Создаём установки
+   // Создаём настройки
   RootSetting := TPhoaSetting.Create(nil, 0, '');
-  InitSettings;
-   // Создаём списки параметров командной строки
-  SLCommandLineFiles := TStringList.Create;
-  SLCommandLineKeys  := TStringList.Create;
 finalization
-  SLCommandLineKeys.Free;
-  SLCommandLineFiles.Free;
   RootSetting.Free;
 end.
 

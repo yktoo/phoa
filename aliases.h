@@ -4,6 +4,7 @@ IDH_eula_rus                       = eula-rus.html
 IDH_faq                            = faq.html
 IDH_file_formats                   = file-formats.html
 IDH_how_it_works                   = how-it-works.html
+IDH_info_cmd_line                  = info-cmd-line.html
 IDH_intf_album_props               = intf-album-props.html
 IDH_intf_browse_mode_menu          = intf-browse-mode-menu.html
 IDH_intf_browse_mode_tasks         = intf-browse-mode-tasks.html

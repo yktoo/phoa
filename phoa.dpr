@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.13 2004-05-21 16:34:53 dale Exp $
+//  $Id: phoa.dpr,v 1.14 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -67,13 +67,19 @@ var
   hMtx: THandle;
 
 begin
+   // Создаём мьютекс, свидетельствующий о том, что программа запущена (используется инсталлером)
   hMtx := CreateMutex(nil, False, 'PHOA_RUNNING_MUTEX');
-  if ParseCommandLine then begin
-     // Отображаем окно прогресса
-    CreateProgressWnd;
-    Application.Initialize;
-    Application.CreateForm(TfMain, fMain);
-    Application.Run;
-  end;
+   // Инициализируем и загружаем настройки
+  InitSettings;
+  LoadAllSettings;
+   // Отображаем окно прогресса
+  CreateProgressWnd;
+   // Выполняем приложение
+  Application.Initialize;
+  Application.CreateForm(TfMain, fMain);
+  Application.Run;
+   // Сохраняем настройки
+  SaveAllSettings; 
+   // Уничтожаем мьютекс
   if hMtx<>0 then CloseHandle(hMtx);
 end.

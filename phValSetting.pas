@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
+//  $Id: phValSetting.pas,v 1.10 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -199,6 +199,22 @@ type
   TPhoaMutexIntSetting = class(TPhoaIntSetting)
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+  end;
+
+   //===================================================================================================================
+   // TPhoaRectSetting - настройка, имеющая значение типа TRect. НЕ ПРЕДНАЗНАЧЕНА ДЛЯ ОТОБРАЖЕНИЯ!
+   //===================================================================================================================
+
+  TPhoaRectSetting = class(TPhoaStrSetting)
+  private
+     // Prop handlers
+    function  GetValue: TRect;
+    procedure SetValue(const Value: TRect);
+  public
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; const rValue: TRect);
+     // Props
+     // -- Значение пункта
+    property Value: TRect read GetValue write SetValue;
   end;
 
    //===================================================================================================================
@@ -585,6 +601,25 @@ type
   constructor TPhoaMutexIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
   begin
     inherited Create(AOwner, iID, sName, iValue, MinInt, MaxInt);
+  end;
+
+   //===================================================================================================================
+   // TPhoaRectSetting
+   //===================================================================================================================
+
+  constructor TPhoaRectSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; const rValue: TRect);
+  begin
+    inherited Create(AOwner, iID, sName, RectToStr(rValue));
+  end;
+
+  function TPhoaRectSetting.GetValue: TRect;
+  begin
+    Result := StrToRect(inherited Value, Rect(0, 0, 0, 0));
+  end;
+
+  procedure TPhoaRectSetting.SetValue(const Value: TRect);
+  begin
+    inherited Value := RectToStr(Value);
   end;
 
    //===================================================================================================================

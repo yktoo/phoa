@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
+//  $Id: phSettings.pas,v 1.12 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -93,7 +93,9 @@ type
     FImageIndex: Integer;
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
+     // Prop handlers
     function  GetEditorClass: TWinControlClass; virtual; abstract;
+    function  GetVisible: Boolean; virtual;
   public
     constructor Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
     procedure Assign(Source: TPhoaSetting); override;
@@ -104,9 +106,26 @@ type
     property HelpContext: THelpContext read FHelpContext;
      // -- ImageIndex пункта
     property ImageIndex: Integer read FImageIndex;
+     // -- True, если страница содержит видимые настройки; иначе False
+    property Visible: Boolean read GetVisible;
   end;
 
+   //===================================================================================================================
+   // Невидимая страница настроек
+   //===================================================================================================================
+
+  TPhoaInvisiblePageSetting = class(TPhoaPageSetting)
+  protected
+    function  GetEditorClass: TWinControlClass; override;
+    function  GetVisible: Boolean; override;
+  public
+    constructor Create(AOwner: TPhoaSetting; iID: Integer);
+  end;
+
+   //===================================================================================================================
    // Интерфейс редактора настроек
+   //===================================================================================================================
+
   IPhoaSettingEditor = interface(IInterface)
     ['{32018724-F48C-4EC4-B86A-81C5C5A1F75E}']
      // Инициализирует и встраивает редактор
@@ -127,9 +146,18 @@ var
   function  SettingValueInt (iID: Integer): Integer;
   function  SettingValueBool(iID: Integer): Boolean;
   function  SettingValueStr (iID: Integer): String;
+  function  SettingValueRect(iID: Integer): TRect;
   procedure SetSettingValueInt (iID, iValue: Integer);
   procedure SetSettingValueBool(iID: Integer; bValue: Boolean);
   procedure SetSettingValueStr (iID: Integer; const sValue: String);
+  procedure SetSettingValueRect(iID: Integer; const rValue: TRect);
+
+   // Процедуры сохранения и загрузки настроек (дочерних узлов RootSetting) из реестра / phoa.ini (если последнее включено)
+  procedure SaveAllSettings;
+  procedure LoadAllSettings;
+   // Процедуры сохранения и загрузки настроек из реестра ini-файла
+  procedure IniSaveSettings(const sIniFileName: String);
+  procedure IniLoadSettings(const sIniFileName: String);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses TypInfo, phUtils, phValSetting;
@@ -175,6 +203,14 @@ const
     Result := TPhoaStrSetting(Setting).Value;
   end;
 
+  function SettingValueRect(iID: Integer): TRect;
+  var Setting: TPhoaSetting;
+  begin
+    Setting := RootSetting.Settings[iID];
+    if not (Setting is TPhoaRectSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['Rect']);
+    Result := TPhoaRectSetting(Setting).Value;
+  end;
+
   procedure SetSettingValueInt(iID, iValue: Integer);
   var Setting: TPhoaSetting;
   begin
@@ -199,6 +235,67 @@ const
     TPhoaStrSetting(Setting).Value := sValue;
   end;
 
+  procedure SetSettingValueRect(iID: Integer; const rValue: TRect);
+  var Setting: TPhoaSetting;
+  begin
+    Setting := RootSetting.Settings[iID];
+    if not (Setting is TPhoaRectSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['Rect']);
+    TPhoaRectSetting(Setting).Value := rValue;
+  end;
+
+  procedure SaveAllSettings;
+  var rif: TRegIniFile;
+  begin
+     // Сохраняем настройки в реестре
+    rif := TRegIniFile.Create(SRegRoot);
+    try
+      RootSetting.RegSave(rif);
+    finally
+      rif.Free;
+    end;
+  end;
+
+  procedure LoadAllSettings;
+  var
+    rif: TRegIniFile;
+    sAutoLoadIniFile: String;
+  begin
+     // Загружаем настройки из реестра
+    rif := TRegIniFile.Create(SRegRoot);
+    try
+      RootSetting.RegLoad(rif);
+    finally
+      rif.Free;
+    end;
+     // Если нужно и присутствует ini-файл, подгружаем настройки из него
+    if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
+      sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
+      if FileExists(sAutoLoadIniFile) then IniLoadSettings(sAutoLoadIniFile);
+    end;
+  end;
+
+  procedure IniSaveSettings(const sIniFileName: String);
+  var fi: TIniFile;
+  begin
+    fi := TIniFile.Create(sIniFileName);
+    try
+      RootSetting.IniSave(fi);
+    finally
+      fi.Free;
+    end;
+  end;
+
+  procedure IniLoadSettings(const sIniFileName: String);
+  var fi: TIniFile;
+  begin
+    fi := TIniFile.Create(sIniFileName);
+    try
+      RootSetting.IniLoad(fi);
+    finally
+      fi.Free;
+    end;
+  end;
+  
    //===================================================================================================================
    // TPhoaSetting
    //===================================================================================================================
@@ -378,6 +475,30 @@ const
   begin
     inherited CreateNew(AOwner);
     FImageIndex := -1;
+  end;
+
+  function TPhoaPageSetting.GetVisible: Boolean;
+  begin
+    Result := True;
+  end;
+
+   //===================================================================================================================
+   // TPhoaInvisiblePageSetting
+   //===================================================================================================================
+
+  constructor TPhoaInvisiblePageSetting.Create(AOwner: TPhoaSetting; iID: Integer);
+  begin
+    inherited Create(AOwner, iID, -1, '', 0);
+  end;
+
+  function TPhoaInvisiblePageSetting.GetEditorClass: TWinControlClass;
+  begin
+    Result := nil;
+  end;
+
+  function TPhoaInvisiblePageSetting.GetVisible: Boolean;
+  begin
+    Result := False;
   end;
 
 end.

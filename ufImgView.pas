@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.10 2004-05-13 12:23:19 dale Exp $
+//  $Id: ufImgView.pas,v 1.11 2004-05-23 13:23:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -151,6 +151,8 @@ type
   private
     FGroup: TPhoaGroup;
     FPhoA: TPhotoAlbum;
+     // Инициализационные флаги
+    FInitFlags: TImgViewInitFlags;
      // Поток фоновой загрузки картинок
     FDecodeThread: TDecodeThread;
      // True, если последняя смена картинки была в направлении "назад" (используется для предекодирования)
@@ -200,6 +202,7 @@ type
     FInfoFont: String;
     FInfoBkColor: TColor;
     FInfoBkOpacity: Byte;
+    FViewInfoPos: TRect;
      // Коэффициенты увеличения/уменьшения изображения
     FDefaultZoomFactor: Single;
     FBestFitZoomFactor: Single;
@@ -229,8 +232,9 @@ type
     FPicIdx: Integer;
     FShowInfo: Boolean;
     FSlideShow: Boolean;
-     // Настраивает параметры окна и вычисляет базовые параметры отображения
-    procedure ApplySettings;
+     // Настраивает параметры окна и вычисляет базовые параметры отображения. При bUseInitFlags также учитывает
+     //   FInitFlags
+    procedure ApplySettings(bUseInitFlags: Boolean);
      // Настраивает инструменты
     procedure ApplyTools; 
      // Настраивает видимость курсора мыши
@@ -300,23 +304,24 @@ type
    //   iPicIdx        - индекс изображения в группе, с которого начинать просмотр
    //   UndoOperations - буфер отката
    //   bPhGroups      - True, если отображается дерево папок фотоальбома (не представление)
-  procedure ViewImage(Group: TPhoaGroup; PhoA: TPhotoAlbum; iPicIdx: Integer; UndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
 
 implementation
 {$R *.dfm}
-uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
-  phToolSetting;
+uses
+  Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(Group: TPhoaGroup; PhoA: TPhotoAlbum; iPicIdx: Integer; UndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
     with TfImgView.Create(Application) do
       try
-        FGroup          := Group;
-        FPhoA           := PhoA;
+        FInitFlags      := AInitFlags;
+        FGroup          := AGroup;
+        FPhoA           := APhoA;
         FPicIdx         := iPicIdx;
-        FUndoOperations := UndoOperations;
+        FUndoOperations := AUndoOperations;
         aEdit.Enabled   := bPhGroups;
-        ApplySettings;
+        ApplySettings(True);
         ShowModal;
       finally
         if FCursorHidden then ShowCursor(True);
@@ -483,11 +488,12 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
      // Режим активен - сохраняем позицию RBLayer и уничтожаем его
     end else begin
       fr := FRBLayer.GetAdjustedLocation;
-      ViewInfoPos := Rect(
+      FViewInfoPos := Rect(
         Round(fr.Left/FWClient*10000),
         Round(fr.Top/FHClient*10000),
         Round(fr.Right/FWClient*10000),
         Round(fr.Bottom/FHClient*10000));
+      SetSettingValueRect(ISettingID_Hidden_ViewInfoPos, FViewInfoPos);
       FreeAndNil(FRBLayer);
     end;
     aRelocateInfo.Checked := Assigned(FRBLayer);
@@ -508,7 +514,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
      // Применяем настройки
     if bEdited then begin
       fMain.ApplySettings;
-      ApplySettings;
+      ApplySettings(False);
       RestartShowTimer;
     end else
       AdjustCursorVisibility(False);
@@ -552,7 +558,8 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     end;
   end;
 
-  procedure TfImgView.ApplySettings;
+  procedure TfImgView.ApplySettings(bUseInitFlags: Boolean);
+  var bFullscreen: Boolean;
   begin
      // Кэшируем значения настроек
     FBackgroundColor   := SettingValueInt(ISettingID_View_BkColor);
@@ -578,6 +585,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     FInfoFont          := SettingValueStr(ISettingID_View_InfoFont);
     FInfoBkColor       := SettingValueInt(ISettingID_View_InfoBkColor);
     FInfoBkOpacity     := SettingValueInt(ISettingID_View_InfoBkOpacity);
+    FViewInfoPos       := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
      // Настраиваем параметры окна
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
     Color              := FBackgroundColor;
@@ -590,16 +598,20 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     ApplyToolbarSettings(dkRight);
     ApplyToolbarSettings(dkBottom);
      // Настраиваем инструменты
-    ApplyTools; 
+    ApplyTools;
      // Настраиваем установки текущей сессии
+    bFullscreen := FDefaultFullscreen;
+    if bUseInitFlags then bFullscreen := (bFullscreen or (ivifForceFullscreen in FInitFlags)) and not (ivifForceWindow in FInitFlags);
     RedisplayLock;
     try
       ShowInfo   := FDefaultShowInfo;
-      FullScreen := FDefaultFullscreen;
+      FullScreen := bFullscreen;
     finally
        // Этот вызов загружает изображение
       RedisplayUnlock(True);
     end;
+     // Если нужно включить режим показа слайдов, переданный при инициализации
+    if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
   end;
 
   procedure TfImgView.ApplyTools;
@@ -678,10 +690,10 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
      // Настраиваем положение информации
     FDescLayer.Location := FloatRect(
-      FWClient/10000*ViewInfoPos.Left,
-      FHClient/10000*ViewInfoPos.Top,
-      FWClient/10000*ViewInfoPos.Right,
-      FHClient/10000*ViewInfoPos.Bottom);
+      FWClient/10000*FViewInfoPos.Left,
+      FHClient/10000*FViewInfoPos.Top,
+      FWClient/10000*FViewInfoPos.Right,
+      FHClient/10000*FViewInfoPos.Bottom);
      // Настраиваем Actions (ZoomFactor и текущий индекс картинки влияют на это)
     EnableActions;
   end;
