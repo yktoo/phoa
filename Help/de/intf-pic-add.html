@@ -1,0 +1,78 @@
+<!-- $Id: intf-pic-add.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+{[%hh_hdr_de:Bild hinzuf&uuml;gen Assistent]}
+
+<p align=justify>Mit dieser Funktion k&ouml;nnen Sie Bilder zu einer gerade ausgew&auml;hlten Gruppe hinzuf&uuml;gen (auch zur Hauptgruppe, d.h. zum Fotoalbum selbst). Wenn keine Gruppe ausgew&auml;hlt wurde, kann diese Funktion nicht angewendet werden.
+
+{[%hh_h2:<a name=selfiles>Dialog 1: Dateien und Ordner ausw&auml;hlen</a>]}
+<p align=justify>W&auml;hlen Sie zuerst Bilddateien und/oder Ordner, die Bilddateien enthalten, aus.
+
+<h3>Liste der Dateien/Ordner</h3>
+<p align=justify>W&auml;hlen Sie jene Elemente, die Sie hinzuf&uuml;gen wollen, mithilfe der Tastatur oder der Maus plus <b>Shift-Taste</b> oder <b>Strg-Taste</b> aus.
+
+<h3>Inklusive Unterordner</h3>
+<p align=justify>Wenn dieses Kontrollk&auml;stchen aktiviert ist und Ordner im Baum ausgew&auml;hlt sind, werden nicht nur Dateien aus diesen Ordnern hinzugef&uuml;gt, sondern auch Dateien aus s&auml;mtlichen Unterordnern.
+
+<h3>Erweitert</h3>
+<p align=justify>Zeigt den <b>Dateiauswahlfilter</b> an bzw. verbirgt ihn. Mit diesem k&ouml;nnen Sie die Dateiauswahl durch bestimmte Kriterien eingrenzen (siehe unten).
+
+<h3>Vorhandensein im Fotoalbum</h3>
+<p align=justify>Sie haben die M&ouml;glichkeit, Bilddateien nach ihrem Vorhandensein im Fotoalbum zu filtern:
+<ul>
+  <li><b>Nicht ber&uuml;cksichtigen</b> - der Filter wird unterdr&uuml;ckt.</li>
+  <li><b>Nur Dateien, die noch nicht im Fotoalbum vorhanden sind</b> - es werden nur Dateien hinzugef&uuml;gt, die noch nicht in der Bilderliste des Fotoalbums sind.</li>
+  <li><b>Nur Dateien, die schon im Fotoalbum vorhanden sind</b> - es werden nur Dateien hinzugef&uuml;gt, die bereits im Fotoalbum sind.</li>
+</ul>
+
+<h3>Dateimaske</h3>
+<p align=justify>Dieser Filter f&uuml;gt nur Dateien mit einem bestimmten Dateinamen und/oder Format hinzu. Die Maske ist wie &uuml;blich aufgebaut: <b>?</b> ersetzt jedes Zeichen und <b>*</b> ersetzt eine beliebige Anzahl von Zeichen; au&szlig;erdem k&ouml;nnen Sie in eckigen Klammern Zeichenketten spezifizieren, wie Sie es auch im <a href="intf-search.html">Dialog Bilder suchen</a> tun k&ouml;nnen.
+<p align=justify>Sie k&ouml;nnen mehr als eine Maske spezifizieren, indem Sie sie durch einen Strichpunkt trennen. In diesem Fall wird eine Datei zugelassen, wenn sie den Kriterien einer der Masken entspricht.
+
+<h3>Datei bearbeitet zwischen</h3>
+<p align=justify>Sie k&ouml;nnen Zeitspannen (Datum und/oder Uhrzeit) festlegen, in denen die Datei bearbeitet wurde. So k&ouml;nnen Sie z.B. Dateien ausw&auml;hlen, die vor oder nach einem bestimmten Datum gespeichert worden sind. Lassen Sie das Feld leer, ist der Filter nicht aktiv.
+
+{[%hh_h2:<a name=checkfiles>Dialog 2: Dateien &uuml;berpr&uuml;fen</a>]}
+<p align=justify>In diesem Fenster k&ouml;nnen Sie durch &quot;Markieren&quot; oder &quot;Markierung aufheben&quot; entscheiden, welche der im vorhergehenden Dialog ausgew&auml;hlten Dateien hinzugef&uuml;gt werden sollen. Wenn Sie selbst nichts &auml;ndern, sind von vornherein alle Dateien markiert.
+<p align=justify>Sie k&ouml;nnen die Markierung mit der Maus oder mit der <b>Leertaste</b> vornehmen. Letztere hebt die Markierung aller blau markierten Dateien auf bzw. aktiviert sie. Das Popup-Men&uuml; (aufgerufen durch Klicken der rechten Maustaste) bietet zus&auml;tzliche Optionen.
+<div class=nb><b>NB:</b> Dieses Dialog wird nur angezeigt, wenn die Standardoptionen verwendet werden. Sie k&ouml;nnen das Anzeigen dieses Fensters unter <a href="setup-dialogs.html">Optionen - Dialoge</a> verhindern, dann wird es &uuml;bersprungen und nach dem Dialog Dateien/Ordner ausw&auml;hlen startet sofort der <a href="#process">Prozess Bilder hinzuf&uuml;gen</a>.
+</div>
+
+{[%hh_h2:<a name=process>Dialog 3: Bilder hinzuf&uuml;gen</a>]}
+<p align=justify>Dieses Fenster wird angezeigt, w&auml;hrend die ausgew&auml;hlten Bilddateien hinzugef&uuml;gt werden. Das Programm zeigt den Fortschritt des Prozesses und die Zahl der aufgetretenen Fehler an. Sie k&ouml;nnen sich diese Fehler dann im <a href="#log">Protokoll</a> ansehen, sofern einige Bilder erfolgreich hinzugef&uuml;gt wurden.
+<p align=justify>Au&szlig;erdem wird von dem zuletzt hinzugef&uuml;gten Bild ein <i>Thumbnail</i> angezeigt.
+<div class=nb><b>NB:</b>
+  <ul>
+    <li>Der Prozess Bilder hinzuf&uuml;gen wird parallel umgesetzt; Sie k&ouml;nnen diesen Prozess nur zwischen der Verarbeitung zweier Bilder unterbrechen, deshalb reagiert das Programm verz&ouml;gert auf den Befehl <b>Unterbrechen</b>.</li>
+    <li>Au&szlig;erdem k&ouml;nnen Sie dieses Fenster <i>nicht</i> schlie&szlig;en, w&auml;hrend Bilder hinzugef&uuml;gt werden. Sie m&uuml;ssen auf <b>Unterbrechen</b> klicken, bevor das Fenster geschlossen werden kann.</li>
+    <li>Beim Hinzuf&uuml;gen von Bildern wird die Funktion <a href="pic-prop-autofill.html">Automatisches Auslesen und Einf&uuml;gen der Bildeigenschaften</a> aktiv. Sie k&ouml;nnen in <a href="setup-dialogs.html">Optionen - Dialoge</a> festlegen, welche Bilddaten &uuml;bernommen werden sollen; im <a href="#log">Protokoll</a> wird angezeigt, welche Daten &uuml;bernommen wurden.</li>
+  </ul>
+</div>
+
+<h3>Unterbrechen</h3>
+<p align=justify>Wenn Sie diese Schaltfl&auml;che anklicken, wird der Prozess Bilder hinzuf&uuml;gen unterbrochen. Diese Schaltfl&auml;che wird dann zu <b>Weiter</b>, und durch Anklicken nehmen Sie den Prozess wieder auf.
+
+<p align=justify>Wenn der Prozess abgeschlossen ist, schlie&szlig;t das Programm das Fenster des Assistenten (nur wenn keine Fehler aufgetreten sind und in den <a href="setup-dialogs.html">Optionen</a> bestimmt wurde, das Protokoll in einem solchen Fall nicht anzuzeigen) oder es geht zum <a href="#log">Protokoll</a> &uuml;ber.
+
+{[%hh_h2:<a name=log>Dialog 4: Protokoll von Bilder hinzuf&uuml;gen</a>]}
+<p align=justify>Das Protokoll zeigt alle an den Bilddateien durchgef&uuml;hrten Operationen der Reihe nach an. An der Kennzeichnung der (ausgew&auml;hlten) Dateien ist erkennbar, ob der Prozess erfolgreich war oder gescheitert ist. Wenn letzteres der Fall ist, erscheint eine Fehlerbeschreibung neben dem Dateinamen, im Erfolgsfall werden die automatisch &uuml;bernommenen Bilddaten angezeigt.
+
+<h3>Nur Fehler anzeigen</h3>
+<p align=justify>Wenn dieses Kontrollk&auml;stchen aktiviert ist, zeigt das Protokoll nur die fehlgeschlagenen Versuche an, sonst werden auch die erfolgreichen angezeigt. Diese Option ist n&uuml;tzlich, wenn Sie einen Fehler in einer gro&szlig;en Anzahl hinzugef&uuml;gter Dateien finden m&uuml;ssen.
+
+<h3>In Datei speichern...</h3>
+<p align=justify>Erm&ouml;glicht Ihnen, das Protokoll als Textdatei zu speichern.
+<div class=nb><b>NB:</b>
+  <ul>
+    <li>Wenn das Protokoll gespeichert wird, werden <i>alle</i> Versuche festgehalten, ungeachtet des Kontrollk&auml;stchens <b>Nur Fehler anzeigen</b>.</li>
+    <li>Fehlgeschlagene Versuche werden mit Symbolen gekennzeichnet <b>[!]</b>, erfolgreiche vorne mit <b>[+]</b>. So k&ouml;nnen Sie Fehler im Protokoll leicht finden.</li>
+  </ul>
+</div>
+
+<p align=justify>Sie k&ouml;nnen das Protokoll anschauen, bevor alle Dateien hinzugef&uuml;gt worden sind, indem Sie den Hinzuf&uuml;gungsprozess unterbrechen und dann die Schaltfl&auml;che <b>Weiter</b> anklicken. Danach k&ouml;nnen Sie mit <b>Zur&uuml;ck</b> den Prozess wieder aufnehmen.
+
+<p align=justify><img src="../undo-bullet.gif" align=absmiddle width=20 height=20> Diese Operation unterst&uuml;tzt die <a href="intf-browse-mode-tasks.html#undo"><b>R&uuml;ckg&auml;ngig-Funktion</b></a>
+
+{[%hh_seealso_de]}  
+  <a href="intf-browse-mode.html">Browser Modus</a><br>
+  <a href="intf-browse-mode-tasks.html">Arbeiten im Browser Modus</a><br>
+
+{[%hh_ftr_de]}

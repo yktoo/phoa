@@ -1,0 +1,71 @@
+<!-- $Id: intf-search.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+{[%hh_hdr_de:Bilder suchen Dialog]}
+
+<p align=justify><b>PhoA</b> verf&uuml;gt &uuml;ber ein ausgekl&uuml;geltes Suchwerkzeug. Um den Bilder suchen Dialog anzuzeigen, w&auml;hlen Sie in der Men&uuml;leiste <b>Tools | Suchen...</b> oder dr&uuml;cken Sie die <b>F3</b> Taste im <a href="intf-browse-mode.html">Browser Modus</a>.
+
+<h3>Liste der Suchkriterien</h3>
+<p align=justify>Bestimmen Sie die Suchkriterien in der Tabelle mit den folgenden Spalten:
+<ul>
+  <li><b>Bildeigenschaften</b> - W&auml;hlen Sie aus der 1. Spalte eines der <i>suchbaren</i> <a href="pic-data.html">Bildeigenschaften</a> aus. </li>
+  <li><b>Status des Kriteriums</b> - W&auml;hlen Sie in der 2. Spalte den zutreffenden Status aus. Die Liste der M&ouml;glichkeiten h&auml;ngt davon ab, um welche <a href="#datatypes">Datentypen</a> es sich bei den Bildeigenschaften handelt.</li>
+  <li><b>Wert des Kriteriums</b> - Tragen Sie in die 3. Spalte den Wert ein, der mit der Bildeigenschaft verglichen werden soll.</li>
+</ul>
+<p align=justify>Mit den Pfeiltasten k&ouml;nnen Sie in der Tabelle navigieren. Zum Erweitern der Dropdown-Liste verwenden Sie die Tastenkombination <b>Alt+Nach-Unten-Taste</b>.
+<p align=justify>Werte des Kriteriums k&ouml;nnen in der Dropdown-Liste mit fr&uuml;heren Eingaben ausgew&auml;hlt werden.
+
+<h3>Suchen</h3>
+<p align=justify>Startet die Bildsuche
+<p align=justify>Beim Suchvorgang gefundene Bilder (falls vorhanden) befinden sich im Ordner <b>Suchergebnisse</b>, der am Ende des Gruppenbaums angezeigt wird. Der Ordner Suchergebnisse hat die gleichen Eigenschaften und Funktionen wie gew&ouml;hnliche Bildgruppenordner, au&szlig;er dass keine Bilder hinzuf&uuml;gt oder entfernt werden k&ouml;nnen.
+
+<h3>Zur&uuml;cksetzen</h3>
+<p align=justify>Leert alle Eingabefelder und setzt alle Werte auf ihre Grundeinstellungen zur&uuml;ck.
+
+{[%hh_h2:<a name=datatypes>Datentypen der Bildeigenschaften</a>]}
+<p align=justify>Wie aus der <a href="pic-data.html">Tabelle der Bilddaten</a> hervorgeht, verwendet <b>PhoA</b> folgende Datentypen als Werte der Bildeigenschaften:
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Datentyp</td>
+    <td nowrap>Beschreibung &amp; Kriterien</td>
+  </tr>
+  <tr>
+    <td><b>Integer-</b> oder <b>Ordinalwerte</b></td>
+    <td>Ein ganzer Wert kann im Vergleich mit anderen auf Gleichheit, Ungleichheit etc. &uuml;berpr&uuml;ft werden.</td>
+  </tr>
+  <tr>
+    <td><b>Dateiname</b></td>
+    <td>Nach dem Dateinamen kann mit Hilfe einer <i>Maske</i> gesucht werden. Die Maske ist nach den &uuml;blichen Regeln aufgebaut: <b>?</b> - jedes Zeichen, <b>*</b> - beliebige Anzahl von Zeichen; au&szlig;erdem k&ouml;nnen Sie in eckigen Klammern Zeichenketten festlegen, z.B. <b>[A-Z]</b>.</td>
+  </tr>
+  <tr>
+    <td><b>Zeichenfolge</b></td>
+    <td>Alle Buchstaben. Es wird nach einer Zeichenfolge oder Teilzeichenfolge gesucht, unabh&auml;ngig von Gro&szlig;- oder Kleinschreibung.</td>
+  </tr>
+  <tr>
+    <td><b>Pixelformat</b></td>
+    <td>Kein suchbarer Datentyp.</td>
+  </tr>
+  <tr>
+    <td><b>Datum</b></td>
+    <td>Kriterien sind &auml;hnlich wie beim ersten Eintrag.</td>
+  </tr>
+  <tr>
+    <td><b>Zeit</b></td>
+    <td>Kriterien sind &auml;hnlich wie beim ersten Eintrag.</td>
+  </tr>
+  <tr>
+    <td><b>Liste von Zeichenfolgen</b></td>
+    <td>Schl&uuml;sselw&ouml;rter k&ouml;nnen manuell oder durch Klicken der &quot;<b>...</b>&quot; Schaltfl&auml;che im Eintragsfeld der <a href="intf-select-keywords.html">Liste</a> eingegeben werden.</td>
+  </tr>
+</table>
+
+<p align=justify>Das Programm w&auml;hlt jene Bilder aus, die mit allen Suchkriterien &uuml;bereinstimmen (d.h., der logische Operator <b>UND</b> kommt hier zum Einsatz).
+<p align=justify>Um ein Kriterium au&szlig;er Kraft zu setzten, l&ouml;schen Sie einfach den eingetragenen Wert.
+
+{[%hh_seealso_de]}  
+  <a href="pic-data.html">Bildeigenschaften</a><br>
+  <a href="intf-browse-mode-tasks.html">Arbeiten im Browser Modus</a><br>
+  <a href="intf-key-mouse-controls.html">Tastenkombinationen und Mausbefehle</a><br>
+  <a href="intf-pic-add.html">Bilder hinzuf&uuml;gen Assistent</a><br>
+  <a href="intf-pic-props.html">Bearbeiten Bildeigenschaften Dialog</a><br>
+
+{[%hh_ftr_de]}
