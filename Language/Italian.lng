@@ -1,9 +1,9 @@
-TargetApplication=PhoA 1.1.7 beta
+TargetApplication=PhoA 1.1.8 beta
 Author=Alberto Polizzano
 SourceLANGID=1033
 LANGID=1040
 Generator=DKLang Translation Editor v2.4
-LastModified=2004-12-09 08.32.09
+LastModified=2005-01-10 15.11.55
 
 [dAbout]
 00000003=Informazioni
@@ -35,10 +35,7 @@ LastModified=2004-12-09 08.32.09
 00000018=Aiuto
 00000021=&Gruppo:
 00000024=&Operazione:
-00000029=Muovi le immagini selezionate nel gruppo specificato sotto\nCopia 
-le immagini selezionate nel gruppo specificato sotto\nCancella le immagini 
-selezionate dal gruppo specificato sotto\nLascia solo le immagini 
-selezionate nel gruppo sotto (intersezione)\n
+00000029=Muovi le immagini selezionate nel gruppo specificato sotto\nCopia
 
 [dPicProps]
 00000003=Prorprietà: immagine
@@ -151,8 +148,7 @@ selezionate nel gruppo sotto (intersezione)\n
 00000087=Mostra nel menu del riquadro Gruppi Immagini
 00000090=Mostra nel menu del riquadro Finestra miniature
 00000093=Mostra nel menu del riquadro Visualizza
-00000100=Applicazioni (*.bat;*.com;*.exe)|*.bat;*.com;*.exe|Tutti i file 
-(*.*)|*.*
+00000100=Applicazioni (*.bat;*.com;*.exe)|*.bat;*.com;*.exe|Tutti i file
 00000102=Seleziona una applicazione
 
 [dViewProps]
@@ -219,13 +215,11 @@ selezionate nel gruppo sotto (intersezione)\n
 00000195=Dimensione reale|Imposta dimensione 1:1
 00000196=Ingrandimento
 00000197=Adatta allo scher&mo
-00000199=Adatta allo schermo|Imposta la dimensione per farla rientrare nella 
-finestra
+00000199=Adatta allo schermo|Imposta la dimensione per farla rientrare nella
 00000200=Visualizza
 00000201=Schermi &intero
 00000203=Schermo intero|Passa alla modalità schermo intero
-00000207=Slide show|Passa alla modaltià slide show (avanza automaticamente 
-all'immagine successiva)
+00000207=Slide show|Passa alla modaltià slide show (avanza automaticamente
 00000208=Visualizza
 00000209=&Ricarica
 00000211=Ricarica|Ricarica l'immagine corrente dal file
@@ -250,8 +244,7 @@ all'immagine successiva)
 00000239=Ruota di 180°|Ruota l'immagine di 180°
 00000240=Strumenti
 00000241=Ruota di 9&0° in senso antiorario
-00000243=Ruota di 9&0° in senso antiorario|Ruota di 9&0° in senso antiorario 
-(o in senso orario di 270°)
+00000243=Ruota di 9&0° in senso antiorario|Ruota di 9&0° in senso antiorario
 00000244=Strumenti
 00000245=Metti in &orizzontale
 00000247=Metti in &orizzontale|Mette l'immagine in orizzontale
@@ -260,8 +253,7 @@ all'immagine successiva)
 00000251=Metti in verticale|Mette l'immagine in verticale
 00000252=Strumenti
 00000253=Memorizza &transformazioni
-00000255=Memorizza transformazioni|Memorizza le transformazioni applicate 
-all'immagine
+00000255=Memorizza transformazioni|Memorizza le transformazioni applicate
 00000271=&Avanti
 00000273=&Indietro
 00000275=&Casuale
@@ -278,8 +270,7 @@ all'immagine
 00000287=Aiuto
 00000289=&Transformazioni
 00000290=&Barra Strumenti principale
-00000291=Barra Strumenti principale|Mostra o nasconde la barra Strumenti 
-principale
+00000291=Barra Strumenti principale|Mostra o nasconde la barra Strumenti
 00000292=Barra &Transformazioni
 00000293=Barra Trasformazioni|Mostra o nascondi la barra trasformazioni
 00000294=Barra Slide S&how
@@ -300,8 +291,7 @@ principale
 00000018=Altri bottoni|
 00000024=&Modifica
 00000026=Operazioni a&nnullabili
-00000027=Mostra la lista dei cambiamenti fatti e permette di annullare un 
-numero di azioni
+00000027=Mostra la lista dei cambiamenti fatti e permette di annullare un
 00000032=&Visualizza
 00000034=&Barra Strumenti
 00000035=Barra Strumenti|Mostra o nasconde la barra Strumenti
@@ -312,8 +302,7 @@ numero di azioni
 00000052=Gruppi immagini
 00000061=Visualizza
 00000062=Rimuove i risultati della &ricerca
-00000064=Rimuove i risultati della ricerca|Rimuove i risultati della ricerca 
-dall'albero del gruppo
+00000064=Rimuove i risultati della ricerca|Rimuove i risultati della ricerca
 00000065=Vista
 00000066=&Nuova vista...
 00000068=Nuova vista...|Crea una nuova vista dell'album
@@ -329,11 +318,9 @@ dall'albero del gruppo
 00000086=Salva &come...
 00000088=Salva come...|Salva il corrente album su un file diverso
 00000090=Sal&va impostazioni correnti su file...
-00000092=Salva impostazioni correnti su file...|Salva impostazioni del 
-programma su un file ti tipo ini
+00000092=Salva impostazioni correnti su file...|Salva impostazioni del
 00000094=&Carica impostazioni da un file...
-00000096=Carica impostazioni da un file...|Carica i Impostazioni da un file 
-di tipo ini
+00000096=Carica impostazioni da un file...|Carica i Impostazioni da un file
 00000098=E&sci
 00000100=Esci|Esce dal programma
 00000101=Modifica
@@ -344,8 +331,7 @@ di tipo ini
 00000108=Aggiungi gruppo|Aggiungi un nuovo gruppo di immagini
 00000109=Modifica
 00000110=Aggiungi &Immagini...
-00000112=Aggiungi immagini...|Apre la procedura guidata che permette di 
-aggiungere immagini al gruppo correntemente selezionato
+00000112=Aggiungi immagini...|Apre la procedura guidata che permette di
 00000113=Modifica
 00000114=Cancella
 00000116=Cancella|Cancella gli elementi selezionati
@@ -372,8 +358,7 @@ aggiungere immagini al gruppo correntemente selezionato
 00000144=Seleziona Nessuna|Seleziona nessuna immagine
 00000145=Modifica
 00000146=&Visualizza
-00000148=Visualizza|Attiva la modalità visualizzazione dall'immagine 
-corrente
+00000148=Visualizza|Attiva la modalità visualizzazione dall'immagine
 00000149=Strumenti
 00000150=Impostazioni Pro&gramma...
 00000152=Impostazioni programma...|Visualizza/Modifica le impostazioni
@@ -382,12 +367,10 @@ corrente
 00000156=Statistiche...|Informazioni sommarie sull'album
 00000157=Strumenti
 00000158=O&perazioni sulle immagini...
-00000160=Operazioni sulle immagini...|Permette di copiare, muovere ecc. le 
-immagini selezionate
+00000160=Operazioni sulle immagini...|Permette di copiare, muovere ecc. le
 00000161=Strumenti
 00000162=Ope&razione sui file...
-00000164=Operazioni sui file...|Apre la procedura guidata per le operazioni 
-sui file per copiare, muovere ecc., o per riparare link a file rotti
+00000164=Operazioni sui file...|Apre la procedura guidata per le operazioni
 00000165=Strumenti
 00000166=&Trova...
 00000168=Trova...|Trova le immagini secondo i criteri forniti
@@ -402,8 +385,7 @@ sui file per copiare, muovere ecc., o per riparare link a file rotti
 00000180=Modifica vista...|Modifica la vista corrente dell'album
 00000181=Vista
 00000182=For&ma un gruppo...
-00000184=Forma un gruppo...|Trasferisce la gerarchia del corrente gruppo nel 
-gruppo selezionato
+00000184=Forma un gruppo...|Trasferisce la gerarchia del corrente gruppo nel
 00000185=Aiuto
 00000188=FAQ|Visualizza le FAQ (Domande poste più frequentemente)
 00000189=Aiuto
@@ -413,15 +395,13 @@ gruppo selezionato
 00000205=Gruppi|Visualizza l'albero dei gruppi
 00000206=Vista
 00000207=Modalità &Flat
-00000208=Modalità Flat|Mosta le miniature del gruppo selezionato e dei suoi 
-sottogruppi
+00000208=Modalità Flat|Mosta le miniature del gruppo selezionato e dei suoi
 00000209=Aiuto
 00000210=Sito &Web DK Software
 00000211=Sito Web DK Software|Apre il sito web del produttore
 00000212=Aiuto
 00000213=Controlla per &aggiornamenti
-00000214=Controlla per aggiornamenti|Controlla il sito per eventuali 
-aggiornamenti
+00000214=Controlla per aggiornamenti|Controlla il sito per eventuali
 00000216=Aiuto
 00000217=&Supporto
 00000218=Supporto|Apre nel browser la pagina di supporto del prodotto
@@ -447,8 +427,7 @@ aggiornamenti
 00000137=Soltanto &selezionati
 00000139=Soltanto selezionati|viasualizza solo le parole chiavi selezionate
 00000141=&Aggiungi
-00000143=Aggiungi una parola chiave|Aggiunge una parola chiave all'immagini 
-selezionate
+00000143=Aggiungi una parola chiave|Aggiunge una parola chiave all'immagini
 00000145=&Seleziona tutte
 00000147=Seleziona tutte|Seleziona tutte le parole chiave della lista
 00000149=&Deseleziona tutte
@@ -488,8 +467,7 @@ selezionate
 00000095=Ruota di 180°|Ruota l'immagine di 180°
 00000096=Strumenti
 00000097=Ruota di 9&0° in senso antiorario
-00000099=Ruota di 90° in senso antiorario|Ruota di 90° in senso antiorario 
-(o in senso orario di 270°)
+00000099=Ruota di 90° in senso antiorario|Ruota di 90° in senso antiorario
 00000100=Strumenti
 00000101=Metti in &orizzontale
 00000103=Metti in orizzontale|Mette l'immagine in orizzontale
@@ -515,8 +493,7 @@ selezionate
 00000013=Maschere &File (delimitate con ';'):
 00000016=&Presenze Album:
 00000019=&a:
-00000029=Ignorate\nSolo i file che sono assenti dall'album\nSolo i file che 
-sono presenti nell'album\n
+00000029=Ignorate\nSolo i file che sono assenti dall'album\nSolo i file che
 00000055=&Analizza sottocartelle
 00000056=Nome
 00000057=Grandezza
@@ -528,8 +505,7 @@ sono presenti nell'album\n
 00000010=&Descrizione album:
 00000013=Copia il p&rogramma stesso sulla cartella di destinazione
 00000016=Crea un &file album con le immagini selezionate:
-00000023=Crea un file &autorun.inf per lanciare in automatico il play del 
-CD/DVD, nella cartella di destinazione
+00000023=Crea un file &autorun.inf per lanciare in automatico il play del
 00000034=Includi anche le &viste esistenti
 00000037=Copia le impostazioni correnti nel file phoa.&ini
 
@@ -552,10 +528,8 @@ CD/DVD, nella cartella di destinazione
 00000013=&Cancella i file originali
 00000016=&Sposta nel cestino
 00000019=Imposta le opzioni di crea&zione CD/DVD
-00000024=Salta l'immagine corrente\nChiedi per sovrascrivere il 
-file\nSovrascrivi sempre il file\n
-00000029=Tratta come un errore\nAggiorna il link solo se il target 
-esiste\nAggiorna il link in ogni caso\n
+00000024=Salta l'immagine corrente\nChiedi per sovrascrivere il
+00000029=Tratta come un errore\nAggiorna il link solo se il target
 
 [frWzPageFileOps_RepairOptions]
 00000007=Sto cercando il file da accoppiare
@@ -563,15 +537,12 @@ esiste\nAggiorna il link in ogni caso\n
 00000013=Accoppia il file per grande&zza
 00000016=Accoppia il file per nome e grand&ezza
 00000019=Controlla nelle sottocarte&lle della cartella di destinazione
-00000022=Se un file da accoppiare è stato trovato ma è usato da un'altra 
-immagine
+00000022=Se un file da accoppiare è stato trovato ma è usato da un'altra
 00000025=&Saltalo e cerca il successivo
-00000028=Cancella l'immagine al quale il file è collegato, e ricollegalo 
-alla &nuova immagine
+00000028=Cancella l'immagine al quale il file è collegato, e ricollegalo
 
 [frWzPageFileOps_RepairSelLinks]
-00000013=&Cancella le immagini che non hanno un file accoppiato (si applica 
-solo alle immagini con nessun file collegato)
+00000013=&Cancella le immagini che non hanno un file accoppiato (si applica
 
 [frWzPageFileOps_SelFolder]
 00000014=&Crea cartella
@@ -582,8 +553,7 @@ solo alle immagini con nessun file collegato)
 00000070=Filtro di validità dei link
 00000073=&Tutte le immagini selezionate
 00000076=Solo le immagini che hanno un file collegato &valido (esistente)
-00000079=Solo le immagini che &NON hanno un collegamento valido (esistente) 
-ad un file
+00000079=Solo le immagini che &NON hanno un collegamento valido (esistente)
 00000081=&Seleziona tutti i gruppi
 00000083=Seleziona tutti i gruppi che contengono immagini
 00000085=&Deseleziona tutti i gruppi
@@ -592,22 +562,12 @@ ad un file
 00000091=Inverti la selezione attuale
 
 [frWzPageFileOps_SelTask]
-00000007=Copia i file delle immagini che hai selezionato, nella cartella 
-specificata. Usa questa opzione per preparare l'album ad essere scritto su 
-CD o DVD
-00000010=Muovi i file dell immagini che hai selezionato, nella cartella 
-specificata, e aggiorna i collegamenti delle immagini ai file 
-appropriatamente
-00000013=Cancella i file delle immagini che hai selezionato e fisicamente 
-cancella i corrispondenti file. Use questa opzione per cancelllare i file 
-delle immagini che non si vogliono
-00000016=Permette di riparare collegamenti rotti trovando i file nella 
-cartella specificata, e, opzionalmente, a cancellare le immagini non più 
-associate con file validi (esistenti)
-00000019=• NB: Queste operazioni non possono essere annullate dopo essere 
-state portate a termine!
-00000022=Rilegge i file delle immagini, ricrea le miniature e aggiorna le 
-informazioni relative ai file, quali ad esempio la dimensione dell'imagine
+00000007=Copia i file delle immagini che hai selezionato, nella cartella
+00000010=Muovi i file dell immagini che hai selezionato, nella cartella
+00000013=Cancella i file delle immagini che hai selezionato e fisicamente
+00000016=Permette di riparare collegamenti rotti trovando i file nella
+00000019=• NB: Queste operazioni non possono essere annullate dopo essere
+00000022=Rilegge i file delle immagini, ricrea le miniature e aggiorna le
 00000025=&Copia i file su una cartella
 00000028=&Muove i file su una cartella
 00000031=C&ancella immagini e file
@@ -622,8 +582,7 @@ informazioni relative ai file, quali ad esempio la dimensione dell'imagine
 00000183=&Salva su file...
 00000185=Salva su file...|Salva il log sul file selezionato
 00000187=&Visualizza solo gli errori
-00000189=Visualizza solo gli errori|Nascondi le informazioni di caricamento 
-terminate con successo
+00000189=Visualizza solo gli errori|Nascondi le informazioni di caricamento
 
 [frExprPicFilter]
 00000001=Barra accessori
@@ -650,6 +609,10 @@ terminate con successo
 00000033=Controllo sintassi
 00000034=Controlla la sintassi dell'espressione
 00000038=Proprietà
+
+[frPicProps_FileProps]
+00000001=&Cambia file...
+00000002=Cambia file...|Cambia file per l'immagine selezionata
 
 [$CONSTANTS]
 dfpArchive=Archivio
@@ -695,8 +658,7 @@ gpText=Testo
 IMS_CannotOpenFile=Non riesco ad aprire il file
 IMS_InternalError=Errore interno
 IMS_InvalidEXIFHeader=La testa EXIF non combacia
-IMS_InvalidTIFFHeader=La testata TIFF (all'interno della testata EXIF) è 
-invalida o mancante
+IMS_InvalidTIFFHeader=La testata TIFF (all'interno della testata EXIF) è
 IMS_NoMetadata=Non sono stati trovati metadata nel file
 IMS_NotAJPEGFile=Non si tratta di un file JPEG
 IMS_ReadFailure=Non riesco a leggere dal file
@@ -707,21 +669,17 @@ ISettingID_Browse_GT_HintInfo=Visualizza con le proprietà selezionate
 ISettingID_Browse_GT_HintNone=Nessuno
 ISettingID_Browse_GT_HintProps=Visualizza nella barra dei suggerimenti
 ISettingID_Browse_GT_Hints=Barra dei suggerimenti
-ISettingID_Browse_GT_HintTips=Visualizza se è troncato dal margine della 
-finestra
+ISettingID_Browse_GT_HintTips=Visualizza se è troncato dal margine della
 ISettingID_Browse_MaxUndoCount=Numero massimo di annullamenti
 ISettingID_Browse_Viewer=Finestra visualizzazione miniature
 ISettingID_Browse_ViewerBkColor=Colore di sfondo:
 ISettingID_Browse_ViewerDragDrop=Trascinamento
 ISettingID_Browse_ViewerStchFilt=Filtro per resampling
 ISettingID_Browse_ViewerThBColor=Colore sfondo miniature:
-ISettingID_Browse_ViewerThBordCl=Colore personalizzato del bordo dello 
-sfondo della miniatura
-ISettingID_Browse_ViewerThBordSt=Stile del bordo dello sfondo della 
-miniatura
+ISettingID_Browse_ViewerThBordCl=Colore personalizzato del bordo dello
+ISettingID_Browse_ViewerThBordSt=Stile del bordo dello sfondo della
 ISettingID_Browse_ViewerThFColor=Colore font miniatura:
-ISettingID_Browse_ViewerThInfo=Dettaglio delle immagini visualizzato sulle 
-miniature
+ISettingID_Browse_ViewerThInfo=Dettaglio delle immagini visualizzato sulle
 ISettingID_Browse_ViewerThLBProp=Nell'angolo in basso a sinistra:
 ISettingID_Browse_ViewerThLTProp=Nell'angolo in alto a sinistra:
 ISettingID_Browse_ViewerThRBProp=Nell'angolo in basso a destra:
@@ -733,43 +691,33 @@ ISettingID_Browse_ViewerThShOffsY=Spostamento verticale ombra, pixel:
 ISettingID_Browse_ViewerThShOpact=Opacità ombra (0-255):
 ISettingID_Browse_ViewerThShRadius=Raggi di Blur dell'ombra, pixel:
 ISettingID_Browse_ViewerTipProps=Visualizza nella barra dei suggerimenti
-ISettingID_Browse_ViewerTooltips=Mostra nella barra dei suggerimenti della 
-miniatura
+ISettingID_Browse_ViewerTooltips=Mostra nella barra dei suggerimenti della
 ISettingID_Dialogs=Dialoghi
 ISettingID_Dlgs_AddPicWizard=Procedura guidata aggiunta immagini
-ISettingID_Dlgs_APW_AutofillDate=Riempi automaticamente la data 
-dell'immagine da (in ordine di preferenza):
-ISettingID_Dlgs_APW_AutofillTime=Riempi automaticamente l'ora dell'immagine 
-da (in ordine di preferenza):
-ISettingID_Dlgs_APW_AutofillXfrm=Riempi automaticamente le trasformazioni 
-dell'immagine dal metadata
-ISettingID_Dlgs_APW_LogOnErrOnly=Mostra la pagina di log solo se si sono 
-verificati degli errori
+ISettingID_Dlgs_APW_AutofillDate=Riempi automaticamente la data
+ISettingID_Dlgs_APW_AutofillTime=Riempi automaticamente l'ora dell'immagine
+ISettingID_Dlgs_APW_AutofillXfrm=Riempi automaticamente le trasformazioni
+ISettingID_Dlgs_APW_LogOnErrOnly=Mostra la pagina di log solo se si sono
 ISettingID_Dlgs_APW_ReplaceDate=Sovrascrivi la data se già specificata
 ISettingID_Dlgs_APW_ReplaceTime=Sovrascrivi l'ora se già specificata
 ISettingID_Dlgs_APW_ShowHidden=Mostra i file e le cartelle nascoste
 ISettingID_Dlgs_APW_SkipChkPage=Salta sempre la pagina 'Controlla file'
-ISettingID_Dlgs_ConfmAppExit=Prima di uscire (quando l'album non è stato 
-modificato)
+ISettingID_Dlgs_ConfmAppExit=Prima di uscire (quando l'album non è stato
 ISettingID_Dlgs_ConfmDelGroup=Prima di cancellare un gruppo
 ISettingID_Dlgs_ConfmDelPics=Prima di cancellare una immagine
 ISettingID_Dlgs_ConfmDelView=Prima di cancellare una vista
 ISettingID_Dlgs_ConfmOldFile=Prima di salvare file di una vecchia versione
 ISettingID_Dlgs_Confms=Conferme
-ISettingID_Dlgs_FileOpsWizard=Procedura guidata di operazione sui file 
-dell'immagine
+ISettingID_Dlgs_FileOpsWizard=Procedura guidata di operazione sui file
 ISettingID_Dlgs_FOW_CfmCopyFiles=Conferma la copia dei file
 ISettingID_Dlgs_FOW_CfmDelFiles=Conferma la cancellazione dei file
 ISettingID_Dlgs_FOW_CfmMoveFiles=Conferma lo spostamento dei file
 ISettingID_Dlgs_FOW_CfmRebuildTh=Conferma la ricostruzione delle miniature
 ISettingID_Dlgs_FOW_CfmRepairFLs=Conferma la riparazione dei collegamenti
-ISettingID_Dlgs_FOW_LogOnErrOnly=Mostra la pagina di log solo se si sono 
-verificati degli errori
+ISettingID_Dlgs_FOW_LogOnErrOnly=Mostra la pagina di log solo se si sono
 ISettingID_Dlgs_Notifies=Notifiche
-ISettingID_Dlgs_NotifyDragCopy=Dopo aver copiato immagini usango 
-Trascinamento
-ISettingID_Dlgs_NotifyDragMove=Dopo aver spostato immagini usando 
-Trascinamento
+ISettingID_Dlgs_NotifyDragCopy=Dopo aver copiato immagini usango
+ISettingID_Dlgs_NotifyDragMove=Dopo aver spostato immagini usando
 ISettingID_Dlgs_NotifyPaste=Dopo aver incollato immagini
 ISettingID_Dlgs_PicProps=Dialogo delle proprietà dell'immagine
 ISettingID_Dlgs_PP_DefaultPage=Pagina visualizzata per default
@@ -781,18 +729,15 @@ ISettingID_Dlgs_PP_Def_LastUsed=Ultima usata
 ISettingID_Dlgs_PP_Def_View=Visualizzazione & Aggiusta
 ISettingID_Dlgs_PP_ExpFileProps=Apri le proprietà del file sul display
 ISettingID_Dlgs_PP_ExpMetadata=April'immagine metadata sul display
-ISettingID_Dlgs_SplashAboutFade=Dialogo di Informazioni animato in uscita 
-(Windows 2000+)
-ISettingID_Dlgs_SplashStartFade=Schermata di partenza animata (Windows 
-2000+)
+ISettingID_Dlgs_SplashAboutFade=Dialogo di Informazioni animato in uscita
+ISettingID_Dlgs_SplashStartFade=Schermata di partenza animata (Windows
 ISettingID_Dlgs_SplashStartShow=Mostra la schermata di inizio alla partenza
 ISettingID_Gen=Generale
 ISettingID_Gen_Clipboard=Memoria
 ISettingID_Gen_ClipFormats=Formati di copia
 ISettingID_Gen_Intf=Interfaccia utente
 ISettingID_Gen_Language=Interfaccia linguaggio
-ISettingID_Gen_LookupPhoaIni=Alla partenza carica le impostazioni dal file 
-phoa.ini se è presente nella cartella del programma
+ISettingID_Gen_LookupPhoaIni=Alla partenza carica le impostazioni dal file
 ISettingID_Gen_MainFont=Font principale programma:
 ISettingID_Gen_OpenMRUCount=Lista dei file aperti di recente:
 ISettingID_Gen_Theme=Tema visuale:
@@ -810,14 +755,11 @@ ISettingID_Gen_TooltipDisplTime=Lunghezza della barra dei suggerimenti, ms:
 ISettingID_Gen_Tree=Alberi/liste
 ISettingID_Gen_TreeAnimation=Espansione/Collasso animati
 ISettingID_Gen_TreeBS_Triangle=Triangoli
-ISettingID_Gen_TreeButtonStyle=Stile dei bottoni Collassa/espandi (sistemi 
-non-XP)
+ISettingID_Gen_TreeButtonStyle=Stile dei bottoni Collassa/espandi (sistemi
 ISettingID_Gen_TreeCenterSel=Centra la selezione nella vista
-ISettingID_Gen_TreeCheckStyle=Stile delle caselle di spunta (sistemi 
-non-XP):
+ISettingID_Gen_TreeCheckStyle=Stile delle caselle di spunta (sistemi
 ISettingID_Gen_TreeIncrSearch=Ricerca incrementale durante la digitazione
-ISettingID_Gen_TreeIncrSrchDelay=Ritardo nella pulizia della ricerca 
-incrementale, ms:
+ISettingID_Gen_TreeIncrSrchDelay=Ritardo nella pulizia della ricerca
 ISettingID_Gen_TreeSelBlended=Rettangoli mescolati
 ISettingID_Gen_TreeSelDotted=Contorno puntato
 ISettingID_Gen_TreeSelStyle=Stile rettangolo selezione multiplo
@@ -827,28 +769,24 @@ ISettingID_Tools=Accessori
 ISettingID_View=Vista\nmodalità
 ISettingID_View_AlwaysOnTop=Visualizza la finestra sempre in primo piano
 ISettingID_View_BkColor=Colore della finestra di sfondo:
-ISettingID_View_CacheBehind=Carica in memoria le immagini precedentemente 
-viste
+ISettingID_View_CacheBehind=Carica in memoria le immagini precedentemente
 ISettingID_View_CaptionProps=Visualizza in cattura finestra
 ISettingID_View_CenterWindow=Centra la finestra sul desktop
 ISettingID_View_Cyclic=Visualizzazione ciclica
-ISettingID_View_FitWindowToPic=Adatta la finestra alla dimensione 
-dell'immagine
+ISettingID_View_FitWindowToPic=Adatta la finestra alla dimensione
 ISettingID_View_Fullscreen=Schermi intero
 ISettingID_View_HideCursor=Nascondi il cursore de l mouse a schermo intero
 ISettingID_View_Info=Visualizza informazioni
 ISettingID_View_InfoBkColor=Colore di sfondo:
 ISettingID_View_InfoBkOpacity=Opacità sfondo (0-255):
 ISettingID_View_InfoPicProps=Proprietà immagine
-ISettingID_View_KeepCursorOverTB=Mantieni il cursore del mouse sopra la 
-barra dei bottoni durante il ridimensionamento della finestra
+ISettingID_View_KeepCursorOverTB=Mantieni il cursore del mouse sopra la
 ISettingID_View_Optimizing=Ottimizzazione della velocità di vista
 ISettingID_View_PicChange=Avanzamento immagine
 ISettingID_View_Predecode=Predecodifica l'immagine seguente in anticipo
 ISettingID_View_ShowInfo=Mostra le informazioni sull'immagine
 ISettingID_View_ShowToolbar=Mostra la barra degli accessori
-ISettingID_View_ShrinkPicToFit=Adatta l'immagine alla dimensione della 
-finestra
+ISettingID_View_ShrinkPicToFit=Adatta l'immagine alla dimensione della
 ISettingID_View_SlideCyclic=Ciclico
 ISettingID_View_SlideDirBackward=Indietro
 ISettingID_View_SlideDirection=Direzione dell Slide show
@@ -857,8 +795,7 @@ ISettingID_View_SlideDirRandom=Casuale
 ISettingID_View_SlideInterval=Visualizza ora, ms:
 ISettingID_View_StchFilt=Filtro di resampling immagine
 ISettingID_View_ZoomFactor=Scala per:
-ISettingID_View_ZoomPicToFit=Ingrandisci immagine per adattarla alla 
-finestra
+ISettingID_View_ZoomPicToFit=Ingrandisci immagine per adattarla alla
 pcfHDrop=File immagine
 pcfPhoa=Immagine PhoA
 pcfPlainList=Percorso immagine file
@@ -928,19 +865,10 @@ SConfirm_AppExit=Esci dal programma?
 SConfirm_DelGroup=Cancello il gruppo selezionato?
 SConfirm_DelPics=Cancello le immagini selezionate?
 SConfirm_DelView=Cancello la vista corrente?
-SConfirm_FileNotSaved=File dell'album "%s" non salvato. Vuoi salvare i 
-cambiamenti?
+SConfirm_FileNotSaved=File dell'album "%s" non salvato. Vuoi salvare i
 SConfirm_FileOverwrite=Sovrascrivi il file "%s"?
-SConfirm_PerformFileOperation=Vuoi continuare l'operazione che hai 
-scelto?\n\nATTENZIONE! Questa operazione non può essere annullata una volta 
-portata a termine!
-SConfirm_SavingOldFormatFile=Attenzione!\nTu stai salvando il file in un 
-formato più vecchio di questo. Se tu salvi l'album in questo file potresti 
-perdere alcuni dei dati a causa di funzioni non supportate in questo 
-formato.\n  • Per salvare il file in un formato aggiornato clicca su 
-Annulla, quindi usa File | Salva come... \n  • Per conoscere le differenze 
-tra i formati delle varie versioni di PhoA fai riferimento al sistema di 
-aiuto PhoA.\n\nVuoi continuare ?
+SConfirm_PerformFileOperation=Vuoi continuare l'operazione che hai
+SConfirm_SavingOldFormatFile=Attenzione!\nTu stai salvando il file in un
 SDefaultNewGroupName=Nuovo gruppo
 SDefaultNewKeyword=Nuova parola chiave
 SDlgTitle_Confirm=PhoA: Conferma
@@ -953,6 +881,7 @@ SDlgTitle_SaveIni=Salva il file delle impostazioni
 SDlgTitle_SavePhoa=Salva l'album come
 SDlgTitle_SaveSearchExprAs=Save l'epsressione di ricerca come
 SDlgTitle_SelectFolder=Seleziona una cartella
+SDlgTitle_SelectPicFile=Seleziona un file immagine
 SDlgTitle_Warning=PhoA: Attenzione
 SErrCannotCreateFolder=Non riesco a creare la cartella "%s"
 SErrCannotDecodePicture=Errore decodificando il file "%s":\n%s
@@ -963,17 +892,13 @@ SErrDuplicateKeyword=Questa parola chiave è già nella lista
 SErrExecutingToolFailed=Errore eseguendo il tool "%s" per il file "%s": %s
 SErrFileNotFound=File non trovato
 SErrFileNotFoundFmt=File non trovato: "%s"
-SErrFileRevHigher=L'album è stato creato con una versione più nuova di 
-questa. Non posso aprire il file.
+SErrFileRevHigher=L'album è stato creato con una versione più nuova di
 SErrInvalidPicFileName=Nome dell'immagine non valido: "%s"
-SErrNotAllPicsLinked=%d immagini selezionate di %d non sono inserite in un 
-gruppo, è questo è un errore. Ciascuna immagine deve essere collegata ad 
-almeno un gruppo.
-SErrNoTargetPathDetermined=Nessun percorso di arrivo trovato per il file 
-"%s"
+SErrNotAllPicsLinked=%d immagini selezionate di %d non sono inserite in un
+SErrNoTargetPathDetermined=Nessun percorso di arrivo trovato per il file
 SError=Errore
-SErrSrcAndDestFoldersAreSame=Le cartelle sorgente e destinazione sono le 
-stesse ("%s") per il file "%s"
+SErrPicFileAlreadyInUse=Il file "%s" è già usato da un'altra immagine (ID=%d) nell'album
+SErrSrcAndDestFoldersAreSame=Le cartelle sorgente e destinazione sono le
 SErrTargetFileExists=File di destinazione "%s" già esiste
 SErrUnknownPicFileExtension=Estensione sconosciuta per il file "%s"
 SFileFilter_Ini=File Ini (*.ini)|*.ini
@@ -983,15 +908,11 @@ SImgView_DefaultCaption=Visualizza immagine
 SImgView_ErrorMsg=ERRORE
 SInfo_SearchStringNotFound=Testo non trovato
 SLogEntry_AddingError=Aggiungendo %s si è verificato un errore: %s
-SLogEntry_AddingOK=%s aggiunto senza errori. Riempimento automatico Data: 
-%s. Riempimento automatico Ora: %s. Riempimento automatico Transformazione: 
-%s.
+SLogEntry_AddingOK=%s aggiunto senza errori. Riempimento automatico Data:
 SLogEntry_AutorunCreatedOK=autorun.inf creato senza errori
 SLogEntry_AutorunCreationError=Impossibile creare autorun.inf: %s
-SLogEntry_ExecutableCopiedOK=Il programma eseguibile è stato copiato senza 
-errori sulla cartella "%s"
-SLogEntry_ExecutableCopyingError=Errore durante la copia del programma 
-eseguibile sulla cartella "%s": %s
+SLogEntry_ExecutableCopiedOK=Il programma eseguibile è stato copiato senza
+SLogEntry_ExecutableCopyingError=Errore durante la copia del programma
 SLogEntry_FileCopiedOK=Copiati da "%s" a "%s" senza errori
 SLogEntry_FileDeletedOK=Il file "%s" è stato cancellato
 SLogEntry_FileDeletingError=Impossibile cancellare il file "%s"
@@ -1000,28 +921,21 @@ SLogEntry_FileOpFinalizationError=Operazione di finalizzazione fallita: %s
 SLogEntry_FileRecycledOK=Il file "%s" è stato spostato nel cestino
 SLogEntry_FileRecyclingError=Impossibile spostare il file "%s" nel cestino
 SLogEntry_PhoaSavedOK=L'album è stato salvato su "%s" senza errori
-SLogEntry_PhoaSaveError=Errore durante il salvataggio dell'album sul 
-file"%s": %s
+SLogEntry_PhoaSaveError=Errore durante il salvataggio dell'album sul
 SLogEntry_PicDeletedOK=L'immagine "%s" è stata rimossa dall'album
-SLogEntry_PicRelinkedOK=Cambiato il collegamento dell'immagine da "%s" a 
-"%s"
-SLogEntry_PicRelinkingError=Non posso aggiornare il percorso del file 
-dell'immagine a "%s": il file è già utilizzato da un'altra immagine
-SLogEntry_SkipInsteadOfDelFile=il file "%s" non esiste, non è necessario 
-cancellarlo
-SLogEntry_ThumbRebuiltOK=La miniatura per "%s" è stata ricostruita senza 
-errori (grandezza miniatura: %d -> %d, grandezza file: %d -> %d)
+SLogEntry_PicRelinkedOK=Cambiato il collegamento dell'immagine da "%s" a
+SLogEntry_PicRelinkingError=Non posso aggiornare il percorso del file
+SLogEntry_SkipInsteadOfDelFile=il file "%s" non esiste, non è necessario
+SLogEntry_ThumbRebuiltOK=La miniatura per "%s" è stata ricostruita senza
 SLogEntry_UserAbort=Processo interrotto dall'utente
-SLogEntry_UserDeniedFileOverwrite=L'utente ha rifiutato di sovrascrivere il 
-file "%s"
+SLogEntry_UserDeniedFileOverwrite=L'utente ha rifiutato di sovrascrivere il
 SLogInfoNoErrors=Totali: %d righe, nessun errore
 SLogInfoWithErrors=Totali: %d righe, errori: %d
 SMsg_ApplyingLanguage=Sto applicando il corrente linguaggio...
 SMsg_ApplyingSettings=Sto applicando le impostazioni...
 SMsg_Initializing=Sto inializzando...
 SMsg_LoadingPhoa=Sto caricando l'album %s...
-SMsg_NoMetatagSelected=Nessun metatag selezionato. Seleziona un elemento per 
-vedere la sua descrizione
+SMsg_NoMetatagSelected=Nessun metatag selezionato. Seleziona un elemento per
 SMsg_ProcessingSomething=Sto elaborando %s...
 SMsg_ScanningLanguages=Sto cercando file di linguaggio...
 SMsg_SelectSearchPicProp=(seleziona una proprietà)
@@ -1031,12 +945,8 @@ SNoFilesSelected=Nessun file selezionato nella lista dei risultati
 SNone=(nessuno)
 SNotAValidDate="%s" non è una data valida
 SNotAValidTime="%s" non è un'ora valida
-SNotify_DragCopy=Totali: %0:d immagini copiate, incluse:\n  • %1:d erano 
-nuove per il gruppo di arrivo;\n  • %2:d erano già contenute nel gruppo di 
-arrivo.\n
-SNotify_DragMove=Totali: %0:d immagini spostate, incluse:\n  • %1:d erano 
-nuove per il gruppo di arrivo;\n  • %2:d erano già contenute nel gruppo di 
-arrivo.\n
+SNotify_DragCopy=Totali: %0:d immagini copiate, incluse:\n  • %1:d erano
+SNotify_DragMove=Totali: %0:d immagini spostate, incluse:\n  • %1:d erano
 SNotify_Paste=Incollate %d immagini
 SPhotoAlbumNode=Album
 SPicCount=%d immagini
@@ -1110,29 +1020,22 @@ SUnclassified_Place=Nessun posto
 SUnclassified_Time=Nessuna ora
 SUndoActionTitle=Ann&ullamento %s
 SUndoOperationCount=Azioni annullamento %d
-SWzAddFiles_Paused=Immagini aggiunte: %d\nImmagini saltate a causa di 
-errori: %d\nClicca su Continua per riprendere l'elaborazione
+SWzAddFiles_Paused=Immagini aggiunte: %d\nImmagini saltate a causa di
 SWzAddFiles_Processing=Sto aggiungendo l'immagine %d di %d (errori: %d):\n%s
 SWzFileOps_AllPicsInPhoa=Tutte le imm&agini dell'album
 SWzFileOps_AllPicsInView=Tutte le imm&agini della vista "%s"
-SWzFileOps_Paused=Immagini elaborate senza errori: %d\nErrori durante 
-l'elaborazione     : %d\nClicca "Continua" per riprendere l'elaborazione
-SWzFileOps_PicGroupSelectedCount=Selezionate %d immagini in %d grouppi; 
-grandezza totale: %s
-SWzFileOps_Processing=Sto elaborando l'immagine %d di %d\nErrori: %d\nFile: 
-%s
+SWzFileOps_Paused=Immagini elaborate senza errori: %d\nErrori durante
+SWzFileOps_PicGroupSelectedCount=Selezionate %d immagini in %d grouppi;
+SWzFileOps_Processing=Sto elaborando l'immagine %d di %d\nErrori: %d\nFile:
 SWzPageAddFiles_CheckFiles=Scegli i file che vuoi aggiungere all'album
 SWzPageAddFiles_CheckFiles_Info=File selezionati: %d; files scelti: %d
 SWzPageAddFiles_Log=Log dell'aggiunta immagini
 SWzPageAddFiles_Processing=Sto aggiungo le immagini
-SWzPageAddFiles_SelFiles=Seleziona i file e/o cartelle che vuoi aggiungere 
-all'album
+SWzPageAddFiles_SelFiles=Seleziona i file e/o cartelle che vuoi aggiungere
 SWzPageFileOps_Log=La log dell'operazione
 SWzPageFileOps_Options=Scegli le seguenti opzioni
 SWzPageFileOps_Processing=Sto eseguendo l'operazione
-SWzPageFileOps_RepairSelLinks=Qui sotto ci sono i file immagine originali, 
-come pure le opzioni di riparazione.\nScegli le immagini che vuoi riparare. 
-Se ci sono diverse opzioni per una immagine, seleziona il file appropriato
+SWzPageFileOps_RepairSelLinks=Qui sotto ci sono i file immagine originali,
 SWzPageFileOps_SelFolder=Seleziona la cartella di destinazione
 SWzPageFileOps_SelPics=Seleziona l'immagine per l'operazione
 SWzPageFileOps_SelTask=Seleziona un lavoro
@@ -1161,4 +1064,3 @@ TPhoaOp_ViewDelete=Cancella vista
 TPhoaOp_ViewEdit=Modifica vista
 TPhoaOp_ViewMakeGroup=Crea un gruppo a partire dalla vista
 TPhoaOp_ViewNew=Crea vista
-
