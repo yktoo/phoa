@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.17 2004-12-07 11:09:36 dale Exp $
+rem $Id: _make_.bat,v 1.18 2004-12-07 13:59:47 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -22,7 +22,7 @@ set COMPILER="%DELPHI%\Bin\dcc32.exe"
 
 set HELP_COMPILER="C:\Program Files\HTML Help Workshop\hhc.exe"
 
-set SETUP_COMPILER="C:\Program Files\Inno Setup 4\iscc.exe"
+set SETUP_COMPILER="C:\Program Files\Inno Setup 5\iscc.exe"
 
 if "%1"=="app" goto compapp
 if "%1"=="help" goto comphelp
