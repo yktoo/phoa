@@ -1,7 +1,7 @@
 inherited dStats: TdStats
-  Left = 390
-  Top = 184
-  Caption = 'Estat'#1085'stica'
+  Left = 378
+  Top = 228
+  Caption = 'Photo album statistics'
   ClientHeight = 435
   ClientWidth = 612
   OldCreateOrder = True
@@ -57,14 +57,12 @@ inherited dStats: TdStats
       35)
     inherited bCancel: TButton
       Left = 453
-      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 373
     end
     inherited bHelp: TButton
       Left = 531
-      Caption = 'Ajuda'
     end
   end
   inherited dklcMain: TDKLanguageController
