@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.12 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.13 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrWzPageFileOps_SelPics;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, StdCtrls, VirtualTrees, TB2Item, TBX, Menus,
   ActnList, DKLang;
 
@@ -74,7 +75,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
+uses phUtils, udFileOpsWizard, Main, phSettings;
 
   procedure TfrWzPageFileOps_SelPics.aaCheckAll(Sender: TObject);
   begin
@@ -277,8 +278,8 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
         Pics := Wiz.ViewerSelPics;
        // Все изображения фотоальбома
       end else if rbAllPics.Checked then begin
-        FSelGroupCount := Wiz.PhoA.RootGroup.NestedGroupCount+1;
-        Pics := Wiz.PhoA.Pics;
+        FSelGroupCount := Wiz.Project.RootGroup.NestedGroupCount+1;
+        Pics := Wiz.Project.Pics;
        // Изображения из выбранных групп. Создаём уникальный список изображений и добавляем в него изображения из
        //   отмеченных в дереве групп
       end else begin

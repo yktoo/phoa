@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.15 2004-10-11 11:41:24 dale Exp $
+//  $Id: udStats.pas,v 1.16 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,8 +10,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phObj, ConsVars, VirtualShellUtilities, phDlg, Placemnt, DKLang,
-  VirtualTrees, StdCtrls, ExtCtrls;
+  VirtualShellUtilities, Placemnt, 
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phDlg,
+  DKLang, VirtualTrees, StdCtrls, ExtCtrls;
 
 type
   PPStatsData = ^PStatsData;
@@ -31,8 +32,8 @@ type
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
-     // Фотоальбом
-    FPhoA: TPhotoAlbum;
+     // Проект
+    FProject: IPhotoAlbumProject;
      // Текущая группа
     FGroup: IPhotoAlbumPicGroup;
      // Создаёт в памяти новый объект данных статистики
@@ -42,18 +43,18 @@ type
     procedure InitializeDialog; override;
   end;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup);
+  procedure ShowProjectStats(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup);
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phPhoa, phSettings;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup);
+  procedure ShowProjectStats(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup);
   begin
     with TdStats.Create(Application) do
       try
-        FPhoA  := PhoA;
-        FGroup := Group;
+        FProject := AProject;
+        FGroup   := AGroup;
         Execute;
       finally
         Free;
@@ -69,9 +70,9 @@ uses phUtils, Main, phPhoa, phSettings;
       ns: TNamespace;
       DFProp: TDiskFileProp;
     begin
-      if FPhoA.FileName<>'' then
+      if FProject.FileName<>'' then
         try
-          ns := TNamespace.CreateFromFileName(FPhoA.FileName);
+          ns := TNamespace.CreateFromFileName(FProject.FileName);
           for DFProp := Low(DFProp) to High(DFProp) do tvMain.AddChild(nParent, NewStatData(DiskFilePropName(DFProp), DiskFilePropValue(DFProp, ns)));
         except
           on EVSTInvalidFileName do {ignore};
@@ -131,7 +132,7 @@ uses phUtils, Main, phPhoa, phSettings;
         sMaxFileName   := '';
         sMinFileName   := '';
         for i := 0 to IDs.Count-1 do begin
-          Pic := FPhoA.Pics.ItemsByID[IDs[i]];
+          Pic := FProject.Pics.ItemsByID[IDs[i]];
           i64FSize := Pic.FileSize;
           Inc(i64TotalFileSize,  i64FSize);
           Inc(i64TotalThumbSize, Length(Pic.ThumbnailData));
@@ -193,13 +194,13 @@ uses phUtils, Main, phPhoa, phSettings;
     try
        // -- Фотоальбом
       n0 := tvMain.AddChild(nil, NewStatData('@SStat_PhotoAlbum', '', iiPhoA));
-        n1 := tvMain.AddChild(n0, NewStatData('@SStat_PhoaFilename', FPhoA.FileName));
+        n1 := tvMain.AddChild(n0, NewStatData('@SStat_PhoaFilename', FProject.FileName));
           AddPhoaFileProps(n1);
-          tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FPhoA.FileRevision))].sName));
-        tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FPhoA.Pics.Count));
-        AddGroupStats(FPhoA.RootGroup, n0);
+          tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FProject.FileRevision))].sName));
+        tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FProject.Pics.Count));
+        AddGroupStats(FProject.RootGroupX, n0);
        // -- Текущая группа
-      if (FGroup<>nil) and (FGroup<>FPhoA.RootGroup) then begin
+      if (FGroup<>nil) and (FGroup.ID<>FProject.RootGroup.ID) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));
         AddGroupStats(FGroup, n0);
       end;

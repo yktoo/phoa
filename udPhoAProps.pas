@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.7 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udPhoAProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, phObj,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phDlg, RXSpin, ComCtrls, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -26,24 +27,24 @@ type
     eThumbSizeX: TRxSpinEdit;
     eThumbSizeY: TRxSpinEdit;
   private
-    FPhoA: TPhotoAlbum;
+    FProject: IPhotoAlbumProject;
     FUndoOperations: TPhoaOperations;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
   end;
 
-  function EditPhoA(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations): Boolean;
+  function EditPhoA(AProject: IPhotoAlbumProject; UndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.DFM}
 uses ConsVars, phUtils, Main;
 
-  function EditPhoA(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations): Boolean;
+  function EditPhoA(AProject: IPhotoAlbumProject; UndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPhoAProps.Create(Application) do
       try
-        FPhoA           := PhoA;
+        FProject        := AProject;
         FUndoOperations := UndoOperations;
         Result := Execute;
       finally
@@ -59,9 +60,8 @@ uses ConsVars, phUtils, Main;
     try
       Operation := TPhoaOp_PhoAEdit.Create(
         FUndoOperations,
-        FPhoA,
-        eThumbSizeX.AsInteger,
-        eThumbSizeY.AsInteger,
+        FProject,
+        Size(eThumbSizeX.AsInteger, eThumbSizeY.AsInteger),
         tbThumbQuality.Position,
         mDesc.Lines.Text);
     finally
@@ -74,12 +74,10 @@ uses ConsVars, phUtils, Main;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_album_props;
-    with FPhoA do begin
-      eThumbSizeX.AsInteger   := ThumbnailWidth;
-      eThumbSizeY.AsInteger   := ThumbnailHeight;
-      tbThumbQuality.Position := ThumbnailQuality;
-      mDesc.Lines.Text        := Description;
-    end;
+    eThumbSizeX.AsInteger   := FProject.ThumbnailSize.cx;
+    eThumbSizeY.AsInteger   := FProject.ThumbnailSize.cy;
+    tbThumbQuality.Position := FProject.ThumbnailQuality;
+    mDesc.Lines.Text        := FProject.Description;
   end;
 
 end.

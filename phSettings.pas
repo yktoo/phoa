@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.13 2004-09-11 17:52:36 dale Exp $
+//  $Id: phSettings.pas,v 1.14 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phSettings;
 
 interface
-uses SysUtils, Windows, Classes, Graphics, Controls, Registry, IniFiles, ConsVars;
+uses SysUtils, Windows, Classes, Graphics, Controls, Registry, IniFiles, phObj, ConsVars;
 
 type
    // Exception настроек

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.8 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.9 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrWzPageAddFiles_CheckFiles;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phObj, ConsVars,
   phWizard, ImgList, TB2Item, TBX, Menus, ActnList, ExtCtrls, VirtualTrees,
   DKLang;
 
@@ -169,7 +170,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
           SortColumn := Column;
         end;
          // Сортируем список файлов
-        FFiles.Sort(TFileListSortProperty(SortColumn), TSortOrder(SortDirection));
+        FFiles.Sort(TFileListSortProperty(SortColumn), TPhoaSortDirection(SortDirection));
       end;
        // Переписываем птицы в дерево
       n := tvFiles.GetFirst;

@@ -3,7 +3,8 @@ unit udGroupProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
   phDlg, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -16,7 +17,7 @@ type
     lDesc: TLabel;
     mDescription: TMemo;
   private
-    FPhoA: TPhotoAlbum; 
+    FProject: IPhotoAlbumProject;
     FGroup: IPhotoAlbumPicGroup;
     FUndoOperations: TPhoaOperations;
   protected
@@ -25,19 +26,19 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses ConsVars, phUtils, Main;
 
-  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdGroupProps.Create(Application) do
       try
-        FPhoA           := APhoA;
+        FProject        := AProject;
         FGroup          := AGroup;
-        FUndoOperations := UndoOperations;
+        FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
         Free;
@@ -54,7 +55,7 @@ uses ConsVars, phUtils, Main;
     Operation := nil;
     fMain.BeginOperation;
     try
-      Operation := TPhoaOp_GroupEdit.Create(FUndoOperations, FPhoA, FGroup, eText.Text, mDescription.Lines.Text);
+      Operation := TPhoaOp_GroupEdit.Create(FUndoOperations, FProject, FGroup, eText.Text, mDescription.Lines.Text);
     finally
       fMain.EndOperation(Operation);
     end;

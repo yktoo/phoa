@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.10 2004-10-11 11:41:24 dale Exp $
+//  $Id: udSortPics.pas,v 1.11 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udSortPics;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ActiveX,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
   phDlg, VirtualTrees, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, ufrSorting, DKLang;
 
 type
@@ -22,8 +23,8 @@ type
     frSorting: TfrSorting;
     procedure bResetClick(Sender: TObject);
   private
-     // Фотоальбом
-    FPhoA: TPhotoAlbum;
+     // Проект
+    FProject: IPhotoAlbumProject;
      // Текущая выбранная группа в дереве
     FGroup: IPhotoAlbumPicGroup;
      // Буфер отката
@@ -40,19 +41,19 @@ type
 
    // Отображает диалог сортировки изображений. Если bDirectSort=True, то сортирует выбранную группу непосредственно,
    //   без сохранения информации для отката (используется для сортировки результатов поиска)
-  function DoSortPics(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
+  function DoSortPics(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main;
 
-  function DoSortPics(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
+  function DoSortPics(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
   begin
     with TdSortPics.Create(Application) do
       try
-        FPhoA           := PhoA;
-        FGroup          := Group;
-        FUndoOperations := UndoOperations;
+        FProject        := AProject;
+        FGroup          := AGroup;
+        FUndoOperations := AUndoOperations;
         FDirectSort     := bDirectSort;
         Result := Execute;
       finally
@@ -75,21 +76,21 @@ uses phUtils, ConsVars, Main;
     g: IPhotoAlbumPicGroup;
   begin
      // Создаём операцию
-    if rbAllGroups.Checked then g := FPhoA.RootGroup else g := FGroup;
+    if rbAllGroups.Checked then g := FProject.RootGroupX else g := FGroup;
     if rbCurGroup.Checked and FDirectSort then begin
-      g.SortPics(frSorting.Sortings);
+      g.PicsX.SortingsSort(frSorting.Sortings);
       fMain.RefreshViewer;
     end else begin
       Operation := nil;
       fMain.BeginOperation;
       try
-        Operation := TPhoaMultiOp_PicSort.Create(FUndoOperations, FPhoA, g, frSorting.Sortings, rbAllGroups.Checked);
+        Operation := TPhoaMultiOp_PicSort.Create(FUndoOperations, FProject, g, frSorting.Sortings, rbAllGroups.Checked);
       finally
         fMain.EndOperation(Operation);
       end;
     end;
      // Сохраняем использованные сортировки
-    frSorting.Sortings.RegSave(SRegSort_LastSortings);
+    frSorting.Sortings.RegSave(SRegRoot, SRegSort_LastSortings);
     inherited ButtonClick_OK;
   end;
 
@@ -109,7 +110,7 @@ uses phUtils, ConsVars, Main;
     inherited InitializeDialog;
     HelpContext := IDH_intf_sort_pics;
     OKIgnoresModified := True;
-    frSorting.Sortings.RegLoad(SRegSort_LastSortings);
+    frSorting.Sortings.RegLoad(SRegRoot, SRegSort_LastSortings);
     frSorting.SyncSortings;
     frSorting.OnChange := frSortingChange;
      // Adjust RadioButtons

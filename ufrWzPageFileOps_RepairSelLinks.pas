@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.9 2004-10-08 12:13:46 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrWzPageFileOps_RepairSelLinks;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, StdCtrls, ExtCtrls, Mask, VirtualTrees,
   DKLang;
 
@@ -32,7 +33,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, udFileOpsWizard, phObj, Main;
+uses phUtils, udFileOpsWizard, Main;
 
   procedure TfrWzPageFileOps_RepairSelLinks.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   var Wiz: TdFileOpsWizard;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.8 2004-09-15 18:53:13 dale Exp $
+//  $Id: udViewProps.pas,v 1.9 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udViewProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ActiveX,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phDlg, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, VirtualTrees,
   ufrSorting, DKLang;
 
@@ -43,13 +44,13 @@ type
     procedure ipmMoveDownClick(Sender: TObject);
   private
      // Редактируемое представление
-    FView: TPhoaView;
-     // Фотоальбом
-    FPhoA: TPhotoAlbum;
+    FView: IPhotoAlbumView;
+     // Проект
+    FProject: IPhotoAlbumProject;
      // Буфер отката
     FUndoOperations: TPhoaOperations;
      // Редактируемые группировки
-    FGroupings: TPhoaGroupings;
+    FGroupings: IPhotoAlbumPicGroupingList;
      // Настраивает доступность действий
     procedure EnableActions;
      // Настраивает tvGrouping (в ответ на изменение FGroupings)
@@ -64,25 +65,24 @@ type
     procedure frSortingChange(Sender: TObject);
   protected
     procedure InitializeDialog; override;
-    procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
   end;
 
    // Редактирует/добавляет представление
-  function EditView(View: TPhoaView; PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations): Boolean;
+  function EditView(AView: IPhotoAlbumView; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
 
-  function EditView(View: TPhoaView; PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations): Boolean;
+  function EditView(AView: IPhotoAlbumView; AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdViewProps.Create(Application) do
       try
-        FView           := View;
-        FPhoA           := PhoA;
-        FUndoOperations := UndoOperations;
+        FView           := AView;
+        FProject        := AProject;
+        FUndoOperations := AUndoOperations;
         Result := Execute;
       finally
         Free;
@@ -117,12 +117,6 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
     ipmMoveDown.Enabled := (idx>=0) and (idx<iCnt-1);
   end;
 
-  procedure TdViewProps.FinalizeDialog;
-  begin
-    FGroupings.Free;
-    inherited FinalizeDialog;
-  end;
-
   procedure TdViewProps.frSortingChange(Sender: TObject);
   begin
     Modified := True;
@@ -141,18 +135,22 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   procedure TdViewProps.GroupingPropClick(Sender: TObject);
   var
     n: PVirtualNode;
-    GBProp: TGroupByProperty;
+    GBProp: TPicGroupByProperty;
+    Grouping: IPhotoAlbumPicGrouping;
   begin
     n := tvGrouping.FocusedNode;
-    GBProp := TGroupByProperty(TComponent(Sender).Tag);
+    GBProp := TPicGroupByProperty(TComponent(Sender).Tag);
      // Смена свойства у существующего пункта
     if GroupingNode(n) then begin
-      FGroupings.SetProp(n.Index, GBProp);
+      FGroupings[n.Index].Prop := GBProp;
       tvGrouping.InvalidateNode(n);
       EnableActions;
      // Добавление нового пункта
     end else begin
-      FGroupings.Add(GBProp, True);
+      Grouping := NewPhotoAlbumPicGrouping;
+      Grouping.Prop := GBProp;
+      Grouping.UnclassifiedInOwnFolder := True;
+      FGroupings.Add(Grouping);
       SyncGroupings;
     end;
     Modified := True;
@@ -161,11 +159,11 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   procedure TdViewProps.InitializeDialog;
   var
     tbi: TTBCustomItem;
-    gbp: TGroupByProperty;
+    gbp: TPicGroupByProperty;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_view_props;
-    FGroupings := TPhoaGroupings.Create;
+    FGroupings := NewPhotoAlbumPicGroupingList;
      // Создаём пункты меню "Добавить группировку"
     for gbp := Low(gbp) to High(gbp) do begin
       tbi := TTBXItem.Create(Self);
@@ -200,7 +198,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   var idx: Integer;
   begin
     idx := tvGrouping.FocusedNode.Index;
-    FGroupings.Exchange(idx, idx+1);
+    FGroupings.Move(idx, idx+1);
     with tvGrouping do MoveTo(FocusedNode, GetNextSibling(FocusedNode), amInsertAfter, False);
     EnableActions;
     Modified := True;
@@ -210,7 +208,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   var idx: Integer;
   begin
     idx := tvGrouping.FocusedNode.Index;
-    FGroupings.Exchange(idx, idx-1);
+    FGroupings.Move(idx, idx-1);
     with tvGrouping do MoveTo(FocusedNode, GetPreviousSibling(FocusedNode), amInsertBefore, False);
     EnableActions;
     Modified := True;
@@ -226,7 +224,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   procedure TdViewProps.ToggleUnclassified(Node: PVirtualNode);
   begin
     if GroupingNode(Node) then begin
-      FGroupings.ToggleUnclassified(Node.Index);
+      FGroupings[Node.Index].ToggleUnclassifiedInOwnFolder;
       tvGrouping.InvalidateNode(Node);
       Modified := True;
     end;
@@ -234,13 +232,13 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
 
   procedure TdViewProps.tvGroupingAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
   var
-    pg: TPhoaGrouping;
+    Grouping: IPhotoAlbumPicGrouping;
     ElementDetails: TThemedElementDetails;
   begin
      // Рисуем Unclassified CheckBox (кроме для gbpFilePath, т.к. изображений без путей не бывает)
     if (Column=1) and GroupingNode(Node) then begin
-      pg := FGroupings[Node.Index];
-      if pg.Prop<>gbpFilePath then begin
+      Grouping := FGroupings[Node.Index];
+      if Grouping.Prop<>gbpFilePath then begin
          // Настраиваем Rect
         with CellRect do begin
           Left := (Left+Right-16) div 2;
@@ -251,11 +249,11 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
          // Рисуем
         if ThemeServices.ThemesEnabled then
           with ThemeServices do begin
-            if pg.bUnclassified then ElementDetails := GetElementDetails(tbCheckBoxCheckedNormal) else ElementDetails := GetElementDetails(tbCheckBoxUncheckedNormal);
+            if Grouping.UnclassifiedInOwnFolder then ElementDetails := GetElementDetails(tbCheckBoxCheckedNormal) else ElementDetails := GetElementDetails(tbCheckBoxUncheckedNormal);
             DrawElement(TargetCanvas.Handle, ElementDetails, CellRect);
           end
         else
-          DrawFrameControl(TargetCanvas.Handle, CellRect, DFC_BUTTON, iif(pg.bUnclassified, DFCS_BUTTONCHECK or DFCS_CHECKED, DFCS_BUTTONCHECK));
+          DrawFrameControl(TargetCanvas.Handle, CellRect, DFC_BUTTON, iif(Grouping.UnclassifiedInOwnFolder, DFCS_BUTTONCHECK or DFCS_CHECKED, DFCS_BUTTONCHECK));
       end;
     end;
   end;

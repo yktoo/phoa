@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.31 2004-10-11 11:41:24 dale Exp $
+//  $Id: phUtils.pas,v 1.32 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -23,6 +23,9 @@ uses
   procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
   procedure RegisterCBHistory(cb: TComboBox);
+
+   // Изготовление типа TSize
+  function  Size(cx, cy: Integer): TSize; 
 
    // Преобразование TRect<->Строка вида '1,2,3,4'
   function  RectToStr(const r: TRect): String;
@@ -103,7 +106,7 @@ uses
    // Возвращает наименование свойства группы
   function  GroupPropName(GroupProp: TGroupProperty): String;
    // Возвращает наименование свойства изображения для группировки
-  function  GroupByPropName(GBProp: TGroupByProperty): String;
+  function  GroupByPropName(GBProp: TPicGroupByProperty): String;
    // Возвращает наименование пиксельного формата изображения
   function  PixelFormatName(PFmt: TPhoaPixelFormat): String;
    // Возвращает наименование свойства дискового файла
@@ -135,13 +138,6 @@ uses
   procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
    // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
   function  GTreeHintModeToVTHintMode(GTHM: TGroupTreeHintMode): TVTHintMode;
-
-   // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
-  procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
-  procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
-   // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
-  procedure UndoWriteSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
-  procedure UndoReadSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
 
    // Укорачивает строку как имя файла
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
@@ -242,9 +238,11 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     cb.Text := s;
   end;
 
-   //-------------------------------------------------------------------------------------------------------------------
-   // Rectangles
-   //-------------------------------------------------------------------------------------------------------------------
+  function Size(cx, cy: Integer): TSize;
+  begin
+    Result.cx := cx;
+    Result.cy := cy;
+  end;
 
   function  RectToStr(const r: TRect): String;
   begin
@@ -591,9 +589,9 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     Result := ConstVal(GetEnumName(TypeInfo(TGroupProperty), Byte(GroupProp)));
   end;
 
-  function GroupByPropName(GBProp: TGroupByProperty): String;
+  function GroupByPropName(GBProp: TPicGroupByProperty): String;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TGroupByProperty), Byte(GBProp)));
+    Result := ConstVal(GetEnumName(TypeInfo(TPicGroupByProperty), Byte(GBProp)));
   end;
 
   function PixelFormatName(PFmt: TPhoaPixelFormat): String;
@@ -766,64 +764,6 @@ type
       hmHint);   // gthmInfo
   begin
     Result := aHM[GTHM];
-  end;
-
-  procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
-  var
-    i: Integer;
-    gpg: TPhoaGrouping;
-  begin
-    UndoFile.WriteInt(Groupings.Count);
-    for i := 0 to Groupings.Count-1 do begin
-      gpg := Groupings[i];
-      UndoFile.WriteByte(Byte(gpg.Prop));
-      UndoFile.WriteBool(gpg.bUnclassified);
-    end;
-  end;
-
-  procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
-  var
-    i, iCnt: Integer;
-    gbp: TGroupByProperty;
-    bUncl: Boolean;
-  begin
-    iCnt := UndoFile.ReadInt;
-    Groupings.Clear;
-    Groupings.Capacity := iCnt;
-    for i := 0 to iCnt-1 do begin
-      gbp   := TGroupByProperty(UndoFile.ReadByte);
-      bUncl := UndoFile.ReadBool;
-      Groupings.Add(gbp, bUncl);
-    end;
-  end;
-
-  procedure UndoWriteSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
-  var
-    i: Integer;
-    ps: TPhoaSorting;
-  begin
-    UndoFile.WriteInt(Sortings.Count);
-    for i := 0 to Sortings.Count-1 do begin
-      ps := Sortings[i];
-      UndoFile.WriteByte(Byte(ps.Prop));
-      UndoFile.WriteByte(Byte(ps.Order));
-    end;
-  end;
-
-  procedure UndoReadSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
-  var
-    i, iCnt: Integer;
-    pp: TPicProperty;
-    so: TSortOrder;
-  begin
-    iCnt := UndoFile.ReadInt;
-    Sortings.Clear;
-    Sortings.Capacity := iCnt;
-    for i := 0 to iCnt-1 do begin
-      pp := TPicProperty(UndoFile.ReadByte);
-      so := TSortOrder  (UndoFile.ReadByte);
-      Sortings.Add(pp, so);
-    end;
   end;
 
   function ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;

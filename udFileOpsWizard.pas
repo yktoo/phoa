@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.23 2004-10-11 11:41:24 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.24 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  GraphicEx, GR32, phWizard, phIntf, phMutableIntf, phObj, ConsVars, phGraphics,  
+  GraphicEx, GR32,
+  phWizard, phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
@@ -89,7 +90,7 @@ type
     FCDOpt_PhoaFileName: String;
     FDelFile_DeleteToRecycleBin: Boolean;
     FDestinationFolder: String;
-    FExportedPhoA: TPhotoAlbum;
+    FExportedProject: IPhotoAlbumProject;
     FFileOpKind: TFileOperationKind;
     FMoveFile_AllowDuplicating: Boolean;
     FMoveFile_Arranging: TFileOpMoveFileArranging;
@@ -101,8 +102,8 @@ type
     FMoveFile_OverwriteMode: TFileOpMoveFileOverwriteMode;
     FMoveFile_ReplaceChar: Char;
     FMoveFile_UseCDOptions: Boolean;
-    FPhoA: TPhotoAlbum;
-    FPhoaChanged: Boolean;
+    FProject: IPhotoAlbumProject;
+    FProjectChanged: Boolean;
     FRepair_DeleteUnmatchedPics: Boolean;
     FRepair_FileLinks: TFileLinks;
     FRepair_LookSubfolders: Boolean;
@@ -112,7 +113,7 @@ type
     FSelectedPics: IPhotoAlbumPicList;
     FSelPicMode: TFileOpSelPicMode;
     FSelPicValidityFilter: TFileOpSelPicValidityFilter;
-    FViewerCurView: TPhoaView;
+    FViewerCurView: IPhotoAlbumView;
     FViewerSelGroup: IPhotoAlbumPicGroup;
     FViewerSelPics: IPhoaPicList;
      // Отбирает изображения для операции в FSelectedPics - на основании выбранного режима и выбранных групп
@@ -184,8 +185,8 @@ type
     property DelFile_DeleteToRecycleBin: Boolean read FDelFile_DeleteToRecycleBin write FDelFile_DeleteToRecycleBin;
      // -- Папка назначения, с которой производятся операции
     property DestinationFolder: String read FDestinationFolder write FDestinationFolder;
-     // -- Фотоальбом, предназначенный для экспорта в процессе копирования/перемещения файлов
-    property ExportedPhoA: TPhotoAlbum read FExportedPhoA;
+     // -- Проект, предназначенный для экспорта в процессе копирования/перемещения файлов
+    property ExportedProject: IPhotoAlbumProject read FExportedProject;
      // -- Выбранная операция с файлами изображений
     property FileOpKind: TFileOperationKind read FFileOpKind write FFileOpKind;
      // -- Копирование/перемещение: режим размещения файлов
@@ -212,10 +213,10 @@ type
     property MoveFile_DeleteToRecycleBin: Boolean read FMoveFile_DeleteToRecycleBin write FMoveFile_DeleteToRecycleBin;
      // -- Копирование/перемещение: если True, отображать и использовать опции создания CD/DVD
     property MoveFile_UseCDOptions: Boolean read FMoveFile_UseCDOptions write FMoveFile_UseCDOptions;
-     // -- Фотоальбом
-    property PhoA: TPhotoAlbum read FPhoA;
-     // -- True, если операция внесла изменения в фотоальбом
-    property PhoaChanged: Boolean read FPhoaChanged;
+     // -- True, если операция внесла изменения в проект
+    property ProjectChanged: Boolean read FProjectChanged;
+     // -- Проект
+    property Project: IPhotoAlbumProject read FProject;
      // -- Восстановление ссылок: флаги поиска совпадения для восстановления
     property Repair_MatchFlags: TFileOpRepairMatchFlags read FRepair_MatchFlags write FRepair_MatchFlags;
      // -- Восстановление ссылок: если True, просматривать вложенные в папку назначения папки в поисках подходящего файла
@@ -241,7 +242,7 @@ type
      // -- Выбранные во вьюере изображения
     property ViewerSelPics: IPhoaPicList read FViewerSelPics;
      // -- Текущее выбранное во вьюере представление; nil, если отображаются группы изображений
-    property ViewerCurView: TPhoaView read FViewerCurView;
+    property ViewerCurView: IPhotoAlbumView read FViewerCurView;
   end;
 
    // Поток-обработчик файловых операций
@@ -284,7 +285,7 @@ type
    //   AViewerCurView    - текущее выбранное во вьюере представление; nil, если отображаются группы изображений
    //   AViewerSelPics    - список выделенных во вьюере изображений
    //   bSelPicsByDefault - если True, по умолчанию выбирать "Выбранные изображения"
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: IPhotoAlbumView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
@@ -296,17 +297,17 @@ uses
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
   ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
 
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: IPhotoAlbumView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
   begin
     with TdFileOpsWizard.Create(Application) do
       try
-        FPhoA             := APhoA;
+        FProject          := AProject;
         FViewerSelGroup   := AViewerSelGroup;
         FViewerCurView    := AViewerCurView;
         FViewerSelPics    := AViewerSelPics;
         FSelPicsByDefault := bSelPicsByDefault;
         Result := Execute;
-        bPhoaChanged := PhoaChanged;
+        bProjectChanged := ProjectChanged;
       finally
         Free;
       end;
@@ -485,9 +486,9 @@ uses
           SLRelTargetPaths.Duplicates := dupIgnore;
            // Заполняем SLRelTargetPaths путями назначения
           if FWizard.ViewerCurView=nil then
-            AddPathIfPicInGroup(FWizard.PhoA.RootGroup)
+            AddPathIfPicInGroup(FWizard.Project.RootGroupX)
           else
-            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup);
+            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroupX);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];
@@ -505,7 +506,7 @@ uses
       if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcPath+sFile, FWizard.MoveFile_DeleteToRecycleBin);
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
-    if FWizard.ExportedPhoA<>nil then FWizard.ExportedPhoA.Pics.ItemsByIDX[Pic.ID].FileName := sTargetPath+sFile;
+    if FWizard.ExportedProject<>nil then FWizard.ExportedProject.PicsX.ItemsByIDX[Pic.ID].FileName := sTargetPath+sFile;
   end;
 
   procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
@@ -548,7 +549,7 @@ uses
   begin
     FChangesMade := True;
      // Удаляем все ссылки на изображения
-    DelID(FWizard.PhoA.RootGroup, Pic.ID);
+    DelID(FWizard.Project.RootGroupX, Pic.ID);
      // Удаляем изображение
     Pic.Release;
   end;
@@ -572,7 +573,10 @@ uses
     iPrevThumbSize := Length(Pic.ThumbnailData);
     iPrevFileSize  := Pic.FileSize;
      // Перестраиваем эскиз
-    Pic.ReloadPicFileData;
+    Pic.ReloadPicFileData(
+      FWizard.Project.ThumbnailSize,
+      TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
+      FWizard.Project.ThumbnailQuality);
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
@@ -589,7 +593,7 @@ uses
   var sPrevFileName: String;
   begin
      // Проверяем, можно ли исправить путь
-    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.IndexOfFileName(sNewFileName)>=0) then
+    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.Project.Pics.IndexOfFileName(sNewFileName)>=0) then
       FileOpError('SLogEntry_PicRelinkingError', [sNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
     sPrevFileName := Pic.FileName;
@@ -685,22 +689,22 @@ uses
 
   begin
      // Создаём фотоальбом
-    FExportedPhoA := TPhotoAlbum.Create;
+    FExportedProject := NewPhotoAlbumProject;
      // Копируем настройки
-    FExportedPhoA.Assign(FPhoA, False);
+    FExportedProject.Assign(FProject, False);
      // Настраиваем опции
-    FExportedPhoA.Description := FCDOpt_PhoaDesc;
-    FExportedPhoA.FileName    := IncludeTrailingPathDelimiter(FDestinationFolder)+FCDOpt_PhoaFileName;
+    FExportedProject.Description := FCDOpt_PhoaDesc;
+    FExportedProject.FileName    := IncludeTrailingPathDelimiter(FDestinationFolder)+FCDOpt_PhoaFileName;
      // Копируем изображения
-    FExportedPhoA.Pics.DuplicatePics(FSelectedPics);
+    FExportedProject.PicsX.DuplicatePics(FSelectedPics);
      // Копируем группы и изображения в них
     case SelPicMode of
-      fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
-      fospmAll:       FExportedPhoA.RootGroup.Assign(FPhoA.RootGroup, True, True, True);
-      fospmSelGroups: AddGroup(FExportedPhoA.RootGroup, nil, FPhoA.RootGroup, True);
+      fospmSelPics:   AddSingleGroup(FExportedProject.RootGroupX, FViewerSelGroup, FViewerSelGroup<>Project.RootGroup);
+      fospmAll:       FExportedProject.RootGroupX.Assign(FProject.RootGroupX, True, True, True);
+      fospmSelGroups: AddGroup(FExportedProject.RootGroupX, nil, FProject.RootGroupX, True);
     end;
      // Копируем представления
-    if FCDOpt_IncludeViews then FExportedPhoA.Views.Assign(FPhoA.Views);
+    if FCDOpt_IncludeViews then FExportedProject.ViewsX.Assign(FProject.Views);
   end;
 
   procedure TdFileOpsWizard.DoSelectPictures;
@@ -710,7 +714,7 @@ uses
     FSelectedPics := NewPhotoAlbumPicList(True);
     case SelPicMode of
       fospmSelPics:   FSelectedPics.Assign(FViewerSelPics);
-      fospmAll:       FSelectedPics.Assign(FPhoA.Pics);
+      fospmAll:       FSelectedPics.Assign(FProject.Pics);
       fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.Add(FSelectedGroups[i].Pics, True);
       else            FSelectedPics := nil;
     end;
@@ -737,12 +741,12 @@ uses
     if (FFileOpKind in [fokCopyFiles, fokMoveFiles]) and FMoveFile_UseCDOptions then begin
       sDestPath := IncludeTrailingPathDelimiter(FDestinationFolder);
        // Если есть фотоальбом, сохраняем его в файл
-      if FExportedPhoA<>nil then
+      if FExportedProject<>nil then
         try
-          FExportedPhoA.SaveToFile(FExportedPhoA.FileName, FExportedPhoA.FileRevision, nil);
-          LogSuccess('SLogEntry_PhoaSavedOK', [FExportedPhoA.FileName]);
+          FExportedProject.SaveToFile(FExportedProject.FileName, SProject_Generator, SProject_Remark, FExportedProject.FileRevision);
+          LogSuccess('SLogEntry_PhoaSavedOK', [FExportedProject.FileName]);
         except
-          on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedPhoA.FileName, e.Message]);
+          on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, e.Message]);
         end;
        // Копируем программу
       if FCDOpt_CopyExecutable then begin
@@ -757,7 +761,7 @@ uses
         if FCDOpt_CopyIniSettings then IniSaveSettings(sDestPath+SDefaultIniFileName);
       end;
        // Создаём autorun.inf
-      if (FExportedPhoA<>nil) and FCDOpt_CreateAutorun then
+      if (FExportedProject<>nil) and FCDOpt_CreateAutorun then
         try
           fs := TFileStream.Create(sDestPath+'autorun.inf', fmCreate);
           try
@@ -785,9 +789,9 @@ uses
   procedure TdFileOpsWizard.FinalizeWizard;
   begin
     FRepair_FileLinks.Free;
-    FExportedPhoA.Free;
-    FSelectedPics := nil;
-    FSelectedGroups := nil;
+    FExportedProject := nil;
+    FSelectedPics    := nil;
+    FSelectedGroups  := nil;
     FLog.Free;
     inherited FinalizeWizard;
   end;
@@ -844,8 +848,8 @@ uses
     FCDOpt_CreateAutorun         := True;
     FCDOpt_CopyIniSettings       := True;
     FCDOpt_MediaLabel            := ConstVal('SPhotoAlbumNode');
-    FCDOpt_PhoaDesc              := FPhoA.Description;
-    FCDOpt_PhoaFileName          := ExtractFileName(FPhoA.FileName);
+    FCDOpt_PhoaDesc              := FProject.Description;
+    FCDOpt_PhoaFileName          := ExtractFileName(FProject.FileName);
     FMoveFile_ReplaceChar        := '_';
     FMoveFile_DeleteToRecycleBin := True;
     FMoveFile_OverwriteMode      := fomfomPrompt;
@@ -998,7 +1002,7 @@ uses
         if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.FileSize;
         if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.FileName));
          // Проверяем доступность по "занятости" другим изображением
-        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.IndexOfFileName(sPath+SRec.Name)<0;
+        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FProject.Pics.IndexOfFileName(sPath+SRec.Name)<0;
          // Если подходит
         if bMatches then begin
            // Создаём файл, если он ещё не создан
@@ -1057,7 +1061,7 @@ uses
      // Создаём протокол
     if FLog=nil then FLog := TStringList.Create;
      // Создаём экспортируемый фотоальбом
-    if (FExportedPhoA=nil) and (FFileOpKind in [fokCopyFiles, fokMoveFiles]) and FMoveFile_UseCDOptions and FCDOpt_CreatePhoa then CreateExportedPhoa;
+    if (FExportedProject=nil) and (FFileOpKind in [fokCopyFiles, fokMoveFiles]) and FMoveFile_UseCDOptions and FCDOpt_CreatePhoa then CreateExportedPhoa;
      // Запоминаем исходное количество файлов
     FInitialPicCount := FSelectedPics.Count;
      // Обновляем страницу прогресса
@@ -1073,7 +1077,7 @@ uses
     if not FFileOpThread.ErrorOccured then Inc(FCountSucceeded);
      // Обновляем статус диалога
     HasUpdates := True;
-    if FFileOpThread.ChangesMade then FPhoaChanged := True;
+    if FFileOpThread.ChangesMade then FProjectChanged := True;
      // Удаляем обработанное изображение
     FSelectedPics.Delete(0);
      // Если операция - удаление изображений, обновляем вьюер

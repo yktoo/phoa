@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.10 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.11 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrPicProps_Keywords;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, Menus, TB2Item, TBX, ActnList, TB2Dock,
   TB2Toolbar, VirtualTrees, phPicPropsDlgPage, DKLang;
 
@@ -142,7 +143,7 @@ uses phUtils, Main, phSettings;
   begin
     inherited Apply(FOperations);
      // Если страница инициализирована, создаём операцию изменения списка ключевых слов
-    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(FOperations, PhoA, EditedPics, FKeywords);
+    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(FOperations, Project, EditedPics, FKeywords);
   end;
 
   procedure TfrPicProps_Keywords.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -150,7 +151,7 @@ uses phUtils, Main, phSettings;
     inherited BeforeDisplay(ChangeMethod);
     if not FInitialized then begin
        // Составляем список ключевых слов
-      FKeywords.PopulateFromPhoA(PhoA, IsPicSelectedCallback, EditedPics.Count);
+      FKeywords.PopulateFromPicList(Project.Pics, IsPicSelectedCallback, EditedPics.Count);
        // Настраиваем дерево
       tvMain.RootNodeCount := FKeywords.Count;
       FInitialized := True;

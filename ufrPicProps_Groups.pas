@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.11 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.12 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrPicProps_Groups;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, VirtualTrees, phPicPropsDlgPage;
 
 type
@@ -86,9 +87,9 @@ type
           end;
            // Выполняем (создаём) операцию
           if n.CheckState=csCheckedNormal then
-            TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, pgd.Group, Pics)
+            TPhoaOp_InternalPicToGroupAdding.Create(FOperations, Project, pgd.Group, Pics)
           else
-            TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, pgd.Group, Pics);
+            TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, Project, pgd.Group, Pics);
         end;
          // Переходим к следующей группе
         n := tvMain.GetNext(n);
@@ -217,7 +218,7 @@ type
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p.Group := PhoA.RootGroup
+      p.Group := Project.RootGroupX
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p.Group := pp.Group.GroupsX[Node.Index];

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.7 2004-09-11 17:52:36 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.8 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udSelKeywords;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, PhObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj,
   phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -25,7 +26,7 @@ type
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
-    FPhoA: TPhotoAlbum;
+    FProject: IPhotoAlbumProject;
      // Список ключевых слов
     FKeywords: TKeywordList;
     FKeywordStr: String;
@@ -35,17 +36,17 @@ type
     procedure ButtonClick_OK; override;
   end;
 
-  function SelectPhoaKeywords(PhoA: TPhotoAlbum; var sKeywords: String): Boolean;
+  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var sKeywords: String): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, phSettings;
 
-  function SelectPhoaKeywords(PhoA: TPhotoAlbum; var sKeywords: String): Boolean;
+  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var sKeywords: String): Boolean;
   begin
     with TdSelKeywords.Create(Application) do
       try
-        FPhoA       := PhoA;
+        FProject    := AProject;
         FKeywordStr := sKeywords;
         Result := Execute;
         if Result then sKeywords := FKeywordStr;
@@ -80,7 +81,7 @@ uses phUtils, ConsVars, Main, phSettings;
     HelpContext := IDH_intf_select_keywords;
      // Составляем список ключевых слов
     FKeywords := TKeywordList.Create;
-    FKeywords.PopulateFromPhoA(FPhoA, nil, 0);
+    FKeywords.PopulateFromPicList(FProject.Pics, nil, 0);
     FKeywords.SelectedKeywords := FKeywordStr;
      // Настраиваем дерево
     ApplyTreeSettings(tvMain);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.10 2004-10-11 11:41:24 dale Exp $
+//  $Id: phIntf.pas,v 1.11 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -11,17 +11,48 @@ interface
 uses Windows;
 
 type
+   // Picture property
+  TPicProperty = (
+    ppID,
+    ppFileName,
+    ppFullFileName,
+    ppFilePath,
+    ppFileSize,
+    ppFileSizeBytes,
+    ppPicWidth,
+    ppPicHeight,
+    ppPicDims,
+    ppFormat,
+    ppDate,
+    ppTime,
+    ppPlace,
+    ppFilmNumber,
+    ppFrameNumber,
+    ppAuthor,
+    ppDescription,
+    ppNotes,
+    ppMedia,
+    ppKeywords,
+    ppRotation,
+    ppFlips);
+  TPicProperties = set of TPicProperty;
+const
+   // All picture properties
+  PPAllProps = [Low(TPicProperty)..High(TPicProperty)];
+
+type
    // Picture rotation angle (measured clockwise)
   TPicRotation = (pr0, pr90, pr180, pr270);
 
-   // Picture flip flags 
+   // Picture flip flags
   TPicFlip = (pflHorz, pflVert);
   TPicFlips = set of TPicFlip;
 
    // Pixel image format
-  TPhoaPixelFormat = (ppfDevice, ppf1bit, ppf4bit, ppf8bit, ppf15bit, ppf16bit, ppf24bit, ppf32bit, ppfCustom); 
+  TPhoaPixelFormat = (ppfDevice, ppf1bit, ppf4bit, ppf8bit, ppf15bit, ppf16bit, ppf24bit, ppf32bit, ppfCustom);
 
-  TPhoaHandle = Cardinal;
+   // Stretch filter
+  TPhoaStretchFilter = (psfNearest, psfDraft, psfLinear, psfCosine, psfSpline, psfLanczos, psfMitchell);
 
    //===================================================================================================================
    // PhoA picture interface
@@ -42,13 +73,15 @@ type
     function  GetFilmNumber: String; stdcall;
     function  GetFlips: TPicFlips; stdcall;
     function  GetFrameNumber: String; stdcall;
-    function  GetImageFormat: TPhoaPixelFormat;
+    function  GetImageFormat: TPhoaPixelFormat; stdcall;
     function  GetImageSize: TSize; stdcall;
     function  GetKeywords: IPhoaKeywordList; stdcall;
     function  GetMedia: String; stdcall;
     function  GetNotes: String; stdcall;
     function  GetPlace: String; stdcall;
     function  GetPropertyValue(const sPropName: String): String; stdcall;
+    function  GetProps(PicProp: TPicProperty): String; stdcall;
+    function  GetRawData(PProps: TPicProperties): String; stdcall;
     function  GetRotation: TPicRotation; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
     function  GetThumbnailData: String; stdcall;
@@ -86,8 +119,12 @@ type
      // -- Place
     property Place: String read GetPlace;
      // -- Picture property value by name (name is on of the SPhoaPicProp_XXX constants), represented as string. Invalid
-     //    values of pcPropName cause nil to be returned
+     //    values of sPropName cause nil to be returned
     property PropertyValue[const sPropName: String]: String read GetPropertyValue;
+     // -- Properties by index
+    property Props[PicProp: TPicProperty]: String read GetProps;
+     // -- Picture raw binary data (for PProps properties)
+    property RawData[PProps: TPicProperties]: String read GetRawData;
      // -- Picture rotation
     property Rotation: TPicRotation read GetRotation;
      // -- Thumbnail dimensions in pixels
@@ -127,6 +164,9 @@ type
     function  IndexOfID(iID: Integer): Integer; stdcall;
      // Returns index of a picture by its full file name (case-insensitive search), or -1 if no such item found
     function  IndexOfFileName(const sFileName: String): Integer; stdcall;
+     // Searches a picture by ID and returns True if found, and its position in Index. Otherwise returns False, and
+     //   position of the nearest greater ID in Index
+    function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
      // Prop handlers
     function  GetCount: Integer; stdcall;
     function  GetItemsByID(iID: Integer): IPhoaPic; stdcall;
@@ -150,6 +190,10 @@ type
    // Picture group
    //===================================================================================================================
 
+   // Group properties
+  TGroupProperty = (gpID, gpText, gpDescription, gpPicCount, gpGroupCount);
+  TGroupProperties = set of TGroupProperty;
+
   IPhoaPicGroupList = interface;
 
   IPhoaPicGroup = interface(IInterface)
@@ -169,6 +213,7 @@ type
     function  GetOwner: IPhoaPicGroup; stdcall;
     function  GetPath(const sRootName: String): String; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
+    function  GetProps(GroupProp: TGroupProperty): String; stdcall;
     function  GetRoot: IPhoaPicGroup; stdcall;
     function  GetText: String; stdcall;
      // Props
@@ -197,6 +242,8 @@ type
     property Path[const sRootName: String]: String read GetPath;
      // -- Pictures in the group
     property Pics: IPhoaPicList read GetPics;
+     // -- Group properties by index
+    property Props[GroupProp: TGroupProperty]: String read GetProps;
      // -- Returns the ultimate owner of the group (all the groups)
     property Root: IPhoaPicGroup read GetRoot;
      // -- Group text (name)
@@ -204,7 +251,7 @@ type
   end;
 
    //===================================================================================================================
-   // Picture group's group list
+   // Picture group list
    //===================================================================================================================
 
   IPhoaPicGroupList = interface(IInterface)
@@ -222,6 +269,193 @@ type
     property Items[Index: Integer]: IPhoaPicGroup read GetItems; default;
      // -- List owner group, if any (nil otherwise)
     property Owner: IPhoaPicGroup read GetOwner;
+  end;
+
+   //===================================================================================================================
+   // Picture sorting
+   //===================================================================================================================
+
+  TPhoaSortDirection = (psdAsc, psdDesc);
+
+  IPhoaPicSorting = interface(IInterface)
+    ['{9ECF6FE6-0E9A-40B4-8F01-E3C8A01688EC}']
+     // Prop handlers
+    function  GetProp: TPicProperty; stdcall;
+    function  GetDirection: TPhoaSortDirection; stdcall;
+     // Props
+     // -- Sort property
+    property Prop: TPicProperty read GetProp;
+     // -- Sort direction
+    property Direction: TPhoaSortDirection read GetDirection;
+  end;
+
+   //===================================================================================================================
+   // Picture sorting list
+   //===================================================================================================================
+
+  IPhoaPicSortingList = interface(IInterface)
+    ['{9ECF6FE6-0E9A-40B4-8F01-E3C8A01688ED}']
+     // Returns index of a sorting by property, or -1 if no such item found
+    function  IndexOfProp(Prop: TPicProperty): Integer; stdcall;
+     // Sort compare routine
+    function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer; stdcall;
+     // Returns True if list content is identical with Sortings content
+    function  IdenticalWith(Sortings: IPhoaPicSortingList): Boolean; stdcall;
+     // Prop handlers
+    function  GetCount: Integer; stdcall;
+    function  GetItems(Index: Integer): IPhoaPicSorting; stdcall;
+     // Props
+     // -- Item count
+    property Count: Integer read GetCount;
+     // -- Sortings by index
+    property Items[Index: Integer]: IPhoaPicSorting read GetItems; default;
+  end;
+
+   //===================================================================================================================
+   // Picture grouping
+   //===================================================================================================================
+
+   // PhoA view group-by picture properties
+  TPicGroupByProperty = (
+    gbpFilePath,
+    gbpDateByYear,
+    gbpDateByMonth,
+    gbpDateByDay,
+    gbpTimeHour,
+    gbpTimeMinute,
+    gbpPlace,
+    gbpFilmNumber,
+    gbpAuthor,
+    gbpMedia,
+    gbpKeywords);
+  TPicGroupByProperties = set of TPicGroupByProperty;
+
+  IPhoaPicGrouping = interface(IInterface)
+    ['{C75C3934-8BC4-4172-9B48-47E55DEF0F46}']
+     // Prop handlers
+    function  GetProp: TPicGroupByProperty; stdcall;
+    function  GetUnclassifiedInOwnFolder: Boolean; stdcall;
+     // Props
+     // -- Group-by property
+    property Prop: TPicGroupByProperty read GetProp;
+     // -- If True, the unclassified pictures are to be placed in separate folder
+    property UnclassifiedInOwnFolder: Boolean read GetUnclassifiedInOwnFolder;
+  end;
+
+   //===================================================================================================================
+   // Picture grouping list
+   //===================================================================================================================
+
+  IPhoaPicGroupingList = interface(IInterface)
+    ['{C75C3934-8BC4-4172-9B48-47E55DEF0F47}']
+     // Returns index of a grouping by property, or -1 if no such item found
+    function  IndexOfProp(Prop: TPicGroupByProperty): Integer; stdcall;
+     // Sort compare routine
+    function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer; stdcall;
+     // Returns True if list content is identical with Groupings content
+    function  IdenticalWith(Groupings: IPhoaPicGroupingList): Boolean; stdcall;
+     // Prop handlers
+    function  GetCount: Integer; stdcall;
+    function  GetItems(Index: Integer): IPhoaPicGrouping; stdcall;
+     // Props
+     // -- Item count
+    property Count: Integer read GetCount;
+     // -- Groupings by index
+    property Items[Index: Integer]: IPhoaPicGrouping read GetItems; default;
+  end;
+
+   //===================================================================================================================
+   // PhoA view
+   //===================================================================================================================
+
+  IPhoaViewList = interface;
+
+  IPhoaView = interface(IInterface)
+    ['{5ADA8486-1E50-44BA-A9F7-2AB729234A21}']
+     // Invalidates the built group hierarchy
+    procedure Invalidate; stdcall;
+     // Prop handlers
+    function  GetGroupings: IPhoaPicGroupingList; stdcall;
+    function  GetIndex: Integer; stdcall;
+    function  GetList: IPhoaViewList; stdcall;
+    function  GetName: String; stdcall;
+    function  GetRootGroup: IPhoaPicGroup; stdcall;
+    function  GetSortings: IPhoaPicSortingList; stdcall;
+     // Props
+     // -- Picture grouping list
+    property Groupings: IPhoaPicGroupingList read GetGroupings;
+     // -- View index in its Owner's list
+    property Index: Integer read GetIndex;
+     // -- Owner list 
+    property List: IPhoaViewList read GetList;
+     // -- View name
+    property Name: String read GetName;
+     // -- View root group. The group hierarchy is created automatically when the property is requested
+    property RootGroup: IPhoaPicGroup read GetRootGroup;
+     // -- Picture sorting list
+    property Sortings: IPhoaPicSortingList read GetSortings;
+  end;
+
+   //===================================================================================================================
+   // PhoA view list, always sorted by view name
+   //===================================================================================================================
+
+  IPhoaViewList = interface(IInterface)
+    ['{5ADA8486-1E50-44BA-A9F7-2AB729234A22}']
+     // Returns index of a view; -1 if no such view
+    function  IndexOf(Item: IPhoaView): Integer; stdcall;
+     // Returns index of a view by its name (case-insensitive search); -1 if no such view
+    function  IndexOfName(const sName: String): Integer; stdcall;
+     // Invalidates all the views
+    procedure Invalidate; stdcall;
+     // Prop handlers
+    function  GetCount: Integer; stdcall;
+    function  GetItems(Index: Integer): IPhoaView; stdcall;
+    function  GetPics: IPhoaPicList; stdcall;
+     // Searches a view by name (case-insensitively) and returns True if found, and its position in Index. Otherwise
+     //   returns False, and position of the nearest greater name in Index
+    function  FindName(const sName: String; var Index: Integer): Boolean; stdcall;
+     // Props
+     // -- Item count
+    property Count: Integer read GetCount;
+     // -- Views by index
+    property Items[Index: Integer]: IPhoaView read GetItems; default;
+     // -- List of pictures the views based on
+    property Pics: IPhoaPicList read GetPics;
+  end;
+
+   //===================================================================================================================
+   // PhoA photo album project
+   //===================================================================================================================
+
+  IPhoaProject = interface(IInterface)
+    ['{769DBE0B-D86B-4F89-A557-9A8DA083E506}']
+     // Prop handlers
+    function  GetDescription: String; stdcall;
+    function  GetFileName: String; stdcall;
+    function  GetFileRevision: Integer; stdcall;
+    function  GetPics: IPhoaPicList; stdcall;
+    function  GetRootGroup: IPhoaPicGroup; stdcall;
+    function  GetThumbnailSize: TSize; stdcall;
+    function  GetThumbnailQuality: Byte; stdcall;
+    function  GetViews: IPhoaViewList; stdcall;
+     // Props
+     // -- Photo album description
+    property Description: String read GetDescription;
+     // -- Project file name
+    property FileName: String read GetFileName;
+     // -- Current file revision
+    property FileRevision: Integer read GetFileRevision;
+     // -- Photo album picture list
+    property Pics: IPhoaPicList read GetPics;
+     // -- Root group of group hierarchy
+    property RootGroup: IPhoaPicGroup read GetRootGroup;
+     // -- Maximum thumbnail dimensions
+    property ThumbnailSize: TSize read GetThumbnailSize;
+     // -- JPEG-thumbnail quality (0..100)
+    property ThumbnailQuality: Byte read GetThumbnailQuality;
+     // -- Photo album views
+    property Views: IPhoaViewList read GetViews;
   end;
 
 const

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.6 2004-10-11 11:41:24 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.7 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -22,26 +22,37 @@ type
      // Creates an exact copy of picture properties
     procedure Assign(SrcPic: IPhoaPic); stdcall;
      // Rebuilds thumbnail and updates thumbnail, image and file parameters
-    procedure ReloadPicFileData; stdcall;
+    procedure ReloadPicFileData(const AThumbnailSize: TSize; StretchFilter: TPhoaStretchFilter; AThumbnailQuality: Byte); stdcall;
+     // Reverts props from Props into their defaults
+    procedure CleanupProps(Props: TPicProperties); stdcall;
      // Prop handlers
     function  GetKeywordsM: IPhoaMutableKeywordList; stdcall;
     procedure SetDate(Value: Integer); stdcall;
     procedure SetFileName(const Value: String); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
+    procedure SetPropertyValue(const sPropName, Value: String); stdcall;
+    procedure SetProps(PicProp: TPicProperty; const Value: String); stdcall;
+    procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
      // Props
-     // -- Date
+     // -- Writable Date
     property Date: Integer read GetDate write SetDate;
-     // -- Picture file name
+     // -- Writable FileName
     property FileName: String read GetFileName write SetFileName;
-     // -- Picture flip flags
+     // -- Writable Flips
     property Flips: TPicFlips read GetFlips write SetFlips;
      // -- Mutable keyword list
     property KeywordsM: IPhoaMutableKeywordList read GetKeywordsM;
-     // -- Picture rotation
+     // -- Writable PropertyValue[]. Invalid values of sPropName are ignored
+    property PropertyValue[const sPropName: String]: String read GetPropertyValue write SetPropertyValue;
+     // -- Writable Props
+    property Props[PicProp: TPicProperty]: String read GetProps write SetProps;
+     // -- Writable RawData[]
+    property RawData[PProps: TPicProperties]: String read GetRawData write SetRawData;
+     // -- Writable Rotation
     property Rotation: TPicRotation read GetRotation write SetRotation;
-     // -- Time
+     // -- Writable Time
     property Time: Integer read GetTime write SetTime;
   end;
 
@@ -51,7 +62,7 @@ type
 
   IPhoaMutableKeywordList = interface(IPhoaKeywordList)
     ['{C000BFAE-CE13-4DF3-A774-8A21E1727D54}']
-     // Creates an exact copy of list contents
+     // Creates an exact copy of list content
     procedure Assign(Source: IPhoaKeywordList); stdcall;
      // Adds an item; returns the index of the newly-added item
     function  Add(const sKeyword: String): Integer; stdcall;
@@ -80,7 +91,7 @@ type
 
   IPhoaMutablePicList = interface(IPhoaPicList)
     ['{7AC3D444-5A48-4396-95C9-82AACDCF68F1}']
-     // Creates an exact copy of list contents
+     // Creates an exact copy of list content
     procedure Assign(Source: IPhoaPicList); stdcall;
      // Add a picture and return its index. bSkipDuplicates controls whether duplicates should be checked and ignored
      //   (a sorted list always checks and ignores duplicates). Version with out bAdded also returns True if the picture
@@ -91,9 +102,6 @@ type
     function  Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer; overload; stdcall;
      // Inserts a picture at given index. Returns True if Pic was actually inserted. Only allowed when Sorted=False
     function  Insert(Index: Integer; Pic: IPhoaPic; bSkipDuplicates: Boolean): Boolean; stdcall;
-     // Searches a picture by ID and returns True if found, and its position in Index. Otherwise returns False, and
-     //   position of the nearest greater ID in Index
-    function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
      // Clears the list
     procedure Clear; stdcall;
      // Deletes the picture by Index
@@ -103,6 +111,8 @@ type
      // Sorts the list using CompareFunc. dwData is an arbitrary value passed to CompareFunc. Only allowed when
      //   Sorted=False
     procedure CustomSort(CompareFunc: TPhoaPicListSortCompareFunc; dwData: Cardinal); stdcall;
+     // Sorts the list using Sortings. Only allowed when Sorted=False
+    procedure SortingsSort(Sortings: IPhoaPicSortingList); stdcall;
      // Moves an item into new position. Only allowed when Sorted=False
     procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
      // Prop handlers
@@ -177,8 +187,8 @@ type
 
   IPhoaMutablePicGroupList = interface(IPhoaPicGroupList)
     ['{5B299022-5911-4154-8307-37170FDD7951}']
-    // Creates an exact copy of list contents
-    procedure Assign(Source: IPhoaMutablePicGroupList); stdcall;
+     // Creates an exact copy of list content
+    procedure Assign(Source: IPhoaPicGroupList); stdcall;
      // Adds a group to the list; returns the index of the newly-added group
     function  Add(Group: IPhoaPicGroup): Integer; stdcall;
      // Inserts group at specified position
@@ -199,6 +209,184 @@ type
     property ItemsM[Index: Integer]: IPhoaMutablePicGroup read GetItemsM; default;
      // -- 'Mutable' version of Owner
     property OwnerM: IPhoaMutablePicGroup read GetOwnerM;
+  end;
+
+   //===================================================================================================================
+   // An alterable picture sorting
+   //===================================================================================================================
+
+  IPhoaMutablePicSorting = interface(IPhoaPicSorting)
+    ['{60F9DAF8-903E-4C48-A6D4-93800461D373}']
+     // Creates an exact copy of a sorting
+    procedure Assign(Source: IPhoaPicSorting); stdcall;
+     // Reverses the sort direction
+    procedure ToggleDirection; stdcall;
+     // Prop handlers
+    procedure SetProp(Value: TPicProperty); stdcall;
+    procedure SetDirection(Value: TPhoaSortDirection); stdcall;
+     // Props
+     // -- Writable Prop
+    property Prop: TPicProperty read GetProp write SetProp;
+     // -- Writable Direction
+    property Direction: TPhoaSortDirection read GetDirection write SetDirection;
+  end;
+
+   //===================================================================================================================
+   // An alterable picture sorting list
+   //===================================================================================================================
+
+  IPhoaMutablePicSortingList = interface(IPhoaPicSortingList)
+    ['{60F9DAF8-903E-4C48-A6D4-93800461D374}']
+     // Creates an exact copy of list content
+    procedure Assign(Source: IPhoaPicSortingList); stdcall;
+     // Adds an item to the list; returns the index of the newly-added item
+    function  Add(Item: IPhoaPicSorting): Integer; stdcall;
+     // Inserts an item at specified position
+    procedure Insert(Index: Integer; Item: IPhoaPicSorting); stdcall;
+     // Deletes an item
+    procedure Delete(Index: Integer); stdcall;
+     // Clears the list
+    procedure Clear; stdcall;
+     // Moves an item into new position
+    procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
+     // Prop handlers
+    function  GetItemsM(Index: Integer): IPhoaMutablePicSorting; stdcall;
+     // Props
+     // -- 'Mutable' version of Items[]
+    property ItemsM[Index: Integer]: IPhoaMutablePicSorting read GetItemsM; default;
+  end;
+
+   //===================================================================================================================
+   // An alterable picture grouping
+   //===================================================================================================================
+
+  IPhoaMutablePicGrouping = interface(IPhoaPicGrouping)
+    ['{FB184478-F95A-4050-BF20-5E2E28AED36D}']
+     // Creates an exact copy of a grouping
+    procedure Assign(Source: IPhoaPicGrouping); stdcall;
+     // Toggles UnclassifiedInOwnFolder value
+    procedure ToggleUnclassifiedInOwnFolder; stdcall;
+     // Prop handlers
+    procedure SetProp(Value: TPicGroupByProperty); stdcall;
+    procedure SetUnclassifiedInOwnFolder(Value: Boolean); stdcall;
+     // Props
+     // -- Writable Prop
+    property Prop: TPicGroupByProperty read GetProp write SetProp;
+     // -- Writable UnclassifiedInOwnFolder
+    property UnclassifiedInOwnFolder: Boolean read GetUnclassifiedInOwnFolder write SetUnclassifiedInOwnFolder;
+  end;
+
+   //===================================================================================================================
+   // An alterable picture grouping list
+   //===================================================================================================================
+
+  IPhoaMutablePicGroupingList = interface(IPhoaPicGroupingList)
+    ['{FB184478-F95A-4050-BF20-5E2E28AED36E}']
+     // Creates an exact copy of list content
+    procedure Assign(Source: IPhoaPicGroupingList); stdcall;
+     // Adds an item to the list; returns the index of the newly-added item
+    function  Add(Item: IPhoaPicGrouping): Integer; stdcall;
+     // Inserts an item at specified position
+    procedure Insert(Index: Integer; Item: IPhoaPicGrouping); stdcall;
+     // Deletes an item
+    procedure Delete(Index: Integer); stdcall;
+     // Clears the list
+    procedure Clear; stdcall;
+     // Moves an item into new position
+    procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
+     // Prop handlers
+    function  GetItemsM(Index: Integer): IPhoaMutablePicGrouping; stdcall;
+     // Props
+     // -- 'Mutable' version of Items[]
+    property ItemsM[Index: Integer]: IPhoaMutablePicGrouping read GetItemsM; default;
+  end;
+
+   //===================================================================================================================
+   // An alterable PhoA view
+   //===================================================================================================================
+
+  IPhoaMutableViewList = interface;
+
+  IPhoaMutableView = interface(IPhoaView)
+    ['{CAD22216-6D18-45D4-8483-F2D53861A42F}']
+     // Creates an exact copy of a view
+    procedure Assign(Source: IPhoaView); stdcall;
+     // Prop handlers
+    function  GetGroupingsM: IPhoaMutablePicGroupingList; stdcall;
+    function  GetListM: IPhoaMutableViewList; stdcall;
+    procedure SetName(const Value: String); stdcall;
+    function  GetSortingsM: IPhoaMutablePicSortingList; stdcall;
+     // Props
+     // -- 'Mutable' version of Groupings
+    property GroupingsM: IPhoaMutablePicGroupingList read GetGroupingsM;
+     // -- 'Mutable' version of List
+    property ListM: IPhoaMutableViewList read GetListM;
+     // -- Writable Name
+    property Name: String read GetName write SetName;
+     // -- 'Mutable' version of Sortings
+    property SortingsM: IPhoaMutablePicSortingList read GetSortingsM;
+  end;
+
+   //===================================================================================================================
+   // An alterable PhoA view list
+   //===================================================================================================================
+
+  IPhoaMutableViewList = interface(IPhoaViewList)
+    ['{CAD22216-6D18-45D4-8483-F2D53861A430}']
+     // Creates an exact copy of list content
+    procedure Assign(Source: IPhoaViewList); stdcall;
+     // Adds an item to the list; returns the index of the newly-added item
+    function  Add(Item: IPhoaView): Integer; stdcall;
+     // Deletes an item
+    procedure Delete(Index: Integer); stdcall;
+     // Clears the list
+    procedure Clear; stdcall;
+     // Prop handlers
+    function  GetItemsM(Index: Integer): IPhoaMutableView; stdcall;
+    function  GetPicsM: IPhoaMutablePicList; stdcall;
+     // Props
+     // -- 'Mutable' version of Items[]
+    property ItemsM[Index: Integer]: IPhoaMutableView read GetItemsM; default;
+     // -- 'Mutable' version of Pics
+    property PicsM: IPhoaMutablePicList read GetPicsM;
+  end;
+
+   //===================================================================================================================
+   // An alterable PhoA photo album project
+   //===================================================================================================================
+
+  IPhoaMutableProject = interface(IPhoaProject)
+    ['{769DBE0B-D86B-4F89-A557-9A8DA083E507}']
+     // Creates an exact copy of source project
+    procedure Assign(Source: IPhoaProject; bCopyRevision: Boolean); stdcall;
+     // Clears and initializes the project
+    procedure New; stdcall;
+     // File loading and saving
+    procedure LoadFromFile(const sFileName: String); stdcall;
+    procedure SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer); stdcall;
+     // Prop handlers
+    function  GetPicsM: IPhoaMutablePicList; stdcall;
+    function  GetRootGroupM: IPhoaMutablePicGroup; stdcall;
+    function  GetViewsM: IPhoaMutableViewList; stdcall;
+    procedure SetDescription(const Value: String); stdcall;
+    procedure SetFileName(const Value: String); stdcall;
+    procedure SetThumbnailQuality(Value: Byte); stdcall;
+    procedure SetThumbnailSize(const Value: TSize); stdcall;
+     // Props
+     // -- Writable Description
+    property Description: String read GetDescription write SetDescription;
+     // -- Writable FileName
+    property FileName: String read GetFileName write SetFileName;
+     // -- 'Mutable' version of Pics
+    property PicsM: IPhoaMutablePicList read GetPicsM;
+     // -- 'Mutable' version of RootGroup
+    property RootGroupM: IPhoaMutablePicGroup read GetRootGroupM;
+     // -- Writable ThumbnailSize
+    property ThumbnailSize: TSize read GetThumbnailSize write SetThumbnailSize;
+     // -- Writable ThumbnailQuality
+    property ThumbnailQuality: Byte read GetThumbnailQuality write SetThumbnailQuality;
+     // -- 'Mutable' version of Views
+    property ViewsM: IPhoaMutableViewList read GetViewsM;
   end;
 
 implementation

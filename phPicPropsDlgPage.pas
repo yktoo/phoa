@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.6 2004-10-11 11:41:24 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.7 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit phPicPropsDlgPage;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   udPicProps, ImgList,
   phWizard;
 
@@ -22,7 +23,7 @@ type
      // Prop handlers 
     function  GetEditedPics: IPhotoAlbumPicList;
     function  GetFileImageIndex(Index: Integer): Integer;
-    function  GetPhoA: TPhotoAlbum;
+    function  GetProject: IPhotoAlbumProject;
     function  GetFileImages: TImageList;
   protected
     procedure InitializePage; override;
@@ -39,7 +40,7 @@ type
      // -- ImageList со значками файлов
     property FileImages: TImageList read GetFileImages;
      // -- Фотоальбом
-    property PhoA: TPhotoAlbum read GetPhoA;
+    property Project: IPhotoAlbumProject read GetProject;
   public
      // Вызывается диалогом при нажатии кнопки ОК. Должна вернуть True, чтобы позволить закрытие, иначе должна сама
      //   объяснить пользователю причину отказа. В базовом классе всегда возвращает True
@@ -87,9 +88,9 @@ implementation
     Result := FDialog.ilFiles;
   end;
 
-  function TPicPropsDialogPage.GetPhoA: TPhotoAlbum;
+  function TPicPropsDialogPage.GetProject: IPhotoAlbumProject;
   begin
-    Result := FDialog.PhoA;
+    Result := FDialog.Project;
   end;
 
   procedure TPicPropsDialogPage.InitializePage;

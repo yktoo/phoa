@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.21 2004-10-11 11:41:24 dale Exp $
+//  $Id: phGUIObj.pas,v 1.22 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,7 +7,10 @@
 unit phGUIObj;
 
 interface
-uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phIntf, phMutableIntf, phObj, phGraphics, ConsVars;
+uses
+  Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms,
+  GR32,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phGraphics, ConsVars;
 
 type
 
@@ -79,7 +82,7 @@ type
   TThumbnailViewer = class(TCustomControl)
   private
      // Интерфейс списка изображений, отображаемых в контроле
-    FPicList: IPhotoAlbumPicList;
+    FPicList: IPhoaPicList;
      // Буферный битмэп для отрисовки содержимого окна контрола
     FBuffer: TBitmap32;
      // Размер пункта-эскиза (вместе с отступами, границами и т.п.)
@@ -244,7 +247,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
      // Обновляет отображаемый список изображений
-    procedure ReloadPicList(APicList: IPhotoAlbumPicList);
+    procedure ReloadPicList(APicList: IPhoaPicList);
      // Создаёт объект IThumbnailViewerDisplayData, сохраняет в него текущие параметры отображения и возвращает его
     function  SaveDisplay: IThumbnailViewerDisplayData;
      // Восстанавливает параметры отображения из Data; подразумевается возможность использования данных, полученных в
@@ -477,7 +480,7 @@ type
        // Скрываем Tooltip, если есть
       Application.CancelHint;
        // Строим описание (добавляем палку, чтобы в StatusBar ничего не попадало)
-      if idx<0 then Hint := '' else Hint := FPicList[idx].GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
+      if idx<0 then Hint := '' else Hint := GetPicPropStrs(FPicList[idx], FThumbTooltipProps, ':'#9, #13)+'|';
       FLastTooltipIdx := idx;
     end;
   end;
@@ -552,8 +555,8 @@ type
     FThumbBackBorderStyle  := tbbsXP;
     FThumbBackColor        := clBtnFace;
     FThumbFontColor        := clWindowText;
-    FThumbnailSize.cx      := IDefaultThumbWidth;
-    FThumbnailSize.cy      := IDefaultThumbHeight;
+    FThumbnailSize.cx      := 100;
+    FThumbnailSize.cy      := 100;
     FThumbShadowBlurRadius := 40;
     FThumbShadowColor      := clBlack;
     FThumbShadowOffset     := Point(7, 7);
@@ -1056,7 +1059,7 @@ type
   procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
   const aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
   var
-    Pic: IPhotoAlbumPic;
+    Pic: IPhoaPic;
     r, rInner: TRect;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
@@ -1232,7 +1235,7 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.ReloadPicList(APicList: IPhotoAlbumPicList);
+  procedure TThumbnailViewer.ReloadPicList(APicList: IPhoaPicList);
   var iItemIdx: Integer;
   begin
     BeginUpdate;

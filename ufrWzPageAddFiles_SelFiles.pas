@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.12 2004-10-10 18:53:32 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.13 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,6 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualShellUtilities, GraphicEx,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
   phWizard, VirtualTrees, VirtualExplorerTree, StdCtrls,
   ExtCtrls, Mask, ToolEdit, DKLang;
 
@@ -45,8 +46,8 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox,
-  phIntf;
+uses
+  phUtils, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
 
   procedure TfrWzPageAddFiles_SelFiles.AdjustAdvancedCtls(bShowAdvanced: Boolean);
   begin
@@ -112,7 +113,7 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox,
     Namespace: TNamespace;
     Node: PVirtualNode;
     Files: TFileList;
-    PhoA: TPhotoAlbum;
+    Project: IPhotoAlbumProject;
     Masks: TPhoaMasks;
     Wiz: TfAddFilesWizard;
 
@@ -139,7 +140,7 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox,
         if bMatches then bMatches := Masks.Matches(SRec.Name);
          // Проверяем присутствие в фотоальбоме
         if bMatches and (Wiz.Filter_Presence<>afpfDontCare) then
-          bMatches := (PhoA.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (Wiz.Filter_Presence=afpfExistingOnly);
+          bMatches := (Project.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (Wiz.Filter_Presence=afpfExistingOnly);
       end;
        // Если все критерии удовлетворены
       if bMatches then Files.Add(SRec.Name, sPath, SRec.Size, -2, d);
@@ -184,8 +185,8 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox,
   begin
     Wiz := TfAddFilesWizard(StorageForm);
      // Получаем объекты
-    Files := Wiz.FileList;
-    PhoA  := Wiz.PhoA;
+    Files   := Wiz.FileList;
+    Project := Wiz.Project;
      // Стираем существующий список файлов
     Files.Clear;
      // Инициализируем критерии

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.33 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufImgView.pas,v 1.34 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,8 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, ConsVars, phObj,
-  GR32_Layers, phGraphics,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
+  GR32_Layers, 
   TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
   TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;
 
@@ -218,8 +218,8 @@ type
   private
      // Список просматриваемых изображений
     FPics: IPhotoAlbumPicList;
-     // Текущий фотоальбом
-    FPhoA: TPhotoAlbum;
+     // Текущий проект
+    FProject: IPhotoAlbumProject;
      // Количество изображений в FPics
     FPicCount: Integer;
      // Инициализационные флаги
@@ -408,21 +408,21 @@ type
    //                     последнего просмотренного изображения
    //   AUndoOperations - буфер отката
    //   bPhGroups       - True, если отображается дерево папок фотоальбома (не представление)
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
 
 implementation
 {$R *.dfm}
 uses
   Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; AProject: IPhotoAlbumProject; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
     with TfImgView.Create(Application) do
       try
         FInitFlags      := AInitFlags;
         FPics           := APics;
         FPicCount       := FPics.Count;
-        FPhoA           := APhoA;
+        FProject        := AProject;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
         aEdit.Enabled   := bPhGroups;
@@ -531,7 +531,7 @@ uses
      // Редактируем изображение
     Pics := NewPhotoAlbumPicList(False);
     Pics.Add(FPic, False);
-    bEdited := EditPics(Pics, FPhoA, FUndoOperations);
+    bEdited := EditPics(Pics, FProject, FUndoOperations);
      // Возвращаем topmost-положение окну
     TopmostRestore;
      // Скрываем курсор
@@ -945,8 +945,8 @@ uses
       sCaption := '';
       FPicDesc := '';
     end else begin
-      sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
-      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
+      sCaption := GetPicPropStrs(FPic, FCaptionProps, '', ' - ');
+      FPicDesc := GetPicPropStrs(FPic, FInfoProps,    '', '    ');
     end;
     if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик

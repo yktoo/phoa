@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.9 2004-10-11 11:41:24 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udSelPhoaGroup;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
   phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -24,8 +25,11 @@ type
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
-    FPhoA: TPhotoAlbum;
+     // Проект
+    FProject: IPhotoAlbumProject;
+     // Буфер отката
     FUndoOperations: TPhoaOperations;
+      // Интерфейс представлений
     FViewsIntf: IPhoaViews;
   protected
     procedure InitializeDialog; override;
@@ -33,19 +37,19 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-  function MakeGroupFromView(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations; ViewsIntf: IPhoaViews): Boolean;
+  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; AViewsIntf: IPhoaViews): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, phSettings;
 
-  function MakeGroupFromView(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations; ViewsIntf: IPhoaViews): Boolean;
+  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; AViewsIntf: IPhoaViews): Boolean;
   begin
     with TdSelPhoaGroup.Create(Application) do
       try
-        FPhoA           := PhoA;
-        FUndoOperations := UndoOperations;
-        FViewsIntf      := ViewsIntf;
+        FProject        := AProject;
+        FUndoOperations := AUndoOperations;
+        FViewsIntf      := AViewsIntf;
         Result := Execute;
       finally
         Free;
@@ -55,7 +59,7 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TdSelPhoaGroup.ButtonClick_OK;
   begin
      // Создаём операцию
-    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FPhoA, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FViewsIntf);
+    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FProject, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FViewsIntf);
     inherited ButtonClick_OK;
   end;
 
@@ -108,7 +112,7 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p^ := FPhoA.RootGroup 
+      p^ := FProject.RootGroupX 
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p^ := pp^.GroupsX[Node.Index];

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.16 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.17 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  GR32, phIntf, phMutableIntf, ConsVars, phObj, phWizard, phGraphics,
+  GR32,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
@@ -42,7 +43,7 @@ type
     FCountFailed: Integer;
      // Prop storage
     FFileList: TFileList;
-    FPhoA: TPhotoAlbum;
+    FProject: IPhotoAlbumProject;
     FGroup: IPhotoAlbumPicGroup;
     FRecurseFolders: Boolean;
     FDefaultPath: String;
@@ -116,7 +117,7 @@ type
      // -- Группа, куда добавляются изображения
     property Group: IPhotoAlbumPicGroup read FGroup;
      // -- Фотоальбом
-    property PhoA: TPhotoAlbum read FPhoA;
+    property Project: IPhotoAlbumProject read FProject;
      // -- True, если включен просмотр вложенных папок
     property RecurseFolders: Boolean read FRecurseFolders write FRecurseFolders;
      // -- True, если включены расширенные опции фильтра
@@ -150,8 +151,8 @@ type
     property AddedPic: IPhotoAlbumPic read FAddedPic;
   end;
 
-   // Показывает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
-  function AddFiles(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+   // Отображает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
+  function AddFiles(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -160,11 +161,11 @@ uses
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
   phPhoa, phSettings;
 
-  function AddFiles(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(AProject: IPhotoAlbumProject; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try
-        FPhoA            := APhoA;
+        FProject         := AProject;
         FGroup           := AGroup;
         FUndoOperations  := AUndoOperations;
         Result := Execute;
@@ -402,7 +403,7 @@ uses
            // Добавляем изображение
           try
             FAddedPic := nil;
-            TPhoaOp_InternalPicAdd.Create(AddOperations, PhoA, Group, FileList.Files[0], FAddedPic);
+            TPhoaOp_InternalPicAdd.Create(AddOperations, Project, Group, FileList.Files[0], FAddedPic);
              // Производим автозаполнение свойств изображения
             AutofillPicProps(FAddedPic);
              // Пишем в протокол
@@ -611,7 +612,7 @@ uses
      // Создаём операцию, если она ещё не создана
     if FOperation=nil then begin
       fMain.BeginOperation;
-      FOperation := TPhoaMultiOp_PicAdd.Create(FUndoOperations, FPhoA);
+      FOperation := TPhoaMultiOp_PicAdd.Create(FUndoOperations, FProject);
     end;
      // Удаляем неотмеченные файлы
     FFileList.DeleteUnchecked;

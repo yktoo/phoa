@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.20 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.21 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
-  phIntf, phMutableIntf, phObj, phGraphics,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phGraphics,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
   TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DKLang;
 
@@ -226,7 +226,7 @@ uses phUtils, Main, phSettings;
         GetRequiredTransform(Pic, Rotation, Flips);
          // Если оно не совпадает - создаём операцию
         if (Rotation<>Pic.Rotation) or (Flips<>Pic.Flips) then
-          TPhoaOp_StoreTransform.Create(FOperations, PhoA, Pic, Rotation, Flips);
+          TPhoaOp_StoreTransform.Create(FOperations, Project, Pic, Rotation, Flips);
       end;
   end;
 

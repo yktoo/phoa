@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.11 2004-10-10 18:53:31 dale Exp $
+//  $Id: phGraphics.pas,v 1.12 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -95,7 +95,7 @@ type
   procedure DropShadow(Target, ShadowTemplate: TBitmap32; const rObject, rClipOuter: TRect; iOffsetX, iOffsetY: Integer; Color: TColor);
 
    // Открывает файл, создаёт эскиз и возвращает его данные в виде бинарной строки
-  function  GetThumbnailData(const sFileName: String; iMaxWidth, iMaxHeight: Integer; StretchFilter: TStretchFilter; bJPEGQuality: Byte; out iWidth, iHeight, iThWidth, iThHeight: Integer): String;
+  function  GetThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; bJPEGQuality: Byte; out ImageSize, ThumbSize: TSize): String;
    // Отрисовывает эскиз на битмэпе в заданном прямоугольнике. В r возвращает фактически использованный для отрисовки
    //   прямоугольник
   procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect); overload;
@@ -247,7 +247,11 @@ uses JPEG, phUtils, Math;
     end;
   end;
 
-  function GetThumbnailData(const sFileName: String; iMaxWidth, iMaxHeight: Integer; StretchFilter: TStretchFilter; bJPEGQuality: Byte; out iWidth, iHeight, iThWidth, iThHeight: Integer): String;
+  function GetThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; bJPEGQuality: Byte; out ImageSize, ThumbSize: TSize): String;
+  const
+     // Таблица перекодировки TPhoaStretchFilter -> GR32.TStretchFilter
+    aPhoaSFtoGR32SF: Array[TPhoaStretchFilter] of GR32.TStretchFilter = (
+      sfNearest, sfDraft, sfLinear, sfCosine, sfSpline, sfLanczos, sfMitchell);
   var
     sScale: Single;
     ThumbBitmap, FullSizeBitmap: TBitmap32;
@@ -260,15 +264,15 @@ uses JPEG, phUtils, Math;
        // Создаём, загружаем картинку и превращаем её в Bitmap32
       FullSizeBitmap := LoadGraphicFromFile(sFileName);
       try
-        FullSizeBitmap.StretchFilter := StretchFilter;
-        iWidth  := FullSizeBitmap.Width;
-        iHeight := FullSizeBitmap.Height;
+        FullSizeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
+        ImageSize.cx := FullSizeBitmap.Width;
+        ImageSize.cy := FullSizeBitmap.Height;
          // Определяем коэффициент масштабирования
-        if (iWidth>0) and (iHeight>0) then sScale := MinS(MinS(iMaxWidth/iWidth, iMaxHeight/iHeight), 1) else sScale := 1;
+        if (ImageSize.cx>0) and (ImageSize.cy>0) then sScale := MinS(MinS(MaxSize.cx/ImageSize.cx, MaxSize.cy/ImageSize.cy), 1) else sScale := 1;
          // Масштабируем изображение
-        iThWidth  := Max(Trunc(iWidth*sScale), 1);
-        iThHeight := Max(Trunc(iHeight*sScale), 1);
-        ThumbBitmap.SetSize(iThWidth, iThHeight);
+        ThumbSize.cx := Max(Trunc(ImageSize.cx*sScale), 1);
+        ThumbSize.cy := Max(Trunc(ImageSize.cy*sScale), 1);
+        ThumbBitmap.SetSize(ThumbSize.cx, ThumbSize.cy);
         FullSizeBitmap.DrawTo(ThumbBitmap, ThumbBitmap.BoundsRect);
       finally
         FullSizeBitmap.Free;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.7 2004-10-06 15:28:52 dale Exp $
+//  $Id: ufrSorting.pas,v 1.8 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrSorting;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ActiveX,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   StdCtrls, TB2Item, TBX, Menus, VirtualTrees;
 
 type
@@ -38,7 +39,7 @@ type
     procedure pmMainPopup(Sender: TObject);
   private
      // Prop storage
-    FSortings: TPhoaSortings;
+    FSortings: IPhotoAlbumPicSortingList;
     FOnChange: TNotifyEvent;
      // Настраивает доступность действий
     procedure EnableActions;
@@ -54,14 +55,13 @@ type
     procedure SetParent(AParent: TWinControl); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
      // Устанавливает стандартные пункты сортировки
     procedure Reset;
      // Настраивает tvMain (в ответ на изменение FSortings)
     procedure SyncSortings;
      // Props
      // -- Редактируемые группировки
-    property Sortings: TPhoaSortings read FSortings;
+    property Sortings: IPhotoAlbumPicSortingList read FSortings;
      // -- Событие модификации списка
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
@@ -76,7 +76,7 @@ uses phUtils, ConsVars, Main, phSettings;
     tbi: TTBXCustomItem;
   begin
     inherited Create(AOwner);
-    FSortings := TPhoaSortings.Create;
+    FSortings := NewPhotoAlbumPicSortingList;
      // Создаём пункты меню "Добавить сортировку"
     for pp := Low(pp) to High(pp) do begin
       tbi := TTBXItem.Create(Self);
@@ -89,12 +89,6 @@ uses phUtils, ConsVars, Main, phSettings;
       ipmsmProp.Add(tbi);
     end;
     SyncSortings;
-  end;
-
-  destructor TfrSorting.Destroy;
-  begin
-    FSortings.Free;
-    inherited Destroy;
   end;
 
   procedure TfrSorting.DoChange;
@@ -127,7 +121,7 @@ uses phUtils, ConsVars, Main, phSettings;
   var idx: Integer;
   begin
     idx := tvMain.FocusedNode.Index;
-    FSortings.Exchange(idx, idx+1);
+    FSortings.Move(idx, idx+1);
     with tvMain do MoveTo(FocusedNode, GetNextSibling(FocusedNode), amInsertAfter, False);
     EnableActions;
     DoChange;
@@ -137,7 +131,7 @@ uses phUtils, ConsVars, Main, phSettings;
   var idx: Integer;
   begin
     idx := tvMain.FocusedNode.Index;
-    FSortings.Exchange(idx, idx-1);
+    FSortings.Move(idx, idx-1);
     with tvMain do MoveTo(FocusedNode, GetPreviousSibling(FocusedNode), amInsertBefore, False);
     EnableActions;
     DoChange;
@@ -148,7 +142,7 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
      // Выключаем сортировки, которые уже есть в списке выбранных
     for i := 0 to ipmsmProp.Count-1 do
-      with ipmsmProp.Items[i] do Visible := FSortings.IndexOf(TPicProperty(Tag))<0;
+      with ipmsmProp.Items[i] do Visible := FSortings.IndexOfProp(TPicProperty(Tag))<0;
   end;
 
   procedure TfrSorting.Reset;
@@ -174,17 +168,20 @@ uses phUtils, ConsVars, Main, phSettings;
   var
     n: PVirtualNode;
     Prop: TPicProperty;
+    Sorting: IPhotoAlbumPicSorting;
   begin
     n := tvMain.FocusedNode;
     Prop := TPicProperty(TComponent(Sender).Tag);
      // Смена свойства у существующего пункта
     if SortingNode(n) then begin
-      FSortings.SetProp(n.Index, Prop);
+      FSortings[n.Index].Prop := Prop;
       tvMain.InvalidateNode(n);
       EnableActions;
      // Добавление нового пункта
     end else begin
-      FSortings.Add(Prop, soAsc);
+      Sorting := NewPhotoAlbumPicSorting;
+      Sorting.Prop := Prop;
+      FSortings.Add(Sorting);
       SyncSortings;
     end;
     DoChange;
@@ -200,7 +197,7 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TfrSorting.ToggleOrder(Node: PVirtualNode);
   begin
     if SortingNode(Node) then begin
-      FSortings.ToggleOrder(Node.Index);
+      FSortings[Node.Index].ToggleDirection;
       tvMain.InvalidateNode(Node);
       DoChange;
     end;
@@ -268,19 +265,19 @@ uses phUtils, ConsVars, Main, phSettings;
     if SortingNode(Node) then
       case Column of
         0: ImageIndex := iiSorting;
-        1: ImageIndex := iif(FSortings[Node.Index].Order=soAsc, iiSortAsc, iiSortDesc);
+        1: ImageIndex := iif(FSortings[Node.Index].Direction=psdAsc, iiSortAsc, iiSortDesc);
       end;
   end;
 
   procedure TfrSorting.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var ps: TPhoaSorting;
+  var Sorting: IPhotoAlbumPicSorting;
   begin
      // Если нормальный пункт сортировки
     if SortingNode(Node) then begin
-      ps := FSortings[Node.Index];
+      Sorting := FSortings[Node.Index];
       case Column of
-        0: CellText := AnsiToUnicodeCP(PicPropName(ps.Prop), cMainCodePage);
-        1: CellText := AnsiToUnicodeCP(ConstVal(iif(ps.Order=soAsc, 'SSort_Ascending', 'SSort_Descending')), cMainCodePage);
+        0: CellText := AnsiToUnicodeCP(PicPropName(Sorting.Prop), cMainCodePage);
+        1: CellText := AnsiToUnicodeCP(ConstVal(iif(Sorting.Direction=psdAsc, 'SSort_Ascending', 'SSort_Descending')), cMainCodePage);
       end;
     end;
   end;

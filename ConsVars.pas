@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.64 2004-10-11 11:41:23 dale Exp $
+//  $Id: ConsVars.pas,v 1.65 2004-10-12 12:38:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,25 +10,9 @@ interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, SysUtils, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32,
-  dkWebUtils, phIntf;
+  dkWebUtils, phIntf, phMutableIntf, phNativeIntf, phObj, phOps;
 
 type
-  EPhoaException = class(Exception);
-
-   // Picture properties
-  TPicProperty = (
-    ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
-    ppFormat, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia,
-    ppKeywords, ppRotation, ppFlips);
-  TPicProperties = set of TPicProperty;
-const
-  PPAllProps = [Low(TPicProperty)..High(TPicProperty)];
-
-type
-   // Свойства группы
-  TGroupProperty = (gpID, gpText, gpDescription, gpPicCount, gpGroupCount);
-  TGroupProperties = set of TGroupProperty;
-
    // Режим отображения всплывающих подсказок для деревьев с группами
   TGroupTreeHintMode = (
     gthmNone,  // Не отображать подсказок
@@ -92,18 +76,6 @@ type
     dfpSystemFile,          // Атрибут системного файла
     dfpTemporary);          // Атрибут временного файла
 
-  TSortOrder = (soAsc, soDesc);
-
-   // Свойство, по которому поизводится группировка изображений в представлении
-  TGroupByProperty = (
-    gbpFilePath, gbpDateByYear, gbpDateByMonth, gbpDateByDay, gbpTimeHour, gbpTimeMinute, gbpPlace, gbpFilmNumber,
-    gbpAuthor, gbpMedia, gbpKeywords);
-  TGroupByProperties = set of TGroupByProperty;
-const
-   // Свойства, поддерживаемые ревизией 2
-  GBPropsRev2: TGroupByProperties = [
-    gbpFilePath, gbpDateByYear, gbpDateByMonth, gbpDateByDay, gbpPlace, gbpFilmNumber, gbpKeywords];
-
 type
    // Инициализационные флаги режима просмотра
   TImgViewInitFlag = (
@@ -159,35 +131,6 @@ type
     mbrDontShow); // Пользователь включил переключатель "Больше не показывать..."
   TMessageBoxResults = set of TMessageBoxResult;
 
-type
-   // Возможные операции с изображениями (доступные через пункт меню Сервис | Операции с изображениями)
-  TPictureOperation = (
-    popMoveToTarget,     // Переместить выделенные изображения в указанную группу
-    popCopyToTarget,     // Копировать выделенные изображения в указанную группу
-    popRemoveFromTarget, // Удалить выделенные изображения из указанной группы
-    popIntersectTarget); // Оставить только выделенные изображения в указанной группе
-
-   // Флаги требуемого обновления операции отката
-  TUndoInvalidationFlag  = (
-     // -- Флаги действий при выполнении (eXecution)
-    uifXReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifXReinitSiblings,      // Переинициализировать соседние с узлом группы операции узлы дерева. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifXReinitRecursive,     // При переинициализации (флаги uifXReinitParent и uifXReinitSiblings) действовать рекурсивно
-    uifXEditGroup,           // Ввести узел группы Op.GroupAbsIdx в режим редактирования его текста. Должно быть заполнено Op.GroupAbsIdx
-     // -- Флаги действий при откате (Undoing)
-    uifUReinitAll,           // Переинициализировать все узлы дерева
-    uifUReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifUReinitRecursive);    // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
-
-  TUndoInvalidationFlags = set of TUndoInvalidationFlag;
-
-   // Флаги форматов буфера обмена для данных изображений
-  TPicClipboardFormat = (
-    pcfPhoa,          // Внутренний формат данных программы (wClipbrdPicFormatID)
-    pcfHDrop,         // Список Shell-объектов (т.е. файлов)
-    pcfPlainList,     // Простой текстовый список путей к файлам
-    pcfSingleBitmap); // Bitmap-изображение эскиза (в случае единственного изображения)
-  TPicClipboardFormats = set of TPicClipboardFormat;
 const
   DefaultPicClipboardFormats: TPicClipboardFormats = [Low(TPicClipboardFormat)..High(TPicClipboardFormat)];
 
@@ -356,6 +299,10 @@ const
   SAppProductSID                  = 'phoa';
   SAppVersion                     = 'v1.1.6 beta';
   SAppVersionSID                  = '116beta';
+
+  SProject_Generator              = 'PhoA '+SAppVersion;
+  SProject_Remark                 = 'Created by PhoA '+SAppVersion+', '+SWeb_MainSite;
+
    // Расширение и имя файла фотоальбома по умолчанию
   SDefaultExt                     = 'phoa';
   SDefaultFName                   = 'untitled.'+SDefaultExt;
@@ -382,11 +329,6 @@ const
   CmdLine_ValidKeys               = ['f', 's', 'g', 'w', 'i'];
 
   MinInt                          = Low(Integer);
-
-   // Размеры и качество эскиза по умолчанию
-  IDefaultThumbWidth              = 150;
-  IDefaultThumbHeight             = 150;
-  IDefaultThumbQuality            = 40;
 
    // Отступы эскиза в сетке в пикселах
    // -- Внешние: горизонтальные и вертикальные                                   |
@@ -495,20 +437,6 @@ const
   adMagnifications: Array[0..6] of Double = (1.10, 1.25, 1.33, 1.50, 1.75, 2, 3);
    // Курсоры для просмотра изображений
   aImgViewCursors: Array[Boolean] of TCursor = (crDefault, crHand);
-
-   // Наименования констант с наименованиями папок для неклассифицированных изображений в зависимости от вида группировки
-  asUnclassifiedConsts: Array[TGroupByProperty] of String[24] = (
-    '',                         // gbpFilePath - такого не бывает
-    'SUnclassified_Date',       // gbpDateByYear
-    'SUnclassified_Date',       // gbpDateByMonth
-    'SUnclassified_Date',       // gbpDateByDay
-    'SUnclassified_Time',       // gbpTimeHour
-    'SUnclassified_Time',       // gbpTimeMinute
-    'SUnclassified_Place',      // gbpPlace
-    'SUnclassified_FilmNumber', // gbpFilmNumber
-    'SUnclassified_Author',     // gbpAuthor
-    'SUnclassified_Media',      // gbpMedia
-    'SUnclassified_Keywords');  // gbpKeywords
 
    // ID группы результатов поиска 
   IGroupID_SearchResults          = MaxInt;
@@ -863,131 +791,6 @@ const
 const
   aCheckStates: Array[Boolean] of TCheckState = (csUncheckedNormal, csCheckedNormal);
 
-   // Соответствие между именами свойств изображений из phIntf и элементами TPicProperty
-  aPicPropertyNames: Array[TPicProperty] of String = (
-    SPhoaPicProp_ID,            // ppID
-    SPhoaPicProp_FileName,      // ppFileName
-    SPhoaPicProp_FullFileName,  // ppFullFileName
-    SPhoaPicProp_FilePath,      // ppFilePath
-    SPhoaPicProp_FileSize,      // ppFileSize
-    SPhoaPicProp_FileSizeBytes, // ppFileSizeBytes
-    SPhoaPicProp_PicWidth,      // ppPicWidth
-    SPhoaPicProp_PicHeight,     // ppPicHeight
-    SPhoaPicProp_PicDims,       // ppPicDims
-    SPhoaPicProp_Format,        // ppFormat
-    SPhoaPicProp_Date,          // ppDate
-    SPhoaPicProp_Time,          // ppTime
-    SPhoaPicProp_Place,         // ppPlace
-    SPhoaPicProp_FilmNumber,    // ppFilmNumber
-    SPhoaPicProp_FrameNumber,   // ppFrameNumber
-    SPhoaPicProp_Author,        // ppAuthor
-    SPhoaPicProp_Description,   // ppDescription
-    SPhoaPicProp_Notes,         // ppNotes
-    SPhoaPicProp_Media,         // ppMedia
-    SPhoaPicProp_Keywords,      // ppKeywords
-    SPhoaPicProp_Rotation,      // ppRotation
-    SPhoaPicProp_Flips);        // ppFlips
-
-   // Таблицы перекодировки
-   // TPicProperty <-> Chunked sorting prop
-  aXlat_PicPropertyToChunkSortingProp: Array[TPicProperty] of Word = (
-     0,  // ppID
-     1,  // ppFileName
-     2,  // ppFullFileName
-     3,  // ppFilePath
-     4,  // ppFileSize
-     5,  // ppFileSizeBytes
-     6,  // ppPicWidth
-     7,  // ppPicHeight
-     8,  // ppPicDims
-     9,  // ppFormat
-    10,  // ppDate
-    11,  // ppTime
-    12,  // ppPlace
-    13,  // ppFilmNumber
-    14,  // ppFrameNumber
-    15,  // ppAuthor
-    16,  // ppDescription
-    17,  // ppNotes
-    18,  // ppMedia
-    19,  // ppKeywords
-    20,  // ppRotation
-    21); // ppFlips
-  aXlat_ChunkSortingPropToPicProperty: Array[0..21] of TPicProperty = (
-    ppID,            //  0  ID
-    ppFileName,      //  1  Picture filename
-    ppFullFileName,  //  2  Picture filename with path
-    ppFilePath,      //  3  Picture file path
-    ppFileSize,      //  4  Picture file size
-    ppFileSizeBytes, //  5  Picture file size in bytes
-    ppPicWidth,      //  6  Image width
-    ppPicHeight,     //  7  Image height
-    ppPicDims,       //  8  Image dimensions
-    ppFormat,        //  9  Pixel format
-    ppDate,          // 10  Date
-    ppTime,          // 11  Time
-    ppPlace,         // 12  Place
-    ppFilmNumber,    // 13  Film number
-    ppFrameNumber,   // 14  Frame number
-    ppAuthor,        // 15  Author
-    ppDescription,   // 16  Description
-    ppNotes,         // 17  Notes
-    ppMedia,         // 18  Media
-    ppKeywords,      // 19  Keywords
-    ppRotation,      // 20  Rotation
-    ppFlips);        // 21  Flips
-
-   // TGroupByProperty <-> Chunked sorting prop
-  aXlat_GBPropertyToChunkGroupingProp: Array[TGroupByProperty] of Word = (
-     0,  // gbpFilePath
-     1,  // gbpDateByYear
-     2,  // gbpDateByMonth
-     3,  // gbpDateByDay
-     4,  // gbpTimeHour
-     5,  // gbpTimeMinute
-     6,  // gbpPlace
-     7,  // gbpFilmNumber
-     8,  // gbpAuthor
-     9,  // gbpMedia
-    10); // gbpKeywords
-  aXlat_ChunkGroupingPropToGBProperty: Array[0..10] of TGroupByProperty = (
-   gbpFilePath,    //  0  Picture file path
-   gbpDateByYear,  //  1  Date year
-   gbpDateByMonth, //  2  Date month
-   gbpDateByDay,   //  3  Date day
-   gbpTimeHour,    //  4  Time hour
-   gbpTimeMinute,  //  5  Time minute
-   gbpPlace,       //  6  Place
-   gbpFilmNumber,  //  7  Film number
-   gbpAuthor,      //  8  Author
-   gbpMedia,       //  9  Media name/code
-   gbpKeywords);   // 10  Keywords
-
-  B_LowGBP  = Byte(Low(TGroupByProperty));
-  B_HighGBP = Byte(High(TGroupByProperty));
-
-   // TGroupByProperty версии 2 <-> Byte
-  aXlat_GBPropToGBProp2: Array[B_LowGBP..B_HighGBP] of Byte = (
-    0,   // gbpFilePath
-    1,   // gbpDateByYear
-    2,   // gbpDateByMonth
-    3,   // gbpDateByDay
-    255, // gbpTimeHour
-    255, // gbpTimeMinute
-    4,   // gbpPlace
-    5,   // gbpFilmNumber
-    255, // gbpAuthor
-    255, // gbpMedia
-    6);  // gbpKeywords
-  aXlat_GBProp2ToGBProp: Array[0..6] of Byte = (
-   Byte(gbpFilePath),      // 0  Picture file path
-   Byte(gbpDateByYear),    // 1  Date year
-   Byte(gbpDateByMonth),   // 2  Date month
-   Byte(gbpDateByDay),     // 3  Date day
-   Byte(gbpPlace),         // 4  Place
-   Byte(gbpFilmNumber),    // 5  Film number
-   Byte(gbpKeywords));     // 6  Keywords
-
 var
    // Кодовая страница ANSI для текущего основного шрифта программы
   cMainCodePage: Cardinal;
@@ -996,9 +799,14 @@ var
    // Глобальный экземпляр IDKWeb
   DKWeb: IDKWeb;  
 
-   // Преобразование PropName (из phIntf) <-> TPicProperty. При недопустимых параметрах, возвращают TPicProperty(-1) / ''
-  function PropNameToPicProperty(const sName: String): TPicProperty;
-  function PicPropertyToPropName(PProp: TPicProperty): String;
+   // Составляет описание изображения Pic из свойств Props, выбирая только указанные данные.
+   //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
+   //   sPropSep - разделительная строка между отдельными свойствами
+  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+     // Составляет описание группы Group из свойств Props, выбирая только указанные данные.
+     //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
+     //   sPropSep - разделительная строка между отдельными свойствами
+  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
 
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
@@ -1023,21 +831,40 @@ uses
   TypInfo, Forms,
   TBXThemes, TBXDefaultTheme, TBXOfficeXPTheme, TBXStripesTheme, TBXAluminumTheme,
   DKLang,
-  phPhoa, phGUIObj, phUtils, phSettings, phValSetting, phProfileSetting, phToolSetting, udAbout;
+  phPhoa, phObjConst, phGUIObj, phUtils, phSettings, phValSetting, phProfileSetting, phToolSetting, udAbout;
 
-  function PropNameToPicProperty(const sName: String): TPicProperty;
+  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+  var
+    Prop: TPicProperty;
+    sVal: String;
   begin
-    if sName<>'' then
-      for Result := Low(Result) to High(Result) do
-        if SameText(sName, aPicPropertyNames[Result]) then Exit;
-    Result := TPicProperty(-1);
+    Result := '';
+    for Prop := Low(Prop) to High(Prop) do
+      if Prop in Props then begin
+        sVal := Pic.Props[Prop];
+        if sVal<>'' then begin
+          if sNameValSep<>'' then sVal := PicPropName(Prop)+sNameValSep+sVal;
+          AccumulateStr(Result, sPropSep, sVal);
+        end;
+      end;
   end;
 
-  function PicPropertyToPropName(PProp: TPicProperty): String;
+  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
+  var
+    Prop: TGroupProperty;
+    sVal: String;
   begin
-    if PProp in PPAllProps then Result := aPicPropertyNames[PProp] else Result := '';
+    Result := '';
+    for Prop := Low(Prop) to High(Prop) do
+      if Prop in Props then begin
+        sVal := Group.Props[Prop];
+        if sVal<>'' then begin
+          if sNameValSep<>'' then sVal := GroupPropName(Prop)+sNameValSep+sVal;
+          AccumulateStr(Result, sPropSep, sVal);
+        end;
+      end;
   end;
-
+  
   function GetPhoaSaveFilter: String;
   var i: Integer;
   begin
@@ -1228,7 +1055,7 @@ type
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarBSz24,        '@ISettingID_Gen_ToolbarBSz24');       
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarBSz32,        '@ISettingID_Gen_ToolbarBSz32');       
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Gen_ToolbarDragStyle,    '@ISettingID_Gen_ToolbarDragStyle',    3, 0, 3);
-          Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarDrgNone,      '@ISettingID_Gen_ToolbarDrgNone');     
+          Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarDrgNone,      '@ISettingID_Gen_ToolbarDrgNone');
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarDrgOneDock,   '@ISettingID_Gen_ToolbarDrgOneDock');  
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarDrgNoFloat,   '@ISettingID_Gen_ToolbarDrgNoFloat');  
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_ToolbarDrgFree,      '@ISettingID_Gen_ToolbarDrgFree');     
@@ -1324,7 +1151,7 @@ type
           Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_View_SlideDirForward,    '@ISettingID_View_SlideDirForward',    Byte(ssdForward));
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_View_SlideCyclic,        '@ISettingID_View_SlideCyclic',        True);
      //== Диалоги ======================================================================================================       
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);   
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
       Lvl2 := TPhoaBoolSetting.Create        (Lvl1, ISettingID_Dlgs_SplashStartShow,    '@ISettingID_Dlgs_SplashStartShow',    True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_SplashStartFade,    '@ISettingID_Dlgs_SplashStartFade',    True);
       Lvl2 := TPhoaBoolSetting.Create        (Lvl1, ISettingID_Dlgs_SplashAboutFade,    '@ISettingID_Dlgs_SplashAboutFade',    True);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.11 2004-10-11 11:41:24 dale Exp $
+//  $Id: udPicOps.pas,v 1.12 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udPicOps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -28,7 +29,7 @@ type
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
-    FPhoA: TPhotoAlbum;
+    FProject : IPhotoAlbumProject;
     FUndoOperations: TPhoaOperations;
     FSourceGroup: IPhotoAlbumPicGroup;
     FPics: IPhoaPicList;
@@ -41,17 +42,17 @@ type
    // Отображает диалог операций с изображениями.
    //   ASourceGroup - текущая выбранная группа.
    //   APics        - список выделенных изображений
-  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phSettings;
 
-  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
   begin
     with TdPicOps.Create(Application) do
       try
-        FPhoA           := APhoA;
+        FProject        := AProject;
         FUndoOperations := AUndoOperations;
         FSourceGroup    := ASourceGroup;
         FPics           := APics;
@@ -69,7 +70,7 @@ uses phUtils, Main, phSettings;
     try
       Operation := TPhoaMultiOp_PicOperation.Create(
         FUndoOperations,
-        FPhoA,
+        FProject,
         FSourceGroup,
         PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
         FPics,

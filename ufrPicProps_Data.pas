@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.11 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.12 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrPicProps_Data;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars, phWizard,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard,
   phPicPropsDlgPage, Mask, ToolEdit, StdCtrls, DKLang;
 
 type
@@ -102,7 +103,7 @@ const
         for Prop := Low(Prop) to High(Prop) do
           if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].sValue, Prop);
          // Если есть изменения - создаём операцию изменения
-        if ChgList.Count>0 then TPhoaOp_InternalEditPicProps.Create(FOperations, PhoA, EditedPics, ChgList);
+        if ChgList.Count>0 then TPhoaOp_InternalEditPicProps.Create(FOperations, Project, EditedPics, ChgList);
       finally
         ChgList.Free;
       end;
@@ -114,7 +115,7 @@ const
     inherited BeforeDisplay(ChangeMethod);
     if not FInitialized then begin
        // Загружаем списки мест, плёнок, авторов, носителей
-      StringsLoadPFAM(PhoA, cbPlace.Items, cbFilmNumber.Items, cbAuthor.Items, cbMedia.Items);
+      StringsLoadPFAM(Project, cbPlace.Items, cbFilmNumber.Items, cbAuthor.Items, cbMedia.Items);
        // Загружаем данные изображений в контролы
       LoadPicControls;
       FInitialized := True;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.9 2004-10-11 11:41:24 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrWzPageFileOps_MoveOptions;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, StdCtrls, Mask, DKLang;
 
 type
@@ -184,7 +185,7 @@ uses phUtils, udFileOpsWizard;
          // -- Выбранные во вьюере изображения - заносим путь к текущей выбранной группе
         fospmSelPics: FillPath(Wiz.ViewerSelGroup, LPath);
          // -- Все изображения - заносим только сам фотоальбом/представление
-        fospmAll: if Wiz.ViewerCurView=nil then LPath.Add(Wiz.PhoA.RootGroup) else LPath.Add(Wiz.ViewerCurView.RootGroup);
+        fospmAll: if Wiz.ViewerCurView=nil then LPath.Add(Wiz.Project.RootGroup) else LPath.Add(Wiz.ViewerCurView.RootGroup);
          // -- Выбранные группы - проходим по всем выбранным группам, выделяя общий путь
         else {fospmSelGroups} begin
           LGroupPath := NewPhotoAlbumPicGroupList(nil);
