@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.16 2004-11-21 09:15:51 dale Exp $
+rem $Id: _make_.bat,v 1.17 2004-12-07 11:09:36 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -42,7 +42,6 @@ if "%1"=="app" goto success
 rem == Compile Help CHM project ==
 rem --- English Help
 :comphelp
-pushd
 cd Help\en
 echo.
 echo == Preprocess Help files (English)
@@ -108,9 +107,8 @@ if not errorlevel == 1 goto err
 move phoa-deu.chm ..\..
 if errorlevel == 1 goto err
 
-popd
-if "%1"=="help" goto success
 cd ..\..
+if "%1"=="help" goto success
 
 rem == Compile Installation ISS script ==
 :compsetup
