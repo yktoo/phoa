@@ -1,86 +1,71 @@
-<html><!-- $Id: setup-browse-mode.html,v 1.5 2004-06-09 14:50:58 dale Exp $ -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-  <title>Program settings :: Browse mode</title>
-  <link rel="stylesheet" type="text/css" href="../main.css">
-</head>
-<body bgcolor=white>
-<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
-  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
-  <tr><td class=hdrshadow></td></tr>
-  <tr><td class=content>
-  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Program settings :: Browse mode</h1>
+<!-- $Id: setup-browse-mode.html,v 1.6 2004-06-14 06:15:29 dale Exp $ -->
+{[%hh_hdr_en:Program settings :: Browse mode]}
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Picture group trees</h2>
-  
-    <h3>Tooltips</h3>
-    <p align=justify>Configures usage and appearance of tooltips in the trees displaying picture groups:
-    <ul>
-      <li><b>None</b> - tooltips disabled.</li>
-      <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that you are able to view it whole.</li>
-      <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below). Additionally, the photo album
-          description is displayed for the photo album node when you hover it.</li>
-    </ul>
-    
-    <h3>Display in tooltips</h3>
-    <p align=justify>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected properties</b> mode.
+{[%hh_h2:Picture group trees]}
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Thumbnail view window</h2>
+  <h3>Tooltips</h3>
+  <p align=justify>Configures usage and appearance of tooltips in the trees displaying picture groups:
+  <ul>
+    <li><b>None</b> - tooltips disabled.</li>
+    <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that you are able to view it whole.</li>
+    <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below). Additionally, the photo album
+        description is displayed for the photo album node when you hover it.</li>
+  </ul>
+  
+  <h3>Display in tooltips</h3>
+  <p align=justify>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected properties</b> mode.
 
-    <h3>Background color</h3>
-    <p align=justify>Determines the thumbnail pane background color.
-  
-    <h3>Thumbnail background color</h3>
-    <p align=justify>Determines the background color for single thumbnails.
-  
-    <h3>Thumbnail font color</h3>
-    <p align=justify>Determines the font color for thumbnail labels.
-  
-    <h3>Drag'n'Drop</h3>
-    <p align=justify>Enables or disables drag'n'drop operations with the thumbnails.
-  
-    <h3>Show thumbnail tooltips</h3>
-    <p align=justify>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
-      These tooltips display picture properties (see below). Being generally useful, this function may irritate someone persons.
-  
-    <h3>Display in tooltips</h3>
-    <p align=justify>The list of <a href="pic-data.html">properties</a> from which you can choose those to display in thumbnail tooltips.
-  
-    <h3>Picture details displayed on the thumbnails</h3>
-    <p align=justify>By using these options you can select whether to display, and which <a href="pic-data.html">picture properties</a> in each
-      thumbnail corner.
+{[%hh_h2:Thumbnail view window]}
 
-    <h3>Thick thumbnail border</h3>
-    <p align=justify>When enabled, thumbnail boundaries are being drawn more plain.
+  <h3>Background color</h3>
+  <p align=justify>Determines the thumbnail pane background color.
+
+  <h3>Thumbnail background color</h3>
+  <p align=justify>Determines the background color for single thumbnails.
+
+  <h3>Thumbnail font color</h3>
+  <p align=justify>Determines the font color for thumbnail labels.
+
+  <h3>Drag'n'Drop</h3>
+  <p align=justify>Enables or disables drag'n'drop operations with the thumbnails.
+
+  <h3>Show thumbnail tooltips</h3>
+  <p align=justify>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
+    These tooltips display picture properties (see below). Being generally useful, this function may irritate someone persons.
+
+  <h3>Display in tooltips</h3>
+  <p align=justify>The list of <a href="pic-data.html">properties</a> from which you can choose those to display in thumbnail tooltips.
+
+  <h3>Picture details displayed on the thumbnails</h3>
+  <p align=justify>By using these options you can select whether to display, and which <a href="pic-data.html">picture properties</a> in each
+    thumbnail corner.
+
+  <h3>Thick thumbnail border</h3>
+  <p align=justify>When enabled, thumbnail boundaries are being drawn more plain.
+
+  <h3>Cache thumbnails while viewing</h3>
+  <p align=justify>Since thumbnails are stored in the <a href="file-formats.html">JPEG format</a>, they must be decoded to be drawn, and it may take
+    sensible time to repaint them each time they need to (particularly when displaying many thumbnails at one time while PC is not so powerful).
+    To amend this caching function enables storing decode thumbnails in the special cache (after they had been painted once). Although it takes a bit
+    more memory.
+
+  <h3>Thumbnail cache size</h3>
+  <p align=justify>Maximum number of thumbnails in the cache.
+
+  <h3>Resampling filter</h3>
+  <p align=justify>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> source images when creating thumbnails.
   
-    <h3>Cache thumbnails while viewing</h3>
-    <p align=justify>Since thumbnails are stored in the <a href="file-formats.html">JPEG format</a>, they must be decoded to be drawn, and it may take
-      sensible time to repaint them each time they need to (particularly when displaying many thumbnails at one time while PC is not so powerful).
-      To amend this caching function enables storing decode thumbnails in the special cache (after they had been painted once). Although it takes a bit
-      more memory.
+<h3>Max. undo count</h3>
+<p align=justify>Determines size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done to the photo album.
+  You can undo no more than specified number of sequential changes (when undo buffer gets full, the least recent changes' data are erased).
+  Large buffer requested may result in large need of room (memory) to store it (the most memory-consuming operations are picture deleting and
+  editing).
 
-    <h3>Thumbnail cache size</h3>
-    <p align=justify>Maximum number of thumbnails in the cache.
+{[%hh_seealso_en]}
+  <a href="setup-general.html">Program settings :: General</a><br>
+  <a href="setup-view-mode.html">Program settings :: View mode</a><br>
+  <a href="setup-dialogs.html">Program settings :: Dialogs</a><br>
+  <a href="setup-tools.html">Program settings :: Tools</a><br>
+  <a href="setup-storing.html">Storing the program settings in a file</a><br>
 
-    <h3>Resampling filter</h3>
-    <p align=justify>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> source images when creating thumbnails.
-    
-  <h3>Max. undo count</h3>
-  <p align=justify>Determines size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done to the photo album.
-    You can undo no more than specified number of sequential changes (when undo buffer gets full, the least recent changes' data are erased).
-    Large buffer requested may result in large need of room (memory) to store it (the most memory-consuming operations are picture deleting and
-    editing).
-
-  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
-  <p class=seealso>
-    <a href="setup-general.html">Program settings :: General</a><br>
-    <a href="setup-view-mode.html">Program settings :: View mode</a><br>
-    <a href="setup-dialogs.html">Program settings :: Dialogs</a><br>
-    <a href="setup-tools.html">Program settings :: Tools</a><br>
-    <a href="setup-storing.html">Storing the program settings in a file</a><br>
-<hr width=40%>
-<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
-</td></tr>
-</table>
-</body>
-</html>
+{[%hh_ftr_en]}

@@ -1,66 +1,50 @@
-<html><!-- $Id: intf-file-ops-selpics.html,v 1.1 2004-05-11 03:35:11 dale Exp $ -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-  <title>Picture file operations wizard :: Picture selection</title>
-  <link rel="stylesheet" type="text/css" href="../main.css">
-</head>
-<body bgcolor=white>
-<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
-  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
-  <tr><td class=hdrshadow></td></tr>
-  <tr><td class=content>
-  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> <a href="intf-file-ops.html">Picture file operations wizard</a> :: Picture selection</h1>
+<!-- $Id: intf-file-ops-selpics.html,v 1.2 2004-06-14 06:15:29 dale Exp $ -->
+{[%hh_hdr_en:Picture file operations wizard :: Picture selection]}
 
-  <p align=justify>This wizard page is intended for selecting the pictures for the operation and is applicable for the following ones:
-  <ul>
-    <li><a href="intf-file-ops-task-copy.html">Copying picture files</a> into a specified folder</li>
-    <li><a href="intf-file-ops-task-move.html">Moving picture files</a> into a specified folder</li>
-    <li><a href="intf-file-ops-task-del.html">Deleting unneeded pictures with corresponding files</a></li>
-    <li><a href="intf-file-ops-task-rthumb.html">Rebuilding picture thumbnails</a></li>
-    <li><a href="intf-file-ops-task-repfl.html">Repairing links</a> to picture files</li>
-  </ul>
+<p align=justify>This wizard page is intended for selecting the pictures for the operation and is applicable for the following ones:
+<ul>
+  <li><a href="intf-file-ops-task-copy.html">Copying picture files</a> into a specified folder</li>
+  <li><a href="intf-file-ops-task-move.html">Moving picture files</a> into a specified folder</li>
+  <li><a href="intf-file-ops-task-del.html">Deleting unneeded pictures with corresponding files</a></li>
+  <li><a href="intf-file-ops-task-rthumb.html">Rebuilding picture thumbnails</a></li>
+  <li><a href="intf-file-ops-task-repfl.html">Repairing links</a> to picture files</li>
+</ul>
 
-  <h3>Selected pictures</h3>
-  <p align=justify>The operation you have selected will process the pictures selected in the thumbnail window. For cases when a group is required
-    for the operation the photo album or view group currently selected is used.
-  <p align=justify>This mode is the default when you start the wizard, and thumbnail window has focus and selected pictures as well.
+<h3>Selected pictures</h3>
+<p align=justify>The operation you have selected will process the pictures selected in the thumbnail window. For cases when a group is required
+  for the operation the photo album or view group currently selected is used.
+<p align=justify>This mode is the default when you start the wizard, and thumbnail window has focus and selected pictures as well.
+
+<h3>All pictures in the photo album/view</h3>
+<p align=justify>The operation will use all the pictures and all photo album groups (in the case picture groups are displayed) or all
+  <a href="intf-browse-mode-views.html">view</a> groups (when a view is active).
   
-  <h3>All pictures in the photo album/view</h3>
-  <p align=justify>The operation will use all the pictures and all photo album groups (in the case picture groups are displayed) or all
-    <a href="intf-browse-mode-views.html">view</a> groups (when a view is active).
-    
-  <h3>Pictures in selected groups</h3>
-  <p align=justify>You decide which groups and pictures will participate in the operation by checking them in the tree. You can only check the groups
-    which actually contain pictures.
-  <p align=justify>This mode is the default when wizard starts and group tree has focus; the group currently selected gets checked immediately (unless
-    it doesn't contain pictures).
-  <p align=justify>Additional options are available in the popup menu accessible with right mouse click or with <b>Shift+F10</b> shortcut keys:
+<h3>Pictures in selected groups</h3>
+<p align=justify>You decide which groups and pictures will participate in the operation by checking them in the tree. You can only check the groups
+  which actually contain pictures.
+<p align=justify>This mode is the default when wizard starts and group tree has focus; the group currently selected gets checked immediately (unless
+  it doesn't contain pictures).
+<p align=justify>Additional options are available in the popup menu accessible with right mouse click or with <b>Shift+F10</b> shortcut keys:
+<ul>
+  <li><b>Check all groups</b> (or <b>Ctrl+A</b> keys) - sets check to all the groups having pictures.</li>
+  <li><b>Uncheck all groups</b> (or <b>Ctrl+D</b> keys) - removes check from all the checked groups.</li>
+  <li><b>Invert group checks</b> (or <b>Ctrl+I</b> keys) - toggles all groups' check state.</li>
+</ul>
+
+<p align=justify><b>Info line</b> at the bottom of the page displays how many groups and pictures the selection actually contains; also the total size
+  for picture files is displayed.
+<div class=nb><b>NB:</b>
   <ul>
-    <li><b>Check all groups</b> (or <b>Ctrl+A</b> keys) - sets check to all the groups having pictures.</li>
-    <li><b>Uncheck all groups</b> (or <b>Ctrl+D</b> keys) - removes check from all the checked groups.</li>
-    <li><b>Invert group checks</b> (or <b>Ctrl+I</b> keys) - toggles all groups' check state.</li>
+    <li>In the case <a href="intf-file-ops-moveopts.html">copy/move options</a> allow file duplication the total size may prove greater than indicated
+        one.</li>
+    <li>The space occupied by a file on the disk is usually greater than its size. You should have this in mind when preparing the files to write
+        onto a removable medium.</li>
   </ul>
-  
-  <p align=justify><b>Info line</b> at the bottom of the page displays how many groups and pictures the selection actually contains; also the total size
-    for picture files is displayed.
-  <div class=nb><b>NB:</b>
-    <ul>
-      <li>In the case <a href="intf-file-ops-moveopts.html">copy/move options</a> allow file duplication the total size may prove greater than indicated
-          one.</li>
-      <li>The space occupied by a file on the disk is usually greater than its size. You should have this in mind when preparing the files to write
-          onto a removable medium.</li>
-    </ul>
-  </div>
+</div>
 
-  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
-  <p class=seealso>
-    <a href="intf-file-ops.html">Picture file operations wizard</a><br>
-    <a href="intf-browse-mode.html">Browse mode</a><br>
-    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a>
+{[%hh_seealso_en]}
+  <a href="intf-file-ops.html">Picture file operations wizard</a><br>
+  <a href="intf-browse-mode.html">Browse mode</a><br>
+  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a>
 
-<hr width=40%>
-<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
-</td></tr>
-</table>
-</body>
-</html>
+{[%hh_ftr_en]}

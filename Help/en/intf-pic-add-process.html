@@ -1,48 +1,33 @@
-<html><!-- $Id: intf-pic-add-process.html,v 1.1 2004-05-11 03:35:11 dale Exp $ -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-  <title>Add pictures wizard :: Adding pictures</title>
-  <link rel="stylesheet" type="text/css" href="../main.css">
-</head>
-<body bgcolor=white>
-<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
-  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
-  <tr><td class=hdrshadow></td></tr>
-  <tr><td class=content>
-  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> <a href="intf-pic-add.html">Add pictures wizard</a> :: Adding pictures</h1>
+<!-- $Id: intf-pic-add-process.html,v 1.2 2004-06-14 06:15:29 dale Exp $ -->
+{[%hh_hdr_en:Add pictures wizard :: Adding pictures]}
 
-  <p align=justify>This page is displayed while adding the selected picture files. The program shows picture addition progress and the number
-    of errors occured. You can watch those errors (as well as pictures were added successfully) afterwards on the <a href="intf-pic-add-log.html">log
-    page</a>.
-  <p align=justify>Moreover the <i>thumbnail</i> created for the picture last added is displayed.
-  <div class=nb><b>NB:</b>
-    <ul>
-      <li>Picture additiong is performed by a parallel thread; you can interrupt the process only between two pictures being processing, and this
-          slightly slows down the program's response on clicking <b>Interrupt</b> button.</li>
-      <li>You <i>cannot</i> close the wizard window having active picture addition process. You will need to interrupt it using the <b>Interrupt</b>
-          button before you can close the window.</li>
-      <li>Picture addition process performs <a href="pic-prop-autofill.html">autofilling the picture data</a>. You can setup the autofill feature
-          in the <a href="setup-dialogs.html">dialog settings</a>; autofill results can be watched at the <a href="intf-pic-add-log.html">log
-          page</a>.</li>
-    </ul>
-  </div>
+<p align=justify>This page is displayed while adding the selected picture files. The program shows picture addition progress and the number
+  of errors occured. You can watch those errors (as well as pictures were added successfully) afterwards on the <a href="intf-pic-add-log.html">log
+  page</a>.
+<p align=justify>Moreover the <i>thumbnail</i> created for the picture last added is displayed.
+<div class=nb><b>NB:</b>
+  <ul>
+    <li>Picture additiong is performed by a parallel thread; you can interrupt the process only between two pictures being processing, and this
+        slightly slows down the program's response on clicking <b>Interrupt</b> button.</li>
+    <li>You <i>cannot</i> close the wizard window having active picture addition process. You will need to interrupt it using the <b>Interrupt</b>
+        button before you can close the window.</li>
+    <li>Picture addition process performs <a href="pic-prop-autofill.html">autofilling the picture data</a>. You can setup the autofill feature
+        in the <a href="setup-dialogs.html">dialog settings</a>; autofill results can be watched at the <a href="intf-pic-add-log.html">log
+        page</a>.</li>
+  </ul>
+</div>
 
-  <h3>Interrupt</h3>
-  <p align=justify>By clicking this button you stop the addition process. The button becomes <b>Continue</b>, and by clicking it you resume the process.
+<h3>Interrupt</h3>
+<p align=justify>By clicking this button you stop the addition process. The button becomes <b>Continue</b>, and by clicking it you resume the process.
 
-  <p align=justify>On process completion the program closes wizard window (only when no errors occured and <a href="setup-dialogs.html">settings</a> 
-    specify not to show the log when no errors), or advances to the <a href="intf-pic-add-log.html">log page</a>.
+<p align=justify>On process completion the program closes wizard window (only when no errors occured and <a href="setup-dialogs.html">settings</a> 
+  specify not to show the log when no errors), or advances to the <a href="intf-pic-add-log.html">log page</a>.
 
-  <p align=justify><a href="intf-pic-add-log.html">Next &gt;&gt;</a>
+<p align=justify><a href="intf-pic-add-log.html">Next &gt;&gt;</a>
 
-  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
-  <p class=seealso>
-    <a href="intf-pic-add.html">Add pictures wizard</a><br>
-    <a href="intf-browse-mode.html">Browse mode</a><br>
-    <a href="intf-browse-mode-tasks.html">Working in the Browse mode</a><br>
-<hr width=40%>
-<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
-</td></tr>
-</table>
-</body>
-</html>
+{[%hh_seealso_en]}
+  <a href="intf-pic-add.html">Add pictures wizard</a><br>
+  <a href="intf-browse-mode.html">Browse mode</a><br>
+  <a href="intf-browse-mode-tasks.html">Working in the Browse mode</a><br>
+
+{[%hh_ftr_en]}

@@ -1,82 +1,67 @@
-<html><!-- $Id: intf-pic-props-keywords.html,v 1.2 2004-04-15 12:54:10 dale Exp $ -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-  <title>Edit pictures dialog :: Keywords</title>
-  <link rel="stylesheet" type="text/css" href="../main.css">
-</head>
-<body bgcolor=white>
-<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
-  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
-  <tr><td class=hdrshadow></td></tr>
-  <tr><td class=content>
-  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> <a href="intf-pic-props.html">Edit pictures dialog</a> :: Keywords</h1>
-  <p align=justify>Each picture maintains a keywords list among <a href="pic-data.html">its data</a>. As a rule this is a list of persons, subject
-    or events on a photograph.
-  <p align=justify>The advantage of keywords compared to plain text is that you dont have to type them - they can be 
-    <a href="intf-select-keywords.html">selected from the list</a>. Moreover, you may want to build a
-    <a href="intf-browse-mode-views.html">view</a> on them, and watch the line changing year to year (by the way, a highly interesting observation).
-    And finally, the keyword list shows number of images a particular keyword linked to.
+<!-- $Id: intf-pic-props-keywords.html,v 1.3 2004-06-14 06:15:29 dale Exp $ -->
+{[%hh_hdr_en:Edit pictures dialog :: Keywords]}
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Keyword list</h2>
-  <p align=justify>This list displays <i>all the keywords</i> encountered in open photo album pictures. Grayed text in the parentheses right to the
-    keyword is a total number of the keyword occurences.
-  <p align=justify>If a keyword is contained in some of the selected pictures the keyword will be checked (fully checked if the keyword is present at
-    all of the selected pictures, and grayed, depending on <a href="setup-general.html">checkbox style</a>, if the keyword is contained not in all
-    selected pictures), and there will be two numbers in the parens delimited with slash: first one is the number of selected pictures used the
-    keyword, second is a total number of occurences.
-  <p align=justify>If a keyword is contained in none of the selected pictures, the checkbox will remain unchecked.
-  <p align=justify>As long as keywords are compared <i>case-insensitively</i>, the program makes do distinction between <i>qwerty</i> and <i>QwErTy</i>.
-  <p align=justify>You can also add keywords here. For you to distinct between existing and new keywords they are painted differently:
-  <ul>
-    <li>Already existing keywords wear a key icon and are drawn using black font.</li>
-    <li>Newly added keywords have an asterisk icon and are drawn with navy font.</li>
-  </ul>
+<p align=justify>Each picture maintains a keywords list among <a href="pic-data.html">its data</a>. As a rule this is a list of persons, subject
+  or events on a photograph.
+<p align=justify>The advantage of keywords compared to plain text is that you dont have to type them - they can be 
+  <a href="intf-select-keywords.html">selected from the list</a>. Moreover, you may want to build a
+  <a href="intf-browse-mode-views.html">view</a> on them, and watch the line changing year to year (by the way, a highly interesting observation).
+  And finally, the keyword list shows number of images a particular keyword linked to.
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Keyword operations</h2>
-  <p align=justify>Using this page you may freely alter the keyword list for the selected pictures by using the tool panel buttons.
-  <div class=nb><b>NB:</b> the same operations are accessible through the popup menu appearing on right mouse click.</div>
+{[%hh_h2:Keyword list]}
+<p align=justify>This list displays <i>all the keywords</i> encountered in open photo album pictures. Grayed text in the parentheses right to the
+  keyword is a total number of the keyword occurences.
+<p align=justify>If a keyword is contained in some of the selected pictures the keyword will be checked (fully checked if the keyword is present at
+  all of the selected pictures, and grayed, depending on <a href="setup-general.html">checkbox style</a>, if the keyword is contained not in all
+  selected pictures), and there will be two numbers in the parens delimited with slash: first one is the number of selected pictures used the
+  keyword, second is a total number of occurences.
+<p align=justify>If a keyword is contained in none of the selected pictures, the checkbox will remain unchecked.
+<p align=justify>As long as keywords are compared <i>case-insensitively</i>, the program makes do distinction between <i>qwerty</i> and <i>QwErTy</i>.
+<p align=justify>You can also add keywords here. For you to distinct between existing and new keywords they are painted differently:
+<ul>
+  <li>Already existing keywords wear a key icon and are drawn using black font.</li>
+  <li>Newly added keywords have an asterisk icon and are drawn with navy font.</li>
+</ul>
 
-  <h3>Checked only</h3>
-  <p align=justify>When on (the button appears depressed), the list displays only checked keywords, otherwise the whole keyword list is displayed.
-    This switch affects only keyword visibility, and doesn't modify the keyword list itself.
+{[%hh_h2:Keyword operations]}
+<p align=justify>Using this page you may freely alter the keyword list for the selected pictures by using the tool panel buttons.
+<div class=nb><b>NB:</b> the same operations are accessible through the popup menu appearing on right mouse click.</div>
 
-  <h3>Add</h3>
-  <p align=justify>Adds a new keyword to the list, checks it and starts editing it. If you decide not to remove the check when you click <b>OK</b>
-    the keyword will be added to all the selected pictures.
+<h3>Checked only</h3>
+<p align=justify>When on (the button appears depressed), the list displays only checked keywords, otherwise the whole keyword list is displayed.
+  This switch affects only keyword visibility, and doesn't modify the keyword list itself.
 
-  <h3>Edit</h3>
-  <p align=justify>Enters keyword editing mode. Notes:
-  <ul>
-    <li>The keyword will be replaced only for selected pictures already having it.</li>
-    <li>If a keyword is contained by none of the selected pictures (the were no keyword checkmark) then the keyword will remain unchanged.</li>
-    <li>If a keyword becomes checked then <i>new</i> keyword will be added to all of the selected pictures not contained old one before.</li>
-    <li>If a keyword becomes unchecked then <i>old</i> keyword will be simply removed from selected pictures containing it.</li>
-  </ul>
-  <div class=nb><b>NB:</b> you can also start keyword editing by clicking with mouse <i>on already selected</i> keyword.</div>
+<h3>Add</h3>
+<p align=justify>Adds a new keyword to the list, checks it and starts editing it. If you decide not to remove the check when you click <b>OK</b>
+  the keyword will be added to all the selected pictures.
 
-  <h3>Check all</h3>
-  <p align=justify>Checks all the keywords in the list.
+<h3>Edit</h3>
+<p align=justify>Enters keyword editing mode. Notes:
+<ul>
+  <li>The keyword will be replaced only for selected pictures already having it.</li>
+  <li>If a keyword is contained by none of the selected pictures (the were no keyword checkmark) then the keyword will remain unchanged.</li>
+  <li>If a keyword becomes checked then <i>new</i> keyword will be added to all of the selected pictures not contained old one before.</li>
+  <li>If a keyword becomes unchecked then <i>old</i> keyword will be simply removed from selected pictures containing it.</li>
+</ul>
+<div class=nb><b>NB:</b> you can also start keyword editing by clicking with mouse <i>on already selected</i> keyword.</div>
 
-  <h3>Uncheck all</h3>
-  <p align=justify>Unchecks all the keywords.
+<h3>Check all</h3>
+<p align=justify>Checks all the keywords in the list.
 
-  <h3>Invert</h3>
-  <p align=justify>Toggles checks for all the keywords.
+<h3>Uncheck all</h3>
+<p align=justify>Unchecks all the keywords.
 
-  <div class=nb><b>NB:</b> <b>Where is Delete button?</b> There's no Delete button by design: if you want to delete a keyword from the pictures,
-    simply uncheck it.</div>
-  
-  <p align=justify><img src="../undo-bullet.gif" align=absmiddle width=20 height=20> This operation supports 
-    <a href="intf-browse-mode-tasks.html#undo"><b>undo</b></a>
+<h3>Invert</h3>
+<p align=justify>Toggles checks for all the keywords.
 
-  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
-  <p class=seealso>
-    <a href="pic-data.html">Picture data</a><br>
-    <a href="intf-browse-mode.html">Browse mode</a><br>
-    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
-<hr width=40%>
-<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
-</td></tr>
-</table>
-</body>
-</html>
+<div class=nb><b>NB:</b> <b>Where is Delete button?</b> There's no Delete button by design: if you want to delete a keyword from the pictures,
+  simply uncheck it.</div>
+
+{[%hh_undosup_en]}
+
+{[%hh_seealso_en]}
+  <a href="pic-data.html">Picture data</a><br>
+  <a href="intf-browse-mode.html">Browse mode</a><br>
+  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
+
+{[%hh_ftr_en]}

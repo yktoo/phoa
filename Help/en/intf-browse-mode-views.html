@@ -1,109 +1,94 @@
-<html><!-- $Id: intf-browse-mode-views.html,v 1.3 2004-05-16 11:35:09 dale Exp $ -->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-  <title>Working with views</title>
-  <link rel="stylesheet" type="text/css" href="../main.css">
-</head>
-<body bgcolor=white>
-<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
-  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
-  <tr><td class=hdrshadow></td></tr>
-  <tr><td class=content>
-  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Working with views</h1>
-  
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Introduction</h2>
-  <p align=justify>Photo album <b>views</b> look similar to photo album group tree, the only difference is that groups are being created by you
-    while view's folder hierarchy is built automatically based on picture data as well as on <b>groupings</b> you provide. A grouping is one
-    logical unit of view's organzation, and it may form one or more folder tree levels. When generating view's folder hierarchy, <i>each</i>
-    picture is arranged into some group, which is determined by the view properties to be seen below.
+<!-- $Id: intf-browse-mode-views.html,v 1.4 2004-06-14 06:15:29 dale Exp $ -->
+{[%hh_hdr_en:Working with views]}
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> View properties</h2>
-  <p align=justify>As you can see in <a href="intf-view-props.html">View properties dialog</a>, the view has name, the list of groupings and the
-    list of sortings.
+{[%hh_h2:Introduction]}
+<p align=justify>Photo album <b>views</b> look similar to photo album group tree, the only difference is that groups are being created by you
+  while view's folder hierarchy is built automatically based on picture data as well as on <b>groupings</b> you provide. A grouping is one
+  logical unit of view's organzation, and it may form one or more folder tree levels. When generating view's folder hierarchy, <i>each</i>
+  picture is arranged into some group, which is determined by the view properties to be seen below.
 
-  <h3>View name</h3>
-  <p align=justify>The name is specified by you, and it reflects the view's content, eg, &quot;By place and date&quot;.
-  
-  <h3>List of groupings</h3>  
-  <p align=justify>The grouping list is to be seen more detailed. <b>PhoA</b> supports the following grouping kinds:
-  <ul>
-    <li><b>By picture file path</b><br>
-      Pictures are arranged into folders according to their physical locations</li>
-    <li><b>By date year</b><br>
-      Pictures are grouped into folders, each of which contains pictures with the same year. This grouping supports <a href="#unclassified">arranging
-      unclassified pictures into separate folder</a></li>
-    <li><b>By date month</b><br>
-      Pictures are grouped into folders, each of which contains pictures with the same month. Usually it is worth to apply this grouping after the 
-      grouping by date year, in this case you'll have year folders containing folders for months of that year; but you may apply this grouping alone,
-      this way pictures will be grouped by the month, but still with different years. This grouping supports <a href="#unclassified">arranging
-      unclassified pictures into separate folder</a></li>
-    <li><b>By date day</b><br>
-      Pictures are grouped into folders, each of which contains pictures with the same day of the month. Usually it is worth to apply this grouping
-      after the groupings by date year and by date month, in this case you'll have year folders containing folders for months of that year, and they in
-      turn will contain folders for days of that month; but you may apply this grouping alone, this way pictures will be grouped by day of the month,
-      but still with different years and months. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
-      folder</a></li>
-    <li><b>By time hour</b><br>
-      Pictures are grouped into folders, each of which contains pictures with the same hour (taken from picture's time). This grouping supports
-      <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
-    <li><b>By time minute</b><br>
-      Pictures are grouped into folders, each of which contains pictures with the same minute (taken from picture's time). Usually it is worth
-      to apply this grouping after the grouping by time hour, in this case you'll have year folders containing folders for minutes of that hour;
-      but you may apply this grouping alone, this way pictures will be grouped by the minute, but still with different hours. This grouping
-      supports <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
-    <li><b>By place</b><br>
-      Pictures are arranged into folders by their place. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
-      folder</a></li>
-    <li><b>By film number</b><br>
-      Pictures are arranged into folders by their film number. This grouping supports <a href="#unclassified">arranging unclassified pictures into
-      separate folder</a></li>
-    <li><b>By author</b><br>
-      Pictures are arranged into folders by their author. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
-      folder</a></li>
-    <li><b>By media name or code</b><br>
-      Pictures are arranged into folders by their media. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
-      folder</a></li>
-    <li><b>By keywords</b><br>
-      Pictures are arranged into folders by their keywords. Accordingly, one picture may participate in some folders, and it'll do if it contains
-      some keywords. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
-  </ul>
-  
-  <h3>List of sortings</h3>
-  <p align=justify>After pictures are arranged into folders they reside there, as rule, in random order, and that's inconvenient; moreover, you cannot
-    reorder them manually. To fix this there's a possibility in <b>PhoA</b> to sort grouping results in each group with use of sortings. You do this
-    just like when you <a href="intf-sort-pics.html">sort pictures</a> in the photo album.
-  
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name="unclassified">Arranging unclassified pictures into separate folder</a></h2>
-  <p align=justify>As you know, this is not mandatory to completely describe a picture. But since when generating a view each picture is processed
-    and is included into the view (see above), there are two choices how to handle pictures having no data for the given grouping criteria (no date
-    when grouping by date, no place when grouping by place etc):
-  <ul>
-    <li>If the grouping has &quot;Unclassified pictures in own folder&quot; checkbox checked, they will be put into the appropriate folder
-        (&quot;No date&quot;, &quot;No place&quot; etc) located at the same tree level as the rest of folders, and just at the top of the level.</li>
-    <li>If the checkbox is unchecked, pictures with no data will be leaved in the former folder, and no additional folder is created for them. So,
-        given the grouping by date (checkbox is unchecked), the picture remains in the root folder (the folder corresponding to the view itself),
-        and if you then apply the grouping by place (checkbox is checked), the &quot;No place&quot; folder will reside in the root directory,
-        and the picture will be placed there, while the rest of folders (with place specified) will be created under the date folders; thus picture
-        classification by place will reside on different folder tree levels.</li>
-  </ul>
-  <p align=justify>This feature (obvious) is not applicable for the grouping by picture file path since there are no pictures with no files, and
-    there are no files without paths (at least I've heard nothing of it ;).
+{[%hh_h2:View properties]}
+<p align=justify>As you can see in <a href="intf-view-props.html">View properties dialog</a>, the view has name, the list of groupings and the
+  list of sortings.
 
-  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Copying view's folders to the photo album</h2>
-  <p align=justify><b>PhoA</b> also introduces the possibility for copying generated folder and picture structure as ordinary photo album groups.
-    For this you select <b>View | Views | Make a group...</b> menu item, then <a href="intf-sel-phoa-group.html">Select a group dialog</a> appears,
-    allowing you to select a group to place view's folders to.
-  
-  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
-  <p class=seealso>
-    <a href="intf-view-props.html">View properties dialog</a><br>
-    <a href="intf-browse-mode.html">Browse mode</a><br>
-    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
-    <a href="intf-key-mouse-controls.html">Keyboard and mouse controls</a><br>
-    <a href="intf-view-mode-tasks.html">Working in the view mode</a><br>
-<hr width=40%>
-<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
-</td></tr>
-</table>
-</body>
-</html>
+<h3>View name</h3>
+<p align=justify>The name is specified by you, and it reflects the view's content, eg, &quot;By place and date&quot;.
+
+<h3>List of groupings</h3>  
+<p align=justify>The grouping list is to be seen more detailed. <b>PhoA</b> supports the following grouping kinds:
+<ul>
+  <li><b>By picture file path</b><br>
+    Pictures are arranged into folders according to their physical locations</li>
+  <li><b>By date year</b><br>
+    Pictures are grouped into folders, each of which contains pictures with the same year. This grouping supports <a href="#unclassified">arranging
+    unclassified pictures into separate folder</a></li>
+  <li><b>By date month</b><br>
+    Pictures are grouped into folders, each of which contains pictures with the same month. Usually it is worth to apply this grouping after the 
+    grouping by date year, in this case you'll have year folders containing folders for months of that year; but you may apply this grouping alone,
+    this way pictures will be grouped by the month, but still with different years. This grouping supports <a href="#unclassified">arranging
+    unclassified pictures into separate folder</a></li>
+  <li><b>By date day</b><br>
+    Pictures are grouped into folders, each of which contains pictures with the same day of the month. Usually it is worth to apply this grouping
+    after the groupings by date year and by date month, in this case you'll have year folders containing folders for months of that year, and they in
+    turn will contain folders for days of that month; but you may apply this grouping alone, this way pictures will be grouped by day of the month,
+    but still with different years and months. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
+    folder</a></li>
+  <li><b>By time hour</b><br>
+    Pictures are grouped into folders, each of which contains pictures with the same hour (taken from picture's time). This grouping supports
+    <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
+  <li><b>By time minute</b><br>
+    Pictures are grouped into folders, each of which contains pictures with the same minute (taken from picture's time). Usually it is worth
+    to apply this grouping after the grouping by time hour, in this case you'll have year folders containing folders for minutes of that hour;
+    but you may apply this grouping alone, this way pictures will be grouped by the minute, but still with different hours. This grouping
+    supports <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
+  <li><b>By place</b><br>
+    Pictures are arranged into folders by their place. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
+    folder</a></li>
+  <li><b>By film number</b><br>
+    Pictures are arranged into folders by their film number. This grouping supports <a href="#unclassified">arranging unclassified pictures into
+    separate folder</a></li>
+  <li><b>By author</b><br>
+    Pictures are arranged into folders by their author. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
+    folder</a></li>
+  <li><b>By media name or code</b><br>
+    Pictures are arranged into folders by their media. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate
+    folder</a></li>
+  <li><b>By keywords</b><br>
+    Pictures are arranged into folders by their keywords. Accordingly, one picture may participate in some folders, and it'll do if it contains
+    some keywords. This grouping supports <a href="#unclassified">arranging unclassified pictures into separate folder</a></li>
+</ul>
+
+<h3>List of sortings</h3>
+<p align=justify>After pictures are arranged into folders they reside there, as rule, in random order, and that's inconvenient; moreover, you cannot
+  reorder them manually. To fix this there's a possibility in <b>PhoA</b> to sort grouping results in each group with use of sortings. You do this
+  just like when you <a href="intf-sort-pics.html">sort pictures</a> in the photo album.
+
+{[%hh_h2:<a name="unclassified">Arranging unclassified pictures into separate folder</a>]}
+<p align=justify>As you know, this is not mandatory to completely describe a picture. But since when generating a view each picture is processed
+  and is included into the view (see above), there are two choices how to handle pictures having no data for the given grouping criteria (no date
+  when grouping by date, no place when grouping by place etc):
+<ul>
+  <li>If the grouping has &quot;Unclassified pictures in own folder&quot; checkbox checked, they will be put into the appropriate folder
+      (&quot;No date&quot;, &quot;No place&quot; etc) located at the same tree level as the rest of folders, and just at the top of the level.</li>
+  <li>If the checkbox is unchecked, pictures with no data will be leaved in the former folder, and no additional folder is created for them. So,
+      given the grouping by date (checkbox is unchecked), the picture remains in the root folder (the folder corresponding to the view itself),
+      and if you then apply the grouping by place (checkbox is checked), the &quot;No place&quot; folder will reside in the root directory,
+      and the picture will be placed there, while the rest of folders (with place specified) will be created under the date folders; thus picture
+      classification by place will reside on different folder tree levels.</li>
+</ul>
+<p align=justify>This feature (obvious) is not applicable for the grouping by picture file path since there are no pictures with no files, and
+  there are no files without paths (at least I've heard nothing of it ;).
+
+{[%hh_h2:Copying view's folders to the photo album]}
+<p align=justify><b>PhoA</b> also introduces the possibility for copying generated folder and picture structure as ordinary photo album groups.
+  For this you select <b>View | Views | Make a group...</b> menu item, then <a href="intf-sel-phoa-group.html">Select a group dialog</a> appears,
+  allowing you to select a group to place view's folders to.
+
+{[%hh_seealso_en]}
+  <a href="intf-view-props.html">View properties dialog</a><br>
+  <a href="intf-browse-mode.html">Browse mode</a><br>
+  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
+  <a href="intf-key-mouse-controls.html">Keyboard and mouse controls</a><br>
+  <a href="intf-view-mode-tasks.html">Working in the view mode</a><br>
+
+{[%hh_ftr_en]}

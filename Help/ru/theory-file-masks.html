@@ -1,11 +1,11 @@
-<!-- $Id: theory-file-masks.html,v 1.3 2004-06-12 11:51:14 dale Exp $ -->
+<!-- $Id: theory-file-masks.html,v 1.4 2004-06-14 06:15:29 dale Exp $ -->
 {[%hh_hdr_ru:Маски файлов]}
 
 <p align=justify><b>Маски файлов</b> - это шаблоны для проверки имён файлов, составляемые по определённым <a href="#rules">правилам</a>.
 <p align=justify><b>PhoA</b> использует маски файлов в многих местах: при <a href="intf-search.html">поиске</a>, при задании фильтра 
   <a href="intf-pic-add-selfiles.html">добавления файлов изображений</a>, при описании <a href="theory-tools.html">инструментов</a> и пр.
 
-<h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=rules>Правила составления масок файлов</a></h2>
+{[%hh_h2:<a name=rules>Правила составления масок файлов</a>]}
 <ul>
   <li>В программе используются списки <i>масок</i>, разделённые символом точки с запятой (<b>;</b>). Правила составления каждой из масок см. ниже. Файл считается
       соответствующим маскам, если он подходит <i>под любую</i> из заданных в списке масок (условие логического <b>ИЛИ</b>).</li>
@@ -34,7 +34,7 @@
   </ul>
 </div>
 
-<h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=samples>Примеры масок</a></h2>
+{[%hh_h2:<a name=samples>Примеры масок</a>]}
 <ul>
   <li><b>*</b> - любой файл;</li>
   <li><b>*.*</b> - любой файл, имеющий расширение;</li>
@@ -45,8 +45,7 @@
   <li><b>*.jpg;*.gif;*.png;!temp*</b> - все файлы с расширениями .jpg, .gif, .png, а также файлы, чьё имя начинается не на &quot;temp&quot;.</li>
 </ul>
 
-<p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>См. также:
-<p class=seealso>
+{[%hh_seealso_ru]}
   <a href="intf-search.html">Поиск</a><br>
   <a href="theory-tools.html">Инструменты</a><br>
 
