@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.3 2004-04-17 21:02:23 dale Exp $
+;   $Id: phoa.iss,v 1.4 2004-04-18 12:08:27 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -98,88 +98,7 @@
 BeveledLabel=http://phoa.narod.ru
 
 [CustomMessages]
-en.CompMain=Main Files
-en.CompHelp=Help Files
-en.CompHelpEn=English
-en.CompHelpRu=Russian
-en.CompSampleAlbum=Sample photo album
-en.CompPhoaAPI=PhoA API (for developers)
-
-ru.CompMain=Основные файлы
-ru.CompHelp=Файлы Справочной системы
-ru.CompHelpEn=Английский язык
-ru.CompHelpRu=Русский язык
-ru.CompSampleAlbum=Пример фотоальбома
-ru.CompPhoaAPI=PhoA API (для разработчиков)
-
-de.CompMain=Programmdateien
-de.CompHelp=Hilfedateien
-de.CompHelpEn=Englisch
-de.CompHelpRu=Russisch
-de.CompSampleAlbum=Beispiel Fotoalbum
-de.CompPhoaAPI=PhoA API (for developers)
-
-br.CompMain=Arquivos principais
-br.CompHelp=Arquivos de ajuda
-br.CompHelpEn=Inglкs
-br.CompHelpRu=Russo
-br.CompSampleAlbum=Бlbum exemplo
-br.CompPhoaAPI=PhoA API (for developers)
-
-ua.CompMain=Основні файли
-ua.CompHelp=Файли  ДовідковоЇ системи
-ua.CompHelpEn=Англійска мова
-ua.CompHelpRu=Російска мова
-ua.CompSampleAlbum=Приклад фотоальбому
-ua.CompPhoaAPI=PhoA API (для розробників)
-
-en.IconsAllUsers=For all users
-ru.IconsAllUsers=Для всех пользователей
-de.IconsAllUsers=Fьr alle Benutzer
-br.IconsAllUsers=Para todos os usuбrios
-ua.IconsAllUsers=Для усіх користувачів
-
-en.IconsCurUser=For the current user only
-ru.IconsCurUser=Только для текущего пользователя
-de.IconsCurUser=Nur fьr den aktuellen Benutzer
-br.IconsCurUser=Somente para usuбrio atual
-ua.IconsCurUser=Тільки для поточного користувача
-
-en.PhoaDesc=Picture arranging program
-ru.PhoaDesc=Программа для каталогизации изображений и составления фотоальбомов
-de.PhoaDesc=Bildverwaltungsprogramm
-br.PhoaDesc=Programa para organizaзгo de imagens
-ua.PhoaDesc=Програма для каталогізаціі зображень і складання фотоальбомів
-  
-en.SampleAlbum=Sample photo album
-ru.SampleAlbum=Пример фотоальбома
-de.SampleAlbum=Beispiel Fotoalbum
-br.SampleAlbum=Бlbum exemplo
-ua.SampleAlbum=Приклад фотоальбому
-
-en.HelpRu=PhoA help (Russian)
-ru.HelpRu=Справка по PhoA (Русская)
-de.HelpRu=PhoA Hilfe (Russich)
-br.HelpRu=Ajuda PhoA (Russo)
-ua.HelpRu=Довідка по PhoA (Російска)
-
-en.HelpEn=PhoA help (English)
-ru.HelpEn=Справка по PhoA (English)
-de.HelpEn=PhoA Hilfe (Englisch)
-br.HelpEn=PhoA help (English)
-ua.HelpEn=Довідка по PhoA (English)
-
-en.PhoaFmtName=PhoA Photo Album
-ru.PhoaFmtName=Фотоальбом PhoA
-de.PhoaFmtName=PhoA Fotoalbum
-br.PhoaFmtName=PhoA Бlbum
-ua.PhoaFmtName=Фотоальбом PhoA
-
-en.LangID=1033
-ru.LangID=1049
-de.LangID=1031
-br.LangID=1046
-ua.LangID=1058
+#include "SetupMessages.txt"
 
 [Code]
 

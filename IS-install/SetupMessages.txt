@@ -1,0 +1,79 @@
+;== English ===========================================================================================================
+en.CompMain=Main Files
+en.CompHelp=Help Files
+en.CompHelpEn=English
+en.CompHelpRu=Russian
+en.CompSampleAlbum=Sample photo album
+en.CompPhoaAPI=PhoA API (for developers)
+en.IconsAllUsers=For all users
+en.IconsCurUser=For the current user only
+en.PhoaDesc=Picture arranging program
+en.SampleAlbum=Sample photo album
+en.HelpRu=PhoA help (Russian)
+en.HelpEn=PhoA help (English)
+en.PhoaFmtName=PhoA Photo Album
+en.LangID=1033
+
+;== Russian ===========================================================================================================
+ru.CompMain=Основные файлы
+ru.CompHelp=Файлы Справочной системы
+ru.CompHelpEn=Английский язык
+ru.CompHelpRu=Русский язык
+ru.CompSampleAlbum=Пример фотоальбома
+ru.CompPhoaAPI=PhoA API (для разработчиков)
+ru.IconsAllUsers=Для всех пользователей
+ru.IconsCurUser=Только для текущего пользователя
+ru.PhoaDesc=Программа для каталогизации изображений и составления фотоальбомов
+ru.SampleAlbum=Пример фотоальбома
+ru.HelpRu=Справка по PhoA (Русская)
+ru.HelpEn=Справка по PhoA (English)
+ru.PhoaFmtName=Фотоальбом PhoA
+ru.LangID=1049
+
+;== German ============================================================================================================
+de.CompMain=Programmdateien
+de.CompHelp=Hilfedateien
+de.CompHelpEn=Englisch
+de.CompHelpRu=Russisch
+de.CompSampleAlbum=Beispiel Fotoalbum
+de.CompPhoaAPI=PhoA API (for developers)
+de.IconsAllUsers=Fьr alle Benutzer
+de.IconsCurUser=Nur fьr den aktuellen Benutzer
+de.PhoaDesc=Bildverwaltungsprogramm
+de.SampleAlbum=Beispiel Fotoalbum
+de.HelpRu=PhoA Hilfe (Russich)
+de.HelpEn=PhoA Hilfe (Englisch)
+de.PhoaFmtName=PhoA Fotoalbum
+de.LangID=1031
+
+;== Brazilian Portuguese ==============================================================================================
+br.CompMain=Arquivos principais
+br.CompHelp=Arquivos de ajuda
+br.CompHelpEn=Inglкs
+br.CompHelpRu=Russo
+br.CompSampleAlbum=Бlbum exemplo
+br.CompPhoaAPI=PhoA API (for developers)
+br.IconsAllUsers=Para todos os usuбrios
+br.IconsCurUser=Somente para usuбrio atual
+br.PhoaDesc=Programa para organizaзгo de imagens
+br.SampleAlbum=Бlbum exemplo
+br.HelpRu=Ajuda PhoA (Russo)
+br.HelpEn=Ajuda PhoA (English)
+br.PhoaFmtName=PhoA Бlbum
+br.LangID=1046
+
+;== Ukrainian =========================================================================================================
+ua.CompMain=Основні файли
+ua.CompHelp=Файли  ДовідковоЇ системи
+ua.CompHelpEn=Англійска мова
+ua.CompHelpRu=Російска мова
+ua.CompSampleAlbum=Приклад фотоальбому
+ua.CompPhoaAPI=PhoA API (для розробників)
+ua.IconsAllUsers=Для усіх користувачів
+ua.IconsCurUser=Тільки для поточного користувача
+ua.PhoaDesc=Програма для каталогізаціі зображень і складання фотоальбомів
+ua.SampleAlbum=Приклад фотоальбому
+ua.HelpRu=Довідка по PhoA (Російска)
+ua.HelpEn=Довідка по PhoA (English)
+ua.PhoaFmtName=Фотоальбом PhoA
+ua.LangID=1058
