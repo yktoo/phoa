@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.5 2005-03-01 14:24:53 dale Exp $
+//  $Id: Main.pas,v 1.6 2005-03-01 21:35:40 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit Main;
 
 interface
 
-uses Windows, phPlugin, phAppIntf, phActionImpl;
+uses Windows, phPlugin, phAppIntf;
 
 type
 
@@ -16,19 +16,8 @@ type
    // Demo plugin module
    //===================================================================================================================
 
-  IPhoaDemoPluginModule = interface(IPhoaPluginModule)
-    ['{FF55A378-9411-480B-A337-60B894AF4273}']
-     // Prop handlers
-    function  GetApp: IPhoaApp; 
-     // Props
-     // -- Application reference
-    property App: IPhoaApp read GetApp;
-  end;
-
-  TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule, IPhoaDemoPluginModule)
+  TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule)
   private
-     // Prop storage
-    FApp: IPhoaApp;
      // Plugin class which is being created only once
     FPluginClass: IPhoaPluginClass;
      // IPhoaPluginModule
@@ -43,36 +32,19 @@ type
     function  GetInfoWebsiteURL: WideString; stdcall;
     function  GetPluginClassCount: Integer; stdcall;
     function  GetPluginClasses(Index: Integer): IPhoaPluginClass; stdcall;
-     // IPhoaDemoPluginModule
-    function  GetApp: IPhoaApp;
   end;
 
    //===================================================================================================================
    // Demo plugin class
    //===================================================================================================================
 
-  IPhoaDemoPluginClass = interface(IPhoaPluginClass)
-    ['{FF55A378-9411-480B-A337-60B894AF4274}']
-     // Prop handlers
-    function  GetModule: IPhoaDemoPluginModule;
-     // Props
-     // -- Module reference
-    property Module: IPhoaDemoPluginModule read GetModule;
-  end;
-
-  TPhoaDemoPluginClass = class(TInterfacedObject, IPhoaPluginClass, IPhoaDemoPluginClass)
+  TPhoaDemoPluginClass = class(TInterfacedObject, IPhoaPluginClass)
   private
-     // Prop storage
-    FModule: IPhoaDemoPluginModule;
      // IPhoaPluginClass
     function  CreatePlugin: IPhoaPlugin; stdcall;
     function  GetDescription: WideString; stdcall;
     function  GetKind: TPhoaPluginKind; stdcall;
     function  GetName: WideString; stdcall;
-     // IPhoaDemoPluginClass
-    function  GetModule: IPhoaDemoPluginModule;
-  public
-    constructor Create(AModule: IPhoaDemoPluginModule);
   end;
 
    //===================================================================================================================
@@ -86,18 +58,22 @@ type
      // Main plugin action
     FAction: IPhoaAction;
      // Prop storage
-    FPluginClass: IPhoaDemoPluginClass;
+    FPluginClass: IPhoaPluginClass;
+     // Plugin action execute proc
+    procedure ActionExec;
      // IPhoaPlugin
     function  GetPluginClass: IPhoaPluginClass; stdcall;
   public
-    constructor Create(APluginClass: IPhoaDemoPluginClass);
+    constructor Create(APluginClass: IPhoaPluginClass);
     destructor Destroy; override;
   end;
 
-  TPhoaDemoPlugin_InfoAction = class(TPhoaPluginAction)
-  protected
-    function  Execute: LongBool; override; stdcall; 
-  end;
+var
+   // Globally accessible application reference. Should be thread-safe since initialization and finalization are always
+   //   performed "in the foreground", by the main thread. If your plugin contains multiple threads, be sure to
+   //   terminate them before finalization (and interface cleanup) takes place; otherwise you'll always get an Access
+   //   Violation because the plugin module gets unloaded shortly after the finalization (Module.AppFinalizing call). 
+  PhoaApp: IPhoaApp;
 
    // Exported function
   function PhoaGetPluginModule: IPhoaPluginModule; stdcall;
@@ -116,18 +92,13 @@ implementation
   procedure TPhoaDemoPluginModule.AppFinalizing;
   begin
      // ALWAYS RELEASE ALL INTERFACE REFERENCES HERE because it's the last point where plugin library is still loaded!
-    FApp := nil;
+    PhoaApp := nil;
   end;
 
   procedure TPhoaDemoPluginModule.AppInitialized(App: IPhoaApp);
   begin
-     // Store application reference
-    FApp := App;
-  end;
-
-  function TPhoaDemoPluginModule.GetApp: IPhoaApp;
-  begin
-    Result := FApp;
+     // Store global application reference
+    PhoaApp := App;
   end;
 
   function TPhoaDemoPluginModule.GetInfoAuthor: WideString;
@@ -173,20 +144,13 @@ implementation
   function TPhoaDemoPluginModule.GetPluginClasses(Index: Integer): IPhoaPluginClass;
   begin
      // Create a plugin class if it isn't created yet
-    if FPluginClass=nil then FPluginClass := TPhoaDemoPluginClass.Create(Self);
+    if FPluginClass=nil then FPluginClass := TPhoaDemoPluginClass.Create;
     Result := FPluginClass;
   end;
 
    //===================================================================================================================
    // TPhoaDemoPluginClass
    //===================================================================================================================
-
-  constructor TPhoaDemoPluginClass.Create(AModule: IPhoaDemoPluginModule);
-  begin
-    inherited Create;
-    FModule := AModule;
-    MessageBox(0, 'Plugin class created.', 'Demo plugin', 0);
-  end;
 
   function TPhoaDemoPluginClass.CreatePlugin: IPhoaPlugin;
   begin
@@ -203,11 +167,6 @@ implementation
     Result := ppkBrowseMode;
   end;
 
-  function TPhoaDemoPluginClass.GetModule: IPhoaDemoPluginModule;
-  begin
-    Result := FModule;
-  end;
-
   function TPhoaDemoPluginClass.GetName: WideString;
   begin
     Result := 'Demo PhoA plugin';
@@ -217,15 +176,32 @@ implementation
    // TPhoaDemoPlugin
    //===================================================================================================================
 
-  constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaDemoPluginClass);
+  procedure DemoPluginActionExec(Sender: IPhoaAction); stdcall;
+  begin
+     // We store TPhoaDemoPlugin instance reference in action's Tag
+    TPhoaDemoPlugin(Sender.Tag).ActionExec;
+  end;
+
+  procedure TPhoaDemoPlugin.ActionExec;
+  begin
+    MessageBox(0, 'Hello world!', 'Greetings', MB_OK);
+  end;
+
+  constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaPluginClass);
   begin
     inherited Create;
     FPluginClass := APluginClass;
      // Create and register a new action
-    FAction := TPhoaDemoPlugin_InfoAction.Create(nil, 'aDemoPlugin_Info', 'Demo', '&Demo plugin info...', 'Demo plugin info...|Click and you''ll see!');
-    FPluginClass.Module.App.ActionList.Add(FAction);
+    FAction := PhoaApp.ActionList.AddW('aDemoPlugin_Info', DemoPluginActionExec);
+    FAction.CategoryW := 'Demo';
+    FAction.CaptionW  := '&Demo plugin info...';
+    FAction.HintW     := 'Demo plugin info...|Click and you''ll see!';
+     // Store self reference into action tag to track the target of the action in execute handler.
+     // WARNING: avoid referencing self as an interface because this would cause circular interface reference (we have
+     //   to keep Action reference to track its state, maybe Caption etc.)
+    FAction.Tag       := Integer(Self);
      // Create a new item corresponding to the action
-    FItem := (FPluginClass.Module.App.Menu.Subentries[0] as IPhoaMenu).AddItem(FAction);
+    FItem := (PhoaApp.Menu.Subentries[0] as IPhoaMenu).AddItem(FAction);
   end;
 
   destructor TPhoaDemoPlugin.Destroy;
@@ -237,7 +213,7 @@ implementation
     end;
      // Release action
     if FAction<>nil then begin
-      FPluginClass.Module.App.ActionList.Remove(FAction);
+      PhoaApp.ActionList.Remove(FAction);
       FAction := nil;
     end;
     inherited Destroy;
@@ -246,16 +222,6 @@ implementation
   function TPhoaDemoPlugin.GetPluginClass: IPhoaPluginClass;
   begin
     Result := FPluginClass;
-  end;
-
-   //===================================================================================================================
-   // TPhoaDemoPlugin_InfoAction
-   //===================================================================================================================
-
-  function TPhoaDemoPlugin_InfoAction.Execute: LongBool;
-  begin
-    MessageBox(0, 'Hello world!', 'Greetings', MB_OK);
-    Result := True;
   end;
 
 end.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.4 2005-03-01 14:24:53 dale Exp $
+//  $Id: phAppIntf.pas,v 1.5 2005-03-01 21:35:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -14,22 +14,13 @@ uses phIntf;
 type
 
    //===================================================================================================================
-   // An action (the same as command). You implement it yourself through your action objects
+   // An action (the same as command)
    //===================================================================================================================
-
-  IPhoaAction = interface;
-
-   // A callback handler for Action's change notification
-  TPhoaActionChangeNotificationProc = procedure(Sender: IPhoaAction); stdcall;
 
   IPhoaAction = interface(IInterface)
     ['{03A7EFBC-0C77-481B-A3B9-1D25BB2D458C}']
-     // Executes the action. Should return True, if the action succeeded, or False if it was failed due to any reason
+     // Executes the action. Returns True, if the action succeeded, or False if it was failed due to any reason
     function  Execute: LongBool; stdcall;
-     // Set action change notification callback. Once it's not nil, this procedure should be called by your action
-     //   implementation each time its state (Caption, Category, Hint, Enabled values) has been changed. Invoking
-     //   SetChangeNotification(nil) should cancel further notifications.
-    procedure SetChangeNotification(Proc: TPhoaActionChangeNotificationProc); stdcall;
      // Prop handlers
     function  GetCaption: String; stdcall;
     function  GetCaptionW: WideString; stdcall;
@@ -70,8 +61,7 @@ type
      //    action should be named 'aDoorOpener_Knock': your plugin name acts like a prefix.
     property Name: String read GetName;
     property NameW: WideString read GetNameW;
-     // -- Custom data associated with the action - it's for internal program use only. It shouldn't be used by the
-     //    action itself nor by plugin routines  
+     // -- Custom data associated with the action
     property Tag: Integer read GetTag write SetTag;
   end;
 
@@ -79,14 +69,18 @@ type
    // PhoA action list
    //===================================================================================================================
 
+   // Action execute callback procedure prototype
+  TPhoaActionExecuteProc = procedure(Sender: IPhoaAction); stdcall;
+
   IPhoaActionList = interface(IInterface)
     ['{03A7EFBC-0C77-481B-A3B9-1D25BB2D458D}']
-     // Adds a new action interface and returns its index in the list
-    function  Add(Item: IPhoaAction): Integer; stdcall;
+     // Adds and returns a new action interface
+    function  Add(const sName: String; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
+    function  AddW(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
      // Removes an action interface and returns its index in the list it had before it was removed
     function  Remove(Item: IPhoaAction): Integer; stdcall;
      // Finds and returns the action by name; returns nil if no such action found
-    function  FindName(const sName: String): IPhoaAction; stdcall; 
+    function  FindName(const sName: String): IPhoaAction; stdcall;
     function  FindNameW(const sName: WideString): IPhoaAction; stdcall;
      // Prop handlers
     function  GetCount: Integer; stdcall;

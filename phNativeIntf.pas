@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.10 2005-02-14 19:34:08 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.11 2005-03-01 21:35:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phNativeIntf;
 
 interface
 
-uses Windows, ImgList, phIntf, phMutableIntf, phPhoa;
+uses Windows, ImgList, ActnList, phIntf, phAppIntf, phMutableIntf, phPhoa;
 
 type
 
@@ -300,6 +300,21 @@ type
     property ViewRootGroupX: IPhotoAlbumPicGroup read GetViewRootGroupX;
      // -- 'Native' version of Views
     property ViewsX: IPhotoAlbumViewList read GetViewsX;
+  end;
+
+   //===================================================================================================================
+   // IPhotoAlbumAction - native-интерфейс Action-а
+   //===================================================================================================================
+
+  IPhotoAlbumAction = interface(IPhoaAction)
+    ['{9E126412-46AA-4961-A966-7333C163AB4C}']
+     // Уничтожает NativeAction
+    procedure FreeNativeAction;
+     // Prop handlers
+    function  GetNativeAction: TCustomAction; 
+     // Props
+     // -- "Настоящий" Action
+    property NativeAction: TCustomAction read GetNativeAction;
   end;
 
    //===================================================================================================================

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.35 2005-03-01 14:24:53 dale Exp $
+//  $Id: phGUIObj.pas,v 1.36 2005-03-01 21:35:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -400,10 +400,14 @@ type
    // Реализация IPhoaAction (обёртка вокруг TAction)
    //===================================================================================================================
 
-  TPhoaAction = class(TInterfacedObject, IPhoaAction)
+  TPhoaAction = class(TInterfacedObject, IPhoaAction, IPhotoAlbumAction)
   private
      // Ссылка на соответствующий Action
     FAction: TCustomAction;
+     // Обработчик Action
+    FExecuteProc: TPhoaActionExecuteProc;
+     // Prop storage
+    FTag: Integer; 
      // IPhoaAction
     function  Execute: LongBool; stdcall;
     function  GetCaption: String; stdcall;
@@ -420,13 +424,16 @@ type
     procedure SetCaptionW(const Value: WideString); stdcall;
     procedure SetCategory(const Value: String); stdcall;
     procedure SetCategoryW(const Value: WideString); stdcall;
-    procedure SetChangeNotification(Proc: TPhoaActionChangeNotificationProc); stdcall;
     procedure SetEnabled(Value: LongBool); stdcall;
     procedure SetHint(const Value: String); stdcall;
     procedure SetHintW(const Value: WideString); stdcall;
     procedure SetTag(Value: Integer); stdcall;
+     // IPhotoAlbumAction
+    procedure FreeNativeAction;
+    function  GetNativeAction: TCustomAction; 
   public
-    constructor Create(AAction: TCustomAction);
+    constructor Create(AAction: TCustomAction; AExecuteProc: TPhoaActionExecuteProc);
+    destructor Destroy; override;
   end;
 
    //===================================================================================================================
@@ -437,12 +444,13 @@ type
   private
      // Собственно список
     FList: IInterfaceList;
-     // Список "настоящих" Action-ов, в который добавляются underlaying actions 
+     // Список "настоящих" Action-ов, в который добавляются underlaying actions
     FNativeList: TCustomActionList;
      // Обработчик OnExecute для вновь создаваемых Actions
     procedure ActionExecute(Sender: TObject);
      // IPhoaActionList
-    function  Add(Item: IPhoaAction): Integer; stdcall;
+    function  Add(const sName: String; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
+    function  AddW(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
     function  FindName(const sName: String): IPhoaAction; stdcall;
     function  FindNameW(const sName: WideString): IPhoaAction; stdcall;
     function  GetCount: Integer; stdcall;
@@ -1918,17 +1926,31 @@ type
    // TPhoaAction
    //===================================================================================================================
 
-  constructor TPhoaAction.Create(AAction: TCustomAction);
+  constructor TPhoaAction.Create(AAction: TCustomAction; AExecuteProc: TPhoaActionExecuteProc);
   begin
     inherited Create;
-    FAction := AAction;
-     // Для унификации в Tag кладём ссылку на Action
-    FAction.Tag := Integer(FAction); 
+    FAction      := AAction;
+    FExecuteProc := AExecuteProc;
+     // В Tag кладём ссылку на собственный интерфейс
+    FAction.Tag := Integer(Self as IPhoaAction); 
+  end;
+
+  destructor TPhoaAction.Destroy;
+  begin
+     // Удаляем ссылку на себя, хранящуюся в Tag
+    if FAction<>nil then FAction.Tag := 0; 
+    inherited Destroy;
   end;
 
   function TPhoaAction.Execute: LongBool;
   begin
-    Result := FAction.Execute;
+    Result := Assigned(FExecuteProc);
+    if Result then FExecuteProc(Self);
+  end;
+
+  procedure TPhoaAction.FreeNativeAction;
+  begin
+    FreeAndNil(FAction);
   end;
 
   function TPhoaAction.GetCaption: String;
@@ -1976,9 +1998,14 @@ type
     Result := PhoaAnsiToUnicode(FAction.Name);
   end;
 
+  function TPhoaAction.GetNativeAction: TCustomAction;
+  begin
+    Result := FAction;
+  end;
+
   function TPhoaAction.GetTag: Integer;
   begin
-    Result := FAction.Tag;
+    Result := FTag;
   end;
 
   procedure TPhoaAction.SetCaption(const Value: String);
@@ -2001,11 +2028,6 @@ type
     FAction.Category := PhoaUnicodeToAnsi(Value);
   end;
 
-  procedure TPhoaAction.SetChangeNotification(Proc: TPhoaActionChangeNotificationProc);
-  begin
-    { stub. Notification is not needed for native actions }
-  end;
-
   procedure TPhoaAction.SetEnabled(Value: LongBool);
   begin
     FAction.Enabled := Value;
@@ -2023,58 +2045,57 @@ type
 
   procedure TPhoaAction.SetTag(Value: Integer);
   begin
-    FAction.Tag := Value;
+    FTag := Value;
   end;
 
    //===================================================================================================================
    // TPhoaActionList
    //===================================================================================================================
 
-   // Action change notification callback handler
-  procedure ActionChangeNotificationCallback(Sender: IPhoaAction); stdcall;
-  var Action: TCustomAction;
-  begin
-     // Consider Sender.Tag is TCustomAction object and update its properties
-    Action := TCustomAction(Sender.Tag);
-    Action.Caption  := PhoaUnicodeToAnsi(Sender.CaptionW);
-    Action.Category := PhoaUnicodeToAnsi(Sender.CategoryW);
-    Action.Hint     := PhoaUnicodeToAnsi(Sender.HintW);
-    Action.Enabled  := Sender.Enabled;
-  end;
-
   procedure TPhoaActionList.ActionExecute(Sender: TObject);
   var ActionIntf: IPhoaAction;
   begin
      // Sender - это TAction. В его Tag лежит ссылка на IPhoaAction
     ActionIntf := IPhoaAction(TComponent(Sender).Tag);
-    if ActionIntf<>nil then ActionIntf.Execute; // Результат Execute() [пока] игнорируется
+    if (ActionIntf<>nil) then ActionIntf.Execute; // Результат Execute() [пока] игнорируется
   end;
 
-  function TPhoaActionList.Add(Item: IPhoaAction): Integer;
+  function TPhoaActionList.Add(const sName: String; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction;
   var Action: TAction;
   begin
-    Result := FList.Add(Item);
      // Создаём соответствующий Action в NativeList
     Action := TAction.Create(FNativeList.Owner);
-    Action.ActionList := FNativeList;
-    Action.Name       := PhoaUnicodeToAnsi(Item.NameW);
-    Action.Tag        := Integer(Item);
-    Action.OnExecute  := ActionExecute;
-     // Устанавливаем обработчик уведомлений об изменении
-    Item.Tag := Integer(Action);
-    Item.SetChangeNotification(ActionChangeNotificationCallback);
-     // Обновляем свойства Action
-    ActionChangeNotificationCallback(Item);
+    try
+      Action.ActionList := FNativeList;
+      Action.Name       := sName;
+      Action.OnExecute  := ActionExecute;
+       // Создаём IPhoaAction
+      Result := TPhoaAction.Create(Action, AExecuteProc);
+      FList.Add(Result);
+    except
+      Action.Free;
+      raise;
+    end;
+  end;
+
+  function TPhoaActionList.AddW(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction;
+  begin
+    Result := Add(PhoaUnicodeToAnsi(sName), AExecuteProc);
   end;
 
   constructor TPhoaActionList.Create(ANativeList: TCustomActionList);
-  var i: Integer;
+  var
+    i: Integer;
+    ActionIntf: IPhoaAction;
   begin
     inherited Create;
     FList       := TInterfaceList.Create;
     FNativeList := ANativeList;
      // Заполняем список обёртками Action-ов из NativeList
-    for i := 0 to FNativeList.ActionCount-1 do FList.Add(TPhoaAction.Create(FNativeList[i] as TCustomAction) as IPhoaAction);
+    for i := 0 to FNativeList.ActionCount-1 do begin
+      ActionIntf := TPhoaAction.Create(FNativeList[i] as TCustomAction, nil); // Обработчик стандартным Actions не требуется
+      FList.Add(ActionIntf);
+    end;
   end;
 
   function TPhoaActionList.FindName(const sName: String): IPhoaAction;
@@ -2105,8 +2126,7 @@ type
   function TPhoaActionList.Remove(Item: IPhoaAction): Integer;
   begin
      // Уничтожаем Action из NativeList
-    TCustomAction(Item.Tag).Free;
-    Item.Tag := 0;
+    (Item as IPhotoAlbumAction).FreeNativeAction;
     Result := FList.Remove(Item);
   end;
 
@@ -2118,7 +2138,7 @@ type
   var tbi: TTBCustomItem;
   begin
     tbi := TTBXItem.Create(FItem.Owner);
-    tbi.Action := TCustomAction(Action.Tag);
+    tbi.Action := (Action as IPhotoAlbumAction).NativeAction;
     Result := TPhoaMenuItem.Create(Self, tbi, False);
     AddSubentry(Result);
   end;
@@ -2141,8 +2161,6 @@ type
     inherited Create;
     FOwner := AOwner;
     FItem  := AItem;
-     // В Tag пункта записываем ссылку на себя
-    FItem.Tag := Integer(Self);
      // Если нужно, добавляем пункт меню в список пунктов владельца
     if (FOwner<>nil) and (FOwner.FItem.IndexOf(FItem)<0) then FOwner.FItem.Add(FItem);
      // Если нужно, рекурсивно добавляем вложенные пункты
@@ -2177,12 +2195,12 @@ type
 
   function TPhoaMenuItem.GetSubentries(Index: Integer): IPhoaMenuEntry;
   begin
-    Result := TPhoaMenuItem(FItem[Index].Tag);
+    Result := IPhoaMenuEntry(FSubentries[Index]);
   end;
 
   function TPhoaMenuItem.GetSubentryCount: Integer;
   begin
-    Result := FItem.Count;
+    if FSubentries=nil then Result := 0 else Result := FSubentries.Count;
   end;
 
   procedure TPhoaMenuItem.Remove;
