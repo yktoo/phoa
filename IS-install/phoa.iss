@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.15 2004-12-10 13:45:13 dale Exp $
+;   $Id: phoa.iss,v 1.16 2004-12-18 11:37:27 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -13,7 +13,7 @@
   AppPublisher           = DK Software
   AppPublisherURL        = http://www.dk-soft.org/
   AppSupportURL          = http://www.dk-soft.org/forum/
-  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=117beta
+  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=118beta
   AppMutex               = PHOA_RUNNING_MUTEX
   AllowNoIcons           = yes
   ChangesAssociations    = yes
@@ -31,9 +31,9 @@
   Compression            = lzma
 
 [Languages]
-  Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
-  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl;   LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.ru.rtf
-  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
+  Name: "en"; MessagesFile: compiler:Default.isl;           LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
+  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl; LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.ru.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;  LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
 
 [Tasks]
   Name: desktopicon;        Description: {cm:CreateDesktopIcon};             GroupDescription: {cm:AdditionalIcons};
