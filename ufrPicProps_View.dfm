@@ -29,6 +29,7 @@ inherited frPicProps_View: TfrPicProps_View
       Align = alTop
       Caption = 'Main Toolbar'
       ChevronHint = 'More buttons|'
+      DockMode = dmCannotFloat
       Images = fMain.ilActionsSmall
       SystemFont = False
       TabOrder = 0
@@ -63,6 +64,7 @@ inherited frPicProps_View: TfrPicProps_View
       Left = 0
       Top = 26
       Caption = 'Tools'
+      DockMode = dmCannotFloat
       DockPos = -8
       DockRow = 1
       Images = fMain.ilActionsSmall

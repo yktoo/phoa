@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.29 2004-05-30 18:41:18 dale Exp $
+//  $Id: ConsVars.pas,v 1.30 2004-06-01 13:27:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -428,6 +428,11 @@ const
     SRegSort_LastSortings         = SRegSort_Root+'\LastSortings';
 
   SRegStats_Root                  = SRegDialogsRoot+'\Stats';
+
+  SRegWizPagesRoot                = 'WizardPages';
+    SRegWizPages_Toolbars         = '\Toolbars';
+
+    SRegWizPage_PicProp_View      = 'PicProp_View';
 
    // Недопустимые в пути к файлу символы
   SInvalidPathChars               = '\/:*?"<>|';

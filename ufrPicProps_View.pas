@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.8 2004-05-31 14:36:32 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.9 2004-06-01 13:27:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -96,6 +96,7 @@ type
     procedure SetViewZoomFactor(Value: Single);
   protected
     procedure InitializePage; override;
+    function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
@@ -174,7 +175,6 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   begin
     inherited AfterDisplay(ChangeMethod);
     StorageForm.ActiveControl := iMain;
-
   end;
 
   procedure TfrPicProps_View.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -217,6 +217,11 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   begin
     if WheelDelta<0 then aZoomOut.Execute else aZoomIn.Execute;
     Handled := True;
+  end;
+
+  function TfrPicProps_View.GetRegistrySection: String;
+  begin
+    Result := SRegWizPage_PicProp_View;
   end;
 
   function TfrPicProps_View.GetViewOffset: TPoint;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.3 2004-05-31 14:36:32 dale Exp $
+//  $Id: phWizard.pas,v 1.4 2004-06-01 13:27:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -56,25 +56,28 @@ type
   protected
      // Вызывает Controller.OnStatusChange
     procedure StatusChanged;
-     // Должна возвращать True, если страница содержит допустимые данные. В базовом классе всегда возвращает True
-    function  GetDataValid: Boolean; virtual;
-     // Инициализация/финализация страницы. В базовом классе не делают ничего
+     // Инициализация/финализация страницы. В базовом классе восстанавливают/сохраняют панели инструментов
     procedure InitializePage; virtual;
     procedure FinalizePage; virtual;
-     // Вызывается перед отображением страницы
+     // Вызывается перед отображением страницы. В базовом классе не делает ничего
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); virtual;
-     // Вызывается после отображения страницы
+     // Вызывается после отображения страницы. В базовом классе не делает ничего
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); virtual;
-     // Вызывается перед скрытием страницы
+     // Вызывается перед скрытием страницы. В базовом классе не делает ничего
     procedure BeforeHide(ChangeMethod: TPageChangeMethod); virtual;
+     // Вызывается после скрытия страницы. В базовом классе не делает ничего
+    procedure AfterHide(ChangeMethod: TPageChangeMethod); virtual;
      // Вызывается при нажатии пользователем кнопки Далее. Должна вернуть True, чтобы позволить смену страницы, иначе
      //   должна сама объяснить пользователю причину отказа
     function  NextPage: Boolean; virtual;
+     // Prop handlers
+    function  GetDataValid: Boolean; virtual;
+    function  GetRegistrySection: String; virtual;
   public
     constructor Create(Controller: TWizardController; iID, iHelpContext: Integer; const sPageTitle: String); reintroduce; virtual;
     destructor Destroy; override;
      // Props
-     // -- Должна возвращать True, если страница содержит допустимые данные
+     // -- Должна возвращать True, если страница содержит допустимые данные. В базовом классе всегда True
     property DataValid: Boolean read GetDataValid;
      // -- Уникальный идентификатор страницы в списке
     property ID: Integer read FID;
@@ -84,6 +87,9 @@ type
     property Controller: TWizardController read FController;
      // -- Текст, выводимый в заглавии страницы
     property PageTitle: String read FPageTitle;
+     // -- Секция реестра для сохранения визуальны настроек страницы. Если пустая (как в базовом классе), сохранения не
+     //    требуется
+    property RegistrySection: String read GetRegistrySection;
      // -- Форма мастера. Получается через Controller
     property StorageForm: TForm read GetStorageForm;
   end;
@@ -146,7 +152,7 @@ type
 
 implementation
 {$R *.dfm}
-uses VCLUtils, TB2Dock;
+uses VCLUtils, ConsVars, TB2Dock;
 
   procedure PhoaWizardError(const sMsg: String);
   begin
@@ -163,16 +169,13 @@ uses VCLUtils, TB2Dock;
    //===================================================================================================================
 
   procedure TWizardPage.AfterDisplay(ChangeMethod: TPageChangeMethod);
-  var
-    i: Integer;
-    c: TComponent;
   begin
-     // !!! PRERELEASE
-    for i := 0 to ComponentCount-1 do begin
-      c := Components[i];
-      if (c is TTBCustomDockableWindow) and TTBCustomDockableWindow(c).Floating then
-        TTBCustomDockableWindow(c).Visible := True;
-    end;
+    { does nothing }
+  end;
+
+  procedure TWizardPage.AfterHide(ChangeMethod: TPageChangeMethod);
+  begin
+    { does nothing }
   end;
 
   procedure TWizardPage.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -181,16 +184,8 @@ uses VCLUtils, TB2Dock;
   end;
 
   procedure TWizardPage.BeforeHide(ChangeMethod: TPageChangeMethod);
-  var
-    i: Integer;
-    c: TComponent;
   begin
-     // !!! PRERELEASE
-    for i := 0 to ComponentCount-1 do begin
-      c := Components[i];
-      if (c is TTBCustomDockableWindow) and TTBCustomDockableWindow(c).Floating then
-        TTBCustomDockableWindow(c).Visible := False;
-    end;
+    { does nothing }
   end;
 
   constructor TWizardPage.Create(Controller: TWizardController; iID, iHelpContext: Integer; const sPageTitle: String);
@@ -211,7 +206,8 @@ uses VCLUtils, TB2Dock;
 
   procedure TWizardPage.FinalizePage;
   begin
-    { does nothing }
+     // Сохраняем панели инструментов
+    if RegistrySection<>'' then TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegWizPagesRoot+'\'+RegistrySection+SRegWizPages_Toolbars);
   end;
 
   function TWizardPage.GetDataValid: Boolean;
@@ -224,6 +220,11 @@ uses VCLUtils, TB2Dock;
     Result := FController.IndexOf(Self);
   end;
 
+  function TWizardPage.GetRegistrySection: String;
+  begin
+    Result := '';
+  end;
+
   function TWizardPage.GetStorageForm: TForm;
   begin
     Result := FController.HostFormIntf.StorageForm;
@@ -231,7 +232,8 @@ uses VCLUtils, TB2Dock;
 
   procedure TWizardPage.InitializePage;
   begin
-    { does nothing }
+     // Восстанавливаем панели инструментов
+    if RegistrySection<>'' then TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegWizPagesRoot+'\'+RegistrySection+SRegWizPages_Toolbars);
   end;
 
   function TWizardPage.NextPage: Boolean;
@@ -384,11 +386,12 @@ uses VCLUtils, TB2Dock;
 
   function TWizardController.SetVisiblePageID(iNewID: Integer; ChangeMethod: TPageChangeMethod): Boolean;
   var
-    NewPage: TWizardPage;
+    CurPage, NewPage: TWizardPage;
     i, iPrevPageID: Integer;
   begin
     Result := False;
     NewPage := ItemsByID[iNewID];
+    CurPage := VisiblePage;
     iPrevPageID := GetVisiblePageID;
      // Если страница меняется
     if iPrevPageID<>iNewID then begin
@@ -397,7 +400,7 @@ uses VCLUtils, TB2Dock;
          // Если текущая страница и обработчик OnPageChanging разрешают смену
         if FHostFormIntf.PageChanging(ChangeMethod, iNewID) then begin
            // Уведомляем текущую страницу
-          if VisiblePage<>nil then VisiblePage.BeforeHide(ChangeMethod);
+          if CurPage<>nil then CurPage.BeforeHide(ChangeMethod);
            // Уведомляем новую страницу
           NewPage.BeforeDisplay(ChangeMethod);
            // Устанавливаем новую страницу
@@ -413,6 +416,8 @@ uses VCLUtils, TB2Dock;
           FHostFormIntf.StorageForm.HelpContext := NewPage.HelpContext;
            // Уведомляем об смене страницы
           FHostFormIntf.PageChanged(ChangeMethod, iPrevPageID);
+           // Уведомляем прежнюю страницу
+          if CurPage<>nil then CurPage.AfterHide(ChangeMethod);
            // Уведомляем новую страницу
           NewPage.AfterDisplay(ChangeMethod);
            // Уведомляем об изменении статуса
