@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.12 2004-10-22 20:29:30 dale Exp $
+//  $Id: phOps.pas,v 1.13 2004-10-24 17:47:29 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,61 +25,6 @@ type
     pcfPlainList,     // Простой текстовый список путей к файлам
     pcfSingleBitmap); // Bitmap-изображение эскиза (в случае единственного изображения)
   TPicClipboardFormats = set of TPicClipboardFormat;
-
-   //===================================================================================================================
-   // Файл отката PhoA (организован по принципу стека)
-   //===================================================================================================================
-   // Формат файла:
-   //    <данные1><тип1><данные2><тип2>...
-   //    Позиция в потоке всегда сохраняется *за последним байтом потока*
-
-   // Тип данных, сохраняемых в файле
-  TPhoaUndoFileDatatype = (pufdStr, pufdInt, pufdByte, pufdBool);
-
-  TPhoaUndoFile = class(TObject)
-  private
-     // Файловый поток данных отката
-    FStream: TFileStream;
-     // Счётчик вложенности вызовов BeginUndo/EndUndo
-    FUndoCounter: Integer;
-     // Положение, запомненное в первом вызове BeginUndo
-    FUndoPosition: Int64;
-     // Prop storage
-    FFileName: String;
-     // Создаёт поток, если он ещё не создан
-    procedure CreateStream;
-     // Записывает в поток тип данных
-    procedure WriteDatatype(DT: TPhoaUndoFileDatatype);
-     // Считывает из файла байт типа данных и проверяет его на соответствие DTRequired. Если не совпадает, вызывает
-     //   Exception
-    procedure ReadCheckDatatype(DTRequired: TPhoaUndoFileDatatype);
-     // Prop handlers
-    function  GetPosition: Int64;
-  public
-    constructor Create;
-    destructor Destroy; override;
-     // Уничтожает поток и файл 
-    procedure Clear;
-     // Методы для записи/чтения данных из файла
-    procedure WriteStr (const s: String);
-    procedure WriteInt (i: Integer);
-    procedure WriteByte(b: Byte);
-    procedure WriteBool(b: Boolean);
-    function  ReadStr: String;
-    function  ReadInt: Integer;
-    function  ReadByte: Byte;
-    function  ReadBool: Boolean;
-     // Процедуры начала/окончания процесса считывания данных отката. BeginUndo позиционирует файл в заданную позицию,
-     //   и, если это первый вызов BeginUndo, запоминает эту позицию. EndUndo уменьшает счётчик вложенных считываний,
-     //   и, если это последний вызов EndUndo, усекает файл по запомненной в первом вызове BeginUndo позиции
-    procedure BeginUndo(i64Position: Int64);
-    procedure EndUndo;
-     // Props
-     // -- Имя файла данных (временного)
-    property FileName: String read FFileName;
-     // -- Текущее положение в потоке данных. Создаёт поток при первом обращении
-    property Position: Int64 read GetPosition;
-  end;
 
    //===================================================================================================================
    // Интерфейс параметров операции PhoA
@@ -176,37 +121,36 @@ type
 
   TPhoaOperation = class(TBaseOperation)
   private
-     // Позиция данных отката операции в Undo-файле данных отката (UndoFile)
+     // Позиция данных отката операции в Undo-файле данных отката (UndoStream)
     FUndoDataPosition: Int64;
      // Prop storage
+    FGUIStateUndoDataPosition: Int64;
     FList: TPhoaOperations;
-    FProject: IPhotoAlbumProject;
+    FOperations: TPhoaOperations;
     FOpGroupID: Integer;
     FOpParentGroupID: Integer;
-    FOperations: TPhoaOperations;
+    FProject: IPhotoAlbumProject;
      // Prop handlers
+    function  GetOperations: TPhoaOperations;
     function  GetOpGroup: IPhotoAlbumPicGroup;
     function  GetParentOpGroup: IPhotoAlbumPicGroup;
     procedure SetOpGroup(Value: IPhotoAlbumPicGroup);
     procedure SetParentOpGroup(Value: IPhotoAlbumPicGroup);
-    function  GetUndoFile: TPhoaUndoFile;
-    function  GetOperations: TPhoaOperations;
   protected
      // Prop storage
     FSavepoint: Boolean;
      // Основная процедура выполнения операции, вызывается при её создании. В базовом классе не делает ничего
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); virtual;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); virtual;
      // Основная процедура отката изменений, внесённых операцией. В базовом классе откатывает подчинённые операции
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); virtual;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); virtual;
      // Создаёт новый экземпляр операции класса OpClass и добавляет в список дочерних операций
     procedure AddChild(OpClass: TPhoaOperationClass; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
      // Props
-     // -- Возвращает группу, соответствующую GroupID
+     // -- Возвращает группу, соответствующую OpGroupID
     property OpGroup: IPhotoAlbumPicGroup read GetOpGroup write SetOpGroup;
-     // -- Возвращает группу, соответствующую ParentGroupID
+     // -- Возвращает группу, соответствующую OpParentGroupID
     property OpParentGroup: IPhotoAlbumPicGroup read GetParentOpGroup write SetParentOpGroup;
   public
-     // Типовой конструктор для создания операции из параметров
     constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); virtual;
     destructor Destroy; override;
      // Процедура, откатывающая изменения, внесённые операцией (вызовом RollbackChanges()), и уничтожающая
@@ -215,6 +159,8 @@ type
      // Наименование операции
     function Name: String;
      // Props
+     // -- Позиция в Undo-файле данных о состоянии интерфейса
+    property GUIStateUndoDataPosition: Int64 read FGUIStateUndoDataPosition write FGUIStateUndoDataPosition;
      // -- Список - владелец операции
     property List: TPhoaOperations read FList;
      // -- Список подчинённых операций. Создаётся при первом обращении
@@ -228,8 +174,6 @@ type
      // -- Указывает, что после данной операции было произведено сохранение фотоальбома, т.е., если эта операция -
      //    последняя в буфере отката, то это указывает на unmodified-состояние фотоальбома
     property Savepoint: Boolean read FSavepoint;
-     // -- Файл данных отката (получается через FList)
-    property UndoFile: TPhoaUndoFile read GetUndoFile;
   end;
 
    //===================================================================================================================
@@ -258,7 +202,7 @@ type
      // Собственно список
     FList: TList;
      // Prop storage
-    FUndoFile: TPhoaUndoFile;
+    FUndoStream: IPhoaUndoDataStream;
      // Prop handlers
     function  GetItems(Index: Integer): TPhoaOperation;
     function  GetCanUndo: Boolean;
@@ -267,7 +211,7 @@ type
      // Откатывает весь буфер (предназначено для вторичных буферов множественных операций)
     procedure UndoAll(var Changes: TPhoaOperationChanges);
   public
-    constructor Create(AUndoFile: TPhoaUndoFile);
+    constructor Create(AUndoStream: IPhoaUndoDataStream);
     destructor Destroy; override;
      // Добавляет операцию в список, возвращая индекс свежедобавленной операции
     function  Add(Item: TPhoaOperation): Integer; virtual;
@@ -284,8 +228,8 @@ type
     property Count: Integer read GetCount;
      // -- Индексированный список операций
     property Items[Index: Integer]: TPhoaOperation read GetItems; default;
-     // -- Файл данных отката
-    property UndoFile: TPhoaUndoFile read FUndoFile;
+     // -- Хранилище данных отката
+    property UndoStream: IPhoaUndoDataStream read FUndoStream;
   end;
 
    //===================================================================================================================
@@ -306,7 +250,6 @@ type
     procedure SetMaxCount(Value: Integer);
   public
     constructor Create;
-    destructor Destroy; override;
     function  Add(Item: TPhoaOperation): Integer; override;
     procedure Clear; override;
      // Устанавливает, что текущее состояние фотоальбома является сохранённым
@@ -337,8 +280,8 @@ type
 
   TPhoaOp_GroupNew = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -350,8 +293,8 @@ type
 
   TPhoaOp_GroupRename = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -364,8 +307,8 @@ type
 
   TPhoaOp_GroupEdit = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -376,7 +319,7 @@ type
 
   TPhoaOp_GroupDelete = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -388,8 +331,8 @@ type
 
   TPhoaOp_InternalGroupDelete = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -400,8 +343,8 @@ type
 
   TPhoaOp_InternalUnlinkedPicsRemoving = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -422,7 +365,7 @@ type
 
   TPhoaOp_PicEdit = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -434,8 +377,8 @@ type
 
   TPhoaOp_InternalEditPicProps = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -447,8 +390,8 @@ type
 
   TPhoaOp_InternalEditPicKeywords = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -461,7 +404,7 @@ type
 
   TPhoaOp_InternalEditPicToGroupBelonging = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -474,8 +417,8 @@ type
 
   TPhoaOp_StoreTransform = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -487,8 +430,8 @@ type
 
   TPhoaOp_PicAdd = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -500,8 +443,8 @@ type
 
   TPhoaOp_InternalPicFromGroupRemoving = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -513,8 +456,8 @@ type
 
   TPhoaOp_InternalPicToGroupAdding = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -535,7 +478,7 @@ type
 
   TPhoaOp_PicDelete = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -546,7 +489,7 @@ type
 
   TPhoaOp_PicPaste = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -560,8 +503,8 @@ type
 
   TPhoaOp_ProjectEdit = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -575,7 +518,7 @@ type
 
   TPhoaOp_PicOperation = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -587,8 +530,8 @@ type
 
   TPhoaOp_InternalGroupPicSort = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -604,7 +547,7 @@ type
      // Рекурсивная (при bRecursive=True) процедура, создающая операции сортировки группы
     procedure AddGroupSortOp(Group: IPhotoAlbumPicGroup; Sortings: IPhotoAlbumPicSortingList; bRecursive: Boolean; var Changes: TPhoaOperationChanges);
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -617,8 +560,8 @@ type
 
   TPhoaOp_GroupDragAndDrop = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -632,7 +575,7 @@ type
 
   TPhoaOp_PicDragAndDropToGroup = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -645,8 +588,8 @@ type
 
   TPhoaOp_PicDragAndDropInsideGroup = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -659,8 +602,8 @@ type
 
   TPhoaOp_ViewNew = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -675,8 +618,8 @@ type
 
   TPhoaOp_ViewEdit = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -687,8 +630,8 @@ type
 
   TPhoaOp_ViewDelete = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -699,8 +642,8 @@ type
 
   TPhoaOp_ViewMakeGroup = class(TPhoaOperation)
   protected
-    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
-    procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
 
 var
@@ -716,8 +659,8 @@ resourcestring
    // Создаёт экземпляр IPhoaOperationParams и заполняет его параметрами (описания параметров должны идти в Params
    //   парами: [имя1, значение1, имя2, значение2, ...])
   function  NewPhoaOperationParams(const Params: Array of Variant): IPhoaOperationParams;
-
   function  NewPhoaPicPropertyChangeList: IPhoaPicPropertyChangeList;
+  function  NewPhoaUndoDataStream: IPhoaUndoDataStream;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
@@ -726,179 +669,61 @@ uses
   phUtils, phGraphics, ConsVars, phSettings, Variants;
 
    // Запись содержимого IPhotoAlbumPicGroupingList в Undo-файл
-  procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: IPhotoAlbumPicGroupingList);
+  procedure UndoWriteGroupings(UndoStream: IPhoaUndoDataStream; Groupings: IPhotoAlbumPicGroupingList);
   var
     i: Integer;
     Grouping: IPhotoAlbumPicGrouping;
   begin
-    UndoFile.WriteInt(Groupings.Count);
+    UndoStream.WriteInt(Groupings.Count);
     for i := 0 to Groupings.Count-1 do begin
       Grouping := Groupings[i];
-      UndoFile.WriteByte(Byte(Grouping.Prop));
-      UndoFile.WriteBool(Grouping.UnclassifiedInOwnFolder);
+      UndoStream.WriteByte(Byte(Grouping.Prop));
+      UndoStream.WriteBool(Grouping.UnclassifiedInOwnFolder);
     end;
   end;
 
    // Чтение содержимого IPhotoAlbumPicGroupingList из Undo-файла
-  procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: IPhotoAlbumPicGroupingList);
+  procedure UndoReadGroupings(UndoStream: IPhoaUndoDataStream; Groupings: IPhotoAlbumPicGroupingList);
   var
     i: Integer;
     Grouping: IPhotoAlbumPicGrouping;
   begin
     Groupings.Clear;
-    for i := 0 to UndoFile.ReadInt-1 do begin
+    for i := 0 to UndoStream.ReadInt-1 do begin
       Grouping := NewPhotoAlbumPicGrouping;
-      Grouping.Prop                    := TPicGroupByProperty(UndoFile.ReadByte);
-      Grouping.UnclassifiedInOwnFolder := UndoFile.ReadBool;
+      Grouping.Prop                    := TPicGroupByProperty(UndoStream.ReadByte);
+      Grouping.UnclassifiedInOwnFolder := UndoStream.ReadBool;
       Groupings.Add(Grouping);
     end;
   end;
 
    // Запись содержимого IPhotoAlbumPicSortingList в Undo-файл
-  procedure UndoWriteSortings(UndoFile: TPhoaUndoFile; Sortings: IPhotoAlbumPicSortingList);
+  procedure UndoWriteSortings(UndoStream: IPhoaUndoDataStream; Sortings: IPhotoAlbumPicSortingList);
   var
     i: Integer;
     Sorting: IPhotoAlbumPicSorting;
   begin
-    UndoFile.WriteInt(Sortings.Count);
+    UndoStream.WriteInt(Sortings.Count);
     for i := 0 to Sortings.Count-1 do begin
       Sorting := Sortings[i];
-      UndoFile.WriteByte(Byte(Sorting.Prop));
-      UndoFile.WriteByte(Byte(Sorting.Direction));
+      UndoStream.WriteByte(Byte(Sorting.Prop));
+      UndoStream.WriteByte(Byte(Sorting.Direction));
     end;
   end;
 
    // Чтение содержимого IPhotoAlbumPicSortingList из Undo-файла
-  procedure UndoReadSortings(UndoFile: TPhoaUndoFile; Sortings: IPhotoAlbumPicSortingList);
+  procedure UndoReadSortings(UndoStream: IPhoaUndoDataStream; Sortings: IPhotoAlbumPicSortingList);
   var
     i: Integer;
     Sorting: IPhotoAlbumPicSorting;
   begin
     Sortings.Clear;
-    for i := 0 to UndoFile.ReadInt-1 do begin
+    for i := 0 to UndoStream.ReadInt-1 do begin
       Sorting := NewPhotoAlbumPicSorting;
-      Sorting.Prop      := TPicProperty(UndoFile.ReadByte);
-      Sorting.Direction := TPhoaSortDirection(UndoFile.ReadByte);
+      Sorting.Prop      := TPicProperty(UndoStream.ReadByte);
+      Sorting.Direction := TPhoaSortDirection(UndoStream.ReadByte);
       Sortings.Add(Sorting);
     end;
-  end;
-
-   //===================================================================================================================
-   // TPhoaUndoFile
-   //===================================================================================================================
-
-  procedure TPhoaUndoFile.BeginUndo(i64Position: Int64);
-  begin
-    if FUndoCounter=0 then FUndoPosition := i64Position;
-    FStream.Position := i64Position;
-    Inc(FUndoCounter);
-  end;
-
-  procedure TPhoaUndoFile.Clear;
-  begin
-    if FStream<>nil then begin
-      FreeAndNil(FStream);
-      SysUtils.DeleteFile(FFileName);
-    end;
-  end;
-
-  constructor TPhoaUndoFile.Create;
-  begin
-    inherited Create;
-     // Определяем имя файла
-    FFileName := Format('%sphoa_undo_%.8x.tmp', [GetWindowsTempPath, GetCurrentProcessId]);
-  end;
-
-  procedure TPhoaUndoFile.CreateStream;
-  begin
-    if FStream=nil then FStream := TFileStream.Create(FFileName, fmCreate);
-  end;
-
-  destructor TPhoaUndoFile.Destroy;
-  begin
-     // Уничтожаем поток и файл
-    Clear;
-    inherited Destroy;
-  end;
-
-  procedure TPhoaUndoFile.EndUndo;
-  begin
-    Assert(FUndoCounter>0, 'Excessive TPhoaUndoFile.EndUndo() call');
-    Dec(FUndoCounter);
-     // Счётчик сравнялся с нулём - позиционируем в запомненную позицию и усекаем файл
-    if FUndoCounter=0 then begin
-      FStream.Position := FUndoPosition;
-      FStream.Size     := FUndoPosition;
-    end;
-  end;
-
-  function TPhoaUndoFile.GetPosition: Int64;
-  begin
-    CreateStream;
-    Result := FStream.Position;
-  end;
-
-  function TPhoaUndoFile.ReadBool: Boolean;
-  begin
-    ReadCheckDatatype(pufdBool);
-    Result := StreamReadByte(FStream)<>0;
-  end;
-
-  function TPhoaUndoFile.ReadByte: Byte;
-  begin
-    ReadCheckDatatype(pufdByte);
-    Result := StreamReadByte(FStream);
-  end;
-
-  procedure TPhoaUndoFile.ReadCheckDatatype(DTRequired: TPhoaUndoFileDatatype);
-  var DTActual: TPhoaUndoFileDatatype;
-  begin
-    Byte(DTActual) := StreamReadByte(FStream);
-    if DTActual<>DTRequired then
-      raise Exception.CreateFmt(
-        'Invalid undo stream datatype; required: %s, actual: %s',
-        [GetEnumName(TypeInfo(TPhoaUndoFileDatatype), Byte(DTRequired)), GetEnumName(TypeInfo(TPhoaUndoFileDatatype), Byte(DTActual))]);
-  end;
-
-  function TPhoaUndoFile.ReadInt: Integer;
-  begin
-    ReadCheckDatatype(pufdInt);
-    Result := StreamReadInt(FStream);
-  end;
-
-  function TPhoaUndoFile.ReadStr: String;
-  begin
-    ReadCheckDatatype(pufdStr);
-    Result := StreamReadStr(FStream);
-  end;
-
-  procedure TPhoaUndoFile.WriteBool(b: Boolean);
-  begin
-    WriteDatatype(pufdBool);
-    StreamWriteByte(FStream, Byte(b));
-  end;
-
-  procedure TPhoaUndoFile.WriteByte(b: Byte);
-  begin
-    WriteDatatype(pufdByte);
-    StreamWriteByte(FStream, b);
-  end;
-
-  procedure TPhoaUndoFile.WriteDatatype(DT: TPhoaUndoFileDatatype);
-  begin
-    StreamWriteByte(FStream, Byte(DT));
-  end;
-
-  procedure TPhoaUndoFile.WriteInt(i: Integer);
-  begin
-    WriteDatatype(pufdInt);
-    StreamWriteInt(FStream, i);
-  end;
-
-  procedure TPhoaUndoFile.WriteStr(const s: String);
-  begin
-    WriteDatatype(pufdStr);
-    StreamWriteStr(FStream, s);
   end;
 
    //===================================================================================================================
@@ -1146,9 +971,9 @@ type
     FList := AList;
     FList.Add(Self);
      // Запоминаем позицию Undo-данных
-    FUndoDataPosition := FList.UndoFile.Position;
+    FUndoDataPosition := FList.UndoStream.Position;
      // Выполняем операцию
-    Perform(Params, Changes); 
+    Perform(Params, FList.UndoStream, Changes); 
   end;
 
   destructor TPhoaOperation.Destroy;
@@ -1161,7 +986,7 @@ type
 
   function TPhoaOperation.GetOperations: TPhoaOperations;
   begin
-    if FOperations=nil then FOperations := TPhoaOperations.Create(List.UndoFile);
+    if FOperations=nil then FOperations := TPhoaOperations.Create(List.UndoStream);
     Result := FOperations;
   end;
 
@@ -1175,22 +1000,17 @@ type
     Result := FProject.RootGroupX.GroupByIDX[FOpParentGroupID];
   end;
 
-  function TPhoaOperation.GetUndoFile: TPhoaUndoFile;
-  begin
-    Result := FList.UndoFile;
-  end;
-
   function TPhoaOperation.Name: String;
   begin
     Result := ConstVal(ClassName);
   end;
 
-  procedure TPhoaOperation.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOperation.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
     { does nothing }
   end;
 
-  procedure TPhoaOperation.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOperation.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
     if FOperations<>nil then FOperations.UndoAll(Changes);
   end;
@@ -1206,16 +1026,18 @@ type
   end;
 
   procedure TPhoaOperation.Undo(var Changes: TPhoaOperationChanges);
+  var UndoStream: IPhoaUndoDataStream;
   begin
     try
        // Позиционируем undo-файл в запомненную позицию
-      UndoFile.BeginUndo(FUndoDataPosition);
+      UndoStream := FList.UndoStream; 
+      UndoStream.BeginUndo(FUndoDataPosition);
       try
          // Откатываем изменения
-        RollbackChanges(Changes);
+        RollbackChanges(UndoStream, Changes);
       finally
          // Возвращаем позицию в undo-файле на место
-        UndoFile.EndUndo;
+        UndoStream.EndUndo(True);
       end;
     finally
        // Уничтожаем объект
@@ -1287,11 +1109,11 @@ type
     for i := FList.Count-1 downto 0 do Delete(i);
   end;
 
-  constructor TPhoaOperations.Create(AUndoFile: TPhoaUndoFile);
+  constructor TPhoaOperations.Create(AUndoStream: IPhoaUndoDataStream);
   begin
     inherited Create;
     FList := TList.Create;
-    FUndoFile := AUndoFile;
+    FUndoStream := AUndoStream;
   end;
 
   procedure TPhoaOperations.Delete(Index: Integer);
@@ -1347,23 +1169,14 @@ type
   begin
     inherited Clear;
      // Обрезаем файл
-    UndoFile.Clear;
+    UndoStream.Clear;
   end;
 
   constructor TPhoaUndo.Create;
   begin
-    inherited Create(TPhoaUndoFile.Create);
+    inherited Create(NewPhoaUndoDataStream);
     FSavepointOnEmpty := True;
     FMaxCount := MaxInt;
-  end;
-
-  destructor TPhoaUndo.Destroy;
-  var UFile: TPhoaUndoFile;
-  begin
-    UFile := UndoFile;
-    inherited Destroy;
-     // Уничтожаем файл отката 
-    UFile.Free;
   end;
 
   function TPhoaUndo.GetIsUnmodified: Boolean;
@@ -1407,10 +1220,10 @@ type
    // TPhoaOp_NewGroup
    //===================================================================================================================
 
-  procedure TPhoaOp_GroupNew.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupNew.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Group, NewGroup: IPhotoAlbumPicGroup;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
      // Создаём дочернюю группу
@@ -1424,55 +1237,55 @@ type
     Include(Changes, pocGroupStructure);
   end;
 
-  procedure TPhoaOp_GroupNew.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupNew.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Удаляем группу операции
     OpGroup.Owner := nil;
      // Добавляем флаги изменений
     Include(Changes, pocGroupStructure);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_GroupRename
    //===================================================================================================================
 
-  procedure TPhoaOp_GroupRename.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupRename.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Group: IPhotoAlbumPicGroup;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Запоминаем данные отката
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup := Group;
-    UndoFile.WriteStr(Group.Text);
+    UndoStream.WriteStr(Group.Text);
      // Выполняем операцию
     Group.Text := Params.ValStr['NewText'];
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
   end;
 
-  procedure TPhoaOp_GroupRename.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupRename.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Получаем группу и восстанавливаем текст
-    OpGroup.Text := UndoFile.ReadStr;
+    OpGroup.Text := UndoStream.ReadStr;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_GroupEdit
    //===================================================================================================================
 
-  procedure TPhoaOp_GroupEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupEdit.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Group: IPhotoAlbumPicGroup;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Запоминаем данные отката
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup := Group;
-    UndoFile.WriteStr(Group.Text);
-    UndoFile.WriteStr(Group.Description);
+    UndoStream.WriteStr(Group.Text);
+    UndoStream.WriteStr(Group.Description);
      // Выполняем операцию
     Group.Text        := Params.ValStr['NewText'];
     Group.Description := Params.ValStr['NewDescription'];
@@ -1480,26 +1293,26 @@ type
     Include(Changes, pocGroupProps);
   end;
 
-  procedure TPhoaOp_GroupEdit.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupEdit.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Group: IPhotoAlbumPicGroup;
   begin
      // Получаем группу
     Group := OpGroup;
      // Восстанавливаем свойства
-    Group.Text        := UndoFile.ReadStr;
-    Group.Description := UndoFile.ReadStr;
+    Group.Text        := UndoStream.ReadStr;
+    Group.Description := UndoStream.ReadStr;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_GroupDelete
    //===================================================================================================================
 
-  procedure TPhoaOp_GroupDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupDelete.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Удаляем группу (и подгруппы)
     AddChild(TPhoaOp_InternalGroupDelete, Params, Changes);
      // Удаляем неиспользуемые изображения
@@ -1510,23 +1323,23 @@ type
    // TPhoaOp_InternalGroupDelete
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalGroupDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalGroupDelete.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     Group: IPhotoAlbumPicGroup;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Запоминаем данные удаляемой группы
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup       := Group;
     OpParentGroup := Group.OwnerX;
-    UndoFile.WriteStr (Group.Text);
-    UndoFile.WriteStr (Group.Description);
-    UndoFile.WriteInt (Group.Index);
-    UndoFile.WriteBool(Group.Expanded);
+    UndoStream.WriteStr (Group.Text);
+    UndoStream.WriteStr (Group.Description);
+    UndoStream.WriteInt (Group.Index);
+    UndoStream.WriteBool(Group.Expanded);
      // Записываем ID изображений и удаляем изображения из группы
-    UndoFile.WriteInt(Group.Pics.Count);
-    for i := 0 to Group.Pics.Count-1 do UndoFile.WriteInt(Group.Pics[i].ID);
+    UndoStream.WriteInt(Group.Pics.Count);
+    for i := 0 to Group.Pics.Count-1 do UndoStream.WriteInt(Group.Pics[i].ID);
     Group.PicsX.Clear;
      // Каскадно удаляем группы
     for i := Group.Groups.Count-1 downto 0 do
@@ -1537,44 +1350,44 @@ type
     Include(Changes, pocGroupStructure);
   end;
 
-  procedure TPhoaOp_InternalGroupDelete.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalGroupDelete.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     g: IPhotoAlbumPicGroup;
   begin
      // Восстанавливаем группу
     g := NewPhotoAlbumPicGroup(OpParentGroup, OpGroupID);
-    g.Text        := UndoFile.ReadStr;
-    g.Description := UndoFile.ReadStr;
-    g.Index       := UndoFile.ReadInt;
-    g.Expanded    := UndoFile.ReadBool;
+    g.Text        := UndoStream.ReadStr;
+    g.Description := UndoStream.ReadStr;
+    g.Index       := UndoStream.ReadInt;
+    g.Expanded    := UndoStream.ReadBool;
      // Восстанавливаем изображения
-    for i := 0 to UndoFile.ReadInt-1 do g.PicsX.Add(Project.Pics.ItemsByID[UndoFile.ReadInt], False);
+    for i := 0 to UndoStream.ReadInt-1 do g.PicsX.Add(Project.Pics.ItemsByID[UndoStream.ReadInt], False);
      // Добавляем флаги изменений
     Include(Changes, pocGroupStructure);
      // Восстанавливаем вложенные группы
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalUnlinkedPicsRemoving
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalUnlinkedPicsRemoving.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalUnlinkedPicsRemoving.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     Pic: IPhotoAlbumPic;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Цикл по всем изображениям фотоальбома
     for i := Project.Pics.Count-1 downto 0 do begin
       Pic := Project.PicsX[i];
        // Если изображение не связано ни с одной группой
       if not Project.RootGroup.IsPicLinked(Pic.ID, True) then begin
          // Пишем флаг продолжения
-        UndoFile.WriteBool(True);
+        UndoStream.WriteBool(True);
          // Сохраняем данные изображения
-        UndoFile.WriteStr(Pic.RawData[PPAllProps]);
+        UndoStream.WriteStr(Pic.RawData[PPAllProps]);
          // Удаляем изображение из списка
         Project.PicsX.Delete(i);
          // Добавляем флаги изменений
@@ -1582,30 +1395,30 @@ type
       end;
     end;
      // Пишем стоп-флаг
-    UndoFile.WriteBool(False);
+    UndoStream.WriteBool(False);
   end;
 
-  procedure TPhoaOp_InternalUnlinkedPicsRemoving.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalUnlinkedPicsRemoving.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Читаем данные, пока не встретим стоп-флаг
-    while UndoFile.ReadBool do
+    while UndoStream.ReadBool do
        // Создаём изображение
       with NewPhotoAlbumPic do begin
          // Загружаем данные
-        RawData[PPAllProps] := UndoFile.ReadStr;
+        RawData[PPAllProps] := UndoStream.ReadStr;
          // Кладём в список (ID уже загружен)
         PutToList(Project.PicsX);
          // Добавляем флаги изменений
         Include(Changes, pocProjectPicList);
       end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_PicEdit
    //===================================================================================================================
 
-  procedure TPhoaOp_PicEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicEdit.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
 
      // Выполняет операцию класса OpClass с параметрами, получаемыми из собственного параметра с именем sOpParamName,
      //   если он указан
@@ -1617,7 +1430,7 @@ type
     end;
 
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Выполняем требуемые дочерние операции
     PerformIfSpecified('EditViewOpParams',     TPhoaOp_InternalEditPicProps);
     PerformIfSpecified('EditDataOpParams',     TPhoaOp_InternalEditPicProps);
@@ -1629,7 +1442,7 @@ type
    // TPhoaOp_InternalEditPicProps
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalEditPicProps.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalEditPicProps.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Pics: IPhotoAlbumPicList;
     ChangeList: IPhoaPicPropertyChangeList;
@@ -1637,21 +1450,21 @@ type
     Pic: IPhotoAlbumPic;
     ChangedProps: TPicProperties;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Pics',       IPhotoAlbumPicList,         Pics);
     Params.ObtainValIntf('ChangeList', IPhoaPicPropertyChangeList, ChangeList);
      // Сохраняем набор изменяющихся свойств
     ChangedProps := ChangeList.ChangedProps;
-    UndoFile.WriteInt(PicPropsToInt(ChangedProps));
+    UndoStream.WriteInt(PicPropsToInt(ChangedProps));
      // Сохраняем количество изображений
-    UndoFile.WriteInt(Pics.Count);
+    UndoStream.WriteInt(Pics.Count);
      // Цикл по изображениям
     for iPic := 0 to Pics.Count-1 do begin
        // Запоминаем старые данные
       Pic := Pics[iPic];
-      UndoFile.WriteInt(Pic.ID);
-      UndoFile.WriteStr(Pic.RawData[ChangedProps]);
+      UndoStream.WriteInt(Pic.ID);
+      UndoStream.WriteStr(Pic.RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
         with ChangeList[iChg]^ do Pic.PropValues[Prop] := vNewValue;
@@ -1660,30 +1473,30 @@ type
     end;
   end;
 
-  procedure TPhoaOp_InternalEditPicProps.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalEditPicProps.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i, iPicID: Integer;
     ChangedProps: TPicProperties;
     sPicData: String;
   begin
      // Получаем набор изменённых свойств
-    ChangedProps := IntToPicProps(UndoFile.ReadInt);
+    ChangedProps := IntToPicProps(UndoStream.ReadInt);
      // Возвращаем данные изменённых изображений
-    for i := 0 to UndoFile.ReadInt-1 do begin
-      iPicID   := UndoFile.ReadInt;
-      sPicData := UndoFile.ReadStr;
+    for i := 0 to UndoStream.ReadInt-1 do begin
+      iPicID   := UndoStream.ReadInt;
+      sPicData := UndoStream.ReadStr;
       Project.PicsX.ItemsByIDX[iPicID].RawData[ChangedProps] := sPicData;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalEditPicKeywords
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalEditPicKeywords.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalEditPicKeywords.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Pics: IPhotoAlbumPicList;
     KeywordList: IPhotoAlbumKeywordList;
@@ -1698,9 +1511,9 @@ type
     procedure SavePicKeywords;
     begin
       if not bKWSaved then begin
-        UndoFile.WriteBool(True); // Признак записи ключевого слова (в противоположность стоп-флагу)
-        UndoFile.WriteInt(Pic.ID);
-        UndoFile.WriteStr(Pic.Keywords.CommaText);
+        UndoStream.WriteBool(True); // Признак записи ключевого слова (в противоположность стоп-флагу)
+        UndoStream.WriteInt(Pic.ID);
+        UndoStream.WriteStr(Pic.Keywords.CommaText);
         bKWSaved := True;
          // Добавляем флаги изменений
         Include(Changes, pocPicProps);
@@ -1708,7 +1521,7 @@ type
     end;
 
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Pics',        IPhotoAlbumPicList,     Pics);
     Params.ObtainValIntf('KeywordList', IPhotoAlbumKeywordList, KeywordList);
@@ -1770,33 +1583,33 @@ type
       end;
     end;
      // Пишем стоп-флаг
-    UndoFile.WriteBool(False);
+    UndoStream.WriteBool(False);
   end;
 
-  procedure TPhoaOp_InternalEditPicKeywords.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalEditPicKeywords.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var iPicID: Integer;
   begin
      // Возвращаем КС изменённым изображениям: крутим цикл, пока не встретим стоп-флаг
-    while UndoFile.ReadBool do begin
-      iPicID    := UndoFile.ReadInt;
-      Project.PicsX.ItemsByIDX[iPicID].KeywordsM.CommaText := UndoFile.ReadStr;
+    while UndoStream.ReadBool do begin
+      iPicID    := UndoStream.ReadInt;
+      Project.PicsX.ItemsByIDX[iPicID].KeywordsM.CommaText := UndoStream.ReadStr;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalEditPicToGroupBelonging
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalEditPicToGroupBelonging.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalEditPicToGroupBelonging.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Pics: IPhotoAlbumPicList;
     AddToGroups, RemoveFromGroups: IPhotoAlbumPicGroupList;
     i: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Pics',             IPhotoAlbumPicList,      Pics);
     Params.ObtainValIntf('AddToGroups',      IPhotoAlbumPicGroupList, AddToGroups);
@@ -1819,16 +1632,16 @@ type
    // TPhoaOp_StoreTransform
    //===================================================================================================================
 
-  procedure TPhoaOp_StoreTransform.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_StoreTransform.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Pic: IPhotoAlbumPic;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Pic', IPhotoAlbumPic, Pic);
      // Сохраняем прежние свойства
-    UndoFile.WriteInt(Pic.ID);
-    UndoFile.WriteByte(Byte(Pic.Rotation));
-    UndoFile.WriteByte(Byte(Pic.Flips));
+    UndoStream.WriteInt(Pic.ID);
+    UndoStream.WriteByte(Byte(Pic.Rotation));
+    UndoStream.WriteByte(Byte(Pic.Flips));
      // Применяем новые свойства
     Pic.Rotation := TPicRotation(Params.ValByte['NewRotation']);
     Pic.Flips    := TPicFlips   (Params.ValByte['NewFlips']);
@@ -1836,22 +1649,22 @@ type
     Include(Changes, pocPicProps);
   end;
 
-  procedure TPhoaOp_StoreTransform.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_StoreTransform.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Pic: IPhotoAlbumPic;
   begin
-    Pic          := Project.PicsX.ItemsByIDX[UndoFile.ReadInt];
-    Pic.Rotation := TPicRotation(UndoFile.ReadByte);
-    Pic.Flips    := TPicFlips(Byte(UndoFile.ReadByte)); // Странный typecast, но иначе не компилируется
+    Pic          := Project.PicsX.ItemsByIDX[UndoStream.ReadInt];
+    Pic.Rotation := TPicRotation(UndoStream.ReadByte);
+    Pic.Flips    := TPicFlips(Byte(UndoStream.ReadByte)); // Странный typecast, но иначе не компилируется
      // Добавляем флаги изменений
     Include(Changes, pocPicProps);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_PicAdd
    //===================================================================================================================
 
-  procedure TPhoaOp_PicAdd.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicAdd.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     Pics: IPhotoAlbumPicList;
@@ -1859,14 +1672,14 @@ type
     Pic, PicEx: IPhotoAlbumPic;
     bExisting, bAddedToGroup: Boolean;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Pics',  IPhotoAlbumPicList,  Pics);
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
      // Сохраняем данные для отката
     OpGroup := Group;
      // Перебираем все новые изображения
-    UndoFile.WriteInt(Pics.Count);
+    UndoStream.WriteInt(Pics.Count);
     for i := 0 to Pics.Count-1 do begin
       Pic := Pics[i];
        // Ищем уже существующее изображение с тем же файлом
@@ -1884,13 +1697,13 @@ type
       Group.PicsX.Add(Pic, True, bAddedToGroup);
       if bAddedToGroup then Include(Changes, pocGroupPicList);
        // Сохраняем ID изображения, флаг существования, флаг добавления в группу
-      UndoFile.WriteInt(Pic.ID);
-      UndoFile.WriteBool(bExisting);
-      UndoFile.WriteBool(bAddedToGroup);
+      UndoStream.WriteInt(Pic.ID);
+      UndoStream.WriteBool(bExisting);
+      UndoStream.WriteBool(bAddedToGroup);
     end;
   end;
 
-  procedure TPhoaOp_PicAdd.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicAdd.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     i, iPicID: Integer;
@@ -1899,10 +1712,10 @@ type
      // Получаем группу, куда добавляли изображения
     Group := OpGroup;
      // Считываем данные по каждому изображению
-    for i := 0 to UndoFile.ReadInt-1 do begin
-      iPicID        := UndoFile.ReadInt;
-      bExisting     := UndoFile.ReadBool;
-      bAddedToGroup := UndoFile.ReadBool;
+    for i := 0 to UndoStream.ReadInt-1 do begin
+      iPicID        := UndoStream.ReadInt;
+      bExisting     := UndoStream.ReadBool;
+      bAddedToGroup := UndoStream.ReadBool;
        // Если было добавлено в группу - удаляем
       if bAddedToGroup then begin
         Group.PicsX.Remove(iPicID);
@@ -1914,20 +1727,20 @@ type
         Include(Changes, pocProjectPicList);
       end;
     end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalPicFromGroupRemoving
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalPicFromGroupRemoving.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalPicFromGroupRemoving.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     Pics:  IPhotoAlbumPicList;
     i, idx: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     Params.ObtainValIntf('Pics',  IPhotoAlbumPicList,  Pics);
@@ -1939,11 +1752,11 @@ type
       idx := Group.Pics.IndexOfID(Pics[i].ID);
       if idx>=0 then begin
          // Пишем флаг продолжения
-        UndoFile.WriteBool(True);
+        UndoStream.WriteBool(True);
          // Пишем ID
-        UndoFile.WriteInt(Pics[i].ID);
+        UndoStream.WriteInt(Pics[i].ID);
          // Пишем индекс
-        UndoFile.WriteInt(idx);
+        UndoStream.WriteInt(idx);
          // Удаляем изображение
         Group.PicsX.Delete(idx);
          // Добавляем флаги изменений
@@ -1951,10 +1764,10 @@ type
       end;
     end;
      // Пишем стоп-флаг
-    UndoFile.WriteBool(False);
+    UndoStream.WriteBool(False);
   end;
 
-  procedure TPhoaOp_InternalPicFromGroupRemoving.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalPicFromGroupRemoving.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     g: IPhotoAlbumPicGroup;
@@ -1964,9 +1777,9 @@ type
      // Загружаем ID и индексы во временный список
     IIs := TIntegerList.Create(True);
     try
-      while UndoFile.ReadBool do begin
-        IIs.Add(UndoFile.ReadInt);
-        IIs.Add(UndoFile.ReadInt);
+      while UndoStream.ReadBool do begin
+        IIs.Add(UndoStream.ReadInt);
+        IIs.Add(UndoStream.ReadInt);
       end;
        // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
       i := IIs.Count-2; // i указывает на ID, i+1 - на индекс
@@ -1979,14 +1792,14 @@ type
     finally
       IIs.Free;
     end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalPicToGroupAdding
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalPicToGroupAdding.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalPicToGroupAdding.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     Pics:  IPhotoAlbumPicList;
@@ -1994,7 +1807,7 @@ type
     bAdded: Boolean;
     Pic: IPhoaPic;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     Params.ObtainValIntf('Pics',  IPhotoAlbumPicList,  Pics);
@@ -2004,27 +1817,27 @@ type
       Pic := Pics[i];
       Group.PicsX.Add(Pic, True, bAdded);
       if bAdded then begin
-        UndoFile.WriteBool(True); // Флаг продолжения
-        UndoFile.WriteInt (Pic.ID);
+        UndoStream.WriteBool(True); // Флаг продолжения
+        UndoStream.WriteInt (Pic.ID);
          // Добавляем флаги изменений
         Include(Changes, pocGroupPicList);
       end;
     end;
      // Пишем стоп-флаг
-    UndoFile.WriteBool(False);
+    UndoStream.WriteBool(False);
   end;
 
-  procedure TPhoaOp_InternalPicToGroupAdding.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalPicToGroupAdding.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var g: IPhotoAlbumPicGroup;
   begin
      // Удаляем добавленные изображения (считываем ID добавленных изображений из файла, пока не встретим стоп-флаг)
     g := OpGroup;
-    while UndoFile.ReadBool do begin
-      g.PicsX.Remove(UndoFile.ReadInt);
+    while UndoStream.ReadBool do begin
+      g.PicsX.Remove(UndoStream.ReadInt);
        // Добавляем флаги изменений
       Include(Changes, pocGroupPicList);
     end;
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
@@ -2156,9 +1969,9 @@ type
    // TPhoaOp_PicDelete
    //===================================================================================================================
 
-  procedure TPhoaOp_PicDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicDelete.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Удаляем изображения из группы
     AddChild(TPhoaOp_InternalPicFromGroupRemoving, Params, Changes);
      // Удаляем несвязанные изображения из фотоальбома
@@ -2169,7 +1982,7 @@ type
    // TPhoaOp_PicPaste
    //===================================================================================================================
 
-  procedure TPhoaOp_PicPaste.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicPaste.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     PastedPics: IPhotoAlbumPicList;
@@ -2177,7 +1990,7 @@ type
     ms: TMemoryStream;
     Streamer: TPhoaStreamer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
     if Clipboard.HasFormat(wClipbrdPicFormatID) then begin
        // Получаем параметры
       Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
@@ -2211,14 +2024,14 @@ type
    // TPhoaOp_ProjectEdit
    //===================================================================================================================
 
-  procedure TPhoaOp_ProjectEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ProjectEdit.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Сохраняем старые свойства
-    UndoFile.WriteInt (Project.ThumbnailSize.cx);
-    UndoFile.WriteInt (Project.ThumbnailSize.cy);
-    UndoFile.WriteByte(Project.ThumbnailQuality);
-    UndoFile.WriteStr (Project.Description);
+    UndoStream.WriteInt (Project.ThumbnailSize.cx);
+    UndoStream.WriteInt (Project.ThumbnailSize.cy);
+    UndoStream.WriteByte(Project.ThumbnailQuality);
+    UndoStream.WriteStr (Project.Description);
      // Выполняем операцию
     Project.ThumbnailSize    := Size(Params.ValInt['NewThWidth'], Params.ValInt['NewThHeight']);
     Project.ThumbnailQuality := Params.ValByte['NewThQuality'];
@@ -2227,25 +2040,25 @@ type
     Include(Changes, pocProjectProps);
   end;
 
-  procedure TPhoaOp_ProjectEdit.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ProjectEdit.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var Sz: TSize;
   begin
      // Восстанавливаем свойства фотоальбома
-    Sz.cx   := UndoFile.ReadInt;
-    Sz.cy   := UndoFile.ReadInt;
+    Sz.cx   := UndoStream.ReadInt;
+    Sz.cy   := UndoStream.ReadInt;
     Project.ThumbnailSize    := Sz;
-    Project.ThumbnailQuality := UndoFile.ReadByte;
-    Project.Description      := UndoFile.ReadStr;
+    Project.ThumbnailQuality := UndoStream.ReadByte;
+    Project.Description      := UndoStream.ReadStr;
      // Добавляем флаги изменений
     Include(Changes, pocProjectProps);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_PicOperation
    //===================================================================================================================
 
-  procedure TPhoaOp_PicOperation.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicOperation.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     SourceGroup, TargetGroup: IPhotoAlbumPicGroup;
     Pics: IPhoaPicList;
@@ -2254,7 +2067,7 @@ type
     Pic: IPhoaPic;
     PicOperation: TPictureOperation;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('SourceGroup', IPhotoAlbumPicGroup, SourceGroup);
     Params.ObtainValIntf('TargetGroup', IPhotoAlbumPicGroup, TargetGroup);
@@ -2299,36 +2112,36 @@ type
    // TPhoaOp_InternalGroupPicSort
    //===================================================================================================================
 
-  procedure TPhoaOp_InternalGroupPicSort.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalGroupPicSort.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     Sortings: IPhotoAlbumPicSortingList;
     i: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group',    IPhotoAlbumPicGroup,       Group);
     Params.ObtainValIntf('Sortings', IPhotoAlbumPicSortingList, Sortings);
      // Запоминаем группу
     OpGroup := Group;
      // Запоминаем порядок следования ID изображений в группе
-    UndoFile.WriteInt(Group.Pics.Count);
-    for i := 0 to Group.Pics.Count-1 do UndoFile.WriteInt(Group.Pics[i].ID);
+    UndoStream.WriteInt(Group.Pics.Count);
+    for i := 0 to Group.Pics.Count-1 do UndoStream.WriteInt(Group.Pics[i].ID);
      // Сортируем изображения в группе
     Group.PicsX.SortingsSort(Sortings);
      // Добавляем флаги изменений
     Include(Changes, pocGroupPicList);
   end;
 
-  procedure TPhoaOp_InternalGroupPicSort.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_InternalGroupPicSort.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var i: Integer;
   begin
      // Восстанавливаем старый порядок следования ID изображений в группе
     OpGroup.PicsX.Clear;
-    for i := 0 to UndoFile.ReadInt-1 do OpGroup.PicsX.Add(Project.Pics.ItemsByID[UndoFile.ReadInt], False);
+    for i := 0 to UndoStream.ReadInt-1 do OpGroup.PicsX.Add(Project.Pics.ItemsByID[UndoStream.ReadInt], False);
      // Добавляем флаги изменений
     Include(Changes, pocGroupPicList);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
@@ -2345,12 +2158,12 @@ type
       for i := 0 to Group.Groups.Count-1 do AddGroupSortOp(Group.GroupsX[i], Sortings, True, Changes);
   end;
 
-  procedure TPhoaOp_PicSort.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicSort.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     Sortings: IPhotoAlbumPicSortingList;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group',    IPhotoAlbumPicGroup,       Group);
     Params.ObtainValIntf('Sortings', IPhotoAlbumPicSortingList, Sortings);
@@ -2362,19 +2175,19 @@ type
    // TPhoaOp_GroupDragAndDrop
    //===================================================================================================================
 
-  procedure TPhoaOp_GroupDragAndDrop.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupDragAndDrop.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group, NewParentGroup, gOldParent: IPhotoAlbumPicGroup;
     iNewIndex: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group',          IPhotoAlbumPicGroup, Group);
     Params.ObtainValIntf('NewParentGroup', IPhotoAlbumPicGroup, NewParentGroup);
     iNewIndex := Params.ValInt['NewIndex'];
      // Запоминаем данные отката
     gOldParent := Group.OwnerX;
-    UndoFile.WriteInt(Group.Index);
+    UndoStream.WriteInt(Group.Index);
      // Перемещаем группу
     Group.Owner := NewParentGroup;
     if iNewIndex>=0 then Group.Index := iNewIndex; // Индекс -1 означает добавление последним ребёнком
@@ -2385,28 +2198,28 @@ type
     Include(Changes, pocGroupStructure);
   end;
 
-  procedure TPhoaOp_GroupDragAndDrop.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_GroupDragAndDrop.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Восстанавливаем положение группы
     with OpGroup do begin
       Owner := OpParentGroup;
-      Index := UndoFile.ReadInt;
+      Index := UndoStream.ReadInt;
     end;
      // Добавляем флаги изменений
     Include(Changes, pocGroupStructure);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_PicDragAndDropToGroup
    //===================================================================================================================
 
-  procedure TPhoaOp_PicDragAndDropToGroup.Perform( Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicDragAndDropToGroup.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     SourceGroup, TargetGroup: IPhotoAlbumPicGroup;
     Pics: IPhoaPicList;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('SourceGroup', IPhotoAlbumPicGroup, SourceGroup);
     Params.ObtainValIntf('TargetGroup', IPhotoAlbumPicGroup, TargetGroup);
@@ -2421,13 +2234,13 @@ type
    // TPhoaOp_PicDragAndDropInsideGroup
    //===================================================================================================================
 
-  procedure TPhoaOp_PicDragAndDropInsideGroup.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicDragAndDropInsideGroup.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
     Pics: IPhoaPicList;
     i, idxOld, iNewIndex: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     Params.ObtainValIntf('Pics',  IPhotoAlbumPicList,  Pics);
@@ -2437,12 +2250,12 @@ type
      // Выполняем операцию
     for i := 0 to Pics.Count-1 do begin
        // -- Пишем признак продолжения
-      UndoFile.WriteBool(True);
+      UndoStream.WriteBool(True);
        // -- Запоминаем индексы
       idxOld := Group.Pics.IndexOfID(Pics[i].ID);
       if idxOld<iNewIndex then Dec(iNewIndex);
-      UndoFile.WriteInt(idxOld);
-      UndoFile.WriteInt(iNewIndex);
+      UndoStream.WriteInt(idxOld);
+      UndoStream.WriteInt(iNewIndex);
        // -- Перемещаем изображение на новое место
       Group.PicsX.Move(idxOld, iNewIndex);
       Inc(iNewIndex);
@@ -2450,10 +2263,10 @@ type
       Include(Changes, pocGroupPicList);
     end;
      // Пишем стоп-флаг
-    UndoFile.WriteBool(False);
+    UndoStream.WriteBool(False);
   end;
 
-  procedure TPhoaOp_PicDragAndDropInsideGroup.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_PicDragAndDropInsideGroup.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
     g: IPhotoAlbumPicGroup;
@@ -2463,9 +2276,9 @@ type
      // Загружаем индексы из файла во временный список
     Indexes := TIntegerList.Create(True);
     try
-      while UndoFile.ReadBool do begin
-        Indexes.Add(UndoFile.ReadInt);
-        Indexes.Add(UndoFile.ReadInt);
+      while UndoStream.ReadBool do begin
+        Indexes.Add(UndoStream.ReadInt);
+        Indexes.Add(UndoStream.ReadInt);
       end;
        // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
       i := Indexes.Count-2; // i указывает на старый индекс, i+1 - на новый
@@ -2478,26 +2291,26 @@ type
     end;
      // Добавляем флаги изменений
     Include(Changes, pocGroupPicList);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewNew
    //===================================================================================================================
 
-  procedure TPhoaOp_ViewNew.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewNew.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Groupings: IPhotoAlbumPicGroupingList;
     Sortings: IPhotoAlbumPicSortingList;
     View: IPhotoAlbumView;
     iNewViewIndex: Integer;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Groupings', IPhotoAlbumPicGroupingList, Groupings);
     Params.ObtainValIntf('Sortings',  IPhotoAlbumPicSortingList,  Sortings);
      // Сохраняем предыдущий текущий индекс представления проекта
-    UndoFile.WriteInt(Project.ViewIndex);
+    UndoStream.WriteInt(Project.ViewIndex);
      // Выполняем операцию
     View := NewPhotoAlbumView(Project.ViewsX);
     View.Name := Params.ValStr['Name'];
@@ -2505,62 +2318,62 @@ type
     View.SortingsX.Assign(Sortings);
      // Сохраняем новый индекс представления
     iNewViewIndex := View.Index;
-    UndoFile.WriteInt(iNewViewIndex);
+    UndoStream.WriteInt(iNewViewIndex);
      // Перегружаем список
     Project.ViewIndex := iNewViewIndex;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
   end;
 
-  procedure TPhoaOp_ViewNew.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewNew.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var iPrevViewIndex, iNewViewIndex: Integer;
   begin
      // Получаем сохранённые данные
-    iPrevViewIndex := UndoFile.ReadInt;
-    iNewViewIndex  := UndoFile.ReadInt;
+    iPrevViewIndex := UndoStream.ReadInt;
+    iNewViewIndex  := UndoStream.ReadInt;
      // Удаляем представление
     Project.ViewsX.Delete(iNewViewIndex);
      // Восстанавливаем прежнее выбранное представление
     Project.ViewIndex := iPrevViewIndex;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewEdit
    //===================================================================================================================
 
-  procedure TPhoaOp_ViewEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewEdit.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     View: IPhotoAlbumView;
     Groupings: IPhotoAlbumPicGroupingList;
     Sortings: IPhotoAlbumPicSortingList;
     bWriteGroupings, bWriteSortings: Boolean;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('View',      IPhotoAlbumView,            View);
     Params.ObtainValIntf('Groupings', IPhotoAlbumPicGroupingList, Groupings, False);
     Params.ObtainValIntf('Sortings',  IPhotoAlbumPicSortingList,  Sortings,  False);
      // Сохраняем данные отката и применяем изменения
-    UndoFile.WriteStr(View.Name);
+    UndoStream.WriteStr(View.Name);
     View.Name := Params.ValStr['Name'];
      // Запоминаем новый индекс представления (ПОСЛЕ присвоения имени, т.к. оно изменяет позицию представления в списке)
-    UndoFile.WriteInt(View.Index);
+    UndoStream.WriteInt(View.Index);
      // Список группировок создаём и сохраняем, если он есть
     bWriteGroupings := Groupings<>nil;
-    UndoFile.WriteBool(bWriteGroupings); // Признак наличия группировок
+    UndoStream.WriteBool(bWriteGroupings); // Признак наличия группировок
     if bWriteGroupings then begin
-      UndoWriteGroupings(UndoFile, View.GroupingsX);
+      UndoWriteGroupings(UndoStream, View.GroupingsX);
       View.GroupingsX.Assign(Groupings);
       View.Invalidate;
     end;
      // Список сортировок создаём и сохраняем, если он есть
     bWriteSortings := Sortings<>nil;
-    UndoFile.WriteBool(bWriteSortings); // Признак наличия сортировок
+    UndoStream.WriteBool(bWriteSortings); // Признак наличия сортировок
     if bWriteSortings then begin
-      UndoWriteSortings(UndoFile, View.SortingsX);
+      UndoWriteSortings(UndoStream, View.SortingsX);
       View.SortingsX.Assign(Sortings);
       View.Invalidate;
     end;
@@ -2570,40 +2383,40 @@ type
     Include(Changes, pocViewList);
   end;
 
-  procedure TPhoaOp_ViewEdit.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewEdit.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     sViewName: String;
     iViewIndex: Integer;
     View: IPhotoAlbumView;
   begin
      // Восстанавливаем представление
-    sViewName  := UndoFile.ReadStr;
-    iViewIndex := UndoFile.ReadInt;
+    sViewName  := UndoStream.ReadStr;
+    iViewIndex := UndoStream.ReadInt;
     View := Project.ViewsX[iViewIndex];
     View.Name := sViewName;
-    if UndoFile.ReadBool then UndoReadGroupings(UndoFile, View.GroupingsX);
-    if UndoFile.ReadBool then UndoReadSortings (UndoFile, View.SortingsX);
+    if UndoStream.ReadBool then UndoReadGroupings(UndoStream, View.GroupingsX);
+    if UndoStream.ReadBool then UndoReadSortings (UndoStream, View.SortingsX);
     View.Invalidate;
      // Обновляем текущий индекс представления (мог поменяться после переименования представления)
     Project.ViewIndex := View.Index;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewDelete
    //===================================================================================================================
 
-  procedure TPhoaOp_ViewDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewDelete.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var View: IPhotoAlbumView;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Сохраняем данные отката
     View := Project.CurrentViewX;
-    UndoFile.WriteStr(View.Name);
-    UndoWriteGroupings(UndoFile, View.GroupingsX);
-    UndoWriteSortings (UndoFile, View.SortingsX);
+    UndoStream.WriteStr(View.Name);
+    UndoWriteGroupings(UndoStream, View.GroupingsX);
+    UndoWriteSortings (UndoStream, View.SortingsX);
      // Удаляем представление
     Project.ViewsX.Delete(Project.ViewIndex);
      // Устанавливаем режим отображения групп
@@ -2612,31 +2425,31 @@ type
     Include(Changes, pocViewList);
   end;
 
-  procedure TPhoaOp_ViewDelete.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewDelete.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var View: IPhotoAlbumView;
   begin
       // Создаём представление
     View := NewPhotoAlbumView(Project.ViewsX);
-    View.Name := UndoFile.ReadStr;
-    UndoReadGroupings(UndoFile, View.GroupingsX);
-    UndoReadSortings (UndoFile, View.SortingsX);
+    View.Name := UndoStream.ReadStr;
+    UndoReadGroupings(UndoStream, View.GroupingsX);
+    UndoReadSortings (UndoStream, View.SortingsX);
      // Активизируем представление
     Project.ViewIndex := View.Index;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewMakeGroup
    //===================================================================================================================
 
-  procedure TPhoaOp_ViewMakeGroup.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewMakeGroup.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     Group, ViewGroup: IPhotoAlbumPicGroup;
     View: IPhotoAlbumView;
   begin
-    inherited Perform(Params, Changes);
+    inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
      // Получаем представление
@@ -2655,7 +2468,7 @@ type
     Changes := Changes+[pocViewIndex, pocGroupStructure];
   end;
 
-  procedure TPhoaOp_ViewMakeGroup.RollbackChanges(var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewMakeGroup.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Удаляем корневую группу копии представления
     OpGroup.Owner := nil;
@@ -2663,7 +2476,180 @@ type
     Project.ViewIndex := -1;
      // Добавляем флаги изменений
     Changes := Changes+[pocViewIndex, pocGroupStructure];
-    inherited RollbackChanges(Changes);
+    inherited RollbackChanges(UndoStream, Changes);
+  end;
+
+type  
+   //===================================================================================================================
+   // TPhoaUndoDataStream - реализация IPhoaUndoDataStream, файл отката PhoA (организован по принципу стека)
+   //===================================================================================================================
+   // Формат файла:
+   //    <данные1><тип1><данные2><тип2>...
+   //    Позиция в потоке всегда сохраняется *за последним байтом потока*
+
+   // Тип данных, сохраняемых в файле
+  TPhoaUndoDataStreamDatatype = (pudsdStr, pudsdInt, pudsdByte, pudsdBool);
+
+  TPhoaUndoDataStream = class(TInterfacedObject, IPhoaDataStream, IPhoaUndoDataStream)
+  private
+     // Файловый поток данных отката
+    FStream: TFileStream;
+     // Счётчик вложенности вызовов BeginUndo/EndUndo
+    FUndoCounter: Integer;
+     // Положение, запомненное в первом вызове BeginUndo
+    FUndoPosition: Int64;
+     // Prop storage
+    FFileName: String;
+     // Создаёт поток, если он ещё не создан
+    procedure CreateStream;
+     // Записывает в поток тип данных
+    procedure WriteDatatype(DT: TPhoaUndoDataStreamDatatype);
+     // Считывает из файла байт типа данных и проверяет его на соответствие DTRequired. Если не совпадает, вызывает
+     //   Exception
+    procedure ReadCheckDatatype(DTRequired: TPhoaUndoDataStreamDatatype);
+     // IPhoaDataStream
+    procedure Clear;
+    procedure WriteStr (const s: String);
+    procedure WriteInt (i: Integer);
+    procedure WriteByte(b: Byte);
+    procedure WriteBool(b: Boolean);
+    function  ReadStr: String;
+    function  ReadInt: Integer;
+    function  ReadByte: Byte;
+    function  ReadBool: Boolean;
+    function  GetPosition: Int64;
+     // IPhoaUndoDataStream
+    procedure BeginUndo(i64Position: Int64);
+    procedure EndUndo(bTruncate: Boolean);
+    function  GetFileName: String;
+  public
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+  procedure TPhoaUndoDataStream.BeginUndo(i64Position: Int64);
+  begin
+    if FUndoCounter=0 then FUndoPosition := i64Position;
+    FStream.Position := i64Position;
+    Inc(FUndoCounter);
+  end;
+
+  procedure TPhoaUndoDataStream.Clear;
+  begin
+    if FStream<>nil then begin
+      FreeAndNil(FStream);
+      SysUtils.DeleteFile(FFileName);
+    end;
+  end;
+
+  constructor TPhoaUndoDataStream.Create;
+  begin
+    inherited Create;
+     // Определяем имя файла
+    FFileName := Format('%sphoa_undo_%.8x.tmp', [GetWindowsTempPath, GetCurrentProcessId]);
+  end;
+
+  procedure TPhoaUndoDataStream.CreateStream;
+  begin
+    if FStream=nil then FStream := TFileStream.Create(FFileName, fmCreate);
+  end;
+
+  destructor TPhoaUndoDataStream.Destroy;
+  begin
+     // Уничтожаем поток и файл
+    Clear;
+    inherited Destroy;
+  end;
+
+  procedure TPhoaUndoDataStream.EndUndo(bTruncate: Boolean);
+  begin
+    Assert(FUndoCounter>0, 'Excessive TPhoaUndoDataStream.EndUndo() call');
+    Dec(FUndoCounter);
+     // Счётчик сравнялся с нулём. Если надо, позиционируем в запомненную позицию и усекаем файл
+    if (FUndoCounter=0) and bTruncate then begin
+      FStream.Position := FUndoPosition;
+      FStream.Size     := FUndoPosition;
+    end;
+  end;
+
+  function TPhoaUndoDataStream.GetFileName: String;
+  begin
+    Result := FFileName;
+  end;
+
+  function TPhoaUndoDataStream.GetPosition: Int64;
+  begin
+    CreateStream;
+    Result := FStream.Position;
+  end;
+
+  function TPhoaUndoDataStream.ReadBool: Boolean;
+  begin
+    ReadCheckDatatype(pudsdBool);
+    Result := StreamReadByte(FStream)<>0;
+  end;
+
+  function TPhoaUndoDataStream.ReadByte: Byte;
+  begin
+    ReadCheckDatatype(pudsdByte);
+    Result := StreamReadByte(FStream);
+  end;
+
+  procedure TPhoaUndoDataStream.ReadCheckDatatype(DTRequired: TPhoaUndoDataStreamDatatype);
+  var DTActual: TPhoaUndoDataStreamDatatype;
+  begin
+    if FStream=nil then raise Exception.Create('Attempt of reading before writing to undo file');
+    Byte(DTActual) := StreamReadByte(FStream);
+    if DTActual<>DTRequired then
+      raise Exception.CreateFmt(
+        'Invalid undo stream datatype; required: %s, actual: %s',
+        [GetEnumName(TypeInfo(TPhoaUndoDataStreamDatatype), Byte(DTRequired)), GetEnumName(TypeInfo(TPhoaUndoDataStreamDatatype), Byte(DTActual))]);
+  end;
+
+  function TPhoaUndoDataStream.ReadInt: Integer;
+  begin
+    ReadCheckDatatype(pudsdInt);
+    Result := StreamReadInt(FStream);
+  end;
+
+  function TPhoaUndoDataStream.ReadStr: String;
+  begin
+    ReadCheckDatatype(pudsdStr);
+    Result := StreamReadStr(FStream);
+  end;
+
+  procedure TPhoaUndoDataStream.WriteBool(b: Boolean);
+  begin
+    CreateStream;
+    WriteDatatype(pudsdBool);
+    StreamWriteByte(FStream, Byte(b));
+  end;
+
+  procedure TPhoaUndoDataStream.WriteByte(b: Byte);
+  begin
+    CreateStream;
+    WriteDatatype(pudsdByte);
+    StreamWriteByte(FStream, b);
+  end;
+
+  procedure TPhoaUndoDataStream.WriteDatatype(DT: TPhoaUndoDataStreamDatatype);
+  begin
+    CreateStream;
+    StreamWriteByte(FStream, Byte(DT));
+  end;
+
+  procedure TPhoaUndoDataStream.WriteInt(i: Integer);
+  begin
+    CreateStream;
+    WriteDatatype(pudsdInt);
+    StreamWriteInt(FStream, i);
+  end;
+
+  procedure TPhoaUndoDataStream.WriteStr(const s: String);
+  begin
+    CreateStream;
+    WriteDatatype(pudsdStr);
+    StreamWriteStr(FStream, s);
   end;
 
    //===================================================================================================================
@@ -2682,6 +2668,11 @@ type
   function NewPhoaPicPropertyChangeList: IPhoaPicPropertyChangeList;
   begin
     Result := TPhoaPicPropertyChangeList.Create;
+  end;
+
+  function  NewPhoaUndoDataStream: IPhoaUndoDataStream;
+  begin
+    Result := TPhoaUndoDataStream.Create;
   end;
 
 initialization

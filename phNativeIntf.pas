@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.7 2004-10-22 12:43:18 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.8 2004-10-24 17:47:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -333,6 +333,50 @@ type
     property SelectedPics: IPhotoAlbumPicList read GetSelectedPics;
      // -- Текущие отображаемые изображения (эскизы)
     property ViewedPics: IPhotoAlbumPicList read GetViewedPics;
+  end;
+
+   //===================================================================================================================
+   // IPhoaDataStream - интерфейс потока данных
+   //===================================================================================================================
+
+  IPhoaDataStream = interface(IInterface)
+    ['{2C2E5BCD-F397-4824-B2EC-09F23D47334F}']
+     // Стирает содержимое потока
+    procedure Clear;
+     // Методы для записи данных в поток
+    procedure WriteStr (const s: String);
+    procedure WriteInt (i: Integer);
+    procedure WriteByte(b: Byte);
+    procedure WriteBool(b: Boolean);
+     // Методы для чтения данных из потока
+    function  ReadStr: String;
+    function  ReadInt: Integer;
+    function  ReadByte: Byte;
+    function  ReadBool: Boolean;
+     // Prop handlers
+    function  GetPosition: Int64; 
+     // Props
+     // -- Текущее положение в потоке данных
+    property Position: Int64 read GetPosition;
+  end;
+
+   //===================================================================================================================
+   // IPhoaUndoDataStream - интерфейс потока данных отката
+   //===================================================================================================================
+
+  IPhoaUndoDataStream = interface(IPhoaDataStream)
+    ['{71515E8A-42FC-4763-8EE2-797B0170E497}']
+     // Процедуры начала/окончания процесса считывания данных отката. BeginUndo позиционирует файл в заданную позицию,
+     //   и, если это первый вызов BeginUndo, запоминает эту позицию. EndUndo уменьшает счётчик вложенных считываний,
+     //   и, если это последний вызов EndUndo и bTruncate=True, усекает файл по запомненной в первом вызове BeginUndo
+     //   позиции
+    procedure BeginUndo(i64Position: Int64);
+    procedure EndUndo(bTruncate: Boolean);
+     // Prop handlers
+    function  GetFileName: String; 
+     // Props
+     // -- Имя файла данных (временного)
+    property FileName: String read GetFileName;
   end;
 
 implementation

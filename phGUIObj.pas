@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.29 2004-10-23 14:05:08 dale Exp $
+//  $Id: phGUIObj.pas,v 1.30 2004-10-24 17:47:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -27,6 +27,9 @@ type
    // Информация о состоянии TThumbnailViewer, используемая его методами SaveDisplay() и RestoreDisplay()
   IThumbnailViewerDisplayData = interface(IInterface)
     ['{436126B8-5E50-4BAB-83D1-CA83FE19B976}']
+     // Сохранение/загрузка из IPhoaDataStream
+    procedure SaveToDataStream(DataStream: IPhoaDataStream);
+    procedure LoadFromDataStream(DataStream: IPhoaDataStream);
      // Prop handlers
     function  GetFocusedID: Integer;
     function  GetSelectedIDCount: Integer;
@@ -397,70 +400,12 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+   // Создаёт новый экземпляр IThumbnailViewerDisplayData
+  function  NewThumbnailViewerDisplayData: IThumbnailViewerDisplayData; overload;
+  function  NewThumbnailViewerDisplayData(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer): IThumbnailViewerDisplayData; overload;
+
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses Math, Themes, phUtils;
-
-type
-
-   //===================================================================================================================
-   // TThumbnailViewerDisplayData - реализация IThumbnailViewerDisplayData
-   //===================================================================================================================
-
-  TThumbnailViewerDisplayData = class(TInterfacedObject, IThumbnailViewerDisplayData)
-  private
-     // Список выделенных ID
-    FSelIDs: TList;
-     // Prop storage
-    FFocusedID: Integer;
-    FTopOffset: Integer; 
-     // IThumbnailViewerDisplayData
-    function  GetFocusedID: Integer;
-    function  GetSelectedIDCount: Integer;
-    function  GetSelectedIDs(Index: Integer): Integer;
-    function  GetTopOffset: Integer;
-  public
-    constructor Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer);
-    destructor Destroy; override;
-  end;
-
-  constructor TThumbnailViewerDisplayData.Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer);
-  var i: Integer;
-  begin
-    inherited Create;
-     // Переписываем ID выделенных изображений, если они есть
-    if (SelectedPics<>nil) and (SelectedPics.Count>0) then begin
-      FSelIDs := TList.Create;
-      for i := 0 to SelectedPics.Count-1 do FSelIDs.Add(Pointer(SelectedPics[i].ID));
-    end;
-    FFocusedID := iFocusedID;
-    FTopOffset := iTopOffset;
-  end;
-
-  destructor TThumbnailViewerDisplayData.Destroy;
-  begin
-    FSelIDs.Free;
-    inherited Destroy;
-  end;
-
-  function TThumbnailViewerDisplayData.GetFocusedID: Integer;
-  begin
-    Result := FFocusedID;
-  end;
-
-  function TThumbnailViewerDisplayData.GetSelectedIDCount: Integer;
-  begin
-    if FSelIDs=nil then Result := 0 else Result := FSelIDs.Count;
-  end;
-
-  function TThumbnailViewerDisplayData.GetSelectedIDs(Index: Integer): Integer;
-  begin
-    Result := Integer(FSelIDs[Index]);
-  end;
-
-  function TThumbnailViewerDisplayData.GetTopOffset: Integer;
-  begin
-    Result := FTopOffset;
-  end;
 
    //===================================================================================================================
    // TThumbnailViewer
@@ -1342,7 +1287,7 @@ type
   var iFocusedID: Integer;
   begin
     if FItemIndex>=0 then iFocusedID := FPicList[FItemIndex].ID else iFocusedID := 0;
-    Result := TThumbnailViewerDisplayData.Create(FSelectedPics, iFocusedID, FTopOffset);
+    Result := NewThumbnailViewerDisplayData(FSelectedPics, iFocusedID, FTopOffset);
   end;
 
   procedure TThumbnailViewer.ScrollIntoView;
@@ -1790,6 +1735,107 @@ type
       p := ScreenToClient(SmallPointToPoint(Msg.Pos));
       if PtInRect(ClientRect, p) then Msg.Result := HTBOTTOMRIGHT;
     end;
+  end;
+
+   //===================================================================================================================
+   // TThumbnailViewerDisplayData - реализация IThumbnailViewerDisplayData
+   //===================================================================================================================
+type
+  TThumbnailViewerDisplayData = class(TInterfacedObject, IThumbnailViewerDisplayData)
+  private
+     // Список выделенных ID
+    FSelIDs: TList;
+     // Prop storage
+    FFocusedID: Integer;
+    FTopOffset: Integer;
+     // IThumbnailViewerDisplayData
+    procedure SaveToDataStream(DataStream: IPhoaDataStream);
+    procedure LoadFromDataStream(DataStream: IPhoaDataStream);
+    function  GetFocusedID: Integer;
+    function  GetSelectedIDCount: Integer;
+    function  GetSelectedIDs(Index: Integer): Integer;
+    function  GetTopOffset: Integer;
+  public
+    constructor Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer); overload;
+    destructor Destroy; override;
+  end;
+
+  constructor TThumbnailViewerDisplayData.Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer);
+  var i: Integer;
+  begin
+    inherited Create;
+     // Переписываем ID выделенных изображений, если они есть
+    if (SelectedPics<>nil) and (SelectedPics.Count>0) then begin
+      FSelIDs := TList.Create;
+      for i := 0 to SelectedPics.Count-1 do FSelIDs.Add(Pointer(SelectedPics[i].ID));
+    end;
+    FFocusedID := iFocusedID;
+    FTopOffset := iTopOffset;
+  end;
+
+  destructor TThumbnailViewerDisplayData.Destroy;
+  begin
+    FSelIDs.Free;
+    inherited Destroy;
+  end;
+
+  function TThumbnailViewerDisplayData.GetFocusedID: Integer;
+  begin
+    Result := FFocusedID;
+  end;
+
+  function TThumbnailViewerDisplayData.GetSelectedIDCount: Integer;
+  begin
+    if FSelIDs=nil then Result := 0 else Result := FSelIDs.Count;
+  end;
+
+  function TThumbnailViewerDisplayData.GetSelectedIDs(Index: Integer): Integer;
+  begin
+    Result := Integer(FSelIDs[Index]);
+  end;
+
+  function TThumbnailViewerDisplayData.GetTopOffset: Integer;
+  begin
+    Result := FTopOffset;
+  end;
+
+  procedure TThumbnailViewerDisplayData.LoadFromDataStream(DataStream: IPhoaDataStream);
+  var i, iCount: Integer;
+  begin
+     // Читаем свойства
+    FFocusedID := DataStream.ReadInt;
+    FTopOffset := DataStream.ReadInt;
+     // Читаем SelIDs
+    FreeAndNil(FSelIDs);
+    iCount := DataStream.ReadInt;
+    if iCount>0 then begin
+      FSelIDs := TList.Create;
+      for i := 0 to iCount-1 do FSelIDs.Add(Pointer(DataStream.ReadInt));
+    end;
+  end;
+
+  procedure TThumbnailViewerDisplayData.SaveToDataStream(DataStream: IPhoaDataStream);
+  var i: Integer;
+  begin
+     // Пишем свойства
+    DataStream.WriteInt(FFocusedID);
+    DataStream.WriteInt(FTopOffset);
+     // Пишем SelIDs
+    DataStream.WriteInt(GetSelectedIDCount);
+    if FSelIDs<>nil then
+      for i := 0 to FSelIDs.Count-1 do DataStream.WriteInt(Integer(FSelIDs[i]));
+  end;
+
+   //===================================================================================================================
+
+  function NewThumbnailViewerDisplayData: IThumbnailViewerDisplayData;
+  begin
+    Result := TThumbnailViewerDisplayData.Create;
+  end;
+
+  function NewThumbnailViewerDisplayData(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer): IThumbnailViewerDisplayData;
+  begin
+    Result := TThumbnailViewerDisplayData.Create(SelectedPics, iFocusedID, iTopOffset);
   end;
 
 end.

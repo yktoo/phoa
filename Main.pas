@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.62 2004-10-23 14:05:08 dale Exp $
+//  $Id: Main.pas,v 1.63 2004-10-24 17:47:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -346,6 +346,8 @@ type
     function  GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
      // Отрабатывает флаги изменения операций путём обновления соответствующих частей приложения
     procedure ProcessOpChanges(Changes: TPhoaOperationChanges);
+     // По возможности восстанавливает состояние интерфейса
+    procedure RestoreGUIState(iCurViewIndex, iCurGroupID: Integer; const pGroupOffset: TPoint; ViewerData: IThumbnailViewerDisplayData);
      // Откатывает все операции с последней до Index и обновляет визуальные объекты согласно флагам операций
     procedure UndoOperations(Index: Integer);
      // Событие клика на пункте инструмента
@@ -1287,40 +1289,39 @@ uses
   var
     Changes: TPhoaOperationChanges;
     ViewerData: IThumbnailViewerDisplayData;
-    iCurView, iCurGroupID: Integer;
+    iCurViewIndex, iCurGroupID: Integer;
     pGroupOffset: TPoint;
+    Operation: TPhoaOperation;
+    UndoStream: IPhoaUndoDataStream;
   begin
     BeginUpdate;
     try
       StartWait;
       try
          // Сохраняем текущее состояние интерфейса
-        iCurView     := Integer(FProject.CurrentViewX); // Избегаем создания ссылки, iCurView ведь нам только для проверки
-        iCurGroupID  := CurGroupID;
-        pGroupOffset := tvGroups.OffsetXY;
-        ViewerData   := Viewer.SaveDisplay;
+        iCurViewIndex := FProject.ViewIndex;
+        iCurGroupID   := CurGroupID;
+        pGroupOffset  := tvGroups.OffsetXY;
+        ViewerData    := Viewer.SaveDisplay;
          // Создаём (выполняем операцию)
         Changes := [];
         try
-          OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
+          Operation := OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
+           // Записываем состояние интерфейса в Undo-файл
+          UndoStream := FUndo.UndoStream;
+          Operation.GUIStateUndoDataPosition := UndoStream.Position;
+          UndoStream.WriteInt(iCurViewIndex);
+          UndoStream.WriteInt(iCurGroupID);
+          UndoStream.WriteInt(pGroupOffset.x);
+          UndoStream.WriteInt(pGroupOffset.y);
+          ViewerData.SaveToDataStream(UndoStream);
         finally
            // Отрабатываем результирущие изменения всех операций
           ProcessOpChanges(Changes);
           StateChanged([asActionChangePending, asModifiedChangePending]);
         end;
          // Восстанавливаем состояние интерфейса
-        if iCurView=Integer(FProject.CurrentView) then begin
-           // Восстанавливаем текущую группу
-          tvGroups.BeginUpdate;
-          try
-            CurGroupID := iCurGroupID;
-            tvGroups.OffsetXY := pGroupOffset;
-          finally
-            tvGroups.EndUpdate;
-          end;
-           // Если получилось - восстанавливаем состояние вьюера
-          if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
-        end;
+        RestoreGUIState(iCurViewIndex, iCurGroupID, pGroupOffset, ViewerData);
       finally
         StopWait;
       end;
@@ -1530,6 +1531,22 @@ uses
   begin
      // Завершаем inplace-редактирование текста узла в дереве групп
     tvGroups.EndEditNode;
+  end;
+
+  procedure TfMain.RestoreGUIState(iCurViewIndex, iCurGroupID: Integer; const pGroupOffset: TPoint; ViewerData: IThumbnailViewerDisplayData);
+  begin
+    if iCurViewIndex=FProject.ViewIndex then begin
+       // Восстанавливаем текущую группу
+      tvGroups.BeginUpdate;
+      try
+        CurGroupID := iCurGroupID;
+        tvGroups.OffsetXY := pGroupOffset;
+      finally
+        tvGroups.EndUpdate;
+      end;
+       // Если получилось - восстанавливаем состояние вьюера
+      if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
+    end;
   end;
 
   procedure TfMain.SetCurGroup(Value: IPhotoAlbumPicGroup);
@@ -1821,18 +1838,38 @@ uses
 
   procedure TfMain.UndoOperations(Index: Integer);
   var
-    i: Integer;
+    i, iCurViewIndex, iCurGroupID: Integer;
     Changes: TPhoaOperationChanges;
+    Operation: TPhoaOperation;
+    UndoStream: IPhoaUndoDataStream;
+    ViewerData: IThumbnailViewerDisplayData;
+    pGroupOffset: TPoint;
   begin
     ResetMode;
     BeginUpdate;
     try
+       // Получаем операцию и загружаем состояние интерфейса, не усекая поток
+      Operation := FUndo[Index];
+      UndoStream := FUndo.UndoStream;
+      UndoStream.BeginUndo(Operation.GUIStateUndoDataPosition);
+      try
+        iCurViewIndex  := UndoStream.ReadInt;
+        iCurGroupID    := UndoStream.ReadInt;
+        pGroupOffset.x := UndoStream.ReadInt;
+        pGroupOffset.y := UndoStream.ReadInt;
+        ViewerData := NewThumbnailViewerDisplayData;
+        ViewerData.LoadFromDataStream(UndoStream);
+      finally
+        UndoStream.EndUndo(False);
+      end;
        // Крутим цикл по операциям (с конца до указанного индекса), накапливая изменения
       Changes := [];
       for i := FUndo.Count-1 downto Index do FUndo[i].Undo(Changes);
        // Отрабатываем результирущие изменения всех операций
       ProcessOpChanges(Changes);
       StateChanged([asActionChangePending, asModifiedChangePending]);
+       // Восстанавливаем состояние интерфейса
+      RestoreGUIState(iCurViewIndex, iCurGroupID, pGroupOffset, ViewerData);
     finally
       EndUpdate;
     end;
@@ -1887,7 +1924,9 @@ uses
       aPhoaView_MakeGroup.Enabled  := bView;
        // Drag-and-drop
       Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop) and not bView;
-      Viewer.DragInsideEnabled := gnk in [gnkProject, gnkPhoaGroup];
+       // -- Переупорядочивать эскизы можно в группах фотоальбома, если не рекурсивный режим или у текущей группы нет
+       //    подгрупп 
+      Viewer.DragInsideEnabled := (gnk in [gnkProject, gnkPhoaGroup]) and (not aFlatMode.Checked or (GetCurGroup.Groups.Count=0));
     end;
 
      // Настраивает доступность инструментов
