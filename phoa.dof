@@ -121,7 +121,7 @@ Locale=1033
 CodePage=1252
 [Version Info Keys]
 CompanyName=Dmitry Kann
-FileDescription=PhoA picture arranging tool
+FileDescription=PhoA image arranging and searching tool
 FileVersion=1.1.5.234
 InternalName=PhoA
 LegalCopyright=©2002-2004 Dmitry Kann
