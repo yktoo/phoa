@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-15 23:54:45
+LastModified=2004-09-20 22:01:15
 SourceLANGID=1033
 
 [fMain]
@@ -710,6 +710,7 @@ ISettingID_Gen_TreeSelBlended=Оттенённый прямоугольник
 ISettingID_Gen_TreeSelDotted=Пунктирная
 ISettingID_Gen_TreeSelStyle=Вид рамки выделения
 ISettingID_Gen_TreeWhPanning=Панорамирование нажатием средней кнопки мыши
+ISettingID_Profiles=Профили
 ISettingID_Tools=Инструменты
 ISettingID_View=Режим\nпросмотра
 ISettingID_View_AlwaysOnTop=Окно просмотра поверх всех окон
