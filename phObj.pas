@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.27 2004-06-24 13:48:31 dale Exp $
+//  $Id: phObj.pas,v 1.28 2004-06-25 03:13:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -867,18 +867,7 @@ type
    // Внутренняя операция редактирования свойств изображения, кроме ключевых слов
    //-------------------------------------------------------------------------------------------------------------------
 
-   // Запись, сохраняющая изменённые свойства изображения
-  TInternalPicPropSaveRec = record
-    iPicID:   Integer;
-    sPicData: String;
-  end;
-
   TPhoaOp_InternalEditPicProps = class(TPhoaOperation)
-  private
-     // Изменённые свойства изображения
-    FChangedProps: TPicProperties;
-     // Список прежних значений свойств
-    FSavedProps: Array of TInternalPicPropSaveRec;
   protected
     procedure RollbackChanges; override;
   public
@@ -892,14 +881,10 @@ type
   TKeywordList = class;
 
   TPhoaOp_InternalEditPicKeywords = class(TPhoaOperation)
-  private
-     // Список прежних ключевых слов, Objects[] - ID изображений
-    FSavedKeywords: TStringList;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; Keywords: TKeywordList);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -907,12 +892,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_StoreTransform = class(TPhoaOperation)
-  private
-     // ID изображения
-    FPicID: Integer; 
-     // Прежние значения свойств преобразования
-    FSavedRotation: TPicRotation;
-    FSavedFlips: TPicFlips;
   protected
     procedure RollbackChanges; override;
   public
@@ -4573,17 +4552,20 @@ var
   var
     iPic, iChg: Integer;
     Pic: TPhoaPic;
+    ChangedProps: TPicProperties;
   begin
     inherited Create(List, PhoA);
      // Сохраняем набор изменяющихся свойств
-    FChangedProps := ChangeList.ChangedProps;
+    ChangedProps := ChangeList.ChangedProps;
+    UndoFile.WriteInt(PicPropsToInt(ChangedProps));
+     // Сохраняем количество изображений
+    UndoFile.WriteInt(Length(Pics));
      // Цикл по изображениям
-    SetLength(FSavedProps, Length(Pics));
     for iPic := 0 to High(Pics) do begin
        // Запоминаем старые данные
       Pic := Pics[iPic];
-      FSavedProps[iPic].iPicID   := Pic.ID;
-      FSavedProps[iPic].sPicData := Pic.RawData[FChangedProps];
+      UndoFile.WriteInt(Pic.ID);
+      UndoFile.WriteStr(Pic.RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
         with ChangeList[iChg]^ do Pic.Props[Prop] := sNewValue;
@@ -4591,12 +4573,20 @@ var
   end;
 
   procedure TPhoaOp_InternalEditPicProps.RollbackChanges;
-  var i: Integer;
+  var
+    i, iPicID: Integer;
+    ChangedProps: TPicProperties;
+    sPicData: String;
   begin
     inherited RollbackChanges;
+     // Получаем набор изменённых свойств
+    ChangedProps := IntToPicProps(UndoFile.ReadInt);
      // Возвращаем данные изменённых изображений
-    for i := 0 to High(FSavedProps) do
-      with FSavedProps[i] do FPhoA.Pics.PicByID(iPicID).RawData[FChangedProps] := sPicData;
+    for i := 0 to UndoFile.ReadInt-1 do begin
+      iPicID   := UndoFile.ReadInt;
+      sPicData := UndoFile.ReadStr;
+      FPhoA.Pics.PicByID(iPicID).RawData[ChangedProps] := sPicData;
+    end;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4614,14 +4604,15 @@ var
     procedure SavePicKeywords;
     begin
       if not bKWSaved then begin
-        FSavedKeywords.AddObject(Pic.PicKeywords.CommaText, Pointer(Pic.ID));
+        UndoFile.WriteBool(True); // Признак записи ключевого слова (в противоположность стоп-флагу)
+        UndoFile.WriteInt(Pic.ID);
+        UndoFile.WriteStr(Pic.PicKeywords.CommaText);
         bKWSaved := True;
       end;
     end;
 
   begin
     inherited Create(List, PhoA);
-    FSavedKeywords := TStringList.Create;
     iCnt := Length(Pics);
      // Цикл по изображениям
     for iPic := 0 to iCnt-1 do begin
@@ -4677,21 +4668,22 @@ var
         end;
       end;
     end;
-  end;
-
-  destructor TPhoaOp_InternalEditPicKeywords.Destroy;
-  begin
-    FSavedKeywords.Free;
-    inherited Destroy;
+     // Пишем стоп-флаг
+    UndoFile.WriteBool(False); 
   end;
 
   procedure TPhoaOp_InternalEditPicKeywords.RollbackChanges;
-  var i: Integer;
+  var
+    iPicID: Integer;
+    sKeywords: String;
   begin
     inherited RollbackChanges;
-     // Возвращаем КС изменённым изображениям
-    for i := 0 to FSavedKeywords.Count-1 do
-      FPhoA.Pics.PicByID(Integer(FSavedKeywords.Objects[i])).PicKeywords.CommaText := FSavedKeywords[i];
+     // Возвращаем КС изменённым изображениям: крутим цикл, пока не встретим стоп-флаг
+    while UndoFile.ReadBool do begin
+      iPicID    := UndoFile.ReadInt;
+      sKeywords := UndoFile.ReadStr;
+      FPhoA.Pics.PicByID(iPicID).PicKeywords.CommaText := sKeywords;
+    end;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4702,9 +4694,9 @@ var
   begin
     inherited Create(List, PhoA);
      // Сохраняем прежние свойства
-    FPicID         := Pic.ID;
-    FSavedRotation := Pic.PicRotation;
-    FSavedFlips    := Pic.PicFlips;
+    UndoFile.WriteInt(Pic.ID);
+    UndoFile.WriteByte(Byte(Pic.PicRotation));
+    UndoFile.WriteByte(Byte(Pic.PicFlips));
      // Применяем новые свойства
     Pic.PicRotation := NewRotation;
     Pic.PicFlips    := NewFlips; 
@@ -4714,9 +4706,9 @@ var
   var Pic: TPhoaPic;
   begin
     inherited RollbackChanges;
-    Pic := PhoA.Pics.PicByID(FPicID);
-    Pic.PicRotation := FSavedRotation;
-    Pic.PicFlips    := FSavedFlips;
+    Pic             := PhoA.Pics.PicByID(UndoFile.ReadInt);
+    Pic.PicRotation := TPicRotation     (UndoFile.ReadByte);
+    Pic.PicFlips    := TPicFlips   (Byte(UndoFile.ReadByte)); // Странный typecast, но иначе не компилируется
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
