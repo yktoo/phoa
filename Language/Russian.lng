@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-06 01:23:51
+LastModified=2004-09-07 19:33:58
 SourceLANGID=1033
 
 [fMain]
@@ -513,7 +513,6 @@ SourceLANGID=1033
 00000036=выше\nбольше размер
 
 [dMsgBox]
-00000003=<>
 00000012=Больше не &показывать данное сообщение
 
 [dGroupProps]
