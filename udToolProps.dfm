@@ -238,8 +238,8 @@ inherited dToolProps: TdToolProps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 40
     Top = 336
     LangData = {

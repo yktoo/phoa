@@ -111,9 +111,8 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvFiles.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 124
     Top = 28
     LangData = {

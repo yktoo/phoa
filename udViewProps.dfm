@@ -147,10 +147,8 @@ inherited dViewProps: TdViewProps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'frSorting.tvMain.Header.Font.Name'
-      'SecondaryShortCuts'
-      'tvGrouping.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 76
     Top = 104
     LangData = {

@@ -126,9 +126,8 @@ inherited dSearch: TdSearch
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvCriteria.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 20
     Top = 76
     LangData = {

@@ -7049,9 +7049,8 @@ object fMain: TfMain
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.SecondaryShortCuts'
-      'Font.Name'
-      'mruOpen.Prefix'
-      'tvGroups.Header.Font.Name')
+      '*.Font.Name'
+      'mruOpen.Prefix')
     OnLanguageChanged = dklcMainLanguageChanged
     Left = 292
     Top = 168

@@ -68,11 +68,10 @@ inherited dStats: TdStats
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'IniFileName'
-      'IniSection'
-      'SecondaryShortCuts'
-      'tvMain.Header.Font.Name')
+      '*.Font.Name'
+      'fpMain.IniFileName'
+      'fpMain.IniSection'
+      '*.SecondaryShortCuts')
     Top = 400
     LangData = {
       0600645374617473010100000003000000070043617074696F6E010700000008

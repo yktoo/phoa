@@ -131,9 +131,9 @@ inherited dPhoAProps: TdPhoAProps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
+      '*.Font.Name'
       'lThumbSizeX.Caption'
-      'SecondaryShortCuts')
+      '*.SecondaryShortCuts')
     Left = 12
     Top = 260
     LangData = {

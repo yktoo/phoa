@@ -80,9 +80,8 @@ inherited dSelKeywords: TdSelKeywords
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvMain.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Top = 400
     LangData = {
       0C006453656C4B6579776F726473010100000003000000070043617074696F6E

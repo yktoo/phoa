@@ -110,9 +110,8 @@ inherited dSortPics: TdSortPics
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'frSorting.tvMain.Header.Font.Name'
-      'SecondaryShortCuts')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 60
     Top = 126
     LangData = {

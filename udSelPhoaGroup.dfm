@@ -69,9 +69,8 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvGroups.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Top = 404
     LangData = {
       0D006453656C50686F6147726F7570010100000003000000070043617074696F

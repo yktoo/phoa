@@ -139,7 +139,6 @@ lText.Caption=00000024,&Text:
 lDesc.Caption=00000027,&Description:
 
 [dMsgBox]
-Caption=00000003,<>
 cbDontShowAgain.Caption=00000012,Don't &show this message again
 
 [dPhoAProps]

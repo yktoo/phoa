@@ -78,9 +78,8 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvFolder.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 8
     Top = 12
     LangData = {

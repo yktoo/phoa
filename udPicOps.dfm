@@ -99,9 +99,8 @@ inherited dPicOps: TdPicOps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvGroups.Header.Font.Name')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Top = 400
     LangData = {
       0700645069634F7073010100000003000000070043617074696F6E0109000000

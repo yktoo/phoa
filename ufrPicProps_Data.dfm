@@ -174,10 +174,9 @@ inherited frPicProps_Data: TfrPicProps_Data
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'eTime.EditMask'
-      'eTime.Text'
-      'Font.Name'
-      'SecondaryShortCuts')
+      'eTime.*'
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 476
     Top = 212
     LangData = {

@@ -41,9 +41,9 @@ inherited fAddFilesWizard: TfAddFilesWizard
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
+      '*.Font.Name'
       'lHeading.Caption'
-      'SecondaryShortCuts')
+      '*.SecondaryShortCuts')
     Left = 92
     Top = 368
     LangData = {

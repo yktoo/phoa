@@ -119,10 +119,9 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'eReplaceChar.EditMask'
-      'eReplaceChar.Text'
-      'Font.Name'
-      'SecondaryShortCuts')
+      'eReplaceChar.*'
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 536
     Top = 12
     LangData = {

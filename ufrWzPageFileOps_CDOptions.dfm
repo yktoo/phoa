@@ -100,8 +100,8 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
-      'SecondaryShortCuts')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 60
     Top = 76
     LangData = {

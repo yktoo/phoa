@@ -726,8 +726,8 @@ object fImgView: TfImgView
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       'eCounter.Text'
-      'Font.Name'
-      'SecondaryShortCuts')
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 92
     Top = 48
     LangData = {

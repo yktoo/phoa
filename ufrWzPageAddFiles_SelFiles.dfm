@@ -219,13 +219,10 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       'cbFileMasks.Text'
-      'eFileTimeFrom.EditMask'
-      'eFileTimeFrom.Text'
-      'eFileTimeTo.EditMask'
-      'eFileTimeTo.Text'
-      'Font.Name'
-      'SecondaryShortCuts'
-      'tvMain.Header.Font.Name')
+      'eFileTimeFrom.*'
+      'eFileTimeTo.*'
+      '*.Font.Name'
+      '*.SecondaryShortCuts')
     Left = 8
     Top = 24
     LangData = {

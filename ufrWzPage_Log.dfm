@@ -136,10 +136,9 @@ inherited frWzPage_Log: TfrWzPage_Log
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Font.Name'
+      '*.Font.Name'
       'lInfo.Caption'
-      'SecondaryShortCuts'
-      'tvMain.Header.Font.Name')
+      '*.SecondaryShortCuts')
     Left = 128
     Top = 8
     LangData = {
