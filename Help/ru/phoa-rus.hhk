@@ -216,6 +216,18 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&agrave;&yuml; &ntilde;&ograve;&eth;&icirc;&ecirc;&agrave;">
+		<param name="Name" value="командная строка">
+		<param name="See Also" value="командная строка">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc;">
+			<param name="Name" value="Параметры командной строки">
+			<param name="Local" value="info-cmd-line.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&euml;&egrave;&ouml;&aring;&iacute;&ccedil;&egrave;&icirc;&iacute;&iacute;&icirc;&aring; &ntilde;&icirc;&atilde;&euml;&agrave;&oslash;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Лицензионное соглашение">
 		<param name="Local" value="general-license.html">
@@ -443,6 +455,11 @@
 		<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave;&ucirc; &eth;&agrave;&aacute;&icirc;&ograve;&ucirc; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
 		<param name="Name" value="Режимы работы программы">
 		<param name="Local" value="general-major-modes.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&eth;&aring;&ecirc;&oacute;&eth;&ntilde;&egrave;&acirc;&iacute;&ucirc;&eacute; &iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
+		<param name="Name" value="Меню режима обзора :: Вид :: Рекурсивный просмотр">
+		<param name="Local" value="intf-browse-mode-menu-view.html#flat_mode">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&eth;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">

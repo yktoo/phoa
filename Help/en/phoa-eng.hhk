@@ -47,6 +47,18 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="command line">
+		<param name="Name" value="command line">
+		<param name="See Also" value="command line">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="parameters">
+			<param name="Name" value="Command line parameters">
+			<param name="Local" value="info-cmd-line.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="copyright">
 		<param name="Name" value="License Agreement">
 		<param name="Local" value="general-license.html">
@@ -165,6 +177,11 @@
 		<param name="Name" value="find pictures">
 		<param name="Name" value="Find pictures dialog">
 		<param name="Local" value="intf-search.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="flat mode">
+		<param name="Name" value="Browse mode menu :: View :: Flat mode">
+		<param name="Local" value="intf-browse-mode-menu-view.html#flat_mode">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="graphic formats">
