@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.55 2004-10-18 19:27:03 dale Exp $
+//  $Id: Main.pas,v 1.56 2004-10-19 07:31:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -729,7 +729,7 @@ uses
     if PhoaConfirm(False, 'SConfirm_DelView', ISettingID_Dlgs_ConfmDelView) then begin
       BeginOperation;
       try
-        TPhoaOp_ViewDelete.Create(FUndo, FProject, Changes);
+        TPhoaOp_ViewDelete.Create(FUndo, FProject, nil, Changes);
       finally
         EndOperation(Changes);
       end;
@@ -1692,7 +1692,14 @@ uses
        // Перемещаем
       BeginOperation;
       try
-        TPhoaOp_GroupDragAndDrop.Create(FUndo, FProject, GetNodeGroup(nSrc), gTgt, iNewIndex, Changes);
+        TPhoaOp_GroupDragAndDrop.Create(
+          FUndo,
+          FProject,
+          NewPhoaOperationParams([
+            'Group',          GetNodeGroup(nSrc),
+            'NewParentGroup', gTgt,
+            'NewIndex',       iNewIndex]),
+          Changes);
       finally
         EndOperation(Changes);
       end;
@@ -1704,7 +1711,15 @@ uses
       iCntBefore := gTgt.Pics.Count;
       BeginOperation;
       try
-        TPhoaOp_PicDragAndDropToGroup.Create(FUndo, FProject, CurGroup, gTgt, Viewer.SelectedPics, bCopy, Changes);
+        TPhoaOp_PicDragAndDropToGroup.Create(
+          FUndo,
+          FProject,
+          NewPhoaOperationParams([
+            'SourceGroup', CurGroup,
+            'TargetGroup', gTgt,
+            'Pics',        Viewer.SelectedPics,
+            'Copy',        bCopy]), 
+          Changes);
       finally
         EndOperation(Changes);
       end;
@@ -1853,10 +1868,7 @@ uses
           TPhoaOp_ViewEdit.Create(
             FUndo,
             FProject,
-            FProject.CurrentViewX,
-            UnicodetoAnsiCP(NewText, cMainCodePage),
-            nil,
-            nil,
+            NewPhoaOperationParams(['View', FProject.CurrentViewX, 'Name', UnicodetoAnsiCP(NewText, cMainCodePage)]),
             Changes);
         gnkPhoaGroup:
           TPhoaOp_GroupRename.Create(
@@ -1926,7 +1938,11 @@ uses
     Changes := [];
     BeginOperation;
     try
-      TPhoaOp_PicDragAndDropInsideGroup.Create(FUndo, FProject, CurGroup, Viewer.SelectedPics, Viewer.DropTargetIndex, Changes);
+      TPhoaOp_PicDragAndDropInsideGroup.Create(
+        FUndo,
+        FProject,
+        NewPhoaOperationParams(['Group', CurGroup, 'Pics', Viewer.SelectedPics, 'NewIndex', Viewer.DropTargetIndex]),
+        Changes);
     finally
       EndOperation(Changes);
     end;

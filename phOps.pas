@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.7 2004-10-18 19:27:03 dale Exp $
+//  $Id: phOps.pas,v 1.8 2004-10-19 07:31:32 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -87,9 +87,10 @@ type
 
   IPhoaOperationParams = interface(IInterface)
     ['{4AF24473-A666-4373-9BD6-DC0868647DC9}']
-     // Получает объектные значения параметров с проверкой на существование, тип и интерфейс/класс
-    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf);
-//???    procedure ObtainValObj(const sName: String; AClass: TClass; out Obj);
+     // Получает интерфейсное значение параметра. Если bRequired=True, то проверяет наличие параметра и при отсутствии
+     //   вызывает Exception; при bRequired=False и отсутствии параметра в Intf возвращает nil. Если параметр есть,
+     //   обязательно проверяет доступность интерфейса, при его отсутствии вызвает Exception
+    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
      // Prop handlers
     function  GetCount: Integer;
     function  GetNames(Index: Integer): String;
@@ -623,11 +624,11 @@ type
    //===================================================================================================================
    // Операция изменения представления
    //   Params:
-   //     View:         IPhotoAlbumView            - изменяемое представление
-   //     NewName:      String                     - новое наименование представления
-   //     NewGroupings: IPhotoAlbumPicGroupingList - новый список группировок представления
-   //     NewSortings:  IPhotoAlbumPicSortingList  - новый список сортировок представления
-   //       Если NewGroupings=nil и NewSortings=nil, значит, это просто переименование представления
+   //     View:      IPhotoAlbumView            - изменяемое представление
+   //     Name:      String                     - новое наименование представления
+   //     Groupings: IPhotoAlbumPicGroupingList - новый список группировок представления
+   //     Sortings:  IPhotoAlbumPicSortingList  - новый список сортировок представления
+   //       Если Groupings=nil и Sortings=nil, значит, это просто переименование представления
    //===================================================================================================================
 
   TPhoaOp_ViewEdit = class(TPhoaOperation)
@@ -638,34 +639,32 @@ type
 
    //===================================================================================================================
    // Операция удаления представления
+   //   Params:
+   //     <none>
    //===================================================================================================================
 
   TPhoaOp_ViewDelete = class(TPhoaOperation)
   protected
     procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
-  public
-    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; var Changes: TPhoaOperationChanges);
   end;
 
    //===================================================================================================================
    // Операция создания группы фотоальбома из представления
+   //   Params:
+   //     Group: IPhotoAlbumPicGroup - группа, куда помещать папки представления
    //===================================================================================================================
 
   TPhoaOp_ViewMakeGroup = class(TPhoaOperation)
   protected
     procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
-  public
-     // Group - группа, куда помещать папки представления
-    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup; var Changes: TPhoaOperationChanges);
   end;
 
 resourcestring
   SPhoaOpErrMsg_ParamNotFound         = 'Operation parameter named "%s" not found';
   SPhoaOpErrMsg_ParamTypeMismatch     = 'Operation parameter "%s" type mismatch. Expected: "%s", actual: "%s"';
   SPhoaOpErrMsg_CannotObtainParamIntf = 'Operation parameter "%s" doesn''t implement required interface';
-  SPhoaOpErrMsg_ParamIsntDescendant   = 'Operation parameter "%s" isn''t a descendant of class "%s"';
 
    // Создаёт экземпляр IPhoaOperationParams и заполняет его параметрами (описания параметров должны идти в Params
    //   парами: [имя1, значение1, имя2, значение2, ...])
@@ -870,8 +869,7 @@ type
      // Проверяет тип значения. При несоответствии вызывает Exception
     procedure CheckVarType(const sName: String; const v: Variant; RequiredType: TVarType);
      // IPhoaOperationParams
-    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf);
-//???    procedure ObtainValObj(const sName: String; AClass: TClass; out Obj);
+    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
     function  GetCount: Integer;
     function  GetNames(Index: Integer): String;
     function  GetValBool(const sName: String): Boolean;
@@ -973,22 +971,13 @@ type
     if VarIsEmpty(Result) then PhoaException(SPhoaOpErrMsg_ParamNotFound, [sName]);
   end;
 
-  procedure TPhoaOperationParams.ObtainValIntf(const sName: String; GUID: TGUID; out Intf);
+  procedure TPhoaOperationParams.ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
   var v: Variant;
   begin
-    v := GetValueStrict(sName);
-    if not VarSupports(v, GUID, Intf) then PhoaException(SPhoaOpErrMsg_CannotObtainParamIntf, [sName]);
+    IInterface(Intf) := nil;
+    if bRequired then v := GetValueStrict(sName) else v := GetValues(sName);
+    if not VarIsEmpty(v) and not VarSupports(v, GUID, Intf) then PhoaException(SPhoaOpErrMsg_CannotObtainParamIntf, [sName]);
   end;
-
-//???  procedure TPhoaOperationParams.ObtainValObj(const sName: String; AClass: TClass; out Obj);
-//  var v: Variant;
-//  begin
-//    v := GetValueStrict(sName);
-//     // Объекты передаём typecasted to Integer
-//    CheckVarType(sName, v, varInteger);
-//    if not (TObject(Integer(v)) is AClass) then PhoaException(SPhoaOpErrMsg_ParamIsntDescendant, [sName, AClass.ClassName]);
-//    Integer(Obj) := Integer(v);
-//  end;
 
   procedure TPhoaOperationParams.SetValues(const sName: String; const Value: Variant);
   var
@@ -2009,7 +1998,6 @@ type
   procedure TPhoaOp_PicPaste.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var
     Group: IPhotoAlbumPicGroup;
-    Pic: IPhotoAlbumPic;
     PastedPics: IPhotoAlbumPicList;
     hRec: THandle;
     ms: TMemoryStream;
@@ -2205,18 +2193,21 @@ type
    //===================================================================================================================
 
   procedure TPhoaOp_GroupDragAndDrop.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
-  var Group, NewParentGroup, gOldParent: IPhotoAlbumPicGroup;
+  var
+    Group, NewParentGroup, gOldParent: IPhotoAlbumPicGroup;
+    iNewIndex: Integer;
   begin
     inherited Perform(Params, Changes);
      // Получаем параметры
     Params.ObtainValIntf('Group',          IPhotoAlbumPicGroup, Group);
     Params.ObtainValIntf('NewParentGroup', IPhotoAlbumPicGroup, NewParentGroup);
+    iNewIndex := Params.ValInt['NewIndex'];
      // Запоминаем данные отката
     gOldParent := Group.OwnerX;
     UndoFile.WriteInt(Group.Index);
      // Перемещаем группу
     Group.Owner := NewParentGroup;
-    if iNewIndex>=0 then Group.Index := Params.ValInt['NewIndex']; // Индекс -1 означает добавление последним ребёнком
+    if iNewIndex>=0 then Group.Index := iNewIndex; // Индекс -1 означает добавление последним ребёнком
      // Запоминаем группы (ID прежнего родителя и ID группы)
     OpParentGroup := gOldParent;
     OpGroup       := Group;
@@ -2254,13 +2245,13 @@ type
     TPhoaOp_InternalPicToGroupAdding.Create(
       Operations,
       Project,
-      NewPhoaOperationParams[('Group', TargetGroup, 'Pics', Pics]),
+      NewPhoaOperationParams(['Group', TargetGroup, 'Pics', Pics]),
       Changes);
     if not Params.ValBool['Copy'] then
       TPhoaOp_InternalPicFromGroupRemoving.Create(
         Operations,
         Project,
-        NewPhoaOperationParams[('Group', SourceGroup, 'Pics', Pics]),
+        NewPhoaOperationParams(['Group', SourceGroup, 'Pics', Pics]),
         Changes);
   end;
 
@@ -2334,7 +2325,6 @@ type
 
   procedure TPhoaOp_ViewNew.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var
-    sName: String;
     Groupings: IPhotoAlbumPicGroupingList;
     Sortings: IPhotoAlbumPicSortingList;
     View: IPhotoAlbumView;
@@ -2382,36 +2372,34 @@ type
   procedure TPhoaOp_ViewEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var
     View: IPhotoAlbumView;
-    NewGroupings: IPhotoAlbumPicGroupingList;
-    NewSortings: IPhotoAlbumPicSortingList;
+    Groupings: IPhotoAlbumPicGroupingList;
+    Sortings: IPhotoAlbumPicSortingList;
     bWriteGroupings, bWriteSortings: Boolean;
   begin
     inherited Perform(Params, Changes);
      // Получаем параметры
-    Params.ObtainValIntf('View',         IPhotoAlbumView,            View);
-    Params.ObtainValIntf('NewGroupings', IPhotoAlbumPicGroupingList, NewGroupings);
-    Params.ObtainValIntf('NewSortings',  IPhotoAlbumPicSortingList,  NewSortings);
+    Params.ObtainValIntf('View',      IPhotoAlbumView,            View);
+    Params.ObtainValIntf('Groupings', IPhotoAlbumPicGroupingList, Groupings, False);
+    Params.ObtainValIntf('Sortings',  IPhotoAlbumPicSortingList,  Sortings,  False);
      // Сохраняем данные отката и применяем изменения
     UndoFile.WriteStr(View.Name);
-    View.Name := Params.ValStr['NewName'];
+    View.Name := Params.ValStr['Name'];
      // Запоминаем новый индекс представления (ПОСЛЕ присвоения имени, т.к. оно изменяет позицию представления в списке)
     UndoFile.WriteInt(View.Index);
-     // Список группировок создаём и сохраняем только в том случае, если это не переименование и он различается
-    bWriteGroupings := (NewGroupings<>nil) and not View.Groupings.IdenticalWith(NewGroupings);
-     // Пишем признак наличия группировок
-    UndoFile.WriteBool(bWriteGroupings);
+     // Список группировок создаём и сохраняем, если он есть
+    bWriteGroupings := Groupings<>nil;
+    UndoFile.WriteBool(bWriteGroupings); // Признак наличия группировок
     if bWriteGroupings then begin
       UndoWriteGroupings(UndoFile, View.GroupingsX);
-      View.GroupingsX.Assign(NewGroupings);
+      View.GroupingsX.Assign(Groupings);
       View.Invalidate;
     end;
-     // Список сортировок создаём и сохраняем только в том случае, если это не переименование и он различается
-    bWriteSortings := (NewSortings<>nil) and not View.Sortings.IdenticalWith(NewSortings);
-     // Пишем признак наличия сортировок
-    UndoFile.WriteBool(bWriteSortings);
+     // Список сортировок создаём и сохраняем, если он есть
+    bWriteSortings := Sortings<>nil;
+    UndoFile.WriteBool(bWriteSortings); // Признак наличия сортировок
     if bWriteSortings then begin
       UndoWriteSortings(UndoFile, View.SortingsX);
-      View.SortingsX.Assign(NewSortings);
+      View.SortingsX.Assign(Sortings);
       View.Invalidate;
     end;
      // Обновляем текущий индекс представления (мог поменяться после переименования представления)
@@ -2445,10 +2433,10 @@ type
    // TPhoaOp_ViewDelete
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewDelete.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var View: IPhotoAlbumView;
   begin
-    inherited Create(AList, AProject, Changes);
+    inherited Perform(Params, Changes);
      // Сохраняем данные отката
     View := Project.CurrentViewX;
     UndoFile.WriteStr(View.Name);
@@ -2460,12 +2448,6 @@ type
     Project.ViewIndex := -1;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
-  end;
-
-  procedure TPhoaOp_ViewDelete.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
-  begin
-    inherited Perform(Params, Changes);
-    //!!!!
   end;
 
   procedure TPhoaOp_ViewDelete.RollbackChanges(var Changes: TPhoaOperationChanges);
@@ -2487,31 +2469,28 @@ type
    // TPhoaOp_ViewMakeGroup
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewMakeGroup.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup; var Changes: TPhoaOperationChanges);
+  procedure TPhoaOp_ViewMakeGroup.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var
-    g: IPhotoAlbumPicGroup;
+    Group, ViewGroup: IPhotoAlbumPicGroup;
     View: IPhotoAlbumView;
   begin
-    inherited Create(AList, AProject, Changes);
+    inherited Perform(Params, Changes);
+     // Получаем параметры
+    Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
+     // Получаем представление
     View := Project.CurrentViewX;
      // Создаём группы (изначально с нулевыми ID)
-    g := NewPhotoAlbumPicGroup(Group, 0);
-    g.Assign(View.RootGroup, False, True, True);
-    g.Text := View.Name;
+    ViewGroup := NewPhotoAlbumPicGroup(Group, 0);
+    ViewGroup.Assign(View.RootGroup, False, True, True);
+    ViewGroup.Text := View.Name;
      // Распределяем группам настоящие ID
     Project.RootGroupX.FixupIDs;
-     // Запоминаем созданную (корневую) группу 
-    OpGroup := g;
+     // Запоминаем созданную (корневую) группу
+    OpGroup := ViewGroup;
      // Устанавливаем режим отображения групп
     Project.ViewIndex := -1;
      // Добавляем флаги изменений
     Changes := Changes+[pocViewIndex, pocGroupStructure];
-  end;
-
-  procedure TPhoaOp_ViewMakeGroup.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
-  begin
-    inherited Perform(Params, Changes);
-    //!!!!
   end;
 
   procedure TPhoaOp_ViewMakeGroup.RollbackChanges(var Changes: TPhoaOperationChanges);

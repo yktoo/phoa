@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.12 2004-10-13 11:03:33 dale Exp $
+//  $Id: phIntf.pas,v 1.13 2004-10-19 07:31:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -299,8 +299,6 @@ type
     function  IndexOfProp(Prop: TPicProperty): Integer; stdcall;
      // Sort compare routine
     function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer; stdcall;
-     // Returns True if list content is identical with Sortings content
-    function  IdenticalWith(Sortings: IPhoaPicSortingList): Boolean; stdcall;
      // Prop handlers
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaPicSorting; stdcall;
@@ -352,8 +350,6 @@ type
     function  IndexOfProp(Prop: TPicGroupByProperty): Integer; stdcall;
      // Sort compare routine
     function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer; stdcall;
-     // Returns True if list content is identical with Groupings content
-    function  IdenticalWith(Groupings: IPhoaPicGroupingList): Boolean; stdcall;
      // Prop handlers
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaPicGrouping; stdcall;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.8 2004-10-15 13:49:35 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.9 2004-10-19 07:31:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -67,9 +67,11 @@ uses ConsVars, phUtils, Main;
       TPhoaOp_ProjectEdit.Create(
         FUndoOperations,
         FApp.Project,
-        Size(eThumbSizeX.AsInteger, eThumbSizeY.AsInteger),
-        tbThumbQuality.Position,
-        mDesc.Lines.Text,
+        NewPhoaOperationParams([
+          'NewThWidth',     eThumbSizeX.AsInteger,
+          'NewThHeight',    eThumbSizeY.AsInteger,
+          'NewThQuality',   tbThumbQuality.Position,
+          'NewDescription', mDesc.Text]),
         Changes);
     finally
       fMain.EndOperation(Changes);

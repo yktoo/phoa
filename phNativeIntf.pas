@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.4 2004-10-18 12:25:49 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.5 2004-10-19 07:31:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -57,6 +57,7 @@ type
    // Дополнительные данные ключевого слова
   PPhoaKeywordData = ^TPhoaKeywordData;
   TPhoaKeywordData = record
+    sKeyword:    String;             // Ключевое слово
     sOldKeyword: String;             // Прежнее ключевое слово, если нужно заменить существующее на другое
     Change:      TPhoaKeywordChange; // Требуемое изменение [текста] ключевого слова
     State:       TPhoaKeywordState;  // Состояние выбора ключевого слова

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.13 2004-10-15 13:49:35 dale Exp $
+//  $Id: udPicOps.pas,v 1.14 2004-10-19 07:31:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -67,10 +67,11 @@ uses phUtils, Main, phSettings;
       TPhoaOp_PicOperation.Create(
         FUndoOperations,
         FApp.Project,
-        FApp.CurGroup,
-        PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
-        FApp.SelectedPics,
-        TPictureOperation(cbOp.ItemIndex),
+        NewPhoaOperationParams([
+          'SourceGroup',  FApp.CurGroup,
+          'TargetGroup',  PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
+          'Pics',         FApp.SelectedPics,
+          'PicOperation', Byte(cbOp.ItemIndex)]),
         Changes)
     finally
       fMain.EndOperation(Changes);
