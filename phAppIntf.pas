@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.1 2005-02-19 13:30:16 dale Exp $
+//  $Id: phAppIntf.pas,v 1.2 2005-02-26 12:35:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -14,13 +14,22 @@ uses phIntf;
 type
 
    //===================================================================================================================
-   // An action (the same as command)
+   // An action (the same as command). You implement it yourself through your action objects
    //===================================================================================================================
+
+  IPhoaAction = interface;
+
+   // A callback handler for Action's OnChange event
+  TPhoaActionChangeNotificationProc = procedure(Sender: IPhoaAction); stdcall;
 
   IPhoaAction = interface(IInterface)
     ['{03A7EFBC-0C77-481B-A3B9-1D25BB2D458C}']
      // Executes the action. Should return True, if the action succeeded, or False if it was failed due to any reason
     function  Execute: LongBool; stdcall;
+     // Set action change notification callback. Once it's not nil, this procedure should be called by your action
+     //   implementation each time its state (Caption, Category, Hint, Enabled values) has been changed. Invoking
+     //   SetChangeNotification(nil) should cancel further notifications.
+    procedure SetChangeNotification(Proc: TPhoaActionChangeNotificationProc); stdcall;
      // Prop handlers
     function  GetCaption: String; stdcall;
     function  GetCaptionW: WideString; stdcall;
@@ -31,6 +40,7 @@ type
     function  GetHintW: WideString; stdcall;
     function  GetName: String; stdcall;
     function  GetNameW: WideString; stdcall;
+    function  GetTag: Integer; stdcall;
     procedure SetCaption(const Value: String); stdcall;
     procedure SetCaptionW(const Value: WideString); stdcall;
     procedure SetCategory(const Value: String); stdcall;
@@ -38,6 +48,7 @@ type
     procedure SetEnabled(Value: LongBool); stdcall;
     procedure SetHint(const Value: String); stdcall;
     procedure SetHintW(const Value: WideString); stdcall;
+    procedure SetTag(Value: Integer); stdcall;
      // Props
      // -- Action caption
     property Caption: String read GetCaption write SetCaption;
@@ -59,6 +70,9 @@ type
      //    action should be named 'aDoorOpener_Knock': your plugin name acts like a prefix.
     property Name: String read GetName;
     property NameW: WideString read GetNameW;
+     // -- Custom data associated with the action - it's for internal program use only. It shouldn't be used by the
+     //    action itself nor by plugin routines  
+    property Tag: Integer read GetTag write SetTag;
   end;
 
    //===================================================================================================================
@@ -86,8 +100,19 @@ type
    // An abstract menu entry
    //===================================================================================================================
 
+  IPhoaMenu = interface;
+
   IPhoaMenuEntry = interface(IInterface)
     ['{D6AF0D63-5419-490F-A7AB-03AA448CED0D}']
+     // Prop handlers
+    function  GetIndex: Integer; stdcall;
+    function  GetOwner: IPhoaMenu; stdcall;
+    procedure SetIndex(Value: Integer); stdcall;
+     // Props
+     // -- Index in Owner menu
+    property Index: Integer read GetIndex write SetIndex;
+     // -- Owner menu (nil for a top-level entry)
+    property Owner: IPhoaMenu read GetOwner;
   end;
 
    //===================================================================================================================
@@ -95,7 +120,7 @@ type
    //===================================================================================================================
 
   IPhoaMenuItem = interface(IPhoaMenuEntry)
-    ['{099DEDE9-E3E3-4938-87C2-E808C32A6CE0}']
+    ['{D6AF0D63-5419-490F-A7AB-03AA448CED0E}']
      // Prop handlers
     function  GetAction: IPhoaAction; stdcall;
      // Props
@@ -104,11 +129,11 @@ type
   end;
 
    //===================================================================================================================
-   // A menu
+   // A menu (or submenu)
    //===================================================================================================================
 
   IPhoaMenu = interface(IPhoaMenuEntry)
-    ['{099DEDE9-E3E3-4938-87C2-E808C32A6CE0}']
+    ['{D6AF0D63-5419-490F-A7AB-03AA448CED0F}']
      // Adds and returns a new submenu
     function  AddMenu: IPhoaMenu; stdcall;
      // Adds and returns a new item
@@ -140,14 +165,17 @@ type
   IPhoaApp = interface(IInterface)
     ['{D931B4CD-F8F0-48F7-B844-F1BECAC0E045}']
      // Prop handlers
-    function  GetCurGroup: IPhoaPicGroup;
-    function  GetFocusedControl: TPhoaAppFocusedControl;
-    function  GetMenu: IPhoaMenu;
-    function  GetProject: IPhoaProject;
-    function  GetSelectedPics: IPhoaPicList;
-    function  GetViewedPics: IPhoaPicList;
-    procedure SetCurGroup(Value: IPhoaPicGroup);
+    function  GetActionList: IPhoaActionList; stdcall;
+    function  GetCurGroup: IPhoaPicGroup; stdcall;
+    function  GetFocusedControl: TPhoaAppFocusedControl; stdcall;
+    function  GetMenu: IPhoaMenu; stdcall;
+    function  GetProject: IPhoaProject; stdcall;
+    function  GetSelectedPics: IPhoaPicList; stdcall;
+    function  GetViewedPics: IPhoaPicList; stdcall;
+    procedure SetCurGroup(Value: IPhoaPicGroup); stdcall;
      // Props
+     // -- Application action list
+    property ActionList: IPhoaActionList read GetActionList;
      // -- Group curently selected
     property CurGroup: IPhoaPicGroup read GetCurGroup write SetCurGroup;
      // -- Control currently focused

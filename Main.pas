@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.78 2005-02-19 13:30:16 dale Exp $
+//  $Id: Main.pas,v 1.79 2005-02-26 12:35:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -302,6 +302,8 @@ type
     FAppState: TAppStates;
      // Prop storage
     FViewer: TThumbnailViewer;
+    FAppActionList: IPhoaActionList;
+    FAppMenu: IPhoaMenu;
      // Применяет параметры настройки языка
     procedure ApplyLanguage;
      // Применяет параметры настройки инструментов
@@ -370,6 +372,7 @@ type
     procedure ViewerSelectionChange(Sender: TObject);
     procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
      // IPhoaApp
+    function  IPhoaApp.GetActionList     = IApp_GetActionList;
     function  IPhoaApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhoaApp.GetMenu           = IApp_GetMenu;
@@ -377,14 +380,16 @@ type
     function  IPhoaApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhoaApp.GetViewedPics     = IApp_GetViewedPics;
     procedure IPhoaApp.SetCurGroup       = IApp_SetCurGroup;
-    function  IApp_GetCurGroup: IPhoaPicGroup;
-    function  IApp_GetFocusedControl: TPhoaAppFocusedControl;
-    function  IApp_GetMenu: IPhoaMenu;
-    function  IApp_GetProject: IPhoaProject;
-    function  IApp_GetSelectedPics: IPhoaPicList;
-    function  IApp_GetViewedPics: IPhoaPicList;
-    procedure IApp_SetCurGroup(Value: IPhoaPicGroup);
+    function  IApp_GetActionList: IPhoaActionList; stdcall;
+    function  IApp_GetCurGroup: IPhoaPicGroup; stdcall;
+    function  IApp_GetFocusedControl: TPhoaAppFocusedControl; stdcall;
+    function  IApp_GetMenu: IPhoaMenu; stdcall;
+    function  IApp_GetProject: IPhoaProject; stdcall;
+    function  IApp_GetSelectedPics: IPhoaPicList; stdcall;
+    function  IApp_GetViewedPics: IPhoaPicList; stdcall;
+    procedure IApp_SetCurGroup(Value: IPhoaPicGroup); stdcall;
      // IPhoaMutableApp
+    function  IPhoaMutableApp.GetActionList     = IApp_GetActionList;
     function  IPhoaMutableApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaMutableApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhoaMutableApp.GetProject        = IApp_GetProject;
@@ -403,6 +408,7 @@ type
     function  IApp_GetViewedPicsM: IPhoaMutablePicList;
     procedure IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
      // IPhotoAlbumApp
+    function  IPhotoAlbumApp.GetActionList     = IApp_GetActionList;
     function  IPhotoAlbumApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhotoAlbumApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhotoAlbumApp.GetMenu           = IApp_GetMenu;
@@ -1136,8 +1142,10 @@ uses
        // Настраиваем fpMain
       fpMain.IniFileName := SRegRoot;
       fpMain.IniSection  := SRegMainWindow_Root;
-       // Создаём фотоальбом
-      FProject := NewPhotoAlbumProject;
+       // Создаём интерфейсы
+      FProject       := NewPhotoAlbumProject;
+      FAppActionList := TPhoaActionList.Create(alMain);
+      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, True);
        // Настраиваем Application
       Application.OnActionExecute := AppActionExecute;
       Application.OnHint          := AppHint;
@@ -1166,9 +1174,6 @@ uses
       RootSetting.Modified := True;
       ApplySettings;
       ApplyLanguage;
-       // Загружаем плагины
-      ShowProgressInfo('SMsg_LoadingPlugins', []);
-      PluginsInitialize(Self);
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
@@ -1191,13 +1196,14 @@ uses
   begin
      // Remove self from the clipboard viewer chain
     ChangeClipboardChain(Handle, FHNextClipbrdViewer);
+     // Free interfaces and destroy objects
+    FAppMenu       := nil; 
+    FAppActionList := nil;
     FViewer.Free;
     FViewedPics    := nil;
     FSearchResults := nil;
     FProject       := nil;
     FUndo.Free;
-     // Выгружаем плагины
-    PluginsFinalize;
   end;
 
   procedure TfMain.fpMainRestorePlacement(Sender: TObject);
@@ -1263,6 +1269,11 @@ uses
     end;
   end;
 
+  function TfMain.IApp_GetActionList: IPhoaActionList;
+  begin
+    Result := FAppActionList;
+  end;
+
   function TfMain.IApp_GetCurGroup: IPhoaPicGroup;
   begin
     Result := GetNodeGroup(tvGroups.FocusedNode);
@@ -1292,7 +1303,7 @@ uses
 
   function TfMain.IApp_GetMenu: IPhoaMenu;
   begin
-    Result := nil; {!!!!}
+    Result := FAppMenu;
   end;
 
   function TfMain.IApp_GetProject: IPhoaProject;

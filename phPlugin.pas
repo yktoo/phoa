@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPlugin.pas,v 1.4 2005-02-19 13:30:16 dale Exp $
+//  $Id: phPlugin.pas,v 1.5 2005-02-26 12:35:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -18,9 +18,8 @@ type
   IPhoaPluginClass  = interface;
 
    // A plugin module interface obtaining function prototype. Should be exported from a plugin DLL named
-   //   'PhoaGetPluginModule'. Must create and return a module instance. App is the main application interface, the
-   //   module can (and should) copy and store it locally for future reference.
-  TPhoaGetPluginModuleProc = function(App: IPhoaApp): IPhoaPluginModule; stdcall;
+   //   'PhoaGetPluginModule'. Must create and return a module instance.
+  TPhoaGetPluginModuleProc = function: IPhoaPluginModule; stdcall;
 
    //===================================================================================================================
    // IPhoaPluginModule - A module implementing a number of plugin classes
@@ -28,12 +27,13 @@ type
 
   IPhoaPluginModule = interface(IInterface)
     ['{B8F84EC7-5675-429D-88B1-13F819AB2E3B}']
-     // Called by the application once all of the modules has been loaded and application initialization process is
-     //   finished. Should perform any required module initialization
-    procedure AppInitialized;
+     // Called by the application once all of the modules have been loaded and application initialization process is
+     //   finished. Should perform any required module initialization. App is the main application interface, the
+     //   module can (and should) copy and store it locally for future reference
+    procedure AppInitialized(App: IPhoaApp); stdcall;
      // Called by the application when it needs to close and just before cleanup routine starts. Should perform any
-     //   required module cleanup 
-    procedure AppFinalizing;
+     //   required module cleanup
+    procedure AppFinalizing; stdcall;
      // Prop handlers
     function  GetInfoAuthor: WideString; stdcall;
     function  GetInfoCopyright: WideString; stdcall;

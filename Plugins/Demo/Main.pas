@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.2 2005-02-15 14:15:35 dale Exp $
+//  $Id: Main.pas,v 1.3 2005-02-26 12:35:51 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit Main;
 
 interface
 
-uses Windows, phPlugin;
+uses Windows, phPlugin, phAppIntf, phActionImpl;
 
 type
 
@@ -18,11 +18,19 @@ type
 
   TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule)
   private
+     // Locally stored Application interface
+    FApp: IPhoaApp;
+     // Plugin class which is being created only once
+    FPluginClass: IPhoaPluginClass;
      // IPhoaPluginModule
+    procedure AppInitialized(App: IPhoaApp); stdcall;
+    procedure AppFinalizing; stdcall;
     function  GetInfoAuthor: WideString; stdcall;
     function  GetInfoCopyright: WideString; stdcall;
     function  GetInfoDescription: WideString; stdcall;
     function  GetInfoName: WideString; stdcall;
+    function  GetInfoVersion: Cardinal;
+    function  GetInfoVersionText: WideString;
     function  GetInfoWebsiteURL: WideString; stdcall;
     function  GetPluginClassCount: Integer; stdcall;
     function  GetPluginClasses(Index: Integer): IPhoaPluginClass; stdcall;
@@ -40,6 +48,11 @@ type
     constructor Create;
   end;
 
+  TPhoaDemoPlugin_InfoAction = class(TPhoaPluginAction)
+  protected
+    function  Execute: LongBool; override; stdcall; 
+  end;
+
    // Exported function
   function PhoaGetPluginModule: IPhoaPluginModule; stdcall;
 
@@ -54,10 +67,28 @@ implementation
    // TPhoaDemoPluginModule
    //===================================================================================================================
 
+  procedure TPhoaDemoPluginModule.AppFinalizing;
+  begin
+     // ALWAYS RELEASE ALL INTERFACE REFERENCES HERE because it's the last point where plugin library is still loaded!
+    FApp := nil;
+  end;
+
+  procedure TPhoaDemoPluginModule.AppInitialized(App: IPhoaApp);
+  var Action: IPhoaAction;
+  begin
+    FApp := App;
+     // Create and register a new action
+    Action := TPhoaDemoPlugin_InfoAction.Create(nil, 'aDemoPlugin_Info', 'Demo', '&Demo plugin info...', 'Demo plugin info...|Click and you''ll see!');
+    FApp.ActionList.Add(Action);
+     // Create a new item corresponding to the action
+    (FApp.Menu.Subentries[0] as IPhoaMenu).AddItem(Action); 
+  end;
+
   constructor TPhoaDemoPluginModule.Create;
   begin
     inherited Create;
-    MessageBox(0, 'Module interface created.', 'Demo plugin', 0);
+     // Create a plugin class
+    FPluginClass := TPhoaDemoPluginClass.Create;
   end;
 
   function TPhoaDemoPluginModule.GetInfoAuthor: WideString;
@@ -80,6 +111,16 @@ implementation
     Result := 'PhoA demo plugin';
   end;
 
+  function TPhoaDemoPluginModule.GetInfoVersion: Cardinal;
+  begin
+    Result := $00010000;
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoVersionText: WideString;
+  begin
+    Result := '0.01.00.00';
+  end;
+
   function TPhoaDemoPluginModule.GetInfoWebsiteURL: WideString;
   begin
     Result := 'http://www.dk-soft.org/';
@@ -92,7 +133,7 @@ implementation
 
   function TPhoaDemoPluginModule.GetPluginClasses(Index: Integer): IPhoaPluginClass;
   begin
-    Result := TPhoaDemoPluginClass.Create;
+    Result := FPluginClass;
   end;
 
    //===================================================================================================================
@@ -118,6 +159,16 @@ implementation
   function TPhoaDemoPluginClass.GetName: WideString;
   begin
     Result := 'Demo PhoA plugin';
+  end;
+
+   //===================================================================================================================
+   // TPhoaDemoPlugin_InfoAction
+   //===================================================================================================================
+
+  function TPhoaDemoPlugin_InfoAction.Execute: LongBool;
+  begin
+    MessageBox(0, 'Hello world!', 'Greetings', MB_OK);
+    Result := True;
   end;
 
 end.

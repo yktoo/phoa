@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.32 2004-12-31 13:38:58 dale Exp $
+//  $Id: phGUIObj.pas,v 1.33 2005-02-26 12:35:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,9 +8,9 @@ unit phGUIObj;
 
 interface
 uses
-  Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms,
-  GR32,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phGraphics, ConsVars;
+  Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, ActnList, Forms,
+  GR32, TB2Item, TBX,
+  phIntf, phMutableIntf, phAppIntf, phNativeIntf, phObj, phGraphics, ConsVars;
 
 type
 
@@ -155,8 +155,6 @@ type
     FThumbShadowBlurRadius: Integer;
     FThumbShadowVisible: Boolean;
     FStates: TThumbnailViewerStates;
-
-
      // Painting stage handlers
     procedure Paint_EraseBackground(const Info: TThumbnailViewerPaintInfo);
     procedure Paint_Thumbnails(const Info: TThumbnailViewerPaintInfo);
@@ -176,8 +174,6 @@ type
     procedure SelectionChanged;
      // Возвращает индекс самого верхнего отображаемого эскиза
     function  GetFirstVisibleIndex: Integer;
-
-
      // Invalidates all the selected thumbnails
     procedure InvalidateSelection;
      // Ставит или убирает выделение с эскиза
@@ -398,6 +394,91 @@ type
     procedure SetParent(AParent: TWinControl); override;
   public
     constructor Create(AOwner: TComponent); override;
+  end;
+
+   //===================================================================================================================
+   // Реализация IPhoaAction (обёртка вокруг TAction)
+   //===================================================================================================================
+
+  TPhoaAction = class(TInterfacedObject, IPhoaAction)
+  private
+     // Ссылка на соответствующий Action
+    FAction: TCustomAction;
+     // IPhoaAction
+    function  Execute: LongBool; stdcall;
+    function  GetCaption: String; stdcall;
+    function  GetCaptionW: WideString; stdcall;
+    function  GetCategory: String; stdcall;
+    function  GetCategoryW: WideString; stdcall;
+    function  GetEnabled: LongBool; stdcall;
+    function  GetHint: String; stdcall;
+    function  GetHintW: WideString; stdcall;
+    function  GetName: String; stdcall;
+    function  GetNameW: WideString; stdcall;
+    function  GetTag: Integer; stdcall;
+    procedure SetCaption(const Value: String); stdcall;
+    procedure SetCaptionW(const Value: WideString); stdcall;
+    procedure SetCategory(const Value: String); stdcall;
+    procedure SetCategoryW(const Value: WideString); stdcall;
+    procedure SetChangeNotification(Proc: TPhoaActionChangeNotificationProc); stdcall;
+    procedure SetEnabled(Value: LongBool); stdcall;
+    procedure SetHint(const Value: String); stdcall;
+    procedure SetHintW(const Value: WideString); stdcall;
+    procedure SetTag(Value: Integer); stdcall;
+  public
+    constructor Create(AAction: TCustomAction);
+  end;
+
+   //===================================================================================================================
+   // Реализация IPhoaActionList (обёртка вокруг TInterfaceList)
+   //===================================================================================================================
+
+  TPhoaActionList = class(TInterfacedObject, IPhoaActionList)
+  private
+     // Собственно список
+    FList: IInterfaceList;
+     // Список "настоящих" Action-ов, в который добавляются underlaying actions 
+    FNativeList: TCustomActionList;
+     // Обработчик OnExecute для вновь создаваемых Actions
+    procedure ActionExecute(Sender: TObject);
+     // IPhoaActionList
+    function  Add(Item: IPhoaAction): Integer; stdcall;
+    function  FindName(const sName: String): IPhoaAction; stdcall;
+    function  FindNameW(const sName: WideString): IPhoaAction; stdcall;
+    function  GetCount: Integer; stdcall;
+    function  GetItems(Index: Integer): IPhoaAction; stdcall;
+  public
+     // Создаёт список, наполняя его обёртками для Actions из NativeList
+    constructor Create(ANativeList: TCustomActionList);
+  end;
+
+   //===================================================================================================================
+   // Реализация IPhoaMenuEntry, IPhoaMenuItem и IPhoaMenu (обёртка вокруг TTBCustomItem)
+   //===================================================================================================================
+
+  TPhoaMenuItem = class(TInterfacedObject, IPhoaMenuEntry, IPhoaMenuItem, IPhoaMenu)
+  private
+     // Ссылка на соответствующий пункт меню
+    FItem: TTBCustomItem;
+     // Prop storage
+    FOwner: TPhoaMenuItem;
+     // IPhoaMenuEntry
+    function  GetIndex: Integer; stdcall;
+    function  GetOwner: IPhoaMenu; stdcall;
+    procedure SetIndex(Value: Integer); stdcall;
+     // IPhoaMenuItem
+    function  GetAction: IPhoaAction; stdcall;
+     // IPhoaMenu
+    function  AddMenu: IPhoaMenu; stdcall;
+    function  AddItem(Action: IPhoaAction): IPhoaMenuItem; stdcall;
+    function  GetCaption: String; stdcall;
+    function  GetCaptionW: WideString; stdcall;
+    function  GetSubentryCount: Integer; stdcall;
+    function  GetSubentries(Index: Integer): IPhoaMenuEntry; stdcall;
+    procedure SetCaption(const Value: String); stdcall;
+    procedure SetCaptionW(const Value: WideString); stdcall;
+  public
+    constructor Create(AOwner: TPhoaMenuItem; AItem: TTBCustomItem; bRecursive: Boolean);
   end;
 
    // Создаёт новый экземпляр IThumbnailViewerDisplayData
@@ -1824,6 +1905,276 @@ type
     DataStream.WriteInt(GetSelectedIDCount);
     if FSelIDs<>nil then
       for i := 0 to FSelIDs.Count-1 do DataStream.WriteInt(Integer(FSelIDs[i]));
+  end;
+
+   //===================================================================================================================
+   // TPhoaAction
+   //===================================================================================================================
+
+  constructor TPhoaAction.Create(AAction: TCustomAction);
+  begin
+    inherited Create;
+    FAction := AAction;
+     // Для унификации в Tag кладём ссылку на Action
+    FAction.Tag := Integer(FAction); 
+  end;
+
+  function TPhoaAction.Execute: LongBool;
+  begin
+    Result := FAction.Execute;
+  end;
+
+  function TPhoaAction.GetCaption: String;
+  begin
+    Result := FAction.Caption;
+  end;
+
+  function TPhoaAction.GetCaptionW: WideString;
+  begin
+    Result := PhoaAnsiToUnicode(FAction.Caption);
+  end;
+
+  function TPhoaAction.GetCategory: String;
+  begin
+    Result := FAction.Category;
+  end;
+
+  function TPhoaAction.GetCategoryW: WideString;
+  begin
+    Result := PhoaAnsiToUnicode(FAction.Category);
+  end;
+
+  function TPhoaAction.GetEnabled: LongBool;
+  begin
+    Result := FAction.Enabled;
+  end;
+
+  function TPhoaAction.GetHint: String;
+  begin
+    Result := FAction.Hint;
+  end;
+
+  function TPhoaAction.GetHintW: WideString;
+  begin
+    Result := PhoaAnsiToUnicode(FAction.Hint);
+  end;
+
+  function TPhoaAction.GetName: String;
+  begin
+    Result := FAction.Name;
+  end;
+
+  function TPhoaAction.GetNameW: WideString;
+  begin
+    Result := PhoaAnsiToUnicode(FAction.Name);
+  end;
+
+  function TPhoaAction.GetTag: Integer;
+  begin
+    Result := FAction.Tag;
+  end;
+
+  procedure TPhoaAction.SetCaption(const Value: String);
+  begin
+    FAction.Caption := Value;
+  end;
+
+  procedure TPhoaAction.SetCaptionW(const Value: WideString);
+  begin
+    FAction.Caption := PhoaUnicodeToAnsi(Value);
+  end;
+
+  procedure TPhoaAction.SetCategory(const Value: String);
+  begin
+    FAction.Category := Value;
+  end;
+
+  procedure TPhoaAction.SetCategoryW(const Value: WideString);
+  begin
+    FAction.Category := PhoaUnicodeToAnsi(Value);
+  end;
+
+  procedure TPhoaAction.SetChangeNotification(Proc: TPhoaActionChangeNotificationProc);
+  begin
+    { stub. Notification is not needed for native actions }
+  end;
+
+  procedure TPhoaAction.SetEnabled(Value: LongBool);
+  begin
+    FAction.Enabled := Value;
+  end;
+
+  procedure TPhoaAction.SetHint(const Value: String);
+  begin
+    FAction.Hint := Value;
+  end;
+
+  procedure TPhoaAction.SetHintW(const Value: WideString);
+  begin
+    FAction.Hint := PhoaUnicodeToAnsi(Value);
+  end;
+
+  procedure TPhoaAction.SetTag(Value: Integer);
+  begin
+    FAction.Tag := Value;
+  end;
+
+   //===================================================================================================================
+   // TPhoaActionList
+   //===================================================================================================================
+
+   // Action change notification callback handler
+  procedure ActionChangeNotificationCallback(Sender: IPhoaAction); stdcall;
+  var Action: TCustomAction;
+  begin
+     // Consider Sender.Tag is TCustomAction object and update its properties
+    Action := TCustomAction(Sender.Tag);
+    Action.Caption  := PhoaUnicodeToAnsi(Sender.CaptionW);
+    Action.Category := PhoaUnicodeToAnsi(Sender.CategoryW);
+    Action.Hint     := PhoaUnicodeToAnsi(Sender.HintW);
+    Action.Enabled  := Sender.Enabled;
+  end;
+
+  procedure TPhoaActionList.ActionExecute(Sender: TObject);
+  var ActionIntf: IPhoaAction;
+  begin
+     // Sender - это TAction. В его Tag лежит ссылка на IPhoaAction
+    ActionIntf := IPhoaAction(TComponent(Sender).Tag);
+    if ActionIntf<>nil then ActionIntf.Execute; // Результат Execute() [пока] игнорируется
+  end;
+
+  function TPhoaActionList.Add(Item: IPhoaAction): Integer;
+  var Action: TAction;
+  begin
+    Result := FList.Add(Item);
+     // Создаём соответствующий Action в NativeList
+    Action := TAction.Create(FNativeList.Owner);
+    Action.ActionList := FNativeList;
+    Action.Name       := PhoaUnicodeToAnsi(Item.NameW);
+    Action.Tag        := Integer(Item);
+    Action.OnExecute  := ActionExecute;
+     // Устанавливаем обработчик уведомлений об изменении
+    Item.Tag := Integer(Action);
+    Item.SetChangeNotification(ActionChangeNotificationCallback);
+     // Обновляем свойства Action
+    ActionChangeNotificationCallback(Item);
+  end;
+
+  constructor TPhoaActionList.Create(ANativeList: TCustomActionList);
+  var i: Integer;
+  begin
+    inherited Create;
+    FList       := TInterfaceList.Create;
+    FNativeList := ANativeList;
+     // Заполняем список обёртками Action-ов из NativeList
+    for i := 0 to FNativeList.ActionCount-1 do FList.Add(TPhoaAction.Create(FNativeList[i] as TCustomAction) as IPhoaAction);
+  end;
+
+  function TPhoaActionList.FindName(const sName: String): IPhoaAction;
+  var i: Integer;
+  begin
+    for i := 0 to FList.Count-1 do begin
+      Result := IPhoaAction(FList[i]);
+      if SameText(Result.Name, sName) then Exit;
+    end;
+    Result := nil;
+  end;
+
+  function TPhoaActionList.FindNameW(const sName: WideString): IPhoaAction;
+  begin
+    Result := FindName(PhoaUnicodeToAnsi(sName));
+  end;
+
+  function TPhoaActionList.GetCount: Integer;
+  begin
+    Result := FList.Count;
+  end;
+
+  function TPhoaActionList.GetItems(Index: Integer): IPhoaAction;
+  begin
+    Result := IPhoaAction(FList[Index]);
+  end;
+
+   //===================================================================================================================
+   // TPhoaMenuItem
+   //===================================================================================================================
+
+  function TPhoaMenuItem.AddItem(Action: IPhoaAction): IPhoaMenuItem;
+  var tbi: TTBCustomItem;
+  begin
+    tbi := TTBXItem.Create(FItem.Owner);
+    tbi.Action := TCustomAction(Action.Tag);
+    Result := TPhoaMenuItem.Create(Self, tbi, False);
+  end;
+
+  function TPhoaMenuItem.AddMenu: IPhoaMenu;
+  begin
+    Result := TPhoaMenuItem.Create(Self, TTBXSubmenuItem.Create(FItem.Owner), False);
+  end;
+
+  constructor TPhoaMenuItem.Create(AOwner: TPhoaMenuItem; AItem: TTBCustomItem; bRecursive: Boolean);
+  var i: Integer;
+  begin
+    inherited Create;
+    FOwner := AOwner;
+    FItem  := AItem;
+     // В Tag пункта записываем ссылку на себя
+    FItem.Tag := Integer(Self);
+     // Если нужно, добавляем пункт меню в список пунктов владельца
+    if (FOwner<>nil) and (FOwner.FItem.IndexOf(FItem)<0) then FOwner.FItem.Add(FItem); 
+     // Если нужно, рекурсивно добавляем вложенные пункты
+    if bRecursive then
+      for i := 0 to AItem.Count-1 do TPhoaMenuItem.Create(Self, AItem[i], True);
+  end;
+
+  function TPhoaMenuItem.GetAction: IPhoaAction;
+  begin
+    if FItem.Action=nil then Result := nil else Result := IPhoaAction(FItem.Action.Tag);
+  end;
+
+  function TPhoaMenuItem.GetCaption: String;
+  begin
+    Result := FItem.Caption;
+  end;
+
+  function TPhoaMenuItem.GetCaptionW: WideString;
+  begin
+    Result := PhoaAnsiToUnicode(FItem.Caption);
+  end;
+
+  function TPhoaMenuItem.GetIndex: Integer;
+  begin
+    if FOwner=nil then Result := -1 else Result := FOwner.FItem.IndexOf(FItem);
+  end;
+
+  function TPhoaMenuItem.GetOwner: IPhoaMenu;
+  begin
+    Result := FOwner;
+  end;
+
+  function TPhoaMenuItem.GetSubentries(Index: Integer): IPhoaMenuEntry;
+  begin
+    Result := TPhoaMenuItem(FItem[Index].Tag);
+  end;
+
+  function TPhoaMenuItem.GetSubentryCount: Integer;
+  begin
+    Result := FItem.Count;
+  end;
+
+  procedure TPhoaMenuItem.SetCaption(const Value: String);
+  begin
+    FItem.Caption := Value;
+  end;
+
+  procedure TPhoaMenuItem.SetCaptionW(const Value: WideString);
+  begin
+    FItem.Caption := PhoaUnicodeToAnsi(Value);
+  end;
+
+  procedure TPhoaMenuItem.SetIndex(Value: Integer);
+  begin
+    if FOwner<>nil then FOwner.FItem.Move(FOwner.FItem.IndexOf(FItem), Value);
   end;
 
    //===================================================================================================================

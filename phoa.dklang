@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.46 2005-02-14 19:34:08 dale Exp $
+;  $Id: phoa.dklang,v 1.47 2005-02-26 12:35:51 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -927,6 +927,7 @@ SErrCannotLoadPicture=Error loading picture file "%s":\n%s
 SErrCannotRead=Stream read error
 SErrCannotUsePathPropsInFormat=Property "%s" cannot be used in a file name format as it contains file path
 SErrCannotWrite=Stream write error
+SErrCreatingPluginModule=Error creating plugin module.\nLibrary: "%s":\nError: %s
 SErrDuplicateKeyword=This keyword is already in the list
 SErrExecutingToolFailed=Error executing tool "%s" for file "%s": %s
 SErrFileNotFound=File not found
@@ -935,6 +936,7 @@ SErrFileRevHigher=The photo album file is created by a program version higher th
 SErrInvalidCharsInFileName=A file name cannot contain any of the following characters:\n\\ / : * ? " < > |\nRemove them and try again
 SErrInvalidPicFileName=Invalid picture file name: "%s"
 SErrInvalidPicPropName=Invalid picture property name: "%s"
+SErrLoadingPluginModule=Error loading plugin module.\nLibrary: "%s":\nError: %s
 SErrNotAllPicsLinked=%d of %d selected pictures won't be placed in a group, which is invalid. Each picture must be linked to at least one group.
 SErrNoTargetPathDetermined=No target path determined for file "%s"
 SError=Error
@@ -979,10 +981,11 @@ SMsg_ApplyingLanguage=Applying current language...
 SMsg_ApplyingSettings=Applying settings...
 SMsg_Initializing=Initializing...
 SMsg_LoadingPhoa=Loading photo album %s...
-SMsg_LoadingPlugins=Loading plugins...
+SMsg_LoadingPlugin=Loading plugin library: %s...
 SMsg_NoMetatagSelected=No metatag selected. Select an item to view its description.
 SMsg_ProcessingSomething=Processing %s...
 SMsg_ScanningLanguages=Scanning for language files...
+SMsg_ScanningPlugins=Scanning for plugins...
 SMsg_SelectSearchPicProp=(select a property)
 SMsg_Starting=Starting the application...
 SMsg_SyntaxOK=Expression syntax is OK.
