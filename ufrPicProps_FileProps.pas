@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.13 2004-12-10 13:45:13 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.14 2004-12-28 10:50:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -34,6 +34,8 @@ type
   private
      // Скэшированное значение настройки ISettingID_Dlgs_PP_ExpFileProps
     FExpandAll: Boolean;
+     // Возвращает индекс файла, соответствующего текущему выделенному узлу; -1, если нет выделенного узла
+    function  GetCurFileIndex: Integer;
   protected
     procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
@@ -51,14 +53,14 @@ type
 
   procedure TfrPicProps_FileProps.aaChangeFile(Sender: TObject);
   var
-    n: PVirtualNode;
+    idx: Integer;
     Pic: IPhoaPic;
   begin
-    n := tvMain.FocusedNode;
-    if n<>nil then
+    idx := GetCurFileIndex;
+    if idx>=0 then begin
       with TOpenDialog.Create(Self) do
         try
-          FileName   := Dialog.PictureFiles[n.Index];
+          FileName   := Dialog.PictureFiles[idx];
           Filter     := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
           Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
           Title      := ConstVal('SDlgTitle_SelectPicFile');
@@ -66,13 +68,14 @@ type
              // Ищем изображение с таким файлом
             Pic := App.Project.Pics.ItemsByFileName[FileName];
              // Не нашли - изменяем файл
-            if Pic=nil then Dialog.PictureFiles[n.Index] := FileName
+            if Pic=nil then Dialog.PictureFiles[idx] := FileName
              // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
-            else if Pic.ID<>EditedPics[n.Index].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [FileName, Pic.ID]));
+            else if Pic.ID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [FileName, Pic.ID]));
           end;
         finally
           Free;
         end;
+    end;
   end;
 
   procedure TfrPicProps_FileProps.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
@@ -117,6 +120,18 @@ type
     if n<>nil then tvMain.ResetNode(n);
   end;
 
+  function TfrPicProps_FileProps.GetCurFileIndex: Integer;
+  var n: PVirtualNode;
+  begin
+    n := tvMain.FocusedNode;
+    if n=nil then
+      Result := -1
+    else begin
+      if tvMain.NodeParent[n]<>nil then n := tvMain.NodeParent[n];
+      Result := n.Index;
+    end;
+  end;
+
   procedure TfrPicProps_FileProps.InitializePage;
   begin
     inherited InitializePage;
@@ -137,14 +152,10 @@ type
   end;
 
   procedure TfrPicProps_FileProps.tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
-  var Node, nParent: PVirtualNode;
+  var idx: Integer;
   begin
-    Node := tvMain.FocusedNode;
-    if Node<>nil then begin
-      nParent := tvMain.NodeParent[Node];
-      if nParent<>nil then Node := nParent;
-      ShowFileShellContextMenu(Dialog.PictureFiles[Node.Index]);
-    end;
+    idx := GetCurFileIndex;
+    if idx>=0 then ShowFileShellContextMenu(Dialog.PictureFiles[idx]);
     Handled := True;
   end;
 
