@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.3 2005-02-27 15:51:48 dale Exp $
+//  $Id: phAppIntf.pas,v 1.4 2005-03-01 14:24:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -106,6 +106,8 @@ type
 
   IPhoaMenuEntry = interface(IInterface)
     ['{D6AF0D63-5419-490F-A7AB-03AA448CED0D}']
+     // Removes itself from owner menu
+    procedure Remove; stdcall;
      // Prop handlers
     function  GetIndex: Integer; stdcall;
     function  GetOwner: IPhoaMenu; stdcall;

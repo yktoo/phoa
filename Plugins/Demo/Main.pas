@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.4 2005-02-27 15:51:49 dale Exp $
+//  $Id: Main.pas,v 1.5 2005-03-01 14:24:53 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -16,9 +16,18 @@ type
    // Demo plugin module
    //===================================================================================================================
 
-  TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule)
+  IPhoaDemoPluginModule = interface(IPhoaPluginModule)
+    ['{FF55A378-9411-480B-A337-60B894AF4273}']
+     // Prop handlers
+    function  GetApp: IPhoaApp; 
+     // Props
+     // -- Application reference
+    property App: IPhoaApp read GetApp;
+  end;
+
+  TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule, IPhoaDemoPluginModule)
   private
-     // Locally stored Application interface
+     // Prop storage
     FApp: IPhoaApp;
      // Plugin class which is being created only once
     FPluginClass: IPhoaPluginClass;
@@ -34,35 +43,54 @@ type
     function  GetInfoWebsiteURL: WideString; stdcall;
     function  GetPluginClassCount: Integer; stdcall;
     function  GetPluginClasses(Index: Integer): IPhoaPluginClass; stdcall;
-  public
-    constructor Create;
+     // IPhoaDemoPluginModule
+    function  GetApp: IPhoaApp;
   end;
 
-  TPhoaDemoPluginClass = class(TInterfacedObject, IPhoaPluginClass)
+   //===================================================================================================================
+   // Demo plugin class
+   //===================================================================================================================
+
+  IPhoaDemoPluginClass = interface(IPhoaPluginClass)
+    ['{FF55A378-9411-480B-A337-60B894AF4274}']
+     // Prop handlers
+    function  GetModule: IPhoaDemoPluginModule;
+     // Props
+     // -- Module reference
+    property Module: IPhoaDemoPluginModule read GetModule;
+  end;
+
+  TPhoaDemoPluginClass = class(TInterfacedObject, IPhoaPluginClass, IPhoaDemoPluginClass)
   private
+     // Prop storage
+    FModule: IPhoaDemoPluginModule;
      // IPhoaPluginClass
     function  CreatePlugin: IPhoaPlugin; stdcall;
     function  GetDescription: WideString; stdcall;
     function  GetKind: TPhoaPluginKind; stdcall;
     function  GetName: WideString; stdcall;
+     // IPhoaDemoPluginClass
+    function  GetModule: IPhoaDemoPluginModule;
   public
-    constructor Create;
+    constructor Create(AModule: IPhoaDemoPluginModule);
   end;
+
+   //===================================================================================================================
+   // Demo plugin
+   //===================================================================================================================
 
   TPhoaDemoPlugin = class(TInterfacedObject, IPhoaPlugin)
   private
-     // Application reference
-    FApp: IPhoaApp;
      // Plugin menu item
     FItem: IPhoaMenuItem;
      // Main plugin action
     FAction: IPhoaAction;
      // Prop storage
-    FPluginClass: IPhoaPluginClass;
+    FPluginClass: IPhoaDemoPluginClass;
      // IPhoaPlugin
     function  GetPluginClass: IPhoaPluginClass; stdcall;
   public
-    constructor Create(APluginClass: IPhoaPluginClass; AApp: IPhoaApp);
+    constructor Create(APluginClass: IPhoaDemoPluginClass);
     destructor Destroy; override;
   end;
 
@@ -92,21 +120,14 @@ implementation
   end;
 
   procedure TPhoaDemoPluginModule.AppInitialized(App: IPhoaApp);
-  var Action: IPhoaAction;
   begin
+     // Store application reference
     FApp := App;
-     // Create and register a new action
-    Action := TPhoaDemoPlugin_InfoAction.Create(nil, 'aDemoPlugin_Info', 'Demo', '&Demo plugin info...', 'Demo plugin info...|Click and you''ll see!');
-    FApp.ActionList.Add(Action);
-     // Create a new item corresponding to the action
-    (FApp.Menu.Subentries[0] as IPhoaMenu).AddItem(Action); 
   end;
 
-  constructor TPhoaDemoPluginModule.Create;
+  function TPhoaDemoPluginModule.GetApp: IPhoaApp;
   begin
-    inherited Create;
-     // Create a plugin class
-    FPluginClass := TPhoaDemoPluginClass.Create;
+    Result := FApp;
   end;
 
   function TPhoaDemoPluginModule.GetInfoAuthor: WideString;
@@ -151,6 +172,8 @@ implementation
 
   function TPhoaDemoPluginModule.GetPluginClasses(Index: Integer): IPhoaPluginClass;
   begin
+     // Create a plugin class if it isn't created yet
+    if FPluginClass=nil then FPluginClass := TPhoaDemoPluginClass.Create(Self);
     Result := FPluginClass;
   end;
 
@@ -158,15 +181,16 @@ implementation
    // TPhoaDemoPluginClass
    //===================================================================================================================
 
-  constructor TPhoaDemoPluginClass.Create;
+  constructor TPhoaDemoPluginClass.Create(AModule: IPhoaDemoPluginModule);
   begin
     inherited Create;
+    FModule := AModule;
     MessageBox(0, 'Plugin class created.', 'Demo plugin', 0);
   end;
 
   function TPhoaDemoPluginClass.CreatePlugin: IPhoaPlugin;
   begin
-    Result := nil;
+    Result := TPhoaDemoPlugin.Create(Self);
   end;
 
   function TPhoaDemoPluginClass.GetDescription: WideString;
@@ -179,6 +203,11 @@ implementation
     Result := ppkBrowseMode;
   end;
 
+  function TPhoaDemoPluginClass.GetModule: IPhoaDemoPluginModule;
+  begin
+    Result := FModule;
+  end;
+
   function TPhoaDemoPluginClass.GetName: WideString;
   begin
     Result := 'Demo PhoA plugin';
@@ -188,19 +217,29 @@ implementation
    // TPhoaDemoPlugin
    //===================================================================================================================
 
-  constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaPluginClass; AApp: IPhoaApp);
+  constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaDemoPluginClass);
   begin
     inherited Create;
     FPluginClass := APluginClass;
-    FApp := AApp;
+     // Create and register a new action
+    FAction := TPhoaDemoPlugin_InfoAction.Create(nil, 'aDemoPlugin_Info', 'Demo', '&Demo plugin info...', 'Demo plugin info...|Click and you''ll see!');
+    FPluginClass.Module.App.ActionList.Add(FAction);
+     // Create a new item corresponding to the action
+    FItem := (FPluginClass.Module.App.Menu.Subentries[0] as IPhoaMenu).AddItem(FAction);
   end;
 
   destructor TPhoaDemoPlugin.Destroy;
   begin
      // Remove menu item
-    FItem.Remove; 
+    if FItem<>nil then begin
+      FItem.Remove;
+      FItem := nil;
+    end;
      // Release action
-    FApp.ActionList.Remove(FAction);
+    if FAction<>nil then begin
+      FPluginClass.Module.App.ActionList.Remove(FAction);
+      FAction := nil;
+    end;
     inherited Destroy;
   end;
 

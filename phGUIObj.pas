@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.34 2005-02-27 15:51:48 dale Exp $
+//  $Id: phGUIObj.pas,v 1.35 2005-03-01 14:24:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -461,9 +461,12 @@ type
   private
      // Ссылка на соответствующий пункт меню
     FItem: TTBCustomItem;
+     // Список подчинённых пунктов
+    FSubentries: IInterfaceList;
      // Prop storage
     FOwner: TPhoaMenuItem;
      // IPhoaMenuEntry
+    procedure Remove; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetOwner: IPhoaMenu; stdcall;
     procedure SetIndex(Value: Integer); stdcall;
@@ -478,6 +481,9 @@ type
     function  GetSubentries(Index: Integer): IPhoaMenuEntry; stdcall;
     procedure SetCaption(const Value: String); stdcall;
     procedure SetCaptionW(const Value: WideString); stdcall;
+  protected
+    procedure AddSubentry(Item: IPhoaMenuEntry);
+    procedure RemoveSubentry(Item: IPhoaMenuEntry);
   public
     constructor Create(AOwner: TPhoaMenuItem; AItem: TTBCustomItem; bRecursive: Boolean);
   end;
@@ -2114,11 +2120,19 @@ type
     tbi := TTBXItem.Create(FItem.Owner);
     tbi.Action := TCustomAction(Action.Tag);
     Result := TPhoaMenuItem.Create(Self, tbi, False);
+    AddSubentry(Result);
   end;
 
   function TPhoaMenuItem.AddMenu: IPhoaMenu;
   begin
     Result := TPhoaMenuItem.Create(Self, TTBXSubmenuItem.Create(FItem.Owner), False);
+    AddSubentry(Result);
+  end;
+
+  procedure TPhoaMenuItem.AddSubentry(Item: IPhoaMenuEntry);
+  begin
+    if FSubentries=nil then FSubentries := TInterfaceList.Create;
+    FSubentries.Add(Item);
   end;
 
   constructor TPhoaMenuItem.Create(AOwner: TPhoaMenuItem; AItem: TTBCustomItem; bRecursive: Boolean);
@@ -2130,10 +2144,10 @@ type
      // В Tag пункта записываем ссылку на себя
     FItem.Tag := Integer(Self);
      // Если нужно, добавляем пункт меню в список пунктов владельца
-    if (FOwner<>nil) and (FOwner.FItem.IndexOf(FItem)<0) then FOwner.FItem.Add(FItem); 
+    if (FOwner<>nil) and (FOwner.FItem.IndexOf(FItem)<0) then FOwner.FItem.Add(FItem);
      // Если нужно, рекурсивно добавляем вложенные пункты
     if bRecursive then
-      for i := 0 to AItem.Count-1 do TPhoaMenuItem.Create(Self, AItem[i], True);
+      for i := 0 to AItem.Count-1 do AddSubentry(TPhoaMenuItem.Create(Self, AItem[i], True));
   end;
 
   function TPhoaMenuItem.GetAction: IPhoaAction;
@@ -2169,6 +2183,17 @@ type
   function TPhoaMenuItem.GetSubentryCount: Integer;
   begin
     Result := FItem.Count;
+  end;
+
+  procedure TPhoaMenuItem.Remove;
+  begin
+    FItem.Free;
+    if FOwner<>nil then FOwner.RemoveSubentry(Self);
+  end;
+
+  procedure TPhoaMenuItem.RemoveSubentry(Item: IPhoaMenuEntry);
+  begin
+    if FSubentries<>nil then FSubentries.Remove(Item);
   end;
 
   procedure TPhoaMenuItem.SetCaption(const Value: String);
