@@ -84,7 +84,7 @@ MapFile=0
 OutputObjs=0
 ConsoleApp=1
 DebugInfo=0
-RemoteSymbols=0
+RemoteSymbols=1
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
@@ -105,6 +105,8 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
+RemoteHost=10.0.2.110
+RemotePath=c:\tmp\phoa.exe
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.13 2004-10-24 17:47:29 dale Exp $
+//  $Id: phOps.pas,v 1.14 2004-11-19 05:33:47 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1849,11 +1849,11 @@ type
      // Копирует в буфер обмена данные изображения PhoA
     procedure CopyPhoaData;
     var
-      i: Integer;
+      i, iSize: Integer;
       ms: TMemoryStream;
       Streamer: TPhoaStreamer;
       hRec: THandle;
-      p: Pointer;
+      p: PByte;
     begin
        // Сохраняем данные изображений во временный поток
       ms := TMemoryStream.Create;
@@ -1869,12 +1869,19 @@ type
         finally
           Streamer.Free;
         end;
-         // Выделяем память и блокируем её
-        hRec := GlobalAlloc(GMEM_MOVEABLE or GMEM_DDESHARE, ms.Size);
+        iSize := ms.Size;
+         // Выделяем память
+        hRec := GlobalAlloc(GMEM_MOVEABLE, iSize+SizeOf(iSize)+12);
+        if hRec=0 then RaiseLastOSError;
+         // Блокируем память, получая указатель
         p := GlobalLock(hRec);
+        if p=nil then RaiseLastOSError;
         try
+           // Пишем размер блока
+          Move(iSize, p^, SizeOf(iSize));
+          Inc(p, SizeOf(iSize)+12); // Пропускаем 12 байт. Подпорка для Win9x
            // Переписываем строку в память
-          Move(ms.Memory^, p^, ms.Size);
+          Move(ms.Memory^, p^, iSize);
         finally
           GlobalUnlock(hRec);
         end;
@@ -1989,6 +1996,8 @@ type
     hRec: THandle;
     ms: TMemoryStream;
     Streamer: TPhoaStreamer;
+    p: PByte;
+    iSize: Integer;
   begin
     inherited Perform(Params, UndoStream, Changes);
     if Clipboard.HasFormat(wClipbrdPicFormatID) then begin
@@ -2000,10 +2009,20 @@ type
        // Создаём временный поток
       ms := TMemoryStream.Create;
       try
-         // Получаем данные из буфера обмена
+         // Получаем Handle блока данных из буфера обмена
         hRec := Clipboard.GetAsHandle(wClipbrdPicFormatID);
-        ms.Write(GlobalLock(hRec)^, GlobalSize(hRec));
-        GlobalUnlock(hRec);
+        if hRec=0 then RaiseLastOSError;
+         // Получаем размер данных из буфера обмена
+        p := GlobalLock(hRec);
+        if p=nil then RaiseLastOSError;
+        try
+          Move(p^, iSize, SizeOf(iSize));
+          Inc(p, SizeOf(iSize)+12); // Прибавляем 12 байт, пропущенных при копировании
+           // Получаем данные из буфера обмена
+          ms.Write(p^, iSize);
+        finally
+          GlobalUnlock(hRec);
+        end;
         ms.Position := 0;
          // Создаём Streamer и загружаем изображения
         Streamer := TPhoaStreamer.Create(ms, psmRead, '');
