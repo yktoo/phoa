@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.63 2004-10-10 18:53:31 dale Exp $
+//  $Id: ConsVars.pas,v 1.64 2004-10-11 11:41:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -111,6 +111,12 @@ type
     ivifForceWindow,     // Принудительно задать оконный режим (несовместим с ivifForceFullscreen)
     ivifSlideShow);      // Начать показ слайдов
   TImgViewInitFlags = set of TImgViewInitFlag;
+
+   // Направление показа слайдов
+  TSlideShowDirection = (
+    ssdBackward, // Назад
+    ssdRandom,   // Вразброс
+    ssdForward); // Вперёд
 
    // Структура сообщения для WM_STARTVIEWMODE
   TWMStartViewMode = packed record
@@ -587,7 +593,10 @@ const
   iiStoreTransform                = 72;
   iiDKSoftware                    = 73;
   iiProfile                       = 74;
-
+  iiSlideShowForward              = 75;
+  iiSlideShowBackward             = 76;
+  iiSlideShowRandom               = 77;
+  iiSlideShowCyclic               = 78;
 
    // Help topics
   IDH_start                       = 00001;
@@ -785,7 +794,11 @@ const
     ISettingID_View_InfoBkOpacity      = 2054; // Info: Непрозрачность фона (0-255)
   ISettingID_View_Slideshow            = 0;    // Просмотр слайдов
     ISettingID_View_SlideInterval      = 2060; // Slideshow: Задержка показа, мс
-    ISettingID_View_SlideCyclic        = 2061; // Slideshow: Циклический просмотр
+    ISettingID_View_SlideDirection     = 2064; // Slideshow: Направление просмотра
+      ISettingID_View_SlideDirForward  = 2065; // Slideshow: Направление просмотра: вперёд
+      ISettingID_View_SlideDirBackward = 2066; // Slideshow: Направление просмотра: назад
+      ISettingID_View_SlideDirRandom   = 2067; // Slideshow: Направление просмотра: вразброс
+    ISettingID_View_SlideCyclic        = 2070; // Slideshow: Циклический просмотр
    //===================================================================================================================
   ISettingID_Dialogs                   = 3001; // Диалоги
   ISettingID_Dlgs_SplashStartShow      = 3005; // Отображать заставку при запуске
@@ -1290,20 +1303,25 @@ type
           Lvl4 := TPhoaBoolSetting.Create    (Lvl3, ISettingID_View_Predecode,          '@ISettingID_View_Predecode',          True);
           Lvl4 := TPhoaBoolSetting.Create    (Lvl3, ISettingID_View_CacheBehind,        '@ISettingID_View_CacheBehind',        True);
       Lvl2 := TPhoaListSetting.Create        (Lvl1, ISettingID_View_ZoomFactor,         '@ISettingID_View_ZoomFactor',         3 {=50%}, lsvtIndex);
-      AdjustMagnificationSetting(Lvl2 as TPhoaListSetting);                                                                    
+      AdjustMagnificationSetting(Lvl2 as TPhoaListSetting);
       Lvl2 := TPhoaIntSetting.Create         (Lvl1, ISettingID_View_CaptionProps,       '@ISettingID_View_CaptionProps',       PicPropsToInt([ppFileName]), MinInt, MaxInt);
-      AddPicPropSettings(Lvl2 as TPhoaIntSetting);                                                                             
+      AddPicPropSettings(Lvl2 as TPhoaIntSetting);
       Lvl2 := TPhoaIntSetting.Create         (Lvl1, ISettingID_View_StchFilt,           '@ISettingID_View_StchFilt',           Byte(sfNearest), Byte(Low(TStretchFilter)), Byte(High(TStretchFilter)));
-      AddStretchFilterSettings(Lvl2 as TPhoaIntSetting);                                                                       
-      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_View_Info,               '@ISettingID_View_Info');              
+      AddStretchFilterSettings(Lvl2 as TPhoaIntSetting);
+      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_View_Info,               '@ISettingID_View_Info');
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_View_ShowInfo,           '@ISettingID_View_ShowInfo',           True);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_View_InfoPicProps,       '@ISettingID_View_InfoPicProps',       PicPropsToInt([ppDate, ppTime, ppPlace, ppDescription]), MinInt, MaxInt);
-        AddPicPropSettings(Lvl3 as TPhoaIntSetting);                                                                           
+        AddPicPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaFontSetting.Create      (Lvl2, ISettingID_View_InfoFont,           '@ISettingID_View_InfoFont',           'Arial/14/0/16777215/1');
         Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_View_InfoBkColor,        '@ISettingID_View_InfoBkColor',        $000000);
         Lvl3 := TPhoaIntEntrySetting.Create  (Lvl2, ISettingID_View_InfoBkOpacity,      '@ISettingID_View_InfoBkOpacity',      $40, 0, 255);
-      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_View_Slideshow,          '@ISettingID_View_Slideshow');         
+      Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_View_Slideshow,          '@ISettingID_View_Slideshow');
         Lvl3 := TPhoaIntEntrySetting.Create  (Lvl2, ISettingID_View_SlideInterval,      '@ISettingID_View_SlideInterval',      5000, 0, 600*1000);
+
+        Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_View_SlideDirection,     '@ISettingID_View_SlideDirection',     Byte(ssdForward), Byte(Low(TSlideShowDirection)), Byte(High(TSlideShowDirection)));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_View_SlideDirBackward,   '@ISettingID_View_SlideDirBackward',   Byte(ssdBackward));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_View_SlideDirRandom,     '@ISettingID_View_SlideDirRandom',     Byte(ssdRandom));
+          Lvl4 := TPhoaMutexIntSetting.Create(Lvl3, ISettingID_View_SlideDirForward,    '@ISettingID_View_SlideDirForward',    Byte(ssdForward));
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_View_SlideCyclic,        '@ISettingID_View_SlideCyclic',        True);
      //== Диалоги ======================================================================================================       
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);   
@@ -1376,6 +1394,7 @@ type
      // Добавляем настройки выбора языка
     LoadLanguageSettings;
      // Переключаем язык интерфейса
+    ShowProgressInfo('SMsg_ApplyingLanguage', []);
     LangManager.LanguageID := (LangSetting as TPhoaIntSetting).Value;
      // Актуализируем настройку языка
     TPhoaIntSetting(LangSetting).Value := LangManager.LanguageID;

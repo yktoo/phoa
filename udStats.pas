@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.14 2004-10-10 18:53:32 dale Exp $
+//  $Id: udStats.pas,v 1.15 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -108,7 +108,7 @@ uses phUtils, Main, phPhoa, phSettings;
         for i := 0 to Group.Pics.Count-1 do IDs.Add(Group.Pics[i].ID);
          // Рекурсивно вызываем для вложенных групп
         for i := 0 to Group.Groups.Count-1 do begin
-          gChild := Group.Groups[i] as IPhotoAlbumPicGroup;
+          gChild := Group.GroupsX[i];
           Inc(iCntNestedGroups);
           ProcessGroup(gChild);
         end;
@@ -197,7 +197,7 @@ uses phUtils, Main, phPhoa, phSettings;
           AddPhoaFileProps(n1);
           tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FPhoA.FileRevision))].sName));
         tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FPhoA.Pics.Count));
-        AddGroupStats(FPhoA.RootGroup as IPhotoAlbumPicGroup, n0);
+        AddGroupStats(FPhoA.RootGroup, n0);
        // -- Текущая группа
       if (FGroup<>nil) and (FGroup<>FPhoA.RootGroup) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));

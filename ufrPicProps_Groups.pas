@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.10 2004-10-10 18:53:32 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.11 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,12 +15,13 @@ uses
 type
   TfrPicProps_Groups = class(TPicPropsDialogPage)
     tvMain: TVirtualStringTree;
-    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvMainChecking(Sender: TBaseVirtualTree; Node: PVirtualNode; var NewState: TCheckState; var Allowed: Boolean);
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainChecking(Sender: TBaseVirtualTree; Node: PVirtualNode; var NewState: TCheckState; var Allowed: Boolean);
+    procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
      // ¬озвращает количество выбранных изображений среди изображений группы
     function  GetSelCount(Group: IPhotoAlbumPicGroup): Integer;
@@ -77,7 +78,7 @@ type
         end;
          // ≈сли есть - составл€ем список изображений
         if bChanges then begin
-          Pics := NewPhoaMutablePicList(False);
+          Pics := NewPhotoAlbumPicList(False);
           for i := 0 to EditedPics.Count-1 do begin
             Pic := EditedPics[i];
             bLinked := pgd.Group.IsPicLinked(Pic.ID, False);
@@ -186,6 +187,11 @@ type
         if (iSelCount>0) and (iSelCount<EditedPics.Count) then NewState := csMixedNormal;
   end;
 
+  procedure TfrPicProps_Groups.tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    Finalize(PGroupData(Sender.GetNodeData(Node))^);
+  end;
+
   procedure TfrPicProps_Groups.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
     if Kind in [ikNormal, ikSelected] then ImageIndex := iif(Sender.NodeParent[Node]=nil, iiPhoA, iiFolder);
@@ -211,10 +217,10 @@ type
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p.Group := PhoA.RootGroup as IPhotoAlbumPicGroup
+      p.Group := PhoA.RootGroup
     else begin
       pp := Sender.GetNodeData(ParentNode);
-      p.Group := pp.Group.Groups[Node.Index] as IPhotoAlbumPicGroup;
+      p.Group := pp.Group.GroupsX[Node.Index];
     end;
     Sender.ChildCount[Node] := p.Group.Groups.Count;
      // —читаем количество выбранных изображений среди изображений группы

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.5 2004-10-06 14:41:10 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.6 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -20,7 +20,7 @@ type
      // Диалог свойств изображений (владелец страницы)
     FDialog: TdPicProps;
      // Prop handlers 
-    function  GetEditedPics: IPhoaPicList;
+    function  GetEditedPics: IPhotoAlbumPicList;
     function  GetFileImageIndex(Index: Integer): Integer;
     function  GetPhoA: TPhotoAlbum;
     function  GetFileImages: TImageList;
@@ -33,7 +33,7 @@ type
     procedure EndUpdate;
      // Свойства, получаемые через родительский диалог
      // -- Ссылки на редактируемые изображения по индексу
-    property EditedPics: IPhoaPicList read GetEditedPics;
+    property EditedPics: IPhotoAlbumPicList read GetEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
      // -- ImageList со значками файлов
@@ -72,7 +72,7 @@ implementation
     FDialog.EndUpdate;
   end;
 
-  function TPicPropsDialogPage.GetEditedPics: IPhoaPicList;
+  function TPicPropsDialogPage.GetEditedPics: IPhotoAlbumPicList;
   begin
     Result := FDialog.EditedPics;
   end;

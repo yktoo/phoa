@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.22 2004-10-10 18:53:32 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.23 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -109,7 +109,7 @@ type
     FRepair_MatchFlags: TFileOpRepairMatchFlags;
     FRepair_RelinkFilesInUse: Boolean;
     FSelectedGroups: IPhotoAlbumPicGroupList;
-    FSelectedPics: IPhoaMutablePicList;
+    FSelectedPics: IPhotoAlbumPicList;
     FSelPicMode: TFileOpSelPicMode;
     FSelPicValidityFilter: TFileOpSelPicValidityFilter;
     FViewerCurView: TPhoaView;
@@ -150,8 +150,6 @@ type
     function  IPhoaWizardPageHost_Process.GetProcessingActive = ProcPage_GetProcessingActive;
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
-     // Prop handlers
-    function  GetSelectedPics: IPhoaPicList;
   protected
     procedure InitializeWizard; override;
     procedure FinalizeWizard; override;
@@ -232,8 +230,8 @@ type
     property Repair_FileLinks: TFileLinks read FRepair_FileLinks;
      // -- Выбранные группы (список не пустой только для SelPicMode=fospmSelGroups)
     property SelectedGroups: IPhotoAlbumPicGroupList read FSelectedGroups;
-     // -- Отобранные для операции изображения (снаружи видны, как immutable)
-    property SelectedPics: IPhoaPicList read GetSelectedPics;
+     // -- Отобранные для операции изображения
+    property SelectedPics: IPhotoAlbumPicList read FSelectedPics;
      // -- Режим выбора изображений
     property SelPicMode: TFileOpSelPicMode read FSelPicMode write FSelPicMode;
      // -- Фильтр выбора изображений по наличию соответствующего файла
@@ -258,16 +256,16 @@ type
     FOverwriteFileName: String;
     FOverwriteResults: TMessageBoxResults;
      // Процедуры, выполняющие операцию для отдельного изображения
-    procedure DoCopyMovePic(Pic: IPhoaPic);
-    procedure DoDelPicAndFile(Pic: IPhoaPic);
-    procedure DoRebuildThumb(Pic: IPhoaPic);
-    procedure DoRepairFileLink(Pic: IPhoaPic);
+    procedure DoCopyMovePic(Pic: IPhotoAlbumPic);
+    procedure DoDelPicAndFile(Pic: IPhotoAlbumPic);
+    procedure DoRebuildThumb(Pic: IPhotoAlbumPic);
+    procedure DoRepairFileLink(Pic: IPhotoAlbumPic);
      // Процедура удаления файла
     procedure DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
      // Удаляет изображение из фотоальбома (также ссылки на него из групп)
-    procedure DoDeletePic(Pic: IPhoaPic);
+    procedure DoDeletePic(Pic: IPhotoAlbumPic);
      // Обновляет ссылку на файл (предварительно проверяя допустимость этого)
-    procedure DoUpdateFileLink(Pic: IPhoaMutablePic; const sNewFileName: String);
+    procedure DoUpdateFileLink(Pic: IPhotoAlbumPic; const sNewFileName: String);
      // Спрашивает возможность перезаписи файла (вызывается в Synchronize())
     procedure AskOverwrite;
   protected
@@ -331,7 +329,7 @@ uses
     FFilePath := sFilePath;
     FFileSize := iFileSize;
     FFileTime := dFileTime;
-    FPics     := NewPhoaMutablePicList(True);
+    FPics     := NewPhotoAlbumPicList(True);
   end;
 
    //===================================================================================================================
@@ -371,7 +369,7 @@ uses
     Resume;
   end;
 
-  procedure TFileOpThread.DoCopyMovePic(Pic: IPhoaPic);
+  procedure TFileOpThread.DoCopyMovePic(Pic: IPhotoAlbumPic);
   var
     sFile, sSrcPath, sDestPath, sTargetPath: String;
     SLRelTargetPaths: TStringList;
@@ -399,7 +397,7 @@ uses
         sRelPath := '';
         while (g<>nil) and (g<>FWizard.MoveFile_BaseGroup) do begin
           sRelPath := ReplaceChars(g.Text, SInvalidPathChars, FWizard.MoveFile_ReplaceChar)+'\'+sRelPath;
-          g := g.Owner as IPhotoAlbumPicGroup;
+          g := g.OwnerX;
         end;
          // Добавляем путь в список
         SLRelTargetPaths.Add(sRelPath);
@@ -408,7 +406,7 @@ uses
       end;
        // Повторяем то же для вложенных групп
       for i := 0 to Group.Groups.Count-1 do begin
-        AddPathIfPicInGroup(Group.Groups[i] as IPhotoAlbumPicGroup);
+        AddPathIfPicInGroup(Group.GroupsX[i]);
          // Если дублирование файлов не позволяется, прерываем поиск при наличии [хотя бы одной] записи пути
         if not FWizard.MoveFile_AllowDuplicating and (SLRelTargetPaths.Count>0) then Exit;
       end;
@@ -487,9 +485,9 @@ uses
           SLRelTargetPaths.Duplicates := dupIgnore;
            // Заполняем SLRelTargetPaths путями назначения
           if FWizard.ViewerCurView=nil then
-            AddPathIfPicInGroup(FWizard.PhoA.RootGroup as IPhotoAlbumPicGroup)
+            AddPathIfPicInGroup(FWizard.PhoA.RootGroup)
           else
-            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup as IPhotoAlbumPicGroup);
+            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];
@@ -502,13 +500,12 @@ uses
      // Если режим - перемещение
     if FWizard.FileOpKind=fokMoveFiles then begin
        // Исправляем ссылку
-      DoUpdateFileLink(Pic as IPhoaMutablePic, sTargetPath+sFile);
+      DoUpdateFileLink(Pic, sTargetPath+sFile);
        // Удаляем исходный файл
       if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcPath+sFile, FWizard.MoveFile_DeleteToRecycleBin);
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
-    if FWizard.ExportedPhoA<>nil then
-      (FWizard.ExportedPhoA.Pics.ItemsByID[Pic.ID] as IPhoaMutablePic).FileName := sTargetPath+sFile;
+    if FWizard.ExportedPhoA<>nil then FWizard.ExportedPhoA.Pics.ItemsByIDX[Pic.ID].FileName := sTargetPath+sFile;
   end;
 
   procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
@@ -538,14 +535,14 @@ uses
           FileOpError('SLogEntry_FileDeletingError', [sFileName]);
   end;
 
-  procedure TFileOpThread.DoDeletePic(Pic: IPhoaPic);
+  procedure TFileOpThread.DoDeletePic(Pic: IPhotoAlbumPic);
 
      // Рекурсивно удаляет изображение из группы Group и её подгрупп
-    procedure DelID(Group: IPhoaPicGroup; iID: Integer);
+    procedure DelID(Group: IPhotoAlbumPicGroup; iID: Integer);
     var i: Integer;
     begin
-      (Group.Pics as IPhoaMutablePicList).Remove(iID);
-      for i := 0 to Group.Groups.Count-1 do DelID(Group.Groups[i], iID);
+      Group.PicsX.Remove(iID);
+      for i := 0 to Group.Groups.Count-1 do DelID(Group.GroupsX[i], iID);
     end;
 
   begin
@@ -553,10 +550,10 @@ uses
      // Удаляем все ссылки на изображения
     DelID(FWizard.PhoA.RootGroup, Pic.ID);
      // Удаляем изображение
-    (Pic as IPhotoAlbumPic).Release;
+    Pic.Release;
   end;
 
-  procedure TFileOpThread.DoDelPicAndFile(Pic: IPhoaPic);
+  procedure TFileOpThread.DoDelPicAndFile(Pic: IPhotoAlbumPic);
   var sFileName: String;
   begin
      // Удаляем файл
@@ -568,14 +565,14 @@ uses
     FWizard.LogSuccess('SLogEntry_PicDeletedOK', [sFileName]);
   end;
 
-  procedure TFileOpThread.DoRebuildThumb(Pic: IPhoaPic);
+  procedure TFileOpThread.DoRebuildThumb(Pic: IPhotoAlbumPic);
   var iPrevThumbSize, iPrevFileSize: Integer;
   begin
      // Запоминаем прежние размеры эскиза и файла
     iPrevThumbSize := Length(Pic.ThumbnailData);
     iPrevFileSize  := Pic.FileSize;
      // Перестраиваем эскиз
-    (Pic as IPhoaMutablePic).ReloadPicFileData;
+    Pic.ReloadPicFileData;
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
@@ -583,12 +580,12 @@ uses
     FChangesMade := True;
   end;
 
-  procedure TFileOpThread.DoRepairFileLink(Pic: IPhoaPic);
+  procedure TFileOpThread.DoRepairFileLink(Pic: IPhotoAlbumPic);
   begin
     //#ToDo3: Написать repair routine
   end;
 
-  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhoaMutablePic; const sNewFileName: String);
+  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhotoAlbumPic; const sNewFileName: String);
   var sPrevFileName: String;
   begin
      // Проверяем, можно ли исправить путь
@@ -605,7 +602,7 @@ uses
 
   procedure TFileOpThread.Execute;
   var
-    Pic: IPhoaPic;
+    Pic: IPhotoAlbumPic;
     sFileName: String;
   begin
     while not Terminated do begin
@@ -671,7 +668,7 @@ uses
          // Копируем свойства исходной группы. Если выбрана сама группа, добавляем в неё и изображения исходной группы
         TgtGroup.Assign(SrcGroup, True, GS=gsSelected, False);
          // Повторяем то же для всех подгрупп
-        for i := 0 to SrcGroup.Groups.Count-1 do AddGroup(nil, TgtGroup, SrcGroup.Groups[i] as IPhotoAlbumPicGroup, False);
+        for i := 0 to SrcGroup.Groups.Count-1 do AddGroup(nil, TgtGroup, SrcGroup.GroupsX[i], False);
       end;
     end;
 
@@ -683,7 +680,7 @@ uses
        // Копируем свойства исходной группы
       TgtGroup.Assign(SrcGroup, True, False, False);
        // Добавляем выбранные изображения
-      (TgtGroup.Pics as IPhoaMutablePicList).Add(FSelectedPics, True);
+      TgtGroup.PicsX.Add(FSelectedPics, True);
     end;
 
   begin
@@ -698,9 +695,9 @@ uses
     FExportedPhoA.Pics.DuplicatePics(FSelectedPics);
      // Копируем группы и изображения в них
     case SelPicMode of
-      fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup as IPhotoAlbumPicGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
-      fospmAll:       (FExportedPhoA.RootGroup as IPhotoAlbumPicGroup).Assign(FPhoA.RootGroup, True, True, True);
-      fospmSelGroups: AddGroup(FExportedPhoA.RootGroup as IPhotoAlbumPicGroup, nil, FPhoA.RootGroup as IPhotoAlbumPicGroup, True);
+      fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
+      fospmAll:       FExportedPhoA.RootGroup.Assign(FPhoA.RootGroup, True, True, True);
+      fospmSelGroups: AddGroup(FExportedPhoA.RootGroup, nil, FPhoA.RootGroup, True);
     end;
      // Копируем представления
     if FCDOpt_IncludeViews then FExportedPhoA.Views.Assign(FPhoA.Views);
@@ -710,7 +707,7 @@ uses
   var i: Integer;
   begin
      // Добавляем изображения
-    FSelectedPics := NewPhoaMutablePicList(True);
+    FSelectedPics := NewPhotoAlbumPicList(True);
     case SelPicMode of
       fospmSelPics:   FSelectedPics.Assign(FViewerSelPics);
       fospmAll:       FSelectedPics.Assign(FPhoA.Pics);
@@ -827,11 +824,6 @@ uses
         IWzFileOpsPageID_RepairSelLinks: Result := IWzFileOpsPageID_Processing;
       IWzFileOpsPageID_Processing:       Result := IWzFileOpsPageID_Log;
     end;
-  end;
-
-  function TdFileOpsWizard.GetSelectedPics: IPhoaPicList;
-  begin
-    Result := FSelectedPics;
   end;
 
   procedure TdFileOpsWizard.InitializeWizard;

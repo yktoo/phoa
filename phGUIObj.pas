@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.20 2004-10-10 18:53:31 dale Exp $
+//  $Id: phGUIObj.pas,v 1.21 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -79,7 +79,7 @@ type
   TThumbnailViewer = class(TCustomControl)
   private
      // Интерфейс списка изображений, отображаемых в контроле
-    FPicList: IPhoaPicList;
+    FPicList: IPhotoAlbumPicList;
      // Буферный битмэп для отрисовки содержимого окна контрола
     FBuffer: TBitmap32;
      // Размер пункта-эскиза (вместе с отступами, границами и т.п.)
@@ -99,7 +99,7 @@ type
      // Битмэп тени эскиза (nil, если нет валидной рассчитанной тени)
     FThumbShadow: TBitmap32;
      // Выделенные эскизы
-    FSelectedPics: IPhoaMutablePicList;
+    FSelectedPics: IPhotoAlbumPicList;
      // Индекс активного эскиза
     FItemIndex: Integer;
      // Индекс эскиза, с которого началось поточное выделение (Shift+[стрелки] или Shift+[клик])
@@ -210,7 +210,6 @@ type
     function  GetIDSelected(iID: Integer): Boolean;
     function  GetIndexSelected(iIndex: Integer): Boolean;
     function  GetSelectedIndexes(Index: Integer): Integer;
-    function  GetSelectedPics: IPhoaPicList;
     function  GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
     procedure SetBorderStyle(Value: TBorderStyle);
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
@@ -245,7 +244,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
      // Обновляет отображаемый список изображений
-    procedure ReloadPicList(APicList: IPhoaPicList);
+    procedure ReloadPicList(APicList: IPhotoAlbumPicList);
      // Создаёт объект IThumbnailViewerDisplayData, сохраняет в него текущие параметры отображения и возвращает его
     function  SaveDisplay: IThumbnailViewerDisplayData;
      // Восстанавливает параметры отображения из Data; подразумевается возможность использования данных, полученных в
@@ -286,8 +285,8 @@ type
      // -- Индексы выделенных изображений в общем списке изображений viewer'а (Index - индекс выделенного изображения,
      //    0..SelCount-1)
     property SelectedIndexes[Index: Integer]: Integer read GetSelectedIndexes;
-     // -- Выделенные изображения (read-only)
-    property SelectedPics: IPhoaPicList read GetSelectedPics;
+     // -- Выделенные изображения
+    property SelectedPics: IPhotoAlbumPicList read FSelectedPics;
      // -- Если True, отображает всплывающие описания эскизов
     property ShowThumbTooltips: Boolean read FShowThumbTooltips write SetShowThumbTooltips;
      // -- Состояния контрола
@@ -478,7 +477,7 @@ type
        // Скрываем Tooltip, если есть
       Application.CancelHint;
        // Строим описание (добавляем палку, чтобы в StatusBar ничего не попадало)
-      if idx<0 then Hint := '' else Hint := (FPicList[idx] as IPhotoAlbumPic).GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
+      if idx<0 then Hint := '' else Hint := FPicList[idx].GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
       FLastTooltipIdx := idx;
     end;
   end;
@@ -548,7 +547,7 @@ type
     FBorderStyle           := bsSingle;
     FColCount              := 1;
     FNoMoveItemIndex       := -1;
-    FSelectedPics          := NewPhoaMutablePicList(True);
+    FSelectedPics          := NewPhotoAlbumPicList(True);
     FThumbBackBorderColor  := clGray;
     FThumbBackBorderStyle  := tbbsXP;
     FThumbBackColor        := clBtnFace;
@@ -737,11 +736,6 @@ type
   function TThumbnailViewer.GetSelectedIndexes(Index: Integer): Integer;
   begin
     Result := FPicList.IndexOfID(FSelectedPics[Index].ID);
-  end;
-
-  function TThumbnailViewer.GetSelectedPics: IPhoaPicList;
-  begin
-    Result := FSelectedPics;
   end;
 
   function TThumbnailViewer.GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
@@ -1105,7 +1099,7 @@ type
 
   begin
      // Получаем изображение
-    Pic := FPicList[iIndex] as IPhotoAlbumPic;
+    Pic := FPicList[iIndex];
      // Рисуем рамку
     r := ItemRect;
     Info.Bitmap.Font.Assign(Self.Font);
@@ -1238,7 +1232,7 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.ReloadPicList(APicList: IPhoaPicList);
+  procedure TThumbnailViewer.ReloadPicList(APicList: IPhotoAlbumPicList);
   var iItemIdx: Integer;
   begin
     BeginUpdate;

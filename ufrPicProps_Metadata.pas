@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.11 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.12 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,21 +15,21 @@ uses
 
 type
   TfrPicProps_Metadata = class(TPicPropsDialogPage)
-    tvMain: TVirtualStringTree;
     dkBottom: TTBXDock;
+    dklcMain: TDKLanguageController;
     dpDesc: TTBXDockablePanel;
+    ipmShowDescPanel: TTBXVisibilityToggleItem;
     lDesc: TTBXLabel;
     pmMain: TTBXPopupMenu;
-    ipmShowDescPanel: TTBXVisibilityToggleItem;
-    dklcMain: TDKLanguageController;
+    tvMain: TVirtualStringTree;
+    procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+    procedure tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
-    procedure tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   private
      // Скэшированное значение настройки ISettingID_Dlgs_PP_ExpMetadata
     FExpandAll: Boolean;

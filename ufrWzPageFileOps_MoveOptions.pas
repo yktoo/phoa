@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.8 2004-10-10 18:53:32 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.9 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -162,7 +162,7 @@ uses phUtils, udFileOpsWizard;
       List.Clear;
       repeat
         List.Insert(0, Group);
-        Group := Group.Owner as IPhotoAlbumPicGroup;
+        Group := Group.OwnerX;
       until Group=nil;
     end;
 
@@ -189,7 +189,7 @@ uses phUtils, udFileOpsWizard;
         else {fospmSelGroups} begin
           LGroupPath := NewPhotoAlbumPicGroupList(nil);
           for i := 0 to Wiz.SelectedGroups.Count-1 do begin
-            FillPath(Wiz.SelectedGroups[i] as IPhotoAlbumPicGroup, LGroupPath);
+            FillPath(Wiz.SelectedGroups[i], LGroupPath);
             if i=0 then LPath.Assign(LGroupPath) else FindCommonPath(LPath, LGroupPath);
              // Если путь уже пустой (или там единственный узел - узел фотоальбома), выходим
             if LPath.Count<=1 then Break;
@@ -199,7 +199,7 @@ uses phUtils, udFileOpsWizard;
        // Выделяем части пути, пишем в Items[] - путь группы, в Items.Objects[] - ссылку на группу
       if Wiz.ViewerCurView=nil then sRootGroupName := ConstVal('SPhotoAlbumNode') else sRootGroupName := Wiz.ViewerCurView.Name;
       for i := LPath.Count-1 downto 0 do begin
-        Group := LPath[i] as IPhotoAlbumPicGroup;
+        Group := LPath[i];
         cbBaseGroup.Items.AddObject(Group.Path[sRootGroupName], Pointer(Group));
       end;
        // Выбираем нужный пункт

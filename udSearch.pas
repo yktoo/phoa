@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.14 2004-10-10 18:53:32 dale Exp $
+//  $Id: udSearch.pas,v 1.15 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -594,7 +594,7 @@ type
       PhoaInfo(False, 'SPicsNotFound')
     else begin
        // Fill search results
-      (FResultsGroup.Pics as IPhoaMutablePicList).Assign(FLocalResults);
+      FResultsGroup.PicsX.Assign(FLocalResults);
       inherited ButtonClick_OK;
     end;
   end;
@@ -622,7 +622,7 @@ type
     inherited InitializeDialog;
     HelpContext := IDH_intf_search;
     OKIgnoresModified := True;
-    FLocalResults     := NewPhoaMutablePicList(False);
+    FLocalResults     := NewPhotoAlbumPicList(False);
      // Загружаем списки мест, номеров плёнок, авторов
     SLPhoaPlaces      := NewSL;
     SLPhoaFilmNumbers := NewSL;
@@ -645,7 +645,7 @@ type
     FMasks: TPhoaMasks;
     i, iSrchCount, iID, iFSize, iPicWidth, iPicHeight: Integer;
     SearchArea: TSearchArea;
-    Pic: IPhoaPic;
+    Pic: IPhotoAlbumPic;
 
     function Matches(Pic: IPhotoAlbumPic): Boolean;
     var i: Integer;
@@ -718,10 +718,10 @@ type
         for i := 0 to iSrchCount-1 do begin
           case SearchArea of
             saAll:      Pic := FPhoA.Pics[i];
-            saCurGroup: Pic := FCurGroup.Pics[i];
-            else        Pic := FResultsGroup.Pics[i];
+            saCurGroup: Pic := FCurGroup.PicsX[i];
+            else        Pic := FResultsGroup.PicsX[i];
           end;
-          if Matches(Pic as IPhotoAlbumPic) then FLocalResults.Add(Pic, True);
+          if Matches(Pic) then FLocalResults.Add(Pic, True);
         end;
       finally
         FMasks.Free;

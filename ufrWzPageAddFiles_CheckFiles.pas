@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.7 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.8 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -27,15 +27,15 @@ type
     ipmFilesUncheckAll: TTBXItem;
     ipmFilesCheckAll: TTBXItem;
     dklcMain: TDKLanguageController;
+    procedure aaFilesCheckAll(Sender: TObject);
+    procedure aaFilesInvertChecks(Sender: TObject);
+    procedure aaFilesUncheckAll(Sender: TObject);
     procedure tvFilesChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvFilesGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvFilesHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure tvFilesInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvFilesKeyAction(Sender: TBaseVirtualTree; var CharCode: Word; var Shift: TShiftState; var DoDefault: Boolean);
-    procedure aaFilesCheckAll(Sender: TObject);
-    procedure aaFilesUncheckAll(Sender: TObject);
-    procedure aaFilesInvertChecks(Sender: TObject);
   private
      // Список файлов
     FFiles: TFileList;

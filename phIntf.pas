@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.9 2004-10-10 18:53:31 dale Exp $
+//  $Id: phIntf.pas,v 1.10 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -11,12 +11,15 @@ interface
 uses Windows;
 
 type
-   // A picture rotation angle (measured clockwise)
+   // Picture rotation angle (measured clockwise)
   TPicRotation = (pr0, pr90, pr180, pr270);
 
-   // Picture flip flags (pfl prefix used for avoiding confusing with TPixelFormat)
+   // Picture flip flags 
   TPicFlip = (pflHorz, pflVert);
   TPicFlips = set of TPicFlip;
+
+   // Pixel image format
+  TPhoaPixelFormat = (ppfDevice, ppf1bit, ppf4bit, ppf8bit, ppf15bit, ppf16bit, ppf24bit, ppf32bit, ppfCustom); 
 
   TPhoaHandle = Cardinal;
 
@@ -39,6 +42,7 @@ type
     function  GetFilmNumber: String; stdcall;
     function  GetFlips: TPicFlips; stdcall;
     function  GetFrameNumber: String; stdcall;
+    function  GetImageFormat: TPhoaPixelFormat;
     function  GetImageSize: TSize; stdcall;
     function  GetKeywords: IPhoaKeywordList; stdcall;
     function  GetMedia: String; stdcall;
@@ -69,6 +73,8 @@ type
     property Flips: TPicFlips read GetFlips;
      // -- Frame number
     property FrameNumber: String read GetFrameNumber;
+     // -- Pixel image format
+    property ImageFormat: TPhoaPixelFormat read GetImageFormat;
      // -- Image dimensions in pixels
     property ImageSize: TSize read GetImageSize;
      // -- Keyword list
@@ -170,8 +176,6 @@ type
     property Description: String read GetDescription;
      // -- True if a group node is expanded
     property Expanded: Boolean read GetExpanded;
-     // -- Maximum ID of the group and all owned groups
-    property MaxGroupID: Integer read GetMaxGroupID;
      // -- Owned group list
     property Groups: IPhoaPicGroupList read GetGroups;
      // -- Finds and returns the group by its ID (recursively); nil if no such group
@@ -183,6 +187,8 @@ type
     property ID: Integer read GetID;
      // -- Group index in its Owner's list
     property Index: Integer read GetIndex;
+     // -- Maximum ID of the group and all owned groups
+    property MaxGroupID: Integer read GetMaxGroupID;
      // -- Recursive number of owned groups
     property NestedGroupCount: Integer read GetNestedGroupCount;
      // -- Group owner

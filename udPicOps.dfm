@@ -89,6 +89,7 @@ inherited dPicOps: TdPicOps
     TreeOptions.StringOptions = [toShowStaticText, toAutoAcceptEditChange]
     OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChange = tvGroupsChange
+    OnFreeNode = tvGroupsFreeNode
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText
     OnGetImageIndex = tvGroupsGetImageIndex

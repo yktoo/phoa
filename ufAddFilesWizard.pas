@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.15 2004-10-10 18:53:32 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.16 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -138,16 +138,16 @@ type
     FTimeFillResult: TDateTimeFillResult;
     FXFormFilled: Boolean;
      // Prop storage
-    FAddedPic: IPhoaPic;
+    FAddedPic: IPhotoAlbumPic;
      // Производит автозаполнение свойств изображения
-    procedure AutofillPicProps(Pic: IPhoaMutablePic);
+    procedure AutofillPicProps(Pic: IPhotoAlbumPic);
   protected
     procedure Execute; override;
   public
     constructor Create(Wizard: TfAddFilesWizard);
      // Props
      // -- Последнее добавленное изображение (nil, если нет или была ошибка)
-    property AddedPic: IPhoaPic read FAddedPic;
+    property AddedPic: IPhotoAlbumPic read FAddedPic;
   end;
 
    // Показывает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
@@ -177,7 +177,7 @@ uses
    // TAddFilesThread
    //===================================================================================================================
 
-  procedure TAddFilesThread.AutofillPicProps(Pic: IPhoaMutablePic);
+  procedure TAddFilesThread.AutofillPicProps(Pic: IPhotoAlbumPic);
   type
      // Запись о требуемых преобразованиях
     TTransformRec = record
@@ -404,7 +404,7 @@ uses
             FAddedPic := nil;
             TPhoaOp_InternalPicAdd.Create(AddOperations, PhoA, Group, FileList.Files[0], FAddedPic);
              // Производим автозаполнение свойств изображения
-            AutofillPicProps(FAddedPic as IPhoaMutablePic);
+            AutofillPicProps(FAddedPic);
              // Пишем в протокол
             LogSuccess(
               'SLogEntry_AddingOK',

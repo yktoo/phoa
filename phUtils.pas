@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.30 2004-10-06 14:41:10 dale Exp $
+//  $Id: phUtils.pas,v 1.31 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -105,7 +105,7 @@ uses
    // Возвращает наименование свойства изображения для группировки
   function  GroupByPropName(GBProp: TGroupByProperty): String;
    // Возвращает наименование пиксельного формата изображения
-  function  PixelFormatName(PFmt: TPixelFormat): String;
+  function  PixelFormatName(PFmt: TPhoaPixelFormat): String;
    // Возвращает наименование свойства дискового файла
   function  DiskFilePropName(DFProp: TDiskFileProp): String;
    // Возвращает значение свойства дискового файла по объекту TNamespace файла. Если Namespace=nil, возвращает пустую строку
@@ -596,9 +596,9 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     Result := ConstVal(GetEnumName(TypeInfo(TGroupByProperty), Byte(GBProp)));
   end;
 
-  function PixelFormatName(PFmt: TPixelFormat): String;
+  function PixelFormatName(PFmt: TPhoaPixelFormat): String;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPixelFormat), Byte(PFmt)));
+    Result := ConstVal(GetEnumName(TypeInfo(TPhoaPixelFormat), Byte(PFmt)));
   end;
 
   function DiskFilePropName(DFProp: TDiskFileProp): String;

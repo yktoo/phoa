@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.25 2004-10-05 13:16:34 dale Exp $
+//  $Id: phoa.dpr,v 1.26 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -84,6 +84,7 @@ begin
    // Составляем список доступных языков
   InitLanguages;
    // Выполняем приложение
+  ShowProgressInfo('SMsg_Starting', []);
   Application.Initialize;
   Application.CreateForm(TfMain, fMain);
   Application.Run;

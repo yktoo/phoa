@@ -43,6 +43,7 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowTreeLines, toThemeAware, toUseBlendedImages]
     TreeOptions.StringOptions = [toShowStaticText, toAutoAcceptEditChange]
     OnChange = tvGroupsChange
+    OnFreeNode = tvGroupsFreeNode
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText
     OnGetImageIndex = tvGroupsGetImageIndex

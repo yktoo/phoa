@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.48 2004-10-10 18:53:31 dale Exp $
+//  $Id: Main.pas,v 1.49 2004-10-11 11:41:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -19,181 +19,181 @@ uses
 
 type
   TfMain = class(TForm, IPhoaViews)
-    alMain: TActionList;
-    aNew: TAction;
-    aOpen: TAction;
-    aSave: TAction;
-    aSaveAs: TAction;
-    aExit: TAction;
     aAbout: TAction;
-    aNewGroup: TAction;
-    aNewPic: TAction;
+    aCopy: TAction;
+    aCut: TAction;
     aDelete: TAction;
     aEdit: TAction;
-    aSettings: TAction;
-    aView: TAction;
-    dkTop: TTBXDock;
-    dkBottom: TTBXDock;
-    dkLeft: TTBXDock;
-    dkRight: TTBXDock;
-    tbMain: TTBXToolbar;
-    tbMenu: TTBXToolbar;
-    smFile: TTBXSubmenuItem;
-    iNew: TTBXItem;
-    iOpen: TTBXItem;
-    iSave: TTBXItem;
-    iSaveAs: TTBXItem;
-    iFileSep1: TTBXSeparatorItem;
-    iExit: TTBXItem;
-    smEdit: TTBXSubmenuItem;
-    iNewGroup: TTBXItem;
-    iNewPic: TTBXItem;
-    iDelete: TTBXItem;
-    iEditSep2: TTBXSeparatorItem;
-    iEdit: TTBXItem;
-    iEditSep3: TTBXSeparatorItem;
-    iView: TTBXItem;
-    smTools: TTBXSubmenuItem;
-    iSettings: TTBXItem;
-    smHelp: TTBXSubmenuItem;
-    iAbout: TTBXItem;
-    bNewGroup: TTBXItem;
-    bSaveAs: TTBXItem;
-    bSave: TTBXItem;
-    bNew: TTBXItem;
-    tbSep1: TTBXSeparatorItem;
-    bDelete: TTBXItem;
-    bNewPic: TTBXItem;
-    tbSep2: TTBXSeparatorItem;
-    bAbout: TTBXItem;
-    bSettings: TTBXItem;
-    bExit: TTBXItem;
-    bView: TTBXItem;
-    tbSep3: TTBXSeparatorItem;
-    pmGroups: TTBXPopupMenu;
-    ipmGroupsDelete: TTBXItem;
-    ipmGroupsEdit: TTBXItem;
-    ipmGroupsSep1: TTBXSeparatorItem;
-    ipmGroupsNewGroup: TTBXItem;
-    pmPics: TTBXPopupMenu;
-    ipmPicsView: TTBXItem;
-    ipmPicsSep1: TTBXSeparatorItem;
-    ipmPicsEdit: TTBXItem;
-    ipmPicsDelete: TTBXItem;
-    ipmPicsSep2: TTBXSeparatorItem;
-    ipmPicsNewPic: TTBXItem;
-    sbarMain: TTBXStatusBar;
-    mruOpen: TTBXMRUList;
-    bOpen: TTBXSubmenuItem;
-    bOpenMRU: TTBXMRUListItem;
-    iFileSep2: TTBXSeparatorItem;
-    smFileMRU: TTBXMRUListItem;
-    smView: TTBXSubmenuItem;
-    iToggleStatusbar: TTBXVisibilityToggleItem;
-    iToggleToolbar: TTBXVisibilityToggleItem;
-    aHelpContents: TAction;
-    iHelpContents: TTBXItem;
-    bHelpContents: TTBXItem;
-    aStats: TAction;
-    bStats: TTBXItem;
-    pmView: TTBXPopupMenu;
+    aExit: TAction;
+    aFileOperations: TAction;
     aFind: TAction;
-    iFind: TTBXItem;
-    iToolsSep1: TTBXSeparatorItem;
+    aFlatMode: TAction;
+    aHelpCheckUpdates: TAction;
+    aHelpContents: TAction;
+    aHelpFAQ: TAction;
+    aHelpProductWebsite: TAction;
+    aHelpSupport: TAction;
+    aHelpVendorWebsite: TAction;
+    aIniLoadSettings: TAction;
+    aIniSaveSettings: TAction;
+    alMain: TActionList;
+    aNew: TAction;
+    aNewGroup: TAction;
+    aNewPic: TAction;
+    aOpen: TAction;
+    aPaste: TAction;
+    aPhoaView_Delete: TAction;
+    aPhoaView_Edit: TAction;
+    aPhoaView_MakeGroup: TAction;
+    aPhoaView_New: TAction;
+    aPicOps: TAction;
+    aRemoveSearchResults: TAction;
+    aSave: TAction;
+    aSaveAs: TAction;
     aSelectAll: TAction;
     aSelectNone: TAction;
-    iSelectNone: TTBXItem;
-    iSelectAll: TTBXItem;
-    ipmPicsSelectAll: TTBXItem;
-    ipmPicsSelectNone: TTBXItem;
-    aPicOps: TAction;
-    iPicOps: TTBXItem;
+    aSettings: TAction;
     aSortPics: TAction;
-    bEdit: TTBXItem;
-    iSortPics: TTBXItem;
-    tbViewSep1: TTBXSeparatorItem;
-    fpMain: TFormPlacement;
-    aCut: TAction;
-    aCopy: TAction;
-    aPaste: TAction;
-    iPaste: TTBXItem;
-    iCopy: TTBXItem;
-    iCut: TTBXItem;
-    iEditSep1: TTBXSeparatorItem;
-    ipmPicsPaste: TTBXItem;
-    ipmPicsCopy: TTBXItem;
-    ipmPicsCut: TTBXItem;
-    ipmPicsSep3: TTBXSeparatorItem;
-    tbSep4: TTBXSeparatorItem;
-    bPaste: TTBXItem;
+    aStats: TAction;
+    aUndo: TAction;
+    aView: TAction;
+    bAbout: TTBXItem;
     bCopy: TTBXItem;
     bCut: TTBXItem;
-    aUndo: TAction;
-    iUndo: TTBXItem;
-    iEditSep4: TTBXSeparatorItem;
+    bDelete: TTBXItem;
+    bEdit: TTBXItem;
+    bExit: TTBXItem;
+    bFind: TTBXItem;
+    bHelpContents: TTBXItem;
+    bNew: TTBXItem;
+    bNewGroup: TTBXItem;
+    bNewPic: TTBXItem;
+    bOpen: TTBXSubmenuItem;
+    bOpenMRU: TTBXMRUListItem;
+    bPaste: TTBXItem;
+    bSave: TTBXItem;
+    bSaveAs: TTBXItem;
+    bSettings: TTBXItem;
+    bStats: TTBXItem;
     bUndo: TTBXSubmenuItem;
-    smUndoHistory: TTBXSubmenuItem;
-    ilActionsSmall: TTBImageList;
-    ilActionsMiddle: TImageList;
+    bView: TTBXItem;
+    dkBottom: TTBXDock;
+    dklcMain: TDKLanguageController;
+    dkLeft: TTBXDock;
+    dkRight: TTBXDock;
+    dkTop: TTBXDock;
+    dpGroups: TTBXDockablePanel;
+    fpMain: TFormPlacement;
+    gipmPhoaView: TTBGroupItem;
+    gipmPhoaViewViews: TTBGroupItem;
+    gismViewViews: TTBGroupItem;
+    giTools_GroupsMenu: TTBGroupItem;
+    giTools_PicsMenu: TTBGroupItem;
+    giTools_ToolsMenu: TTBGroupItem;
+    iAbout: TTBXItem;
+    iCopy: TTBXItem;
+    iCut: TTBXItem;
+    iDelete: TTBXItem;
+    iEdit: TTBXItem;
+    iEditSep1: TTBXSeparatorItem;
+    iEditSep2: TTBXSeparatorItem;
+    iEditSep3: TTBXSeparatorItem;
+    iEditSep4: TTBXSeparatorItem;
+    iExit: TTBXItem;
+    iFileOperations: TTBXItem;
+    iFileSep1: TTBXSeparatorItem;
+    iFileSep2: TTBXSeparatorItem;
+    iFileSep3: TTBXSeparatorItem;
+    iFind: TTBXItem;
+    iFlatMode: TTBXItem;
+    iHelpCheckUpdates: TTBXItem;
+    iHelpContents: TTBXItem;
+    iHelpFAQ: TTBXItem;
+    iHelpProductWebsite: TTBXItem;
+    iHelpSupport: TTBXItem;
+    iHelpVendorWebsite: TTBXItem;
+    iIniLoadSettings: TTBXItem;
+    iIniSaveSettings: TTBXItem;
     ilActionsLarge: TImageList;
-    aPhoaView_New: TAction;
-    aPhoaView_Edit: TAction;
-    aPhoaView_Delete: TAction;
-    aPhoaView_MakeGroup: TAction;
-    pmPhoaView: TTBXPopupMenu;
+    ilActionsMiddle: TImageList;
+    ilActionsSmall: TTBImageList;
+    iNew: TTBXItem;
+    iNewGroup: TTBXItem;
+    iNewPic: TTBXItem;
+    iOpen: TTBXItem;
+    iPaste: TTBXItem;
+    iPhoaView_Delete: TTBXItem;
+    iPhoaView_Edit: TTBXItem;
+    iPhoaView_MakeGroup: TTBXItem;
+    iPhoaView_New: TTBXItem;
     iPhoaView_SetDefault: TTBXItem;
     iPhoaViewSep1: TTBXSeparatorItem;
     iPhoaViewSep2: TTBXSeparatorItem;
-    iPhoaView_New: TTBXItem;
-    iPhoaView_Delete: TTBXItem;
-    iPhoaView_Edit: TTBXItem;
     iPhoaViewSep3: TTBXSeparatorItem;
-    iPhoaView_MakeGroup: TTBXItem;
-    gipmPhoaView: TTBGroupItem;
-    ulToolbarUndo: TTBXUndoList;
-    tbxlToolbarUndo: TTBXLabelItem;
-    gismViewViews: TTBGroupItem;
-    tbSepHelpWebsite: TTBXSeparatorItem;
-    aHelpProductWebsite: TAction;
-    iHelpProductWebsite: TTBXItem;
-    bFind: TTBXItem;
-    gipmPhoaViewViews: TTBGroupItem;
-    aFileOperations: TAction;
+    iPicOps: TTBXItem;
+    ipmGroupsDelete: TTBXItem;
+    ipmGroupsEdit: TTBXItem;
+    ipmGroupsFileOperations: TTBXItem;
+    ipmGroupsNewGroup: TTBXItem;
+    ipmGroupsNewPic: TTBXItem;
+    ipmGroupsPicOps: TTBXItem;
+    ipmGroupsSep1: TTBXSeparatorItem;
     ipmGroupsSep2: TTBXSeparatorItem;
+    ipmGroupsSep3: TTBXSeparatorItem;
     ipmGroupsSortPics: TTBXItem;
     ipmGroupsStats: TTBXItem;
-    ipmGroupsPicOps: TTBXItem;
-    iFileOperations: TTBXItem;
+    ipmPicsCopy: TTBXItem;
+    ipmPicsCut: TTBXItem;
+    ipmPicsDelete: TTBXItem;
+    ipmPicsEdit: TTBXItem;
     ipmPicsFileOperations: TTBXItem;
-    ipmGroupsFileOperations: TTBXItem;
-    aIniSaveSettings: TAction;
-    aIniLoadSettings: TAction;
-    iFileSep3: TTBXSeparatorItem;
-    iIniLoadSettings: TTBXItem;
-    iIniSaveSettings: TTBXItem;
-    iToolsSep2: TTBXSeparatorItem;
-    giTools_ToolsMenu: TTBGroupItem;
-    ipmGroupsSep3: TTBXSeparatorItem;
-    giTools_GroupsMenu: TTBGroupItem;
-    ipmGroupsNewPic: TTBXItem;
+    ipmPicsNewPic: TTBXItem;
+    ipmPicsPaste: TTBXItem;
+    ipmPicsSelectAll: TTBXItem;
+    ipmPicsSelectNone: TTBXItem;
+    ipmPicsSep1: TTBXSeparatorItem;
+    ipmPicsSep2: TTBXSeparatorItem;
+    ipmPicsSep3: TTBXSeparatorItem;
     ipmPicsSep4: TTBXSeparatorItem;
-    giTools_PicsMenu: TTBGroupItem;
-    aHelpFAQ: TAction;
-    iHelpFAQ: TTBXItem;
-    dpGroups: TTBXDockablePanel;
-    tvGroups: TVirtualStringTree;
-    aRemoveSearchResults: TAction;
+    ipmPicsView: TTBXItem;
     iRemoveSearchResults: TTBXItem;
-    dklcMain: TDKLanguageController;
-    aFlatMode: TAction;
-    iFlatMode: TTBXItem;
-    aHelpVendorWebsite: TAction;
-    aHelpCheckUpdates: TAction;
+    iSave: TTBXItem;
+    iSaveAs: TTBXItem;
+    iSelectAll: TTBXItem;
+    iSelectNone: TTBXItem;
+    iSettings: TTBXItem;
+    iSortPics: TTBXItem;
+    iToggleStatusbar: TTBXVisibilityToggleItem;
+    iToggleToolbar: TTBXVisibilityToggleItem;
+    iToolsSep1: TTBXSeparatorItem;
+    iToolsSep2: TTBXSeparatorItem;
+    iUndo: TTBXItem;
+    iView: TTBXItem;
+    mruOpen: TTBXMRUList;
+    pmGroups: TTBXPopupMenu;
+    pmPhoaView: TTBXPopupMenu;
+    pmPics: TTBXPopupMenu;
+    pmView: TTBXPopupMenu;
+    sbarMain: TTBXStatusBar;
+    smEdit: TTBXSubmenuItem;
+    smFile: TTBXSubmenuItem;
+    smFileMRU: TTBXMRUListItem;
+    smHelp: TTBXSubmenuItem;
     smHelpInternet: TTBXSubmenuItem;
-    iHelpVendorWebsite: TTBXItem;
-    iHelpCheckUpdates: TTBXItem;
-    aHelpSupport: TAction;
-    iHelpSupport: TTBXItem;
+    smTools: TTBXSubmenuItem;
+    smUndoHistory: TTBXSubmenuItem;
+    smView: TTBXSubmenuItem;
+    tbMain: TTBXToolbar;
+    tbMenu: TTBXToolbar;
+    tbSep1: TTBXSeparatorItem;
+    tbSep2: TTBXSeparatorItem;
+    tbSep3: TTBXSeparatorItem;
+    tbSep4: TTBXSeparatorItem;
+    tbSepHelpWebsite: TTBXSeparatorItem;
+    tbViewSep1: TTBXSeparatorItem;
+    tbxlToolbarUndo: TTBXLabelItem;
+    tvGroups: TVirtualStringTree;
+    ulToolbarUndo: TTBXUndoList;
     procedure aaAbout(Sender: TObject);
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
@@ -256,6 +256,7 @@ type
     procedure tvGroupsEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
     procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -264,13 +265,11 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
-    procedure tvGroupsFreeNode(Sender: TBaseVirtualTree;
-      Node: PVirtualNode);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
      // Просматриваемые в настоящий момент изображения (с учётом режима Flat)
-    FViewedPics: IPhoaPicList;
+    FViewedPics: IPhotoAlbumPicList;
      // Узел результатов поиска
     FSearchNode: PVirtualNode;
      // Список изображений - результаты поиска
@@ -987,7 +986,7 @@ uses
 
   procedure TfMain.DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
   begin
-    if bForceRemove then (FSearchResults.Pics as IPhoaMutablePicList).Clear;
+    if bForceRemove then FSearchResults.PicsX.Clear;
      // Если есть результаты, следим, чтобы узел поиска существовал
     if FSearchResults.Pics.Count>0 then begin
       if FSearchNode=nil then FSearchNode := tvGroups.AddChild(nil);
@@ -1310,7 +1309,7 @@ uses
 
   function TfMain.GetCurRootGroup: IPhotoAlbumPicGroup;
   begin
-    if ViewIndex<0 then Result := FPhoA.RootGroup as IPhotoAlbumPicGroup else Result := FPhoA.Views[ViewIndex].RootGroup as IPhotoAlbumPicGroup;
+    if ViewIndex<0 then Result := FPhoA.RootGroup else Result := FPhoA.Views[ViewIndex].RootGroup;
   end;
 
   function TfMain.GetDisplayFileName: String;
@@ -1456,12 +1455,8 @@ uses
 
      // Выбирает в качестве текущей заданную группу в дереве, если sGroupPath<>''
     procedure SelectGroupByPath(const sGroupPath: String);
-    var g: IPhoaPicGroup;
     begin
-      if sGroupPath<>'' then begin
-        g := CurRootGroup.GroupByPath[sGroupPath];
-        if g<>nil then CurGroup := g as IPhotoAlbumPicGroup;
-      end;
+      if sGroupPath<>'' then CurGroup := CurRootGroup.GroupByPathX[sGroupPath];
     end;
 
      // Выбирает изображение с заданным ID
@@ -1512,7 +1507,7 @@ uses
   end;
 
   procedure TfMain.RefreshViewer;
-  var UniquePics, ViewPics: IPhoaMutablePicList;
+  var UniquePics, ViewPics: IPhotoAlbumPicList;
 
     procedure RecursivelyAddPics(Group: IPhotoAlbumPicGroup);
     var
@@ -1529,7 +1524,7 @@ uses
         if bDoAdd then ViewPics.Add(Pic, False);
       end;
        // Повторяем то же для вложенных групп
-      for i := 0 to Group.Groups.Count-1 do RecursivelyAddPics(Group.Groups[i] as IPhotoAlbumPicGroup);
+      for i := 0 to Group.Groups.Count-1 do RecursivelyAddPics(Group.GroupsX[i]);
     end;
 
   begin
@@ -1538,13 +1533,13 @@ uses
     if CurGroup<>nil then
        // Не рекурсивный режим
       if not SettingValueBool(ISettingID_Browse_FlatMode) then
-        FViewedPics := CurGroup.Pics
+        FViewedPics := CurGroup.PicsX
        // Рекурсивный режим
       else begin
          // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
-        UniquePics := NewPhoaMutablePicList(True);
+        UniquePics := NewPhotoAlbumPicList(True);
          // Создаём список изображений для просмотра
-        ViewPics := NewPhoaMutablePicList(False);
+        ViewPics := NewPhotoAlbumPicList(False);
          // Рекурсивно наполняем список
         RecursivelyAddPics(CurGroup);
          // Сохраняем список 
@@ -1841,7 +1836,7 @@ uses
      // Узел обычной группы
     if ParentNode<>nil then begin
       pp := Sender.GetNodeData(ParentNode);
-      p^ := pp^.Groups[Node.Index] as IPhotoAlbumPicGroup;
+      p^ := pp^.GroupsX[Node.Index];
      // Узел фотоальбома/представления
     end else if Node.Index=0 then begin
       p^ := CurRootGroup;

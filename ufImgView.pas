@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.32 2004-10-10 18:53:32 dale Exp $
+//  $Id: ufImgView.pas,v 1.33 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -46,6 +46,12 @@ type
     property QueuedFileName: String read FQueuedFileName write SetQueuedFileName;
   end;
 
+   // Направление предекодирования изображений
+  TPredecodeDirection = (
+    pddDisabled,  // Отключено
+    pddForward,   // Вперёд
+    pddBackward); // Назад
+
   TfImgView = class(TForm)
     alMain: TActionList;
     aNextPic: TAction;
@@ -64,28 +70,15 @@ type
     ipmPrevPic: TTBXItem;
     ipmLastPic: TTBXItem;
     ipmFirstPic: TTBXItem;
-    ipmSepZoomIn: TTBXSeparatorItem;
-    ipmZoomIn: TTBXItem;
-    ipmZoomOut: TTBXItem;
-    ipmZoomActual: TTBXItem;
-    ipmZoomFit: TTBXItem;
-    ipmSepSlideShow: TTBXSeparatorItem;
-    ipmRefresh: TTBXItem;
-    ipmSettings: TTBXItem;
+    ipmSepZoom: TTBXSeparatorItem;
     ipmSepClose: TTBXSeparatorItem;
     ipmClose: TTBXItem;
     aFullScreen: TAction;
-    ipmFullScreen: TTBXItem;
     aHelp: TAction;
-    ipmHelp: TTBXItem;
     aEdit: TAction;
-    ipmEdit: TTBXItem;
     aSlideShow: TAction;
-    ipmSepSMView: TTBXSeparatorItem;
-    iSlideShow: TTBXItem;
     iMain: TImage32;
     aRelocateInfo: TAction;
-    ipmRelocateInfo: TTBXItem;
     dkTop: TTBXDock;
     dkLeft: TTBXDock;
     dkRight: TTBXDock;
@@ -100,8 +93,7 @@ type
     bZoomOut: TTBXItem;
     bZoomActual: TTBXItem;
     bZoomFit: TTBXItem;
-    tbMainSepSlideShow: TTBXSeparatorItem;
-    bSlideShow: TTBXItem;
+    tbMainSepFullScreen: TTBXSeparatorItem;
     tbSepEdit: TTBXSeparatorItem;
     bEdit: TTBXItem;
     bFullScreen: TTBXItem;
@@ -114,83 +106,119 @@ type
     tbSepCounter: TTBXSeparatorItem;
     eCounter: TTBXEditItem;
     aShowInfo: TAction;
-    ipmShowInfo: TTBXItem;
     bShowInfo: TTBXItem;
-    ipmSepGIPMTools: TTBXSeparatorItem;
-    gipmTools: TTBGroupItem;
-    pmsmView: TTBXSubmenuItem;
-    pmsmTools: TTBXSubmenuItem;
-    ipmViewSep1: TTBXSeparatorItem;
-    ipmToggleToolsToolbar: TTBXVisibilityToggleItem;
-    ipmToggleMainToolbar: TTBXVisibilityToggleItem;
-    ipmToolsSep1: TTBXSeparatorItem;
-    ipmRotate270: TTBXItem;
-    ipmRotate180: TTBXItem;
-    ipmRotate90: TTBXItem;
-    ipmToolsSep2: TTBXSeparatorItem;
-    ipmFlipVert: TTBXItem;
-    ipmFlipHorz: TTBXItem;
+    iSepCustomTools: TTBXSeparatorItem;
     tbTools: TTBXToolbar;
-    bRotate90: TTBXItem;
-    bRotate180: TTBXItem;
-    bRotate270: TTBXItem;
-    itbToolsSep1: TTBXSeparatorItem;
-    bFlipHorz: TTBXItem;
-    bFlipVert: TTBXItem;
     aStoreTransform: TAction;
-    ipmToolsSep3: TTBXSeparatorItem;
-    ipmStoreTransform: TTBXItem;
-    itbToolsSep2: TTBXSeparatorItem;
-    bStoreTransform: TTBXItem;
     aRotate0: TAction;
     aRotate90: TAction;
     aRotate180: TAction;
     aRotate270: TAction;
     aFlipHorz: TAction;
     aFlipVert: TAction;
-    bRotate0: TTBXItem;
-    ipmRotate0: TTBXItem;
     dklcMain: TDKLanguageController;
+    tbSlideShow: TTBXToolbar;
+    aSlideShowForward: TAction;
+    aSlideShowBackward: TAction;
+    aSlideShowRandom: TAction;
+    aSlideShowCyclic: TAction;
+    tbMenu: TTBXToolbar;
+    smHelp: TTBXSubmenuItem;
+    smTools: TTBXSubmenuItem;
+    smZoom: TTBXSubmenuItem;
+    smView: TTBXSubmenuItem;
+    smPicture: TTBXSubmenuItem;
+    iClose: TTBXItem;
+    iSepFileClose: TTBXSeparatorItem;
+    iEdit: TTBXItem;
+    iLastPic: TTBXItem;
+    iNextPic: TTBXItem;
+    iPrevPic: TTBXItem;
+    iFirstPic: TTBXItem;
+    TBXSeparatorItem1: TTBXSeparatorItem;
+    iZoomFit: TTBXItem;
+    iZoomActual: TTBXItem;
+    iZoomOut: TTBXItem;
+    iZoomIn: TTBXItem;
+    smSlideShow: TTBXSubmenuItem;
+    iSlideShow: TTBXItem;
+    iSepSlideShowBackward: TTBXSeparatorItem;
+    iSlideShowBackward: TTBXItem;
+    iSlideShowRandom: TTBXItem;
+    iSlideShowForward: TTBXItem;
+    iSepSlideShowCyclic: TTBXSeparatorItem;
+    iSlideShowCyclic: TTBXItem;
+    smTransforms: TTBXSubmenuItem;
+    iRotate0: TTBXItem;
+    iRotate90: TTBXItem;
+    iRotate180: TTBXItem;
+    iRotate270: TTBXItem;
+    iSepFlipHorz: TTBXSeparatorItem;
+    iFlipHorz: TTBXItem;
+    iFlipVert: TTBXItem;
+    iSepStoreTransform: TTBXSeparatorItem;
+    iStoreTransform: TTBXItem;
+    iFullScreen: TTBXItem;
+    iRefresh: TTBXItem;
+    iShowInfo: TTBXItem;
+    iRelocateInfo: TTBXItem;
+    iSepFullScreen: TTBXSeparatorItem;
+    iToggleMainToolbar: TTBXVisibilityToggleItem;
+    iToggleToolsToolbar: TTBXVisibilityToggleItem;
+    iToggleSlideShowToolbar: TTBXVisibilityToggleItem;
+    iSettings: TTBXItem;
+    tbgiZoom: TTBGroupItem;
+    tbgiTools: TTBGroupItem;
+    tbgiVew: TTBGroupItem;
+    iHelp: TTBXItem;
+    gipmTools: TTBGroupItem;
+    iToolsSep: TTBXSeparatorItem;
+    procedure aaClose(Sender: TObject);
+    procedure aaEdit(Sender: TObject);
+    procedure aaFirstPic(Sender: TObject);
+    procedure aaFlipHorz(Sender: TObject);
+    procedure aaFlipVert(Sender: TObject);
+    procedure aaFullScreen(Sender: TObject);
+    procedure aaHelp(Sender: TObject);
+    procedure aaLastPic(Sender: TObject);
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);
-    procedure aaClose(Sender: TObject);
+    procedure aaRelocateInfo(Sender: TObject);
+    procedure aaRotate0(Sender: TObject);
+    procedure aaRotate180(Sender: TObject);
+    procedure aaRotate270(Sender: TObject);
+    procedure aaRotate90(Sender: TObject);
     procedure aaSettings(Sender: TObject);
-    procedure aaFirstPic(Sender: TObject);
-    procedure aaLastPic(Sender: TObject);
+    procedure aaShowInfo(Sender: TObject);
+    procedure aaSlideShow(Sender: TObject);
+    procedure aaSlideShowBackward(Sender: TObject);
+    procedure aaSlideShowCyclic(Sender: TObject);
+    procedure aaSlideShowForward(Sender: TObject);
+    procedure aaSlideShowRandom(Sender: TObject);
+    procedure aaStoreTransform(Sender: TObject);
+    procedure aaZoomActual(Sender: TObject);
     procedure aaZoomFit(Sender: TObject);
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
-    procedure aaZoomActual(Sender: TObject);
-    procedure aaFullScreen(Sender: TObject);
-    procedure aaHelp(Sender: TObject);
-    procedure aaEdit(Sender: TObject);
-    procedure aaSlideShow(Sender: TObject);
-    procedure aaRelocateInfo(Sender: TObject);
-    procedure aaShowInfo(Sender: TObject);
-    procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
-    procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
-    procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-    procedure tbMainVisibleChanged(Sender: TObject);
+    procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
+    procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
+    procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
-    procedure aaRotate0(Sender: TObject);
-    procedure aaRotate90(Sender: TObject);
-    procedure aaRotate180(Sender: TObject);
-    procedure aaRotate270(Sender: TObject);
-    procedure aaFlipHorz(Sender: TObject);
-    procedure aaFlipVert(Sender: TObject);
-    procedure aaStoreTransform(Sender: TObject);
+    procedure tbMainVisibleChanged(Sender: TObject);
   private
-    FPics: IPhoaPicList;
+     // Список просматриваемых изображений
+    FPics: IPhotoAlbumPicList;
+     // Текущий фотоальбом
     FPhoA: TPhotoAlbum;
      // Количество изображений в FPics
     FPicCount: Integer;
@@ -198,8 +226,8 @@ type
     FInitFlags: TImgViewInitFlags;
      // Поток фоновой загрузки картинок
     FDecodeThread: TDecodeThread;
-     // True, если последняя смена картинки была в направлении "назад" (используется для предекодирования)
-    FLastPicChangeBackwards: Boolean;
+     // Направление предекодирования изображений
+    FPredecodeDirection: TPredecodeDirection;
      // Слой, на котором рисуется описание
     FDescLayer: TPositionedLayer;
      // Слой перемещения информации
@@ -230,7 +258,6 @@ type
     FCaptionProps: TPicProperties;
     FDoShrinkPic: Boolean;
     FDoZoomPic: Boolean;
-    FDefaultFullscreen: Boolean;
     FAlwaysOnTop: Boolean;
     FKeepCursorOverTB: Boolean;
     FHideCursorInFS: Boolean;
@@ -241,8 +268,6 @@ type
     FCacheBehindPic: Boolean;
     FStretchFilter: TStretchFilter;
     FSlideInterval: Integer;
-    FSlideCyclic: Boolean;
-    FDefaultShowInfo: Boolean;
     FInfoProps: TPicProperties;
     FInfoFont: String;
     FInfoBkColor: TColor;
@@ -283,6 +308,8 @@ type
     FPicIdx: Integer;
     FShowInfo: Boolean;
     FSlideShow: Boolean;
+    FSlideShowDirection: TSlideShowDirection;
+    FSlideShowCyclic: Boolean;
      // Настраивает параметры окна и вычисляет базовые параметры отображения. При bUseInitFlags также учитывает
      //   FInitFlags
     procedure ApplySettings(bUseInitFlags: Boolean);
@@ -314,8 +341,12 @@ type
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
      // События преобразования
     procedure TransformApplied(Sender: TObject);
+     // Настраивает aShowInfo.Checked
+    procedure UpdateShowInfoActions;
      // Настраивает свойство Checked для Actions преобразований
     procedure UpdateTransformActions;
+     // Настраивает состояние Actions показа слайдов
+    procedure UpdateSlideShowActions;
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
@@ -335,14 +366,16 @@ type
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
      // Prop handlers
-    procedure SetPicIdx(Value: Integer);
-    function  GetZoomFactor: Single;
-    procedure SetZoomFactor(Value: Single);
     function  GetViewOffset: TPoint;
-    procedure SetViewOffset(const Value: TPoint);
+    function  GetZoomFactor: Single;
     procedure SetFullScreen(Value: Boolean);
-    procedure SetSlideShow(Value: Boolean);
+    procedure SetPicIdx(Value: Integer);
     procedure SetShowInfo(Value: Boolean);
+    procedure SetSlideShow(Value: Boolean);
+    procedure SetViewOffset(const Value: TPoint);
+    procedure SetZoomFactor(Value: Single);
+    procedure SetSlideShowCyclic(Value: Boolean);
+    procedure SetSlideShowDirection(Value: TSlideShowDirection);
   protected
      // Если True, то по выходу из ViewImage iPicIdx устанавливается равным индексу последнего просмотренного
      //   изображения
@@ -357,6 +390,10 @@ type
     property ShowInfo: Boolean read FShowInfo write SetShowInfo;
      // -- True, если активно Slide Show
     property SlideShow: Boolean read FSlideShow write SetSlideShow;
+     // -- True, если Slide Show показывается циклически
+    property SlideShowCyclic: Boolean read FSlideShowCyclic write SetSlideShowCyclic;
+     // -- Направление показа слайдов
+    property SlideShowDirection: TSlideShowDirection read FSlideShowDirection write SetSlideShowDirection;
      // -- Смещение левого верхнего угла просматриваемого изображения
     property ViewOffset: TPoint read GetViewOffset write SetViewOffset;
      // -- Масштаб просматриваемого изображения
@@ -371,14 +408,14 @@ type
    //                     последнего просмотренного изображения
    //   AUndoOperations - буфер отката
    //   bPhGroups       - True, если отображается дерево папок фотоальбома (не представление)
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhoaPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
 
 implementation
 {$R *.dfm}
 uses
   Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhoaPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
     with TfImgView.Create(Application) do
       try
@@ -483,7 +520,7 @@ uses
 
   procedure TfImgView.aaEdit(Sender: TObject);
   var
-    Pics: IPhoaMutablePicList;
+    Pics: IPhotoAlbumPicList;
     bEdited: Boolean;
   begin
     CommitInfoRelocation;
@@ -492,7 +529,7 @@ uses
      // Показываем курсор
     AdjustCursorVisibility(True);
      // Редактируем изображение
-    Pics := NewPhoaMutablePicList(False);
+    Pics := NewPhotoAlbumPicList(False);
     Pics.Add(FPic, False);
     bEdited := EditPics(Pics, FPhoA, FUndoOperations);
      // Возвращаем topmost-положение окну
@@ -505,7 +542,7 @@ uses
 
   procedure TfImgView.aaFirstPic(Sender: TObject);
   begin
-    FLastPicChangeBackwards := False;
+    FPredecodeDirection := pddForward;
     PicIdx := 0;
   end;
 
@@ -533,20 +570,20 @@ uses
 
   procedure TfImgView.aaLastPic(Sender: TObject);
   begin
-    FLastPicChangeBackwards := True;
+    FPredecodeDirection := pddBackward;
     PicIdx := FPicCount-1;
   end;
 
   procedure TfImgView.aaNextPic(Sender: TObject);
   begin
-    FLastPicChangeBackwards := False;
+    FPredecodeDirection := pddForward;
     if PicIdx<FPicCount-1 then PicIdx := PicIdx+1
     else if FCyclicViewing then PicIdx := 0;
   end;
 
   procedure TfImgView.aaPrevPic(Sender: TObject);
   begin
-    FLastPicChangeBackwards := True;
+    FPredecodeDirection := pddBackward;
     if PicIdx>0 then PicIdx := PicIdx-1
     else if FCyclicViewing then PicIdx := FPicCount-1;
   end;
@@ -629,6 +666,26 @@ uses
     SlideShow := not SlideShow;
   end;
 
+  procedure TfImgView.aaSlideShowBackward(Sender: TObject);
+  begin
+    SlideShowDirection := ssdBackward;
+  end;
+
+  procedure TfImgView.aaSlideShowCyclic(Sender: TObject);
+  begin
+    SlideShowCyclic := not SlideShowCyclic;
+  end;
+
+  procedure TfImgView.aaSlideShowForward(Sender: TObject);
+  begin
+    SlideShowDirection := ssdForward;
+  end;
+
+  procedure TfImgView.aaSlideShowRandom(Sender: TObject);
+  begin
+    SlideShowDirection := ssdRandom;
+  end;
+
   procedure TfImgView.aaStoreTransform(Sender: TObject);
 //  var Operation: TPhoaOperation;
   begin
@@ -674,36 +731,36 @@ uses
   var bFullscreen: Boolean;
   begin
      // Кэшируем значения настроек
-    FBackgroundColor   := SettingValueInt(ISettingID_View_BkColor);
-    FZoomFactorChange  := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
-    FCaptionProps      := IntToPicProps(SettingValueInt(ISettingID_View_CaptionProps));
-    FDoShrinkPic       := SettingValueBool(ISettingID_View_ShrinkPicToFit);
-    FDoZoomPic         := SettingValueBool(ISettingID_View_ZoomPicToFit);
-    FDefaultFullscreen := SettingValueBool(ISettingID_View_Fullscreen);
-    FAlwaysOnTop       := SettingValueBool(ISettingID_View_AlwaysOnTop);
-    FKeepCursorOverTB  := SettingValueBool(ISettingID_View_KeepCursorOverTB);
-    FHideCursorInFS    := SettingValueBool(ISettingID_View_HideCursor);
-    FFitWindowToPic    := SettingValueBool(ISettingID_View_FitWindowToPic);
-    FCenterWindow      := SettingValueBool(ISettingID_View_CenterWindow);
-    FCyclicViewing     := SettingValueBool(ISettingID_View_Cyclic);
-    FPredecodePic      := SettingValueBool(ISettingID_View_Predecode);
-    FCacheBehindPic    := SettingValueBool(ISettingID_View_CacheBehind);
-    FStretchFilter     := TStretchFilter(SettingValueInt(ISettingID_View_StchFilt));
-    FSlideInterval     := SettingValueInt(ISettingID_View_SlideInterval);
-    FSlideCyclic       := SettingValueBool(ISettingID_View_SlideCyclic);
-    FDefaultShowInfo   := SettingValueBool(ISettingID_View_ShowInfo);
-    FShowInfo          := FDefaultShowInfo;
-    FInfoProps         := IntToPicProps(SettingValueInt(ISettingID_View_InfoPicProps));
-    FInfoFont          := SettingValueStr(ISettingID_View_InfoFont);
-    FInfoBkColor       := SettingValueInt(ISettingID_View_InfoBkColor);
-    FInfoBkOpacity     := SettingValueInt(ISettingID_View_InfoBkOpacity);
-    FViewInfoPos       := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
+    FBackgroundColor    := SettingValueInt(ISettingID_View_BkColor);
+    FZoomFactorChange   := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
+    FCaptionProps       := IntToPicProps(SettingValueInt(ISettingID_View_CaptionProps));
+    FDoShrinkPic        := SettingValueBool(ISettingID_View_ShrinkPicToFit);
+    FDoZoomPic          := SettingValueBool(ISettingID_View_ZoomPicToFit);
+    bFullscreen         := SettingValueBool(ISettingID_View_Fullscreen);
+    FAlwaysOnTop        := SettingValueBool(ISettingID_View_AlwaysOnTop);
+    FKeepCursorOverTB   := SettingValueBool(ISettingID_View_KeepCursorOverTB);
+    FHideCursorInFS     := SettingValueBool(ISettingID_View_HideCursor);
+    FFitWindowToPic     := SettingValueBool(ISettingID_View_FitWindowToPic);
+    FCenterWindow       := SettingValueBool(ISettingID_View_CenterWindow);
+    FCyclicViewing      := SettingValueBool(ISettingID_View_Cyclic);
+    FPredecodePic       := SettingValueBool(ISettingID_View_Predecode);
+    FCacheBehindPic     := SettingValueBool(ISettingID_View_CacheBehind);
+    FStretchFilter      := TStretchFilter(SettingValueInt(ISettingID_View_StchFilt));
+    FSlideInterval      := SettingValueInt(ISettingID_View_SlideInterval);
+    FSlideShowDirection := TSlideShowDirection(SettingValueInt(ISettingID_View_SlideDirection));
+    FSlideShowCyclic    := SettingValueBool(ISettingID_View_SlideCyclic);
+    FShowInfo           := SettingValueBool(ISettingID_View_ShowInfo);
+    FInfoProps          := IntToPicProps(SettingValueInt(ISettingID_View_InfoPicProps));
+    FInfoFont           := SettingValueStr(ISettingID_View_InfoFont);
+    FInfoBkColor        := SettingValueInt(ISettingID_View_InfoBkColor);
+    FInfoBkOpacity      := SettingValueInt(ISettingID_View_InfoBkOpacity);
+    FViewInfoPos        := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
      // Настраиваем параметры окна
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
-    Color              := FBackgroundColor;
+    Color               := FBackgroundColor;
      // Настраиваем доки/панели инструментов
      // -- Видимость
-    tbMain.Visible     := SettingValueBool(ISettingID_View_ShowToolbar);
+    tbMain.Visible      := SettingValueBool(ISettingID_View_ShowToolbar);
      // -- Перетаскиваемость
     ApplyToolbarSettings(dkTop);
     ApplyToolbarSettings(dkLeft);
@@ -712,11 +769,9 @@ uses
      // Настраиваем инструменты
     ApplyTools;
      // Настраиваем установки текущей сессии
-    bFullscreen := FDefaultFullscreen;
     if bUseInitFlags then bFullscreen := (bFullscreen or (ivifForceFullscreen in FInitFlags)) and not (ivifForceWindow in FInitFlags);
     RedisplayLock;
     try
-      ShowInfo   := FDefaultShowInfo;
       FullScreen := bFullscreen;
     finally
        // Этот вызов загружает изображение
@@ -724,6 +779,9 @@ uses
     end;
      // Если нужно включить режим показа слайдов, переданный при инициализации
     if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
+     // Обновляем actions
+    UpdateShowInfoActions;
+    UpdateSlideShowActions;
   end;
 
   procedure TfImgView.ApplyTools;
@@ -899,9 +957,9 @@ uses
   var idxNextPic: Integer;
   begin
      // Если включено предекодирование 
-    if FPredecodePic then begin
+    if FPredecodePic and (FPredecodeDirection<>pddDisabled) then begin
        // Находим индекс следующего изображения с учётом направления листания
-      idxNextPic := FPicIdx+iif(FLastPicChangeBackwards, -1, 1);
+      idxNextPic := FPicIdx+iif(FPredecodeDirection=pddBackward, -1, 1);
        // Проверяем границы / цикличность просмотра
       if idxNextPic<0 then
         if FCyclicViewing then idxNextPic := FPicCount-1 else idxNextPic := -1
@@ -955,7 +1013,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FPics[FPicIdx] as IPhotoAlbumPic;
+    FPic := FPics[FPicIdx];
      // Определяем, есть ли изображение в кэше 
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
@@ -1198,7 +1256,7 @@ uses
      // Настраиваем доступность инструментов в pmMain
     if gipmTools.Count>0 then begin
        // Добавляем просматриваемое изображение
-      Pics := NewPhoaMutablePicList(False);
+      Pics := NewPhotoAlbumPicList(False);
       if not FErroneous then Pics.Add(FPic, False);
       AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, Pics);
     end;
@@ -1276,8 +1334,8 @@ uses
       FShowInfo := Value;
        // Перерисовываем картинку
       iMain.Invalidate;
+      UpdateShowInfoActions;
     end;
-    aShowInfo.Checked := Value;
   end;
 
   procedure TfImgView.SetSlideShow(Value: Boolean);
@@ -1285,9 +1343,26 @@ uses
     if FSlideShow<>Value then begin
       CommitInfoRelocation;
       FSlideShow := Value;
+      if Value then Randomize;
       RestartShowTimer;
+      UpdateSlideShowActions;
     end;
-    aSlideShow.Checked := Value;
+  end;
+
+  procedure TfImgView.SetSlideShowCyclic(Value: Boolean);
+  begin
+    if FSlideShowCyclic<>Value then begin
+      FSlideShowCyclic := Value;
+      UpdateSlideShowActions;
+    end;
+  end;
+
+  procedure TfImgView.SetSlideShowDirection(Value: TSlideShowDirection);
+  begin
+    if FSlideShowDirection<>Value then begin
+      FSlideShowDirection := Value;
+      UpdateSlideShowActions;
+    end;
   end;
 
   procedure TfImgView.SetViewOffset(const Value: TPoint);
@@ -1319,7 +1394,7 @@ uses
   begin
     if not FErroneous then begin
        // Создаём массив ссылок на изображения
-      Pics := NewPhoaMutablePicList(True);
+      Pics := NewPhotoAlbumPicList(True);
        // Добавляем просматриваемое изображение
       Pics.Add(FPic, True);
        // Выполняем инструмент
@@ -1343,6 +1418,20 @@ uses
     UpdateTransformActions;
   end;
 
+  procedure TfImgView.UpdateShowInfoActions;
+  begin
+    aShowInfo.Checked := FShowInfo;
+  end;
+
+  procedure TfImgView.UpdateSlideShowActions;
+  begin
+    aSlideShow.Checked         := FSlideShow;
+    aSlideShowForward.Checked  := FSlideShowDirection=ssdForward;
+    aSlideShowBackward.Checked := FSlideShowDirection=ssdBackward;
+    aSlideShowRandom.Checked   := FSlideShowDirection=ssdRandom;
+    aSlideShowCyclic.Checked   := FSlideShowCyclic;
+  end;
+
   procedure TfImgView.UpdateTransformActions;
   begin
     aRotate0.Checked   := FTransform.Rotation=pr0;
@@ -1360,10 +1449,24 @@ uses
 
   procedure TfImgView.WMTimer(var Msg: TWMTimer);
   begin
-    FLastPicChangeBackwards := False;
-    if PicIdx<FPicCount-1 then PicIdx := PicIdx+1
-    else if FSlideCyclic then PicIdx := 0
-    else SlideShow := False;
+    case SlideShowDirection of
+      ssdForward: begin
+        FPredecodeDirection := pddForward;
+        if PicIdx<FPicCount-1   then PicIdx := PicIdx+1
+        else if SlideShowCyclic then PicIdx := 0
+        else SlideShow := False;
+      end;
+      ssdBackward: begin
+        FPredecodeDirection := pddBackward;
+        if PicIdx>0             then PicIdx := PicIdx-1
+        else if SlideShowCyclic then PicIdx := FPicCount-1
+        else SlideShow := False;
+      end;
+      ssdRandom: begin
+        FPredecodeDirection := pddDisabled;
+        PicIdx := Random(FPicCount);
+      end;
+    end;
   end;
 
 end.

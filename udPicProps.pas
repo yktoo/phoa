@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
+//  $Id: udPicProps.pas,v 1.9 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -35,7 +35,7 @@ type
      // Контроллер страниц
     FController: TWizardController;
      // Список редактируемых изображений
-    FEditedPics: IPhoaPicList;
+    FEditedPics: IPhotoAlbumPicList;
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
      // Список операций для отмены редактирования/добавления
@@ -63,14 +63,14 @@ type
     procedure ButtonClick_OK; override;
   public
      // -- Ссылки на редактируемые изображения
-    property EditedPics: IPhoaPicList read FEditedPics;
+    property EditedPics: IPhotoAlbumPicList read FEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
      // -- Фотоальбом
     property PhoA: TPhotoAlbum read FPhoA;
   end;
 
-  function EditPics(APics: IPhoaPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -80,7 +80,7 @@ uses
   phPicPropsDlgPage, ufrPicProps_FileProps, ufrPicProps_Metadata, ufrPicProps_View, ufrPicProps_Data,
   ufrPicProps_Keywords, ufrPicProps_Groups;
 
-  function EditPics(APics: IPhoaPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(APics: IPhotoAlbumPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPicProps.Create(Application) do
       try

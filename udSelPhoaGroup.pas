@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.8 2004-10-10 18:53:32 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.9 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -18,6 +18,7 @@ type
     lGroup: TLabel;
     tvGroups: TVirtualStringTree;
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -78,6 +79,11 @@ uses phUtils, ConsVars, Main, phSettings;
     Modified := True;
   end;
 
+  procedure TdSelPhoaGroup.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^ := nil;
+  end;
+
   procedure TdSelPhoaGroup.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
     if Kind in [ikNormal, ikSelected] then ImageIndex := iif(Sender.NodeParent[Node]=nil, iiPhoA, iiFolder);
@@ -102,10 +108,10 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p^ := FPhoA.RootGroup as IPhotoAlbumPicGroup
+      p^ := FPhoA.RootGroup 
     else begin
       pp := Sender.GetNodeData(ParentNode);
-      p^ := pp^.Groups[Node.Index] as IPhotoAlbumPicGroup;
+      p^ := pp^.GroupsX[Node.Index];
     end;
     Sender.ChildCount[Node] := p^.Groups.Count;
      // Разворачиваем корневой узел или если группа развёрнута

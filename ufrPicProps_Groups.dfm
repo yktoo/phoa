@@ -23,6 +23,7 @@ inherited frPicProps_Groups: TfrPicProps_Groups
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
     OnChecked = tvMainChecked
     OnChecking = tvMainChecking
+    OnFreeNode = tvMainFreeNode
     OnGetText = tvMainGetText
     OnPaintText = tvMainPaintText
     OnGetImageIndex = tvMainGetImageIndex

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.10 2004-10-06 15:28:52 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.11 2004-10-11 11:41:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -139,7 +139,7 @@ const
     begin
        // Цикл по изображениям
       for i := 0 to EditedPics.Count-1 do begin
-        Pic := EditedPics[i] as IPhotoAlbumPic;
+        Pic := EditedPics[i];
          // Обрабатываем все редактируемые свойства с состоянием pvsUnassigned или pvsUniform
         for Prop := Low(Prop) to High(Prop) do
           if Prop in EditablePicProps then
