@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_all.bat,v 1.2 2004-04-15 12:54:11 dale Exp $
+rem $Id: _make_all.bat,v 1.3 2004-05-01 18:08:33 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -21,7 +21,8 @@ set SAMPLE_ARCHIVER=C:\Progra~1\WinRAR\WinRAR.exe a -m3 -afzip
 set MAKER_BATCH=makesamp.bat
 
 rem /Q = no confirmation on wildcard deletion
-del /Q _deploy_\*.*
+del /Q _deploy_\*.txt
+del /Q _deploy_\*.zip
 
 
 call %MAKER_BATCH% phoadump
