@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.11 2004-04-25 16:28:31 dale Exp $
+//  $Id: ConsVars.pas,v 1.12 2004-04-26 09:33:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -977,7 +977,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //=================================================================================================================
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiNewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiFolder, '@ISettingID_Browse', IDH_setup_browse_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);
