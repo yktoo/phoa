@@ -388,6 +388,22 @@
 			<param name="Local" value="tasks-media-preparing.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Удаление изображений">
+			<param name="Local" value="tasks-pic-deletion.html">
+			</OBJECT>			
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Исправление ссылки на файл изображения">
+			<param name="Local" value="tasks-pic-file-link-repair.html">
+			</OBJECT>			
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Сортировка изображений">
+			<param name="Local" value="tasks-sorting.html">
+			</OBJECT>			
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Просмотр изображений">
+			<param name="Local" value="tasks-viewing.html">
+			</OBJECT>			
+  	<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (&divide;&agrave;&ntilde;&ograve;&icirc; &ccedil;&agrave;&auml;&agrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &acirc;&icirc;&iuml;&eth;&icirc;&ntilde;&ucirc;)">
 			<param name="Local" value="info-faq.html">
 			</OBJECT>
