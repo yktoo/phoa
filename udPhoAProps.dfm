@@ -59,15 +59,18 @@ inherited dPhoAProps: TdPhoAProps
   inherited pButtonsBottom: TPanel
     Top = 261
     Width = 386
+    TabOrder = 4
     DesignSize = (
       386
       35)
     inherited bCancel: TButton
       Left = 227
       Caption = 'Close'
+      TabOrder = 1
     end
     inherited bOK: TButton
       Left = 147
+      TabOrder = 0
     end
     inherited bHelp: TButton
       Left = 305
@@ -80,7 +83,7 @@ inherited dPhoAProps: TdPhoAProps
     Height = 149
     Anchors = [akLeft, akTop, akRight, akBottom]
     ScrollBars = ssVertical
-    TabOrder = 1
+    TabOrder = 3
     OnChange = DlgDataChange
   end
   object tbThumbQuality: TTrackBar [9]
@@ -107,7 +110,7 @@ inherited dPhoAProps: TdPhoAProps
     MaxValue = 1024.000000000000000000
     MinValue = 32.000000000000000000
     Value = 150.000000000000000000
-    TabOrder = 3
+    TabOrder = 0
     OnChange = DlgDataChange
   end
   object eThumbSizeY: TRxSpinEdit [11]
@@ -121,7 +124,7 @@ inherited dPhoAProps: TdPhoAProps
     MaxValue = 1024.000000000000000000
     MinValue = 32.000000000000000000
     Value = 150.000000000000000000
-    TabOrder = 4
+    TabOrder = 1
     OnChange = DlgDataChange
   end
   inherited dtlsMain: TDTLanguageSwitcher
