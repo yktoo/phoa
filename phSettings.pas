@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.1 2004-04-18 16:13:35 dale Exp $
+//  $Id: phSettings.pas,v 1.2 2004-04-19 13:25:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -154,6 +154,17 @@ type
      // Props
      // -- ImageIndex пункта
     property ImageIndex: Integer read FImageIndex;
+  end;
+
+   // Интерфейс редактора настроек
+  IPhoaSettingEditor = interface(IInterface)
+    ['{32018724-F48C-4EC4-B86A-81C5C5A1F75E}']
+     // Prop handlers
+    function  GetRootSetting: TPhoaPageSetting;
+    procedure SetRootSetting(Value: TPhoaPageSetting);
+     // Props
+     // -- Корневой узел настройки - все его дети должны редактироваться редактором
+    property RootSetting: TPhoaPageSetting read GetRootSetting write SetRootSetting;
   end;
 
    // Применяет пользовательские настройки к TVirtualStringTree

@@ -58,15 +58,6 @@ inherited dSettings: TdSettings
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnAfterCellPaint = tvMainAfterCellPaint
-      OnChecked = tvMainChecked
-      OnEnter = EmbedControlNotify
-      OnExit = EmbedControlNotify
-      OnFocusChanged = tvMainFocusChanged
-      OnGetCellIsEmpty = tvMainGetCellIsEmpty
-      OnGetText = tvMainGetText
-      OnPaintText = tvMainPaintText
-      OnInitNode = tvMainInitNode
       Columns = <
         item
           Position = 0
