@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.60 2004-10-22 20:29:30 dale Exp $
+//  $Id: Main.pas,v 1.61 2004-10-23 06:35:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1965,7 +1965,7 @@ uses
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);
   begin
-    StateChanged([asViewerSelChangePending]);
+    StateChanged([asActionChangePending, asViewerSelChangePending]);
   end;
 
   procedure TfMain.WMChangeCBChain(var Msg: TWMChangeCBChain);
