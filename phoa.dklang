@@ -259,6 +259,7 @@ iToggleMainMenu.Hint=00000297,Main Menu|Show or hide the Main Menu
 eSlideShowInterval.EditCaption=00000298,Slide sho&w interval:
 eSlideShowInterval.Hint=00000299,Slide show interval|Slide show interval in seconds
 eSlideShowInterval.Postfix=00000300,s
+smpmView.Caption=00000301,&View
 
 [dSearch]
 Caption=00000003,Find pictures

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.41 2004-10-23 14:05:08 dale Exp $
+//  $Id: ufImgView.pas,v 1.42 2004-10-23 17:59:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -185,13 +185,13 @@ type
     iSettings: TTBXItem;
     tbgiZoom: TTBGroupItem;
     tbgiTools: TTBGroupItem;
-    tbgiVew: TTBGroupItem;
     iHelp: TTBXItem;
     gipmTools: TTBGroupItem;
     iToolsSep: TTBXSeparatorItem;
     iToggleMainMenu: TTBXVisibilityToggleItem;
     eSlideShowInterval: TTBXSpinEditItem;
     iSepSlideShowInterval: TTBXSeparatorItem;
+    smpmView: TTBXSubmenuItem;
     procedure aaClose(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaFirstPic(Sender: TObject);
