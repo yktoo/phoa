@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.3 2004-09-19 18:39:14 dale Exp $
+//  $Id: phGUIObj.pas,v 1.4 2004-09-21 03:30:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -20,6 +20,7 @@ type
     RClip:     TRect;     // ClipRect
     RClient:   TRect;     // ClientRect
     Bitmap:    TBitmap32; // Buffer bitmap object
+    bFocused:  Boolean;   // True if control has focus
   end;
 
    // Координаты отрисовки маркера вставки перетаскиваемых эскизов
@@ -31,6 +32,9 @@ type
                      //   В таком случае, если bLower=True, маркер рисуется в конце предыдущей строки, если False - в
                      //   начале текущей (слева от данного эскиза)
   end;
+
+   // Стиль рамки подложки эскиза
+  TThumbBackBorderStyle = (tbbsFlat, tbbsRaised, tbbsSunken, tbbsPlain, tbbsGroove, tbbsXP, tbbsColor);
 
    // Угол эскиза
   TThumbCorner = (tcLeftTop, tcRightTop, tcLeftBottom, tcRightBottom);
@@ -113,13 +117,15 @@ type
     FOnStartViewMode: TNotifyEvent;
     FDisplayMode: TThumbViewerDisplayMode;
     FTopOffset: Integer;
-    FThumbnailSize: TSize; //DEPRECATED !!!
+    FThumbnailSize: TSize;
+    FThumbBackAlpha: Byte;
+    FThumbBackBorderStyle: TThumbBackBorderStyle; //DEPRECATED !!!
 
 
      // Painting stage handlers
     procedure Paint_EraseBackground(const Info: TThumbnailViewerPaintInfo);
     procedure Paint_Thumbnails(const Info: TThumbnailViewerPaintInfo);
-    procedure Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect);
+    procedure Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
     procedure Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
      // Validates the specified offset and returns the correctly ranged offset value
     function  GetValidTopOffset(iOffset: Integer): Integer;
@@ -191,6 +197,8 @@ type
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
     procedure SetTopOffset(Value: Integer);
     procedure SetThumbnailSize(const Value: TSize);
+    procedure SetThumbBackAlpha(Value: Byte);
+    procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -265,7 +273,6 @@ type
     property ThumbCornerDetails[Corner: TThumbCorner]: TThumbCornerDetail read GetThumbCornerDetails write SetThumbCornerDetails;
      // -- Данные, отображаемые на всплывающих описаниях эскизов
     property ThumbTooltipProps: TPicProperties read FThumbTooltipProps write SetThumbTooltipProps;
-
      // -- Размеры эскизов
     property ThumbnailSize: TSize read FThumbnailSize write SetThumbnailSize;
      // -- Смещение верхнего края окна относительно начала списка эскизов, в пикселах
@@ -298,6 +305,10 @@ type
     property TabStop default True;
      // -- Если True, рамка эскиза рисуется более чётко
     property ThickThumbBorder: Boolean read FThickThumbBorder write SetThickThumbBorder default False;
+     // -- Непрозрачность фона эскизов
+    property ThumbBackAlpha: Byte read FThumbBackAlpha write SetThumbBackAlpha default $ff;
+     // -- Стиль рамки фона эскиза
+    property ThumbBackBorderStyle: TThumbBackBorderStyle read FThumbBackBorderStyle write SetThumbBackBorderStyle default tbbsXP;  
      // -- Цвет фона эскизов
     property ThumbBackColor: TColor read FThumbBackColor write SetThumbBackColor default clBtnFace;
      // -- Цвет шрифта эскизов
@@ -406,8 +417,8 @@ type
     case FDisplayMode of
       tvdmTile: begin
          // -- Прибавляем отступы на краях эскиза
-        Inc(FItemSize.cx, ILThumbMargin+IRThumbMargin);
-        Inc(FItemSize.cy, ITThumbMargin+IBThumbMargin);
+        Inc(FItemSize.cx, IThumbMarginH*2+IThumbPaddingL+IThumbPaddingR);
+        Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
          // -- Находим высоту строки текста
         dc := GetDC(0);
         Canvas.Handle := dc;
@@ -424,7 +435,7 @@ type
       else {tvdmDetail} begin
         FColCount := 1;
         FItemSize.cx := ClientWidth;
-        Inc(FItemSize.cy, ITThumbMargin+IBThumbMargin);
+        Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
       end;
     end;
      // Обновляем значения
@@ -468,22 +479,25 @@ type
   constructor TThumbnailViewer.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
-    ControlStyle      := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
-    Width             := 100;
-    Height            := 100;
-    TabStop           := True;
-    ParentColor       := False;
-    Color             := clBtnFace;
-    FBorderStyle      := bsSingle;
-    FColCount         := 1;
-    FCacheThumbnails  := True;
-    FNoMoveItemIndex  := -1;
-    FPicLinks         := TPhoaPicLinks.Create(False);
-    FSelIndexes       := TIntegerList.Create(False);
-    FThumbBackColor   := clBtnFace;
-    FThumbCache       := TList.Create;
-    FThumbnailSize.cx := IDefaultThumbWidth;
-    FThumbnailSize.cy := IDefaultThumbHeight;
+    ControlStyle          := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
+    Width                 := 100;
+    Height                := 100;
+    TabStop               := True;
+    ParentColor           := False;
+    Color                 := clBtnFace;
+    FBorderStyle          := bsSingle;
+    FColCount             := 1;
+    FCacheThumbnails      := True;
+    FNoMoveItemIndex      := -1;
+    FPicLinks             := TPhoaPicLinks.Create(False);
+    FSelIndexes           := TIntegerList.Create(False);
+    FThumbBackAlpha       := $ff{ff !!!};
+    FThumbBackBorderStyle := tbbsXP;
+    FThumbBackColor       := clBtnFace;
+    FThumbFontColor       := clWindowText;
+    FThumbCache           := TList.Create;
+    FThumbnailSize.cx     := IDefaultThumbWidth;
+    FThumbnailSize.cy     := IDefaultThumbHeight;
   end;
 
   procedure TThumbnailViewer.CreateParams(var Params: TCreateParams);
@@ -930,77 +944,23 @@ type
   end;
 
   procedure TThumbnailViewer.Paint;
-  var
-    Info: TThumbnailViewerPaintInfo;
-//    bmp: TBitmap;
-//    r, rClip, rThumb: TRect;
-//    idx: Integer;
-//
-//    procedure MakeBufferBitmap;
-//    begin
-//      if bmp=nil then begin
-//        bmp := TBitmap.Create;
-//        bmp.Width  := FItemSize.cx;
-//        bmp.Height := FItemSize.cy;
-//      end;
-//    end;
-
+  var Info: TThumbnailViewerPaintInfo;
   begin
      // Создаём буферный битмэп, если он ещё не создан
     if FBuffer=nil then FBuffer := TBitmap32.Create;
-     // Создаём структуру данных для отрисовки 
+     // Создаём структуру данных для отрисовки
     with Info do begin
-      RClip   := Canvas.ClipRect;
-      RClient := ClientRect;
+      RClip    := Canvas.ClipRect;
+      RClient  := ClientRect;
       if IsRectEmpty(RClient) then Exit;
       FBuffer.SetSize(RClient.Right-RClient.Left, RClient.Bottom-RClient.Top);
-      Bitmap := FBuffer;
+      Bitmap   := FBuffer;
+      bFocused := Focused;
     end;
      // Invoke the painting stages one-by-one
     Paint_EraseBackground(Info);
     Paint_Thumbnails(Info);
     Paint_TransferBuffer(Info);
-
-
-
-(*    rClip := Canvas.ClipRect;
-    bmp := nil;
-    try
-       // Отрисовываем эскизы
-      idx := FTopIndex;
-      repeat
-         // Находим область эскиза (выходим вне видимой области экрана)
-        rThumb := ItemRect(idx);
-        if IsRectEmpty(rThumb) then Break;
-         // Находим пересечение эскиза с ClipRect
-        IntersectRect(r, rThumb, rClip);
-        if not IsRectEmpty(r) then begin
-           // Если такой эскиз есть - рисуем в буфер и переносим его на экран
-          if idx<FItemCount then begin
-            MakeBufferBitmap;
-            PaintThumb(idx, bmp);
-            BitBlt(Canvas.Handle, r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top, bmp.Canvas.Handle, r.Left-rThumb.Left, r.Top-rThumb.Top, SRCCOPY);
-           // Иначе - стираем фон
-          end ;//else
-//            with Canvas do begin
-//              Brush.Style := bsSolid;
-//              Brush.Color := Color;
-//              FillRect(r);
-//            end;
-        end;
-        Inc(idx);
-      until False;
-    finally
-      bmp.Free;
-    end;
-     // Стираем неотрисовываемую область справа от эскизов
-//    IntersectRect(r, Rect(FColCount*FItemSize.cx, 0, ClientWidth, ClientHeight), rClip);
-//    if not IsRectEmpty(r) then
-//      with Canvas do begin
-//        Brush.Style := bsSolid;
-//        Brush.Color := Color;
-//        FillRect(r);
-//      end;*)
   end;
 
   procedure TThumbnailViewer.PaintMarquee;
@@ -1015,16 +975,11 @@ type
     CurrentTheme.PaintBackgnd(Info.Bitmap.Canvas, Info.RClient, Info.RClient, Info.RClip, Color, False, VT_UNKNOWN);
   end;
 
-  procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect);
-  const                                                                                                             
-    aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
-    aSelectedBackClr: Array[Boolean] of TColor = (clBtnShadow,  clHighlight);
-    aEdges: Array[Boolean] of Integer = (BDR_RAISEDINNER, BDR_RAISEDINNER or BDR_RAISEDOUTER);
+  procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
+  const aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
   var
     Pic: TPhoaPic;
-    bSel, bFocused: Boolean;
     iLineHeight: Integer;
-    cBack: TColor32;
     r, rInner: TRect;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
@@ -1090,48 +1045,24 @@ type
     end;
 
   begin
-    bSel     := FSelIndexes.IndexOf(iIndex)>=0;
-    bFocused := Focused;
-     // Ищем изображение
+     // Получаем изображение
     Pic := FPicLinks[iIndex];
      // Рисуем рамку
     r := ItemRect;
 //    if (idx=FItemIndex) and bFocused then DrawFocusRect(r);
-    InflateRect(r, -2, -2);
     Info.Bitmap.Font.Assign(Self.Font);
-    if bSel then begin
-      Info.Bitmap.Font.Color := aSelectedFontClr[bFocused];
-      cBack                  := Color32(aSelectedBackClr[bFocused]);
-    end else begin
-      Info.Bitmap.Font.Color := FThumbFontColor;
-      cBack                  := Color32(FThumbBackColor);
-    end;
-    cBack := SetAlpha(cBack, $70);
-    if ThemeServices.ThemesEnabled then begin
-      SaveDC(Info.Bitmap.Canvas.Handle);
-      try
-        ExcludeClipRect(Info.Bitmap.Canvas.Handle, r.Left+2, r.Top+2, r.Right-2, r.Bottom-2);
-        ThemeServices.DrawElement(Info.Bitmap.Canvas.Handle, ThemeServices.GetElementDetails(teEditTextNormal), r);
-      finally
-        RestoreDC(Info.Bitmap.Canvas.Handle, -1);
-      end;
-      InflateRect(r, -2, -2);
-      Info.Bitmap.FillRectTS(r, cBack);
-    end else begin
-      Info.Bitmap.FillRectTS(r, cBack);
-      DrawEdge(Info.Bitmap.Canvas.Handle, r, aEdges[FThickThumbBorder], BF_RECT);
-    end;
+    Info.Bitmap.Font.Color := iif(bSelected, aSelectedFontClr[Info.bFocused], FThumbFontColor);
     iLineHeight := Info.Bitmap.TextHeight('Wg');
      // Отрисовываем изображение эскиза
     rInner := ItemRect;
     if FDisplayMode=tvdmTile then begin
-      Inc(rInner.Left,   ILThumbMargin);
-      Dec(rInner.Right,  IRThumbMargin);
+      Inc(rInner.Left,   IThumbPaddingL);
+      Dec(rInner.Right,  IThumbPaddingR);
       if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    iLineHeight);
       if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, iLineHeight);
     end;
-    Inc(rInner.Top,    ITThumbMargin);
-    Dec(rInner.Bottom, IBThumbMargin);
+    Inc(rInner.Top,    IThumbPaddingT);
+    Dec(rInner.Bottom, IThumbPaddingB);
     DoPaintThumbnail(rInner);
      // Рисуем описание
     case FDisplayMode of
@@ -1151,17 +1082,71 @@ type
   var
     rThumb: TRect;
     i, idxStart: Integer;
+    bmpNormal, bmpSelected: TBitmap32; // Заготовки "подложек" эскизов обычного и выделенного
+    bSelected: Boolean;
+
+     // Возвращает битмэп с "подложкой" эскиза: выделенного или обычного (в зависимости от bSelected); кэширует
+     //   созданный битмэп
+    function GetThBackBitmap: TBitmap32;
+    const
+      aSelBackClr: Array[Boolean] of TColor = (clBtnShadow,  clHighlight);
+      aEdges: Array[Boolean] of Integer = (BDR_RAISEDINNER, BDR_RAISEDINNER or BDR_RAISEDOUTER);
+    var
+      p: ^TBitmap32;
+      cBack: TColor32;
+      r: TRect;
+    begin
+      p := iif(bSelected, @bmpSelected, @bmpNormal);
+       // Если подложка не создана
+      if p^=nil then begin
+         // Создаём подложку
+        p^ := TBitmap32.Create;
+        r := Rect(0, 0, rThumb.Right-rThumb.Left, rThumb.Bottom-rThumb.Top);
+        p^.SetSize(r.Right, r.Bottom);
+         // Рисуем
+        cBack := Color32(iif(bSelected, aSelBackClr[Info.bFocused], FThumbBackColor));
+        if ThemeServices.ThemesEnabled then begin
+          ThemeServices.DrawElement(p^.Canvas.Handle, ThemeServices.GetElementDetails(teEditTextNormal), r);
+          InflateRect(r, -2, -2);
+          p^.FillRectS(r, cBack);
+        end else begin
+          p^.FillRectS(r, cBack);
+          DrawEdge(p^.Canvas.Handle, r, aEdges[FThickThumbBorder], BF_RECT);
+        end;
+         // Настраиваем режим отрисовки
+        if FThumbBackAlpha<$ff then p^.DrawMode := dmBlend else p^.DrawMode := dmOpaque;
+        p^.MasterAlpha := FThumbBackAlpha;
+      end;
+      Result := p^;
+    end;
+
   begin
      // Отрисовываем эскизы
     idxStart := GetFirstVisibleIndex;
-    if idxStart>=0 then
-      for i := idxStart to FItemCount-1 do begin
-         // Находим область эскиза
-        rThumb := ItemRect(i);
-        if IsRectEmpty(rThumb) then Break;
-         // Если область эскиза пересекается с ClipRect - рисуем этот эскиз
-        if RectsOverlap(rThumb, Info.RClip) then Paint_Thumbnail(Info, i, rThumb);
-      end;;
+    if idxStart>=0 then begin
+      bmpNormal   := nil;
+      bmpSelected := nil;
+      try
+        for i := idxStart to FItemCount-1 do begin
+           // Находим область эскиза
+          rThumb := ItemRect(i);
+          if IsRectEmpty(rThumb) then Break;
+          InflateRect(rThumb, -IThumbMarginH, -IThumbMarginV);
+           // Если область эскиза пересекается с ClipRect - рисуем этот эскиз
+          if RectsOverlap(rThumb, Info.RClip) then begin
+             // Определяем, выделен ли эскиз
+            bSelected := FSelIndexes.IndexOf(i)>=0;
+             // Рисуем "подложку"
+            GetThBackBitmap.DrawTo(Info.Bitmap, rThumb.Left, rThumb.Top);
+             // Рисуем эскиз
+            Paint_Thumbnail(Info, i, rThumb, bSelected);
+          end;
+        end;
+      finally
+        bmpNormal.Free;
+        bmpSelected.Free;
+      end;
+    end;
   end;
 
   procedure TThumbnailViewer.Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
@@ -1309,6 +1294,22 @@ type
     if FThickThumbBorder<>Value then begin
       FThickThumbBorder := Value;
       Invalidate;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbBackAlpha(Value: Byte);
+  begin
+    if FThumbBackAlpha<>Value then begin
+      FThumbBackAlpha := Value;
+      if FPicLinks.Count>0 then Invalidate;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
+  begin
+    if FThumbBackBorderStyle<>Value then begin
+      FThumbBackBorderStyle := Value;
+      if FPicLinks.Count>0 then Invalidate;
     end;
   end;
 

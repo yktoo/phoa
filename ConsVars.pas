@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.53 2004-09-18 19:44:23 dale Exp $
+//  $Id: ConsVars.pas,v 1.54 2004-09-21 03:30:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -390,10 +390,25 @@ const
   IDefaultThumbQuality            = 40;
 
    // Отступы эскиза в сетке в пикселах
-  ILThumbMargin                   = 5;
-  IRThumbMargin                   = 5;
-  ITThumbMargin                   = 5;
-  IBThumbMargin                   = 5;
+   // -- Внешние: горизонтальные и вертикальные                                   |
+  IThumbMarginH                   = 2;       //                                MarginV
+  IThumbMarginV                   = 2;       //                                   |
+   // -- Внутренние                                         +-------------------------------------------+
+  IThumbPaddingL                  = 5;       //             |                     |                     |
+  IThumbPaddingR                  = 5;       //             |                  PaddingT                 |
+  IThumbPaddingT                  = 5;       //             |                     |                     |
+  IThumbPaddingB                  = 5;       //             |              +-------------+              |
+                                             //             |              |             |              |
+                                             // - MarginH - | - PaddingL - |  Thumbnail  | - PaddingR - | - MarginH -
+                                             //             |              |    image    |              |
+                                             //             |              +-------------+              |
+                                             //             |                     |                     |
+                                             //             |                  PaddingB                 |
+                                             //             |                     |                     |
+                                             //             +-------------------------------------------+
+                                             //                                   |
+                                             //                                MarginV
+                                             //                                   |
 
    // Максимальное к-во записей в истории ввода
   IMaxHistoryEntries              = 20;
