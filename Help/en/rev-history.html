@@ -1,4 +1,4 @@
-<html><!-- $Id: rev-history.html,v 1.2 2004-04-15 12:54:10 dale Exp $ -->
+<html><!-- $Id: rev-history.html,v 1.3 2004-05-11 03:35:12 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <title>Revision History</title>
@@ -12,6 +12,38 @@
   <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Revision History</h1>
   <p align=justify>This document summarizes differences between versions of <b>PhoA</b> in reverse chronological order.
   
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> PhoA 1.1.4 beta</h2>
+  <p align=justify>[xxx xx, 2004]
+  <ul>
+    <li>File operations wizard:
+      <ul>
+        <li>Options for skipping pictures with existent or nonexistent files on the picture selection page.</li>
+        <!--li><b>Repairing file links for selected pictures</b> allows to repair &quot;lost&quot; file links caused by physically relocated files. The program 
+          searches matched files by their name and/or size. Also option for removing unrepaired pictures is present.</li-->
+      </ul>
+    </li>
+    <li>File masks have been extended: symbol <b>!</b> at the start of the mask inverts its meaning.</li>
+    <li>Right mouse click when <b>Ctrl</b> is pressed invokes shell context menu for the current file for both browse (click on a thumbnail image) and
+        view (click on image) modes.</li>
+    <li>View window in <b>Always on top</b> mode now doesn't obscure Picture properties and Program settings dialogs.</li>
+    <li>Program settings use inplace editing now. Eg., picture properties to display on thumbnails are now being selected from the dropdown list.</li>
+    <li>Browse mode options <b>Thumbnail background color</b> and <b>Thumbnail font color</b>.</li>
+    <li>View mode option <b>Keep mouse cursor over the toolbar button on window resize</b>.</li>
+    <li>View mode option <b>Show picture info</b> and <b>Show info</b> command in the view mode.</li>
+    <li>Add pictures wizard option <b>Show hidden files and folders</b>.</li>
+    <li>Wizard log pages display record number, total number of records and number of failed entries. Also Copy to clipboard and Find text features 
+        implemented.</li>
+    <li>Clipboard options allow to specify which formats are placed into the clipboard on <b>Copy</b> and <b>Cut</b> operations. Possible formats are:
+        PhoA pictures, shell file objects (this allows you to simply copy the necessary files for selected pictures into any folder), plain-text file
+        path list, thumbnail image.</li>
+    <li>Implemented invoking the external programs - <i>tools</i>: <b>Tools</b> page in the settings dialog; a possibility to include additional items
+        in <b>Tools</b> and popup menus.</li>
+    <li>Fixed invoking the help in dialogs with F1 key.</li>
+    <li>Fixed Access Violation when the root group contains pictures and <b>File | New</b> menu item is selected.</li>
+    <li>Fixed display of file sizes over 2 GB in <b>Statistics</b>.</li>
+    <li>Reorganized documentation.</li>
+  </ul>
+
   <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> PhoA 1.1.3 beta</h2>
   <p align=justify>[Mar 29, 2004]
   <ul>
@@ -24,8 +56,6 @@
           There is also option for deleting the original files (wipe or recycle).</li>
         <li><b>Deleting files of selected pictures</b>, including corresponding pictures.</li>
         <li><b>Rebuilding thumbnails for selected pictures</b> - this operation is also handled by the Wizard.</li>
-        <!--li><b>Repairing file links for selected pictures</b> allows to repair &quot;lost&quot; file links caused by physically relocated files. The program 
-          searches matched files by their name and/or size. Also option for removing unrepaired pictures is present.</li-->
       </ul>
       Moreover, copying and moving also allow to automatically create a separate photo album for the files being copied or moved, to copy the program executable
       and to create autorun.inf file - the File operations Wizard makes preparing a CD or DVD a snap.

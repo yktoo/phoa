@@ -1,0 +1,55 @@
+<html><!-- $Id: setup-storing.html,v 1.1 2004-05-11 03:35:12 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Storing the program settings in a file</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Storing the program settings in a file</h1>
+
+  <p align=justify><b>PhoA</b> program like most Windows applications automatically stores customized settings in the System Registry. These settings
+    cover not only specified in <a href="setup-general.html">Program settings dialog</a> ones, but also some other interface options such as window
+    sizes, toolbar positions and history lists.
+
+  <p align=justify>As a bonus you can store settings in a file - it is useful eg when you run the program on another computer and don't want to
+    set up all the parameters again.
+
+  <p align=justify><b>PhoA</b> allows storing current program settings as a regular Windows ini file. You perform this by selecting <b>File |
+    Save current settings to file...</b> menu item, or by pressing <b>Shift+Ctrl+S</b> shortcut keys. This invokes standard File Save dialog to
+    enter the name of a file to save settings to. By default the program uses <b>phoa.ini</b> file.
+
+  <p align=justify>If it is possible to save settings to a file, it is indeed to load them from a file too. You load settings by selecting 
+    <b>File | Load settings from file...</b> menu item, or using <b>Shift+Ctrl+O</b> shortcut keys. The dialog that appears you fill the file you
+    have previously saved settings to. By default the <b>phoa.ini</b> file is suggested.
+
+  <p align=justify>The <b>phoa.ini</b> file have a special meaning: if it is present in the same folder as the program (<b>phoa.exe</b>) itself, 
+    it gets loaded when <b>PhoA</b> starts. This default behaviour can be changed in <a href="setup-general.html">General program settings</a> -
+    the <b>Load settings from phoa.ini if it is present in the program folder, on startup</b> can be turned off which means no <b>phoa.ini</b>
+    autoloading occurs.
+
+  <div class=nb><b>NB:</b>
+    <ul>
+      <li>It might be already obvious that settings are being loaded in the following order: at first data are loaded from the Registry,
+          and then (if this is enabled) - from <b>phoa.ini</b>. Thus all settings not covered by the file are taken from the Registry.</li>
+      <li>ini file stores settings not related to window dimensions only. Window sizes, positions, states, toolbar positions and visibility are always
+          stored locally, in the Registry.</li>
+    </ul>
+  </div>
+
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso>
+    <a href="setup-general.html">Program settings :: General</a><br>
+    <a href="setup-browse-mode.html">Program settings :: Browse mode</a><br>
+    <a href="setup-view-mode.html">Program settings :: View mode</a><br>
+    <a href="setup-dialogs.html">Program settings :: Dialogs</a><br>
+    <a href="setup-tools.html">Program settings :: Tools</a><br>
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

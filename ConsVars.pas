@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.18 2004-05-06 10:13:26 dale Exp $
+//  $Id: ConsVars.pas,v 1.19 2004-05-11 03:35:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -144,6 +144,12 @@ type
     fospmSelPics,    // Выбранные во вьюере изображения
     fospmAll,        // Все изображения фотоальбома/представления
     fospmSelGroups); // Изображения из указанных групп
+
+   // Фильтр выбора изображений для операций с файлами изображений на основе существования связанного файла
+  TFileOpSelPicValidityFilter = (
+    fospvfAny,          // Все изображения
+    fospvfValidOnly,    // Только изображения, связанные с существующим файлом
+    fospvfInvalidOnly); // Только изображения, связанные с НЕсуществующим файлом
 
    // Режим размещения файлов при копировании/перемещении с использованием операций с файлами изображений
   TFileOpMoveFileArranging = (
@@ -490,6 +496,7 @@ const
   IDH_intf_select_keywords        = 00250;
   IDH_intf_sort_pics              = 00260;
   IDH_intf_stats                  = 00270;
+  IDH_intf_tool_props             = 00275;
   IDH_intf_view_mode_tasks        = 00280;
   IDH_intf_view_mode              = 00290;
   IDH_intf_view_props             = 00300;
@@ -498,6 +505,7 @@ const
   IDH_intf_file_ops_delopts       = 00420;
   IDH_intf_file_ops_log           = 00430;
   IDH_intf_file_ops_moveopts      = 00440;
+  IDH_intf_file_ops_moveopts2     = 00442;
   IDH_intf_file_ops_process       = 00450;
   IDH_intf_file_ops_repropts      = 00460;
   IDH_intf_file_ops_selfolder     = 00470;
@@ -513,6 +521,8 @@ const
   IDH_setup_general               = 00720;
   IDH_setup_view_mode             = 00730;
   IDH_setup_browse_mode           = 00740;
+  IDH_setup_tools                 = 00750;
+  IDH_setup_storing               = 00760;
   IDH_advantages                  = 01010;
   IDH_eula_eng                    = 01020;
   IDH_eula_rus                    = 01030;
@@ -524,9 +534,11 @@ const
   IDH_pic_prop_autofill           = 01090;
   IDH_requirements                = 01100;
   IDH_rev_history                 = 01110;
-  IDH_theory_metadata             = 01120;
-  IDH_theory_resampling           = 01130;
-  IDH_thumbnails                  = 01140;
+  IDH_theory_file_masks           = 01120;
+  IDH_theory_metadata             = 01130;
+  IDH_theory_resampling           = 01140;
+  IDH_theory_tools                = 01150;
+  IDH_thumbnails                  = 01160;
 
    // ID страниц Мастера добавления файлов
   IWzAddFilesPageID_SelFiles      = 1;
@@ -1081,9 +1093,8 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
      //=================================================================================================================
-    Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
+    Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_tools);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Edit',  '@SActionHint_EditPics',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Print', '@SActionHint_PrintPics', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
   end;
   {$HINTS ON}

@@ -46,14 +46,6 @@
 			<param name="Local" value="pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Resampling">
-			<param name="Local" value="theory-resampling.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Metadata">
-			<param name="Local" value="theory-metadata.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Revision History">
 			<param name="Local" value="rev-history.html">
 			<param name="New" value="1">
@@ -112,6 +104,24 @@
 				<param name="Name" value="Add pictures wizard">
 				<param name="Local" value="intf-pic-add.html">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="File selection">
+					<param name="Local" value="intf-pic-add-selfiles.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Checking files">
+					<param name="Local" value="intf-pic-add-checkfiles.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Adding pictures">
+					<param name="Local" value="intf-pic-add-process.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Addition log">
+					<param name="Local" value="intf-pic-add-log.html">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Picture properties dialog">
 				<param name="Local" value="intf-pic-props.html">
@@ -124,7 +134,6 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Metadata">
 					<param name="Local" value="intf-pic-props-metadata.html">
-					<param name="New" value="1">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="View">
@@ -137,7 +146,6 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Keywords">
 					<param name="Local" value="intf-pic-props-keywords.html">
-					<param name="New" value="1">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="Groups">
@@ -147,10 +155,6 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Sort pictures dialog">
 				<param name="Local" value="intf-sort-pics.html">
-				</OBJECT>
-			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="Rebuild thumbnails dialog">
-				<param name="Local" value="intf-rebuild-thumbs.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Picture operations dialog">
@@ -176,20 +180,116 @@
 				<param name="Name" value="Select photo album group dialog">
 				<param name="Local" value="intf-sel-phoa-group.html">
 				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Tool properties dialog">
+				<param name="Local" value="intf-tool-props.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture file operations wizard">
+				<param name="Local" value="intf-file-ops.html">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Wizard tasks">
+					</OBJECT>
+				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Copy files">
+						<param name="Local" value="intf-file-ops-task-copy.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Move files">
+						<param name="Local" value="intf-file-ops-task-move.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Delete files">
+						<param name="Local" value="intf-file-ops-task-del.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Rebuild thumbnails">
+						<param name="Local" value="intf-file-ops-task-rthumb.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Repair file links">
+						<param name="Local" value="intf-file-ops-task-repfl.html">
+						</OBJECT>
+				</UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Wizard pages">
+					</OBJECT>
+				<UL>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Task selection">
+						<param name="Local" value="intf-file-ops-seltask.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Picture selection">
+						<param name="Local" value="intf-file-ops-selpics.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Destination folder selection">
+						<param name="Local" value="intf-file-ops-selfolder.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Copy/move options (page 1)">
+						<param name="Local" value="intf-file-ops-moveopts.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Copy/move options (page 2)">
+						<param name="Local" value="intf-file-ops-moveopts2.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="CD/DVD creation options">
+						<param name="Local" value="intf-file-ops-cdopts.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Deletion options">
+						<param name="Local" value="intf-file-ops-delopts.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Repair file links options">
+						<param name="Local" value="intf-file-ops-repropts.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Operation process">
+						<param name="Local" value="intf-file-ops-process.html">
+						</OBJECT>
+					<LI> <OBJECT type="text/sitemap">
+						<param name="Name" value="Operation log">
+						<param name="Local" value="intf-file-ops-log.html">
+						</OBJECT>
+				</UL>
+			</UL>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keyboard and mouse controls">
 			<param name="Local" value="intf-key-mouse-controls.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Metadata">
+			<param name="Local" value="theory-metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Resampling">
+			<param name="Local" value="theory-resampling.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="File masks">
+			<param name="Local" value="theory-file-masks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tools">
+			<param name="Local" value="theory-tools.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Program settings">
+		<param name="Local" value="setup.html">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="General">
 			<param name="Local" value="setup-general.html">
-			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Browse mode">
@@ -202,6 +302,14 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Dialogs">
 			<param name="Local" value="setup-dialogs.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tools">
+			<param name="Local" value="setup-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Storing settings in a file">
+			<param name="Local" value="setup-storing.html">
 			</OBJECT>
 	</UL>
 </UL>

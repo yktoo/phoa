@@ -1,0 +1,76 @@
+<html><!-- $Id: intf-file-ops-cdopts.html,v 1.1 2004-05-11 03:35:11 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Picture file operations wizard :: CD/DVD creation options</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> <a href="intf-file-ops.html">Picture file operations wizard</a> :: CD/DVD creation options</h1>
+
+  <p align=justify>This wizard page allows specifying extended options for CD, DVD and other removable media creation for the following file operations:
+  <ul>
+    <li><a href="intf-file-ops-task-copy.html">Copying picture files</a> into a specified folder</li>
+    <li><a href="intf-file-ops-task-move.html">Moving picture files</a> into a specified folder</li>
+  </ul>
+
+  <h3>Create a photo album file with selected pictures to</h3>
+  <p align=justify>If turned on, the program creates a new photo album based on <a href="intf-file-ops-selpics.html">selected groups and pictures</a>,
+    and places it in the file specified in the next field.
+
+  <h3>Photo album file name</h3>
+  <p align=justify>Specifies the name of the file to save photo album to (with <b>.phoa</b> extension). The currently open photo album file name is 
+    used by default.
+
+  <h3>Photo album description</h3>
+  <p align=justify>Allows you to specify the description for the newly created photo album. The currently open photo album description is used by
+    default.
+
+  <h3>Also include existing views</h3>
+  <p align=justify>If on, all the views from the current photo album will be added to the photo album being created.
+
+  <h3>Copy the program itself to the destination folder</h3>
+  <p align=justify>If on, the main program executable (<b>phoa.exe</b>) will also be copied into the <a href="intf-file-ops-selfolder.html">destination
+    folder</a>. Since (as <a href="advantages.html">it's well known</a>) the program doesn't require to be installed to be run on a machine, it can
+    be executed from any media, including removable ones.
+
+  <h3>Copy the current program settings to phoa.ini</h3>
+  <p align=justify>If on, the current program settings will be <a href="setup-storing.html">saved to <b>phoa.ini</b> file</a> in the
+    <a href="intf-file-ops-selfolder.html">destination fodler</a> during copy/move operation. This allows running the program from a removable media
+    keeping all the current settings on any machine (but only if setting autoloading from <b>phoa.ini</b> is not disabled in that machine's 
+    <a href="setup-general.html">settings</a>.)
+
+  <h3>Create autorun.inf file</h3>
+  <p align=justify>This option allows to automatically generate <b>autorun.inf</b> file placed in the <a href="intf-file-ops-selfolder.html">destination
+    folder</a>. In this case inserting CD-ROM to a computer will cause automatic <b>PhoA</b> startup, and then the program will load the photo album
+    specified above.
+  <div class=nb><b>NB:</b> Autorun is functional unless this feature is disabled on a machine.</div>
+
+  <h3>Label the media as</h3>
+  <p align=justify>Specifies media name that is displayed in <b>My computer</b>. The wizard uses <b>Photo album</b>, or current 
+    <a href="intf-browse-mode-views.html">view</a> name by default.
+  <div class=nb><b>NB:</b> 
+    <ul>
+      <li>This field is optional, and can be left empty. <b>My computer</b> will display the media label if this is the case.</li>
+      <li>Media label is displayed unless autorun feature is disabled on a computer.</li>
+    </ul>
+  </div>
+
+  <p align=justify><b>ATTENTION:</b> all the contents of the folder designated as <a href="intf-file-ops-selfolder.html">destionation folder</a> must
+    reside in the root directory of the written disk!
+
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso>
+    <a href="intf-file-ops.html">Picture file operations wizard</a><br>
+    <a href="intf-browse-mode.html">Browse mode</a><br>
+    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a>
+
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: maps.h,v 1.3 2004-05-11 03:35:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -30,6 +30,7 @@
 #define IDH_intf_select_keywords        00250
 #define IDH_intf_sort_pics              00260
 #define IDH_intf_stats                  00270
+#define IDH_intf_tool_props             00275
 #define IDH_intf_view_mode_tasks        00280
 #define IDH_intf_view_mode              00290
 #define IDH_intf_view_props             00300
@@ -38,6 +39,7 @@
 #define IDH_intf_file_ops_delopts       00420
 #define IDH_intf_file_ops_log           00430
 #define IDH_intf_file_ops_moveopts      00440
+#define IDH_intf_file_ops_moveopts2     00442
 #define IDH_intf_file_ops_process       00450
 #define IDH_intf_file_ops_repropts      00460
 #define IDH_intf_file_ops_selfolder     00470
@@ -53,7 +55,8 @@
 #define IDH_setup_general               00720
 #define IDH_setup_view_mode             00730
 #define IDH_setup_browse_mode           00740
-#define IDH_setup_storing               00750
+#define IDH_setup_tools                 00750
+#define IDH_setup_storing               00760
 #define IDH_advantages                  01010
 #define IDH_eula_eng                    01020
 #define IDH_eula_rus                    01030
@@ -65,7 +68,8 @@
 #define IDH_pic_prop_autofill           01090
 #define IDH_requirements                01100
 #define IDH_rev_history                 01110
-#define IDH_theory_metadata             01120
-#define IDH_theory_resampling           01130
-#define IDH_thumbnails                  01140
-
+#define IDH_theory_file_masks           01120
+#define IDH_theory_metadata             01130
+#define IDH_theory_resampling           01140
+#define IDH_theory_tools                01150
+#define IDH_thumbnails                  01160

@@ -1,4 +1,4 @@
-<html><!-- $Id: advantages.html,v 1.2 2004-04-15 12:54:10 dale Exp $ -->
+<html><!-- $Id: advantages.html,v 1.3 2004-05-11 03:35:11 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <title>PhoA features and advantages</title>
@@ -21,7 +21,7 @@
     <li>The program allows you to build up catalogues (called <i>photo albums</i>) on completely different pictures. Pictures are arranged into groups
         similar to folders in Windows Explorer. Source images can be almost of any raster format, and also a number of vector formats are supported.
         Details on supported file formats are <a href="file-formats.html">here</a>.</li>
-    <li>Each picture may contain date, place, film and frame number, keywords, description, author and so on. A <i>thumbnail</i> - shrinked view of
+    <li>Each picture may be described by date, place, film and frame number, keywords, description, author and so on. A <i>thumbnail</i> - shrinked view of
         a picture - is generated automatically (a number of <a href="theory-resampling.html">resampling</a> algorithms implemented). Thumbnail dimensions
         can be specified in <a href="intf-album-props.html">photo album properties</a>, thumbnails themselves are stored in the photo album file;
         this allows nearly instant photo album opening and viewing. Thumbnails are being compressed with JPEG algorithm and may be cached while
@@ -48,9 +48,14 @@
         being decoded by a parallel thread thus allowing background loading while viewing another picture. Also there's an option for caching the
         last viewed picture.</li>
     <li>The program supports <a href="intf-browse-mode-tasks.html#clipboard">clipboard operations</a>: you can copy or cut selected pictures into
-        the clipboard and paste them into another group or even another photo album.</li>
+        the clipboard and paste them into another group or even another photo album; there's also a possibility to paste files in Explorer or
+        file list in a text editor.</li>
     <li>There is fully operational <a href="intf-browse-mode-tasks.html#undo"><i>undo system</i></a>: any wrong operation may be rolled back (the
         same for group of operations). The undo buffer capacity is specified through <b>PhoA</b> <a href="setup-browse-mode.html">settings</a>.</li>      
+    <li>The program allows performing of some kinds of <a href="intf-file-ops.html">file operations</a>:
+        <a href="intf-file-ops-task-copy.html">copying</a>, <a href="intf-file-ops-task-move.html">moving</a>,
+        <a href="intf-file-ops-task-del.html">deletion</a> etc. In particular there's a built-in mechanism for preparing the photo album (or view,
+        or any part of them) for writing onto a <b>CD</b>, <b>DVD</b> or another removable medium.</li>
     <li>There are also a number of tool features (<a href="intf-stats.html">statistics</a>, <a href="intf-pic-operations.html">inter-group
         operations</a> etc.)</li>
     <li><b>PhoA</b> looks good, has pretty suave manner and a handly interface. What else you may need?</li>

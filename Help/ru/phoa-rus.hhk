@@ -16,6 +16,11 @@
 		<param name="Local" value="eula-eng.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="drag'n'drop">
+		<param name="Name" value="Работа в режиме обзора">
+		<param name="Local" value="intf-browse-mode-tasks.html#dnd">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="license agreement">
 		<param name="Name" value="License Agreement">
 		<param name="Local" value="eula-eng.html">
@@ -24,6 +29,11 @@
 		<param name="Name" value="PhoA">
 		<param name="Name" value="PhoA">
 		<param name="Local" value="start.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
+		<param name="Name" value="Автозаполнение свойств изображений">
+		<param name="Local" value="pic-prop-autofill.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&eth;&ntilde;&ecirc;&icirc;&aring; &iuml;&eth;&agrave;&acirc;&icirc;">
@@ -46,24 +56,109 @@
 		<param name="Local" value="how-it-works.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
-		<param name="Name" value="Окно добавления изображения">
-		<param name="Local" value="intf-pic-add.html">
+		<param name="Name" value="&auml;&agrave;&iacute;&iacute;&ucirc;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
+		<param name="Name" value="Данные изображений">
+		<param name="Local" value="pic-data.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
-		<param name="Name" value="Окно изменения изображения">
-		<param name="Local" value="intf-pic-props.html">
+		<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
+		<param name="Name" value="изображения">
+		<param name="See Also" value="изображения">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="(&ntilde;&igrave;. &igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;)">
+			<param name="Name" value="метаданные">
+			<param name="See Also" value="метаданные">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="(&ntilde;&igrave;. &yacute;&ntilde;&ecirc;&egrave;&ccedil;&ucirc;)">
+			<param name="Name" value="эскизы">
+			<param name="See Also" value="эскизы">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
+			<param name="Name" value="Автозаполнение свойств изображений">
+			<param name="Local" value="pic-prop-autofill.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
+			<param name="Name" value="Данные изображений">
+			<param name="Local" value="pic-data.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &acirc; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
+			<param name="Name" value="Мастер добавления изображений">
+			<param name="Local" value="intf-pic-add.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&eth;&atilde;&agrave;&iacute;&egrave;&ccedil;&agrave;&ouml;&egrave;&yuml;">
+			<param name="Name" value="Работа в режиме обзора">
+			<param name="Local" value="intf-browse-mode-tasks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&icirc;&egrave;&ntilde;&ecirc;">
+			<param name="Name" value="Окно поиска изображений">
+			<param name="Local" value="intf-search.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
+			<param name="Name" value="Режим просмотра">
+			<param name="Local" value="intf-view-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&agrave;&aacute;&icirc;&ograve;&agrave; &ntilde; &aacute;&oacute;&ocirc;&aring;&eth;&icirc;&igrave; &icirc;&aacute;&igrave;&aring;&iacute;&agrave;">
+			<param name="Name" value="Работа в режиме обзора">
+			<param name="Local" value="intf-browse-mode-tasks.html#clipboard">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
+			<param name="Name" value="Окно свойств изображений">
+			<param name="Local" value="intf-pic-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&icirc;&eth;&ograve;&egrave;&eth;&icirc;&acirc;&ecirc;&agrave;">
+			<param name="Name" value="Окно сортировки изображений">
+			<param name="Local" value="intf-sort-pics.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&aring;">
-		<param name="Name" value="Как это работает">
-		<param name="Local" value="how-it-works.html">
-		<param name="Name" value="Эскизы">
-		<param name="Local" value="thumbnails.html">
-		<param name="Name" value="Режим обзора">
-		<param name="Local" value="intf-browse-mode.html">
+		<param name="Name" value="&egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
+		<param name="Name" value="инструменты">
+		<param name="See Also" value="инструменты">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&acirc;&egrave;&auml;&ucirc;">
+			<param name="Name" value="Инструменты">
+			<param name="Local" value="theory-tools.html#tool-kinds">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&ntilde;&iuml;&icirc;&euml;&uuml;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&aring;">
+			<param name="Name" value="Инструменты">
+			<param name="Local" value="theory-tools.html#usages">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
+			<param name="Name" value="Инструменты">
+			<param name="Local" value="theory-tools.html#masks">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave;">
+			<param name="Name" value="Настройки программы :: Инструменты">
+			<param name="Local" value="setup-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&ecirc;&iacute;&icirc; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
+			<param name="Name" value="Окно свойств инструмента">
+			<param name="Local" value="intf-tool-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
+			<param name="Name" value="Инструменты">
+			<param name="Local" value="theory-tools.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&egrave;&ntilde;&ograve;&icirc;&eth;&egrave;&yuml;">
 		<param name="Name" value="История версий">
@@ -81,30 +176,101 @@
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ecirc;&euml;&thorn;&divide;&aring;&acirc;&ucirc;&aring; &ntilde;&euml;&icirc;&acirc;&agrave;">
-		<param name="Name" value="Окно поиска изображений">
-		<param name="Local" value="intf-search.html">
-		<param name="Name" value="Окно выбора ключевых слов">
-		<param name="Local" value="intf-select-keywords.html">
-		<param name="Name" value="Окно свойств изображения :: Ключевые слова">
-		<param name="Local" value="intf-pic-props-keywords.html">
+		<param name="Name" value="ключевые слова">
+		<param name="See Also" value="ключевые слова">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&acirc;&ucirc;&aacute;&icirc;&eth; &egrave;&ccedil; &ntilde;&iuml;&egrave;&ntilde;&ecirc;&agrave;">
+			<param name="Name" value="Окно выбора ключевых слов">
+			<param name="Local" value="intf-select-keywords.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ccedil;&agrave;&auml;&agrave;&iacute;&egrave;&aring; &auml;&euml;&yuml; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
+			<param name="Name" value="Окно свойств изображения :: Ключевые слова">
+			<param name="Local" value="intf-pic-props-keywords.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&icirc;&egrave;&ntilde;&ecirc; &iuml;&icirc; &ecirc;&euml;&thorn;&divide;&aring;&acirc;&ucirc;&igrave; &ntilde;&euml;&icirc;&acirc;&agrave;&igrave;">
+			<param name="Name" value="Окно поиска изображений">
+			<param name="Local" value="intf-search.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&euml;&egrave;&ouml;&aring;&iacute;&ccedil;&egrave;&icirc;&iacute;&iacute;&icirc;&aring; &ntilde;&icirc;&atilde;&euml;&agrave;&oslash;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Лицензионное соглашение">
 		<param name="Local" value="eula-rus.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&igrave;&aring;&iacute;&thorn;">
-		<param name="Name" value="Описание команд меню в режиме обзора">
-		<param name="Local" value="intf-browse-mode-menu.html">
+		<param name="Name" value="&igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
+		<param name="Name" value="маски файлов">
+		<param name="See Also" value="маски файлов">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&ntilde;&iuml;&icirc;&euml;&uuml;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&aring;">
+			<param name="Name" value="Окно поиска изображений">
+			<param name="Local" value="intf-search.html">
+			<param name="Name" value="Мастер добавления изображения :: Выбор файлов">
+			<param name="Local" value="intf-pic-add-selfiles.html">
+			<param name="Name" value="Инструменты">
+			<param name="Local" value="theory-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&eth;&aring;&auml;&aring;&euml;&aring;&iacute;&egrave;&aring; &egrave; &iacute;&agrave;&ccedil;&iacute;&agrave;&divide;&aring;&iacute;&egrave;&aring;">
+			<param name="Name" value="Маски файлов">
+			<param name="Local" value="theory-file-masks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&agrave;&acirc;&egrave;&euml;&agrave; &ntilde;&icirc;&ntilde;&ograve;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&yuml;">
+			<param name="Name" value="Правила составления масок">
+			<param name="Local" value="theory-file-masks.html#rules">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&egrave;&igrave;&aring;&eth;&ucirc;">
+			<param name="Name" value="Примеры масок">
+			<param name="Local" value="theory-file-masks.html#samples">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&igrave;&aring;&iacute;&thorn;">
+		<param name="Name" value="меню">
+		<param name="See Also" value="меню">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave;">
+			<param name="Name" value="Описание команд меню в режиме обзора">
+			<param name="Local" value="intf-browse-mode-menu.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
-		<param name="Name" value="Метаданные">
-		<param name="Local" value="theory-metadata.html">
-		<param name="Name" value="Окно свойств изображения :: Метаданные">
-		<param name="Local" value="intf-pic-props-metadata.html">
+		<param name="Name" value="метаданные">
+		<param name="See Also" value="метаданные">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="EXIF (&ntilde;&igrave;. &igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;)">
+			<param name="Name" value="метаданные">
+			<param name="See Also" value="метаданные">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
+			<param name="Name" value="Автозаполнение свойств изображений">
+			<param name="Local" value="pic-prop-autofill.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
+			<param name="Name" value="Метаданные">
+			<param name="Local" value="theory-metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
+			<param name="Name" value="Окно свойств изображения :: Метаданные">
+			<param name="Local" value="intf-pic-props-metadata.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&igrave;&ucirc;&oslash;&uuml;, &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Сочетания клавиш и управление мышью">
@@ -119,41 +285,75 @@
 		<param name="Name" value="&iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
 		<param name="Name" value="Настройки программы">
 		<param name="Local" value="setup.html">
-		<param name="Name" value="Настройки программы :: Общие">
-		<param name="Local" value="setup-general.html">
-		<param name="Name" value="Настройки программы :: Режим обзора">
-		<param name="Local" value="setup-browse-mode.html">
-		<param name="Name" value="Настройки программы :: Режим просмотра">
-		<param name="Local" value="setup-view-mode.html">
-		<param name="Name" value="Настройки программы :: Диалоги">
-		<param name="Local" value="setup-dialogs.html">
-		<param name="Name" value="Хранение настроек программы в файле">
-		<param name="Local" value="setup-storing.html">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&auml;&egrave;&agrave;&euml;&icirc;&atilde;&egrave; &egrave; &igrave;&agrave;&ntilde;&ograve;&aring;&eth;&agrave;">
+			<param name="Name" value="Настройки программы :: Диалоги">
+			<param name="Local" value="setup-dialogs.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
+			<param name="Name" value="Настройки программы :: Инструменты">
+			<param name="Local" value="setup-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&aacute;&ugrave;&egrave;&aring;">
+			<param name="Name" value="Настройки программы :: Общие">
+			<param name="Local" value="setup-general.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&ecirc;&iacute;&icirc; &iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&aring;&ecirc;">
+			<param name="Name" value="Настройки программы">
+			<param name="Local" value="setup.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave;">
+			<param name="Name" value="Настройки программы :: Режим обзора">
+			<param name="Local" value="setup-browse-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave; &iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;&agrave;">
+			<param name="Name" value="Настройки программы :: Режим просмотра">
+			<param name="Local" value="setup-view-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&otilde;&eth;&agrave;&iacute;&aring;&iacute;&egrave;&aring; &acirc; &ocirc;&agrave;&eacute;&euml;&aring;">
+			<param name="Name" value="Хранение настроек программы в файле">
+			<param name="Local" value="setup-storing.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&icirc;&aacute;&iacute;&icirc;&acirc;&euml;&aring;&iacute;&egrave;&yuml; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
 		<param name="Name" value="Лицензионное соглашение">
 		<param name="Local" value="eula-rus.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&egrave; &ntilde; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;&igrave;&egrave;">
-		<param name="Name" value="Окно операций с изображениями">
-		<param name="Local" value="intf-pic-operations.html">
+		<param name="Name" value="&icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&egrave;">
+		<param name="Name" value="операции">
+		<param name="See Also" value="операции">
 		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&egrave; &ntilde; &ocirc;&agrave;&eacute;&euml;&agrave;&igrave;&egrave;">
-		<param name="Name" value="Мастер операций с файлами изображений">
-		<param name="Local" value="intf-file-ops.html">
-		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;&igrave;&egrave;">
+			<param name="Name" value="Окно операций с изображениями">
+			<param name="Local" value="intf-pic-operations.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde; &ocirc;&agrave;&eacute;&euml;&agrave;&igrave;&egrave;">
+			<param name="Name" value="Мастер операций с файлами изображений">
+			<param name="Local" value="intf-file-ops.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&icirc;&ograve;&ecirc;&agrave;&ograve; &egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&eacute;">
-		<param name="Name" value="Описание команд меню в режиме обзора">
-		<param name="Local" value="intf-browse-mode-menu.html">
+		<param name="Name" value="Работа в режиме обзора">
+		<param name="Local" value="intf-browse-mode-tasks.html#undo">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&icirc;&ograve;&igrave;&aring;&iacute;&agrave;">
-		<param name="Name" value="Описание команд меню в режиме обзора">
-		<param name="Local" value="intf-browse-mode-menu.html">
+		<param name="Name" value="&icirc;&ograve;&igrave;&aring;&iacute;&agrave; &egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&eacute; (&ntilde;&igrave;. &icirc;&ograve;&ecirc;&agrave;&ograve; &egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&eacute;)">
+		<param name="Name" value="откат изменений">
+		<param name="See Also" value="откат изменений">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iuml;&aring;&eth;&aring;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave; &yacute;&ntilde;&ecirc;&egrave;&ccedil;&icirc;&acirc;">
@@ -210,11 +410,36 @@
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
-		<param name="Name" value="Окно свойств фотоальбома">
-		<param name="Local" value="intf-album-props.html">
-		<param name="Name" value="Окно изменения изображения">
-		<param name="Local" value="intf-pic-props.html">
+		<param name="Name" value="свойства">
+		<param name="See Also" value="свойства">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring;">
+			<param name="Name" value="Автозаполнение свойств изображений">
+			<param name="Local" value="pic-prop-autofill.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
+			<param name="Name" value="Окно свойств изображений">
+			<param name="Local" value="intf-pic-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&agrave;">
+			<param name="Name" value="Окно свойств инструмента">
+			<param name="Local" value="intf-tool-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&aring;&auml;&ntilde;&ograve;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&yuml;">
+			<param name="Name" value="Окно свойств представления">
+			<param name="Local" value="intf-view-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;&agrave;">
+			<param name="Name" value="Окно свойств фотоальбома">
+			<param name="Local" value="intf-album-props.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&egrave;&ntilde;&ograve;&aring;&igrave;&iacute;&ucirc;&aring; &ograve;&eth;&aring;&aacute;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
 		<param name="Name" value="Системные требования">
@@ -222,31 +447,132 @@
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&icirc;&ccedil;&auml;&agrave;&iacute;&egrave;&aring; CD/DVD">
-		<param name="Name" value="Мастер операций с файлами изображений :: Операция копирования файлов изображений">
-		<param name="Local" value="intf-file-ops-task-copy.html">
-		<param name="Name" value="Мастер операций с файлами изображений :: Опции создания CD/DVD">
-		<param name="Local" value="intf-file-ops-cdopts.html">
+		<param name="Name" value="создание CD/DVD">
+		<param name="See Also" value="создание CD/DVD">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&ouml;&egrave;&egrave;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Опции создания CD/DVD">
+			<param name="Local" value="intf-file-ops-cdopts.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&icirc;&auml;&atilde;&icirc;&ograve;&icirc;&acirc;&ecirc;&agrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция копирования файлов изображений">
+			<param name="Local" value="intf-file-ops-task-copy.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&ntilde;&icirc;&eth;&ograve;&egrave;&eth;&icirc;&acirc;&ecirc;&agrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
-		<param name="Name" value="Окно сортировки изображений">
-		<param name="Local" value="intf-sort-pics.html">
+		<param name="Name" value="&ntilde;&icirc;&eth;&ograve;&egrave;&eth;&icirc;&acirc;&ecirc;&agrave;">
+		<param name="Name" value="сортировка">
+		<param name="See Also" value="сортировка">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
+			<param name="Name" value="Окно сортировки изображений">
+			<param name="Local" value="intf-sort-pics.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute; &acirc; &iuml;&eth;&aring;&auml;&ntilde;&ograve;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&egrave;">
+			<param name="Name" value="Работа с представлениями">
+			<param name="Local" value="intf-browse-mode-views.html#sortings">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&ograve;&agrave;&ograve;&egrave;&ntilde;&ograve;&egrave;&ecirc;&agrave; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;&agrave;">
 		<param name="Name" value="Статистика фотоальбома">
 		<param name="Local" value="intf-stats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&ocirc;&agrave;&eacute;&euml;&ucirc;">
+		<param name="Name" value="файлы">
+		<param name="See Also" value="файлы">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&acirc;&icirc;&ntilde;&ntilde;&ograve;&agrave;&iacute;&icirc;&acirc;&euml;&aring;&iacute;&egrave;&aring; &ntilde;&ntilde;&ucirc;&euml;&icirc;&ecirc;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Опции восстановления ссылок на файлы">
+			<param name="Local" value="intf-file-ops-repropts.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &acirc; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
+			<param name="Name" value="Мастер добавления изображений">
+			<param name="Local" value="intf-pic-add.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ecirc;&icirc;&iuml;&egrave;&eth;&icirc;&acirc;&agrave;&iacute;&egrave;&aring; &acirc; &iuml;&agrave;&iuml;&ecirc;&oacute;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция копирования файлов изображений">
+			<param name="Local" value="intf-file-ops-task-copy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&egrave;">
+			<param name="Name" value="Мастер операций с файлами изображений">
+			<param name="Local" value="intf-file-ops.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&aring;&eth;&aring;&igrave;&aring;&ugrave;&aring;&iacute;&egrave;&aring; &acirc; &iuml;&agrave;&iuml;&ecirc;&oacute;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция перемещения файлов изображений">
+			<param name="Local" value="intf-file-ops-task-move.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&aring;&eth;&aring;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave; &yacute;&ntilde;&ecirc;&egrave;&ccedil;&icirc;&acirc;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция перестройки эскизов">
+			<param name="Local" value="intf-file-ops-task-rthumb.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&icirc;&auml;&auml;&aring;&eth;&aelig;&egrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc;">
+			<param name="Name" value="Форматы файлов">
+			<param name="Local" value="file-formats.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
+			<param name="Name" value="Окно свойств изображения :: Свойства файла">
+			<param name="Local" value="intf-pic-props-fprops.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&oacute;&auml;&agrave;&euml;&aring;&iacute;&egrave;&aring;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция удаления файлов изображений">
+			<param name="Local" value="intf-file-ops-task-del.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ocirc;&agrave;&eacute;&euml;&ucirc; &iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&aring;&ecirc;">
+			<param name="Name" value="Хранение настроек программы в файле">
+			<param name="Local" value="setup-storing.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
 		<param name="Name" value="Форматы файлов">
 		<param name="Local" value="file-formats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="&ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;, &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
-		<param name="Name" value="Окно свойств фотоальбома">
-		<param name="Local" value="intf-album-props.html">
+		<param name="Name" value="&ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
+		<param name="Name" value="фотоальбом">
+		<param name="See Also" value="фотоальбом">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
+			<param name="Name" value="Мастер добавления изображений">
+			<param name="Local" value="intf-pic-add.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
+			<param name="Name" value="Режим просмотра">
+			<param name="Local" value="intf-view-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
+			<param name="Name" value="Окно свойств фотоальбома">
+			<param name="Local" value="intf-album-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&ograve;&agrave;&ograve;&egrave;&ntilde;&ograve;&egrave;&ecirc;&agrave;">
+			<param name="Name" value="Статистика фотоальбома">
+			<param name="Local" value="intf-stats.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&divide;&ograve;&icirc; &iacute;&icirc;&acirc;&icirc;&atilde;&icirc;">
 		<param name="Name" value="История версий">
@@ -254,10 +580,40 @@
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&yacute;&ntilde;&ecirc;&egrave;&ccedil;&ucirc;">
-		<param name="Name" value="Эскизы">
-		<param name="Local" value="thumbnails.html">
-		<param name="Name" value="Мастер операций с файлами изображений :: Операция перестройки эскизов">
-		<param name="Local" value="intf-file-ops-task-rthumb.html">
+		<param name="Name" value="эскизы">
+		<param name="See Also" value="эскизы">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ecirc;&agrave;&divide;&aring;&ntilde;&ograve;&acirc;&icirc;">
+			<param name="Name" value="Окно свойств фотоальбома">
+			<param name="Local" value="intf-album-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
+			<param name="Name" value="Эскизы">
+			<param name="Local" value="thumbnails.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&iuml;&aring;&eth;&aring;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave;">
+			<param name="Name" value="Мастер операций с файлами изображений :: Операция перестройки эскизов">
+			<param name="Local" value="intf-file-ops-task-rthumb.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&agrave;&ccedil;&igrave;&aring;&eth;&ucirc;">
+			<param name="Name" value="Окно свойств фотоальбома">
+			<param name="Local" value="intf-album-props.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">
+			<param name="Name" value="Настройки программы :: Режим обзора">
+			<param name="Local" value="setup-browse-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
+			<param name="Name" value="Окно свойств фотоальбома">
+			<param name="Local" value="intf-album-props.html">
+			</OBJECT>
+	</UL>
 </UL>
 </BODY></HTML>

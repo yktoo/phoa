@@ -1,0 +1,69 @@
+<html><!-- $Id: intf-file-ops-moveopts2.html,v 1.1 2004-05-11 03:35:11 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Picture file operations wizard :: Copy/move options page 2</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> <a href="intf-file-ops.html">Picture file operations wizard</a> :: Copy/move options page 2</h1>
+
+  <p align=justify>This wizard page configures parameters for the following file operations:
+  <ul>
+    <li><a href="intf-file-ops-task-copy.html">Copying picture files</a> into a specified folder</li>
+    <li><a href="intf-file-ops-task-move.html">Moving picture files</a> into a specified folder</li>
+  </ul>
+
+  <h3>If the original file does not exist:</h3>
+  <p align=justify>Is applicable for <a href="intf-file-ops-task-move.html">Move files operation</a> only and determines the program behaviour when
+    it finds that the source file doesn't exist:
+  <ul>
+    <li><b>Treat as an error</b> - logs the error and skips the picture.</li>
+    <li><b>Update the link only if the target file exists</b> - if a file found as a target one exists the picture will be linked to it; otherwise
+      the picture will be skipped. This mode is useful in cases you have moved files from outside the <b>PhoA</b>, and wish to restore the valid links.
+      In that case you should specify the folder where new files reside (but take into account their former and new folder structure).</li>
+    <li><b>Update the link anyway</b> - the link to picture file will be changed disregarding the source and target files existence.</li>
+  </ul>
+
+  <h3>Delete original files</h3>
+  <p align=justify>Is applicable for <a href="intf-file-ops-task-move.html">Move files operation</a> only. When on, the successful file copying and
+    link updating will be followed by deletion of the file.
+  
+  <h3>Delete to the Recycle Bin</h3>
+  <p align=justify>Is applicable for <a href="intf-file-ops-task-move.html">Move files operation</a> only.
+    <ul>
+      <li>If this option is <b>off</b>, all the files are being wiped off and cannot be restored.</li>
+      <li>If the option is <b>on</b>, the files are being moved into the Recycle Bin rather than deleted (if this is possible on the given machine).</li>
+    </ul>
+
+  <h3>If the target file already exists</h3>
+  <p align=justify>Specifies the overwrite mode for existing files:
+  <ul>
+    <li><b>Skip the current picture</b> - if the target file exists the program will consider this an error, log this and leave the file intact.</li>
+    <li><b>Prompt to overwrite the file</b> - the program will ask you to overwrite the existing file. If you decide not to overwrite the file
+        the picture will also be logged as failed.</li>
+    <li><b>Always overwrite the file</b> - the file will be overwritten with the new one without any notifications.</li>
+  </ul>
+  
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> CD/DVD options</h2>
+  <h3>Set up CD/DVD creation options as well</h3>
+  <p align=justify>If on the <b>Next &gt;</b> button click will cause the wizard to advance to the <a href="intf-file-ops-cdopts.html">CD/DVD creation
+    options page</a>, or otherwise the program will start <a href="intf-file-ops-process.html">processing pictures</a> (after confirmation, if this is 
+    specified in the <a href="setup-dialogs.html">Program settings</a>).
+
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso>
+    <a href="intf-file-ops-moveopts.html">Copy/move options (page 1)</a><br>
+    <a href="intf-file-ops.html">Picture file operations wizard</a><br>
+    <a href="intf-browse-mode.html">Browse mode</a><br>
+    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a>
+
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>
