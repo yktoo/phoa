@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.16 2004-12-04 17:53:11 dale Exp $
+//  $Id: phGraphics.pas,v 1.17 2004-12-16 14:17:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -437,6 +437,8 @@ var
         if Graphic<>nil then
           try
             Bitmap32.Assign(Graphic);
+            FullSize.cx := Bitmap32.Width;
+            FullSize.cy := Bitmap32.Height;
           except
             on e: Exception do
               if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotDecodePicture', [sFileName, e.Message]));
