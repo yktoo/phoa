@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.29 2004-06-25 13:01:14 dale Exp $
+//  $Id: phObj.pas,v 1.30 2004-06-27 17:44:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1000,14 +1000,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_InternalGroupPicSort = class(TPhoaOperation)
-  private
-     // Список старого порядка следования изображений группы
-    FOldPicIDs: TIntegerList;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Sortings: TPhoaSortings);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1027,9 +1023,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_GroupDragAndDrop = class(TPhoaOperation)
-  private
-     // Прежний индекс узла группы в родителе
-    FOldIndex: Integer;
   protected
     function GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
@@ -1051,14 +1044,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_PicDragAndDropInsideGroup = class(TPhoaOperation)
-  private
-     // Список старых и новых индексов изображений в группе (в виде old_index1, new_index1, old_index2, new_index2, ...)
-    FIndexes: TIntegerList;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray; idxNew: Integer);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1087,10 +1076,6 @@ type
   private
      // Интерфейс списка представлений
     FViewsIntf: IPhoaViews;
-     // Предыдущий индекс представления
-    FPrevViewIndex: Integer;
-     // Индекс созданного представления
-    FNewViewIndex: Integer;
   protected
     procedure RollbackChanges; override;
   public
@@ -1105,18 +1090,11 @@ type
   private
      // Интерфейс списка представлений
     FViewsIntf: IPhoaViews;
-     // Прежние данные представления
-    FOldName: String;
-    FOldGroupings: TPhoaGroupings;
-    FOldSortings: TPhoaSortings;
-     // Новый индекс представления
-    FNewViewIndex: Integer;
   protected
     procedure RollbackChanges; override;
   public
      // Если NewGroupings=nil и NewSortings=nil, значит, это просто переименование представления
     constructor Create(List: TPhoaOperations; View: TPhoaView; ViewsIntf: IPhoaViews; const sNewName: String; NewGroupings: TPhoaGroupings; NewSortings: TPhoaSortings);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1127,15 +1105,10 @@ type
   private
      // Интерфейс списка представлений
     FViewsIntf: IPhoaViews;
-     // Прежние данные представления
-    FOldName: String;
-    FOldGroupings: TPhoaGroupings;
-    FOldSortings: TPhoaSortings;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; ViewsIntf: IPhoaViews);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5134,26 +5107,19 @@ var
   constructor TPhoaOp_InternalGroupPicSort.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Sortings: TPhoaSortings);
   begin
     inherited Create(List, PhoA);
-     // Запоминаем порядок следования ID изображений в группе
-    FOldPicIDs := TIntegerList.Create(False);
-    FOldPicIDs.Assign(Group.PicIDs);
      // Запоминаем группу
     OpGroup := Group;
+     // Запоминаем порядок следования ID изображений в группе
+    UndoWriteIntList(UndoFile, Group.PicIDs);
      // Сортируем изображения в группе
-    Group.SortPics(Sortings, PhoA.Pics); 
-  end;
-
-  destructor TPhoaOp_InternalGroupPicSort.Destroy;
-  begin
-    FOldPicIDs.Free;
-    inherited Destroy;
+    Group.SortPics(Sortings, PhoA.Pics);
   end;
 
   procedure TPhoaOp_InternalGroupPicSort.RollbackChanges;
   begin
     inherited RollbackChanges;
      // Восстанавливаем старый порядок следования ID изображений в группе
-    OpGroup.PicIDs.Assign(FOldPicIDs);
+    UndoReadIntList(UndoFile, OpGroup.PicIDs);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5187,7 +5153,7 @@ var
     inherited Create(List, PhoA);
      // Запоминаем данные отката
     gOldParent := Group.Owner;
-    FOldIndex := Group.Index;
+    UndoFile.WriteInt(Group.Index);
      // Перемещаем группу
     Group.Owner := NewParentGroup;
     if iNewIndex>=0 then Group.Index := iNewIndex; // Индекс -1 означает добавление последним ребёнком
@@ -5207,7 +5173,7 @@ var
      // Восстанавливаем положение группы
     with OpGroup do begin
       Owner := OpParentGroup;
-      Index := FOldIndex;
+      Index := UndoFile.ReadInt;
     end;
   end;
 
@@ -5231,40 +5197,48 @@ var
   var i, idxOld: Integer;
   begin
     inherited Create(List, PhoA);
+     // Запоминаем группу
+    OpGroup := Group;
      // Выполняем операцию
-    FIndexes := TIntegerList.Create(True);
     for i := 0 to High(aPicIDs) do begin
+       // -- Пишем признак продолжения
+      UndoFile.WriteBool(True);
        // -- Запоминаем индексы
       idxOld := Group.PicIDs.IndexOf(aPicIDs[i]);
       if idxOld<idxNew then Dec(idxNew);
-      FIndexes.Add(idxOld);
-      FIndexes.Add(idxNew);
+      UndoFile.WriteInt(idxOld);
+      UndoFile.WriteInt(idxNew);
        // -- Перемещаем изображение на новое место
       Group.PicIDs.Move(idxOld, idxNew);
       Inc(idxNew);
     end;
-     // Запоминаем группу
-    OpGroup := Group;
-  end;
-
-  destructor TPhoaOp_PicDragAndDropInsideGroup.Destroy;
-  begin
-    FIndexes.Free;
-    inherited Destroy;
+     // Пишем стоп-флаг
+    UndoFile.WriteBool(False);
   end;
 
   procedure TPhoaOp_PicDragAndDropInsideGroup.RollbackChanges;
   var
     i: Integer;
     g: TPhoaGroup;
+    Indexes: TIntegerList;
   begin
     inherited RollbackChanges;
     g := OpGroup;
-     // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
-    i := FIndexes.Count-2; // i указывает на idxOld, i+1 - на idxNew
-    while i>=0 do begin
-      g.PicIDs.Move(FIndexes[i+1], FIndexes[i]);
-      Dec(i, 2);
+     // Загружаем индексы из файла во временный список
+    Indexes := TIntegerList.Create(True);
+    try
+      while UndoFile.ReadBool do begin
+        Indexes.Add(UndoFile.ReadInt);
+        Indexes.Add(UndoFile.ReadInt);
+      end;
+       // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
+      i := Indexes.Count-2; // i указывает на старый индекс, i+1 - на новый
+      while i>=0 do begin
+        g.PicIDs.Move(Indexes[i+1], Indexes[i]);
+        Dec(i, 2);
+      end;
+    finally
+      Indexes.Free;
     end;
   end;
 
@@ -5273,29 +5247,37 @@ var
    //-------------------------------------------------------------------------------------------------------------------
 
   constructor TPhoaOp_ViewNew.Create(List: TPhoaOperations; ViewsIntf: IPhoaViews; const sName: String; Groupings: TPhoaGroupings; Sortings: TPhoaSortings);
-  var FView: TPhoaView;
+  var
+    FView: TPhoaView;
+    iNewViewIndex: Integer;
   begin
     inherited Create(List, nil);
     FViewsIntf := ViewsIntf;
-    FPrevViewIndex := ViewsIntf.ViewIndex;
+     // Сохраняем предыдущий индекс представления
+    UndoFile.WriteInt(ViewsIntf.ViewIndex);
      // Выполняем операцию
     FView := TPhoaView.Create(ViewsIntf.Views);
     FView.Name := sName;
     FView.Groupings.Assign(Groupings);
     FView.Sortings.Assign(Sortings);
-     // Запоминаем новый индекс представления
-    FNewViewIndex := ViewsIntf.Views.IndexOf(FView);
+     // Сохраняем новый индекс представления
+    iNewViewIndex := ViewsIntf.Views.IndexOf(FView);
+    UndoFile.WriteInt(iNewViewIndex);
      // Перегружаем список
-    ViewsIntf.LoadViewList(FNewViewIndex);
+    ViewsIntf.LoadViewList(iNewViewIndex);
   end;
 
   procedure TPhoaOp_ViewNew.RollbackChanges;
+  var iPrevViewIndex, iNewViewIndex: Integer;
   begin
     inherited RollbackChanges;
+     // Получаем сохранённые данные
+    iPrevViewIndex := UndoFile.ReadInt;
+    iNewViewIndex  := UndoFile.ReadInt;
      // Удаляем представление
-    FViewsIntf.Views.Delete(FNewViewIndex);
+    FViewsIntf.Views.Delete(iNewViewIndex);
      // Перегружаем список и восстанавливаем прежнее выбранное представление
-    FViewsIntf.LoadViewList(FPrevViewIndex);
+    FViewsIntf.LoadViewList(iPrevViewIndex);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5303,52 +5285,53 @@ var
    //-------------------------------------------------------------------------------------------------------------------
 
   constructor TPhoaOp_ViewEdit.Create(List: TPhoaOperations; View: TPhoaView; ViewsIntf: IPhoaViews; const sNewName: String; NewGroupings: TPhoaGroupings; NewSortings: TPhoaSortings);
+  var bWriteGroupings, bWriteSortings: Boolean;
   begin
     inherited Create(List, nil);
      // Сохраняем данные отката и применяем изменения
     FViewsIntf := ViewsIntf;
-    FOldName := View.Name;
+    UndoFile.WriteStr(View.Name);
     View.Name := sNewName;
+     // Пересортировываем список
+    ViewsIntf.Views.Sort;
+     // Запоминаем новый индекс представления
+    UndoFile.WriteInt(View.Index);
      // -- Список группировок создаём и сохраняем только в том случае, если это не переименование и он различается
-    if (NewGroupings<>nil) and not View.Groupings.IdenticalWith(NewGroupings) then begin
-      FOldGroupings := TPhoaGroupings.Create;
-      FOldGroupings.Assign(View.Groupings);
+    bWriteGroupings := (NewGroupings<>nil) and not View.Groupings.IdenticalWith(NewGroupings);
+    UndoFile.WriteBool(bWriteGroupings); // Признак наличия группировок
+    if bWriteGroupings then begin
+      UndoWriteGroupings(UndoFile, View.Groupings);
       View.Groupings.Assign(NewGroupings);
        // -- Invalidate view's groups
       View.UnprocessGroups;
     end;
      // -- Список сортировок создаём и сохраняем только в том случае, если это не переименование и он различается
-    if (NewSortings<>nil) and not View.Sortings.IdenticalWith(NewSortings) then begin
-      FOldSortings := TPhoaSortings.Create;
-      FOldSortings.Assign(View.Sortings);
+    bWriteSortings := (NewSortings<>nil) and not View.Sortings.IdenticalWith(NewSortings);
+    UndoFile.WriteBool(bWriteSortings); // Признак наличия сортировок
+    if bWriteSortings then begin
+      UndoWriteSortings(UndoFile, View.Sortings);
       View.Sortings.Assign(NewSortings);
        // -- Invalidate view's groups
       View.UnprocessGroups;
     end;
-     // Пересортировываем список
-    ViewsIntf.Views.Sort;
-     // Запоминаем новый индекс представления
-    FNewViewIndex := View.Index;
      // Перегружаем список
-    ViewsIntf.LoadViewList(FNewViewIndex);
-  end;
-
-  destructor TPhoaOp_ViewEdit.Destroy;
-  begin
-    FOldGroupings.Free;
-    FOldSortings.Free;
-    inherited Destroy;
+    ViewsIntf.LoadViewList(View.Index);
   end;
 
   procedure TPhoaOp_ViewEdit.RollbackChanges;
-  var View: TPhoaView;
+  var
+    sViewName: String;
+    iViewIndex: Integer;
+    View: TPhoaView;
   begin
     inherited RollbackChanges;
      // Восстанавливаем представление
-    View := FViewsIntf.Views[FNewViewIndex];
-    View.Name := FOldName;
-    if FOldGroupings<>nil then View.Groupings.Assign(FOldGroupings);
-    if FOldSortings<>nil  then View.Sortings.Assign(FOldSortings);
+    sViewName  := UndoFile.ReadStr;
+    iViewIndex := UndoFile.ReadInt;
+    View := FViewsIntf.Views[iViewIndex];
+    View.Name := sViewName;
+    if UndoFile.ReadBool then UndoReadGroupings(UndoFile, View.Groupings);
+    if UndoFile.ReadBool then UndoReadSortings(UndoFile,  View.Sortings);
     View.UnprocessGroups;
      // Пересортировываем список (смена имени может повлиять на положение представления в списке)
     FViewsIntf.Views.Sort;
@@ -5366,23 +5349,14 @@ var
      // Сохраняем данные отката
     FViewsIntf := ViewsIntf;
     with ViewsIntf.Views[ViewsIntf.ViewIndex] do begin
-      FOldName := Name;
-      FOldGroupings := TPhoaGroupings.Create;
-      FOldGroupings.Assign(Groupings);
-      FOldSortings  := TPhoaSortings.Create;
-      FOldSortings.Assign(Sortings);
+      UndoFile.WriteStr(Name);
+      UndoWriteGroupings(UndoFile, Groupings);
+      UndoWriteSortings (UndoFile, Sortings);
     end;
      // Удаляем представление
     ViewsIntf.Views.Delete(ViewsIntf.ViewIndex);
      // Перегружаем список
     ViewsIntf.LoadViewList(-1);
-  end;
-
-  destructor TPhoaOp_ViewDelete.Destroy;
-  begin
-    FOldGroupings.Free;
-    FOldSortings.Free;
-    inherited Destroy;
   end;
 
   procedure TPhoaOp_ViewDelete.RollbackChanges;
@@ -5391,9 +5365,9 @@ var
     inherited RollbackChanges;
      // Создаём представление
     View := TPhoaView.Create(FViewsIntf.Views);
-    View.Name := FOldName;
-    View.Groupings.Assign(FOldGroupings);
-    View.Sortings.Assign(FOldSortings);
+    View.Name := UndoFile.ReadStr;
+    UndoReadGroupings(UndoFile, View.Groupings);
+    UndoReadSortings (UndoFile, View.Sortings);
      // Пересортировываем список
     FViewsIntf.Views.Sort;
      // Перегружаем список

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.18 2004-06-22 12:59:58 dale Exp $
+//  $Id: phUtils.pas,v 1.19 2004-06-27 17:44:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -8,7 +8,8 @@ unit phUtils;
 
 interface
 uses
-  SysUtils, Windows, Messages, Classes, Controls, Graphics, GraphicEx, GR32, StdCtrls, ConsVars, VirtualTrees, VirtualShellUtilities;
+  SysUtils, Windows, Messages, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities, GraphicEx,
+  GR32, ConsVars, phObj;
 
    // Exception raising
   procedure PhoaException(const sMsg: String; const aParams: Array of const);
@@ -129,6 +130,15 @@ uses
 
    // Возвращает True, если iID содержится в массиве aIDs
   function  IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
+   // Запись/чтение содержимого списка TIntegerList в/из Undo-файла
+  procedure UndoWriteIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
+  procedure UndoReadIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
+   // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
+  procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
+  procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
+   // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
+  procedure UndoWriteSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
+  procedure UndoReadSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
 
    // Укорачивает строку как имя файла
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
@@ -726,6 +736,80 @@ type
         Exit;
       end;
     Result:= False;
+  end;
+
+  procedure UndoWriteIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
+  var i: Integer;
+  begin
+    UndoFile.WriteInt(List.Count);
+    for i := 0 to List.Count-1 do UndoFile.WriteInt(List[i]);
+  end;
+
+  procedure UndoReadIntList(UndoFile: TPhoaUndoFile; List: TIntegerList);
+  var i, iCnt: Integer;
+  begin
+    iCnt := UndoFile.ReadInt;
+    List.Clear;
+    List.Capacity := iCnt;
+    for i := 0 to iCnt-1 do List.Add(UndoFile.ReadInt);
+  end;
+
+  procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
+  var
+    i: Integer;
+    gpg: TPhoaGrouping;
+  begin
+    UndoFile.WriteInt(Groupings.Count);
+    for i := 0 to Groupings.Count-1 do begin
+      gpg := Groupings[i];
+      UndoFile.WriteByte(Byte(gpg.Prop));
+      UndoFile.WriteBool(gpg.bUnclassified);
+    end;
+  end;
+
+  procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
+  var
+    i, iCnt: Integer;
+    gbp: TGroupByProperty;
+    bUncl: Boolean;
+  begin
+    iCnt := UndoFile.ReadInt;
+    Groupings.Clear;
+    Groupings.Capacity := iCnt;
+    for i := 0 to iCnt-1 do begin
+      gbp   := TGroupByProperty(UndoFile.ReadByte);
+      bUncl := UndoFile.ReadBool;
+      Groupings.Add(gbp, bUncl);
+    end;
+  end;
+
+  procedure UndoWriteSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
+  var
+    i: Integer;
+    ps: TPhoaSorting;
+  begin
+    UndoFile.WriteInt(Sortings.Count);
+    for i := 0 to Sortings.Count-1 do begin
+      ps := Sortings[i];
+      UndoFile.WriteByte(Byte(ps.Prop));
+      UndoFile.WriteByte(Byte(ps.Order));
+    end;
+  end;
+
+  procedure UndoReadSortings(UndoFile: TPhoaUndoFile; Sortings: TPhoaSortings);
+  var
+    i, iCnt: Integer;
+    pp: TPicProperty;
+    so: TSortOrder;
+  begin
+    iCnt := UndoFile.ReadInt;
+    Sortings.Clear;
+    Sortings.Capacity := iCnt;
+    for i := 0 to iCnt-1 do begin
+      pp := TPicProperty(UndoFile.ReadByte);
+      so := TSortOrder  (UndoFile.ReadByte);
+      Sortings.Add(pp, so);
+    end;
   end;
 
   function ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
