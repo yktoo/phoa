@@ -68,20 +68,20 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Left = 8
     Top = 28
     object aFilesCheckAll: TAction
-      Caption = 'Check &all files'
-      Hint = 'Set check to all the files in the list'
+      Caption = 'Marcar &tudo'
+      Hint = 'Marca todas as imagens da lista'
       ImageIndex = 13
       OnExecute = aaFilesCheckAll
     end
     object aFilesUncheckAll: TAction
-      Caption = '&Uncheck all files'
-      Hint = 'Remove check from all the files'
+      Caption = '&Desmarcar tudo'
+      Hint = 'Remove marca de todas as imagens'
       ImageIndex = 14
       OnExecute = aaFilesUncheckAll
     end
     object aFilesInvertChecks: TAction
-      Caption = '&Invert file checks'
-      Hint = 'Toggle each file'#39's check'
+      Caption = '&Inverter marca'#1079#1075'o'
+      Hint = 'Alterna todas as marcas'
       ImageIndex = 40
       OnExecute = aaFilesInvertChecks
     end
@@ -109,7 +109,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Top = 28
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 92
     Top = 28
     LangData = {
@@ -174,5 +174,20 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
       04000016040000220400000B0048656C704B6579776F72640500000019040000
       09040000070400001604000022040000040048696E7405000000190400000904
       00000704000016040000220400000000000000000000}
+  end
+  object dklcMain: TDKLanguageController
+    Left = 120
+    Top = 28
+    LangData = {
+      1B006672577A5061676541646446696C65735F436865636B46696C657300010C
+      0000000600616C4D61696E0000080064746C734D61696E00000700747646696C
+      65730000070070426F74746F6D00000E006146696C6573436865636B416C6C01
+      020000000C000000070043617074696F6E0E000000040048696E740010006146
+      696C6573556E636865636B416C6C010200000010000000070043617074696F6E
+      12000000040048696E740012006146696C6573496E76657274436865636B7301
+      0200000014000000070043617074696F6E16000000040048696E74000700706D
+      46696C65730000100069706D46696C6573436865636B416C6C0000120069706D
+      46696C6573556E636865636B416C6C0000140069706D46696C6573496E766572
+      74436865636B7300000700696C46696C65730000}
   end
 end

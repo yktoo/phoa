@@ -55,7 +55,7 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
       Top = 0
       MinClientHeight = 16
       MinClientWidth = 16
-      Caption = 'Description'
+      Caption = 'Descri'#1079#1075'o'
       CaptionRotation = dpcrAlwaysHorz
       Color = clInfoBk
       DockedHeight = 40
@@ -79,13 +79,13 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
     Left = 4
     Top = 212
     object ipmShowDescPanel: TTBXVisibilityToggleItem
-      Caption = 'Description panel'
+      Caption = 'Painel descritivo'
       Control = dpDesc
-      Hint = 'Description panel|Show/hide the Description panel'
+      Hint = 'Painel descritivo|Mostrar/ocultar painel descritivo'
     end
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 32
     Top = 212
     LangData = {
@@ -122,5 +122,15 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
       16040000220400000B0048656C704B6579776F72640500000019040000090400
       00070400001604000022040000040048696E7405000000190400000904000007
       04000016040000220400000000000000000000}
+  end
+  object dklcMain: TDKLanguageController
+    Left = 60
+    Top = 212
+    LangData = {
+      1300667250696350726F70735F4D657461646174610001070000000800646B42
+      6F74746F6D0000080064746C734D61696E0000060074764D61696E0000060064
+      7044657363010100000035000000070043617074696F6E0005006C4465736300
+      000600706D4D61696E0000100069706D53686F774465736350616E656C010200
+      000039000000070043617074696F6E3A000000040048696E7400}
   end
 end

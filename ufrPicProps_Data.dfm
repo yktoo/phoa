@@ -3,50 +3,50 @@ inherited frPicProps_Data: TfrPicProps_Data
   object lPlace: TLabel
     Left = 192
     Top = 8
-    Width = 29
+    Width = 31
     Height = 13
-    Caption = '&Place:'
+    Caption = '&Lugar:'
     FocusControl = cbPlace
   end
   object lDesc: TLabel
     Left = 8
     Top = 128
-    Width = 132
+    Width = 129
     Height = 13
-    Caption = 'D&escription (for displaying):'
+    Caption = 'D&escri'#1079#1075'o (para visualizar):'
     FocusControl = mDesc
   end
   object lFilmNumber: TLabel
     Left = 8
     Top = 48
-    Width = 103
+    Width = 128
     Height = 13
-    Caption = '&Film number or name:'
+    Caption = 'N'#1098'mero ou nome do &Filme:'
     FocusControl = cbFilmNumber
   end
   object lFrameNumber: TLabel
     Left = 447
     Top = 48
-    Width = 73
+    Width = 94
     Height = 13
     Anchors = [akTop, akRight]
-    Caption = 'F&rame number:'
+    Caption = 'N'#1098'me&ro do quadro:'
     FocusControl = eFrameNumber
   end
   object lAuthor: TLabel
     Left = 8
     Top = 88
-    Width = 37
+    Width = 31
     Height = 13
-    Caption = '&Author:'
+    Caption = '&Autor:'
     FocusControl = cbAuthor
   end
   object lNotes: TLabel
     Left = 8
     Top = 200
-    Width = 110
+    Width = 139
     Height = 13
-    Caption = '&Notes (additional info):'
+    Caption = '&Notas (informa'#1079#1075'o adicional):'
     FocusControl = mNotes
   end
   object lDate: TLabel
@@ -54,24 +54,24 @@ inherited frPicProps_Data: TfrPicProps_Data
     Top = 8
     Width = 27
     Height = 13
-    Caption = '&Date:'
+    Caption = '&Data:'
     FocusControl = eDate
   end
   object lTime: TLabel
     Left = 120
     Top = 8
-    Width = 26
+    Width = 27
     Height = 13
-    Caption = '&Time:'
+    Caption = '&Hora:'
     FocusControl = eTime
   end
   object lMedia: TLabel
     Left = 8
     Top = 254
-    Width = 100
+    Width = 137
     Height = 13
     Anchors = [akLeft, akBottom]
-    Caption = '&Media name or code:'
+    Caption = 'N'#1098'mero ou c'#1091'digo da &M'#1085'dia:'
     FocusControl = cbMedia
   end
   object cbPlace: TComboBox
@@ -173,7 +173,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     OnChange = PicPropEditorChange
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 448
     Top = 212
     LangData = {
@@ -290,5 +290,24 @@ inherited frPicProps_Data: TfrPicProps_Data
       0019040000090400000704000016040000220400000700496D654E616D650500
       0000190400000904000007040000160400002204000005004C696E6573050000
       0019040000090400000704000016040000220400000000000000000000}
+  end
+  object dklcMain: TDKLanguageController
+    Left = 476
+    Top = 212
+    LangData = {
+      0F00667250696350726F70735F44617461000113000000080064746C734D6169
+      6E000006006C506C616365010100000007000000070043617074696F6E000500
+      6C4465736301010000000A000000070043617074696F6E000B006C46696C6D4E
+      756D62657201010000000D000000070043617074696F6E000C006C4672616D65
+      4E756D626572010100000010000000070043617074696F6E0007006C41757468
+      6F72010100000013000000070043617074696F6E0006006C4E6F746573010100
+      000016000000070043617074696F6E0005006C44617465010100000019000000
+      070043617074696F6E0005006C54696D6501010000001C000000070043617074
+      696F6E0006006C4D6564696101010000001F000000070043617074696F6E0007
+      006362506C616365000005006D4465736300000C00636246696C6D4E756D6265
+      7200000C00654672616D654E756D626572000008006362417574686F72000006
+      006D4E6F746573000005006544617465000005006554696D6501020000004200
+      00000800456469744D61736B4400000004005465787400070063624D65646961
+      0000}
   end
 end

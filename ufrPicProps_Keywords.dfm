@@ -42,7 +42,7 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Width = 576
     Height = 22
     Align = alTop
-    ChevronHint = 'More buttons|'
+    ChevronHint = 'Mais bot'#1093'es|'
     Images = fMain.ilActionsSmall
     SystemFont = False
     TabOrder = 1
@@ -81,44 +81,46 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Top = 252
     object aCheckedOnly: TAction
       AutoCheck = True
-      Caption = 'C&hecked only'
-      Hint = 'Checked only|Display only checked keywords'
+      Caption = '&Somente marcadas'
+      Hint = 'Somente marcadas|Mostrar somente palavras-chave marcadas'
       ImageIndex = 41
       OnExecute = aaCheckedOnly
     end
     object aAdd: TAction
-      Caption = '&Add'
-      Hint = 'Add a keyword|Add new keyword to selected pictures'
+      Caption = '&Adicionar'
+      Hint = 
+        'Adicionar palavra-chave|Adicionar nova palavra-chave para imagen' +
+        's selecionadas'
       ImageIndex = 0
       OnExecute = aaAdd
     end
     object aEdit: TAction
-      Caption = '&Edit'
-      Hint = 'Edit keyword|Edit selected keyword'
+      Caption = '&Editar'
+      Hint = 'Editar palavra-chave|Editar palavra-chave selecionada'
       ImageIndex = 8
       OnExecute = aaEdit
     end
     object aCheckAll: TAction
-      Caption = '&Check all'
-      Hint = 'Check all|Check all the keywords in the list'
+      Caption = 'Marcar &todas'
+      Hint = 'Marcar Todas|Marcar todas as palavras-chave na lista'
       ImageIndex = 13
       OnExecute = aaCheckAll
     end
     object aUncheckAll: TAction
-      Caption = '&Uncheck all'
-      Hint = 'Uncheck all|Remove check from all the keywords in the list'
+      Caption = '&Desmarcar todasl'
+      Hint = 'Desmarcar todas|Remove marca de todas as palavras-chave na lista'
       ImageIndex = 14
       OnExecute = aaUncheckAll
     end
     object aInvertCheck: TAction
-      Caption = '&Invert'
-      Hint = 'Invert check|Toggle keyword check'
+      Caption = '&Inverter'
+      Hint = 'Inverter marca'#1079#1075'o|Alternar marca'#1079#1075'o da palavra-chave'
       ImageIndex = 40
       OnExecute = aaInvertCheck
     end
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 12
     Top = 252
     LangData = {
@@ -250,5 +252,24 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Images = fMain.ilActionsSmall
     Left = 68
     Top = 252
+  end
+  object dklcMain: TDKLanguageController
+    Left = 96
+    Top = 252
+    LangData = {
+      1300667250696350726F70735F4B6579776F726473000112000000060074624D
+      61696E0101000000090000000B0043686576726F6E48696E7400060074625365
+      703100000500624564697400000600616C4D61696E0000050061456469740102
+      00000082000000070043617074696F6E84000000040048696E7400080064746C
+      734D61696E0000060074764D61696E00000C0062436865636B65644F6E6C7900
+      000400624164640000090062436865636B416C6C00000B0062556E636865636B
+      416C6C00000C0062496E76657274436865636B00000C0061436865636B65644F
+      6E6C79010200000089000000070043617074696F6E8B000000040048696E7400
+      04006141646401020000008D000000070043617074696F6E8F00000004004869
+      6E7400090061436865636B416C6C010200000091000000070043617074696F6E
+      93000000040048696E74000B0061556E636865636B416C6C0102000000950000
+      00070043617074696F6E97000000040048696E74000C0061496E766572744368
+      65636B010200000099000000070043617074696F6E9B000000040048696E7400
+      0600706D4D61696E0000}
   end
 end

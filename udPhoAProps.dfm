@@ -1,6 +1,8 @@
 inherited dPhoAProps: TdPhoAProps
+  Left = 586
+  Top = 248
   ActiveControl = eThumbSizeX
-  Caption = 'Properties: photo album'
+  Caption = 'Propriedades: '#1041'lbum'
   ClientHeight = 296
   ClientWidth = 386
   OldCreateOrder = True
@@ -13,17 +15,17 @@ inherited dPhoAProps: TdPhoAProps
   object lDesc: TLabel [1]
     Left = 12
     Top = 80
-    Width = 57
+    Width = 49
     Height = 13
-    Caption = '&Description:'
+    Caption = '&Descri'#1079#1075'o:'
     FocusControl = mDesc
   end
   object lThumbSize: TLabel [2]
     Left = 12
     Top = 12
-    Width = 107
+    Width = 144
     Height = 13
-    Caption = '&Thumbnail size (WxH):'
+    Caption = '&Tamanho da miniatura (WxH):'
     FocusControl = eThumbSizeX
   end
   object lThumbSizeX: TLabel [3]
@@ -36,25 +38,25 @@ inherited dPhoAProps: TdPhoAProps
   object lThumbQuality: TLabel [4]
     Left = 136
     Top = 12
-    Width = 87
+    Width = 114
     Height = 13
-    Caption = '&Thumbnail quality:'
+    Caption = '&Qualidade da miniatura:'
     FocusControl = tbThumbQuality
   end
   object lThQuality1: TLabel [5]
     Left = 136
     Top = 60
-    Width = 39
+    Width = 75
     Height = 26
-    Caption = 'lower'#13#10'less size'
+    Caption = 'baixa'#13#10'menor tamanho'
   end
   object lThQuality2: TLabel [6]
-    Left = 316
+    Left = 302
     Top = 60
-    Width = 57
+    Width = 71
     Height = 26
     Alignment = taRightJustify
-    Caption = 'higher'#13#10'greater size'
+    Caption = 'alta'#13#10'maior tamanho'
   end
   inherited pButtonsBottom: TPanel
     Top = 261
@@ -65,7 +67,7 @@ inherited dPhoAProps: TdPhoAProps
       35)
     inherited bCancel: TButton
       Left = 227
-      Caption = 'Close'
+      Caption = 'Fechar'
       TabOrder = 1
     end
     inherited bOK: TButton
@@ -74,6 +76,7 @@ inherited dPhoAProps: TdPhoAProps
     end
     inherited bHelp: TButton
       Left = 305
+      Caption = 'Ajuda'
     end
   end
   object mDesc: TMemo [8]
@@ -209,5 +212,23 @@ inherited dPhoAProps: TdPhoAProps
       0B0048656C704B6579776F726405000000190400000904000007040000160400
       0022040000040048696E74050000001904000009040000070400001604000022
       0400000000000000000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 36
+    Top = 260
+    LangData = {
+      0A006450686F4150726F7073010100000003000000070043617074696F6E0110
+      000000080064746C734D61696E000008006276426F74746F6D00000E00704275
+      74746F6E73426F74746F6D000007006243616E63656C01010000000C00000007
+      0043617074696F6E000300624F4B01010000000F000000070043617074696F6E
+      0005006248656C70010100000012000000070043617074696F6E0005006C4465
+      7363010100000015000000070043617074696F6E000A006C5468756D6253697A
+      65010100000018000000070043617074696F6E000B006C5468756D6253697A65
+      5801010000001B000000070043617074696F6E000D006C5468756D625175616C
+      69747901010000001E000000070043617074696F6E000B006C54685175616C69
+      747931010100000021000000070043617074696F6E000B006C54685175616C69
+      747932010100000024000000070043617074696F6E0005006D4465736300000E
+      0074625468756D625175616C69747900000B00655468756D6253697A65580000
+      0B00655468756D6253697A65590000}
   end
 end

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.6 2004-05-20 11:50:54 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.7 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -31,6 +31,7 @@ type
     bAdvanced: TButton;
     tvMain: TVirtualExplorerTree;
     dtlsMain: TDTLanguageSwitcher;
+    dklcMain: TDKLanguageController;
     procedure tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);
     procedure bAdvancedClick(Sender: TObject);
     procedure tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);

@@ -1,7 +1,7 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
-  Left = 543
-  Top = 209
-  Caption = 'Select picture group'
+  Left = 508
+  Top = 182
+  Caption = 'Selecionar grupo'
   ClientHeight = 435
   ClientWidth = 473
   OldCreateOrder = True
@@ -12,7 +12,7 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Top = 12
     Width = 33
     Height = 13
-    Caption = '&Group:'
+    Caption = '&Grupo:'
     FocusControl = tvGroups
   end
   inherited bvBottom: TBevel
@@ -58,12 +58,14 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
       35)
     inherited bCancel: TButton
       Left = 313
+      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 233
     end
     inherited bHelp: TButton
       Left = 391
+      Caption = 'Ajuda'
     end
   end
   inherited dtlsMain: TDTLanguageSwitcher
@@ -103,5 +105,17 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
       0000000800747647726F757073020000000B0048656C704B6579776F72640500
       00001904000009040000070400001604000022040000040048696E7405000000
       19040000090400000704000016040000220400000000000000000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 48
+    Top = 36
+    LangData = {
+      0D006453656C50686F6147726F7570010100000003000000070043617074696F
+      6E0108000000080064746C734D61696E000008006276426F74746F6D00000E00
+      70427574746F6E73426F74746F6D000007006243616E63656C01010000000C00
+      0000070043617074696F6E000300624F4B01010000000F000000070043617074
+      696F6E0005006248656C70010100000012000000070043617074696F6E000600
+      6C47726F7570010100000015000000070043617074696F6E000800747647726F
+      7570730000}
   end
 end

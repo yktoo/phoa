@@ -5,7 +5,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     Width = 576
     Height = 94
     Align = alBottom
-    Caption = 'File selection filter'
+    Caption = 'Filtro de sele'#1079#1075'o'
     TabOrder = 1
     Visible = False
     DesignSize = (
@@ -14,33 +14,33 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     object lFileDateFrom: TLabel
       Left = 12
       Top = 68
-      Width = 88
+      Width = 127
       Height = 13
-      Caption = '&File modified from:'
+      Caption = '&Arquivo modificado desde:'
       FocusControl = eFileDateFrom
     end
     object lFileMasks: TLabel
       Left = 12
       Top = 44
-      Width = 139
+      Width = 170
       Height = 13
-      Caption = '&File masks (delimited with '#39';'#39'):'
+      Caption = '&Tipo de arquivo (delimitado com '#39';'#39'):'
       FocusControl = cbFileMasks
     end
     object lPresence: TLabel
       Left = 12
       Top = 20
-      Width = 110
+      Width = 94
       Height = 13
-      Caption = '&Photo album presence:'
+      Caption = '&Presen'#1079'a no album:'
       FocusControl = cbPresence
     end
     object lFileDateTo: TLabel
       Left = 352
       Top = 68
-      Width = 14
+      Width = 20
       Height = 13
-      Caption = '&to:'
+      Caption = 'at&'#1081':'
       FocusControl = eFileDateTo
     end
     object cbFileMasks: TComboBox
@@ -67,9 +67,9 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       TabOrder = 0
       OnChange = PageDataChange
       Items.Strings = (
-        'Disregard'
-        'Only files which are absent at the photo album'
-        'Only files which are present at the photo album')
+        'Descartar'
+        'Somente arquivos ausentes no '#1073'lbum'
+        'Somente arquivos presentes no '#1073'lbum')
     end
     object eFileDateFrom: TDateEdit
       Left = 184
@@ -130,7 +130,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Top = 3
       Width = 221
       Height = 17
-      Caption = '&Recurse subfolders'
+      Caption = 'Incluir &subdiret'#1091'rios'
       TabOrder = 0
       OnClick = PageDataChange
     end
@@ -216,7 +216,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       end>
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 8
     Top = 24
     LangData = {
@@ -339,5 +339,24 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       74680500000019040000090400000704000016040000220400001A005368656C
       6C436F6E746578745375624D656E7543617074696F6E05000000190400000904
       00000704000016040000220400000000000000000000}
+  end
+  object dklcMain: TDKLanguageController
+    Left = 36
+    Top = 24
+    LangData = {
+      19006672577A5061676541646446696C65735F53656C46696C65730001100000
+      00080064746C734D61696E00000800676246696C746572010100000007000000
+      070043617074696F6E000D006C46696C654461746546726F6D01010000000A00
+      0000070043617074696F6E000A006C46696C654D61736B7301010000000D0000
+      00070043617074696F6E0009006C50726573656E636501010000001000000007
+      0043617074696F6E000B006C46696C6544617465546F01010000001300000007
+      0043617074696F6E000B00636246696C654D61736B7301010000001700000004
+      0054657874000A00636250726573656E636501010000001D0000000500497465
+      6D73000D006546696C654461746546726F6D00000B006546696C654461746554
+      6F00000D006546696C6554696D6546726F6D01020000002A0000000800456469
+      744D61736B2C000000040054657874000B006546696C6554696D65546F010200
+      00002F0000000800456469744D61736B31000000040054657874000500704D61
+      696E00001000636252656375727365466F6C6465727301010000003700000007
+      0043617074696F6E00090062416476616E6365640000060074764D61696E0000}
   end
 end

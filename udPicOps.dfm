@@ -1,7 +1,8 @@
 inherited dPicOps: TdPicOps
-  Top = 211
+  Left = 575
+  Top = 202
   ActiveControl = cbOp
-  Caption = 'Picture operations'
+  Caption = 'Opera'#1079#1093'es com imagens'
   ClientHeight = 433
   ClientWidth = 399
   OldCreateOrder = True
@@ -17,15 +18,15 @@ inherited dPicOps: TdPicOps
     Top = 52
     Width = 33
     Height = 13
-    Caption = '&Group:'
+    Caption = '&Grupo:'
     FocusControl = tvGroups
   end
   object lOp: TLabel [2]
     Left = 12
     Top = 12
-    Width = 52
+    Width = 50
     Height = 13
-    Caption = '&Operation:'
+    Caption = '&Opera'#1079#1075'o:'
     FocusControl = cbOp
   end
   inherited pButtonsBottom: TPanel
@@ -36,12 +37,14 @@ inherited dPicOps: TdPicOps
       35)
     inherited bCancel: TButton
       Left = 239
+      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 159
     end
     inherited bHelp: TButton
       Left = 317
+      Caption = 'Ajuda'
     end
   end
   object cbOp: TComboBox [4]
@@ -56,12 +59,10 @@ inherited dPicOps: TdPicOps
     TabOrder = 1
     OnChange = DlgDataChange
     Items.Strings = (
-      'Move selected pictures to the group specified below'
-      'Copy selected pictures to the group specified below'
-      'Delete selected pictures from the group specified below'
-      
-        'Leave only selected pictures to the group specified below (inter' +
-        'sect)')
+      'Mover as imagens selecionadas para o grupo indicado'
+      'Copiar as imagens selecionadas para o grupo indicado'
+      'Excluir as imagens selecionadas do grupo indicado'
+      'Deixar somente as imagens selecionadas no grupo indicado (corte)')
   end
   object tvGroups: TVirtualStringTree [5]
     Left = 12
@@ -180,5 +181,18 @@ inherited dPicOps: TdPicOps
       6579776F72640500000019040000090400000704000016040000220400000400
       48696E7405000000190400000904000007040000160400002204000000000000
       00000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 48
+    Top = 76
+    LangData = {
+      0700645069634F7073010100000003000000070043617074696F6E010A000000
+      080064746C734D61696E000008006276426F74746F6D00000E0070427574746F
+      6E73426F74746F6D000007006243616E63656C01010000000C00000007004361
+      7074696F6E000300624F4B01010000000F000000070043617074696F6E000500
+      6248656C70010100000012000000070043617074696F6E0006006C47726F7570
+      010100000015000000070043617074696F6E0003006C4F700101000000180000
+      00070043617074696F6E00040063624F7001010000001D00000005004974656D
+      73000800747647726F7570730000}
   end
 end

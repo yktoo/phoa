@@ -1,9 +1,9 @@
 object dAbout: TdAbout
-  Left = 486
-  Top = 301
+  Left = 471
+  Top = 255
   HelpType = htKeyword
   BorderStyle = bsNone
-  Caption = 'About'
+  Caption = 'Sobre o PhoA'
   ClientHeight = 191
   ClientWidth = 363
   Color = clWhite
@@ -66,7 +66,7 @@ object dAbout: TdAbout
     end
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 4
     Top = 160
     LangData = {
@@ -95,5 +95,14 @@ object dAbout: TdAbout
     OnTimer = TheTimerTick
     Left = 32
     Top = 160
+  end
+  object dklcMain: TDKLanguageController
+    Left = 60
+    Top = 160
+    LangData = {
+      06006441626F7574010100000003000000070043617074696F6E010500000008
+      0064746C734D61696E00000500694D61696E000008006C576562736974650000
+      03006C4F4B01010000000C000000070043617074696F6E00080054686554696D
+      65720000}
   end
 end

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.7 2004-06-09 13:55:25 dale Exp $
+//  $Id: phDlg.pas,v 1.8 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -20,6 +20,7 @@ type
     bOK: TButton;
     bHelp: TButton;
     bvBottom: TBevel;
+    dklcMain: TDKLanguageController;
      // ќбработчик событи€ дл€ прив€зывани€ событий TNotifyEvent, измен€ющих данные диалога
     procedure DlgDataChange(Sender: TObject);
     procedure bOKClick(Sender: TObject);

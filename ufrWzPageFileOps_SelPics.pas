@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.4 2004-06-09 12:18:15 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.5 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -33,6 +33,7 @@ type
     rbValidityAny: TRadioButton;
     rbValidityValid: TRadioButton;
     rbValidityInvalid: TRadioButton;
+    dklcMain: TDKLanguageController;
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

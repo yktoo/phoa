@@ -1,9 +1,9 @@
 object PhoaWizardForm: TPhoaWizardForm
-  Left = 424
-  Top = 242
+  Left = 388
+  Top = 213
   AutoScroll = False
   BorderIcons = [biSystemMenu]
-  Caption = '<wizard caption>'
+  Caption = 'Adicionar imagem'
   ClientHeight = 401
   ClientWidth = 592
   Color = clBtnFace
@@ -59,7 +59,7 @@ object PhoaWizardForm: TPhoaWizardForm
       Height = 23
       Anchors = [akTop, akRight]
       Cancel = True
-      Caption = 'Cancel'
+      Caption = 'Cancelar'
       TabOrder = 3
       OnClick = bCancelClick
     end
@@ -69,7 +69,7 @@ object PhoaWizardForm: TPhoaWizardForm
       Width = 75
       Height = 23
       Anchors = [akTop, akRight]
-      Caption = 'Next >'
+      Caption = 'Pr'#1091'xima >'
       Default = True
       TabOrder = 2
       OnClick = bNextClick
@@ -79,7 +79,7 @@ object PhoaWizardForm: TPhoaWizardForm
       Top = 6
       Width = 75
       Height = 23
-      Caption = 'Help'
+      Caption = 'Ajuda'
       TabOrder = 0
       OnClick = bHelpClick
     end
@@ -89,7 +89,7 @@ object PhoaWizardForm: TPhoaWizardForm
       Width = 75
       Height = 23
       Anchors = [akTop, akRight]
-      Caption = '< Back'
+      Caption = '< Voltar'
       TabOrder = 1
       OnClick = bBackClick
     end
@@ -127,7 +127,7 @@ object PhoaWizardForm: TPhoaWizardForm
     end
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 120
     Top = 360
     LangData = {
@@ -174,5 +174,18 @@ object PhoaWizardForm: TPhoaWizardForm
       48656C704B6579776F7264050000001904000009040000070400001604000022
       040000040048696E740500000019040000090400000704000016040000220400
       000000000000000000}
+  end
+  object dklcMain: TDKLanguageController
+    Left = 148
+    Top = 360
+    LangData = {
+      0E0050686F6157697A617264466F726D01010000000300000007004361707469
+      6F6E010C000000080064746C734D61696E000008006276426F74746F6D00000A
+      006276546F7050616E656C00000500704D61696E0000080070427574746F6E73
+      000007006243616E63656C010100000011000000070043617074696F6E000500
+      624E657874010100000014000000070043617074696F6E0005006248656C7001
+      0100000017000000070043617074696F6E000500624261636B01010000001A00
+      0000070043617074696F6E00070070486561646572000008006C48656164696E
+      67010100000020000000070043617074696F6E0005006949636F6E0000}
   end
 end

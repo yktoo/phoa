@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.20 2004-06-22 12:59:58 dale Exp $
+//  $Id: ufImgView.pas,v 1.21 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -150,6 +150,7 @@ type
     aFlipVert: TAction;
     bRotate0: TTBXItem;
     ipmRotate0: TTBXItem;
+    dklcMain: TDKLanguageController;
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);

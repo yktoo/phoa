@@ -1,6 +1,7 @@
 inherited dSelKeywords: TdSelKeywords
-  Top = 213
-  Caption = 'Select keywords'
+  Left = 601
+  Top = 198
+  Caption = 'Selecionar palavra-chave'
   ClientHeight = 431
   ClientWidth = 354
   OldCreateOrder = True
@@ -9,9 +10,9 @@ inherited dSelKeywords: TdSelKeywords
   object lMain: TLabel [0]
     Left = 12
     Top = 12
-    Width = 186
-    Height = 26
-    Caption = '&Select one or more keywords from the complete list:'
+    Width = 101
+    Height = 39
+    Caption = '&Selecionar uma ou mais palavras-chave da lista:'
     WordWrap = True
   end
   inherited bvBottom: TBevel
@@ -24,7 +25,7 @@ inherited dSelKeywords: TdSelKeywords
     Width = 75
     Height = 23
     Anchors = [akLeft, akBottom]
-    Caption = '&Reset'
+    Caption = '&Reiniciar'
     TabOrder = 0
     OnClick = bResetClick
   end
@@ -67,12 +68,14 @@ inherited dSelKeywords: TdSelKeywords
       35)
     inherited bCancel: TButton
       Left = 195
+      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 115
     end
     inherited bHelp: TButton
       Left = 273
+      Caption = 'Ajuda'
     end
   end
   inherited dtlsMain: TDTLanguageSwitcher
@@ -125,5 +128,17 @@ inherited dSelKeywords: TdSelKeywords
       6F7264050000001904000009040000070400001604000022040000040048696E
       7405000000190400000904000007040000160400002204000000000000000000
       00}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 40
+    Top = 40
+    LangData = {
+      0C006453656C4B6579776F726473010100000003000000070043617074696F6E
+      0109000000080064746C734D61696E000008006276426F74746F6D00000E0070
+      427574746F6E73426F74746F6D000007006243616E63656C01010000000C0000
+      00070043617074696F6E000300624F4B01010000000F00000007004361707469
+      6F6E0005006248656C70010100000012000000070043617074696F6E0005006C
+      4D61696E010100000015000000070043617074696F6E00060062526573657401
+      0100000018000000070043617074696F6E00060074764D61696E0000}
   end
 end

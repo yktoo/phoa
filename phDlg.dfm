@@ -1,6 +1,6 @@
 object PhoaDialog: TPhoaDialog
-  Left = 601
-  Top = 295
+  Left = 480
+  Top = 237
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'PhoaDialog'
@@ -72,8 +72,18 @@ object PhoaDialog: TPhoaDialog
     end
   end
   object dtlsMain: TDTLanguageSwitcher
-    Language = 1033
+    Language = 1046
     Left = 4
     Top = 136
+  end
+  object dklcMain: TDKLanguageController
+    Left = 32
+    Top = 136
+    LangData = {
+      0A0050686F614469616C6F67010100000003000000070043617074696F6E0106
+      000000080064746C734D61696E000008006276426F74746F6D00000E00704275
+      74746F6E73426F74746F6D000007006243616E63656C01010000000C00000007
+      0043617074696F6E000300624F4B01010000000F000000070043617074696F6E
+      0005006248656C70010100000012000000070043617074696F6E00}
   end
 end

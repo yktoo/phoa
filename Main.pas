@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.30 2004-08-14 14:12:06 dale Exp $
+//  $Id: Main.pas,v 1.31 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,7 +14,7 @@ uses
   ActiveX, XPMan,
   VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt, DTLangTools,
   TB2MRU, TBXExtItems, Menus, TBX, ActnList, TBXStatusBars, TBXLists,
-  TB2Dock, TB2Toolbar;
+  TB2Dock, TB2Toolbar, StdCtrls;
 
 type
   TfMain = class(TForm, IPhoaViews)
@@ -184,6 +184,8 @@ type
     tvGroups: TVirtualStringTree;
     aRemoveSearchResults: TAction;
     iRemoveSearchResults: TTBXItem;
+    dklcMain: TDKLanguageController;
+    cbLng: TComboBox;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -249,6 +251,7 @@ type
     procedure aaHelpFAQ(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure aaRemoveSearchResults(Sender: TObject);
+    procedure cbLngChange(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -1150,7 +1153,10 @@ uses
   end;
 
   procedure TfMain.FormCreate(Sender: TObject);
+var i: Integer;
   begin
+for i := 0 to LangManager.LanguageCount-1 do
+  fMain.cbLng.AddItem(LangManager.LanguageNames[i], Pointer(LangManager.LanguageIDs[i]));
     try
       ShowProgressInfo('SMsg_Initializing', []);
       ShortTimeFormat := 'hh:nn';
@@ -1897,4 +1903,14 @@ uses
     StartViewMode(Msg.InitFlags);
   end;
 
+procedure TfMain.cbLngChange(Sender: TObject);
+begin
+LangManager.LanguageID := Integer(cbLng.Items.Objects[cbLng.ItemIndex]);
+end;
+
+initialization
+  LangManager.RegisterLangFile('phoa-rus.lng');
+  LangManager.RegisterLangFile('phoa-ukr.lng');
+  LangManager.RegisterLangFile('phoa-deu.lng');
+  LangManager.RegisterLangFile('phoa-brp.lng');
 end.

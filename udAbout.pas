@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.4 2004-05-21 16:34:53 dale Exp $
+//  $Id: udAbout.pas,v 1.5 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -21,6 +21,7 @@ type
     lWebsite: TLabel;
     lOK: TLabel;
     TheTimer: TTimer;
+    dklcMain: TDKLanguageController;
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure lWebsiteClick(Sender: TObject);
     procedure lOKClick(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.5 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -33,6 +33,7 @@ type
     tbSep1: TTBXSeparatorItem;
     aCheckedOnly: TAction;
     bCheckedOnly: TTBXItem;
+    dklcMain: TDKLanguageController;
     procedure aaAdd(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);

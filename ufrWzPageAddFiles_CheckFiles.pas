@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.4 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -27,6 +27,7 @@ type
     ipmFilesUncheckAll: TTBXItem;
     ipmFilesCheckAll: TTBXItem;
     dtlsMain: TDTLanguageSwitcher;
+    dklcMain: TDKLanguageController;
     procedure tvFilesChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvFilesGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);

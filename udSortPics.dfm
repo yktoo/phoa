@@ -1,5 +1,7 @@
 inherited dSortPics: TdSortPics
-  Caption = 'Sort pictures'
+  Left = 589
+  Top = 254
+  Caption = 'Classificar imagens'
   ClientHeight = 344
   ClientWidth = 398
   OldCreateOrder = True
@@ -15,7 +17,7 @@ inherited dSortPics: TdSortPics
     Width = 75
     Height = 23
     Anchors = [akRight, akBottom]
-    Caption = '&Reset'
+    Caption = '&Reiniciar'
     TabOrder = 0
     OnClick = bResetClick
   end
@@ -28,12 +30,14 @@ inherited dSortPics: TdSortPics
       35)
     inherited bCancel: TButton
       Left = 240
+      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 160
     end
     inherited bHelp: TButton
       Left = 318
+      Caption = 'Ajuda'
     end
   end
   object gbWhereToSort: TGroupBox [3]
@@ -42,14 +46,14 @@ inherited dSortPics: TdSortPics
     Width = 373
     Height = 69
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Where to sort pictures'
+    Caption = 'Onde classificar imagens'
     TabOrder = 2
     object rbCurGroup: TRadioButton
       Left = 16
       Top = 20
       Width = 345
       Height = 17
-      Caption = 'In t&he current group'
+      Caption = 'No &corrente grupo'
       TabOrder = 0
       OnClick = DlgDataChange
     end
@@ -58,7 +62,7 @@ inherited dSortPics: TdSortPics
       Top = 40
       Width = 345
       Height = 17
-      Caption = 'In &all photo album groups'
+      Caption = 'Em &todos os grupos do '#1073'lbum'
       TabOrder = 1
       OnClick = DlgDataChange
     end
@@ -72,7 +76,7 @@ inherited dSortPics: TdSortPics
     TabOrder = 3
     inherited lMain: TLabel
       Width = 372
-      Caption = '&Sort pictures by:'
+      Caption = '&Classificar imagens por:'
     end
     inherited tvMain: TVirtualStringTree
       Width = 372
@@ -90,20 +94,20 @@ inherited dSortPics: TdSortPics
     end
     inherited pmMain: TTBXPopupMenu
       inherited ipmsmProp: TTBXSubmenuItem
-        Caption = '&Picture property'
+        Caption = '&Propriedade da imagem'
       end
       inherited ipmDelete: TTBXItem
-        Caption = '&Delete'
+        Caption = '&Excluir'
       end
       inherited ipmMoveUp: TTBXItem
-        Caption = 'Move &up'
+        Caption = 'Mover &para cima'
       end
       inherited ipmMoveDown: TTBXItem
-        Caption = 'Move do&wn'
+        Caption = 'Mover &para baixo'
       end
     end
   end
-  inherited dtlsMain: TDTLanguageSwitcher
+  inherited dtlsMain: TDTLanguageSwitcher [5]
     Left = 20
     Top = 172
     LangData = {
@@ -197,5 +201,25 @@ inherited dSortPics: TdSortPics
       1100D32026EFEEF2EEF7EDB3E920E3F0F3EFB30B0048656C704B6579776F7264
       050000001904000009040000070400001604000022040000040048696E740500
       000019040000090400000704000016040000220400000000000000000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 20
+    Top = 216
+    LangData = {
+      090064536F727450696373010100000003000000070043617074696F6E010B00
+      0000080064746C734D61696E000008006276426F74746F6D00000E0070427574
+      746F6E73426F74746F6D000007006243616E63656C01010000000C0000000700
+      43617074696F6E000300624F4B01010000000F000000070043617074696F6E00
+      05006248656C70010100000012000000070043617074696F6E00060062526573
+      6574010100000015000000070043617074696F6E000D0067625768657265546F
+      536F7274010100000018000000070043617074696F6E000A0072624375724772
+      6F757001010000001B000000070043617074696F6E000B007262416C6C47726F
+      75707301010000001E000000070043617074696F6E0009006672536F7274696E
+      6700010800000005006C4D61696E010100000023000000070043617074696F6E
+      00060074764D61696E00000600706D4D61696E0000090069706D736D50726F70
+      010100000027000000070043617074696F6E00090069706D44656C6574650101
+      00000029000000070043617074696F6E00060069706D5365700000090069706D
+      4D6F7665557001010000002C000000070043617074696F6E000B0069706D4D6F
+      7665446F776E01010000002E000000070043617074696F6E00}
   end
 end

@@ -1,7 +1,7 @@
 inherited dViewProps: TdViewProps
-  Left = 590
-  Top = 209
-  Caption = 'Properties: photo album view'
+  Left = 573
+  Top = 176
+  Caption = 'Propriedades: visualiza'#1079#1075'o do '#1073'lbum'
   ClientHeight = 435
   ClientWidth = 426
   OldCreateOrder = True
@@ -16,15 +16,15 @@ inherited dViewProps: TdViewProps
     Top = 12
     Width = 31
     Height = 13
-    Caption = '&Name:'
+    Caption = '&Nome:'
     FocusControl = eName
   end
   object lGrouping: TLabel [2]
     Left = 12
     Top = 52
-    Width = 111
+    Width = 180
     Height = 13
-    Caption = '&Picture grouping order:'
+    Caption = '&Ordem de agrupamento das imagens:'
   end
   inherited pButtonsBottom: TPanel
     Top = 400
@@ -34,12 +34,14 @@ inherited dViewProps: TdViewProps
       35)
     inherited bCancel: TButton
       Left = 266
+      Caption = 'Cancelar'
     end
     inherited bOK: TButton
       Left = 186
     end
     inherited bHelp: TButton
       Left = 344
+      Caption = 'Ajuda'
     end
   end
   object eName: TEdit [4]
@@ -105,7 +107,7 @@ inherited dViewProps: TdViewProps
     TabOrder = 3
     inherited lMain: TLabel
       Width = 402
-      Caption = '&Sort pictures in each group by:'
+      Caption = '&Classificar imagem em cada grupo por:'
     end
     inherited tvMain: TVirtualStringTree
       Width = 402
@@ -125,20 +127,20 @@ inherited dViewProps: TdViewProps
     end
     inherited pmMain: TTBXPopupMenu
       inherited ipmsmProp: TTBXSubmenuItem
-        Caption = '&Picture property'
+        Caption = '&Propriedade da imagem'
       end
       inherited ipmDelete: TTBXItem
-        Caption = '&Delete'
+        Caption = '&Excluir'
       end
       inherited ipmMoveUp: TTBXItem
-        Caption = 'Move &up'
+        Caption = 'Mover &para cima'
       end
       inherited ipmMoveDown: TTBXItem
-        Caption = 'Move do&wn'
+        Caption = 'Mover &para baixo'
       end
     end
   end
-  inherited dtlsMain: TDTLanguageSwitcher
+  inherited dtlsMain: TDTLanguageSwitcher [7]
     Left = 72
     Top = 104
     LangData = {
@@ -264,15 +266,38 @@ inherited dViewProps: TdViewProps
       1604000022040000040048696E74050000001904000009040000070400001604
       0000220400000000000000000000}
   end
+  inherited dklcMain: TDKLanguageController
+    Left = 112
+    Top = 104
+    LangData = {
+      0A00645669657750726F7073010100000003000000070043617074696F6E0111
+      000000080064746C734D61696E000008006276426F74746F6D00000E00704275
+      74746F6E73426F74746F6D000007006243616E63656C01010000000C00000007
+      0043617074696F6E000300624F4B01010000000F000000070043617074696F6E
+      0005006248656C70010100000012000000070043617074696F6E0005006C4E61
+      6D65010100000015000000070043617074696F6E0009006C47726F7570696E67
+      010100000018000000070043617074696F6E000500654E616D6500000A007476
+      47726F7570696E67000009006672536F7274696E6700010800000005006C4D61
+      696E010100000024000000070043617074696F6E00060074764D61696E000006
+      00706D4D61696E0000090069706D736D50726F70010100000028000000070043
+      617074696F6E00090069706D44656C65746501010000002A0000000700436170
+      74696F6E00060069706D5365700000090069706D4D6F7665557001010000002D
+      000000070043617074696F6E000B0069706D4D6F7665446F776E01010000002F
+      000000070043617074696F6E000A00706D47726F7570696E670000090069706D
+      736D50726F70010100000031000000070043617074696F6E00090069706D4465
+      6C657465010100000033000000070043617074696F6E00060069706D53657000
+      00090069706D4D6F76655570010100000036000000070043617074696F6E000B
+      0069706D4D6F7665446F776E010100000038000000070043617074696F6E00}
+  end
   object pmGrouping: TTBXPopupMenu
     Images = fMain.ilActionsSmall
     Left = 32
     Top = 104
     object ipmsmProp: TTBXSubmenuItem
-      Caption = '&Picture property'
+      Caption = '&Propriedad da imagem'
     end
     object ipmDelete: TTBXItem
-      Caption = '&Delete'
+      Caption = '&Excluir'
       ImageIndex = 7
       ShortCut = 46
       OnClick = ipmDeleteClick
@@ -280,13 +305,13 @@ inherited dViewProps: TdViewProps
     object ipmSep: TTBXSeparatorItem
     end
     object ipmMoveUp: TTBXItem
-      Caption = 'Move &up'
+      Caption = 'Mover &para cima'
       ImageIndex = 55
       ShortCut = 16422
       OnClick = ipmMoveUpClick
     end
     object ipmMoveDown: TTBXItem
-      Caption = 'Move do&wn'
+      Caption = 'Mover &para baixo'
       ImageIndex = 56
       ShortCut = 16424
       OnClick = ipmMoveDownClick

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.5 2004-06-06 13:26:00 dale Exp $
+//  $Id: udMsgBox.pas,v 1.6 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -18,6 +18,7 @@ type
     iIcon: TImage;
     lMessage: TLabel;
     cbDontShowAgain: TCheckBox;
+    dklcMain: TDKLanguageController;
   private
      // Вид сообщения
     FKind: TMessageBoxKind;

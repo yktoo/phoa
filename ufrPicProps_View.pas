@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.13 2004-06-14 10:32:01 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.14 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -51,6 +51,7 @@ type
     gipmToolsToolbar: TTBGroupItem;
     gipmMainToolbar: TTBGroupItem;
     ipmSep: TTBXSeparatorItem;
+    dklcMain: TDKLanguageController;
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);

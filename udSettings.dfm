@@ -1,7 +1,7 @@
 inherited dSettings: TdSettings
-  Left = 384
-  Top = 209
-  Caption = 'Program settings'
+  Left = 357
+  Top = 178
+  Caption = 'Op'#1079#1093'es'
   ClientHeight = 435
   ClientWidth = 632
   OldCreateOrder = True
@@ -58,13 +58,14 @@ inherited dSettings: TdSettings
       35)
     inherited bCancel: TButton
       Left = 473
-      Caption = 'Close'
+      Caption = 'Fechar'
     end
     inherited bOK: TButton
       Left = 393
     end
     inherited bHelp: TButton
       Left = 551
+      Caption = 'Ajuda'
     end
   end
   inherited dtlsMain: TDTLanguageSwitcher
@@ -104,6 +105,19 @@ inherited dSettings: TdSettings
       00000B0048656C704B6579776F72640400000019040000070400001604000022
       040000040048696E740400000019040000070400001604000022040000000000
       0000000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 60
+    Top = 400
+    LangData = {
+      09006453657474696E6773010100000003000000070043617074696F6E010B00
+      0000080064746C734D61696E000008006276426F74746F6D00000E0070427574
+      746F6E73426F74746F6D000007006243616E63656C01010000000C0000000700
+      43617074696F6E000300624F4B01010000000F000000070043617074696F6E00
+      05006248656C70010100000012000000070043617074696F6E000500704D6169
+      6E00000500646B4E61760000050074624E61760000070070456469746F720000
+      060066704D61696E01020000001D0000000B00496E6946696C654E616D651E00
+      00000A00496E6953656374696F6E00}
   end
   object fpMain: TFormPlacement
     IniFileName = '\\\'

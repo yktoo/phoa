@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.6 2004-06-01 14:05:04 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.7 2004-08-29 19:15:28 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -22,6 +22,7 @@ type
     pmMain: TTBXPopupMenu;
     ipmShowDescPanel: TTBXVisibilityToggleItem;
     dtlsMain: TDTLanguageSwitcher;
+    dklcMain: TDKLanguageController;
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);

@@ -1,7 +1,7 @@
 inherited dSearch: TdSearch
-  Left = 491
-  Top = 209
-  Caption = 'Find pictures'
+  Left = 462
+  Top = 195
+  Caption = 'Procurar imagem'
   ClientHeight = 435
   ClientWidth = 525
   OldCreateOrder = True
@@ -10,9 +10,9 @@ inherited dSearch: TdSearch
   object lCriteria: TLabel [0]
     Left = 12
     Top = 52
-    Width = 73
+    Width = 99
     Height = 13
-    Caption = '&Search criteria:'
+    Caption = '&Crit'#1081'rio de pesquisa:'
   end
   inherited bvBottom: TBevel
     Top = 398
@@ -64,14 +64,14 @@ inherited dSearch: TdSearch
     Width = 502
     Height = 41
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Perform search'
+    Caption = 'Realizar pesquisa'
     TabOrder = 0
     object rbAll: TRadioButton
       Left = 16
       Top = 16
       Width = 137
       Height = 17
-      Caption = 'In the &photo album'
+      Caption = 'No &'#1073'lbum'
       Checked = True
       TabOrder = 0
       TabStop = True
@@ -82,7 +82,7 @@ inherited dSearch: TdSearch
       Top = 16
       Width = 145
       Height = 17
-      Caption = 'In the &current group'
+      Caption = 'No grup&o corrente'
       TabOrder = 1
       OnClick = DlgDataChange
     end
@@ -91,7 +91,7 @@ inherited dSearch: TdSearch
       Top = 16
       Width = 189
       Height = 17
-      Caption = 'In the search &results'
+      Caption = 'No &resultado da busca'
       TabOrder = 2
       OnClick = DlgDataChange
     end
@@ -105,20 +105,22 @@ inherited dSearch: TdSearch
       35)
     inherited bCancel: TButton
       Left = 364
+      Caption = 'Cancela'
     end
     inherited bOK: TButton
       Left = 284
-      Caption = 'Find'
+      Caption = 'Procurar'
     end
     inherited bHelp: TButton
       Left = 442
+      Caption = 'Ajuda'
     end
     object bReset: TButton
       Left = 8
       Top = 6
       Width = 75
       Height = 23
-      Caption = '&Reset'
+      Caption = '&Reiniciar'
       TabOrder = 3
       OnClick = bResetClick
     end
@@ -191,5 +193,21 @@ inherited dSearch: TdSearch
       48656C704B6579776F7264050000001904000009040000070400001604000022
       040000040048696E740500000019040000090400000704000016040000220400
       000000000000000000}
+  end
+  inherited dklcMain: TDKLanguageController
+    Left = 432
+    Top = 100
+    LangData = {
+      070064536561726368010100000003000000070043617074696F6E010D000000
+      080064746C734D61696E000008006276426F74746F6D00000E0070427574746F
+      6E73426F74746F6D000007006243616E63656C01010000000C00000007004361
+      7074696F6E000300624F4B01010000000F000000070043617074696F6E000500
+      6248656C70010100000012000000070043617074696F6E0009006C4372697465
+      726961010100000015000000070043617074696F6E000A007476437269746572
+      696100000800676253656172636801010000001B000000070043617074696F6E
+      0005007262416C6C01010000001E000000070043617074696F6E000A00726243
+      757247726F7570010100000021000000070043617074696F6E000F0072625365
+      61726368526573756C7473010100000024000000070043617074696F6E000600
+      625265736574010100000027000000070043617074696F6E00}
   end
 end
