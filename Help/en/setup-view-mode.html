@@ -1,4 +1,4 @@
-<html><!-- $Id: setup-view-mode.html,v 1.3 2004-05-11 03:35:12 dale Exp $ -->
+<html><!-- $Id: setup-view-mode.html,v 1.4 2004-05-16 11:35:09 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <title>Program settings :: View mode</title>
@@ -16,13 +16,17 @@
 
   <h3>Fullscreen mode</h3>
   <p align=justify>When entering view mode the program will set up the fullscreen mode when all other screen elements are hidden
-    (including the Taskbar). This can be overriden with <b>F</b> ley or by clicking middle mouse button.
+    (including the Taskbar). This can be overriden with the <b>F</b> key or by clicking middle mouse button.
+
+  <h3>Keep mouse cursor over the toolbar button on window resize</h3>
+  <p align=justify>If on, the mouse cursor stays at the same point of the viewer toolbar when the window resizes. This allows you to
+    click buttons (such as <b>Next picture</b> or <b>Zoom out</b>) multiple times without having to move the mouse.
 
   <h3>Hide mouse cursor in fullscreen</h3>
   <p align=justify>When entering fullscreen mode the program will turn off mouse pointer.
 
   <h3>Window background color</h3>
-  <p align=justify>Determines color for filling viewing window background. The default is black.
+  <p align=justify>Determines color for filling the viewing window background. The default is black.
 
   <h3>Show toolbar</h3>
   <p align=justify>Enables or disables view mode toolbar.
@@ -57,31 +61,34 @@
     depressed).
 
   <h3>Display in window caption</h3>
-  <p align=justify>Allows you to choose which <a href="pic-data.html">picture properties</a> to display in the window caption bar.
+  <p align=justify>Allows you to choose which <a href="pic-data.html">picture properties</a> are to be displayed in the window caption bar.
 
   <h3>Picture resampling filter</h3>
   <p align=justify>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> (scaling) source images when viewing them.
   
   <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> View info</h2>
   
+    <h3>Show picture info</h3>
+    <p align=justify>Enables or disables displaying the information from the properties described below. Can be overriden in the view mode by pressing
+      the <b>F2</b> key.
+
     <h3>Picture properties</h3>
     <p align=justify>Specifies which <a href="pic-data.html">picture properties</a> will be shown in the view mode.
   
     <h3>Font</h3>
-    <p align=justify>Determines which font will be used for drawing the picture info in view mode.
+    <p align=justify>Determines which font will be used for drawing the picture info.
   
     <h3>Background color</h3>
     <p align=justify>Specifies the color of information bar background. See the next option.
   
     <h3>Background opacity</h3>
-    <p align=justify>Value ranging from 0 (transparent, ie nonexistent background) to 255 (opaque). Allows to adjust the translucence of information bar
-      background.
+    <p align=justify>Value ranging from 0 (transparent) to 255 (opaque). Allows to adjust the translucence of information bar background.
   
   <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Slide show</h2>
 
     <h3>Display time</h3>
     <p align=justify>Determines time intervals (in milliseconds) between picture changes in Slide Show mode (this mode is activated
-      by pressing <b>Pause</b> key in the view mode, with the toolbutton or by context menu).
+      by pressing the <b>Pause</b> key in the view mode, with the toolbar button or by context menu).
   
     <h3>Cyclic</h3>
     <p align=justify>When on, <b>PhoA</b> automatically rewinds to the first picture in the group after showing the last in Slide Show mode,
