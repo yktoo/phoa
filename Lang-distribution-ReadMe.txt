@@ -1,4 +1,4 @@
-$Id: Lang-distribution-ReadMe.txt,v 1.5 2004-11-09 15:07:46 dale Exp $
+$Id: Lang-distribution-ReadMe.txt,v 1.6 2004-11-11 13:15:27 dale Exp $
 --------------------------------------------------------------------------------
 Dmitry Kann :: http://www.dk-soft.org/
 Notes on language files distribution
@@ -16,7 +16,7 @@ Please send the translation you made to the address: phoa@narod.ru (specifying
 [no-spam] in the subject line will give much more chances to bypass the spam
 filter) so I can publish it for public access.
 
-Please do not forgive to:
+Please do not forget to:
   - Select an appropriate Target Language for the language you are translating
     to.
   - Correctly specify the program version the translation is for.
