@@ -2,7 +2,7 @@ LANGID=1031
 TargetApplication=PhoA 1.1.5 beta
 Author=Dominik Mayer <dominik.mayer@web.de>
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-03 19:56:12
+LastModified=2004-09-03 20:30:19
 
 [frWzPageFileOps_SelTask]
 00000007=Kopiert die Dateien der ausgewählten Bilder, in den angegebenen Ordner. Verwenden Sie diese Option, um Fotoalben für das schreiben auf CD oder DVD vorzubereiten.
@@ -852,6 +852,7 @@ SFileFilter_Ini=Ini-Dateien (*.ini)|*.ini
 SFileFilter_OpenPhoa=Fotoalbum Dateien (*.phoa)|*.phoa|Alle Dateien (*.*)|*.*
 SGroup_UnclassifiedInOwnFolder=Unklassifiziert in eigenem Ordner
 SHelpFileName=phoa-eng.chm
+SImgView_ErrorMsg=FEHLER
 SInfo_SearchStringNotFound=Gesuchter Begriff nicht gefunden
 SLogEntry_AddingError=Hinzufügen von %s gescheitert: %s
 SLogEntry_AddingOK=%s erfolgreich hinzugefügt. Datum: %s. Zeit: %s. Transformation: %s.
