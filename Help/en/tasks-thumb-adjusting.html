@@ -1,17 +1,38 @@
-<!-- $Id: tasks-thumb-adjusting.html,v 1.2 2005-03-12 14:35:15 dale Exp $ -->
+<!-- $Id: tasks-thumb-adjusting.html,v 1.3 2005-03-23 17:06:54 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Configuring thumbnail dimensions and quality]}
 
-<p align=justify>Эскизы, создаваемые программой, по умолчанию имеют размер 150х150 пиксел и качество примерно 40% от
-  максимума.
+<p align=justify>Thumbnails created by the program are by default of size 150x150 pixels and quality about 40% max.
 
-<p align=justify>Эти значения сохраняются индивидально для каждого фотоальбома, и вы можете изменить их в его свойствах.
+<p align=justify>These values are stored on a per-album basis, and you can modify them in photo album properties.
 
-{[%hh_h2:Изменение параметров эскизов]}
+{[%hh_h2:Changing thumbnail parameters]}
 <ol>
-  <li>Выделите в дереве групп корневой узел (узел Фотоальбом).
-  <li>Выберите пункт меню <b>Правка | Изменить...</b> &mdash; появится диалоговое окно свойств фотоальбома.
-  <li>Задайте требуемые параметры эскизов.
-  <li>Сохраните изменения, нажав <b>ОК</b>.
+  <li>Highlight the root node in the group tree (<b>Photo Album</b> node).
+  <li>Select the <b>Edit | Edit...</b> menu item, the Photo album properties dialog will appear.
+  <li>Specify thumbnail parameters as needed.
+  <li>Save changes clicking <b>OK</b>.
 </ol>
+
+<p align=justify>However, changing thumbnail parameters itself affects only newly added pictures, and has no effect on
+  existing pictures. In order to have those thumbnais having the same characteristics, you should <i>rebuild</i> them.
+
+{[%hh_h2:Rebuilding thumbnails]}
+
+<p align=justify>You rebuild thumbnails in <b>PhoA</b> using the File operations wizard:
+
+<ol>
+  <li>Run the <b>File operations wizard</b>. You do it using the <b>Tools | File operations...</b> menu item.
+
+  <li>On the first page of the wizard select <b>Rebuild thumbnails</b> and click <b>Next</b>.
+
+  <li>As long as changing thumbnail parameters should affect all of the photo album thumbnails, choose <b>All pictures
+      in the photo album</b>.
+
+  <li>After clicking <b>Next</b> the program will start rebuilding thumbnails for all pictures.
+</ol>
+
+{[%hh_seealso_en]}
+  <a href="intf-album-props.html">Photo album properties dialog</a><br>
+  <a href="intf-file-ops-task-rthumb.html">Rebuild thumbnails operation</a><br>
 
 {[%hh_ftr_en]}
