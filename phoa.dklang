@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.39 2004-12-06 20:22:45 dale Exp $
+;  $Id: phoa.dklang,v 1.40 2004-12-07 14:54:31 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -608,6 +608,32 @@ lID.Caption=00000021,&ID:
 lText.Caption=00000024,&Text:
 lDesc.Caption=00000027,&Description:
 
+[frExprPicFilter]
+tbExprMain.Caption=00000001,Toolbar
+smInsertProp.Caption=00000002,Insert propert&y
+smInsertProp.Hint=00000003,Insert a picture property into the expression
+smInsertOperator.Caption=00000004,Insert &operator
+smInsertOperator.Hint=00000005,Insert an operator into the expression
+aNew.Caption=00000009,&New
+aNew.Hint=00000010,New|Clear the expression
+aOpen.Caption=00000012,&Open...
+aOpen.Hint=00000013,Open...|Open a text file containing the search expression
+aSaveAs.Caption=00000015,Save &as...
+aSaveAs.Hint=00000016,Save as...|Save the expression to a file
+aCut.Caption=00000018,&Cut
+aCut.Hint=00000019,Cut|Cut selected text to the clipboard
+aCopy.Caption=00000021,Co&py
+aCopy.Hint=00000022,Copy|Copy selected text to the clipboard
+aPaste.Caption=00000024,&Paste
+aPaste.Hint=00000025,Paste|Paste text from the clipboard
+aUndo.Caption=00000027,&Undo
+aUndo.Hint=00000028,Undo|Undo the last change
+aRedo.Caption=00000030,&Redo
+aRedo.Hint=00000031,Redo|Redo the last undone change
+aSyntaxCheck.Caption=00000033,Syntax check
+aSyntaxCheck.Hint=00000034,Syntax check the expression
+scpMain.Title=00000038,Properties
+
 [$CONSTANTS]
 dfpArchive=Archive
 dfpCompressed=Compressed
@@ -1073,30 +1099,3 @@ TPhoaOp_ViewDelete=Delete view
 TPhoaOp_ViewEdit=Edit view
 TPhoaOp_ViewMakeGroup=Make group from view
 TPhoaOp_ViewNew=Create view
-
-[frExprPicFilter]
-tbExprMain.Caption=00000001,Toolbar
-smInsertProp.Caption=00000002,Insert propert&y
-smInsertProp.Hint=00000003,Insert a picture property into the expression
-smInsertOperator.Caption=00000004,Insert &operator
-smInsertOperator.Hint=00000005,Insert an operator into the expression
-aNew.Caption=00000009,&New
-aNew.Hint=00000010,New|Clear the expression
-aOpen.Caption=00000012,&Open...
-aOpen.Hint=00000013,Open...|Open a text file containing the search expression
-aSaveAs.Caption=00000015,Save &as...
-aSaveAs.Hint=00000016,Save as...|Save the expression to a file
-aCut.Caption=00000018,&Cut
-aCut.Hint=00000019,Cut|Cut selected text to the clipboard
-aCopy.Caption=00000021,Co&py
-aCopy.Hint=00000022,Copy|Copy selected text to the clipboard
-aPaste.Caption=00000024,&Paste
-aPaste.Hint=00000025,Paste|Paste text from the clipboard
-aUndo.Caption=00000027,&Undo
-aUndo.Hint=00000028,Undo|Undo the last change
-aRedo.Caption=00000030,&Redo
-aRedo.Hint=00000031,Redo|Redo the last undone change
-aSyntaxCheck.Caption=00000033,Syntax check
-aSyntaxCheck.Hint=00000034,Syntax check the expression
-scpMain.Title=00000038,Properties
-
