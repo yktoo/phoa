@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.11 2004-10-28 13:10:17 dale Exp $
+rem $Id: _make_.bat,v 1.12 2004-11-02 21:17:48 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -52,6 +52,7 @@ if errorlevel == 1 goto err
 copy phoa-eng.hhp ..\processed
 copy phoa-eng.hhc ..\processed
 copy phoa-eng.hhk ..\processed
+copy browse-mode-chart.png ..\processed
 copy pic-oranization.png ..\processed
 
 cd ..\processed
@@ -72,6 +73,7 @@ if errorlevel == 1 goto err
 copy phoa-rus.hhp ..\processed
 copy phoa-rus.hhc ..\processed
 copy phoa-rus.hhk ..\processed
+copy browse-mode-chart.png ..\processed
 copy pic-oranization.png ..\processed
 
 cd ..\processed
@@ -92,6 +94,7 @@ if errorlevel == 1 goto err
 copy phoa-deu.hhp ..\processed
 copy phoa-deu.hhc ..\processed
 copy phoa-deu.hhk ..\processed
+copy browse-mode-chart.png ..\processed
 copy pic-oranization.png ..\processed
 
 cd ..\processed

@@ -1,32 +1,95 @@
-<!-- $Id: intf-browse-mode-menu-edit.html,v 1.1 2004-10-30 12:07:01 dale Exp $ -->
+<!-- $Id: intf-browse-mode-menu-edit.html,v 1.2 2004-11-02 21:17:49 dale Exp $ -->
 {[%hh_hdr_en:Browse mode menu commands :: Edit menu]}
 
-<p align=justify>This menu gathers photo album editing commands:
-<ul>
-  <li>{[%hh_ii:Undo]} <b>Edit | Undo <i>operation</i></b> menu item rolls back the changes done to the photo album by the indicated (most recent) operation.</li>
-  <li>{[%hh_ii:UndoHistory]} <b>Edit | Undo history</b> submenu contains the changes made list, allowing you to roll back a number of sequential changes at once.</li>
-  <li>{[%hh_ii:Cut]} <b>Edit | Cut</b> menu item removes pictures highlighted and places it into the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>
-     (you can add them later to another picture group).</li>
-  <li>{[%hh_ii:Copy]} Similarly, <b>Edit | Copy</b> menu item copies highlighted pictures to the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>.</li>
-  <li>{[%hh_ii:Paste]} <b>Edit | Paste</b> item adds pictures (if any) from the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a> to the current group.
-      Obviously, you can only add new pictures to a group so all duplicates are skipped. If this is specified in the
-      <a href="setup-dialogs.html">program settings</a>, <b>PhoA</b> notifies you of number of the pictures actually pasted.</li>
-  <li>{[%hh_ii:Edit]} The <i>photo album</i> is the ultimate parent for all the picture groups, and therefore it is the root node of the group tree. The photo
-      album has a text description and it also defines the thumbnail parameters - you can change them in <a href="intf-album-props.html">Photo album
-      properties dialog</a> which appears when you select the <b>Edit | Edit...</b> menu item while photo album node is highlighted.</li>
-  <li>{[%hh_ii:Edit]} A picture group can also be renamed by selecting the <b>Edit | Edit...</b> menu item, but the group node must be highlighted in the tree;
-      alternatively, you can click once on a highlighted group name, or press the <b>F2</b> key. To cancel edit you press the <b>Esc</b> key or
-      the <b>Enter</b> key to apply the new group name.</li>
-  <li>{[%hh_ii:NewGroup]} To add new group you select the <b>Edit | Add group</b> menu item. The group is created as a child to group currently highlighted. When the
-      photo album node is highlighted the group is created in the photo album's root directory. The default group name is &quot;New group&quot;, 
-      you change it by editing it and pressing <b>Enter</b>.</li>
-  <li>{[%hh_ii:Delete]} A group can be deleted by selecting <b>Edit | Delete</b> menu item while folder tree is active.</li>
-  <li>{[%hh_ii:NewPic]} To add pictures to a group you select <b>Edit | Add picture...</b> menu item which invokes <a href="intf-pic-add.html">Add pictures wizard</a>
-      window.</li>
-  <li>{[%hh_ii:Sort]} To arrange (sort) the pictures the <b>Edit | Sort pictures...</b> menu item shows the <a href="intf-sort-pics.html">Sort pictures dialog</a>.</li>
-  <li>{[%hh_ii:SelectAll]} The <b>Edit | Select all</b> highlights all the pictures in the current group.</li>
-  <li>{[%hh_ii:SelectNone]} The <b>Edit | Select none</b> removes the highlighting from all the pictures.</li>
-  <li>{[%hh_ii:ViewMode]} To swith to <a href="intf-view-mode.html">view mode</a> you select the <b>Edit | View</b> menu item or double-click a picture.</li>
-</ul>
+<p align=justify>This menu contains the photo album editing commands, and also commands for switching to the View mode.
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Menu Item</td>
+    <td nowrap>Description</td>
+  </tr>
+  <tr>
+    <td><a name=undo></a><b>{[%hh_ii:Undo]} Undo <i>operation</i></b></td>
+    <td>Rolls back the changes to the photo album caused by indicated (the most recent) operation.</td>
+  </tr>
+  <tr>
+    <td><a name=undo_history></a><b>{[%hh_ii:UndoHistory]} Undo history</b></td>
+    <td>Contains the list of changes made allowing you to roll back a number of sequential changes at once.</td>
+  </tr>
+  <tr>
+    <td><a name=cut></a><b>{[%hh_ii:Cut]} Cut</b></td>
+    <td>Removes highlighted pictures and places them into the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>
+        (you can add them later to another picture group).</td>
+  </tr>
+  <tr>
+    <td><a name=copy></a><b>{[%hh_ii:Copy]} Copy</b></td>
+    <td>Copies highlighted pictures to the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>.</td>
+  </tr>
+  <tr>
+    <td><a name=paste></a><b>{[%hh_ii:Paste]} Paste</b></td>
+    <td>Adds pictures contained in the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a> (if any) to the current group.
+        Obviously, you can only add new pictures to a group so any duplicate is skipped. If this is specified in the
+        <a href="setup-dialogs.html">program settings</a>, <b>PhoA</b> notifies you of number of the pictures actually pasted.</td>
+  </tr>
+  <tr>
+    <td><a name=new_group></a><b>{[%hh_ii:NewGroup]} Add group</b></td>
+    <td>Adds a new picture group. A group is created as a child to the group currently highlighted. Thus, when the
+        photo album node is highlighted, a group is created in the photo album's root directory. The default group name
+        is &quot;New group&quot;, you change it by editing it and pressing <b>Enter</b>.</td>
+  </tr>
+  <tr>
+    <td><a name=new_pics></a><b>{[%hh_ii:NewPic]} Add pictures...</b></td>
+    <td>Invokes the <a href="intf-pic-add.html">Add pictures wizard</a> allowing you to add pictures (i.&nbsp;e. files) to the
+        photo album.</td>
+  </tr>
+  <tr>
+    <td><a name=delete></a><b>{[%hh_ii:Delete]} Delete</b></td>
+    <td>
+      <ul>
+        <li>When group tree is active: remove the current group.</li>
+        <li>When thumbnail window is active: remove selected thumbnails.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><a name=edit></a><b>{[%hh_ii:Edit]} Edit...</b></td>
+    <td>
+      <ul>
+        <li>When the <i>photo album</i> is selected in the group tree (the root node when picture groups are displayed), this
+            items allows you to edit photo album's description or change thumbnail settings in the 
+            <a href="intf-album-props.html">Photo album properties dialog</a>.</li>
+        <li>When a photo album picture group is selected, this item allows you to rename it, or edit its description
+            (you also can rename a group by clicking once on a <i>selected</i> group text, or by hitting the <b>F2</b> key.
+            To cancel edit, press <b>Esc</b>; to accept the new group name press <b>Enter</b>).</li>
+        <li>When a photo album <a href="intf-browse-mode-views.html">view</a> node is selected (the root node when a view is
+            displayed), this item shows the <a href="intf-view-props.html">View properties dialog</a>.</li>
+        <li>When thumbnail window is active, this item displays the <a href="intf-pic-props.html">Picture properties dialog</a>
+            allowing you to view or modify selected picture properties.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><a name=sort></a><b>{[%hh_ii:Sort]} Sort pictures...</b></td>
+    <td>Arrange (sort) pictures in the current group, or in all photo album groups using the <a href="intf-sort-pics.html">Sort
+        pictures dialog</a>.</td>
+  </tr>
+  <tr>
+    <td><a name=select_all></a><b>{[%hh_ii:SelectAll]} Select all</b></td>
+    <td>Selects all the pictures in the current group.</td>
+  </tr>
+  <tr>
+    <td><a name=select_none></a><b>{[%hh_ii:SelectNone]} Select none</b></td>
+    <td>Deselects all the selected pictures.</td>
+  </tr>
+  <tr>
+    <td><a name=view_mode></a><b>{[%hh_ii:ViewMode]} View</b></td>
+    <td>Enters the program into the <a href="intf-view-mode.html">View mode</a>. You can also enter the View mode by
+        double-clicking a picture, or pressing <b>Enter</b> when thumbnail window is active.</td>
+  </tr>
+  <tr>
+    <td><a name=slide_show></a><b>{[%hh_ii:SlideShow]} View slide show</b></td>
+    <td>Enters the <a href="intf-view-mode.html">View mode</a> and turns the slide show on.</td>
+  </tr>
+</table>
 
 {[%hh_ftr_en]}

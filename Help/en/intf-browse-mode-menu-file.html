@@ -1,22 +1,50 @@
-<!-- $Id: intf-browse-mode-menu-file.html,v 1.1 2004-10-30 12:07:01 dale Exp $ -->
+<!-- $Id: intf-browse-mode-menu-file.html,v 1.2 2004-11-02 21:17:49 dale Exp $ -->
 {[%hh_hdr_en:Browse mode menu commands :: File menu]}
 
-<p align=justify>This menu contains commands for photo album file operations:
-<ul>
-  <li>{[%hh_ii:New]} New photo album is created automatically on the program startup or when you select the <b>File | New</b> menu item. It erases all groups,
-      pictures and <a href="intf-browse-mode-views.html">views</a> while the photo album properties are being reset to the defaults.</li>
-  <li>{[%hh_ii:Open]} To open a photo album file you created before, you select the <b>File | Open...</b> menu item. This command brings up a standard dialog 
-      allowing you to select a file (with the <b>.phoa</b> extension).</li>
-  <li>{[%hh_ii:Save]} To save photo album in the file currently open you select the <b>File | Save</b> menu item.</li>
-  <li>{[%hh_ii:SaveAs]} To save it into another file - the <b>File | Save as...</b> menu item.</li>
-  <li>{[%hh_ii:SaveSettings]} The <b>File | Save current settings to file...</b> menu item displays a Save current settings dialog to an <b>.ini</b> file,
-      <a href="setup-storing.html">details</a>.</li>
-  <li>{[%hh_ii:LoadSettings]} The <b>File | Load settings from file...</b> menu item displays a Load program settings dialog from an <b>.ini</b> file,
-      <a href="setup-storing.html">details</a>.</li>
-  <li>{[%hh_ii:Exit]} The <b>File | Exit</b> menu item confirms whether you wish to save changes if there were any (or if it is selected in the
-      <a href="setup-dialogs.html">Confirmations settings</a>) and exits the program.</li>
-  <li>Below there are <i>MRU</i> (most recently used) files menu items (the count of stored entries is adjusted with <a href="setup-general.html">Program
-      settings dialog</a>)</li>
-</ul>
+<p align=justify>This menu contains commands for photo album file operations.
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Menu Item</td>
+    <td nowrap>Description</td>
+  </tr>
+  <tr>
+    <td><a name=new></a><b>{[%hh_ii:New]} New</b></td>
+    <td>New photo album creation. This erases all groups, pictures and <a href="intf-browse-mode-views.html">views</a>, and photo
+        album properties are reset to their defaults.</td>
+  </tr>
+  <tr>
+    <td><a name=open></a><b>{[%hh_ii:Open]} Open...</b></td>
+    <td>Opens a standard File open dialog allowing you to select a photo album file (with the <b>.phoa</b> extension).</td>
+  </tr>
+  <tr>
+    <td><a name=save></a><b>{[%hh_ii:Save]} Save</b></td>
+    <td>Save the photo album to the file currently open. If this is a new photo album, this item executes <a href=#save_as>Save
+        as...</a> instead.</td>
+  </tr>
+  <tr>
+    <td><a name=save_as></a><b>{[%hh_ii:SaveAs]} Save as...</b></td>
+    <td>Displays a standard File save dialog to save the photo album into another file.</td>
+  </tr>
+  <tr>
+    <td><a name=save_settings></a><b>{[%hh_ii:SaveSettings]} Save current settings to file...</b></td>
+    <td>Displays a Save current settings dialog allowing you to store the current program settings into an <b>.ini</b> file,
+      <a href="setup-storing.html">details</a>.</td>
+  </tr>
+  <tr>
+    <td><a name=load_settings></a><b>{[%hh_ii:LoadSettings]} Load settings from file...</b></td>
+    <td>Displays a Load program settings dialog for restoring program settings from an <b>.ini</b> file,
+      <a href="setup-storing.html">details</a>.</td>
+  </tr>
+  <tr>
+    <td><a name=exit></a><b>{[%hh_ii:Exit]} Exit</b></td>
+    <td>Confirms whether you wish to save changes if there were any (or if it is configured in the
+        <a href="setup-dialogs.html">Confirmations settings</a>), and then exits the program.</td>
+  </tr>
+  <tr>
+    <td colspan=2>Below follow the <i>MRU</i> (most recently used) file menu items (the number of stored entries is
+        adjusted with <a href="setup-general.html">Program settings dialog</a>).</td>
+  </tr>
+</table>
 
 {[%hh_ftr_en]}
