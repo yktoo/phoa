@@ -1,12 +1,13 @@
-<!-- $Id: intf-browse-mode-views.html,v 1.6 2004-11-10 14:38:38 dale Exp $ -->
+<!-- $Id: intf-browse-mode-views.html,v 1.7 2004-12-07 10:27:17 dale Exp $ -->
 {[%hh_hdr_en:Working with views]}
 
 {[%hh_h2:Introduction]}
 <p align=justify>Photo album <b>views</b> look similar to photo album group tree, the only difference is that groups are
   being created by you while view's folder hierarchy is built automatically based on picture data as well as on
   <b>groupings</b> you provide. A grouping is one logical unit of view's organzation, and it may form one or more folder
-  tree levels. When generating view's folder hierarchy, <i>each</i> picture is arranged into some group, which is
-  determined by the view properties to be seen below.
+  tree levels. When generating view's folder hierarchy, <i>each picture passed through the
+  <a href=#filter_expr>filter</a></i> is arranged into some group, which is determined by the view properties to be seen
+  below.
 
 {[%hh_h2:View properties]}
 <p align=justify>As you can see in <a href="intf-view-props.html">View properties dialog</a>, the view has name, the
@@ -82,8 +83,9 @@
 
 {[%hh_h2:<a name=unclassified></a>Arranging unclassified pictures into a separate folder]}
 <p align=justify>As you know, this is not mandatory to completely describe a picture. But since when generating a view
-  each picture is processed and is included into the view (see above), there are two choices how to handle pictures
-  having no data for the given grouping criteria (no date when grouping by date, no place when grouping by place etc.):
+  each picture passed the <a href=#filter_expr>filter</a> is processed and included into the view (see above), there are
+  two choices how to handle pictures having no data for the given grouping criteria (no date when grouping by date, no
+  place when grouping by place etc.):
 <ul>
   <li>If a grouping has &quot;Unclassified pictures in own folder&quot; checkbox checked, they will be put into the
       appropriate folder (&quot;No date&quot;, &quot;No place&quot; etc.) located at the same tree level as the rest of
@@ -97,6 +99,11 @@
 </ul>
 <p align=justify>This feature (obvious) is not applicable for the grouping by picture file path since there are no
   pictures with no files, and there are no files without paths (at least I've heard nothing of it ;).
+
+{[%hh_h2:<a name=filter_expr></a>Picture filter expression]}
+<p align=justify>You are able to restrict the list of images placed to the view. You do it using
+  <a href="intf-expr-editor.html">Filter expression editor</a> the way like in <a href="intf-search-expr.html">Exprssion
+  search</a>. If no filter expression specified, the view will contain <b>all</b> photo album pictures.
 
 {[%hh_h2:Copying view's folders to the photo album]}
 <p align=justify><b>PhoA</b> also introduces the possibility for copying generated folder and picture structure as

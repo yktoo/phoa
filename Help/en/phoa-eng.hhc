@@ -326,6 +326,10 @@
 						</OBJECT>
 				</UL>
 			</UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture filter expression editor">
+				<param name="Local" value="intf-expr-editor.html">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keyboard and mouse controls">

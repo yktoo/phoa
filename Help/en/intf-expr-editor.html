@@ -1,0 +1,73 @@
+<!-- $Id: intf-expr-editor.html,v 1.1 2004-12-07 10:27:17 dale Exp $ -->
+{[%hh_hdr_en:Picture filter expression editor]}
+
+<p align=justify>Expression editor is used to create picture filter expressions in <b>PhoA</b>: for
+  <a href="intf-search-expr.html">Expression search</a> and in <a href="intf-view-props.html">View
+  properties</a>.
+<p align=justify>Detailed description of <i>picture filter expression language</i>) is given
+  <a href="info-filter-expr.html">here</a>.
+
+{[%hh_h2:Controls]}
+
+<table class=plain border=0>
+  <tr>
+    <td class=command>{[%hh_ii:New]} New</td>
+    <td>Clears the expression editor contents.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Open]} Open...</td>
+    <td>Displays the standard File open dialog which allows you to load text of expression from a file saved before. The
+        dropdown arrow button displays the MRU (most recently used) file list.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:SaveAs]} Save as...</td>
+    <td>Displays the standard File save dialog allowing to select a file to write the current expression to.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Something]} Insert property</td>
+    <td>Displays a menu containing the list of available <a href="info-filter-expr.html#pic_props">picture
+        properties</a>. When you select an item, property text is inserted at the current caret position in the
+        expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Something]} Insert operator</td>
+    <td>Displays a menu containing the list of available <a href="info-filter-expr.html#operators">operators</a>. When
+        you select an item, operator text is inserted at the current caret position in the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Cut]} Cut</td>
+    <td>Cuts text currently selected in the expression editor, to the clipboard.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Copy]} Copy</td>
+    <td>Copies text currently selected in the expression editor, to the clipboard.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Paste]} Paste</td>
+    <td>Pastes text from the clipboard into the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Undo]} Undo</td>
+    <td>Rolls back the last change made in the expression editor.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Redo]} Redo</td>
+    <td>Redoes the last misundone change.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:OK]} Syntax check</td>
+    <td>Performs the syntax check of the entered expression and displays a message saying about check results.</td>
+  </tr>
+</table>
+
+<p align=justify>The same commands are available in the expression editor context menu displayed by a mouse right click
+  or using <b>Shift+F10</b> keys.
+
+{[%hh_seealso_en]}
+  <a href="intf-search.html">Find pictures</a><br>
+  <a href="intf-search-expr.html">Find pictures :: Expression search</a><br>
+  <a href="intf-view-props.html">View properties dialog</a><br>
+  <a href="intf-browse-mode-views.html">Views</a><br>
+  <a href="info-filter-expr.html">Picture filter expressions</a><br>
+
+{[%hh_ftr_en]}

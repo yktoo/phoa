@@ -326,6 +326,10 @@
 						</OBJECT>
 				</UL>
 			</UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Dstrok;&aring;&auml;&agrave;&ecirc;&ograve;&icirc;&eth; &acirc;&ucirc;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute; &ocirc;&egrave;&euml;&uuml;&ograve;&eth;&agrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
+				<param name="Local" value="intf-expr-editor.html">
+				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ntilde;&icirc;&divide;&aring;&ograve;&agrave;&iacute;&egrave;&yuml; &ecirc;&euml;&agrave;&acirc;&egrave;&oslash; &egrave; &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &igrave;&ucirc;&oslash;&uuml;&thorn;">

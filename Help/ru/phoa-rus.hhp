@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-rus.hhp,v 1.14 2004-12-05 16:17:50 dale Exp $
+;   $Id: phoa-rus.hhp,v 1.15 2004-12-07 10:27:17 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -52,6 +52,7 @@ intf-ctl-browser-key.html
 intf-ctl-browser-mouse.html
 intf-ctl-viewer-key.html
 intf-ctl-viewer-mouse.html
+intf-expr-editor.html
 intf-file-ops.html
 intf-file-ops-cdopts.html
 intf-file-ops-delopts.html

@@ -51,6 +51,13 @@
 		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&acirc;&ucirc;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&aring; &ocirc;&egrave;&euml;&uuml;&ograve;&eth;&agrave;">
+		<param name="Name" value="Выражения фильтра изображений">
+		<param name="Local" value="info-filter-expr.html">
+		<param name="Name" value="Редактор выражений фильтра изображений">
+		<param name="Local" value="intf-expr-editor.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&atilde;&eth;&agrave;&ocirc;&egrave;&divide;&aring;&ntilde;&ecirc;&egrave;&aring; &ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc;">
 		<param name="Name" value="Форматы файлов">
 		<param name="Local" value="general-file-formats.html">

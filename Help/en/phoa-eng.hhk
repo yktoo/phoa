@@ -160,6 +160,13 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="filter expression">
+		<param name="Name" value="Picture filter expressions">
+		<param name="Local" value="info-filter-expr.html">
+		<param name="Name" value="Picture filter expression editor">
+		<param name="Local" value="intf-expr-editor.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="find pictures">
 		<param name="Name" value="Find pictures dialog">
 		<param name="Local" value="intf-search.html">
