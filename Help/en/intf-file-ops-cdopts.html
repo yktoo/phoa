@@ -1,4 +1,4 @@
-<!-- $Id: intf-file-ops-cdopts.html,v 1.5 2005-02-05 16:15:58 dale Exp $ -->
+<!-- $Id: intf-file-ops-cdopts.html,v 1.6 2005-03-06 19:04:38 dale Exp $ -->
 {[%hh_hdr_en:Picture file operations wizard :: CD/DVD creation options]}
 
 <p align=justify>This wizard page allows specifying extended options for CD, DVD and other removable media creation for
@@ -40,10 +40,16 @@
   <tr>
     <td class=command>Copy the current program settings to phoa.ini</td>
     <td>If on, the current program settings will be <a href="setup-storing.html">saved to <b>phoa.ini</b> file</a> in
-        the <a href="intf-file-ops-selfolder.html">destination fodler</a> during copy/move operation. This allows
+        the <a href="intf-file-ops-selfolder.html">destination folder</a> during copy/move operation. This allows
         running the program from a removable media keeping all the current settings on any machine (but only if setting
         autoloading from <b>phoa.ini</b> is not disabled in that machine's
         <a href="setup-general.html">settings</a>.)</td>
+  </tr>
+  <tr>
+    <td class=command>Copy the language file currently used</td>
+    <td>If on, the language file currently being used will be copied to the <b>Language</b> subfolder of the
+        <a href="intf-file-ops-selfolder.html">destination folder</a> during copy/move operation. Applicable only if
+        a language other than English is active.</td>
   </tr>
   <tr>
     <td class=command>Create autorun.inf file</td>

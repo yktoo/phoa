@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.31 2005-02-19 13:30:16 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.32 2005-03-06 19:04:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -83,6 +83,7 @@ type
     FApp: IPhotoAlbumApp;
     FCDOpt_CopyExecutable: Boolean;
     FCDOpt_CopyIniSettings: Boolean;
+    FCDOpt_CopyLangFile: Boolean;
     FCDOpt_CreateAutorun: Boolean;
     FCDOpt_CreatePhoa: Boolean;
     FCDOpt_IncludeViews: Boolean;
@@ -178,6 +179,9 @@ type
     property CDOpt_CopyExecutable: Boolean read FCDOpt_CopyExecutable write FCDOpt_CopyExecutable;
      // -- Создание CD/DVD: True, если нужно сохранить текущие настройки в phoa.ini
     property CDOpt_CopyIniSettings: Boolean read FCDOpt_CopyIniSettings write FCDOpt_CopyIniSettings;
+     // -- Создание CD/DVD: True, если нужно скопировать текущий используемый языковой файл. Имеет смысл только если
+     //    текущий язык - не английский
+    property CDOpt_CopyLangFile: Boolean read FCDOpt_CopyLangFile write FCDOpt_CopyLangFile; 
      // -- Создание CD/DVD: True, если нужно создать файл autorun.inf
     property CDOpt_CreateAutorun: Boolean read FCDOpt_CreateAutorun write FCDOpt_CreateAutorun;
      // -- Создание CD/DVD: метка носителя для autorun.inf
@@ -748,59 +752,100 @@ uses
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
-  var
-    sDestPath: String;
-    fs: TFileStream;
+  var sDestPath: String;
 
-    procedure FSWriteLine(const s: String; const aParams: Array of const);
-    var sf: String;
+    procedure SaveExportedProject;
     begin
-      sf := Format(s, aParams)+S_CRLF;
-      fs.Write(sf[1], Length(sf));
+      try
+        FExportedProject.SaveToFile(FExportedProject.FileName, SProject_Generator, SProject_Remark, FExportedProject.FileRevision);
+        LogSuccess('SLogEntry_PhoaSavedOK', [FExportedProject.FileName]);
+      except
+        on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, e.Message]);
+      end;
     end;
 
+    procedure CopyExecutable;
+    begin
+      if CopyFile(
+          PChar(sApplicationPath+SPhoaExecutableFileName),
+          PChar(sDestPath+SPhoaExecutableFileName),
+          False) then
+        LogSuccess('SLogEntry_ExecutableCopiedOK', [FDestinationFolder])
+      else
+        LogFailure('SLogEntry_ExecutableCopyingError', [FDestinationFolder, SysErrorMessage(GetLastError)]);
+    end;
+
+    procedure CopyLangFile;
+    var
+      pRes: PDKLang_LangResource;
+      sLangFile, sDestLangFile: String;
+    begin
+       // Если язык отличается от языка по умолчанию
+      if LangManager.LanguageID<>LangManager.DefaultLanguageID then begin
+        pRes := LangManager.LanguageResources[LangManager.LanguageIndex];
+         // Если ресурс - это языковой файл
+        if pRes.Kind=dklrkFile then begin
+           // Находим имена файлов
+          sLangFile     := pRes.sName;
+          sDestLangFile := sDestPath+SRelativeLangFilesPath+ExtractFileName(sLangFile);
+           // Создаём каталог языковых файлов
+          if ForceDirectories(sDestPath+SRelativeLangFilesPath) then
+             // Копируем
+            if CopyFile(PChar(sLangFile), PChar(sDestLangFile), False) then
+              LogSuccess('SLogEntry_LangFileCopiedOK', [sLangFile, sDestLangFile])
+            else
+              LogFailure('SLogEntry_LangFileCopyingError', [sLangFile, sDestLangFile, SysErrorMessage(GetLastError)])
+          else
+            LogFailure('SErrCannotCreateFolder', [sDestPath+SRelativeLangFilesPath]);
+        end;
+      end;
+    end;
+
+    procedure CreateAutorun;
+    var fs: TFileStream;
+
+      procedure FSWriteLine(const s: String; const aParams: Array of const);
+      var sf: String;
+      begin
+        sf := Format(s, aParams)+S_CRLF;
+        fs.Write(sf[1], Length(sf));
+      end;
+
+    begin
+      try
+        fs := TFileStream.Create(sDestPath+'autorun.inf', fmCreate);
+        try
+          FSWriteLine(
+            '[autorun]'+S_CRLF+
+            'open=%s "%s"'+S_CRLF+
+            'icon=%0:s,1',
+            [SPhoaExecutableFileName, FCDOpt_PhoaFileName]);
+          if FCDOpt_MediaLabel<>'' then FSWriteLine('label=%s', [FCDOpt_MediaLabel]);
+        finally
+          fs.Free;
+        end;
+        LogSuccess('SLogEntry_AutorunCreatedOK', []);
+      except
+        on e: Exception do LogFailure('SLogEntry_AutorunCreationError', [e.Message]);
+      end;
+    end;
+    
   begin
      // Выполняем задачи по подготовке CD/DVD, если нужно
     if (FFileOpKind in [fokCopyFiles, fokMoveFiles]) and FMoveFile_UseCDOptions then begin
       sDestPath := IncludeTrailingPathDelimiter(FDestinationFolder);
        // Если есть фотоальбом, сохраняем его в файл
-      if FExportedProject<>nil then
-        try
-          FExportedProject.SaveToFile(FExportedProject.FileName, SProject_Generator, SProject_Remark, FExportedProject.FileRevision);
-          LogSuccess('SLogEntry_PhoaSavedOK', [FExportedProject.FileName]);
-        except
-          on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, e.Message]);
-        end;
+      if FExportedProject<>nil then SaveExportedProject;
        // Копируем программу
       if FCDOpt_CopyExecutable then begin
-        if CopyFile(
-            PChar(sApplicationPath+SPhoaExecutableFileName),
-            PChar(sDestPath+SPhoaExecutableFileName),
-            False) then
-          LogSuccess('SLogEntry_ExecutableCopiedOK', [FDestinationFolder])
-        else
-          LogFailure('SLogEntry_ExecutableCopyingError', [FDestinationFolder, SysErrorMessage(GetLastError)]);
+        CopyExecutable;
          // Записываем текущие настройки в phoa.ini
         if FCDOpt_CopyIniSettings then IniSaveSettings(sDestPath+SDefaultIniFileName);
+         // Записываем текущий языковой файл
+        if FCDOpt_CopyLangFile then CopyLangFile;
       end;
        // Создаём autorun.inf
-      if (FExportedProject<>nil) and FCDOpt_CreateAutorun then
-        try
-          fs := TFileStream.Create(sDestPath+'autorun.inf', fmCreate);
-          try
-            FSWriteLine(
-              '[autorun]'+S_CRLF+
-              'open=%s "%s"'+S_CRLF+
-              'icon=%0:s,1',
-              [SPhoaExecutableFileName, FCDOpt_PhoaFileName]);
-            if FCDOpt_MediaLabel<>'' then FSWriteLine('label=%s', [FCDOpt_MediaLabel]);
-          finally
-            fs.Free;
-          end;
-          LogSuccess('SLogEntry_AutorunCreatedOK', []);
-        except
-          on e: Exception do LogFailure('SLogEntry_AutorunCreationError', [e.Message]);
-        end;
+      if (FExportedProject<>nil) and FCDOpt_CreateAutorun then CreateAutorun;
     end;
      // Закрываем форму Мастера/показываем протокол
     if (FCountErrors=0) and SettingValueBool(ISettingID_Dlgs_FOW_LogOnErrOnly) then
@@ -870,6 +915,7 @@ uses
     FCDOpt_CreatePhoa            := True;
     FCDOpt_CreateAutorun         := True;
     FCDOpt_CopyIniSettings       := True;
+    FCDOpt_CopyLangFile          := True;
     FCDOpt_MediaLabel            := ConstVal('SPhotoAlbumNode');
     FCDOpt_PhoaDesc              := FApp.Project.Description;
     FCDOpt_PhoaFileName          := ExtractFileName(FApp.Project.FileName);

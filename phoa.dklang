@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.47 2005-02-26 12:35:51 dale Exp $
+;  $Id: phoa.dklang,v 1.48 2005-03-06 19:04:38 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -563,6 +563,7 @@ cbCreatePhoa.Caption=00000016,Create a photo album &file with selected pictures 
 cbCreateAutorun.Caption=00000023,Create &autorun.inf file for autoplaying the CD/DVD, in the destination folder
 cbIncludeViews.Caption=00000034,Also include existing &views
 cbCopyIniSettings.Caption=00000037,Copy the current program settings to phoa.&ini
+cbCopyLangFile.Caption=00000038,Copy the lan&guage file currently used
 
 [frWzPageFileOps_RepairSelLinks]
 cbDeleteUnmatched.Caption=00000013,&Delete pictures having no matching file (only affects pictures with no valid file linked)
@@ -966,6 +967,8 @@ SLogEntry_FileOpError=Processing picture "%s" failed: %s
 SLogEntry_FileOpFinalizationError=Operation finalization failed: %s
 SLogEntry_FileRecycledOK=File "%s" was successfully moved to the Recycle Bin
 SLogEntry_FileRecyclingError=Unable to move file "%s" to the Recycle Bin
+SLogEntry_LangFileCopiedOK=Language file "%s" was successfully copied to "%s"
+SLogEntry_LangFileCopyingError=Failed to copy language file "%s" to "%s": %s
 SLogEntry_PhoaSavedOK=The photo album was successfully saved to "%s"
 SLogEntry_PhoaSaveError=Failed to save photo album to file "%s": %s
 SLogEntry_PicDeletedOK=Picture "%s" was successfully removed from the photo album

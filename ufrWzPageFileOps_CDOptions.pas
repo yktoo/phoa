@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.8 2005-02-12 15:36:37 dale Exp $
+//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.9 2005-03-06 19:04:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,16 +15,17 @@ uses
 type
   TfrWzPageFileOps_CDOptions = class(TWizardPage)
     cbCopyExecutable: TCheckBox;
-    cbCreatePhoa: TCheckBox;
-    ePhoaFileName: TEdit;
+    cbCopyIniSettings: TCheckBox;
+    cbCopyLangFile: TCheckBox;
     cbCreateAutorun: TCheckBox;
-    lMediaLabel: TLabel;
+    cbCreatePhoa: TCheckBox;
+    cbIncludeViews: TCheckBox;
+    dklcMain: TDKLanguageController;
     eMediaLabel: TEdit;
+    ePhoaFileName: TEdit;
+    lMediaLabel: TLabel;
     lPhoaDesc: TLabel;
     mPhoaDesc: TMemo;
-    cbIncludeViews: TCheckBox;
-    cbCopyIniSettings: TCheckBox;
-    dklcMain: TDKLanguageController;
     procedure AdjustOptionsNotify(Sender: TObject);
   private
      // Настраивает [вторичные] контролы опций
@@ -48,6 +49,7 @@ uses phUtils, udFileOpsWizard, phObj;
     cbIncludeViews.Enabled := bCreatePhoa;
      // Copy the executable
     cbCopyIniSettings.Enabled := cbCopyExecutable.Checked;
+    cbCopyLangFile.Enabled    := cbCopyExecutable.Checked and (LangManager.LanguageID<>LangManager.DefaultLanguageID);
      // Create autorun.inf
     cbCreateAutorun.Enabled := bCreatePhoa;
     EnableControls(bCreatePhoa and cbCreateAutorun.Checked, [lMediaLabel, eMediaLabel]);
@@ -71,6 +73,7 @@ uses phUtils, udFileOpsWizard, phObj;
     cbIncludeViews.Checked    := Wiz.CDOpt_IncludeViews;
     cbCopyExecutable.Checked  := Wiz.CDOpt_CopyExecutable;
     cbCopyIniSettings.Checked := Wiz.CDOpt_CopyIniSettings;
+    cbCopyLangFile.Checked    := Wiz.CDOpt_CopyLangFile;
     cbCreateAutorun.Checked   := Wiz.CDOpt_CreateAutorun;
     eMediaLabel.Text          := Wiz.CDOpt_MediaLabel;
     AdjustOptionControls;
@@ -95,6 +98,7 @@ uses phUtils, udFileOpsWizard, phObj;
       Wiz.CDOpt_IncludeViews    := cbIncludeViews.Checked;
       Wiz.CDOpt_CopyExecutable  := cbCopyExecutable.Checked;
       Wiz.CDOpt_CopyIniSettings := cbCopyIniSettings.Checked;
+      Wiz.CDOpt_CopyLangFile    := cbCopyLangFile.Checked;
       Wiz.CDOpt_CreateAutorun   := cbCreateAutorun.Checked;
       Wiz.CDOpt_MediaLabel      := eMediaLabel.Text;
     end;

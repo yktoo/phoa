@@ -20,7 +20,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
   end
   object cbCopyExecutable: TCheckBox
     Left = 4
-    Top = 176
+    Top = 156
     Width = 567
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -56,7 +56,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     Caption = 
       'Create &autorun.inf file for autoplaying the CD/DVD, in the dest' +
       'ination folder'
-    TabOrder = 6
+    TabOrder = 7
     OnClick = AdjustOptionsNotify
   end
   object eMediaLabel: TEdit
@@ -65,14 +65,14 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     Width = 547
     Height = 21
     Anchors = [akLeft, akTop, akRight]
-    TabOrder = 7
+    TabOrder = 8
     OnChange = PageDataChange
   end
   object mPhoaDesc: TMemo
     Left = 24
     Top = 64
     Width = 547
-    Height = 89
+    Height = 69
     Anchors = [akLeft, akTop, akRight]
     ScrollBars = ssVertical
     TabOrder = 2
@@ -80,7 +80,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
   end
   object cbIncludeViews: TCheckBox
     Left = 24
-    Top = 156
+    Top = 136
     Width = 547
     Height = 17
     Anchors = [akLeft, akTop, akRight]
@@ -90,12 +90,22 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
   end
   object cbCopyIniSettings: TCheckBox
     Left = 24
-    Top = 196
+    Top = 176
     Width = 547
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Copy the current program settings to phoa.&ini'
     TabOrder = 5
+    OnClick = PageDataChange
+  end
+  object cbCopyLangFile: TCheckBox
+    Left = 24
+    Top = 196
+    Width = 547
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Copy the lan&guage file currently used'
+    TabOrder = 6
     OnClick = PageDataChange
   end
   object dklcMain: TDKLanguageController
@@ -105,7 +115,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     Left = 60
     Top = 76
     LangData = {
-      19006672577A5061676546696C654F70735F43444F7074696F6E7300010A0000
+      19006672577A5061676546696C654F70735F43444F7074696F6E7300010B0000
       000B006C4D656469614C6162656C010100000007000000070043617074696F6E
       0009006C50686F614465736301010000000A000000070043617074696F6E0010
       006362436F707945786563757461626C6501010000000D000000070043617074
@@ -114,6 +124,8 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
       4175746F72756E010100000017000000070043617074696F6E000B00654D6564
       69614C6162656C000009006D50686F614465736300000E006362496E636C7564
       655669657773010100000022000000070043617074696F6E0011006362436F70
-      79496E6953657474696E6773010100000025000000070043617074696F6E00}
+      79496E6953657474696E6773010100000025000000070043617074696F6E000E
+      006362436F70794C616E6746696C65010100000026000000070043617074696F
+      6E00}
   end
 end
