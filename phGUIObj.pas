@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.6 2004-09-22 15:12:33 dale Exp $
+//  $Id: phGUIObj.pas,v 1.7 2004-09-23 04:09:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -161,8 +161,9 @@ type
     procedure LimitCacheSize(iNumber: Integer);
      // Настраивает ScrollBar
     procedure UpdateScrollBar;
-     // Выделяет диапазон индексов эскизов и сдвигает ItemIndex в idxEnd
-    procedure SelectRange(idxStart, idxEnd: Integer);
+     // Выделяет диапазон индексов эскизов и сдвигает ItemIndex в idxEnd. При bRectangular=False выделяет эскизы подряд
+     //   по их индексам, при bRectangular=True выделяет прямоугольный блок
+    procedure SelectRange(idxStart, idxEnd: Integer; bRectangular: Boolean);
      // Работа с рамкой группового выделения (marquee)
     procedure PaintMarquee;
     procedure MarqueingStart;
@@ -214,6 +215,7 @@ type
     procedure WndProc(var Msg: TMessage); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure Paint; override;
+    procedure Resize; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -453,15 +455,15 @@ type
       end;
       else {tvdmDetail} begin
         FColCount := 1;
-        FItemSize.cx := ClientWidth;
+        FItemSize.cx := Max(FThumbnailSize.cx+IThumbPaddingL+IThumbPaddingR, ClientWidth);
         Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
       end;
     end;
      // Обновляем значения
-    FItemCount := FPicLinks.Count;
+    FItemCount    := FPicLinks.Count;
     FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
-    FVRange := Ceil(FItemCount/FColCount)*FItemSize.cy;
-    FTopOffset := GetValidTopOffset(FTopOffset);
+    FVRange       := Ceil(FItemCount/FColCount)*FItemSize.cy;
+    FTopOffset    := GetValidTopOffset(FTopOffset);
      // Обновляем отображаемые данные при наличии изменений
     if (FItemCount<>iPrevItemCount) or (FDisplayMode<>PrevDisplayMode) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
     UpdateScrollBar;
@@ -799,27 +801,48 @@ type
 
   procedure TThumbnailViewer.KeyDown(var Key: Word; Shift: TShiftState);
 
-    procedure SetII(ii: Integer);
+     // Возвращает ItemIndex, который должен был бы быть при "простом" нажатии на клавишу (без Shift, Ctrl etc). При
+     //   bAllowLRBoundaryCross=False стрелки влево-вправо не могут "перейти" через вертикальные правую/левую границы
+     //   сетки эскизов (на следующую/предыдущую строку)
+    function GetItemIndexForKey(bAllowLRBoundaryCross: Boolean): Integer;
     begin
-      if (ssShift in Shift) and (FStreamSelStart>=0) then SelectRange(FStreamSelStart, ii) else SetItemIndex(ii);
-      ScrollIntoView;
+      Result := FItemIndex;
+      case Key of
+        VK_UP:     Dec(Result, FColCount);
+        VK_DOWN:   Inc(Result, FColCount);
+        VK_LEFT:   if bAllowLRBoundaryCross or (Result mod FColCount>0) then Dec(Result);
+        VK_RIGHT:  if bAllowLRBoundaryCross or (Result mod FColCount<FColCount-1) then Inc(Result);
+        VK_HOME:   Result := 0;
+        VK_END:    Result := FItemCount-1;
+        VK_PRIOR:  Dec(Result, FVisibleItems);
+        VK_NEXT:   Inc(Result, FVisibleItems);
+      end;
+       // Корректируем результат (если FItemCount=0, то только в этом случае Result будет -1)
+      if Result>=FItemCount then Result := FItemCount-1
+      else if Result<0 then Result := 0;
     end;
 
   begin
-    if (Shift=[]) or
-       (Shift=[ssShift]) or
-       (((Shift=[ssCtrl]) or (Shift=[ssShift, ssCtrl])) and (Key in [VK_PRIOR, VK_NEXT, VK_HOME, VK_END])) then
-      case Key of
-        VK_UP:     if ItemIndex>=FColCount then           SetII(ItemIndex-FColCount);
-        VK_LEFT:   if ItemIndex>0          then           SetII(ItemIndex-1);
-        VK_DOWN:   if ItemIndex<FItemCount-FColCount then SetII(ItemIndex+FColCount);
-        VK_RIGHT:  if ItemIndex<FItemCount-1 then         SetII(ItemIndex+1);
-        VK_HOME:                                         SetII(0);
-        VK_END:                                          SetII(FItemCount-1);
-        VK_PRIOR:  if (ItemIndex>=FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex-FVisibleItems) else SetII(0);
-        VK_NEXT:   if (ItemIndex<FItemCount-FVisibleItems) and not (ssCtrl in Shift) then SetII(ItemIndex+FVisibleItems) else SetII(FItemCount-1);
-        VK_RETURN: DoStartViewMode;
+    case Key of
+       // Enter - входим в режим просмотра
+      VK_RETURN: if Shift=[] then DoStartViewMode;
+       // Стрелки - обрабатываем движения
+      VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_HOME, VK_END, VK_PRIOR, VK_NEXT: begin
+         // Без модификаторов или с Shift, но нет поточного выделения
+        if (Shift=[]) or ((Shift=[ssShift]) and (FStreamSelStart<0)) then begin
+          ItemIndex := GetItemIndexForKey(True);
+          ScrollIntoView;
+         // Нажат Shift - создаём поточное выделение, Shift+Alt - прямоугольное выделение
+        end else if (Shift=[ssShift]) or (Shift=[ssShift, ssAlt]) then begin
+          SelectRange(FStreamSelStart, GetItemIndexForKey(not (ssAlt in Shift)), ssAlt in Shift);
+          ScrollIntoView;
+         // Нажат Ctrl - двигаем только ItemIndex, не меняя выделения
+        end else if Shift=[ssCtrl] then begin
+          MoveItemIndex(GetItemIndexForKey(True), True);
+          ScrollIntoView;
+        end
       end;
+    end;
   end;
 
   procedure TThumbnailViewer.LimitCacheSize(iNumber: Integer);
@@ -894,7 +917,7 @@ type
       DoSelectionChange;
      // Если нажат Shift - выделяем подряд идущие эскизы
     end else if ssShift in Shift then
-      if FStreamSelStart>=0 then SelectRange(FStreamSelStart, idx) else SetItemIndex(idx)
+      if FStreamSelStart>=0 then SelectRange(FStreamSelStart, idx, False) else SetItemIndex(idx)
      // Не нажато кнопок
     else begin
       if (idx<0) or (FSelIndexes.IndexOf(idx)<0) then begin
@@ -1081,9 +1104,12 @@ type
     rInner := Rect(ItemRect.Left+IThumbPaddingL, ItemRect.Top+IThumbPaddingT, ItemRect.Right-IThumbPaddingR, ItemRect.Bottom-IThumbPaddingB);
      // Отрисовываем изображение эскиза
     r := rInner; 
-    if FDisplayMode=tvdmTile then begin
-      if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    FTextLineHeight);
-      if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, FTextLineHeight);
+    case FDisplayMode of
+      tvdmTile: begin
+        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    FTextLineHeight);
+        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, FTextLineHeight);
+      end;
+      tvdmDetail: r.Right := r.Left+FThumbnailSize.cx;
     end;
     DrawThumbnail(r);
      // Рисуем описание
@@ -1210,6 +1236,12 @@ type
     if FSelIndexes.Remove(Index)>=0 then InvalidateItem(Index);
   end;
 
+  procedure TThumbnailViewer.Resize;
+  begin
+    inherited Resize;
+    if FDisplayMode=tvdmDetail then InvalidateRect(Handle, nil, False);
+  end;
+
   procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
   var i, iItemIdx: Integer;
   begin
@@ -1273,17 +1305,38 @@ type
     if ClearSelection then DoSelectionChange;
   end;
 
-  procedure TThumbnailViewer.SelectRange(idxStart, idxEnd: Integer);
-  var i: Integer;
+  procedure TThumbnailViewer.SelectRange(idxStart, idxEnd: Integer; bRectangular: Boolean);
+  var
+    i, ix, iy: Integer;
+    pStart, pEnd: TPoint;
+
+     // Проверяет, что iMin<=iMax. Иначе меняет их значения местами
+    procedure OrderCoord(var iMin, iMax: Integer);
+    var i: Integer;
+    begin
+      if iMin>iMax then begin
+        i    := iMax;
+        iMax := iMin;
+        iMin := i;      
+      end;
+    end;
+
   begin
     ClearSelection;
     MoveItemIndex(idxEnd, False);
-    if idxStart>idxEnd then begin
-      i := idxStart;
-      idxStart := idxEnd;
-      idxEnd := i;
+     // Прямоугольное выделение
+    if bRectangular then begin
+      pStart := Point(idxStart mod FColCount, idxStart div FColCount);
+      pEnd   := Point(idxEnd   mod FColCount, idxEnd   div FColCount);
+      OrderCoord(pStart.x, pEnd.x);
+      OrderCoord(pStart.y, pEnd.y);
+      for iy := pStart.y to pEnd.y do
+        for ix := pStart.x to pEnd.x do AddToSelection(iy*FColCount+ix);
+     // Поточное выделение
+    end else begin
+      OrderCoord(idxStart, idxEnd);
+      for i := idxStart to idxEnd do AddToSelection(i);
     end;
-    for i := idxStart to idxEnd do AddToSelection(i);
     DoSelectionChange;
   end;
 
@@ -1475,6 +1528,16 @@ type
 
   procedure TThumbnailViewer.WMVScroll(var Msg: TWMVScroll);
   var iOffset: Integer;
+
+    function GetRealScrollPos: Integer;
+    var SI: TScrollInfo;
+    begin
+      SI.cbSize := SizeOf(TScrollInfo);
+      SI.fMask  := SIF_TRACKPOS;
+      GetScrollInfo(Handle, SB_VERT, SI);
+      Result := SI.nTrackPos;
+    end;
+
   begin
     case Msg.ScrollCode of
       SB_BOTTOM:       iOffset := MaxInt;
@@ -1483,7 +1546,7 @@ type
       SB_PAGEDOWN:     iOffset := FTopOffset+ClientHeight;
       SB_PAGEUP:       iOffset := FTopOffset-ClientHeight;
       SB_THUMBPOSITION,
-        SB_THUMBTRACK: iOffset := Msg.Pos;
+        SB_THUMBTRACK: iOffset := GetRealScrollPos;
       SB_TOP:          iOffset := 0;
       else Exit;
     end;
