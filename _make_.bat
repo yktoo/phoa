@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.3 2004-05-01 20:10:04 dale Exp $
+rem $Id: _make_.bat,v 1.4 2004-05-11 03:20:01 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -19,7 +19,12 @@ set HELP_COMPILER="C:\Program Files\HTML Help Workshop\hhc.exe"
 
 set SETUP_COMPILER="C:\Program Files\Inno Setup 4\iscc.exe"
 
+if "%1"=="app" goto compapp
+if "%1"=="help" goto comphelp
+if "%1"=="setup" goto compsetup
+
 rem == Compile Delphi DPR project ==
+:compapp
 echo.
 echo == Compile Delphi DPR project ==
 %COMPILER% phoa.dpr %OPTIONS% -$%SWITCHES% -U%LIBRARY_PATH%
@@ -29,32 +34,38 @@ del *.dcu
 del *.ddp
 del *.bkf
 del *.bkm
+if "%1"=="app" goto success
 
 rem == Compile Help CHM project ==
+:comphelp
 echo.
 echo == Compile Help CHM project (English)
 pushd
 cd Help\en
 %HELP_COMPILER% phoa-eng.hhp
-if not errorlevel == 1 goto :err
+if not errorlevel == 1 goto err
 move phoa-eng.chm ..\..
-if errorlevel == 1 goto :err
+if errorlevel == 1 goto err
 echo.
 echo == Compile Help CHM project (Russian)
 cd ..\ru
 %HELP_COMPILER% phoa-rus.hhp
-if not errorlevel == 1 goto :err
+if not errorlevel == 1 goto err
 move phoa-rus.chm ..\..
-if errorlevel == 1 goto :err
+if errorlevel == 1 goto err
 popd
+if "%1"=="help" goto success
 
 rem == Compile Installation ISS script ==
+:compsetup
 echo.
 echo == Compile Installation ISS script ==
 cd ..\..\IS-Install
 %SETUP_COMPILER% phoa.iss
-if errorlevel == 1 goto :err
-goto :success
+if errorlevel == 1 goto err
+if "%1"=="setup" goto success
+
+goto success
 :err
 pause
 :success
