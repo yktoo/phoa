@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.39 2004-09-28 18:23:38 dale Exp $
+//  $Id: phObj.pas,v 1.40 2004-10-04 12:44:36 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phObj;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Masks, ConsVars, phPhoa, phIntf;
+  Windows, Messages, SysUtils, Classes, Graphics, Masks, ConsVars, phPhoa, phIntf, phMutableIntf;
 
 type
   TPhoaGroup  = class;
@@ -216,7 +216,7 @@ type
     function  GetFreeID: Integer;
     function  GetRoot: TPhoaGroup;
     function  GetGroupByID(iID: Integer): TPhoaGroup;
-    function GetProps(GroupProp: TGroupProperty): String;
+    function  GetProps(GroupProp: TGroupProperty): String;
   public
     constructor Create(_Owner: TPhoaGroup; iID: Integer);
     destructor Destroy; override;
@@ -240,7 +240,7 @@ type
     property Description: String read FDescription write FDescription;
      // -- True, если соответствующий группе узел дерева развёрнут
     property Expanded: Boolean read FExpanded write FExpanded;
-     // -- Возвращает следующий свободный ID, больший ID самой группы и ID всх её детей
+     // -- Возвращает следующий свободный ID, больший ID самой группы и ID всех её детей
     property FreeID: Integer read GetFreeID;
      // -- Список групп, входящих в данную группу
     property Groups: TPhoaGroups read FGroups;

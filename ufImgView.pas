@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.26 2004-09-27 17:07:23 dale Exp $
+//  $Id: ufImgView.pas,v 1.27 2004-10-04 12:44:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -203,7 +203,7 @@ type
      // Слой перемещения информации
     FRBLayer: TRubberbandLayer;
      // Текущее отображаемое изображение
-    FPic: TPhoaPic;
+    FPic: IPhoaPic;
      // Предыдущее просмотренное скэшированное изображение, имя его файла и его преобразования
     FCachedBitmap: TBitmap32;
     FCachedBitmapFilename: String;
@@ -478,25 +478,25 @@ uses
   end;
 
   procedure TfImgView.aaEdit(Sender: TObject);
-  var
-    Arr: TPicArray;
-    bEdited: Boolean;
+//  var
+//    Arr: TPicArray;
+//    bEdited: Boolean;
   begin
-    CommitInfoRelocation;
-     // "Снимаем" окно с topmost-положения 
-    TopmostCancel;
-     // Показываем курсор
-    AdjustCursorVisibility(True);
-     // Редактируем изображение
-    SetLength(Arr, 1);
-    Arr[0] := FPic;
-    bEdited := EditPic(Arr, FPhoA, FUndoOperations);
-     // Возвращаем topmost-положение окну
-    TopmostRestore;
-     // Скрываем курсор
-    AdjustCursorVisibility(False);
-     // Обновляем свойства изображения
-    if bEdited then RedisplayPic(False, True);
+//    CommitInfoRelocation;
+//     // "Снимаем" окно с topmost-положения
+//    TopmostCancel;
+//     // Показываем курсор
+//    AdjustCursorVisibility(True);
+//     // Редактируем изображение
+//    SetLength(Arr, 1);
+//    Arr[0] := FPic;
+//    bEdited := EditPic(Arr, FPhoA, FUndoOperations);
+//     // Возвращаем topmost-положение окну
+//    TopmostRestore;
+//     // Скрываем курсор
+//    AdjustCursorVisibility(False);
+//     // Обновляем свойства изображения
+//    if bEdited then RedisplayPic(False, True);
   end;
 
   procedure TfImgView.aaFirstPic(Sender: TObject);
@@ -626,16 +626,16 @@ uses
   end;
 
   procedure TfImgView.aaStoreTransform(Sender: TObject);
-  var Operation: TPhoaOperation;
+//  var Operation: TPhoaOperation;
   begin
-    Operation := nil;
-    fMain.BeginOperation;
-    try
-      Operation := TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips);
-    finally
-      fMain.EndOperation(Operation);
-    end;
-    EnableActions;
+//    Operation := nil;
+//    fMain.BeginOperation;
+//    try
+//      Operation := TPhoaOp_StoreTransform.Create(FUndoOperations, FPhoA, FPic, FTransform.Rotation, FTransform.Flips);
+//    finally
+//      fMain.EndOperation(Operation);
+//    end;
+//    EnableActions;
   end;
 
   procedure TfImgView.aaZoomActual(Sender: TObject);
@@ -845,7 +845,7 @@ uses
   procedure TfImgView.DP_ApplyTransforms;
   begin
      // Сообщение об ошибке не преобразовываем
-    if not FErroneous then FTransform.ApplyValues(FPic.PicRotation, FPic.PicFlips);
+    if not FErroneous then FTransform.ApplyValues(FPic.Rotation, FPic.Flips);
   end;
 
   procedure TfImgView.DP_ComputeDimensions;
@@ -879,13 +879,13 @@ uses
   var sCaption: String;
   begin
      // Настраиваем Caption / составляем описание
-    if FErroneous then begin
+//!!!    if FErroneous then begin
       sCaption := '';
       FPicDesc := '';
-    end else begin
-      sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
-      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
-    end;
+//    end else begin
+//!!!      sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
+//      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
+//    end;
     if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик
     eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.PicIDs.Count]);
@@ -910,7 +910,7 @@ uses
 
   procedure TfImgView.DP_LoadImage;
   var
-    PrevPic: TPhoaPic;
+    PrevPic: IPhoaPic;
     PrevRotation: TPicRotation;
     PrevFlips: TPicFlips;
     bmpDecoded, bmpPrevTemp: TBitmap32;
@@ -953,9 +953,9 @@ uses
      // Находим текущее изображение
     FPic := FPhoA.Pics.PicByID(FGroup.PicIDs[FPicIdx]);
      // Определяем, есть ли изображение в кэше 
-    bPicInCache := FCachedBitmapFilename=FPic.PicFileName;
+    bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
-    if not bPicInCache then FDecodeThread.QueuedFileName := FPic.PicFileName;
+    if not bPicInCache then FDecodeThread.QueuedFileName := FPic.FileName;
      // Если изображения не совпадают, сохраняем старое изображение и преобразования
     if not FErroneous and FCacheBehindPic and (PrevPic<>nil) and (PrevPic<>FPic) then begin
       bmpPrevTemp := TBitmap32.Create;
@@ -984,7 +984,7 @@ uses
     FCachedBitmap   := bmpPrevTemp;
     FCachedRotation := PrevRotation;
     FCachedFlips    := PrevFlips;
-    if bmpPrevTemp=nil then FCachedBitmapFilename := '' else FCachedBitmapFilename := PrevPic.PicFileName;
+    if bmpPrevTemp=nil then FCachedBitmapFilename := '' else FCachedBitmapFilename := PrevPic.FileName;
      // Если не взяли из кэша, дожидаемся окончания загрузки изображения фоновым потоком
     if not bPicInCache then begin
       StartWait;
@@ -994,7 +994,7 @@ uses
          // Если поток вернул nil - значит, произошла ошибка
         FErroneous := bmpDecoded=nil;
         if FErroneous then
-          PaintError(FPic.PicFileName, FDecodeThread.ErrorMessage)
+          PaintError(FPic.FileName, FDecodeThread.ErrorMessage)
         else
           try
             iMain.Bitmap.Assign(bmpDecoded);
@@ -1032,7 +1032,7 @@ uses
     aRotate270.Enabled      := bNoErr;
     aFlipHorz.Enabled       := bNoErr;
     aFlipVert.Enabled       := bNoErr;
-    aStoreTransform.Enabled := bNoErr and ((FPic.PicRotation<>FTransform.Rotation) or (FPic.PicFlips<>FTransform.Flips));
+    aStoreTransform.Enabled := bNoErr and ((FPic.Rotation<>FTransform.Rotation) or (FPic.Flips<>FTransform.Flips));
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1166,7 +1166,7 @@ uses
        // Возвращаем прежний курсор
       iMain.Cursor := FImageCursor;
     end else if FShellCtxMenuOnMouseUp then begin  
-      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.PicFileName);
+      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.FileName);
       FShellCtxMenuOnMouseUp := False;
     end;
   end;
@@ -1192,19 +1192,19 @@ uses
   end;
 
   procedure TfImgView.pmMainPopup(Sender: TObject);
-  var PicLinks: TPhoaPicLinks;
+//!!!  var PicLinks: TPhoaPicLinks;
   begin
-     // Настраиваем доступность инструментов в pmMain
-    if gipmTools.Count>0 then begin
-      PicLinks := TPhoaPicLinks.Create(True);
-      try
-         // Добавляем просматриваемое изображение
-        if not FErroneous then PicLinks.Add(FPic, True);
-        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, PicLinks);
-      finally
-        PicLinks.Free;
-      end;
-    end;
+//     // Настраиваем доступность инструментов в pmMain
+//    if gipmTools.Count>0 then begin
+//      PicLinks := TPhoaPicLinks.Create(True);
+//      try
+//         // Добавляем просматриваемое изображение
+//        if not FErroneous then PicLinks.Add(FPic, True);
+//        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, PicLinks);
+//      finally
+//        PicLinks.Free;
+//      end;
+//    end;
   end;
 
   procedure TfImgView.RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
@@ -1318,20 +1318,20 @@ uses
   end;
 
   procedure TfImgView.ToolItemClick(Sender: TObject);
-  var PicLinks: TPhoaPicLinks;
+//!!!  var PicLinks: TPhoaPicLinks;
   begin
-    if not FErroneous then begin
-       // Создаём массив ссылок на изображения
-      PicLinks := TPhoaPicLinks.Create(True);
-      try
-         // Добавляем просматриваемое изображение
-        PicLinks.Add(FPic, True);
-         // Выполняем инструмент
-        (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
-      finally
-        PicLinks.Free;
-      end;
-    end;
+//!!!    if not FErroneous then begin
+//       // Создаём массив ссылок на изображения
+//      PicLinks := TPhoaPicLinks.Create(True);
+//      try
+//         // Добавляем просматриваемое изображение
+//        PicLinks.Add(FPic, True);
+//         // Выполняем инструмент
+//        (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
+//      finally
+//        PicLinks.Free;
+//      end;
+//    end;
   end;
 
   procedure TfImgView.TopmostCancel;

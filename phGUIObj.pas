@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.15 2004-09-28 18:23:38 dale Exp $
+//  $Id: phGUIObj.pas,v 1.16 2004-10-04 12:44:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phGUIObj;
 
 interface
-uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phIntf, phObj, phGraphics, ConsVars;
+uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phIntf, phMutableIntf, phObj, phGraphics, ConsVars;
 
 type  
 
@@ -519,6 +519,7 @@ uses Math, Themes, phUtils;
   destructor TThumbnailViewer.Destroy;
   begin
     FSelectedPics := nil;
+    FPicList      := nil;
     FBuffer.Free;
     FThumbShadow.Free;
     FPicList := nil;

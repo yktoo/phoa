@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.43 2004-09-28 18:23:38 dale Exp $
+//  $Id: Main.pas,v 1.44 2004-10-04 12:44:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
   ActiveX, XPMan,
-  phObj, phGUIObj, ConsVars,
+  phIntf, phMutableIntf, phObj, phGUIObj, ConsVars,
   VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt,
   TB2MRU, TBXExtItems, Menus, TBX, ActnList, TBXStatusBars, TBXLists,
   TB2Dock, TB2Toolbar, StdCtrls, DKLang;
@@ -268,7 +268,7 @@ type
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
      // Просматриваемые в настоящий момент изображения (с учётом режима Flat)
-    FViewedPics: TPhoaPicLinks;
+    FViewedPics: IPhoaMutablePicList;
      // Узел результатов поиска
     FSearchNode: PVirtualNode;
      // Список изображений - результаты поиска
@@ -319,7 +319,7 @@ type
      //   если активно дерево групп - то всех изображений группы
      //   если активен вьюер - то выделенных во вьюере изображений
      //   иначе возвращает пустой список
-    function  GetSelectedPicLinks: TPhoaPicLinks;
+//    function  GetSelectedPicLinks: TPhoaPicLinks;
      // Отображает результаты поиска. Если bForceRemove=True, удаляет узел результатов, иначе, при bDoSelectNode=True,
      //   выделяет узел
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
@@ -1014,19 +1014,19 @@ uses
   end;
 
   procedure TfMain.DoEnableTools(Item: TTBCustomItem);
-  var PicLinks: TPhoaPicLinks;
+//  var PicLinks: TPhoaPicLinks;
   begin
-     // Если пункт содержит подпункты-инструменты
-    if Item.Count>0 then begin
-       // Создаём список ссылок на изображения
-      PicLinks := GetSelectedPicLinks;
-      try
-         // Настраиваем доступность инструментов
-        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, PicLinks);
-      finally
-        PicLinks.Free;
-      end;
-    end;
+//     // Если пункт содержит подпункты-инструменты
+//    if Item.Count>0 then begin
+//       // Создаём список ссылок на изображения
+//      PicLinks := GetSelectedPicLinks;
+//      try
+//         // Настраиваем доступность инструментов
+//        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, PicLinks);
+//      finally
+//        PicLinks.Free;
+//      end;
+//    end;
   end;
 
   procedure TfMain.DoLoad(const sFileName: String);
@@ -1231,7 +1231,7 @@ uses
       fpMain.IniSection  := SRegMainWindow_Root;
        // Создаём фотоальбом
       FPhoA := TPhotoAlbum.Create;
-      FViewedPics := TPhoaPicLinks.Create(False);
+      FViewedPics := TPhoaMutablePicList.Create(False);
       FViewIndex := -1;
        // Настраиваем Application
       Application.OnHint      := AppHint;
@@ -1282,9 +1282,8 @@ uses
   begin
      // Remove self from the clipboard viewer chain
     ChangeClipboardChain(Handle, FHNextClipbrdViewer);
-     // Уничтожаем Viewer до уничтожения FViewedPics
     FViewer.Free; 
-    FViewedPics.Free;
+    FViewedPics := nil;
     FPhoA.Free;
     FSearchResults.Free;
     FViewerSavedSelectedIDs.Free;
@@ -1345,21 +1344,21 @@ uses
     end;
   end;
 
-  function TfMain.GetSelectedPicLinks: TPhoaPicLinks;
-  begin
-    Result := TPhoaPicLinks.Create(True);
-    try
-       // Если активны группы - составляем список ссылок на изображения текущей группы
-      if tvGroups.Focused then begin
-        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False, False);
-       // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
-      end else if Viewer.Focused then
-        Result.AddFromPicIDs(FPhoA, PicArrayToIDArray(Viewer.GetSelectedPicArray), False);
-    except
-      Result.Free;
-      raise;
-    end;
-  end;
+//!!!  function TfMain.GetSelectedPicLinks: TPhoaPicLinks;
+//  begin
+//    Result := TPhoaPicLinks.Create(True);
+//    try
+//       // Если активны группы - составляем список ссылок на изображения текущей группы
+//      if tvGroups.Focused then begin
+//        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False, False);
+//       // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
+//      end else if Viewer.Focused then
+//        Result.AddFromPicIDs(FPhoA, PicArrayToIDArray(Viewer.GetSelectedPicArray), False);
+//    except
+//      Result.Free;
+//      raise;
+//    end;
+//  end;
 
   function TfMain.GetViewIndex: Integer;
   begin
@@ -1524,14 +1523,14 @@ uses
 
   procedure TfMain.RefreshViewer;
   var
-    UniquePics: TPhoaPicLinks;
+    UniquePics: IPhoaMutablePicList;
     bRecurse: Boolean;
 
     procedure DoAddPics(Group: TPhoaGroup);
     var
       i, iID: Integer;
       bDoAdd: Boolean;
-      Pic: TPhoaPic;
+      Pic: IPhoaPic;
     begin
        // Добавляем ссылки на изображения группы
       for i := 0 to Group.PicIDs.Count-1 do begin
@@ -1554,12 +1553,8 @@ uses
        // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды.
        //   Иначе создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
       bRecurse := aFlatMode.Checked;
-      if bRecurse then UniquePics := TPhoaPicLinks.Create(True) else UniquePics := nil;
-      try
-        DoAddPics(CurGroup);
-      finally
-        UniquePics.Free;
-      end;
+      if bRecurse then UniquePics := TPhoaMutablePicList.Create(True) else UniquePics := nil;
+      DoAddPics(CurGroup);
     end;
      // Обновляем вьюер
     FViewer.ReloadPicList(FViewedPics);
@@ -1624,16 +1619,16 @@ uses
   end;
 
   procedure TfMain.ToolItemClick(Sender: TObject);
-  var PicLinks: TPhoaPicLinks;
+//!!!  var PicLinks: TPhoaPicLinks;
   begin
-     // Создаём массив ссылок на изображения
-    PicLinks := GetSelectedPicLinks;
-    try
-       // Выполняем инструмент
-      (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
-    finally
-      PicLinks.Free;
-    end;
+//     // Создаём массив ссылок на изображения
+//    PicLinks := GetSelectedPicLinks;
+//    try
+//       // Выполняем инструмент
+//      (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
+//    finally
+//      PicLinks.Free;
+//    end;
   end;
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
