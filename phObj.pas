@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.54 2004-10-21 18:39:36 dale Exp $
+//  $Id: phObj.pas,v 1.55 2004-10-22 12:43:18 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -224,8 +224,7 @@ resourcestring
 
    // Создание новых экземпляров интерфейсов
   function  NewPhotoAlbumPic: IPhotoAlbumPic;
-  function  NewPhotoAlbumPicList(bSorted: Boolean): IPhotoAlbumPicList; overload;
-  function  NewPhotoAlbumPicList(APhoA: IPhotoAlbumProject): IPhotoAlbumPicList; overload;
+  function  NewPhotoAlbumPicList(bSorted: Boolean): IPhotoAlbumPicList;
 
   function  NewPhotoAlbumKeywordList: IPhotoAlbumKeywordList;
 
@@ -367,7 +366,6 @@ type
     FImageFormat: TPhoaPixelFormat;
     FImageSize: TSize;
     FKeywords: IPhotoAlbumKeywordList;
-    FList: Pointer;
     FMedia: String;
     FNotes: String;
     FPlace: String;
@@ -411,9 +409,7 @@ type
     procedure SetTime(Value: Integer); stdcall;
      // IPhotoAlbumPic
     function  GetKeywordsX: IPhotoAlbumKeywordList;
-    function  GetList: IPhotoAlbumPicList;
-    procedure PutToList(NewList: IPhotoAlbumPicList; bAllocateNewID: Boolean);
-    procedure Release;
+    procedure PutToList(List: IPhoaMutablePicList; iNewID: Integer = -1);
     procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
     procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
   public
@@ -540,11 +536,6 @@ type
     Result := FKeywords;
   end;
 
-  function TPhotoAlbumPic.GetList: IPhotoAlbumPicList;
-  begin
-    Result := IPhotoAlbumPicList(FList);
-  end;
-
   function TPhotoAlbumPic.GetMedia: String;
   begin
     Result := FMedia;
@@ -653,21 +644,11 @@ type
     Result := FTime;
   end;
 
-  procedure TPhotoAlbumPic.PutToList(NewList: IPhotoAlbumPicList; bAllocateNewID: Boolean);
+  procedure TPhotoAlbumPic.PutToList(List: IPhoaMutablePicList; iNewID: Integer = -1);
   begin
-    if FList<>Pointer(NewList) then begin
-      if FList<>nil then IPhotoAlbumPicList(FList).Remove(FID);
-      FList := Pointer(NewList);
-      if NewList<>nil then begin
-        if bAllocateNewID then FID := NewList.MaxPicID+1;
-        NewList.Add(Self, False);
-      end;
-    end;
-  end;
-
-  procedure TPhotoAlbumPic.Release;
-  begin
-    PutToList(nil, False);
+    if iNewID=0      then FID := List.MaxPicID+1
+    else if iNewID>0 then FID := iNewID;
+    List.Add(Self, False);
   end;
 
   procedure TPhotoAlbumPic.ReloadPicFileData(const AThumbnailSize: TSize; StretchFilter: TPhoaStretchFilter; AThumbnailQuality: Byte);
@@ -871,7 +852,6 @@ type
     FList: IInterfaceList;
      // Prop storage
     FMaxPicID: Integer;
-    FProject: Pointer;
     FSorted: Boolean;
      // IPhoaPicList
     function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
@@ -905,12 +885,8 @@ type
     function  GetItemsByIDX(iID: Integer): IPhotoAlbumPic;
     function  GetItemsByFileNameX(const sFileName: String): IPhotoAlbumPic;
     function  GetItemsX(Index: Integer): IPhotoAlbumPic;
-    function  GetProject: IPhotoAlbumProject;
   public
-     // Конструктор независимого списка. При bSorted список является сортированным по ID изображения
-    constructor Create(bSorted: Boolean); overload;
-     // Конструктор списка изображений фотоальбома (список создаётся сортированным по ID изображения)
-    constructor Create(AProject: IPhotoAlbumProject); overload;
+    constructor Create(bSorted: Boolean);
     destructor Destroy; override;
   end;
 
@@ -929,10 +905,10 @@ type
   var iID: Integer;
   begin
     iID := Pic.ID;
+     // Проверяем наличие допустимого ID
+    if iID<=0 then PhoaException(SPhObjErrMsg_InvalidAddPicID, [iID]);
      // Если нужно проверять дубликаты
     if FSorted or bSkipDuplicates then begin
-       // Проверяем наличие допустимого ID
-      if iID<=0 then PhoaException(SPhObjErrMsg_InvalidAddPicID, [iID]);
       bAdded := not FindID(iID, Result);
       if bAdded then FList.Insert(Result, Pic);
     end else begin
@@ -973,12 +949,6 @@ type
     inherited Create;
     FSorted := bSorted;
     FList := TInterfaceList.Create;
-  end;
-
-  constructor TPhotoAlbumPicList.Create(AProject: IPhotoAlbumProject);
-  begin
-    Create(True);
-    FProject := Pointer(AProject);
   end;
 
   procedure TPhotoAlbumPicList.CustomSort(CompareFunc: TPhoaPicListSortCompareFunc; dwData: Cardinal);
@@ -1032,7 +1002,7 @@ type
          // Копируем в него данные исходного изображения
         Assign(PicList[i]);
          // После этого (ID присвоен) - заносим в список
-        PutToList(Self, False);
+        PutToList(Self);
       end;
   end;
 
@@ -1129,11 +1099,6 @@ type
     Result := FMaxPicID;
   end;
 
-  function TPhotoAlbumPicList.GetProject: IPhotoAlbumProject;
-  begin
-    Result := IPhotoAlbumProject(FProject);
-  end;
-
   function TPhotoAlbumPicList.GetSorted: Boolean;
   begin
     Result := FSorted;
@@ -1188,7 +1153,7 @@ type
     begin
       with NewPhotoAlbumPic do begin
         StreamerLoad(Streamer, True, PPAllProps);
-        PutToList(Self, False);
+        PutToList(Self);
       end;
     end;
 
@@ -3628,7 +3593,7 @@ type
 
   procedure TPhotoAlbumProject.New;
   begin
-    FPics             := NewPhotoAlbumPicList(Self);
+    FPics             := NewPhotoAlbumPicList(True);
     FRootGroup        := NewPhotoAlbumPicGroup(nil, 1);
     FViews            := NewPhotoAlbumViewList(FPics);
     FFileRevision     := IPhFileRevisionNumber;
@@ -4133,11 +4098,6 @@ type
   function NewPhotoAlbumPicList(bSorted: Boolean): IPhotoAlbumPicList;
   begin
     Result := TPhotoAlbumPicList.Create(bSorted);
-  end;
-
-  function NewPhotoAlbumPicList(APhoA: IPhotoAlbumProject): IPhotoAlbumPicList;
-  begin
-    Result := TPhotoAlbumPicList.Create(APhoA);
   end;
 
   function NewPhotoAlbumKeywordList: IPhotoAlbumKeywordList;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.26 2004-10-15 13:49:35 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.27 2004-10-22 12:43:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -530,10 +530,10 @@ uses
 
   begin
     FChangesMade := True;
-     // Удаляем все ссылки на изображения
+     // Удаляем все ссылки на изображение
     DelID(FWizard.App.Project.RootGroupX, Pic.ID);
-     // Удаляем изображение
-    Pic.Release;
+     // Удаляем изображение из проекта
+    FWizard.App.Project.PicsX.Remove(Pic.ID);
   end;
 
   procedure TFileOpThread.DoDelPicAndFile(Pic: IPhotoAlbumPic);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.21 2004-10-19 15:03:31 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.22 2004-10-22 12:43:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -39,6 +39,8 @@ type
     FLastProcessedPic: IPhoaPic;
      // Счётчик сбойных изображений
     FCountFailed: Integer;
+     // Следующий свободный ID изображения 
+    FFreePicID: Integer;
      // Prop storage
     FFileList: TFileList;
     FApp: IPhotoAlbumApp;
@@ -465,8 +467,9 @@ uses
   procedure TfAddFilesWizard.InitializeWizard;
   begin
     inherited InitializeWizard;
-    FFileList := TFileList.Create;
-    FPics     := NewPhotoAlbumPicList(False);
+    FFileList  := TFileList.Create;
+    FPics      := NewPhotoAlbumPicList(False);
+    FFreePicID := FApp.Project.PicsX.MaxPicID+1;
      // Создаём страницы и отображаем первую страницу
     Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
     Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.6 2004-10-19 15:03:31 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.7 2004-10-22 12:43:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -23,11 +23,9 @@ type
 
   IPhotoAlbumPic = interface(IPhoaMutablePic)
     ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB631}']
-     // ”станавливает список NewList в качестве владельца. ѕри bAllocateNewID=True также распредел€ет изображению новый
-     //    ID, уникальный в списке
-    procedure PutToList(NewList: IPhotoAlbumPicList; bAllocateNewID: Boolean);
-     // ”дал€ет изображение из списка (после этого оно должно уничтожатьс€, если на него больше нет ссылок)
-    procedure Release;
+     // ƒобавл€ет изображение в список List. ѕри iNewID<0 оставл€ет ID изображени€ неизменным, при iNewID=0 распредел€ет
+     //   изображению новый ID, уникальный в List. ѕри iNewID>0 присваивает этот ID изображению
+    procedure PutToList(List: IPhoaMutablePicList; iNewID: Integer = -1);
      // «агрузка/сохранение с помощью Streamer
      //   -- ѕараметр bEx...Relative контролирует, осуществл€ть ли преобразование относительного <-> абсолютного пути
      //      к файлу изображени€
@@ -37,12 +35,9 @@ type
     procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
      // Prop handlers
     function  GetKeywordsX: IPhotoAlbumKeywordList;
-    function  GetList: IPhotoAlbumPicList;
      // Props
      // -- 'Native' version of Keywords
     property KeywordsX: IPhotoAlbumKeywordList read GetKeywordsX;
-     // -- —писок-владелец изображени€
-    property List: IPhotoAlbumPicList read GetList;
   end;
 
    //===================================================================================================================
@@ -108,7 +103,6 @@ type
     function  GetItemsByIDX(iID: Integer): IPhotoAlbumPic;
     function  GetItemsByFileNameX(const sFileName: String): IPhotoAlbumPic;
     function  GetItemsX(Index: Integer): IPhotoAlbumPic;
-    function  GetProject: IPhotoAlbumProject;
      // Props
      // -- 'Native' version of ItemsByID[]
     property ItemsByIDX[iID: Integer]: IPhotoAlbumPic read GetItemsByIDX;
@@ -116,8 +110,6 @@ type
     property ItemsByFileNameX[const sFileName: String]: IPhotoAlbumPic read GetItemsByFileNameX;
      // -- 'Native' version of Items[]
     property ItemsX[Index: Integer]: IPhotoAlbumPic read GetItemsX; default;
-     // -- ѕроект-владелец
-    property Project: IPhotoAlbumProject read GetProject;
   end;
 
    //===================================================================================================================

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.10 2004-10-21 12:42:00 dale Exp $
+//  $Id: phOps.pas,v 1.11 2004-10-22 12:43:18 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1020,14 +1020,17 @@ type
   end;
 
   function TPhoaOperationParams.GetValueStrict(const sName: String): Variant;
+  var idx: Integer;
   begin
-    Result := GetValues(sName);
-    if VarIsEmpty(Result) then PhoaException(SPhoaOpErrMsg_ParamNotFound, [sName]);
+    idx := IndexOfName(sName);
+    if idx<0 then PhoaException(SPhoaOpErrMsg_ParamNotFound, [sName]);
+    Result := FParams[idx].vValue;
   end;
 
   function TPhoaOperationParams.IndexOfName(const sName: String): Integer;
   begin
     for Result := 0 to High(FParams) do
+       // Для ускорения сравниваем, используя не-Ansi-версию, т.к. параметры не должны содержать национальных символов 
       if SameText(FParams[Result].sName, sName) then Exit;
     Result := -1;
   end;
@@ -1566,7 +1569,7 @@ type
          // Сохраняем данные изображения
         UndoFile.WriteStr(Pic.RawData[PPAllProps]);
          // Удаляем изображение из списка
-        Pic.Release;
+        Project.PicsX.Delete(i);
          // Добавляем флаги изменений
         Include(Changes, pocProjectPicList);
       end;
@@ -1584,7 +1587,7 @@ type
          // Загружаем данные
         RawData[PPAllProps] := UndoFile.ReadStr;
          // Кладём в список (ID уже загружен)
-        PutToList(Project.PicsX, False);
+        PutToList(Project.PicsX);
          // Добавляем флаги изменений
         Include(Changes, pocProjectPicList);
       end;
@@ -1867,7 +1870,7 @@ type
         Pic := PicEx
        // Иначе заносим в список, распределяя новый ID
       else begin
-        Pic.PutToList(Project.PicsX, True);
+        Pic.PutToList(Project.PicsX, 0);
         Include(Changes, pocProjectPicList);
       end;
        // Добавляем изображение в группу, если его там не было
@@ -1900,7 +1903,7 @@ type
       end;
        // Если было добавлено новое изображение, удаляем и из списка проекта
       if not bExisting then begin
-        Project.PicsX.ItemsByIDX[iPicID].Release;
+        Project.PicsX.Remove(iPicID);
         Include(Changes, pocProjectPicList);
       end;
     end;
