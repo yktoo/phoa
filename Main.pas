@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.53 2004-10-15 13:49:35 dale Exp $
+//  $Id: Main.pas,v 1.54 2004-10-18 12:25:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -337,6 +337,8 @@ type
     procedure UpdateFlatModeAction;
      // Возвращает вид узла
     function  GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
+     // Возвращает группу, соответствующую узлу
+    function  GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
      // Отрабатывает флаги изменения операций путём обновления соответствующих частей приложения
     procedure ProcessOpChanges(Changes: TPhoaOperationChanges);
      // Откатывает все операции с последней до Index и обновляет визуальные объекты согласно флагам операций
@@ -655,16 +657,24 @@ uses
   end;
 
   procedure TfMain.aaNewGroup(Sender: TObject);
-  var Changes: TPhoaOperationChanges;
+  var
+    Changes: TPhoaOperationChanges;
+    Params: IPhoaOperationParams;
+    NewGroup: IPhotoAlbumPicGroup;
   begin
     Changes := [];
+    Params  := NewPhoaOperationParams;
+    Params['Group'] := CurGroup;
     BeginOperation;
     try
-      TPhoaOp_GroupNew.Create(FUndo, FProject, CurGroup, Changes);
+      TPhoaOp_GroupNew.Create(FUndo, FProject, Params, Changes);
     finally
       EndOperation(Changes);
     end;
-    //!!! Входить в режим редактирования имени добавленной группы
+     // Входим в режим редактирования имени добавленной группы
+    Params.ObtainValIntf('NewGroup', IPhotoAlbumPicGroup, NewGroup);
+    CurGroup :=  NewGroup;
+    if tvGroups.FocusedNode<>nil then tvGroups.EditNode(tvGroups.FocusedNode, -1);
   end;
 
   procedure TfMain.aaNewPic(Sender: TObject);
@@ -1174,10 +1184,7 @@ uses
   function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
   begin
     Result := tvGroups.GetFirst;
-    while Result<>nil do begin
-      if PPhotoAlbumPicGroup(tvGroups.GetNodeData(Result))^.ID=iGroupID then Exit;
-      Result := tvGroups.GetNext(Result);
-    end;
+    while (Result<>nil) and (GetNodeGroup(Result).ID<>iGroupID) do Result := tvGroups.GetNext(Result);
   end;
 
   procedure TfMain.FormActivate(Sender: TObject);
@@ -1279,10 +1286,8 @@ uses
   end;
 
   function TfMain.GetCurGroup: IPhotoAlbumPicGroup;
-  var p: PPhotoAlbumPicGroup;
   begin
-    p := tvGroups.GetNodeData(tvGroups.FocusedNode);
-    if p=nil then Result := nil else Result := p^;
+    Result := GetNodeGroup(tvGroups.FocusedNode);
   end;
 
   function TfMain.GetDisplayFileName: String;
@@ -1301,6 +1306,11 @@ uses
     if tvGroups.Focused     then Result := pafcGroupTree
     else if FViewer.Focused then Result := pafcThumbViewer
     else                         Result := pafcNone;
+  end;
+
+  function TfMain.GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
+  begin
+    if Node=nil then Result := nil else Result := PPhotoAlbumPicGroup(tvGroups.GetNodeData(Node))^;
   end;
 
   function TfMain.GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
@@ -1563,13 +1573,7 @@ uses
   procedure TfMain.SetCurGroup(Value: IPhotoAlbumPicGroup);
   var n: PVirtualNode;
   begin
-     // Перебираем узлы, пока не найдём
-    if Value<>nil then begin
-      n := tvGroups.GetFirst;
-      while (n<>nil) and (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>Value) do n := tvGroups.GetNext(n);
-    end else
-      n := nil;
-     // Активизируем
+    if Value=nil then n := nil else n := FindGroupNodeByID(Value.ID);
     ActivateVTNode(tvGroups, n);
   end;
 
@@ -1579,11 +1583,11 @@ uses
   end;
 
   procedure TfMain.SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
-  var p: PPhotoAlbumPicGroup;
+  var Group: IPhotoAlbumPicGroup;
   begin
     if tsUpdating in tvGroups.TreeStates then Exit;
-    p := Sender.GetNodeData(Node);
-    if (p<>nil) then p^.Expanded := Sender.Expanded[Node];
+    Group := GetNodeGroup(Node);
+    if (Group<>nil) then Group.Expanded := Sender.Expanded[Node];
   end;
 
   procedure TfMain.SetPhoaViewClick(Sender: TObject);
@@ -1661,6 +1665,7 @@ uses
     Changes := [];
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
+    gTgt := GetNodeGroup(nTgt);
      // Перетаскивание группы
     if Sender=Source then begin
        // Вычисляем и помещаем в nTgt нового родителя, в iNewIndex - новый индекс в родителе, в AM - режим перемещения
@@ -1680,13 +1685,7 @@ uses
        // Перемещаем
       BeginOperation;
       try
-        TPhoaOp_GroupDragAndDrop.Create(
-          FUndo,
-          FProject,
-          PPhotoAlbumPicGroup(Sender.GetNodeData(nSrc))^, // Group being dragged
-          PPhotoAlbumPicGroup(Sender.GetNodeData(nTgt))^, // New parent group
-          iNewIndex,
-          Changes);
+        TPhoaOp_GroupDragAndDrop.Create(FUndo, FProject, GetNodeGroup(nSrc), gTgt, iNewIndex, Changes);
       finally
         EndOperation(Changes);
       end;
@@ -1694,7 +1693,6 @@ uses
      // Перетаскивание изображений
     end else if Source=Viewer then begin
       bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
-      gTgt := PPhotoAlbumPicGroup(Sender.GetNodeData(nTgt))^;
       iCnt := Viewer.SelectedPics.Count;
       iCntBefore := gTgt.Pics.Count;
       BeginOperation;
@@ -1777,7 +1775,7 @@ uses
   begin
     case GetNodeKind(Sender, Node) of
       gnkPhoA:      s := FProject.Description;
-      gnkPhoaGroup: s := GetPicGroupPropStrs(PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^, FGroupTreeHintProps, ': ', S_CRLF);
+      gnkPhoaGroup: s := GetPicGroupPropStrs(GetNodeGroup(Node), FGroupTreeHintProps, ': ', S_CRLF);
       else          s := '';
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
@@ -1798,10 +1796,10 @@ uses
 
   procedure TfMain.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
-    p: PPhotoAlbumPicGroup;
+    Group: IPhotoAlbumPicGroup;
     s: String;
   begin
-    p := Sender.GetNodeData(Node);
+    Group := GetNodeGroup(Node);
     s := '';
      // Static text
     case TextType of
@@ -1811,23 +1809,22 @@ uses
           gnkView:        s := FProject.CurrentView.Name;
           gnkSearch:      s := ConstVal('SSearchResultsNode');
           gnkPhoaGroup,
-            gnkViewGroup: s := p^.Text;
+            gnkViewGroup: s := Group.Text;
         end;
-      ttStatic: if p^.Pics.Count>0 then s := Format('(%d)', [p^.Pics.Count]);
+      ttStatic: if Group.Pics.Count>0 then s := Format('(%d)', [Group.Pics.Count]);
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   procedure TfMain.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var p, pp: PPhotoAlbumPicGroup;
+  var p: PPhotoAlbumPicGroup;
   begin
     p := Sender.GetNodeData(Node);
      // Узел обычной группы
-    if ParentNode<>nil then begin
-      pp := Sender.GetNodeData(ParentNode);
-      p^ := pp^.GroupsX[Node.Index];
+    if ParentNode<>nil then
+      p^ := GetNodeGroup(ParentNode).GroupsX[Node.Index]
      // Узел фотоальбома/представления
-    end else if Node.Index=0 then begin
+    else if Node.Index=0 then begin
       p^ := FProject.ViewRootGroupX;
       Node.CheckType := ctButton;
      // Узел результатов поиска

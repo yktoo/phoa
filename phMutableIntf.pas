@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.8 2004-10-13 11:03:33 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.9 2004-10-18 12:25:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -42,7 +42,7 @@ type
     property FileName: String read GetFileName write SetFileName;
      // -- Writable Flips
     property Flips: TPicFlips read GetFlips write SetFlips;
-     // -- Mutable keyword list
+     // -- 'Mutable' version of Keywords
     property KeywordsM: IPhoaMutableKeywordList read GetKeywordsM;
      // -- Writable PropertyValue[]. Invalid values of sPropName are ignored
     property PropertyValue[const sPropName: String]: String read GetPropertyValue write SetPropertyValue;
@@ -72,6 +72,10 @@ type
     function  Remove(const sKeyword: String): Integer; stdcall;
      // Clears the list
     procedure Clear; stdcall;
+     // Replaces a keyword for another one; checks that the new keyword is not in list yet, raises an Exception
+     //   otherwise. After replace moves the word into new position according to sort order, and return the new index of
+     //   the keyword
+    function  Rename(Index: Integer; const sNewKeyword: String): Integer; stdcall;
      // Prop handlers
     procedure SetCommaText(const Value: String); stdcall;
      // Props

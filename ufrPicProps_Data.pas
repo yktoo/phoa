@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.13 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.14 2004-10-18 12:25:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -91,22 +91,18 @@ const
 
   procedure TfrPicProps_Data.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
   var
-    ChgList: TPicPropertyChanges;
+    ChgList: IPhoaPicPropertyChangeList;
     Prop: TPicProperty;
   begin
     inherited Apply(AOperations, Changes);
      // Если страница посещалась
     if FInitialized then begin
        // Составляем список изменений
-      ChgList := TPicPropertyChanges.Create;
-      try
-        for Prop := Low(Prop) to High(Prop) do
-          if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].sValue, Prop);
-         // Если есть изменения - создаём операцию изменения
-        if ChgList.Count>0 then TPhoaOp_InternalEditPicProps.Create(AOperations, App.Project, EditedPics, ChgList, Changes);
-      finally
-        ChgList.Free;
-      end;
+      ChgList := NewPhoaPicPropertyChangeList;
+      for Prop := Low(Prop) to High(Prop) do
+        if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].sValue, Prop);
+       // Если есть изменения - создаём операцию изменения
+      if ChgList.Count>0 then TPhoaOp_InternalEditPicProps.Create(AOperations, App.Project, EditedPics, ChgList, Changes);
     end;
   end;
 

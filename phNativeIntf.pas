@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.3 2004-10-15 13:49:35 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.4 2004-10-18 12:25:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -18,7 +18,8 @@ type
    // IPhotoAlbumPic - изображение фотоальбома
    //===================================================================================================================
 
-  IPhotoAlbumPicList = interface;
+  IPhotoAlbumKeywordList = interface;
+  IPhotoAlbumPicList     = interface;
 
   IPhotoAlbumPic = interface(IPhoaMutablePic)
     ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB631}']
@@ -35,10 +36,58 @@ type
     procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
     procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
      // Prop handlers
+    function  GetKeywordsX: IPhotoAlbumKeywordList;
     function  GetList: IPhotoAlbumPicList;
      // Props
+     // -- 'Native' version of Keywords
+    property KeywordsX: IPhotoAlbumKeywordList read GetKeywordsX;
      // -- Список-владелец изображения
     property List: IPhotoAlbumPicList read GetList;
+  end;
+
+   //===================================================================================================================
+   // IPhotoAlbumKeywordList - список ключевых слов
+   //===================================================================================================================
+
+   // Требуемое изменение [текста] ключевого слова
+  TPhoaKeywordChange = (pkcNone, pkcAdd, pkcReplace);
+   // Состояние выбора ключевого слова
+  TPhoaKeywordState  = (pksOff, pksGrayed, pksOn);
+
+   // Дополнительные данные ключевого слова
+  PPhoaKeywordData = ^TPhoaKeywordData;
+  TPhoaKeywordData = record
+    sOldKeyword: String;             // Прежнее ключевое слово, если нужно заменить существующее на другое
+    Change:      TPhoaKeywordChange; // Требуемое изменение [текста] ключевого слова
+    State:       TPhoaKeywordState;  // Состояние выбора ключевого слова
+    iCount:      Integer;            // Количество вхождений в фотоальбом (для существующих, т.е. Change<>kcAdd)
+    iSelCount:   Integer;            // Количество упоминаний среди выбранных изображений (заполняется в PopulateFromPicList при предоставлении Callback-процедуры)
+  end;
+
+   // Callback-процедура, вызываемая из IPhotoAlbumKeywordList.PopulateFromPicList() для определения, выбрано
+   // изображение или нет
+  TPhoaKeywordIsPicSelectedProc = procedure(Pic: IPhoaPic; out bSelected: Boolean) of object;
+
+  IPhotoAlbumKeywordList = interface(IPhoaMutableKeywordList)
+    ['{B14C063F-43EC-48BA-9724-562A97E5E2C7}']
+     // Добавляет слово. При повторном добавлении слова оно не добавляется, только приращивается счётчик. Если
+     //   bSelected=True, приращивается также счётчик iSelCount
+    function  AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+     // Заполняет список на основе ключевых слов изображений из списка. Если передана процедура IsPicSelCallback,
+     //   параллельно заполняются счётчики TKeywordRec.iSelCount, в соответствии с iTotalSelCount выставляется
+     //   TKeywordRec.State
+    procedure PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TPhoaKeywordIsPicSelectedProc; iTotalSelCount: Integer);
+     // Добавляет новое слово с уникальным именем и возвращает его индекс в списке
+    function  InsertNew: Integer;
+     // Prop handlers
+    function  GetKWData(Index: Integer): PPhoaKeywordData;
+    function  GetSelectedKeywords: String;
+    procedure SetSelectedKeywords(const Value: String);
+     // Props
+     // -- Данные ключевых слов по индексу
+    property KWData[Index: Integer]: PPhoaKeywordData read GetKWData; 
+     // -- Разделённые запятой выбранные слова. При присваивании расставляет выбранность слов
+    property SelectedKeywords: String read GetSelectedKeywords write SetSelectedKeywords;
   end;
 
    //===================================================================================================================

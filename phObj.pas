@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.50 2004-10-15 13:49:35 dale Exp $
+//  $Id: phObj.pas,v 1.51 2004-10-18 12:25:49 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -95,66 +95,11 @@ type
     procedure DeleteUnchecked;
      // Props
      // -- Полные пути к файлам по индексу
-    property Files[Index: Integer]: String read GetFiles; 
+    property Files[Index: Integer]: String read GetFiles;
      // -- Элементы списка по индексу
     property Items[Index: Integer]: PFileRec read GetItems; default;
      // -- Handle системного ImageList'а после определения иконки файла в Add()
     property SysImageListHandle: THandle read FSysImageListHandle;
-  end;
-
-   //===================================================================================================================
-   // Список ключевых слов
-   //===================================================================================================================
-
-   // Требуемое изменение [текста] ключевого слова
-  TKeywordChange = (kcNone, kcAdd, kcReplace);
-   // Состояние выбора ключевого слова
-  TKeywordState  = (ksOff, ksGrayed, ksOn);
-
-  PKeywordRec = ^TKeywordRec;
-  TKeywordRec = record
-    sKeyword:    String;         // Ключевое слово (новое, если нужно переименовать)
-    sOldKeyword: String;         // Прежнее ключевое слово, если нужно заменить существующее на другое
-    Change:      TKeywordChange; // Требуемое изменение [текста] ключевого слова
-    State:       TKeywordState;  // Состояние выбора ключевого слова
-    iCount:      Integer;        // Количество вхождений в фотоальбом (для существующих, т.е. Change<>kcAdd)
-    iSelCount:   Integer;        // Количество упоминаний среди выбранных изображений (заполняется в PopulateFromPicList
-                                 //   при предоставлении Callback-процедуры)
-  end;
-
-   // Callback-процедура, вызываемая из TKeywordList.PopulateFromPicList() для определения, выбрано изображение, или нет
-  TKeywordIsPicSelectedProc = procedure(Pic: IPhoaPic; out bSelected: Boolean) of object;
-
-  TKeywordList = class(TList)
-  private
-     // Prop handlers
-    function  GetItems(Index: Integer): PKeywordRec;
-    function  GetSelectedKeywords: String;
-    procedure SetSelectedKeywords(const Value: String);
-  protected
-    procedure Notify(Ptr: Pointer; Action: TListNotification); override;
-  public
-     // Добавляет слово. При повторном добавлении слова оно не добавляется, только приращивается счётчик. Если
-     //   bSelected=True, приращивается также счётчик iSelCount
-    function  Add(const s: String; bSelected: Boolean): Integer;
-     // Определяет индекс, куда нужно вставить слово (с учётом сортировки) или где оно уже есть. Возвращает True, если
-     //   это слово уже есть в списке, иначе False
-    function  FindKeyword(const s: String; out Index: Integer): Boolean;
-     // Заполняет список на основе ключевых слов изображений из списка. Если передана процедура IsPicSelCallback,
-     //   параллельно заполняются счётчики TKeywordRec.iSelCount, в соответствии с iTotalSelCount выставляется
-     //   TKeywordRec.State
-    procedure PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TKeywordIsPicSelectedProc; iTotalSelCount: Integer);
-     // Заменяет слово на новое, проверяя отсутствие такого слова в списке (если уже есть - генерирует Exception).
-     //   При замене перемещает его на новое место с учётом сортировки, возвращая новый индекс. Настраивает изменение
-     //   (TKeywordRec.Change)
-    function  Rename(Index: Integer; const sNewKeyword: String): Integer;
-     // Добавляет новое слово с уникальным именем и возвращает его индекс в списке
-    function  InsertNew: Integer;
-     // Props
-     // -- Записи по индексу
-    property Items[Index: Integer]: PKeywordRec read GetItems; default;
-     // -- Разделённые запятой выбранные слова. При присваивании расставляет выбранность слов
-    property SelectedKeywords: String read GetSelectedKeywords write SetSelectedKeywords;
   end;
 
    //===================================================================================================================
@@ -285,7 +230,7 @@ resourcestring
   function  NewPhotoAlbumPicList(bSorted: Boolean): IPhotoAlbumPicList; overload;
   function  NewPhotoAlbumPicList(APhoA: IPhotoAlbumProject): IPhotoAlbumPicList; overload;
 
-  function  NewPhoaMutableKeywordList: IPhoaMutableKeywordList;
+  function  NewPhotoAlbumKeywordList: IPhotoAlbumKeywordList;
 
   function  NewPhotoAlbumPicGroup(AOwner: IPhoaPicGroup; iID: Integer): IPhotoAlbumPicGroup;
   function  NewPhotoAlbumPicGroupList(AOwner: IPhoaPicGroup): IPhotoAlbumPicGroupList;
@@ -437,7 +382,7 @@ type
     FID: Integer;
     FImageFormat: TPhoaPixelFormat;
     FImageSize: TSize;
-    FKeywords: IPhoaMutableKeywordList;
+    FKeywords: IPhotoAlbumKeywordList;
     FList: Pointer;
     FMedia: String;
     FNotes: String;
@@ -482,6 +427,7 @@ type
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
      // IPhotoAlbumPic
+    function  GetKeywordsX: IPhotoAlbumKeywordList;
     function  GetList: IPhotoAlbumPicList;
     procedure PutToList(NewList: IPhotoAlbumPicList; bAllocateNewID: Boolean);
     procedure Release;
@@ -538,7 +484,7 @@ type
   begin
     inherited Create;
     FImageFormat := ppfCustom;
-    FKeywords := NewPhoaMutableKeywordList;
+    FKeywords := NewPhotoAlbumKeywordList;
   end;
 
   function TPhotoAlbumPic.GetAuthor: String;
@@ -602,6 +548,11 @@ type
   end;
 
   function TPhotoAlbumPic.GetKeywordsM: IPhoaMutableKeywordList;
+  begin
+    Result := FKeywords;
+  end;
+
+  function TPhotoAlbumPic.GetKeywordsX: IPhotoAlbumKeywordList;
   begin
     Result := FKeywords;
   end;
@@ -1277,52 +1228,95 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaMutableKeywordList
+   // TPhotoAlbumKeywordList
    //===================================================================================================================
 type
-  TPhoaMutableKeywordList = class(TInterfacedObject, IPhoaKeywordList, IPhoaMutableKeywordList)
+  TPhotoAlbumKeywordList = class(TInterfacedObject, IPhoaKeywordList, IPhoaMutableKeywordList, IPhotoAlbumKeywordList)
   private
      // Собственно список
     FList: TStringList;
      // Создаёт FList, если он ещё не создан
     procedure CreateList;
      // IPhoaKeywordList
-    function  IndexOf(const sKeyword: String): Integer; stdcall;
     function  GetCommaText: String; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): String; stdcall;
+    function  IndexOf(const sKeyword: String): Integer; stdcall;
      // IPhoaMutableKeywordList
     function  Add(const sKeyword: String): Integer; stdcall;
-    procedure Delete(Index: Integer); stdcall;
     function  Remove(const sKeyword: String): Integer; stdcall;
-    procedure Clear; stdcall;
+    function  Rename(Index: Integer; const sNewKeyword: String): Integer; stdcall;
     procedure Assign(Source: IPhoaKeywordList); stdcall;
+    procedure Clear; stdcall;
+    procedure Delete(Index: Integer); stdcall;
     procedure SetCommaText(const Value: String); stdcall;
+     // IPhotoAlbumKeywordList
+    function  AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+    function  GetKWData(Index: Integer): PPhoaKeywordData;
+    function  GetSelectedKeywords: String;
+    function  InsertNew: Integer;
+    procedure PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TPhoaKeywordIsPicSelectedProc; iTotalSelCount: Integer);
+    procedure SetSelectedKeywords(const Value: String);
   public
     destructor Destroy; override;
   end;
 
-  function TPhoaMutableKeywordList.Add(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.Add(const sKeyword: String): Integer;
   begin
-     // Создаём FList, если он ещё не создан
-    CreateList;
-     // Добавляем слово
-    Result := FList.Add(sKeyword);
+    Result := AddEx(sKeyword, False);
   end;
 
-  procedure TPhoaMutableKeywordList.Assign(Source: IPhoaKeywordList);
-  var i: Integer;
+  function TPhotoAlbumKeywordList.AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+  var p: PPhoaKeywordData;
+  begin
+     // Создаём список, если он ещё не создан
+    CreateList;
+     // Ищем такое слово. Если нашли - приращиваем счётчик
+    Result := IndexOf(sKeyword);  
+    if Result>=0 then begin
+      p := GetKWData(Result);
+      Inc(p.iCount);
+     // Иначе вставляем
+    end else begin
+      Result := FList.Add(sKeyword);
+      New(p);
+      FList.Objects[Result] := Pointer(p);
+      with p^ do begin
+        Change    := kcNone;
+        State     := ksOff;
+        iCount    := 1;
+        iSelCount := 0;
+      end;
+    end;
+    if bSelected then Inc(p.iSelCount);
+  end;
+
+  procedure TPhotoAlbumKeywordList.Assign(Source: IPhoaKeywordList);
+  var
+    i, idx: Integer;
+    PAKL: IPhotoAlbumKeywordList;
   begin
     Clear;
-    for i := 0 to Source.Count-1 do Add(Source[i]);
+     // Проверяем поддержку интерфейса IPhotoAlbumKeywordList
+    Supports(Source, IPhotoAlbumKeywordList, PAKL);
+     // Копируем слова со списка
+    for i := 0 to Source.Count-1 do begin
+      idx := Add(Source[i]);
+       // Если native-интерфейс поддерживается, копируем также дополнительные данные ключевого слова
+      if PAKL<>nil then GetKWData(idx)^ := PAKL.KWData[idx]^;
+    end;
   end;
 
-  procedure TPhoaMutableKeywordList.Clear;
+  procedure TPhotoAlbumKeywordList.Clear;
+  var i: Integer;
   begin
-    FreeAndNil(FList);
+    if FList<>nil then begin
+      for i := 0 to FList.Count-1 do Dispose(PPhoaKeywordData(FList.Objects[Index]));
+      FreeAndNil(FList);
+    end;
   end;
 
-  procedure TPhoaMutableKeywordList.CreateList;
+  procedure TPhotoAlbumKeywordList.CreateList;
   begin
     if FList=nil then begin
       FList := TStringList.Create;
@@ -1331,52 +1325,193 @@ type
     end;
   end;
 
-  procedure TPhoaMutableKeywordList.Delete(Index: Integer);
+  procedure TPhotoAlbumKeywordList.Delete(Index: Integer);
   begin
+    Dispose(PPhoaKeywordData(FList.Objects[Index]));
     FList.Delete(Index);
   end;
 
-  destructor TPhoaMutableKeywordList.Destroy;
+  destructor TPhotoAlbumKeywordList.Destroy;
   begin
+    Clear;
     FList.Free;
     inherited Destroy;
   end;
 
-  function TPhoaMutableKeywordList.GetCommaText: String;
+  function TPhotoAlbumKeywordList.GetCommaText: String;
   begin
     if FList=nil then Result := '' else Result := FList.CommaText;
   end;
 
-  function TPhoaMutableKeywordList.GetCount: Integer;
+  function TPhotoAlbumKeywordList.GetCount: Integer;
   begin
     if FList=nil then Result := 0 else Result := FList.Count;
   end;
 
-  function TPhoaMutableKeywordList.GetItems(Index: Integer): String;
+  function TPhotoAlbumKeywordList.GetItems(Index: Integer): String;
   begin
     Result := FList[Index];
   end;
 
-  function TPhoaMutableKeywordList.IndexOf(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.GetKWData(Index: Integer): PPhoaKeywordData;
+  begin
+    Result := Pointer(FList.Objects[Index]);
+  end;
+
+  function TPhotoAlbumKeywordList.GetSelectedKeywords: String;
+  var
+    i: Integer;
+    sKeyword: String;
+  begin
+    Result := '';
+    if FList<>nil then
+      for i := 0 to FList.Count-1 do begin
+        sKeyword := FList[i];
+        if GetKWData(i).State=pksOn then
+          if LastDelimiter(' ,"', sKeyword)>0 then
+            AccumulateStr(Result, ',', AnsiQuotedStr(sKeyword, '"'))
+          else
+            AccumulateStr(Result, ',', sKeyword);
+      end;
+  end;
+
+  function TPhotoAlbumKeywordList.IndexOf(const sKeyword: String): Integer;
   begin
     if FList=nil then Result := -1 else Result := FList.IndexOf(sKeyword);
   end;
 
-  function TPhoaMutableKeywordList.Remove(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.InsertNew: Integer;
+  var
+    sKWBase, sNewKeyword: String;
+    iAttempt: Integer;
+    p: PKeywordRec;
   begin
-    Result := IndexOf(sKeyword);
-    if Result>=0 then FList.Delete(Result);
+     // Ищем уникальное ключевое слово вида "Новое ключевое слово (n)"
+    sKWBase := ConstVal('SDefaultNewKeyword');
+    iAttempt := 0;
+    repeat
+      Inc(iAttempt);
+      sNewKeyword := Format(iif(iAttempt<2, '%s', '%s (%d)'), [sKWBase, iAttempt]);
+    until IndexOf(sNewKeyword)<0;
+     // Добавляем
+    Result := AddEx(sNewKeyword, True);
+    with GetKWData(Result)^ do begin
+      Change    := pkcAdd;
+      State     := pksOn;
+      iCount    := 0;
+      iSelCount := 0;
+    end;
   end;
 
-  procedure TPhoaMutableKeywordList.SetCommaText(const Value: String);
+  procedure TPhotoAlbumKeywordList.PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TPhoaKeywordIsPicSelectedProc; iTotalSelCount: Integer);
+  var
+    ip, ikw: Integer;
+    Pic: IPhoaPic;
+    bSelected: Boolean;
   begin
-    if Value='' then
-      Clear
-    else begin
-       // Создаём FList, если он ещё не создан
-      CreateList;
-       // Присваиваем текст
-      FList.CommaText := Value;
+     // Стираем список
+    Clear;
+     // Цикл по всем изображениям списка
+    bSelected := False;
+    for ip := 0 to Pics.Count-1 do begin
+      Pic := Pics[ip];
+       // Если передана callback-процедура, вызываем её для определения: выбрано изображение или нет
+      if Assigned(IsPicSelCallback) then IsPicSelCallback(Pic, bSelected);
+      for ikw := 0 to Pic.Keywords.Count-1 do Add(Pic.Keywords[ikw], bSelected);
+    end;
+     // Выставляем состояние выбора
+    if Assigned(IsPicSelCallback) and (iTotalSelCount>0) then
+      for ikw := 0 to Count-1 do
+        with GetKWData(ikw)^ do
+          if iSelCount=0                   then State := pksOff
+          else if iSelCount=iTotalSelCount then State := pksOn
+          else                                  State := pksGrayed;
+  end;
+
+  function TPhotoAlbumKeywordList.Remove(const sKeyword: String): Integer;
+  begin
+    Result := IndexOf(sKeyword);
+    if Result>=0 then Delete(Result);
+  end;
+
+  function TPhotoAlbumKeywordList.Rename(Index: Integer; const sNewKeyword: String): Integer;
+  var
+    p: PPhoaKeywordData;
+    sKeyword: String;
+  begin
+     // Если вообще совпадает, делать нечего
+    sKeyword := FList[Index];
+    if sKeyword=sNewKeyword then Exit;
+    p := GetKWData(Index);
+     // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
+    if not AnsiSameText(sKeyword, sNewKeyword) then begin
+       // Если уже есть такое в списке, вызываем Exception
+      if IndexOf(sNewKeyword)>=0 then PhoaException(ConstVal('SErrDuplicateKeyword'));
+       // Иначе сдвигаем на новое место
+      FList.Delete(Index);
+      Result := Add(sKeyword);
+      FList.Objects[Result] := Pointer(p);
+     // Иначе двигать незачем
+    end else
+      Result := Index;
+     // Настраиваем Change
+    with p^ do begin
+      case Change of
+         // Первое изменение - сохраняем старое значение и устанавливаем изменение kcReplace
+        kcNone: begin
+          sOldKeyword := sKeyword;
+          Change := kcReplace;
+        end;
+         // Не первое изменение - если возвращаем старое значение, снимаем изменение
+        kcReplace:
+          if sOldKeyword=sNewKeyword then begin
+            Change := kcNone;
+            sOldKeyword := '';
+          end;
+      end;
+       // Записываем новое значение
+      sKeyword := sNewKeyword;
+    end;
+  end;
+
+  procedure TPhotoAlbumKeywordList.SetCommaText(const Value: String);
+  var
+    SL: TStringList;
+    i: Integer;
+  begin
+    Clear;
+    if Value<>'' then begin
+      SL := TStringList.Create;
+      try
+        SL.CommaText := Value;
+        for i := 0 to SL.Count-1 do Add(SL[i]);
+      finally
+        SL.Free;
+      end;
+    end;
+  end;
+
+  procedure TPhotoAlbumKeywordList.SetSelectedKeywords(const Value: String);
+  var
+    SL: TStringList;
+    i: Integer;
+    p: PPhoaKeywordData;
+  begin
+    if FList<>nil then begin
+      SL := TStringList.Create;
+      try
+         // Переписываем слова в виде StringList
+        SL.Sorted := True;
+        SL.Duplicates := dupIgnore;
+        SL.CommaText := Value;
+         // Проверяем наличие слов
+        for i := 0 to Count-1 do begin
+          p := GetKWData(i);
+          if SL.IndexOf(FList[i])<0 then p.State := pksOff else p.State := pksOn;
+        end;
+      finally
+        SL.Free;
+      end;
     end;
   end;
 
@@ -3825,183 +3960,6 @@ type
   end;
 
    //===================================================================================================================
-   // TKeywordList
-   //===================================================================================================================
-
-  function TKeywordList.Add(const s: String; bSelected: Boolean): Integer;
-  var p: PKeywordRec;
-  begin
-     // Ищем такое слово. Если нашли - приращиваем счётчик
-    if FindKeyword(s, Result) then begin
-      p := GetItems(Result);
-      Inc(p.iCount);
-     // Иначе вставляем
-    end else begin
-      New(p);
-      Insert(Result, p);
-      with p^ do begin
-        sKeyword  := s;
-        Change    := kcNone;
-        State     := ksOff;
-        iCount    := 1;
-        iSelCount := 0;
-      end;
-    end;
-    if bSelected then Inc(p.iSelCount);
-  end;
-
-  function TKeywordList.FindKeyword(const s: String; out Index: Integer): Boolean;
-  var iR, iL, i: Integer;
-  begin
-    Result := False;
-     // Метод половинного деления
-    iL := 0;
-    iR := Count-1;
-    while iL<=iR do begin
-      i := (iL+iR) div 2;
-      case AnsiCompareText(GetItems(i).sKeyword, s) of
-        Low(Integer)..-1: iL := i+1;
-        1..High(Integer): iR := i-1;
-        else begin
-          Result := True;
-          iL := i;
-          Break;
-        end;
-      end;
-    end;
-    Index := iL;
-  end;
-
-  function TKeywordList.GetItems(Index: Integer): PKeywordRec;
-  begin
-    Result := PKeywordRec(inherited Items[Index]);
-  end;
-
-  function TKeywordList.GetSelectedKeywords: String;
-  var i: Integer;
-  begin
-    Result := '';
-    for i := 0 to Count-1 do
-      with GetItems(i)^ do
-        if State=ksOn then
-          if LastDelimiter(' ,"', sKeyword)>0 then
-            AccumulateStr(Result, ',', AnsiQuotedStr(sKeyword, '"'))
-          else
-            AccumulateStr(Result, ',', sKeyword);
-  end;
-
-  function TKeywordList.InsertNew: Integer;
-  var
-    sKWBase, sNewKeyword: String;
-    iAttempt: Integer;
-    p: PKeywordRec;
-  begin
-     // Ищем уникальное ключевое слово вида "Новое ключевое слово (n)"
-    sKWBase := ConstVal('SDefaultNewKeyword');
-    iAttempt := 0;
-    repeat
-      Inc(iAttempt);
-      sNewKeyword := Format(iif(iAttempt<2, '%s', '%s (%d)'), [sKWBase, iAttempt]);
-    until not FindKeyword(sNewKeyword, Result);
-     // Добавляем
-    New(p);
-    Insert(Result, p);
-    with p^ do begin
-      sKeyword  := sNewKeyword;
-      Change    := kcAdd;
-      State     := ksOn;
-      iCount    := 0;
-      iSelCount := 0;
-    end;
-  end;
-
-  procedure TKeywordList.Notify(Ptr: Pointer; Action: TListNotification);
-  begin
-    if Action in [lnExtracted, lnDeleted] then Dispose(PKeywordRec(Ptr));
-  end;
-
-  procedure TKeywordList.PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TKeywordIsPicSelectedProc; iTotalSelCount: Integer);
-  var
-    ip, ikw: Integer;
-    Pic: IPhoaPic;
-    bSelected: Boolean;
-  begin
-     // Стираем список
-    Clear;
-     // Цикл по всем изображениям фотоальбома
-    bSelected := False;
-    for ip := 0 to Pics.Count-1 do begin
-      Pic := Pics[ip];
-       // Если передана callback-процедура, вызываем её для определения: выбрано изображение или нет
-      if Assigned(IsPicSelCallback) then IsPicSelCallback(Pic, bSelected);
-      for ikw := 0 to Pic.Keywords.Count-1 do Add(Pic.Keywords[ikw], bSelected);
-    end;
-     // Выставляем состояние выбора
-    if Assigned(IsPicSelCallback) and (iTotalSelCount>0) then
-      for ikw := 0 to Count-1 do
-        with GetItems(ikw)^ do
-          if iSelCount=0                   then State := ksOff
-          else if iSelCount=iTotalSelCount then State := ksOn
-          else                                  State := ksGrayed;
-  end;
-
-  function TKeywordList.Rename(Index: Integer; const sNewKeyword: String): Integer;
-  var p: PKeywordRec;
-  begin
-    p := GetItems(Index);
-     // Если вообще совпадает, делать нечего
-    if p.sKeyword=sNewKeyword then Exit;
-     // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
-    if not AnsiSameText(p.sKeyword, sNewKeyword) then begin
-       // Если уже есть такое в списке, вызываем Exception
-      if FindKeyword(sNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'), []);
-       // Иначе сдвигаем на новое место
-      if Index<Result then Dec(Result);
-      Move(Index, Result);
-     // Иначе двигать незачем 
-    end else
-      Result := Index;
-     // Настраиваем Change
-    with p^ do begin
-      case Change of
-         // Первое изменение - сохраняем старое значение и устанавливаем изменение kcReplace
-        kcNone: begin
-          sOldKeyword := sKeyword;
-          Change := kcReplace;
-        end;
-         // Не первое изменение - если возвращаем старое значение, снимаем изменение
-        kcReplace:
-          if sOldKeyword=sNewKeyword then begin
-            Change := kcNone;
-            sOldKeyword := '';
-          end;
-      end;
-       // Записываем новое значение
-      sKeyword := sNewKeyword;
-    end;
-  end;
-
-  procedure TKeywordList.SetSelectedKeywords(const Value: String);
-  var
-    SL: TStringList;
-    i: Integer;
-  begin
-    SL := TStringList.Create;
-    try
-       // Переписываем слова в виде StringList
-      SL.Sorted := True;
-      SL.Duplicates := dupIgnore;
-      SL.CommaText := Value;
-       // Проверяем наличие слов
-      for i := 0 to Count-1 do
-        with GetItems(i)^ do
-          if SL.IndexOf(sKeyword)<0 then State := ksOff else State := ksOn;
-    finally
-      SL.Free;
-    end;
-  end;
-
-   //===================================================================================================================
    // TPhoaMask
    //===================================================================================================================
 
@@ -4190,9 +4148,9 @@ type
     Result := TPhotoAlbumPicList.Create(APhoA);
   end;
 
-  function NewPhoaMutableKeywordList: IPhoaMutableKeywordList;
+  function NewPhotoAlbumKeywordList: IPhotoAlbumKeywordList;
   begin
-    Result := TPhoaMutableKeywordList.Create;
+    Result := TPhotoAlbumKeywordList.Create;
   end;
 
   function NewPhotoAlbumPicGroup(AOwner: IPhoaPicGroup; iID: Integer): IPhotoAlbumPicGroup;

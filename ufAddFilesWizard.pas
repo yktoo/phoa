@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.18 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.19 2004-10-18 12:25:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -404,6 +404,8 @@ uses
            // Добавляем изображение
           try
             FAddedPic := nil;
+      Pic.FileName := sFilename;
+      Pic.ReloadPicFileData(Project.ThumbnailSize, TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)), Project.ThumbnailQuality);
             TPhoaOp_InternalPicAdd.Create(AddOperations, App.Project, App.CurGroup, FileList.Files[0], FAddedPic, FOpChanges);
              // Производим автозаполнение свойств изображения
             AutofillPicProps(FAddedPic);
