@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPlugin.pas,v 1.6 2005-02-26 20:18:09 dale Exp $
+//  $Id: phPlugin.pas,v 1.7 2005-02-27 15:51:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -23,8 +23,9 @@ type
 
    // Plugin kind
   TPhoaPluginKind = (
-    ppkBrowseMode          // Browse mode plugin. The plugin is instantiated automatically once the application finished initialization
+    ppkBrowseMode // Browse mode plugin. The plugin is instantiated automatically once the application has finished initialization
   );
+  TPhoaPluginKinds = set of TPhoaPluginKind;
 
    //===================================================================================================================
    // IPhoaPluginModule - A module implementing a number of plugin classes
@@ -104,6 +105,10 @@ type
      // -- Plugin's class
     property PluginClass: IPhoaPluginClass read GetPluginClass;
   end;
+
+const
+   // All plugin kinds
+  PluginKinds_All = [Low(TPhoaPluginKind)..High(TPhoaPluginKind)];   
 
 implementation
 

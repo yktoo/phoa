@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.2 2005-02-26 12:35:51 dale Exp $
+//  $Id: phAppIntf.pas,v 1.3 2005-02-27 15:51:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -19,7 +19,7 @@ type
 
   IPhoaAction = interface;
 
-   // A callback handler for Action's OnChange event
+   // A callback handler for Action's change notification
   TPhoaActionChangeNotificationProc = procedure(Sender: IPhoaAction); stdcall;
 
   IPhoaAction = interface(IInterface)
@@ -83,6 +83,8 @@ type
     ['{03A7EFBC-0C77-481B-A3B9-1D25BB2D458D}']
      // Adds a new action interface and returns its index in the list
     function  Add(Item: IPhoaAction): Integer; stdcall;
+     // Removes an action interface and returns its index in the list it had before it was removed
+    function  Remove(Item: IPhoaAction): Integer; stdcall;
      // Finds and returns the action by name; returns nil if no such action found
     function  FindName(const sName: String): IPhoaAction; stdcall; 
     function  FindNameW(const sName: WideString): IPhoaAction; stdcall;

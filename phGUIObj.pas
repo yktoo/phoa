@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.33 2005-02-26 12:35:51 dale Exp $
+//  $Id: phGUIObj.pas,v 1.34 2005-02-27 15:51:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -447,6 +447,7 @@ type
     function  FindNameW(const sName: WideString): IPhoaAction; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaAction; stdcall;
+    function  Remove(Item: IPhoaAction): Integer; stdcall;
   public
      // —оздаЄт список, наполн€€ его обЄртками дл€ Actions из NativeList
     constructor Create(ANativeList: TCustomActionList);
@@ -2093,6 +2094,14 @@ type
   function TPhoaActionList.GetItems(Index: Integer): IPhoaAction;
   begin
     Result := IPhoaAction(FList[Index]);
+  end;
+
+  function TPhoaActionList.Remove(Item: IPhoaAction): Integer;
+  begin
+     // ”ничтожаем Action из NativeList
+    TCustomAction(Item.Tag).Free;
+    Item.Tag := 0;
+    Result := FList.Remove(Item);
   end;
 
    //===================================================================================================================

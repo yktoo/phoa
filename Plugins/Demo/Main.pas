@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.3 2005-02-26 12:35:51 dale Exp $
+//  $Id: Main.pas,v 1.4 2005-02-27 15:51:49 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -43,9 +43,27 @@ type
      // IPhoaPluginClass
     function  CreatePlugin: IPhoaPlugin; stdcall;
     function  GetDescription: WideString; stdcall;
+    function  GetKind: TPhoaPluginKind; stdcall;
     function  GetName: WideString; stdcall;
   public
     constructor Create;
+  end;
+
+  TPhoaDemoPlugin = class(TInterfacedObject, IPhoaPlugin)
+  private
+     // Application reference
+    FApp: IPhoaApp;
+     // Plugin menu item
+    FItem: IPhoaMenuItem;
+     // Main plugin action
+    FAction: IPhoaAction;
+     // Prop storage
+    FPluginClass: IPhoaPluginClass;
+     // IPhoaPlugin
+    function  GetPluginClass: IPhoaPluginClass; stdcall;
+  public
+    constructor Create(APluginClass: IPhoaPluginClass; AApp: IPhoaApp);
+    destructor Destroy; override;
   end;
 
   TPhoaDemoPlugin_InfoAction = class(TPhoaPluginAction)
@@ -153,12 +171,42 @@ implementation
 
   function TPhoaDemoPluginClass.GetDescription: WideString;
   begin
-    Result := 'This is a sample plugin to demonstrate PhoA plugin mechanism.';
+    Result := 'This is a sample plugin to show how PhoA plugin mechanism.';
+  end;
+
+  function TPhoaDemoPluginClass.GetKind: TPhoaPluginKind;
+  begin
+    Result := ppkBrowseMode;
   end;
 
   function TPhoaDemoPluginClass.GetName: WideString;
   begin
     Result := 'Demo PhoA plugin';
+  end;
+
+   //===================================================================================================================
+   // TPhoaDemoPlugin
+   //===================================================================================================================
+
+  constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaPluginClass; AApp: IPhoaApp);
+  begin
+    inherited Create;
+    FPluginClass := APluginClass;
+    FApp := AApp;
+  end;
+
+  destructor TPhoaDemoPlugin.Destroy;
+  begin
+     // Remove menu item
+    FItem.Remove; 
+     // Release action
+    FApp.ActionList.Remove(FAction);
+    inherited Destroy;
+  end;
+
+  function TPhoaDemoPlugin.GetPluginClass: IPhoaPluginClass;
+  begin
+    Result := FPluginClass;
   end;
 
    //===================================================================================================================
