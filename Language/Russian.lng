@@ -1,8 +1,8 @@
 LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
-Generator=DKLang Translation Editor v2.4
-LastModified=2004-12-03 16:16:15
+Generator=DKLang Translation Editor v2.3
+LastModified=2004-12-05 16:28:46
 SourceLANGID=1033
 
 [fMain]
@@ -583,8 +583,8 @@ SourceLANGID=1033
 00000084=Поиск по выражению
 00000085=Поиск по выражению
 00000086=Поиск по выражению
-00000087=&Новый
-00000088=Новый|Стереть выражение
+00000087=&Новое
+00000088=Новое|Стереть выражение
 00000089=Поиск по выражению
 00000090=&Открыть...
 00000091=Открыть...|Открыть текстовый файл, содержащий выражение поиска
