@@ -1,11 +1,11 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.13 2004-11-23 16:19:44 dale Exp $
+;   $Id: phoa.iss,v 1.14 2004-12-07 13:59:08 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 ;***********************************************************************************************************************
 [Setup]
-  MinVersion             = 4.0,4.0
+  MinVersion             = 4.0,4.0sp6
   AppName                = PhoA
   AppVersion             = 1.1.7 beta
   AppVerName             = PhoA v1.1.7 beta
@@ -31,12 +31,10 @@
   Compression            = lzma
 
 [Languages]
-  Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf
-  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl;   LicenseFile: eula-rus.rtf
-  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-eng.rtf
-  Name: "br"; MessagesFile: compiler:BrazilianPortuguese.isl; LicenseFile: eula-eng.rtf
-  Name: "ua"; MessagesFile: compiler:Ukrainian.isl;           LicenseFile: eula-eng.rtf
-  
+  Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
+  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl;   LicenseFile: eula-rus.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.ru.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-eng.rtf; InfoBeforeFile: ReleaseNotes\ReleaseNotes-1.1.7-beta.en.rtf
+
 [Tasks]
   Name: desktopicon;        Description: {cm:CreateDesktopIcon};             GroupDescription: {cm:AdditionalIcons};
   Name: desktopicon\common; Description: {cm:IconsAllUsers};                 GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
@@ -106,13 +104,94 @@ BeveledLabel=DK Software
 
 [Code]
 
-  function QuickLaunch(Default: String): String;
+var
+  sPriorVersion: String;
+  
+const
+  sReg_InstalledInfo = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\PhoA_is1';
+  sReg_Root          = 'Software\DKSoftware\PhoA';
+  sReg_Preferences   = sReg_Root+'\Preferences';
+
+   // ¬озвращает текст версии установленного продукта, или '', если продукт не установлен
+  function  GetInstalledVersion: String;
+  begin
+    if not RegQueryStringValue(HKLM, sReg_InstalledInfo, 'DisplayVersion', Result) and
+       not RegQueryStringValue(HKCU, sReg_InstalledInfo, 'DisplayVersion', Result) then Result := '';
+  end;
+
+   // ¬озвращает путь к каталогу панели QuickLaunch
+  function  QuickLaunch(Default: String): String;
   begin
     Result := ExpandConstant('{userappdata}')+'\Microsoft\Internet Explorer\Quick Launch';
   end;
   
-  function PhoaStartupParams(Default: String): String;
+  function  PhoaStartupParams(Default: String): String;
   begin
-    if ShouldProcessEntry('sample', '')=srYes then Result := '"Sample album\sample.phoa"' else Result := '';
+    if IsComponentSelected('sample') then Result := '"Sample album\sample.phoa"' else Result := '';
   end;
+  
+   // ¬озвращает значение Integer-настройки с именем sValueName; -1, если нет такой или значение неверного типа
+  function  GetPreferenceValueInt(const sValueName: String): Integer;
+  var sVal: String;
+  begin
+     // ѕолучаем значение свойства и конвертим его в Integer
+    if RegQueryStringValue(HKCU, sReg_Preferences, sValueName, sVal) then Result := StrToIntDef(sVal, -1) else Result := -1;
+  end;
+  
+   // ”станавливает значение Integer-настройки с именем sValueName
+  procedure SetPreferenceValueInt(const sValueName: String; iValue: Integer);
+  begin
+    RegWriteStringValue(HKCU, sReg_Preferences, sValueName, IntToStr(iValue));
+  end;
+
+   //  овертирует значение реестра типа "—войство изображени€" из формата PhoA 1.1.6 beta в формат 1.1.7 beta
+  procedure Convert116to117Prop(const sValueName: String);
+  var iProp: Integer;
+  begin
+     // ѕолучаем значение свойства
+    iProp := GetPreferenceValueInt(sValueName);
+     // ¬ 1.1.7 beta свойства 9..n стали 12..n+3, сдвигаем их
+    if iProp>=9 then begin
+      iProp := iProp+3;
+      SetPreferenceValueInt(sValueName, iProp);
+    end;
+  end;
+
+   //  овертирует значение реестра типа "Ќабор свойств изображений" из формата PhoA 1.1.6 beta в формат 1.1.7 beta
+  procedure Convert116to117Props(const sValueName: String);
+  var iProp: Integer;
+  begin
+     // ѕолучаем значение свойства
+    iProp := GetPreferenceValueInt(sValueName);
+     // ¬ 1.1.7 beta свойства 9..n стали 12..n+3, сдвигаем биты 9..n на 3 влево
+    if iProp>0 then begin
+      iProp := (iProp and $01ff) or ((iProp and $fffffe00) shl 3);
+      SetPreferenceValueInt(sValueName, iProp);
+    end;
+  end;
+
+   //== Events =========================================================================================================
+
+  function InitializeSetup(): Boolean;
+  begin
+    Result := True;
+     // «апоминаем версию установленного продукта
+    sPriorVersion := GetInstalledVersion;
+  end;
+
+  procedure CurStepChanged(CurStep: TSetupStep);
+  begin
+     // ѕосле инсталл€ции, если была установлена верси€ 1.1.6 beta, конвертируем свойства изображений PhoA 1.1.6 beta в
+     //   свойства изображений 1.1.7 beta
+    if (CurStep=ssPostInstall) and (sPriorVersion='1.1.6 beta') then begin
+      Convert116to117Prop('@ISettingID_Browse_ViewerThLBProp');
+      Convert116to117Prop('@ISettingID_Browse_ViewerThLTProp');
+      Convert116to117Prop('@ISettingID_Browse_ViewerThRBProp');
+      Convert116to117Prop('@ISettingID_Browse_ViewerThRTProp');
+      Convert116to117Props('@ISettingID_Browse_ViewerTipProps');
+      Convert116to117Props('@ISettingID_View_CaptionProps');
+      Convert116to117Props('@ISettingID_View_InfoPicProps');
+    end;
+  end;
+
 
