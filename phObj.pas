@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.33 2004-09-11 17:52:36 dale Exp $
+//  $Id: phObj.pas,v 1.34 2004-09-15 18:53:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1658,7 +1658,7 @@ resourcestring
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
-  TypInfo, Variants, Math, Registry, DateUtils, StrUtils, Clipbrd, ShellAPI, Themes, JPEG, VirtualDataObject,
+  TypInfo, Variants, Math, Registry, DateUtils, StrUtils, Clipbrd, ShellAPI, Themes, JPEG, VirtualDataObject, TBX, TBXThemes,
   phUtils, phSettings, udMsgBox, phGraphics;
 
 type
@@ -6025,9 +6025,10 @@ var
            // Иначе - стираем фон
           end else
             with Canvas do begin
-              Brush.Style := bsSolid;
-              Brush.Color := Color;
-              FillRect(r);
+//              Brush.Style := bsSolid;
+//              Brush.Color := Color;
+//              FillRect(r);
+CurrentTheme.PaintBackgnd(canvas, r, r, r, Color, False, VT_UNKNOWN);
             end;
         end;
         Inc(idx);

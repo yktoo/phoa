@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.5 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrSorting.pas,v 1.6 2004-09-15 18:53:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -162,12 +162,7 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     inherited SetParent(AParent);
      // Настраиваем tvMain после встраивания
-    if AParent<>nil then begin
-      tvMain.HandleNeeded;
-      tvMain.Header.Columns[0].Text := ConstVal('SPicProperty');
-      tvMain.Header.Columns[1].Text := ConstVal('SSort_Direction');
-      ApplyTreeSettings(tvMain);
-    end;
+    if AParent<>nil then ApplyTreeSettings(tvMain);
   end;
 
   function TfrSorting.SortingNode(Node: PVirtualNode): Boolean;

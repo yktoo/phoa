@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.7 2004-09-11 17:52:36 dale Exp $
+//  $Id: udViewProps.pas,v 1.8 2004-09-15 18:53:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -185,8 +185,6 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
       frSorting.OnChange := frSortingChange;
     end;
      // Настраиваем tvGrouping
-    tvGrouping.Header.Columns[0].Text := ConstVal('SPicProperty');
-    tvGrouping.Header.Columns[1].Text := ConstVal('SGroup_UnclassifiedInOwnFolder');
     ApplyTreeSettings(tvGrouping);
     SyncGroupings;
   end;
