@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.10 2004-09-11 17:52:36 dale Exp $
+//  $Id: phWizForm.pas,v 1.11 2004-09-17 14:07:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -93,7 +93,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, ChmHlp, phSettings;
+uses phUtils, ChmHlp, phSettings, phGUIObj;
 
    //===================================================================================================================
    // TdFileOpsWizard

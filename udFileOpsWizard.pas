@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.15 2004-09-11 17:52:36 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.16 2004-09-17 14:07:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -770,7 +770,7 @@ uses
        // Если есть фотоальбом, сохраняем его в файл
       if FExportedPhoA<>nil then
         try
-          FExportedPhoA.FileSave(nil);
+          FExportedPhoA.SaveToFile(FExportedPhoA.FileName, FExportedPhoA.FileRevision, nil);
           LogSuccess('SLogEntry_PhoaSavedOK', [FExportedPhoA.FileName]);
         except
           on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedPhoA.FileName, e.Message]);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.24 2004-09-11 17:52:36 dale Exp $
+//  $Id: phUtils.pas,v 1.25 2004-09-17 14:07:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -27,6 +27,10 @@ uses
    // Преобразование TRect<->Строка вида '1,2,3,4'
   function  RectToStr(const r: TRect): String;
   function  StrToRect(const s: String; const rDefault: TRect): TRect;
+   // "Упорядочивает" координаты в r так, что TopLeft всегда левее и выше, чем BottomRight
+  function  OrderRect(const r: TRect): TRect;
+   // Возвращает True, если прямоугольники пересекаются
+  function  RectsOverlap(const r1, r2: TRect): Boolean;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
@@ -260,6 +264,29 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
     except
       on EConvertError do Result := rDefault;
     end;
+  end;
+
+  function OrderRect(const r: TRect): TRect;
+  begin
+    if r.Left<r.Right then begin
+      Result.Left   := r.Left;
+      Result.Right  := r.Right;
+    end else begin
+      Result.Left   := r.Right;
+      Result.Right  := r.Left;
+    end;
+    if r.Top<r.Bottom then begin
+      Result.Top    := r.Top;
+      Result.Bottom := r.Bottom;
+    end else begin
+      Result.Top    := r.Bottom;
+      Result.Bottom := r.Top;
+    end;
+  end;
+
+  function RectsOverlap(const r1, r2: TRect): Boolean;
+  begin
+    Result := (r1.Right>r2.Left) and (r1.Bottom>r2.Top) and (r2.Right>r1.Left) and (r2.Bottom>r1.Top);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

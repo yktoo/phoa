@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.37 2004-09-11 17:52:36 dale Exp $
+//  $Id: Main.pas,v 1.38 2004-09-17 14:07:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,8 +10,9 @@ interface
 
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
   ActiveX, XPMan,
+  phObj, phGUIObj, ConsVars,
   VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt,
   TB2MRU, TBXExtItems, Menus, TBX, ActnList, TBXStatusBars, TBXLists,
   TB2Dock, TB2Toolbar, StdCtrls, DKLang;
@@ -301,8 +302,9 @@ type
     function  CheckSave: Boolean;
      // Загружает иерархию групп из фотоальбома в tvGroups
     procedure LoadGroupTree;
-     // Загружает фотоальбом из файла
+     // Загрузка/сохранение фотоальбома в файле
     procedure DoLoad(const sFileName: String);
+    procedure DoSave(const sFileName: String; iRevisionNumber: Integer);
      // Обрабатывает параметры командной строки
     procedure ProcessCommandLine;
      // Настраивает разрешённость Actions и настраивает Caption формы
@@ -328,9 +330,6 @@ type
     procedure AppHint(Sender: TObject);
     procedure AppException(Sender: TObject; E: Exception);
     procedure AppIdle(Sender: TObject; var Done: Boolean);
-     // Clipboard messages
-    procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
-    procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
      // Откатывает все операции с последней до Index и обновляет визуальные объекты согласно флагам операций
     procedure UndoOperations(Index: Integer);
      // Откатывает индивидуальную операцию (for internal use only)
@@ -352,8 +351,10 @@ type
     function  GetViews: TPhoaViews;
     procedure LoadViewList(idxSelect: Integer);
      // Message handlers
-    procedure CMFocusChanged(var Msg: TCMFocusChanged); message CM_FOCUSCHANGED;
-    procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
+    procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
+    procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
+    procedure CMFocusChanged(var Msg: TCMFocusChanged);   message CM_FOCUSCHANGED;
+    procedure WMHelp(var Msg: TWMHelp);                   message WM_HELP;
     procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
      // Property handlers
     procedure SetFileName(const Value: String);
@@ -732,21 +733,8 @@ uses
   procedure TfMain.aaSave(Sender: TObject);
   begin
     ResetMode;
-     // Если имя файла не задано, выполняем SaveAs
-    if FileName='' then
-      aaSaveAs(Sender)
-     // Иначе сохраняем файл фотоальбома и помечаем текущее состояние буфера отката как "сохранённое"
-    else begin
-      FUndo.BeginUpdate;
-      StartWait;
-      try
-        FPhoA.FileSave(FUndo);
-      finally
-        StopWait;
-        FUndo.EndUpdate;
-      end;
-      EnableActions;
-    end;
+     // Если имя файла не задано, выполняем SaveAs. Иначе сохраняем файл фотоальбома
+    if FileName='' then aSaveAs.Execute else DoSave(FPhoA.FileName, FPhoA.FileRevision);
   end;
 
   procedure TfMain.aaSaveAs(Sender: TObject);
@@ -760,20 +748,7 @@ uses
         Options     := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
         Title       := ConstVal('SDlgTitle_SavePhoa');
         FileName    := DisplayFileName;
-        if Execute then begin
-           // Сохраняем файл с заданными параметрами, помечаем текущее состояние буфера отката как "сохранённое"
-          FUndo.BeginUpdate;
-          StartWait;
-          try
-            FPhoA.FileSaveTo(FileName, aPhFileRevisions[ValidRevisionIndex(FilterIndex-1)].iNumber, FUndo);
-          finally
-            StopWait;
-            FUndo.EndUpdate;
-          end;
-           // Регистрируем имя файла в списке MRU
-          mruOpen.Add(FileName);
-          EnableActions;
-        end;
+        if Execute then DoSave(FileName, aPhFileRevisions[ValidRevisionIndex(FilterIndex-1)].iNumber);
       finally
         Free;
       end;
@@ -1060,9 +1035,9 @@ uses
            // Уничтожаем результаты поиска
           DisplaySearchResults(True, False);
            // Загружаем файл и очищаем буфер отката
-          FPhoA.FileLoad(ExpandUNCFileName(sFileName), FUndo);
+          FPhoA.LoadFromFile(ExpandUNCFileName(sFileName), FUndo);
            // Регистрируем файл в списке MRU
-          mruOpen.Add(FileName);
+          mruOpen.Add(sFileName);
         finally
            // Загружаем список представлений и по умолчанию выбираем "Группы изображений"
           LoadViewList(-1);
@@ -1075,6 +1050,23 @@ uses
     finally
       tvGroups.EndSynch;
     end;
+  end;
+
+  procedure TfMain.DoSave(const sFileName: String; iRevisionNumber: Integer);
+  begin
+     // Предупреждаем пользователя, если он сохраняет в более старую ревизию
+    if (iRevisionNumber<IPhFileRevisionNumber) and not PhoaConfirm(True, 'SConfirm_SavingOldFormatFile', ISettingID_Dlgs_ConfmOldFile) then Exit;
+    FUndo.BeginUpdate;
+    StartWait;
+    try
+      FPhoA.SaveToFile(sFileName, iRevisionNumber, FUndo);
+    finally
+      StopWait;
+      FUndo.EndUpdate;
+    end;
+     // Регистрируем имя файла в списке MRU
+    mruOpen.Add(sFileName);
+    EnableActions;
   end;
 
   procedure TfMain.EnableActions;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.51 2004-09-11 17:52:35 dale Exp $
+//  $Id: ConsVars.pas,v 1.52 2004-09-17 14:07:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -960,7 +960,8 @@ uses
   TypInfo, Forms,
   TBXThemes, TBXDefaultTheme, TBXOfficeXPTheme, TBXStripesTheme, TBXAluminumTheme,
   DKLang,
-  phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
+  phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout,
+  phGUIObj;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -1309,6 +1310,8 @@ initialization
   end;
    // Регистрируем формат буфера обмена
   wClipbrdPicFormatID := RegisterClipboardFormat(SClipbrdPicFormatName);
+   // Подменяем HintWindowClass
+  HintWindowClass := TPhoAHintWindow;
    // Создаём настройки
   RootSetting := TPhoaSetting.Create(nil, 0, '');
    // Создаём глобальный экземпляр IDKWeb
