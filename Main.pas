@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.66 2004-10-28 13:10:17 dale Exp $
+//  $Id: Main.pas,v 1.67 2004-11-01 17:19:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1653,44 +1653,41 @@ uses
   begin
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
-     // VCL Drag'n'Drop
-    if DataObject=nil then begin
-       // Перетаскивание группы
-      if Sender=Source then begin
-         // Вычисляем и помещаем в nTgt нового родителя, в iNewIndex - новый индекс в родителе, в AM - режим перемещения
-        case Mode of
-          dmAbove: begin
-            iNewIndex := nTgt.Index;
-            nTgt := nTgt.Parent;
-          end;
-          dmBelow: begin
-            iNewIndex := nTgt.Index+1;
-            nTgt := nTgt.Parent;
-          end;
-          else {dmOnNode} iNewIndex := -1;
+     // Перетаскивание группы
+    if Sender=Source then begin
+       // Вычисляем и помещаем в nTgt нового родителя, в iNewIndex - новый индекс в родителе, в AM - режим перемещения
+      case Mode of
+        dmAbove: begin
+          iNewIndex := nTgt.Index;
+          nTgt := nTgt.Parent;
         end;
-         // Если перемещаем ближе к концу среди детей того же родителя, уменьшаем индекс на 1
-        if (Mode in [dmAbove, dmBelow]) and (nTgt=nSrc.Parent) and (iNewIndex>Integer(nSrc.Index)) then Dec(iNewIndex);
-         // Перемещаем
-        PerformOperation('GroupDragAndDrop', ['Group', GetNodeGroup(nSrc), 'NewParentGroup', GetNodeGroup(nTgt), 'NewIndex', iNewIndex]);
-        Effect := DROPEFFECT_NONE;
-       // Перетаскивание изображений
-      end else if Source=Viewer then begin
-        bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
-        gTgt := GetNodeGroup(nTgt);
-        iCnt := Viewer.SelectedPics.Count;
-        iCntBefore := gTgt.Pics.Count;
-        PerformOperation(
-          'PicDragAndDropToGroup',
-          ['SourceGroup', CurGroup, 'TargetGroup', gTgt, 'Pics', Viewer.SelectedPics, 'Copy', bCopy]);
-        PhoaInfo(
-          False,
-          iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'),
-          [iCnt, gTgt.Pics.Count-iCntBefore, iCnt-(gTgt.Pics.Count-iCntBefore)],
-          iif(bCopy, ISettingID_Dlgs_NotifyDragCopy, ISettingID_Dlgs_NotifyDragMove));
+        dmBelow: begin
+          iNewIndex := nTgt.Index+1;
+          nTgt := nTgt.Parent;
+        end;
+        else {dmOnNode} iNewIndex := -1;
       end;
+       // Если перемещаем ближе к концу среди детей того же родителя, уменьшаем индекс на 1
+      if (Mode in [dmAbove, dmBelow]) and (nTgt=nSrc.Parent) and (iNewIndex>Integer(nSrc.Index)) then Dec(iNewIndex);
+       // Перемещаем
+      PerformOperation('GroupDragAndDrop', ['Group', GetNodeGroup(nSrc), 'NewParentGroup', GetNodeGroup(nTgt), 'NewIndex', iNewIndex]);
+      Effect := DROPEFFECT_NONE;
+     // Перетаскивание изображений
+    end else if Source=Viewer then begin
+      bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
+      gTgt := GetNodeGroup(nTgt);
+      iCnt := Viewer.SelectedPics.Count;
+      iCntBefore := gTgt.Pics.Count;
+      PerformOperation(
+        'PicDragAndDropToGroup',
+        ['SourceGroup', CurGroup, 'TargetGroup', gTgt, 'Pics', Viewer.SelectedPics, 'Copy', bCopy]);
+      PhoaInfo(
+        False,
+        iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'),
+        [iCnt, gTgt.Pics.Count-iCntBefore, iCnt-(gTgt.Pics.Count-iCntBefore)],
+        iif(bCopy, ISettingID_Dlgs_NotifyDragCopy, ISettingID_Dlgs_NotifyDragMove));
      // OLE Drag'n'Drop
-    end else begin
+    end else if DataObject<>nil then begin
        // Создаём объект THDrop для получения списка файлов из DataObject
       HDFiles := THDrop.Create;
       try
@@ -1723,39 +1720,36 @@ uses
     nTgt := Sender.DropTargetNode;
     gnkSrc := GetNodeKind(tvGroups, nSrc);
     gnkTgt := GetNodeKind(tvGroups, nTgt);
-     // VCL Drag'n'Drop
-    if Sender.DragManager.DataObject=nil then begin
+     // Перетаскивание группы
+    if Sender=Source then begin
       Accept := False;
-       // Перетаскивание группы
-      if Sender=Source then begin
-        Effect := DROPEFFECT_MOVE;
-        if (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
-          case Mode of
-             // НАД узлом - нельзя вставлять над фотоальбомом и над следующим за nSrc узлом
-            dmAbove:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
-             // НА узле - нельзя таскать в родителя исходного узла
-            dmOnNode: Accept := nSrc.Parent<>nTgt;
-             // ПОД узлом - нельзя вставлять под фотоальбомом и под предыдущим перед nSrc узлом
-            dmBelow:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
-          end;
-           // nTgt не может быть ребёнком nSrc
-          while Accept and (nTgt<>nil) do begin
-            Accept := nSrc<>nTgt;
-            nTgt := nTgt.Parent;
-          end;
+      Effect := DROPEFFECT_MOVE;
+      if (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
+        case Mode of
+           // НАД узлом - нельзя вставлять над фотоальбомом и над следующим за nSrc узлом
+          dmAbove:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
+           // НА узле - нельзя таскать в родителя исходного узла
+          dmOnNode: Accept := nSrc.Parent<>nTgt;
+           // ПОД узлом - нельзя вставлять под фотоальбомом и под предыдущим перед nSrc узлом
+          dmBelow:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
         end;
-       // Перетаскивание изображений
-      end else if Source=Viewer then begin
-        Accept :=
-          (Mode=dmOnNode) and
-          (Viewer.SelectedPics.Count>0) and
-          (nTgt<>nil) and
-          (nTgt<>nSrc) and
-          (gnkTgt<>gnkSearch);
-        if Accept then Viewer.DragCursor := aPicCur[(gnkSrc=gnkSearch) or (ssCtrl in Shift)];
+         // nTgt не может быть ребёнком nSrc
+        while Accept and (nTgt<>nil) do begin
+          Accept := nSrc<>nTgt;
+          nTgt := nTgt.Parent;
+        end;
       end;
+     // Перетаскивание изображений
+    end else if Source=Viewer then begin
+      Accept :=
+        (Mode=dmOnNode) and
+        (Viewer.SelectedPics.Count>0) and
+        (nTgt<>nil) and
+        (nTgt<>nSrc) and
+        (gnkTgt<>gnkSearch);
+      if Accept then Viewer.DragCursor := aPicCur[(gnkSrc=gnkSearch) or (ssCtrl in Shift)];
      // OLE Drag'n'Drop
-    end else begin
+    end else if Sender.DragManager.DataObject<>nil then begin
        // Перетаскивать [файлы] можно только в проект или его группу
       Accept := (Mode=dmOnNode) and (gnkTgt in [gnkProject, gnkPhoaGroup]);
       if Accept then begin
