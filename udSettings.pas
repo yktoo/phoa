@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.13 2004-05-23 13:23:09 dale Exp $
+//  $Id: udSettings.pas,v 1.14 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,8 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings,
-  phDlg, TB2Dock, TB2Toolbar, TBX, DTLangTools, StdCtrls, ExtCtrls,
-  Placemnt, Menus;
+  phDlg, TB2Dock, TB2Toolbar, TBX, StdCtrls, ExtCtrls,
+  Placemnt, Menus, DKLang;
 
 type
   TdSettings = class(TPhoaDialog)
@@ -166,3 +166,4 @@ uses phUtils, Main, TypInfo;
   end;
 
 end.
+

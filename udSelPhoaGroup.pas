@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.4 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj,
-  phDlg, VirtualTrees, StdCtrls, DTLangTools, ExtCtrls;
+  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
   TdSelPhoaGroup = class(TPhoaDialog)
@@ -117,3 +117,4 @@ uses phUtils, ConsVars, Main, phSettings;
   end;
 
 end.
+

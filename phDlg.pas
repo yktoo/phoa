@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.9 2004-08-30 14:10:07 dale Exp $
+//  $Id: phDlg.pas,v 1.10 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DTLangTools, ExtCtrls;
+  Dialogs, StdCtrls, ExtCtrls, DKLang;
 
 type
   TPhoaDialog = class(TForm)
@@ -234,3 +234,4 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj;
   end;
 
 end.
+

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.5 2004-06-22 12:59:58 dale Exp $
+//  $Id: udPicOps.pas,v 1.6 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ConsVars,
-  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DTLangTools;
+  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
   TdPicOps = class(TPhoaDialog)
@@ -147,3 +147,4 @@ uses phUtils, Main, phSettings;
   end;
 
 end.
+

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.7 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, phObj, phWizard,
-  phPicPropsDlgPage, Mask, ToolEdit, DTLangTools, StdCtrls;
+  phPicPropsDlgPage, Mask, ToolEdit, StdCtrls, DKLang;
 
 type
    // Состояние значения редактируемого свойства изображения
@@ -241,3 +241,4 @@ const
   end;
 
 end.
+

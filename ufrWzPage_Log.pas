@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.7 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.8 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,8 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, 
-  phWizard, VirtualTrees, ImgList, TB2Item, TBX, Menus, DTLangTools,
-  ActnList, StdCtrls, ExtCtrls;
+  phWizard, VirtualTrees, ImgList, TB2Item, TBX, Menus, ActnList, StdCtrls, ExtCtrls, DKLang;
 
 type
   TfrWzPage_Log = class(TWizardPage)

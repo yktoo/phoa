@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.11 2004-06-22 12:59:58 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.12 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, Registry, GraphicEx,
-  Placemnt, DTLangTools, StdCtrls, ExtCtrls, phWizForm;
+  Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
    // Exception
@@ -1153,3 +1153,4 @@ uses
   end;
 
 end.
+

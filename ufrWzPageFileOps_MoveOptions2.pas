@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.4 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.5 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phWizard, DTLangTools, StdCtrls;
+  phWizard, StdCtrls, DKLang;
 
 type
   TfrWzPageFileOps_MoveOptions2 = class(TWizardPage)
@@ -86,3 +86,4 @@ uses phUtils, udFileOpsWizard;
   end;
 
 end.
+

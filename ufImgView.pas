@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.22 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufImgView.pas,v 1.23 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,8 +11,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, ConsVars, phObj,
   GR32_Layers, phGraphics,
-  DTLangTools, TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
-  TB2Toolbar, TB2ExtItems, TBXExtItems;
+  TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
+  TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;
 
 type
    // Поток, декодирующий следующее изображение в фоновом режиме
@@ -1373,3 +1373,4 @@ uses
   end;
 
 end.
+

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj,
-  phDlg, DTLangTools, StdCtrls, ExtCtrls;
+  phDlg, StdCtrls, ExtCtrls, DKLang;
 
 type
   TdGroupProps = class(TPhoaDialog)
@@ -75,3 +75,4 @@ uses ConsVars, phUtils, Main;
   end;
 
 end.
+

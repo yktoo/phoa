@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.4 2004-06-22 12:59:58 dale Exp $
+//  $Id: udPicProps.pas,v 1.5 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, phMetadata, GR32_Layers,
   phWizard,
   phDlg, Menus, TB2Item, TBX, ImgList, Placemnt, TB2Dock, TB2Toolbar,
-  ExtCtrls, DTLangTools, StdCtrls;
+  ExtCtrls, StdCtrls, DKLang;
 
 type
   TdPicProps = class(TPhoaDialog, IWizardHostForm)
@@ -206,3 +206,4 @@ uses
   end;
 
 end.
+

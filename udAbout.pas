@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
+//  $Id: udAbout.pas,v 1.7 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32, GR32_Layers, ConsVars, 
-  StdCtrls, GR32_Image, DTLangTools, ExtCtrls;
+  StdCtrls, GR32_Image, ExtCtrls, DKLang;
 
 type
   TShowDetail = (sdTitle, sdAuthor, sdCredits, sdTranslation);
@@ -327,3 +327,4 @@ var
   end;
 
 end.
+

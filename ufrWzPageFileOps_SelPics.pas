@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.7 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,7 +11,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
   Dialogs, phWizard, StdCtrls, VirtualTrees, TB2Item, TBX, Menus,
-  DTLangTools, ActnList;
+  ActnList, DKLang;
 
 type
   TfrWzPageFileOps_SelPics = class(TWizardPage)
@@ -314,3 +314,4 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
   end;
 
 end.
+

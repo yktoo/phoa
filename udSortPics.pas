@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.3 2004-06-22 12:59:58 dale Exp $
+//  $Id: udSortPics.pas,v 1.4 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,8 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ActiveX,
-  phDlg, VirtualTrees, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, DTLangTools,
-  ufrSorting;
+  phDlg, VirtualTrees, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, ufrSorting, DKLang;
 
 type
   TdSortPics = class(TPhoaDialog)

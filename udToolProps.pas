@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phSettings, phToolSetting,
-  Dialogs, phDlg, DTLangTools, StdCtrls, ExtCtrls;
+  Dialogs, phDlg, StdCtrls, ExtCtrls, DKLang;
 
 type
   TdToolProps = class(TPhoaDialog)
@@ -201,3 +201,4 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
   end;
 
 end.
+

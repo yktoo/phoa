@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.7 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,8 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, phObj,
-  phWizard, Menus, TB2Item, TBX, DTLangTools, ActnList, TB2Dock,
-  TB2Toolbar, VirtualTrees, phPicPropsDlgPage;
+  phWizard, Menus, TB2Item, TBX, ActnList, TB2Dock,
+  TB2Toolbar, VirtualTrees, phPicPropsDlgPage, DKLang;
 
 type
   TfrPicProps_Keywords = class(TPicPropsDialogPage)
@@ -310,3 +310,4 @@ uses phUtils, Main, phSettings;
   end;
 
 end.
+

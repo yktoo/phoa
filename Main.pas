@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.32 2004-08-30 14:10:07 dale Exp $
+//  $Id: Main.pas,v 1.33 2004-09-02 14:20:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -12,9 +12,9 @@ uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, phObj, ConsVars,
   ActiveX, XPMan,
-  VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt, DTLangTools,
+  VirtualTrees, TBXDkPanels, ImgList, TB2Item, Placemnt,
   TB2MRU, TBXExtItems, Menus, TBX, ActnList, TBXStatusBars, TBXLists,
-  TB2Dock, TB2Toolbar, StdCtrls;
+  TB2Dock, TB2Toolbar, StdCtrls, DKLang;
 
 type
   TfMain = class(TForm, IPhoaViews)

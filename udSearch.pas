@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.5 2004-06-11 14:42:22 dale Exp $
+//  $Id: udSearch.pas,v 1.6 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phObj,
-  phDlg, StdCtrls, VirtualTrees, DTLangTools, ExtCtrls;
+  phDlg, StdCtrls, VirtualTrees, ExtCtrls, DKLang;
 
 type
   TdSearch = class(TPhoaDialog)
@@ -749,3 +749,4 @@ type
   end;
 
 end.
+

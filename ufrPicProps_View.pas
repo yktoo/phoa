@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.15 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.16 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
   phObj, phGraphics,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
-  TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DTLangTools;
+  TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DKLang;
 
 type
   TfrPicProps_View = class(TPicPropsDialogPage)
@@ -444,3 +444,4 @@ uses phUtils, Main, phSettings;
   end;
 
 end.
+

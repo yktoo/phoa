@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.8 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.9 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,8 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualShellUtilities, GraphicEx,
-  phWizard, DTLangTools, VirtualTrees, VirtualExplorerTree, StdCtrls,
-  ExtCtrls, Mask, ToolEdit;
+  phWizard, VirtualTrees, VirtualExplorerTree, StdCtrls,
+  ExtCtrls, Mask, ToolEdit, DKLang;
 
 type
   TfrWzPageAddFiles_SelFiles = class(TWizardPage)
@@ -233,3 +233,4 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
   end;
 
 end.
+

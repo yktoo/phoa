@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.4 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.5 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DTLangTools, VirtualTrees;
+  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, VirtualTrees,
+  DKLang;
 
 type
   TfrWzPageFileOps_RepairSelLinks = class(TWizardPage)
@@ -139,3 +140,4 @@ uses phUtils, udFileOpsWizard, phObj, Main;
   end;
 
 end.
+

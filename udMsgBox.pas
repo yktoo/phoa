@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.7 2004-08-30 14:10:08 dale Exp $
+//  $Id: udMsgBox.pas,v 1.8 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phDlg, StdCtrls, ExtCtrls, DTLangTools;
+  phDlg, StdCtrls, ExtCtrls, DKLang;
 
 type
   TdMsgBox = class(TForm)
@@ -367,3 +367,4 @@ uses phUtils, phSettings, ChmHlp;
   end;
 
 end.
+

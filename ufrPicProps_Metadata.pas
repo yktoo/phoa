@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.8 2004-08-30 14:10:08 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.9 2004-09-02 14:20:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,7 +11,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, phWizard, VirtualTrees, phPicPropsDlgPage, TBXDkPanels, TB2Dock,
-  TBX, Menus, TB2Item, DTLangTools;
+  TBX, Menus, TB2Item, DKLang;
 
 type
   TfrPicProps_Metadata = class(TPicPropsDialogPage)
@@ -203,3 +203,4 @@ type
   end;
 
 end.
+
