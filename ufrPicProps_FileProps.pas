@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.8 2004-10-23 14:05:08 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.9 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -67,16 +67,13 @@ type
   end;
 
   procedure TfrPicProps_FileProps.tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
-  var
-    Node, nParent: PVirtualNode;
-    NS: TNamespace;
+  var Node, nParent: PVirtualNode;
   begin
     Node := tvMain.FocusedNode;
     if Node<>nil then begin
       nParent := tvMain.NodeParent[Node];
       if nParent<>nil then Node := nParent;
-      NS := PNamespace(tvMain.GetNodeData(Node))^;
-      if NS<>nil then NS.ShowContextMenu(tvMain, nil, nil, nil);
+      ShowFileShellContextMenu(EditedPics[Node.Index].FileName);
     end;
     Handled := True;
   end;

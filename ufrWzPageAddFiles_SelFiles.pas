@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.18 2004-10-26 13:51:18 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.19 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -145,7 +145,8 @@ uses
   procedure TfrWzPageAddFiles_SelFiles.tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);
   begin
     if Namespace.Folder then
-      AllowAsChild := not Namespace.Browsable // Отсеиваем .ZIP-псевдопапки
+       // Под Win2k+ отсеиваем .ZIP-псевдопапки (ранее Win2k атрибута Browsable не существовало)
+      AllowAsChild := not CheckWin32Version(5, 0) or not Namespace.Browsable
     else
       AllowAsChild := FileFormatList.GraphicFromExtension(Namespace.FileName)<>nil;
   end;

@@ -1,5 +1,7 @@
 inherited frPicProps_View: TfrPicProps_View
   Height = 298
+  PopupMenu = pmMain
+  OnContextPopup = FrameContextPopup
   OnMouseWheel = FrameMouseWheel
   object iMain: TImage32
     Left = 9
@@ -8,7 +10,6 @@ inherited frPicProps_View: TfrPicProps_View
     Height = 263
     Align = alClient
     BitmapAlign = baCustom
-    PopupMenu = pmMain
     Scale = 1.000000000000000000
     ScaleMode = smScale
     TabOrder = 0

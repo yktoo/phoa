@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.30 2004-10-24 17:47:29 dale Exp $
+//  $Id: phGUIObj.pas,v 1.31 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -979,7 +979,7 @@ uses Math, Themes, phUtils;
      // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню
     else if FShellCtxMenuOnMouseUp then begin
       FShellCtxMenuOnMouseUp := False;
-      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName, Self);
+      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName);
       Exit;
      // Иначе завершаем Dragging
     end else begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.26 2004-10-23 14:05:08 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.27 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -16,58 +16,59 @@ uses
 
 type
   TfrPicProps_View = class(TPicPropsDialogPage)
-    iMain: TImage32;
-    alMain: TActionList;
-    aZoomIn: TAction;
-    aZoomOut: TAction;
-    aZoomActual: TAction;
-    aZoomFit: TAction;
-    pmMain: TTBXPopupMenu;
-    dkTop: TTBXDock;
-    tbMain: TTBXToolbar;
-    cbViewFile: TTBXComboBoxItem;
-    bViewZoomIn: TTBXItem;
-    bViewZoomOut: TTBXItem;
-    bViewZoomActual: TTBXItem;
-    bViewZoomFit: TTBXItem;
-    dkLeft: TTBXDock;
-    dkRight: TTBXDock;
-    dkBottom: TTBXDock;
-    tbTools: TTBXToolbar;
-    bRotate180: TTBXItem;
-    bRotate90: TTBXItem;
-    bRotate0: TTBXItem;
-    tbSepFlipHorz: TTBXSeparatorItem;
-    bFlipHorz: TTBXItem;
-    bRotate270: TTBXItem;
-    bFlipVert: TTBXItem;
-    aRotate0: TAction;
-    aRotate90: TAction;
-    aRotate180: TAction;
-    aRotate270: TAction;
     aFlipHorz: TAction;
     aFlipVert: TAction;
-    gipmToolsToolbar: TTBGroupItem;
-    gipmMainToolbar: TTBGroupItem;
-    ipmSep: TTBXSeparatorItem;
+    alMain: TActionList;
+    aRotate0: TAction;
+    aRotate180: TAction;
+    aRotate270: TAction;
+    aRotate90: TAction;
+    aZoomActual: TAction;
+    aZoomFit: TAction;
+    aZoomIn: TAction;
+    aZoomOut: TAction;
+    bFlipHorz: TTBXItem;
+    bFlipVert: TTBXItem;
+    bRotate0: TTBXItem;
+    bRotate180: TTBXItem;
+    bRotate270: TTBXItem;
+    bRotate90: TTBXItem;
+    bViewZoomActual: TTBXItem;
+    bViewZoomFit: TTBXItem;
+    bViewZoomIn: TTBXItem;
+    bViewZoomOut: TTBXItem;
+    cbViewFile: TTBXComboBoxItem;
+    dkBottom: TTBXDock;
     dklcMain: TDKLanguageController;
-    procedure aaZoomIn(Sender: TObject);
-    procedure aaZoomOut(Sender: TObject);
+    dkLeft: TTBXDock;
+    dkRight: TTBXDock;
+    dkTop: TTBXDock;
+    gipmMainToolbar: TTBGroupItem;
+    gipmToolsToolbar: TTBGroupItem;
+    iMain: TImage32;
+    ipmSep: TTBXSeparatorItem;
+    pmMain: TTBXPopupMenu;
+    tbMain: TTBXToolbar;
+    tbSepFlipHorz: TTBXSeparatorItem;
+    tbTools: TTBXToolbar;
+    procedure aaFlipHorz(Sender: TObject);
+    procedure aaFlipVert(Sender: TObject);
+    procedure aaRotate0(Sender: TObject);
+    procedure aaRotate180(Sender: TObject);
+    procedure aaRotate270(Sender: TObject);
+    procedure aaRotate90(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);
     procedure aaZoomFit(Sender: TObject);
+    procedure aaZoomIn(Sender: TObject);
+    procedure aaZoomOut(Sender: TObject);
+    procedure cbViewFileAdjustImageIndex(Sender: TTBXComboBoxItem; const AText: String; AIndex: Integer; var ImageIndex: Integer);
+    procedure cbViewFileChange(Sender: TObject; const Text: String);
+    procedure FrameContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure FrameMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainResize(Sender: TObject);
-    procedure cbViewFileChange(Sender: TObject; const Text: String);
-    procedure cbViewFileAdjustImageIndex(Sender: TTBXComboBoxItem; const AText: String; AIndex: Integer; var ImageIndex: Integer);
-    procedure FrameMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure aaRotate0(Sender: TObject);
-    procedure aaRotate90(Sender: TObject);
-    procedure aaRotate180(Sender: TObject);
-    procedure aaRotate270(Sender: TObject);
-    procedure aaFlipHorz(Sender: TObject);
-    procedure aaFlipVert(Sender: TObject);
   private
      // ‘лаг того, что страница проинициализирована
     FInitialized: Boolean;
@@ -85,7 +86,7 @@ type
     FTrackY: Integer;
      // ‘лаг того, что изображение загружено
     FImageLoaded: Boolean;
-     // “екущее отобржаемое изображение (инициализируетс€ в LoadViewImage)
+     // “екущее отображаемое изображение (инициализируетс€ в LoadViewImage)
     FPic: IPhoaPic;
      // ѕреобразование изображений
     FTransform: TPicTransform;
@@ -278,6 +279,15 @@ uses phUtils, Main, phSettings;
     inherited FinalizePage;
   end;
 
+  procedure TfrPicProps_View.FrameContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+  begin
+     // ѕри нажатом Ctrl вместо стандартного отображаем Shell Context Menu дл€ текущего файла
+    if GetKeyState(VK_CONTROL) and $80<>0 then begin
+      ShowFileShellContextMenu(EditedPics[cbViewFile.ItemIndex].FileName);
+      Handled := True;
+    end;
+  end;
+
   procedure TfrPicProps_View.FrameMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   begin
     if WheelDelta<0 then aZoomOut.Execute else aZoomIn.Execute;
@@ -309,7 +319,7 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_View.iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
   begin
-    if (Button=mbLeft) and ((FWScaled>FWView) or (FHScaled>FHView)) then begin
+    if (Button=mbLeft) and (FWScaled>FWView) or (FHScaled>FHView) then begin
       FTrackDrag := True;
       iMain.Cursor := crHandDrag;
       FTrackX := ViewOffset.x-x;

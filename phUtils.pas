@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.38 2004-11-21 13:18:24 dale Exp $
+//  $Id: phUtils.pas,v 1.39 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -150,15 +150,68 @@ uses
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
 
    // Отображает системное контекстное меню для заданного файла. Возвращает True, если удалось
-  function  ShowFileShellContextMenu(const sFileName: String; Owner: TWinControl): Boolean;
+  function  ShowFileShellContextMenu(const sFileName: String): Boolean;
 
    // Показ/скрытие курсора HourGlass
   procedure StartWait;
   procedure StopWait;
 
 implementation
-uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
-  Variants, phPhoa;
+uses
+  Forms, TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, udMsgBox, phPhoa;
+
+type
+   //===================================================================================================================
+   // TShellContextMenuManager - класс для обработки сообщений Shell Context Menu
+   //===================================================================================================================
+
+  TShellContextMenuManager = class(TCustomForm)
+  private
+     // Объект TNamespace, для которого отображаются меню. Существует только в течение вызова ShowMenu()
+    FNamespace: TNamespace;
+  protected
+    procedure WndProc(var Message: TMessage); override;
+  public
+    constructor Create; reintroduce;
+     // Отображает контекстное меню для файла. Возвращает True, если удачно
+    function  ShowMenu(const sFileName: String): Boolean;
+  end;
+
+  constructor TShellContextMenuManager.Create;
+  begin
+    CreateNew(Application);
+  end;
+
+  function TShellContextMenuManager.ShowMenu(const sFileName: String): Boolean;
+  begin
+    Result := False;
+    try
+      try
+        FNamespace := TNamespace.CreateFromFileName(sFileName);
+      except
+        PhoaError('SErrFileNotFoundFmt', [sFileName]);
+      end;
+      if FNamespace<>nil then Result := FNamespace.ShowContextMenu(Self, nil, nil, nil);
+    finally
+      FreeAndNil(FNamespace);
+    end;
+  end;
+
+  procedure TShellContextMenuManager.WndProc(var Message: TMessage);
+  begin
+    inherited WndProc(Message);
+    case Message.Msg of
+       // Перенаправляем сообщения меню в Namespace
+      WM_MEASUREITEM, WM_DRAWITEM, WM_INITMENUPOPUP, WM_MENUCHAR:
+        if FNamespace<>nil then FNamespace.HandleContextMenuMsg(Message.Msg, Message.WParam, Message.LParam, Message.Result);
+    end;
+  end;
+
+var
+   // Экземпляр TShellContextMenuManager для отображения контекстных меню. Создаётся при первом обращении
+  NS_MenuManager: TShellContextMenuManager = nil;
+
+   //===================================================================================================================
 
   procedure PhoaException(const sMsg: String);
 
@@ -818,21 +871,12 @@ type
     Result := aBuf;
   end;
 
-  function ShowFileShellContextMenu(const sFileName: String; Owner: TWinControl): Boolean;
-  var NS: TNamespace;
+  function ShowFileShellContextMenu(const sFileName: String): Boolean;
   begin
-    Result := False;
-    NS := nil;
-    try
-      try
-        NS := TNamespace.CreateFromFileName(sFileName);
-      except
-        PhoaError('SErrFileNotFoundFmt', [sFileName]);
-      end;
-      if NS<>nil then Result := NS.ShowContextMenu(Owner, nil, nil, nil);
-    finally
-      NS.Free;
-    end;
+     // Создаём экземпляр NS_MenuManager, если он ещё не создан
+    if NS_MenuManager=nil then NS_MenuManager := TShellContextMenuManager.Create;
+     // Отображаем меню
+    Result := NS_MenuManager.ShowMenu(sFileName);
   end;
 
 var

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.43 2004-11-09 14:51:11 dale Exp $
+//  $Id: ufImgView.pas,v 1.44 2004-11-23 12:51:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -69,129 +69,129 @@ type
     pddBackward); // Назад
 
   TfImgView = class(TForm)
+    aClose: TAction;
+    aEdit: TAction;
+    aFirstPic: TAction;
+    aFlipHorz: TAction;
+    aFlipVert: TAction;
+    aFullScreen: TAction;
+    aHelp: TAction;
+    aLastPic: TAction;
     alMain: TActionList;
     aNextPic: TAction;
     aPrevPic: TAction;
-    aFirstPic: TAction;
-    aLastPic: TAction;
     aRefresh: TAction;
-    aClose: TAction;
+    aRelocateInfo: TAction;
+    aRotate0: TAction;
+    aRotate180: TAction;
+    aRotate270: TAction;
+    aRotate90: TAction;
     aSettings: TAction;
-    aZoomIn: TAction;
-    aZoomOut: TAction;
+    aShowInfo: TAction;
+    aSlideShow: TAction;
+    aSlideShowBackward: TAction;
+    aSlideShowCyclic: TAction;
+    aSlideShowForward: TAction;
+    aSlideShowRandom: TAction;
+    aStoreTransform: TAction;
     aZoomActual: TAction;
     aZoomFit: TAction;
-    pmMain: TTBXPopupMenu;
-    ipmNextPic: TTBXItem;
-    ipmPrevPic: TTBXItem;
-    ipmLastPic: TTBXItem;
-    ipmFirstPic: TTBXItem;
-    ipmSepZoom: TTBXSeparatorItem;
-    ipmSepClose: TTBXSeparatorItem;
-    ipmClose: TTBXItem;
-    aFullScreen: TAction;
-    aHelp: TAction;
-    aEdit: TAction;
-    aSlideShow: TAction;
-    iMain: TImage32;
-    aRelocateInfo: TAction;
-    dkTop: TTBXDock;
-    dkLeft: TTBXDock;
-    dkRight: TTBXDock;
-    dkBottom: TTBXDock;
-    tbMain: TTBXToolbar;
-    bFirstPic: TTBXItem;
-    bPrevPic: TTBXItem;
-    bNextPic: TTBXItem;
-    bLastPic: TTBXItem;
-    tbMainSepZoomIn: TTBXSeparatorItem;
-    bZoomIn: TTBXItem;
-    bZoomOut: TTBXItem;
-    bZoomActual: TTBXItem;
-    bZoomFit: TTBXItem;
-    tbMainSepFullScreen: TTBXSeparatorItem;
-    tbSepEdit: TTBXSeparatorItem;
+    aZoomIn: TAction;
+    aZoomOut: TAction;
+    bClose: TTBXItem;
     bEdit: TTBXItem;
+    bFirstPic: TTBXItem;
     bFullScreen: TTBXItem;
+    bHelp: TTBXItem;
+    bLastPic: TTBXItem;
+    bNextPic: TTBXItem;
+    bPrevPic: TTBXItem;
     bRefresh: TTBXItem;
     bRelocateInfo: TTBXItem;
     bSettings: TTBXItem;
-    bHelp: TTBXItem;
-    tbSepClose: TTBXSeparatorItem;
-    bClose: TTBXItem;
-    tbSepCounter: TTBXSeparatorItem;
-    eCounter: TTBXEditItem;
-    aShowInfo: TAction;
     bShowInfo: TTBXItem;
-    iSepCustomTools: TTBXSeparatorItem;
-    tbTransforms: TTBXToolbar;
-    aStoreTransform: TAction;
-    aRotate0: TAction;
-    aRotate90: TAction;
-    aRotate180: TAction;
-    aRotate270: TAction;
-    aFlipHorz: TAction;
-    aFlipVert: TAction;
+    bZoomActual: TTBXItem;
+    bZoomFit: TTBXItem;
+    bZoomIn: TTBXItem;
+    bZoomOut: TTBXItem;
+    dkBottom: TTBXDock;
     dklcMain: TDKLanguageController;
-    tbSlideShow: TTBXToolbar;
-    aSlideShowForward: TAction;
-    aSlideShowBackward: TAction;
-    aSlideShowRandom: TAction;
-    aSlideShowCyclic: TAction;
-    tbMenu: TTBXToolbar;
-    smHelp: TTBXSubmenuItem;
-    smTools: TTBXSubmenuItem;
-    smZoom: TTBXSubmenuItem;
-    smView: TTBXSubmenuItem;
-    smPicture: TTBXSubmenuItem;
+    dkLeft: TTBXDock;
+    dkRight: TTBXDock;
+    dkTop: TTBXDock;
+    eCounter: TTBXEditItem;
+    eSlideShowInterval: TTBXSpinEditItem;
+    gipmTools: TTBGroupItem;
     iClose: TTBXItem;
-    iSepFileClose: TTBXSeparatorItem;
     iEdit: TTBXItem;
-    iLastPic: TTBXItem;
-    iNextPic: TTBXItem;
-    iPrevPic: TTBXItem;
     iFirstPic: TTBXItem;
-    TBXSeparatorItem1: TTBXSeparatorItem;
-    iZoomFit: TTBXItem;
-    iZoomActual: TTBXItem;
-    iZoomOut: TTBXItem;
-    iZoomIn: TTBXItem;
-    smSlideShow: TTBXSubmenuItem;
-    iSlideShow: TTBXItem;
-    iSepSlideShowBackward: TTBXSeparatorItem;
-    iSlideShowBackward: TTBXItem;
-    iSlideShowRandom: TTBXItem;
-    iSlideShowForward: TTBXItem;
-    iSepSlideShowCyclic: TTBXSeparatorItem;
-    iSlideShowCyclic: TTBXItem;
-    smTransforms: TTBXSubmenuItem;
-    iRotate0: TTBXItem;
-    iRotate90: TTBXItem;
-    iRotate180: TTBXItem;
-    iRotate270: TTBXItem;
-    iSepFlipHorz: TTBXSeparatorItem;
     iFlipHorz: TTBXItem;
     iFlipVert: TTBXItem;
-    iSepStoreTransform: TTBXSeparatorItem;
-    iStoreTransform: TTBXItem;
     iFullScreen: TTBXItem;
-    iRefresh: TTBXItem;
-    iShowInfo: TTBXItem;
-    iRelocateInfo: TTBXItem;
-    iSepFullScreen: TTBXSeparatorItem;
-    iToggleMainToolbar: TTBXVisibilityToggleItem;
-    iToggleToolsToolbar: TTBXVisibilityToggleItem;
-    iToggleSlideShowToolbar: TTBXVisibilityToggleItem;
-    iSettings: TTBXItem;
-    tbgiZoom: TTBGroupItem;
-    tbgiTools: TTBGroupItem;
     iHelp: TTBXItem;
-    gipmTools: TTBGroupItem;
-    iToolsSep: TTBXSeparatorItem;
-    iToggleMainMenu: TTBXVisibilityToggleItem;
-    eSlideShowInterval: TTBXSpinEditItem;
+    iLastPic: TTBXItem;
+    iMain: TImage32;
+    iNextPic: TTBXItem;
+    ipmClose: TTBXItem;
+    ipmFirstPic: TTBXItem;
+    ipmLastPic: TTBXItem;
+    ipmNextPic: TTBXItem;
+    ipmPrevPic: TTBXItem;
+    ipmSepClose: TTBXSeparatorItem;
+    ipmSepZoom: TTBXSeparatorItem;
+    iPrevPic: TTBXItem;
+    iRefresh: TTBXItem;
+    iRelocateInfo: TTBXItem;
+    iRotate0: TTBXItem;
+    iRotate180: TTBXItem;
+    iRotate270: TTBXItem;
+    iRotate90: TTBXItem;
+    iSepCustomTools: TTBXSeparatorItem;
+    iSepFileClose: TTBXSeparatorItem;
+    iSepFlipHorz: TTBXSeparatorItem;
+    iSepFullScreen: TTBXSeparatorItem;
+    iSepSlideShowBackward: TTBXSeparatorItem;
+    iSepSlideShowCyclic: TTBXSeparatorItem;
     iSepSlideShowInterval: TTBXSeparatorItem;
+    iSepStoreTransform: TTBXSeparatorItem;
+    iSettings: TTBXItem;
+    iShowInfo: TTBXItem;
+    iSlideShow: TTBXItem;
+    iSlideShowBackward: TTBXItem;
+    iSlideShowCyclic: TTBXItem;
+    iSlideShowForward: TTBXItem;
+    iSlideShowRandom: TTBXItem;
+    iStoreTransform: TTBXItem;
+    iToggleMainMenu: TTBXVisibilityToggleItem;
+    iToggleMainToolbar: TTBXVisibilityToggleItem;
+    iToggleSlideShowToolbar: TTBXVisibilityToggleItem;
+    iToggleToolsToolbar: TTBXVisibilityToggleItem;
+    iToolsSep: TTBXSeparatorItem;
+    iZoomActual: TTBXItem;
+    iZoomFit: TTBXItem;
+    iZoomIn: TTBXItem;
+    iZoomOut: TTBXItem;
+    pmMain: TTBXPopupMenu;
+    smHelp: TTBXSubmenuItem;
+    smPicture: TTBXSubmenuItem;
     smpmView: TTBXSubmenuItem;
+    smSlideShow: TTBXSubmenuItem;
+    smTools: TTBXSubmenuItem;
+    smTransforms: TTBXSubmenuItem;
+    smView: TTBXSubmenuItem;
+    smZoom: TTBXSubmenuItem;
+    tbgiTools: TTBGroupItem;
+    tbgiZoom: TTBGroupItem;
+    tbMain: TTBXToolbar;
+    tbMainSepFullScreen: TTBXSeparatorItem;
+    tbMainSepZoomIn: TTBXSeparatorItem;
+    tbMenu: TTBXToolbar;
+    tbSepClose: TTBXSeparatorItem;
+    tbSepCounter: TTBXSeparatorItem;
+    tbSepEdit: TTBXSeparatorItem;
+    tbSlideShow: TTBXToolbar;
+    tbTransforms: TTBXToolbar;
+    iSepFileEdit: TTBXSeparatorItem;
     procedure aaClose(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaFirstPic(Sender: TObject);
@@ -220,6 +220,7 @@ type
     procedure aaZoomFit(Sender: TObject);
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
+    procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure FormCreate(Sender: TObject);
@@ -234,7 +235,6 @@ type
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
     procedure tbMainVisibleChanged(Sender: TObject);
-    procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
   private
      // Приложение
     FApp: IPhotoAlbumApp;
@@ -268,9 +268,6 @@ type
     FTrackDrag: Boolean;
     FTrackX: Integer;
     FTrackY: Integer;
-     // True, если была нажата правая клавиша мыши вместе с Ctrl, и при её отпускании необходимо отобразить системное
-     //   контекстное меню
-    FShellCtxMenuOnMouseUp: Boolean;
      // Флаг принудительного изменения размеров окна
     FForcedResize: Boolean;
      // Кэшированные настройки просмотра
@@ -1163,7 +1160,11 @@ uses
 
   procedure TfImgView.FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
   begin
-    Handled := FShellCtxMenuOnMouseUp;
+     // При нажатом Ctrl вместо стандартного отображаем Shell Context Menu для текущего файла
+    if GetKeyState(VK_CONTROL) and $80<>0 then begin
+      if not FErroneous then ShowFileShellContextMenu(FPic.FileName);
+      Handled := True;
+    end;
   end;
 
   procedure TfImgView.FormCreate(Sender: TObject);
@@ -1273,7 +1274,6 @@ uses
           FTrackY := ViewOffset.y-y;
           UpdateCursor;
         end;
-      mbRight: if not FErroneous and (ssCtrl in Shift) then FShellCtxMenuOnMouseUp := True;
       mbMiddle: aFullScreen.Execute;
     end;
   end;
@@ -1289,9 +1289,6 @@ uses
       FTrackDrag := False;
        // Возвращаем прежний курсор
       UpdateCursor;
-    end else if FShellCtxMenuOnMouseUp then begin
-      if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.FileName, Self);
-      FShellCtxMenuOnMouseUp := False;
     end;
   end;
 
