@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.3 2004-05-20 12:00:10 dale Exp $
+//  $Id: udMsgBox.pas,v 1.4 2004-06-02 08:20:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -266,6 +266,8 @@ uses phUtils, phSettings, ChmHlp;
           if btn<High(btn) then Dec(iBtnRightX, IMsgBox_ButtonGap);
         end;
     end;
+     // !!! Настраиваем TabOrder
+    //??? 
      // Считаем ширину
     FButtonWidths := ClientWidth-iBtnRightX+IMsgBox_ButtonLeftMargin;
      // Настраиваем переключатель
