@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.12 2004-10-12 12:38:09 dale Exp $
+//  $Id: phGraphics.pas,v 1.13 2004-10-13 14:29:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,6 +10,8 @@ interface
 uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars, phIntf;
 
 type
+   // Исключение для прерывания загрузки изображения
+  ELoadGraphicAborted = class(EAbort);
 
    // Байтовая карта одного цветового канала (вход -> выход)
   TChannelByteMap = Array[Byte] of Byte;
@@ -102,12 +104,15 @@ type
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32; var r: TRect); overload;
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32); overload;
 
+   // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const OnProgress: TProgressEvent);
+
 const
   BColor_Alpha_Transparent = $00;
   BColor_Alpha_Opaque      = $ff;
 
 implementation
-uses JPEG, phUtils, Math;
+uses JPEG, Math, GraphicEx, phUtils;
 
   procedure RenderShadowTemplate(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
   var
@@ -251,7 +256,7 @@ uses JPEG, phUtils, Math;
   const
      // Таблица перекодировки TPhoaStretchFilter -> GR32.TStretchFilter
     aPhoaSFtoGR32SF: Array[TPhoaStretchFilter] of GR32.TStretchFilter = (
-      sfNearest, sfDraft, sfLinear, sfCosine, sfSpline, sfLanczos, sfMitchell);
+      GR32.sfNearest, GR32.sfDraft, GR32.sfLinear, GR32.sfCosine, GR32.sfSpline, GR32.sfLanczos, GR32.sfMitchell);
   var
     sScale: Single;
     ThumbBitmap, FullSizeBitmap: TBitmap32;
@@ -262,8 +267,9 @@ uses JPEG, phUtils, Math;
     ThumbBitmap := TBitmap32.Create;
     try
        // Создаём, загружаем картинку и превращаем её в Bitmap32
-      FullSizeBitmap := LoadGraphicFromFile(sFileName);
+      FullSizeBitmap := TBitmap32.Create;
       try
+        LoadGraphicFromFile(sFileName, FullSizeBitmap, nil);
         FullSizeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
         ImageSize.cx := FullSizeBitmap.Width;
         ImageSize.cy := FullSizeBitmap.Height;
@@ -366,6 +372,38 @@ var
   begin
     r := Bitmap32.BoundsRect;
     PaintThumbnail(Pic, Bitmap32, r);
+  end;
+
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const OnProgress: TProgressEvent);
+  var
+    GClass: TGraphicClass;
+    Graphic: TGraphic;
+  begin
+    GClass := FileFormatList.GraphicFromExtension(ExtractFileExt(sFileName));
+    if GClass=nil then PhoaException(ConstVal('SErrUnknownPicFileExtension', [sFileName]));
+    Graphic := GClass.Create;
+    try
+      Graphic.OnProgress := OnProgress;
+       // Загружаем изображение
+      try
+        Graphic.LoadFromFile(sFileName);
+      except
+        on e: Exception do begin
+          FreeAndNil(Graphic);
+          if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
+        end;
+      end;
+       // Преобразовываем в TBitmap32
+      if Graphic<>nil then
+        try
+          Bitmap32.Assign(Graphic);
+        except
+          on e: Exception do
+            if not (e is ELoadGraphicAborted) then PhoaException(ConstVal('SErrCannotDecodePicture', [sFileName, e.Message]));
+        end;
+    finally
+      Graphic.Free;
+    end;
   end;
 
    //===================================================================================================================

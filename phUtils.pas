@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.32 2004-10-12 12:38:09 dale Exp $
+//  $Id: phUtils.pas,v 1.33 2004-10-13 14:29:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,11 +8,12 @@ unit phUtils;
 
 interface
 uses
-  SysUtils, Windows, Messages, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities, GraphicEx,
-  GR32, phIntf, ConsVars, phObj;
+  SysUtils, Windows, Messages, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities,
+  phIntf, ConsVars, phObj;
 
    // Exception raising
-  procedure PhoaException(const sMsg: String; const aParams: Array of const);
+  procedure PhoaException(const sMsg: String); overload;
+  procedure PhoaException(const sMsg: String; const aParams: Array of const); overload;
 
    // Min/max values
   function  Max(i1, i2: Integer): Integer;
@@ -84,7 +85,7 @@ uses
    //   время в 12-часовой нотации (по неизученным причинам)
   function  TimeToStrX(const dTime: TDateTime): String;
 
-   // Возвращает значение константы по её наименованию из fMain.dtlsMain
+   // Возвращает локализованное значение константы по её наименованию 
   function  ConstVal(const sConstName: String): String; overload;
   function  ConstVal(const sConstName: String; const aParams: Array of const): String; overload;
    // Возвращает sText, если он начинается на символ, отличный от '@'. Иначе - трактует текст после '@' как имя
@@ -123,11 +124,6 @@ uses
 
    // Возвращает размер указанного файла, или iDefault, если такого файла не существует
   function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
-   // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
-   // -- Версия для существующего экземпляра TBitmap32
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap: TBitmap32); overload;
-   // -- Версия, создающая новый экземпляр TBitmap32
-  function  LoadGraphicFromFile(const sFileName: String): TBitmap32; overload;
 
    // Фокусирует и выделяет узел и проматывает дерево так, чтобы он был виден. Возвращает True, если Node<>nil
   function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
@@ -151,6 +147,17 @@ uses
 
 implementation
 uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
+
+  procedure PhoaException(const sMsg: String);
+
+     function RetAddr: Pointer;
+     asm
+       mov eax, [ebp+4]
+     end;
+
+  begin
+    raise EPhoaException.Create(sMsg) at RetAddr;
+  end;
 
   procedure PhoaException(const sMsg: String; const aParams: Array of const);
 
@@ -657,48 +664,6 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
       Result := FindData.nFileSizeLow;
     end else
       Result := iDefault;
-  end;
-
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap: TBitmap32);
-  var
-    GClass: TGraphicClass;
-    Graphic: TGraphic;
-  begin
-    GClass := FileFormatList.GraphicFromExtension(ExtractFileExt(sFileName));
-    if GClass=nil then raise Exception.Create(ConstVal('SErrUnknownPicFileExtension', [sFileName]));
-    Graphic := GClass.Create;
-    try
-       // Загружаем изображение
-      try
-        Graphic.LoadFromFile(sFileName);
-      except
-        on e: Exception do begin
-          FreeAndNil(Graphic);
-          raise Exception.Create(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
-        end;
-      end;
-       // Преобразовываем в TBitmap32
-      try
-        Bitmap.Assign(Graphic);
-      except
-        on e: Exception do raise Exception.Create(ConstVal('SErrCannotDecodePicture', [sFileName, e.Message]));
-      end;
-    finally
-      Graphic.Free;
-    end;
-  end;
-
-  function LoadGraphicFromFile(const sFileName: String): TBitmap32;
-  begin
-    Result := TBitmap32.Create;
-    try
-      LoadGraphicFromFile(sFileName, Result);
-    except
-      on e: Exception do begin
-        FreeAndNil(Result); // set to nil to satisfy the compiler
-        raise;
-      end;
-    end;
   end;
 
   function ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;

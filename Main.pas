@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.51 2004-10-13 11:03:33 dale Exp $
+//  $Id: Main.pas,v 1.52 2004-10-13 14:29:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -299,14 +299,16 @@ type
     procedure ApplyLanguage;
      // Применяет параметры настройки инструментов
     procedure ApplyTools;
-     // Проверяет необходимость сохранения файла фотоальбома. Возвращает True, если можно продолжать
+     // Проверяет необходимость сохранения файла проекта. Возвращает True, если можно продолжать
     function  CheckSave: Boolean;
      // Перегружает список представлений проекта
     procedure ReloadViewList;
      // Обновляет индекс текущего представления и дерево групп
     procedure UpdateViewIndex;
-     // Загружает иерархию групп из фотоальбома в tvGroups
+     // Загружает иерархию групп из проекта в tvGroups
     procedure LoadGroupTree;
+     // Вызывается при изменении размера эскиза проекта
+    procedure UpdateThumbnailSize;
      // Загрузка/сохранение фотоальбома в файле
     procedure DoLoad(const sFileName: String);
     procedure DoSave(const sFileName: String; iRevisionNumber: Integer);
@@ -621,6 +623,7 @@ uses
         DisplaySearchResults(True, False);
          // Инициализируем фотоальбом 
         FProject.New;
+        UpdateThumbnailSize;
          // Очищаем буфер отката
         FUndo.Clear;
         FUndo.SetSavepoint;
@@ -1032,6 +1035,7 @@ uses
           DisplaySearchResults(True, False);
            // Загружаем файл
           FProject.LoadFromFile(ExpandUNCFileName(sFileName));
+          UpdateThumbnailSize;
            // Очищаем буфер отката
           FUndo.Clear;
           FUndo.SetSavepoint;
@@ -1170,6 +1174,8 @@ uses
            // -- Переинициализация братьев
           if uifXReinitSiblings in IFlags then tvGroups.ReinitChildren(GetOpParentGroupNode, uifXReinitRecursive in IFlags);
         end;
+         // -- Обновить параметры эскизов
+        if uifXUpdateThumbParams in IFlags then UpdateThumbnailSize;
       end;
     finally
       if FOpLockCounter=0 then tvGroups.EndUpdate;
@@ -1884,6 +1890,8 @@ uses
        // -- Переинициализация родителя
       if uifUReinitParent in IFlags then tvGroups.ReinitNode(OpParentGroupNode, uifUReinitRecursive in IFlags);
     end;
+     // -- Обновить параметры эскизов
+    if uifUUpdateThumbParams in IFlags then UpdateThumbnailSize;
   end;
 
   procedure TfMain.UndoOperations(Index: Integer);
@@ -1905,6 +1913,11 @@ uses
   procedure TfMain.UpdateFlatModeAction;
   begin
     aFlatMode.Checked := SettingValueBool(ISettingID_Browse_FlatMode);
+  end;
+
+  procedure TfMain.UpdateThumbnailSize;
+  begin
+    Viewer.ThumbnailSize := FProject.ThumbnailSize;
   end;
 
   procedure TfMain.UpdateViewIndex;

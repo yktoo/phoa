@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.2 2004-10-13 11:03:33 dale Exp $
+//  $Id: phOps.pas,v 1.3 2004-10-13 14:29:09 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -92,17 +92,19 @@ type
   TUndoInvalidationFlag  = (
      // -- Флаги действий при выполнении (eXecution)
     uifXReloadViews,         // Перегрузить список представлений (и обновить индекс текущего представления)
-    uifXUpdateViewIndex,     // Обновить индекс текущего представления
+    uifXUpdateViewIndex,     // Обновить индекс текущего представления (мог измениться)
     uifXReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
     uifXReinitSiblings,      // Переинициализировать соседние с узлом группы операции узлы дерева. Должно быть заполнено Op.ParentGroupAbsIdx
     uifXReinitRecursive,     // При переинициализации (флаги uifXReinitParent и uifXReinitSiblings) действовать рекурсивно
     uifXEditGroup,           // Ввести узел группы Op.GroupAbsIdx в режим редактирования его текста. Должно быть заполнено Op.GroupAbsIdx
+    uifXUpdateThumbParams,   // Обновить параметры эскизов (могли измениться)
      // -- Флаги действий при откате (Undoing)
     uifUReloadViews,         // Перегрузить список представлений (и обновить индекс текущего представления)
     uifUUpdateViewIndex,     // Обновить индекс текущего представления
     uifUReinitAll,           // Переинициализировать все узлы дерева
     uifUReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifUReinitRecursive);    // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
+    uifUReinitRecursive,     // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
+    uifUUpdateThumbParams);  // Обновить параметры эскизов (могли измениться)
 
   TUndoInvalidationFlags = set of TUndoInvalidationFlag;
 
@@ -461,6 +463,7 @@ type
 
   TPhoaOp_PhoAEdit = class(TPhoaOperation)
   protected
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
     constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; const NewThSize: TSize; bNewThQuality: Byte; const sNewDescription: String);
@@ -1751,6 +1754,13 @@ uses
     Project.ThumbnailSize    := NewThSize;
     Project.ThumbnailQuality := bNewThQuality;
     Project.Description      := sNewDescription;
+  end;
+
+  function TPhoaOp_PhoAEdit.GetInvalidationFlags: TUndoInvalidationFlags;
+  begin
+    Result := [
+      uifXUpdateThumbParams,  // Execution flags
+      uifUUpdateThumbParams]; // Undo flags
   end;
 
   procedure TPhoaOp_PhoAEdit.RollbackChanges;

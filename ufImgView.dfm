@@ -392,10 +392,10 @@ object fImgView: TfImgView
           end
           object eSlideShowInterval: TTBXSpinEditItem
             EditCaption = 'Slide sho&w interval:'
-            EditWidth = 80
             Hint = 'Slide show interval|Slide show interval in seconds'
             ValueType = evtFloat
             Decimal = 1
+            MaxValue = 600.000000000000000000
             Postfix = 's'
             SpaceAfterPrefix = False
             SpaceBeforePostfix = True

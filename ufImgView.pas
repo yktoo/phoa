@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.35 2004-10-13 11:03:33 dale Exp $
+//  $Id: ufImgView.pas,v 1.36 2004-10-13 14:29:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -23,11 +23,19 @@ type
     FBitmap: TBitmap32;
      // Событие постановки изображения в очередь на декодирование
     FHQueuedEvent: THandle;
+     // Флаг необходимости прервать загрузку изображения при первой возможности
+    FLoadAborted: Boolean;
+     // Блокировка доступа к FLoadAborted
+    FLoadAbortLock: TRTLCriticalSection;
      // Prop storage
     FQueuedFileName: String;
     FHDecodedEvent: THandle;
     FErrorMessage: String;
+     // Событие прогресса загрузки изображения
+    procedure LoadProgress(Sender: TObject; Stage: TProgressStage; PercentDone: Byte; RedrawNow: Boolean; const R: TRect; const Msg: string);
+     // Prop handlers
     procedure SetQueuedFileName(const Value: String);
+    function GetDecoding: Boolean;
   protected
     procedure Execute; override;
   public
@@ -37,6 +45,8 @@ type
     function  GetAndReleasePicture: TBitmap32;
     procedure Terminate;
      // Props
+     // -- True, пока поток занят декодированием
+    property Decoding: Boolean read GetDecoding;
      // -- Текст сообщения об ошибке, если после декодирования Graphic=nil
     property ErrorMessage: String read FErrorMessage;
      // -- Событие завершения декодирования
@@ -218,8 +228,7 @@ type
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
     procedure tbMainVisibleChanged(Sender: TObject);
-    procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem;
-      const AValue: Extended);
+    procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
   private
      // Список просматриваемых изображений
     FPics: IPhotoAlbumPicList;
@@ -352,6 +361,8 @@ type
     procedure UpdateTransformActions;
      // Настраивает состояние Actions показа слайдов
     procedure UpdateSlideShowActions;
+     // Обновляет Cursor изображения
+    procedure UpdateImageCursor;
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
@@ -452,12 +463,14 @@ uses
     FHQueuedEvent  := CreateEvent(nil, False, False, nil);
      // Событие декодирования создаём в сигнальном состоянии - это означает, что поток изначально свободен
     FHDecodedEvent := CreateEvent(nil, True,  True,  nil);
+    InitializeCriticalSection(FLoadAbortLock);
     Resume;
   end;
 
   destructor TDecodeThread.Destroy;
   begin
     FBitmap.Free;
+    DeleteCriticalSection(FLoadAbortLock);
     CloseHandle(FHQueuedEvent);
     CloseHandle(FHDecodedEvent);
     inherited Destroy;
@@ -469,13 +482,28 @@ uses
       WaitForSingleObject(FHQueuedEvent, INFINITE);
       if Terminated then Break;
       try
+         // Сбрасываем флаг прерывания загрузки
+        EnterCriticalSection(FLoadAbortLock);
+        try
+          FLoadAborted := False;
+        finally
+          LeaveCriticalSection(FLoadAbortLock);
+        end;
          // Освобождаем прежнее изображение, если оно есть (осталось невостребованным)
         FreeAndNil(FBitmap);
+        FErrorMessage := '';
          // Получаем новое изображение, перехватываем возможные Exceptions
         try
-          FBitmap := LoadGraphicFromFile(FQueuedFileName);
+          FBitmap := TBitmap32.Create;
+           // Пытаемся загрузить изображение
+          if not FLoadAborted then LoadGraphicFromFile(FQueuedFileName, FBitmap, LoadProgress);
+           // Если загрузка была прервана, уничтожаем изображение
+          if FLoadAborted then FreeAndNil(FBitmap);
         except
-          on e: Exception do FErrorMessage := e.Message;
+          on e: Exception do begin
+            FreeAndNil(FBitmap);
+            FErrorMessage := e.Message;
+          end;
         end;
        // Рапортуем о готовности
       finally
@@ -490,11 +518,30 @@ uses
     FBitmap := nil;
   end;
 
+  function TDecodeThread.GetDecoding: Boolean;
+  begin
+    Result := WaitForSingleObject(FHDecodedEvent, 0)<>WAIT_OBJECT_0;
+  end;
+
+  procedure TDecodeThread.LoadProgress(Sender: TObject; Stage: TProgressStage; PercentDone: Byte; RedrawNow: Boolean; const R: TRect; const Msg: string);
+  begin
+    if FLoadAborted then raise ELoadGraphicAborted.Create('Load graphic aborted');
+  end;
+
   procedure TDecodeThread.SetQueuedFileName(const Value: String);
   begin
+     // Если поток ещё занят, а попросили другой файл, взводим флаг отмены загрузки
+    if (FQueuedFileName<>Value) and Decoding then begin
+      EnterCriticalSection(FLoadAbortLock);
+      try
+        FLoadAborted := True;
+      finally
+        LeaveCriticalSection(FLoadAbortLock);
+      end;
+    end;
      // Ждём освобождения потока
     WaitForSingleObject(FHDecodedEvent, INFINITE);
-     // Если в очередь ставится другой файл
+     // Если в очередь ставится другой файл  
     if FQueuedFileName<>Value then begin
       FErrorMessage := '';
       FQueuedFileName := Value;
@@ -859,7 +906,7 @@ uses
     FWClient := iwWindow-FXGap;
     FHClient := ihWindow-FYGap;
      // Настраиваем курсор
-    FImageCursor := aImgViewCursors[(FWScaled>FWClient) or (FHScaled>FHClient)];
+    FImageCursor :=
     iMain.Cursor := FImageCursor;
      // Находим начальное положение изображения
     ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
@@ -1427,6 +1474,11 @@ uses
   begin
     DisplayPic(False, False);
     UpdateTransformActions;
+  end;
+
+  procedure TfImgView.UpdateImageCursor;
+  begin
+aImgViewCursors[(FWScaled>FWClient) or (FHScaled>FHClient)];
   end;
 
   procedure TfImgView.UpdateShowInfoActions;
