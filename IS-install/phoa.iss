@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.10 2004-11-08 10:16:39 dale Exp $
+;   $Id: phoa.iss,v 1.11 2004-11-08 10:28:02 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -82,11 +82,11 @@
   Name: "{group}\{cm:HelpEn}";                Filename: "{app}\phoa-eng.chm"; Components: help\en;
 
 [Registry]
-  Root: HKCR; Subkey: ".phoa";                                                                        ValueType: string; ValueData: "phoa.photoalbum";           Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum";                                                              ValueType: string; ValueData: {cm:PhoaFmtName};            Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum\shell\open\command";                                           ValueType: string; ValueData: """{app}\phoa.exe"" ""%1"""; Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCR; Subkey: "phoa.photoalbum\DefaultIcon";                                                  ValueType: string; ValueData: """{app}\phoa.exe"",1";      Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
-  Root: HKCU; Subkey: "Software\DK Software\PhoA\Preferences"; ValueName: "@ISettingID_Gen_Language"; ValueType: string; ValueData: {cm:LangID};                 Flags: uninsdeletevalue uninsdeletekeyifempty
+  Root: HKCR; Subkey: ".phoa";                                                                       ValueType: string; ValueData: "phoa.photoalbum";           Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum";                                                             ValueType: string; ValueData: {cm:PhoaFmtName};            Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum\shell\open\command";                                          ValueType: string; ValueData: """{app}\phoa.exe"" ""%1"""; Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCR; Subkey: "phoa.photoalbum\DefaultIcon";                                                 ValueType: string; ValueData: """{app}\phoa.exe"",1";      Flags: uninsdeletevalue uninsdeletekeyifempty; Tasks: associate
+  Root: HKCU; Subkey: "Software\DKSoftware\PhoA\Preferences"; ValueName: "@ISettingID_Gen_Language"; ValueType: string; ValueData: {cm:LangID};                 Flags: uninsdeletevalue uninsdeletekeyifempty
 
 [Run]
   Filename: "{app}\phoa.exe"; Parameters: {code:PhoaStartupParams|}; Description: {cm:LaunchProgram,PhoA}; Flags: nowait postinstall skipifsilent
