@@ -6,12 +6,14 @@
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -27,18 +29,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Copies the files of pictures you select, in the specified folder. Use this option to prepare photo album to write onto a CD or DVD"/>
               <tranEntry langID="1049" value="Копирует файлы выбранных Вами изображений в заданную папку. Используйте эту опцию, чтобы подготовить фотоальбом для записи на CD или DVD"/>
+              <tranEntry langID="1031" value="Kopiert die Dateien der ausgew&#228;hlten Bilder, in den angegebenen Ordner. Verwenden Sie diese Option, um Fotoalben f&#252;r das schreiben auf CD oder DVD vorzubereiten."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -50,18 +55,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Deletes pictures you select, and physically deletes corresponding files. Use this option to delete unwanted picture files"/>
               <tranEntry langID="1049" value="Удаляет выбранные Вами изображения и физически стирает соответствующие файлы с диска. Используйте эту опцию для удаления ненужных изображений"/>
+              <tranEntry langID="1031" value="L&#246;scht die ausgew&#228;hlten Bilder und l&#246;scht auch die zugeh&#246;rigen Dateien von Ihrem Computer. Verwenden Sie diese Option um uungew&#252;nschte Bilddateien zu l&#246;schen."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -73,18 +81,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately"/>
               <tranEntry langID="1049" value="Перемещает файлы выбранных Вами изображений в заданную папку и соответствующим образом исправляет ссылки изображений на них"/>
+              <tranEntry langID="1031" value="Verschiebt die ausgew&#228;hlten Bilder in den angegebenen Ordner und passt die Bilddateiverkn&#252;pfungen entsprechend an."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -96,18 +107,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="• NB: These operations are not undoable!"/>
               <tranEntry langID="1049" value="• ВНИМАНИЕ: эти операции не могут быть впоследствии отменены!"/>
+              <tranEntry langID="1031" value="• Achtung: Diese Operationen k&#246;nnen nicht r&#252;ckg&#228;ngig gemacht werden!"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -119,18 +133,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Rereads the picture files, recreates the thumbnails and updates the file-related information, such as image dimensions"/>
               <tranEntry langID="1049" value="Перечитывает файлы изображений, перестраивает эскизы и обновляет информацию, связанную с файлом — такую, как размеры изображения"/>
+              <tranEntry langID="1031" value="Liest die Bilddateien neu ein, erneuert die Thumbnails und aktualisiert alle zur Datei geh&#246;rigen Eigenschaften, wie z.B. die Bilddimensionen."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -142,18 +159,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Allows you to repair broken file links by finding the files in the specified folder, and, optionally, to delete pictures no longer associated with valid (existent) files"/>
               <tranEntry langID="1049" value="Позволяет восстановить испорченные ссылки на файлы путём поиска подходящих файлов в заданной папке, а также удалить изображения, ссылающиеся на несуществующие файлы"/>
+              <tranEntry langID="1031" value="Erlaubt Ihnen, defekte Dateiverkn&#252;pfungen zu reparieren, indem die entsprechenden Dateien im angegeben Ordner gesucht werden. Alternativ k&#246;nnen Sie Bilder, die mit nicht mehr mit g&#252;ltigen (existierenden) Dateien verkn&#252;pft sind, l&#246;schen."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -165,18 +185,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Copy picture files to a folder"/>
               <tranEntry langID="1049" value="&amp;Копировать файлы изображений в папку"/>
+              <tranEntry langID="1031" value="Bilddateien in einen Ordner &amp;kopieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -188,18 +211,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Delete pictures and files"/>
               <tranEntry langID="1049" value="&amp;Удалить изображения и файлы"/>
+              <tranEntry langID="1031" value="Bilder und Dateien &amp;l&#246;schen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -211,18 +237,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Move picture files to a folder"/>
               <tranEntry langID="1049" value="&amp;Переместить файлы изображений в папку"/>
+              <tranEntry langID="1031" value="Bilddateien in einen Ordner &amp;verschieben"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -234,18 +263,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Rebuild thumbnails"/>
               <tranEntry langID="1049" value="Пе&amp;рестроить эскизы"/>
+              <tranEntry langID="1031" value="Thumbnails &amp;erneuern"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -257,18 +289,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Re&amp;pair picture file links"/>
               <tranEntry langID="1049" value="&amp;Восстановить ссылки на файлы"/>
+              <tranEntry langID="1031" value="Bilddateiverkn&#252;pfungen &amp;reparieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

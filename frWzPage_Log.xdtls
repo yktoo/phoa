@@ -30,6 +30,7 @@
               <tranEntry langID="1033" value="&amp;Copy"/>
               <tranEntry langID="1049" value="&amp;Копировать"/>
               <tranEntry langID="1058" value="&amp;Копировать"/>
+              <tranEntry langID="1031" value="&amp;Kopieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -47,6 +48,7 @@
               <tranEntry langID="1033" value="Copy|Copy current record to clipboard"/>
               <tranEntry langID="1049" value="Копировать|Копировать текущую запись в буфер обмена"/>
               <tranEntry langID="1058" value="Копировать|Копировать текущую запись в буфер обмена"/>
+              <tranEntry langID="1031" value="Kopieren|Kopiert die aktuelle Aufzeichnung in die Zwischenablage"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -90,7 +92,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Отображать только ошибки|Скрыть записи об успешно добавленных изображениях"/>
               <tranEntry langID="1033" value="Display errors only|Hide successfully added picture entries"/>
-              <tranEntry langID="1031" value="Nur Fehler anzeigen|Alle Eintrдge erfolgreich hinzugefьgter Bilder verstecken"/>
+              <tranEntry langID="1031" value="Nur Fehler anzeigen|Alle Eintr&#228;ge erfolgreich hinzugef&#252;gter Bilder verstecken"/>
               <tranEntry langID="1046" value="Mostrar somente erros|Ocultar imagens adicionadas com sucesso"/>
               <tranEntry langID="1058" value="Відображувати тільки помилки|Сховати запису про успішно додані зображення"/>
             </tranEntries>
@@ -114,6 +116,7 @@
               <tranEntry langID="1033" value="&amp;Find..."/>
               <tranEntry langID="1049" value="&amp;Найти..."/>
               <tranEntry langID="1058" value="&amp;Найти..."/>
+              <tranEntry langID="1031" value="&amp;Suchen..."/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -131,6 +134,7 @@
               <tranEntry langID="1033" value="Find...|Show Find Text dialog"/>
               <tranEntry langID="1049" value="Найти...|Отобразить диалог поиска текста"/>
               <tranEntry langID="1058" value="Найти...|Отобразить диалог поиска текста"/>
+              <tranEntry langID="1031" value="Suche...|Text Suchen Dialog anzeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -178,7 +182,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Сохранить в файл...|Сохранить протокол в выбранный файл"/>
               <tranEntry langID="1033" value="Save to file...|Save the log to a selected file"/>
-              <tranEntry langID="1031" value="In Datei speichern...|Das Logbuch in eine ausgewдhlte Datei speichern"/>
+              <tranEntry langID="1031" value="In Datei speichern...|Das Logbuch in eine ausgew&#228;hlte Datei speichern"/>
               <tranEntry langID="1046" value="Salvar no arquivo...|Salva ocorrкncias no arquivo selecionado"/>
               <tranEntry langID="1058" value="Зберегти у файл…|Зберегти протокол в обраний файл"/>
             </tranEntries>

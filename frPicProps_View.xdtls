@@ -30,6 +30,7 @@
               <tranEntry langID="1033" value="Flip &amp;horizontally"/>
               <tranEntry langID="1049" value="Отразить &amp;горизонтально"/>
               <tranEntry langID="1058" value="Отразить &amp;горизонтально"/>
+              <tranEntry langID="1031" value="&amp;Horizontal spiegeln"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -47,6 +48,7 @@
               <tranEntry langID="1033" value="Flip horizontally|Flip the image horizontally"/>
               <tranEntry langID="1049" value="Отразить горизонтально|Отразить изображение горизонтально"/>
               <tranEntry langID="1058" value="Отразить горизонтально|Отразить изображение горизонтально"/>
+              <tranEntry langID="1031" value="Horizontal spiegeln|Spiegelt das Bild horizontal"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -64,6 +66,7 @@
               <tranEntry langID="1033" value="Flip &amp;vertically"/>
               <tranEntry langID="1049" value="Отразить &amp;вертикально"/>
               <tranEntry langID="1058" value="Отразить &amp;вертикально"/>
+              <tranEntry langID="1031" value="&amp;Vertikal spiegeln"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -81,6 +84,7 @@
               <tranEntry langID="1033" value="Flip vertically|Flip the image vertically"/>
               <tranEntry langID="1049" value="Отразить вертикально|Отразить изображение вертикально"/>
               <tranEntry langID="1058" value="Отразить вертикально|Отразить изображение вертикально"/>
+              <tranEntry langID="1031" value="Vertikal spiegeln|Spiegelt das Bild vertikal"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -102,6 +106,7 @@
               <tranEntry langID="1033" value="&amp;No rotation"/>
               <tranEntry langID="1049" value="&amp;Без поворота"/>
               <tranEntry langID="1058" value="&amp;Без поворота"/>
+              <tranEntry langID="1031" value="&amp;Nicht drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -119,6 +124,7 @@
               <tranEntry langID="1033" value="No rotation|Don't apply rotation to the image"/>
               <tranEntry langID="1049" value="Без поворота|Не применять поворот к изображению"/>
               <tranEntry langID="1058" value="Без поворота|Не применять поворот к изображению"/>
+              <tranEntry langID="1031" value="Nicht drehen|Bild nicht drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -136,6 +142,7 @@
               <tranEntry langID="1033" value="Rotate by &amp;180°"/>
               <tranEntry langID="1049" value="Повернуть на &amp;180°"/>
               <tranEntry langID="1058" value="Повернуть на &amp;180°"/>
+              <tranEntry langID="1031" value="Um &amp;180° drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -153,6 +160,7 @@
               <tranEntry langID="1033" value="Rotate by 180°|Rotate the image by 180°"/>
               <tranEntry langID="1049" value="Повернуть на 180°|Повернуть изображение на 180°"/>
               <tranEntry langID="1058" value="Повернуть на 180°|Повернуть изображение на 180°"/>
+              <tranEntry langID="1031" value="Um 180° drehen|Dreht das Bild um 180°"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -170,6 +178,7 @@
               <tranEntry langID="1033" value="Rotate CCW by 9&amp;0°"/>
               <tranEntry langID="1049" value="Повернуть против часовой стрелки на 9&amp;0°"/>
               <tranEntry langID="1058" value="Повернуть против часовой стрелки на 9&amp;0°"/>
+              <tranEntry langID="1031" value="Um 9&amp;0° gegen den Uhrzeigersinn drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -187,6 +196,7 @@
               <tranEntry langID="1033" value="Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)"/>
               <tranEntry langID="1049" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
               <tranEntry langID="1058" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
+              <tranEntry langID="1031" value="Um 90° gegen den Uhrzeigersinn drehen|Dreht das Bild um 90° gegen den Uhrzeigersinn (oder um 270° im Uhrzeigersinn)"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -204,6 +214,7 @@
               <tranEntry langID="1033" value="Rotate CW by &amp;90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;90°"/>
+              <tranEntry langID="1031" value="Um &amp;90° im Uhrzeigersinn drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -221,6 +232,7 @@
               <tranEntry langID="1033" value="Rotate CW by 90°|Rotate the image clockwise by 90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
+              <tranEntry langID="1031" value="Um 90° im Uhrzeigersinn drehen|Dreht das Bild um 90° im Uhrzeigersinn"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -237,7 +249,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="М&amp;асштаб 1:1"/>
               <tranEntry langID="1033" value="Zoom &amp;actual"/>
-              <tranEntry langID="1031" value="&amp;Tatsдchlicher Zoom"/>
+              <tranEntry langID="1031" value="&amp;Tats&#228;chlicher Zoom"/>
               <tranEntry langID="1046" value="Tamanho Re&amp;al"/>
               <tranEntry langID="1058" value="М&amp;асштаб 1:1"/>
             </tranEntries>
@@ -314,7 +326,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Установить масштаб по размерам окна"/>
               <tranEntry langID="1033" value="Set zoom to fit window"/>
-              <tranEntry langID="1031" value="Zoom auf FenstergrцЯe einstellen"/>
+              <tranEntry langID="1031" value="Zoom auf Fenstergr&#246;&#223;e einstellen"/>
               <tranEntry langID="1046" value="Ajustar zoom para caber na janela "/>
               <tranEntry langID="1058" value="Встановити масштаб по розмірах вікна"/>
             </tranEntries>
@@ -364,7 +376,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Увеличить|Увеличить изображение"/>
               <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
-              <tranEntry langID="1031" value="Zoom in|VergrцЯert das Bild"/>
+              <tranEntry langID="1031" value="Zoom in|Vergr&#246;&#223;ert das Bild"/>
               <tranEntry langID="1046" value="Ampliar|Ampliaзгo da imagem vista"/>
               <tranEntry langID="1058" value="Збільшити|Збільшити зображення"/>
             </tranEntries>
@@ -636,7 +648,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Основная панель инструментов"/>
               <tranEntry langID="1033" value="Main Toolbar"/>
-              <tranEntry langID="1031" value="Main Toolbar"/>
+              <tranEntry langID="1031" value="Symbolleiste"/>
               <tranEntry langID="1046" value="Main Toolbar"/>
               <tranEntry langID="1058" value="Основная панель инструментов"/>
             </tranEntries>

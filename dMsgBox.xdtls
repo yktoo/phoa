@@ -6,24 +6,28 @@
         <tranEntries>
           <tranEntry langID="1033" value="&lt;&gt;"/>
           <tranEntry langID="1049" value="&lt;&gt;"/>
+          <tranEntry langID="1031" value="&lt;&gt;"/>
         </tranEntries>
       </propEntry>
       <propEntry name="HelpFile">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="HelpKeyword">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -35,12 +39,14 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -52,18 +58,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Don't &amp;show this message again"/>
               <tranEntry langID="1049" value="Ѕольше не &amp;показывать данное сообщение"/>
+              <tranEntry langID="1031" value="Diese Meldung nicht mehr &amp;anzeigen."/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -79,12 +88,14 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -96,18 +107,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&lt;&gt;"/>
               <tranEntry langID="1049" value="&lt;&gt;"/>
+              <tranEntry langID="1031" value="&lt;&gt;"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -119,18 +133,21 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

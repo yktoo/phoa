@@ -29,7 +29,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Äîáàâèòü"/>
               <tranEntry langID="1033" value="&amp;Add"/>
-              <tranEntry langID="1031" value="&amp;Hinzufügen"/>
+              <tranEntry langID="1031" value="&amp;Hinzuf&#252;gen"/>
               <tranEntry langID="1046" value="&amp;Adicionar"/>
               <tranEntry langID="1058" value="&amp;Äîäàòè:"/>
             </tranEntries>
@@ -56,7 +56,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Äîáàâèòü êëþ÷åâîå ñëîâî|Äîáàâèòü êëþ÷åâîå ñëîâî ê âûáðàííûì èçîáðàæåíèÿì"/>
               <tranEntry langID="1033" value="Add a keyword|Add new keyword to selected pictures"/>
-              <tranEntry langID="1031" value="Schlüsselwort hinzufügen|Ein neues Schlüsselwort für die ausgewählten Bilder hinzufügen"/>
+              <tranEntry langID="1031" value="Schl&#252;sselwort hinzuf&#252;gen|Ein neues Schl&#252;sselwort f&#252;r die ausgew&#228;hlten Bilder hinzuf&#252;gen"/>
               <tranEntry langID="1046" value="Adicionar palavra-chave|Adicionar nova palavra-chave para imagens selecionadas"/>
               <tranEntry langID="1058" value="Äîäàòè êëþ÷îâå ñëîâî|Äîäàòè êëþ÷îâå ñëîâî äî  îáðàíèõ çîáðàæåíü"/>
             </tranEntries>
@@ -79,7 +79,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Îòìåòèòü âñå"/>
               <tranEntry langID="1033" value="&amp;Check all"/>
-              <tranEntry langID="1031" value="&amp;Alle auswählen"/>
+              <tranEntry langID="1031" value="&amp;Alle ausw&#228;hlen"/>
               <tranEntry langID="1046" value="Marcar &amp;todas"/>
               <tranEntry langID="1058" value="&amp;Â³äçíà÷èòè âñå"/>
             </tranEntries>
@@ -106,7 +106,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ïîìåòèòü âñå|Ïîìåòèòü âñå êëþ÷åâûå ñëîâà â ñïèñêå"/>
               <tranEntry langID="1033" value="Check all|Check all the keywords in the list"/>
-              <tranEntry langID="1031" value="Alle auswählen|Alle Schlüsselwörter in der Liste auswählen"/>
+              <tranEntry langID="1031" value="Alle ausw&#228;hlen|Alle Schl&#252;sselw&#246;rter in der Liste ausw&#228;hlen"/>
               <tranEntry langID="1046" value="Marcar Todas|Marcar todas as palavras-chave na lista"/>
               <tranEntry langID="1058" value="Ïîçíà÷èòè óñå|Ïîçíà÷èòè âñ³ êëþ÷îâ³ ñëîâà â ñïèñêó"/>
             </tranEntries>
@@ -129,7 +129,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Òîëüêî îòìå÷åííûå"/>
               <tranEntry langID="1033" value="C&amp;hecked only"/>
-              <tranEntry langID="1031" value="Nur aus&amp;gewählte"/>
+              <tranEntry langID="1031" value="Nur aus&amp;gew&#228;hlte"/>
               <tranEntry langID="1046" value="&amp;Somente marcadas"/>
               <tranEntry langID="1058" value="&amp;Ò³ëüêè â³äçíà÷åí³"/>
             </tranEntries>
@@ -156,7 +156,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Òîëüêî îòìå÷åííûå|Îòîáðàæàòü òîëüêî îòìå÷åííûå êëþ÷åâûå ñëîâà"/>
               <tranEntry langID="1033" value="Checked only|Display only checked keywords"/>
-              <tranEntry langID="1031" value="Nur ausgewählte|Nur ausgewählte Schlüsselwörter anzeigen"/>
+              <tranEntry langID="1031" value="Nur ausgew&#228;hlte|Nur ausgew&#228;hlte Schl&#252;sselw&#246;rter anzeigen"/>
               <tranEntry langID="1046" value="Somente marcadas|Mostrar somente palavras-chave marcadas"/>
               <tranEntry langID="1058" value="Ò³ëüêè â³äçíà÷åí³|Â³äîáðàæàòè ò³ëüêè â³äçíà÷åí³ êëþ÷îâ³ ñëîâà"/>
             </tranEntries>
@@ -205,7 +205,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Èçìåíèòü êëþ÷åâîå ñëîâî|Èçìåíèòü âûáðàííîå êëþ÷åâîå ñëîâî"/>
               <tranEntry langID="1033" value="Edit keyword|Edit selected keyword"/>
-              <tranEntry langID="1031" value="Schlüsselwort bearbeiten|Das ausgewählte Schlüsselwort bearbeiten"/>
+              <tranEntry langID="1031" value="Schl&#252;sselwort bearbeiten|Das ausgew&#228;hlte Schl&#252;sselwort bearbeiten"/>
               <tranEntry langID="1046" value="Editar palavra-chave|Editar palavra-chave selecionada"/>
               <tranEntry langID="1058" value="Çì³íèòè êëþ÷îâå ñëîâî|Çì³íèòè îáðàíå êëþ÷îâå ñëîâî"/>
             </tranEntries>
@@ -282,7 +282,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ñ&amp;íÿòü ñî âñåõ"/>
               <tranEntry langID="1033" value="&amp;Uncheck all"/>
-              <tranEntry langID="1031" value="&amp;Nichts auswählen"/>
+              <tranEntry langID="1031" value="&amp;Nichts ausw&#228;hlen"/>
               <tranEntry langID="1046" value="&amp;Desmarcar todasl"/>
               <tranEntry langID="1058" value="Ç&amp;íÿòè ç óñ³õ"/>
             </tranEntries>
@@ -309,7 +309,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Óáðàòü îòìåòêó ó âñåõ|Óáðàòü îòìåòêó ó âñåõ êëþ÷åâûõ ñëîâ"/>
               <tranEntry langID="1033" value="Uncheck all|Remove check from all the keywords in the list"/>
-              <tranEntry langID="1031" value="Nichts auswählen|Alle Schlüsselwörter in der Liste abwählen"/>
+              <tranEntry langID="1031" value="Nichts ausw&#228;hlen|Alle Schl&#252;sselw&#246;rter in der Liste abw&#228;hlen"/>
               <tranEntry langID="1046" value="Desmarcar todas|Remove marca de todas as palavras-chave na lista"/>
               <tranEntry langID="1058" value="Çàáðàòè ïîçíà÷êó â óñ³õ|Çàáðàòè ïîçíà÷êó ç óñ³õ êëþ÷îâèõ ñë³â"/>
             </tranEntries>
@@ -373,7 +373,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Åù¸ êíîïêè|"/>
               <tranEntry langID="1033" value="More buttons|"/>
-              <tranEntry langID="1031" value="Weitere Schaltflächen|"/>
+              <tranEntry langID="1031" value="Weitere Schaltfl&#228;chen|"/>
               <tranEntry langID="1046" value="Mais botões|"/>
               <tranEntry langID="1058" value="Ùå êíîïêè|"/>
             </tranEntries>

@@ -6,7 +6,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Операции с файлами изображений"/>
           <tranEntry langID="1033" value="Picture file operations"/>
-          <tranEntry langID="1031" value="Picture file operations"/>
+          <tranEntry langID="1031" value="Bilddatei Operationen"/>
           <tranEntry langID="1046" value="Picture file operations"/>
           <tranEntry langID="1058" value="Операции с файлами изображений"/>
         </tranEntries>
@@ -47,7 +47,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&lt; Назад"/>
               <tranEntry langID="1033" value="&lt; Back"/>
-              <tranEntry langID="1031" value="&lt; Zurьck"/>
+              <tranEntry langID="1031" value="&lt; Zur&#252;ck"/>
               <tranEntry langID="1046" value="&lt; Voltar"/>
               <tranEntry langID="1058" value="&lt; Назад"/>
             </tranEntries>

@@ -47,7 +47,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Закрыть"/>
               <tranEntry langID="1033" value="Close"/>
-              <tranEntry langID="1031" value="SchlieЯen"/>
+              <tranEntry langID="1031" value="Schlie&#223;en"/>
               <tranEntry langID="1046" value="Fechar"/>
               <tranEntry langID="1058" value="Закрити"/>
             </tranEntries>
@@ -212,7 +212,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ключевые\nслова"/>
               <tranEntry langID="1033" value="Keywords"/>
-              <tranEntry langID="1031" value="Schlьsselwцrter"/>
+              <tranEntry langID="1031" value="Schl&#252;sselw&#246;rter"/>
               <tranEntry langID="1046" value="Palavras-\nchave"/>
               <tranEntry langID="1058" value="Ключові\nслова"/>
             </tranEntries>
@@ -258,7 +258,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Просмотр и\nнастройка"/>
               <tranEntry langID="1033" value="View &amp;&amp; Adjust"/>
-              <tranEntry langID="1031" value="Anzeigen &amp;&amp;\n Adjust"/>
+              <tranEntry langID="1031" value="Anzeigen &amp;&amp;\n Anpassen"/>
               <tranEntry langID="1046" value="Visualizar &amp;&amp;\nAdjust"/>
               <tranEntry langID="1058" value="Перегляд и\nнастройка"/>
             </tranEntries>

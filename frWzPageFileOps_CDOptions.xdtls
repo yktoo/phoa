@@ -6,12 +6,14 @@
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -23,16 +25,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Copy the p&amp;rogram itself to the destination folder"/>
               <tranEntry langID="1049" value="С&amp;копировать саму программу в папку назначения"/>
+              <tranEntry langID="1031" value="Das P&amp;rogramm selbst in den Zielordner kopieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -44,16 +49,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Copy the current program settings to phoa.&amp;ini"/>
               <tranEntry langID="1049" value="Скопировать текущие настройки программы в phoa.&amp;ini"/>
+              <tranEntry langID="1031" value="Die aktuellen Programmeinstellungen in phoa.&amp;ini kopieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -65,16 +73,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Create &amp;autorun.inf file for autoplaying the CD/DVD, in the destination folder"/>
               <tranEntry langID="1049" value="Создать файл &amp;autorun.inf, чтобы CD/DVD запускался автоматически"/>
+              <tranEntry langID="1031" value="&amp;autorun.inf zum automatischen Abspielen der CD/DVD im Zielordner erstellen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -86,16 +97,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Create a photo album &amp;file with selected pictures to:"/>
               <tranEntry langID="1049" value="Создать файл &amp;фотоальбома с выбранными изображениями в:"/>
+              <tranEntry langID="1031" value="Eine &amp;Fotoalbum-Datei mit den ausgew&#228;hlten Bildern erstellen in:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -107,16 +121,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Also include existing &amp;views"/>
               <tranEntry langID="1049" value="Также &amp;включить в фотоальбом существующие представления"/>
+              <tranEntry langID="1031" value="Auch e&amp;xistierende Ansichten hinzuf&#252;gen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -131,21 +148,25 @@
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="ImeName">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -156,21 +177,25 @@
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="ImeName">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -182,16 +207,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Label the media as:"/>
               <tranEntry langID="1049" value="Установить &amp;метку носителя:"/>
+              <tranEntry langID="1031" value="Das Medium bezeichnen a&amp;ls:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -203,16 +231,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Photo album description:"/>
               <tranEntry langID="1049" value="&amp;Описание фотоальбома:"/>
+              <tranEntry langID="1031" value="Beschreibung des &amp;Fotoalbums:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -223,21 +254,25 @@
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="ImeName">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Lines">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

@@ -6,12 +6,14 @@
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -23,18 +25,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Look in the subfolders of the destination folder"/>
               <tranEntry langID="1049" value="Просматривать подпапки в папке назна&amp;чения"/>
+              <tranEntry langID="1031" value="Auch in &amp;Unterverzeichnissen des Zielordners nachsehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -50,18 +55,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="If a matching file found but is in use by another picture"/>
               <tranEntry langID="1049" value="Если подходящий файл уже используется другим изображением"/>
+              <tranEntry langID="1031" value="Falls eine passende Datei gefunden wird, aber von einem andern Bild genutzt wird"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -73,18 +81,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Searching for the matching file"/>
               <tranEntry langID="1049" value="Поиск подходящего файла"/>
+              <tranEntry langID="1031" value="Nach passender Datei suchen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -96,18 +107,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Delete the picture the file was linked to, and relink it to the ne&amp;w picture"/>
               <tranEntry langID="1049" value="Удалить изображение, с которым он связан, и привязать его к новому изображени&amp;ю"/>
+              <tranEntry langID="1031" value="Das Bild, welches mit der Datei verlinkt war l&#246;schen, und sie mit dem neuen Bild &amp;verkn&#252;pfen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -119,18 +133,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Match file by its &amp;name"/>
               <tranEntry langID="1049" value="Искать совпадения по имени &amp;файла"/>
+              <tranEntry langID="1031" value="Datei nach &amp;Namen suchen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -142,18 +159,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Match file by both name and siz&amp;e"/>
               <tranEntry langID="1049" value="Искать совпадения и по имени, и по размеру фа&amp;йла"/>
+              <tranEntry langID="1031" value="Datei nach Namen und Gr&#246;&#223;&amp;e suchen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -165,18 +185,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Match file by its si&amp;ze"/>
               <tranEntry langID="1049" value="Искать совпадения по &amp;размеру файла"/>
+              <tranEntry langID="1031" value="Datei nach &amp;Gr&#246;&#223;e suchen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -188,18 +211,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="S&amp;kip it and look for the next match"/>
               <tranEntry langID="1049" value="Проп&amp;устить его и искать следующий подходящий файл"/>
+              <tranEntry langID="1031" value="&amp;&#220;berspringen und nach n&#228;chster &#220;bereinstimmung suchen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

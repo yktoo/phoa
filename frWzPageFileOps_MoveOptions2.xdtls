@@ -6,12 +6,14 @@
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -23,18 +25,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Delete original files"/>
               <tranEntry langID="1049" value="&amp;Удалять исходные файлы"/>
+              <tranEntry langID="1031" value="Originaldateien &amp;l&#246;schen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -46,18 +51,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Delete to the rec&amp;ycle bin"/>
               <tranEntry langID="1049" value="Удал&amp;ять в Корзину"/>
+              <tranEntry langID="1031" value="In den Papierkorb l&amp;&#246;schen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -68,27 +76,32 @@
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="ImeName">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Items">
             <tranEntries>
               <tranEntry langID="1033" value="Treat as an error\nUpdate the link only if the target file exists\nUpdate the link anyway\n"/>
               <tranEntry langID="1049" value="Считать ошибкой\nОбновить ссылку только если файл назначения существует\nОбновить ссылку в любом случае\n"/>
+              <tranEntry langID="1031" value="Als Fehler behandeln\nDie Verkn&#252;pfung nur aktualisieren, wenn die Zieldatei existiert\nDie Verkn&#252;pfung in jedem Fall aktualisieren\n"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -99,27 +112,32 @@
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="ImeName">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Items">
             <tranEntries>
               <tranEntry langID="1033" value="Skip the current picture\nPrompt to overwrite the file\nAlways overwrite the file\n"/>
               <tranEntry langID="1049" value="Пропускать текущее изображение\nВыдать запрос на перезапись файла\nВсегда перезаписывать файл\n"/>
+              <tranEntry langID="1031" value="Das aktuelle Bild &#252;berspringen\nVor dem &#220;berschreiben der Datei nachfragen\nDie Datei immer &#252;berschreiben\n"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -131,16 +149,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Set up &amp;CD/DVD creation options as well"/>
               <tranEntry langID="1049" value="Настроить также опции записи на C&amp;D/DVD"/>
+              <tranEntry langID="1031" value="Option zur &amp;CD/DVD-Erstellung auch anlegen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -156,16 +177,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="If the &amp;original file does not exist:"/>
               <tranEntry langID="1049" value="&amp;Если исходный файл не существует:"/>
+              <tranEntry langID="1031" value="Falls die &amp;Originaldatei nicht existiert:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -177,16 +201,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="If the target file already e&amp;xists:"/>
               <tranEntry langID="1049" value="Если файл назна&amp;чения уже существует:"/>
+              <tranEntry langID="1031" value="Falls die Zieldatei bereits e&amp;xistiert:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

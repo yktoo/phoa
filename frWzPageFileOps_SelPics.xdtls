@@ -6,12 +6,14 @@
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
       <propEntry name="Hint">
         <tranEntries>
           <tranEntry langID="1033" value=""/>
           <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1031" value=""/>
         </tranEntries>
       </propEntry>
     </propEntries>
@@ -23,30 +25,35 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Check all groups"/>
               <tranEntry langID="1049" value="&amp;Отметить все группы"/>
+              <tranEntry langID="1031" value="Alle Gruppen &amp;ausw&#228;hlen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value="Set check to all the groups having pictures"/>
               <tranEntry langID="1049" value="Установить отметку у всех групп, имеющих изображения"/>
+              <tranEntry langID="1031" value="Alle Gruppen die Bilder enthalten ausw&#228;hlen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -58,30 +65,35 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Invert group checks"/>
               <tranEntry langID="1049" value="&amp;Инвертировать отметку у групп"/>
+              <tranEntry langID="1031" value="Ausgew&#228;hlte Gruppen &amp;invertieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value="Toggle each group's check"/>
               <tranEntry langID="1049" value="Переключить состояние отметки каждой группы на противоположное"/>
+              <tranEntry langID="1031" value="Status jeder Gruppe umkehren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -97,30 +109,35 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Uncheck all groups"/>
               <tranEntry langID="1049" value="&amp;Снять отметку у всех групп"/>
+              <tranEntry langID="1031" value="Alle Gruppen a&amp;bw&#228;hlen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value="Remove check from all the groups"/>
               <tranEntry langID="1049" value="Убрать отметку со всех групп"/>
+              <tranEntry langID="1031" value="Auswahl von allen Gruppen entfernen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -136,16 +153,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="File link validity filter"/>
               <tranEntry langID="1049" value="Фильтр по существованию файла изображения"/>
+              <tranEntry langID="1031" value="G&#252;ltigkeit der Dateiverkn&#252;pfung pr&#252;fen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -169,18 +189,21 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -196,18 +219,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&lt;all pics&gt;"/>
               <tranEntry langID="1049" value="&lt;all pics&gt;"/>
+              <tranEntry langID="1031" value="&lt;all pics&gt;"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -219,18 +245,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="Pictures in selected &amp;groups:"/>
               <tranEntry langID="1049" value="Изображения в выбранных &amp;группах:"/>
+              <tranEntry langID="1031" value="Bilder in ausgew&#228;hlten Gruppen:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -242,18 +271,21 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Selected pictures"/>
               <tranEntry langID="1049" value="Вы&amp;бранные изображения"/>
+              <tranEntry langID="1031" value="Au&amp;sgew&#228;hlte Bilder"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -265,16 +297,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="All selected &amp;pictures"/>
               <tranEntry langID="1049" value="Все в&amp;ыбранные изображения"/>
+              <tranEntry langID="1031" value="Alle ausgew&#228;hlten Bilder"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -286,16 +321,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Only pictures having &amp;NO valid (existent) file linked"/>
               <tranEntry langID="1049" value="Только изображения, ссылающиеся на &amp;НЕсуществующий файл"/>
+              <tranEntry langID="1031" value="Nur Bilder die mit &amp;KEINER korrekten (existierende) Datei verlinkt sind"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -307,16 +345,19 @@
             <tranEntries>
               <tranEntry langID="1033" value="Only pictures having &amp;valid (existent) file linked"/>
               <tranEntry langID="1049" value="Только изображения, ссылающиеся на су&amp;ществующий файл"/>
+              <tranEntry langID="1031" value="Nur Bilder die mit korrekten (existierenden) Dateien verlinkt sind"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -328,18 +369,21 @@
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
               <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

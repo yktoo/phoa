@@ -66,7 +66,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Закрыть"/>
               <tranEntry langID="1033" value="&amp;Close"/>
-              <tranEntry langID="1031" value="&amp;SchlieЯen"/>
+              <tranEntry langID="1031" value="&amp;Schlie&#223;en"/>
               <tranEntry langID="1046" value="&amp;Fechar"/>
               <tranEntry langID="1058" value="&amp;Закрити"/>
             </tranEntries>
@@ -93,7 +93,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Закрыть|Закрыть окно просмотра"/>
               <tranEntry langID="1033" value="Close|Close viewing window"/>
-              <tranEntry langID="1031" value="SchlieЯen|Anzeigefenster schlieЯen"/>
+              <tranEntry langID="1031" value="Schlie&#223;en|Anzeigefenster schlie&#223;en"/>
               <tranEntry langID="1046" value="Fechar|Fechar janela de visualizaзгo"/>
               <tranEntry langID="1058" value="Закрити|Закрити вікно перегляду"/>
             </tranEntries>
@@ -217,6 +217,7 @@
               <tranEntry langID="1033" value="Flip &amp;horizontally"/>
               <tranEntry langID="1049" value="Отразить &amp;горизонтально"/>
               <tranEntry langID="1058" value="Отразить &amp;горизонтально"/>
+              <tranEntry langID="1031" value="&amp;Horizontal spiegeln"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -234,6 +235,7 @@
               <tranEntry langID="1033" value="Flip horizontally|Flip the image horizontally"/>
               <tranEntry langID="1049" value="Отразить горизонтально|Отразить изображение горизонтально"/>
               <tranEntry langID="1058" value="Отразить горизонтально|Отразить изображение горизонтально"/>
+              <tranEntry langID="1031" value="Horizontal spiegeln|Spiegelt das Bild horizontal"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -251,6 +253,7 @@
               <tranEntry langID="1033" value="Flip &amp;vertically"/>
               <tranEntry langID="1049" value="Отразить &amp;вертикально"/>
               <tranEntry langID="1058" value="Отразить &amp;вертикально"/>
+              <tranEntry langID="1031" value="&amp;Vertikal spiegeln"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -268,6 +271,7 @@
               <tranEntry langID="1033" value="Flip vertically|Flip the image vertically"/>
               <tranEntry langID="1049" value="Отразить вертикально|Отразить изображение вертикально"/>
               <tranEntry langID="1058" value="Отразить вертикально|Отразить изображение вертикально"/>
+              <tranEntry langID="1031" value="Vertikal spiegeln|Spiegelt das Bild vertikal"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -438,7 +442,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Следующее изображение"/>
               <tranEntry langID="1033" value="&amp;Next picture"/>
-              <tranEntry langID="1031" value="&amp;Nдchstes Bild"/>
+              <tranEntry langID="1031" value="&amp;N&#228;chstes Bild"/>
               <tranEntry langID="1046" value="Prу&amp;xima imagem"/>
               <tranEntry langID="1058" value="Н&amp;аступне зображення"/>
             </tranEntries>
@@ -465,7 +469,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Следующее изображение|Перейти к следующему изображению в группе"/>
               <tranEntry langID="1033" value="Next picture|Advance to the next picture in the group"/>
-              <tranEntry langID="1031" value="Nдchstes Bild|Weiter zum nдchsten Bild in der Gruppe"/>
+              <tranEntry langID="1031" value="N&#228;chstes Bild|Weiter zum n&#228;chsten Bild in der Gruppe"/>
               <tranEntry langID="1046" value="Prуxima imagem|Ir para ъltima imagem no grupo"/>
               <tranEntry langID="1058" value="Следующее изображение|Перейти к следующему изображению в группе"/>
             </tranEntries>
@@ -515,7 +519,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Предыдущее изображение|Перейти к предыдущему изображению в группе"/>
               <tranEntry langID="1033" value="Previous picture|Rewind to the previous picture in the group"/>
-              <tranEntry langID="1031" value="Vorheriges Bild|Zurьck zum vorherigen Bild in der Gruppe"/>
+              <tranEntry langID="1031" value="Vorheriges Bild|Zur&#252;ck zum vorherigen Bild in der Gruppe"/>
               <tranEntry langID="1046" value="Imagem anterior|Retroceder para imagem anterior no grupo"/>
               <tranEntry langID="1058" value="Попереднє зображення|Перейти до попереднього зображення в групі"/>
             </tranEntries>
@@ -615,7 +619,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Изменить положение или размер информационного блока"/>
               <tranEntry langID="1033" value="Change position and size of the information bar"/>
-              <tranEntry langID="1031" value="Position und GrцЯe der Informationsleiste дndern"/>
+              <tranEntry langID="1031" value="Position und Gr&#246;&#223;e der Informationsleiste &#228;ndern"/>
               <tranEntry langID="1046" value="Mudar posiзгo e tamanho da barra de informaзгo"/>
               <tranEntry langID="1058" value="Змінити положення або розмір інформаційного блоку"/>
             </tranEntries>
@@ -639,6 +643,7 @@
               <tranEntry langID="1033" value="&amp;No rotation"/>
               <tranEntry langID="1049" value="&amp;Без поворота"/>
               <tranEntry langID="1058" value="&amp;Без поворота"/>
+              <tranEntry langID="1031" value="&amp;Nicht drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -656,6 +661,7 @@
               <tranEntry langID="1033" value="No rotation|Don't apply rotation to the image"/>
               <tranEntry langID="1049" value="Без поворота|Не применять поворот к изображению"/>
               <tranEntry langID="1058" value="Без поворота|Не применять поворот к изображению"/>
+              <tranEntry langID="1031" value="Nicht drehen|Bild nicht drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -673,6 +679,7 @@
               <tranEntry langID="1033" value="Rotate by &amp;180°"/>
               <tranEntry langID="1049" value="Повернуть на &amp;180°"/>
               <tranEntry langID="1058" value="Повернуть на &amp;180°"/>
+              <tranEntry langID="1031" value="Um &amp;180° drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -690,6 +697,7 @@
               <tranEntry langID="1033" value="Rotate by 180°|Rotate the image by 180°"/>
               <tranEntry langID="1049" value="Повернуть на 180°|Повернуть изображение на 180°"/>
               <tranEntry langID="1058" value="Повернуть на 180°|Повернуть изображение на 180°"/>
+              <tranEntry langID="1031" value="Um 180° drehen|Dreht das Bild um 180°"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -707,6 +715,7 @@
               <tranEntry langID="1033" value="Rotate CCW by 9&amp;0°"/>
               <tranEntry langID="1049" value="Повернуть против часовой стрелки на 9&amp;0°"/>
               <tranEntry langID="1058" value="Повернуть против часовой стрелки на 9&amp;0°"/>
+              <tranEntry langID="1031" value="Um 9&amp;0° gegen den Uhrzeigersinn drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -724,11 +733,13 @@
               <tranEntry langID="1033" value="Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)"/>
               <tranEntry langID="1049" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
               <tranEntry langID="1058" value="Повернуть против часовой стрелки на 90°|Повернуть изображение против часовой стрелки на 90° (или по часовой стрелке на 270°)"/>
+              <tranEntry langID="1031" value="Um 90° gegen den Uhrzeigersinn drehen|Dreht das Bild um 90° gegen den Uhrzeigersinn (oder um 270° im Uhrzeigersinn)"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -741,6 +752,7 @@
               <tranEntry langID="1033" value="Rotate CW by &amp;90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;90°"/>
+              <tranEntry langID="1031" value="Um &amp;90° im Uhrzeigersinn drehen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -758,6 +770,7 @@
               <tranEntry langID="1033" value="Rotate CW by 90°|Rotate the image clockwise by 90°"/>
               <tranEntry langID="1049" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
               <tranEntry langID="1058" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
+              <tranEntry langID="1031" value="Um 90° im Uhrzeigersinn drehen|Dreht das Bild um 90° im Uhrzeigersinn"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -801,7 +814,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Настройки программы...|Просмотреть/изменить настройки программы"/>
               <tranEntry langID="1033" value="Program settings...|View/change program settings"/>
-              <tranEntry langID="1031" value="Optionen...|Optionen anzeigen/verдndern"/>
+              <tranEntry langID="1031" value="Optionen...|Optionen anzeigen/ver&#228;ndern"/>
               <tranEntry langID="1046" value="Opзхes...|Ver/mudar opзхes"/>
               <tranEntry langID="1058" value="Настроювання програми...|Переглянути/змінити настроювання програми"/>
             </tranEntries>
@@ -825,6 +838,7 @@
               <tranEntry langID="1033" value="Sho&amp;w info"/>
               <tranEntry langID="1049" value="Отобра&amp;жать информацию"/>
               <tranEntry langID="1058" value="Отобра&amp;жать информацию"/>
+              <tranEntry langID="1031" value="Informationen an&amp;zeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -842,6 +856,7 @@
               <tranEntry langID="1033" value="Show info|Display the picture's description"/>
               <tranEntry langID="1049" value="Отображать информацию|Показывать описания изображений"/>
               <tranEntry langID="1058" value="Отображать информацию|Показывать описания изображений"/>
+              <tranEntry langID="1031" value="Informationen anzeigen|Zeigt die Bildbeschreibung"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -885,7 +900,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Slide show|Toggle slide show mode (automatically advance to next picture)"/>
               <tranEntry langID="1049" value="Показ слайдов|Включить/выключить автоматический показ слайдов"/>
-              <tranEntry langID="1031" value="Diashow|In den Diashow Modus wechseln (automatisch zum nдchsten Bild gehen)"/>
+              <tranEntry langID="1031" value="Diashow|In den Diashow Modus wechseln (automatisch zum n&#228;chsten Bild gehen)"/>
               <tranEntry langID="1046" value="Show de slides|Alternar para modo show de slides (avanзo automбtico de imagens)"/>
               <tranEntry langID="1058" value="Показ слайдів|Уключити/виключити автоматичний показ слайдів"/>
             </tranEntries>
@@ -909,6 +924,7 @@
               <tranEntry langID="1033" value="Store &amp;transformations"/>
               <tranEntry langID="1049" value="&amp;Записать преобразования"/>
               <tranEntry langID="1058" value="&amp;Записать преобразования"/>
+              <tranEntry langID="1031" value="&amp;Transformationen speichern"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -926,6 +942,7 @@
               <tranEntry langID="1033" value="Store transformations|Store current transformations applied, to the picture"/>
               <tranEntry langID="1049" value="Записать преобразования|Записать текущие применённые преобразования в свойства изображения"/>
               <tranEntry langID="1058" value="Записать преобразования|Записать текущие применённые преобразования в свойства изображения"/>
+              <tranEntry langID="1031" value="Transformationen speichern|Speichert die aktuell angewandten Transformationen in der Bilddatei"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -942,7 +959,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="М&amp;асштаб 1:1"/>
               <tranEntry langID="1033" value="Zoom &amp;actual"/>
-              <tranEntry langID="1031" value="&amp;tatsдchlicher Zoom"/>
+              <tranEntry langID="1031" value="&amp;tats&#228;chlicher Zoom"/>
               <tranEntry langID="1046" value="&amp;Tamanho real"/>
               <tranEntry langID="1058" value="Мас&amp;штаб 1:1"/>
             </tranEntries>
@@ -969,7 +986,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Масштаб 1:1|Установить масштаб 1:1"/>
               <tranEntry langID="1033" value="Zoom actual|Set magnification to 1:1"/>
-              <tranEntry langID="1031" value="tatsдchlicher Zoom|Zoom auf 1:1 setzen"/>
+              <tranEntry langID="1031" value="tats&#228;chlicher Zoom|Zoom auf 1:1 setzen"/>
               <tranEntry langID="1046" value="Tamanho real|Ajustar ampliaзгo para 1:1"/>
               <tranEntry langID="1058" value="Масштаб 1:1|Встановити масштаб 1:1"/>
             </tranEntries>
@@ -1019,7 +1036,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Масштаб по размеру окна|Установить масштаб по размеру окна"/>
               <tranEntry langID="1033" value="Zoom best fit|Set magnification for image to fit in the window"/>
-              <tranEntry langID="1031" value="Zoom anpassen|Passt den Zoom der FenstergrцЯe an"/>
+              <tranEntry langID="1031" value="Zoom anpassen|Passt den Zoom der Fenstergr&#246;&#223;e an"/>
               <tranEntry langID="1046" value="Melhor zoom|Ajustar ampliaзгo para imagem caber na janela"/>
               <tranEntry langID="1058" value="Масштаб за розміром вікна|Встановити масштаб за розміром вікна"/>
             </tranEntries>
@@ -1069,7 +1086,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Увеличить|Увеличить изображение"/>
               <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
-              <tranEntry langID="1031" value="Zoom in|Das Bild vergrцЯern"/>
+              <tranEntry langID="1031" value="Zoom in|Das Bild vergr&#246;&#223;ern"/>
               <tranEntry langID="1046" value="Maior zoom|ampliar imagem"/>
               <tranEntry langID="1058" value="Збільшити|Збільшити зображення"/>
             </tranEntries>
@@ -1529,6 +1546,7 @@
               <tranEntry langID="1033" value="&amp;Main Toolbar"/>
               <tranEntry langID="1049" value="Основная &amp;панель инструментов"/>
               <tranEntry langID="1058" value="Основная &amp;панель инструментов"/>
+              <tranEntry langID="1031" value="&amp;Symbolleiste"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -1536,6 +1554,7 @@
               <tranEntry langID="1033" value="Main Toolbar|Show or hide the Main Toolbar"/>
               <tranEntry langID="1049" value="Основная панель инструментов|Показать или скрыть основную панель инструментов"/>
               <tranEntry langID="1058" value="Основная панель инструментов|Показать или скрыть основную панель инструментов"/>
+              <tranEntry langID="1031" value="Symbolleiste|Symbolleiste anzeigen/ausblenden"/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -1548,6 +1567,7 @@
               <tranEntry langID="1033" value="&amp;Tools Toolbar"/>
               <tranEntry langID="1049" value="П&amp;анель инструментов «Сервис»"/>
               <tranEntry langID="1058" value="П&amp;анель инструментов «Сервис»"/>
+              <tranEntry langID="1031" value="&amp;Tools-Symbolleiste"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -1555,6 +1575,7 @@
               <tranEntry langID="1033" value="Tools Toolbar|Show or hide the Tools Toolbar"/>
               <tranEntry langID="1049" value="Панель инструментов «Сервис»|Показать или скрыть панель инструментов «Сервис»"/>
               <tranEntry langID="1058" value="Панель инструментов «Сервис»|Показать или скрыть панель инструментов «Сервис»"/>
+              <tranEntry langID="1031" value="Tools-Symbolleiste|Tools-Symbolleiste anzeigen/ausblenden"/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -1668,6 +1689,7 @@
               <tranEntry langID="1033" value="&amp;View"/>
               <tranEntry langID="1049" value="&amp;Вид"/>
               <tranEntry langID="1058" value="&amp;Вид"/>
+              <tranEntry langID="1031" value="&amp;Ansicht"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -1684,7 +1706,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Основная панель инструментов"/>
               <tranEntry langID="1033" value="Main Toolbar"/>
-              <tranEntry langID="1031" value="Main Toolbar"/>
+              <tranEntry langID="1031" value="Symbolleiste"/>
               <tranEntry langID="1046" value="Main Toolbar"/>
               <tranEntry langID="1058" value="Основная панель инструментов"/>
             </tranEntries>

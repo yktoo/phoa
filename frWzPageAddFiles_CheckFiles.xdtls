@@ -29,7 +29,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Отметить все файлы"/>
               <tranEntry langID="1033" value="Check &amp;all files"/>
-              <tranEntry langID="1031" value="&amp;Alle Dateien auswдhlen"/>
+              <tranEntry langID="1031" value="&amp;Alle Dateien ausw&#228;hlen"/>
               <tranEntry langID="1046" value="Marcar &amp;tudo"/>
               <tranEntry langID="1058" value="&amp;Відзначити усі файли"/>
             </tranEntries>
@@ -56,7 +56,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Пометить все файлы в списке"/>
               <tranEntry langID="1033" value="Set check to all the files in the list"/>
-              <tranEntry langID="1031" value="Alle Dateien in der Liste auswдhlen"/>
+              <tranEntry langID="1031" value="Alle Dateien in der Liste ausw&#228;hlen"/>
               <tranEntry langID="1046" value="Marca todas as imagens da lista"/>
               <tranEntry langID="1058" value="Позначити усі файли в списку"/>
             </tranEntries>
@@ -129,7 +129,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="С&amp;нять отметку со всех файлов"/>
               <tranEntry langID="1033" value="&amp;Uncheck all files"/>
-              <tranEntry langID="1031" value="&amp;Nichts auswдhlen"/>
+              <tranEntry langID="1031" value="&amp;Nichts ausw&#228;hlen"/>
               <tranEntry langID="1046" value="&amp;Desmarcar tudo"/>
               <tranEntry langID="1058" value="З&amp;няти позначку з усіх файлів"/>
             </tranEntries>
@@ -156,7 +156,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Снять отметку со всех файлов"/>
               <tranEntry langID="1033" value="Remove check from all the files"/>
-              <tranEntry langID="1031" value="Keine Datei ausgewдhlen"/>
+              <tranEntry langID="1031" value="Keine Datei ausgew&#228;hlen"/>
               <tranEntry langID="1046" value="Remove marca de todas as imagens"/>
               <tranEntry langID="1058" value="Зняти позначку з усіх файлів"/>
             </tranEntries>
