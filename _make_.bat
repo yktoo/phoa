@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.4 2004-05-11 03:20:01 dale Exp $
+rem $Id: _make_.bat,v 1.5 2004-06-01 13:56:53 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,9 +11,9 @@ rem -W = Output warning messages
 rem -H = Output hint messages
 set OPTIONS=-B -W -H
 set SWITCHES=A8B-C-D-G+H+I+J-L-M-O+P+Q-R-T-U-V+W-X+Y-Z1
-set DELPHI=C:\Progra~1\Borland\Delphi7
-set LIBRARY_PATH=%DELPHI%\tb2k\Source;%DELPHI%\tbx;%DELPHI%\Graphics32;%DELPHI%\RX;%DELPHI%\RX\Units;%DELPHI%\vtv;%DELPHI%\vst\Source\Common;%DELPHI%\vst\Source\VirtualExplorerTree;c:\Delphi\CVSpro~1\dale\dtlang~1
-set COMPILER=%DELPHI%\Bin\dcc32.exe
+set DELPHI=C:\Program Files\Borland\Delphi7
+set LIBRARY_PATH=%DELPHI%\tb2k\Source;%DELPHI%\tbx;%DELPHI%\GraphicEx;%DELPHI%\Graphics32;%DELPHI%\RX;%DELPHI%\RX\Units;%DELPHI%\vtv;%DELPHI%\vst\Source\Common;%DELPHI%\vst\Source\VirtualExplorerTree;c:\Delphi\CVSpro~1\dale\dtlang~1
+set COMPILER="%DELPHI%\Bin\dcc32.exe"
 
 set HELP_COMPILER="C:\Program Files\HTML Help Workshop\hhc.exe"
 
@@ -27,7 +27,7 @@ rem == Compile Delphi DPR project ==
 :compapp
 echo.
 echo == Compile Delphi DPR project ==
-%COMPILER% phoa.dpr %OPTIONS% -$%SWITCHES% -U%LIBRARY_PATH%
+%COMPILER% phoa.dpr %OPTIONS% -$%SWITCHES% "-U%LIBRARY_PATH%"
 if errorlevel == 1 goto :err
 del *.~*
 del *.dcu
