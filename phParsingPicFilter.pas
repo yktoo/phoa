@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.5 2004-11-24 11:42:17 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.6 2004-12-01 09:06:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -39,6 +39,7 @@ type
     function  GetParsed: Boolean;
     function  GetParseErrorMsg: String;
     function  GetParseErrorPos: Integer;
+    function  GetParseErrorLocation: TPoint;
     procedure SetExpression(const sValue: String);
      // Props
      // -- Текущее вырыжение
@@ -47,8 +48,10 @@ type
     property HasErrors: Boolean read GetHasErrors;
      // -- Разобрано ли текущее выражение
     property Parsed: Boolean read GetParsed;
-     // -- Позиция ошибки в выражении
+     // -- Линейная позиция ошибки в выражении
     property ParseErrorPos: Integer read GetParseErrorPos;
+     // -- Позиция ошибки в выражении
+    property ParseErrorLocation: TPoint read GetParseErrorLocation;
      // -- сообщение об ошибке при разборе выражения
     property ParseErrorMsg: String read GetParseErrorMsg;
   end;
@@ -125,6 +128,7 @@ resourcestring
   SPhoaParseError_UnbalancedBrackets          = 'Unbalanced brackets';
   SPhoaParseError_StackIsEmpty                = 'Element stack is empty';
   SPhoaParseError_InvalidDatatype             = 'Invalid datatype';
+  SPhoaParseError_CommentBlockNotTerminated   = 'Unterminated comment block';
 
   procedure PhoaParseError(iPos: Integer; const sMsg: String);
   begin
@@ -1070,6 +1074,7 @@ type
     function  GetParsed: Boolean;
     function  GetParseErrorMsg: String;
     function  GetParseErrorPos: Integer;
+    function  GetParseErrorLocation: TPoint;
     procedure SetExpression(const sValue: String);
   protected
      // Список разобранных элементов
@@ -1113,6 +1118,25 @@ type
   function TPhoaParsingPicFilter.GetParsed: Boolean;
   begin
     Result := FParsed;
+  end;
+
+  function TPhoaParsingPicFilter.GetParseErrorLocation: TPoint;
+  var
+    i: Integer;
+    c: Char;
+  begin
+    Result.X := 1;
+    Result.Y := 1;
+    i := 1;
+    while i<FParseErrorPos do begin
+      c := FExpression[i];
+      Inc(i);
+      if c in [#10, #13] then begin
+        Result.X := 1;
+        Inc(Result.Y);
+        if (c=#13) and (i<FParseErrorPos) and (FExpression[i]=#10) then Inc(i);
+      end;
+    end;
   end;
 
   function TPhoaParsingPicFilter.GetParseErrorMsg: String;
@@ -1171,6 +1195,35 @@ type
       while (iCurrentPos<=iLen) and (FExpression[iCurrentPos] in CSSpaceChars) do Inc(iCurrentPos);
     end;
 
+     // Пропускает комментарий до конца строки
+    procedure SkipSingleLineComment;
+    begin
+       // Проверяем два символа "/"
+      CheckCurrentChar('/');
+      Inc(iCurrentPos);
+      CheckCurrentChar('/');
+      Inc(iCurrentPos);
+       // Пропускаем все символы до конца строки
+      while (iCurrentPos<=iLen) and not (FExpression[iCurrentPos] in [#10, #13]) do Inc(iCurrentPos);
+    end;
+
+     // Пропускает многострочный комментарий
+    procedure SkipMultiLineComment;
+    var iStartPos: Integer;
+    begin
+      CheckCurrentChar('{');
+       // Запоминаем начало комментария
+      iStartPos := iCurrentPos;
+       // Перебираем символы до конца строки, пока не встретим "}"
+      repeat
+        Inc(iCurrentPos);
+      until (iCurrentPos>iLen) or (FExpression[iCurrentPos]='}');
+       // Если "}" не встретился, значит, блок комментариев не закрыт
+      if iCurrentPos>iLen then PhoaParseError(iStartPos, SPhoaParseError_CommentBlockNotTerminated);
+       // Переходим к следующему символу
+      Inc(iCurrentPos);
+    end;
+
      // Извлекает из FExpression и возвращает строку идентификатора, начиная с текущей позиции
     function ExtractIdentifierString: String;
     var iStartPos: Integer;
@@ -1191,7 +1244,7 @@ type
       iStartPos := iCurrentPos;
       Inc(iCurrentPos);
       iTempPos  := iCurrentPos;
-       // "Открываем" литерал 
+       // "Открываем" литерал
       bOpen  := True;
       Result := '';
        // Перебираем строку, пока не дойдём до конца или литерал не будет закрыт
@@ -1373,18 +1426,20 @@ type
           Inc(iCurrentPos);
           Result := TPhoaParsedBracket.Create(c, iStartPos);
         end;
+        '{':
+          SkipMultiLineComment;
         else begin
-          if c in CSMathCompChars then
+          if (c='/') and (iCurrentPos<iLen) and (FExpression[iCurrentPos+1]='/') then
+            SkipSingleLineComment
+          else if c in CSMathCompChars then
             Result := ExtractComparison
           else if c in CSIDStartChars then
             Result := ExtractOperator
           else if c in CSValueChars then begin
             s := ExtractValueString;
             Result := TPhoaParsedValue.Create(s, iStartPos);
-          end else begin
+          end else
             PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [c]);
-            Result := nil;
-          end;
         end;
       end; // case
     end;
@@ -1486,9 +1541,11 @@ type
   end;
 
   procedure TPhoaParsingPicFilter.SetExpression(const sValue: String);
+  var s: String;
   begin
-    if FExpression<>sValue then begin
-      FExpression := sValue;
+    s := AdjustLineBreaks(sValue);
+    if FExpression<>s then begin
+      FExpression := s;
       FParsed := False;
     end;
   end;
