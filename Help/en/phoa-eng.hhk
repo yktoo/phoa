@@ -67,6 +67,11 @@
 		<param name="See Also" value="metadata">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="FAQ">
+		<param name="Name" value="FAQ (Frequently Asked Questions)">
+		<param name="Local" value="faq.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="file masks">
 		<param name="Name" value="file masks">
 		<param name="See Also" value="file masks">

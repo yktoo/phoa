@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
-    $Id: main.css,v 1.2 2004-04-15 12:54:10 dale Exp $
+    $Id: main.css,v 1.3 2004-05-16 11:33:07 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
     PhoA image arranging and searching tool
     Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -25,6 +25,9 @@ p.seealso         { margin-left: 20px;
                     text-align: left; }
 p.lsmall          { text-align: left; 
                     font-size: 7pt; }
+p.faqq            { text-align: justify;
+                    color: #303080; }
+p.faqa            { text-align: justify; }
 div.nb            { border-left: 4 black double;
                     border-top: 1 #888888 dotted;
                     border-right: 1 #888888 dotted;
@@ -32,6 +35,8 @@ div.nb            { border-left: 4 black double;
                     padding: 3pt 12pt 3pt 12pt;
                     margin: 6pt;
                     background-color: #f0f0f0; }
+span.fp           { font-family: Courier New,Courier,fixed;
+                    font-size: 9pt; }
 li                { font-family: Verdana,Arial,serif;
                     font-size: 8pt; 
                     text-align: justify; }

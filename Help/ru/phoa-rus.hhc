@@ -281,6 +281,10 @@
 			<param name="Name" value="&Egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
 			<param name="Local" value="theory-tools.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="FAQ (&divide;&agrave;&ntilde;&ograve;&icirc; &ccedil;&agrave;&auml;&agrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &acirc;&icirc;&iuml;&eth;&icirc;&ntilde;&ucirc;)">
+			<param name="Local" value="faq.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&Iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&egrave; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">

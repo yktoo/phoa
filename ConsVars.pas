@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.20 2004-05-11 03:41:57 dale Exp $
+//  $Id: ConsVars.pas,v 1.21 2004-05-16 11:33:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -527,6 +527,7 @@ const
   IDH_advantages                  = 01010;
   IDH_eula_eng                    = 01020;
   IDH_eula_rus                    = 01030;
+  IDH_faq                         = 01035;
   IDH_file_formats                = 01040;
   IDH_how_it_works                = 01050;
   IDH_intro                       = 01060;

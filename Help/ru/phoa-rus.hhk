@@ -21,6 +21,11 @@
 		<param name="Local" value="intf-browse-mode-tasks.html#dnd">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="FAQ">
+		<param name="Name" value="FAQ (часто задаваемые вопросы)">
+		<param name="Local" value="faq.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="license agreement">
 		<param name="Name" value="License Agreement">
 		<param name="Local" value="eula-eng.html">
@@ -573,6 +578,11 @@
 			<param name="Local" value="intf-stats.html">
 			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&times;&agrave;&Acirc;&icirc; (&divide;&agrave;&ntilde;&ograve;&icirc; &ccedil;&agrave;&auml;&agrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &acirc;&icirc;&iuml;&eth;&icirc;&ntilde;&ucirc;) (&ntilde;&igrave;. FAQ)">
+		<param name="Name" value="FAQ">
+		<param name="See Also" value="FAQ">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&divide;&ograve;&icirc; &iacute;&icirc;&acirc;&icirc;&atilde;&icirc;">
 		<param name="Name" value="История версий">

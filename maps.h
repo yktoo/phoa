@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.3 2004-05-11 03:35:32 dale Exp $
+//  $Id: maps.h,v 1.4 2004-05-16 11:33:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -60,6 +60,7 @@
 #define IDH_advantages                  01010
 #define IDH_eula_eng                    01020
 #define IDH_eula_rus                    01030
+#define IDH_faq                         01035
 #define IDH_file_formats                01040
 #define IDH_how_it_works                01050
 #define IDH_intro                       01060

@@ -1,0 +1,130 @@
+<html><!-- $Id: faq.html,v 1.1 2004-05-16 11:33:07 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>FAQ (Frequently Asked Questions)</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<a name=top></a>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> FAQ (Frequently Asked Questions)</h1>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Contents</h2>
+  <ul>
+    <li><a href=#getting-started>I have read and understood all the program documentation. But how in a hell do I create a photo album?</a>
+    <li><a href=#choose-language>How to switch to another interface language?</a>
+    <li><a href=#thumb-dimensions>How do I change default thumbnail dimensions?</a>
+    <li><a href=#thumb-quality>How can I enhance thumbnail quality?</a>
+    <li><a href=#writing-to-cd>Is it possible to write my photo album to a CD-ROM along with the program so I can view it on any computer?</a>
+    <li><a href=#autorun>How do I write <b>autorun.inf</b> file for the photo album on a CD-ROM starts automatically?</a></li>
+    <li><a href=#open-album-on-startup>I want the program to open my photo album automatically when I start it. How?</a></li>
+    <li><a href=#relocating-pics>Is it possible to alter picture file paths?</a></li>
+  </ul>
+  
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Q&A</h2>
+
+  <p class=faqq><a name=getting-started></a>I have read and understood all the program documentation. But how in a hell do I create a photo album?
+  <p class=faqa>Take it easy, all you have to do:
+    <ul>
+      <li>You can create some folders (groups) for pictures. You do it by selecting <b>Edit | Add group</b> menu item or by pressing
+          <b>Alt+Ins</b> shortcut keys - then the group is created &quot;inside&quot; the group currently selected. You may skip this step and add pictures
+          directly to the photo album.</li>
+      <li>Highlight a folder to add pictures to (group or the photo album node).</li>
+      <li>Select <b>Edit | Add pictures...</b> menu item, Add pictures Wizard opens.</li>
+      <li>At the first page you select a folder with pictures. Check the checkbox <b>Recurse subfolders</b> if it contains nested folders with pictures.
+        Click <b>Next &gt;</b>.</li>
+      <li>At the <b>Check files</b> page you can choose exactly which files are to be added to the photo album. All the files are checked by default.
+        Click <b>Next &gt;</b>, and the adding process will start.</li>
+      <li>After adding has finished the program closes Wizard window and you see your pictures, or advances to the <b>Log</b> page (click <b>Close</b> if this is the
+        case) - according to the program settings.</li>
+      <li>Save photo album to a file. That's all!</li>
+    </ul>
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=choose-language></a>How to switch to another interface language?
+  <p class=faqa>The default interface language is determined by the language used during program installation. You can change it by selecting <b>Tools |
+    Program settings...</b> menu item -&gt; <b>General</b> page -&gt; <b>Interface language</b>.
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=thumb-dimensions></a>How do I change default thumbnail dimensions?
+  <p class=faqa>Each photo album can have its own thumbnail dimensions. These data are stored along with the photo album; you can alter it by selecting the
+    photo album node in the group tree, and then selecting <b>Edit | Edit...</b> menu item.
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=thumb-quality></a>How can I enhance thumbnail quality?
+  <p class=faqa>Thumbnail quality is affected by the two factors:
+    <ul>
+      <li><b><a href="theory-resampling.html">Resampling filter</a> used</b>. Nearest Neighbor is the most quick one but images downsampled with
+        it appear &quot;fuzzy&quot;. The most soft contours are achieved by using B-spline, then Linear filters. You get more plain lines with
+        Lanczos filter. To change resampling filter, select <b>Tools | Program settings...</b> -&gt; <b>Browse mode</b> -&gt; <b>Resampling filter</b>.</li>
+      <li><b>Compression level</b>. Thumbnails are stored in JPEG format; this format compresses images with the price of some quality loss. You can change
+        &quot;size/quality&quot; ratio for each photo album individually, by selecting photo album node in the group tree, and then <b>Edit | Edit...</b> menu
+        item.</li>
+    </ul>
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=writing-to-cd></a>Is it possible to write my photo album to a CD-ROM along with the program so I can view it on any computer?
+  <p class=faqa>Yes, it is. <b>PhoA</b> has been designed specially so as photo albums can be written onto a removable media together with the viewing tool itself:
+    <ul>
+      <li>Photo album files store <b>relative</b> links to picture files, whenever possible (relative to photo album file). Absolute linkage is used for pictures
+          residing on a drive other than photo album's one, or on network drives. This allows writing photo album and pictures on a removable disk provided their
+          relative position is <b>unchanged</b>. E.g.:
+          <ul>
+            <li>Before writing: photo album file: <b>C:\My documents\Photos.phoa</b>; base picture files folder: <b>C:\My documents\Pics</b></li>
+            <li>After writing (onto a CD-ROM): photo album file: <b>D:\Photos.phoa</b>; base picture files folder: <b>D:\Pics</b></li>
+          </ul>
+      </li>
+      <li><b>PhoA</b> doesn't require any additional files to run besides the main executable <b>phoa.exe</b>. You can place it in any folder on the CD.</li>
+      <li>For the program to load a given photo album, specify its path in the command line, eg: <b>phoa.exe Photos.phoa</b></li>
+      <li>The most simple and efficient way to prepare the files and the photo album for writing onto a removable medium is using the
+          <a href="intf-file-ops-task-copy.html">Copy files operation</a>.</li>
+    </ul>
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=autorun></a>How do I write <b>autorun.inf</b> file for the photo album on a CD-ROM starts automatically?
+  <p class=faqa>The basic <b>autorun.inf</b> usage is like the following (you create it using any text editor, then place it into the root CD-ROM directory):
+<pre>[autorun] 
+open=phoa.exe Photos.phoa
+icon=phoa.exe,1
+label=My photo album</pre>
+    This example assumes both program executable (<b>phoa.exe</b>) and photo album file (<b>Photos.phoa</b>) reside in root directory of the CD (so the <b>autorun.inf</b>
+      does).<br>
+    <span class=fp>icon=</span> line specifies a file containing icon to display in &quot;My computer&quot;, and icon index (zero-based) in that file. For <b>phoa.exe</b>:<br>
+    &nbsp;&nbsp;&nbsp;<b>0</b> - the program's icon;<br>
+    &nbsp;&nbsp;&nbsp;<b>1</b> - photo album file's icon.<br>
+    <span class=fp>label=</span> line specifies a drive label to display in &quot;My computer&quot;.
+    Refer to
+    <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/programmersguide/shell_basics/shell_basics_extending/autorun/autoplay_cmds.asp">MSDN
+    documentation</a> for details.
+    <div class=nb><b>NB:</b> It is possible to use the autorun.inf creation feature of the <a href="intf-file-ops-task-copy.html">Copy files
+      operation</a>.</div>
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=open-album-on-startup></a>I want the program to open my photo album automatically when I start it. How?
+  <p class=faqa>You should start the photo album file itself, not the program. Eg. put a shortcut to your photo album <b>C:\My documents\Photos.phoa</b>, onto the Desktop,
+     so when you execute it <b>PhoA</b> will start first, then the program will load this photo album.
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+  <p class=faqq><a name=relocating-pics></a>Is it possible to alter picture file paths?
+  <p class=faqa>Firstly, you are able to move picture files together with the photo album file provided their relative placement is unchanged (see
+    <a href=#writing-to-cd>writing to a CD</a>).<br>
+    Secondly, you can move picture files by using the <a href="intf-file-ops-task-move.html">Move files operation</a>.
+  <p align=right><a href=#top>Top</a>
+  <hr>
+
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

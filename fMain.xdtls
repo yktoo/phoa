@@ -3819,6 +3819,39 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="aHelpFAQ">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="FA&amp;Q"/>
+              <tranEntry langID="1049" value="FA&amp;Q"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Help"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="FAQ|View the PhoA FAQ (Frequently Asked Questions) topic"/>
+              <tranEntry langID="1049" value="FAQ|Открыть раздел Справки PhoA FAQ (часто задаваемые вопросы)"/>
+              <tranEntry langID="1058" value="FAQ|Открыть раздел Справки PhoA FAQ (часто задаваемые вопросы)"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="aHelpWebsite">
         <propEntries>
           <propEntry name="Caption">
@@ -5102,6 +5135,18 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="giTools_GroupsMenu">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="giTools_PicsMenu">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="giTools_ToolsMenu">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="iAbout">
         <propEntries/>
         <compEntries/>
@@ -5229,6 +5274,10 @@
         <compEntries/>
       </compEntry>
       <compEntry name="iHelpContents">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="iHelpFAQ">
         <propEntries/>
         <compEntries/>
       </compEntry>
@@ -5377,6 +5426,10 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmGroupsNewPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmGroupsPicOps">
         <propEntries/>
         <compEntries/>
@@ -5392,6 +5445,16 @@
         <compEntries/>
       </compEntry>
       <compEntry name="ipmGroupsSep2">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmGroupsSep3">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
@@ -5487,6 +5550,16 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmPicsSep4">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmPicsView">
         <propEntries/>
         <compEntries/>
@@ -5561,15 +5634,21 @@
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="iToolsSep">
+      <compEntry name="iToolsSep1">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
               <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="iToolsSep2">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

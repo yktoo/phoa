@@ -1,6 +1,7 @@
 IDH_advantages                     = advantages.html
 IDH_eula_eng                       = eula-eng.html
 IDH_eula_rus                       = eula-rus.html
+IDH_faq                            = faq.html
 IDH_file_formats                   = file-formats.html
 IDH_how_it_works                   = how-it-works.html
 IDH_intf_album_props               = intf-album-props.html

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.13 2004-05-06 10:13:26 dale Exp $
+//  $Id: Main.pas,v 1.14 2004-05-16 11:33:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -181,6 +181,8 @@ type
     ipmGroupsNewPic: TTBXItem;
     ipmPicsSep4: TTBXSeparatorItem;
     giTools_PicsMenu: TTBGroupItem;
+    aHelpFAQ: TAction;
+    iHelpFAQ: TTBXItem;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -242,6 +244,7 @@ type
     procedure aaIniLoadSettings(Sender: TObject);
     procedure pmGroupsPopup(Sender: TObject);
     procedure pmPicsPopup(Sender: TObject);
+    procedure aaHelpFAQ(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -435,6 +438,11 @@ uses
   procedure TfMain.aaHelpContents(Sender: TObject);
   begin
     HtmlHelpShowContents;
+  end;
+
+  procedure TfMain.aaHelpFAQ(Sender: TObject);
+  begin
+    HtmlHelpContext(IDH_faq);
   end;
 
   procedure TfMain.aaHelpWebsite(Sender: TObject);
