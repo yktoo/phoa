@@ -110,26 +110,27 @@ IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=1
 MinorVer=1
-Release=4
-Build=228
+Release=5
+Build=234
 Debug=0
 PreRelease=1
 Special=0
 Private=0
 DLL=0
-Locale=1049
-CodePage=1251
+Locale=1033
+CodePage=1252
 [Version Info Keys]
 CompanyName=Dmitry Kann
-FileDescription=PhoA - A Picture Arranging Tool
-FileVersion=1.1.4.228
+FileDescription=PhoA picture arranging tool
+FileVersion=1.1.5.234
 InternalName=PhoA
 LegalCopyright=©2002-2004 Dmitry Kann
 LegalTrademarks=
 OriginalFilename=phoa.exe
 ProductName=PhoA
-ProductVersion=1.1.4
-Comments=http://phoa.narod.ru/
+ProductVersion=1.1.5
+Comments=All rights reserved. Refer to http://phoa.narod.ru for detailed info or distribution terms.
+VendorWebsite=http://phoa.narod.ru
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.6 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -45,7 +45,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings;
+uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
 
   procedure TfrWzPageAddFiles_SelFiles.AdjustAdvancedCtls(bShowAdvanced: Boolean);
   begin
@@ -219,7 +219,7 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings;
       Wiz.ShowAdvancedOptions := bAdvanced.Tag<>0;
       RegSaveHistory(SRegAddFiles_MaskMRU, cbFileMasks, True);
     end else
-      Info(ConstVal('SNoFilesSelected'));
+      PhoaInfo(False, 'SNoFilesSelected');
   end;
 
   procedure TfrWzPageAddFiles_SelFiles.tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);

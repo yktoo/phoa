@@ -4,7 +4,7 @@ object dMsgBox: TdMsgBox
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = '<>'
-  ClientHeight = 118
+  ClientHeight = 87
   ClientWidth = 312
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,53 +16,37 @@ object dMsgBox: TdMsgBox
   Position = poMainFormCenter
   DesignSize = (
     312
-    118)
+    87)
   PixelsPerInch = 96
   TextHeight = 13
-  object bvBottom: TBevel
-    Left = 0
-    Top = 75
-    Width = 312
-    Height = 2
-    Align = alBottom
-    Shape = bsBottomLine
-  end
   object iIcon: TImage
-    Left = 12
-    Top = 12
+    Left = 20
+    Top = 20
     Width = 32
     Height = 32
   end
   object lMessage: TLabel
-    Left = 56
-    Top = 12
+    Left = 68
+    Top = 20
     Width = 16
     Height = 13
     AutoSize = False
     Caption = '<>'
     WordWrap = True
   end
-  object pButtonsBottom: TPanel
-    Left = 0
-    Top = 77
-    Width = 312
-    Height = 41
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 0
-  end
   object cbDontShowAgain: TCheckBox
-    Left = 12
-    Top = 53
-    Width = 282
+    Left = 20
+    Top = 62
+    Width = 277
     Height = 17
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Don'#39't &show this message again'
-    TabOrder = 1
+    TabOrder = 0
   end
   object dtlsMain: TDTLanguageSwitcher
     Language = 1033
-    Top = 84
+    Left = 280
+    Top = 4
     LangData = {
       0700644D7367426F7804000000070043617074696F6E02000000090402003C3E
       190402003C3E080048656C7046696C650200000009040000190400000B004865

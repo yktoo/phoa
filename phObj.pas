@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.10 2004-05-16 11:34:50 dale Exp $
+//  $Id: phObj.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1477,7 +1477,7 @@ type
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses JPEG, phUtils, StrUtils, Clipbrd, TypInfo, Math, Registry, DateUtils, ShellAPI, Themes,
-  Variants, VirtualDataObject, phSettings;
+  Variants, VirtualDataObject, phSettings, udMsgBox;
 
 type
    // Запись кэша эскиза
@@ -1507,12 +1507,12 @@ type
 
   procedure PhoaWriteError;
   begin
-    PhoaError(ConstVal('SErrCannotWrite'), []);
+    PhoaException(ConstVal('SErrCannotWrite'), []);
   end;
 
   procedure PhoaReadError;
   begin
-    PhoaError(ConstVal('SErrCannotRead'), []);
+    PhoaException(ConstVal('SErrCannotRead'), []);
   end;
 
    //==========================================================================
@@ -2557,7 +2557,7 @@ type
       ppNotes:        FPicNotes              := Value;
       ppMedia:        FPicMedia              := Value;
       ppKeywords:     FPicKeywords.CommaText := Value;
-      else            PhoaError('Picture property %s cannot be written', [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
+      else            PhoaException('Picture property %s cannot be written', [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
     end;
   end;
 
@@ -3484,7 +3484,7 @@ var
   var Streamer: TPhoaStreamer;
   begin
      // Предупреждаем пользователя, если он сохраняет в более старую ревизию
-    if (iRevisionNumber<IPhFileRevisionNumber) and not ConfirmIfSettingRequires(ConstVal('SConfirm_SavingOldFormatFile'), ISettingID_Dlgs_ConfmOldFile) then Exit;
+    if (iRevisionNumber<IPhFileRevisionNumber) and not PhoaConfirm(True, 'SConfirm_SavingOldFormatFile', ISettingID_Dlgs_ConfmOldFile) then Exit;
      // Создаём FilerEx и сохраняем с его помощью
     Streamer := TPhoaFilerEx.Create(psmWrite, sFileName);
     try
@@ -3665,7 +3665,7 @@ var
   procedure TPhoaFilerEx.ValidateRevision;
   begin
      // Не допускаем считывания только более новых ревизий
-    if RevisionNumber>IPhFileRevisionNumber then PhoaError(ConstVal('SErrFileRevHigher'), []);
+    if RevisionNumber>IPhFileRevisionNumber then PhoaException(ConstVal('SErrFileRevHigher'), []);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5715,7 +5715,7 @@ var
   procedure TThumbnailViewer.SetPhoA(Value: TPhotoAlbum);
   begin
     if FPhoA<>Value then begin
-      if (Value<>nil) and (Value.FViewer<>nil) then PhoaError('Photo album cannot be linked to more than one viewer instance', []);
+      if (Value<>nil) and (Value.FViewer<>nil) then PhoaException('Photo album cannot be linked to more than one viewer instance', []);
       if (FPhoA<>nil) then FPhoA.FViewer := nil;
       FPhoA := Value;
       if (FPhoA<>nil) then FPhoA.FViewer := Self;
@@ -6257,7 +6257,7 @@ var
      // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
     if not AnsiSameText(p.sKeyword, sNewKeyword) then begin
        // Если уже есть такое в списке, вызываем Exception
-      if FindKeyword(sNewKeyword, Result) then PhoaError(ConstVal('SErrDuplicateKeyword'), []);
+      if FindKeyword(sNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'), []);
        // Иначе сдвигаем на новое место
       if Index<Result then Dec(Result);
       Move(Index, Result);

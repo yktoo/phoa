@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.22 2004-05-19 13:59:42 dale Exp $
+//  $Id: ConsVars.pas,v 1.23 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -12,7 +12,7 @@ uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32;
 
 type
-  EPhoaError = class(Exception);
+  EPhoaException = class(Exception);
 
   TPicProperty = (
     ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
@@ -91,22 +91,18 @@ type
     mbkConfirmWarning, // Предупреждение с подтверждением - OK/Cancel
     mbkError);         // Ошибка                          - OK
 
-   // Кнопка в окне сообщения 
+   // Кнопка в окне сообщения (порядок следования является обратным порядку их появления в диалоге)
   TMessageBoxButton = (
-    mbbYes,      // Да
-    mbbNo,       // Нет
-    mbbOK,       // ОК
+    mbbHelp,     // Справка
     mbbCancel,   // Отмена
-    mbbYesToAll, // Да для всех
+    mbbOK,       // ОК
     mbbNoToAll,  // Нет для всех
-    mbbHelp);    // Справка
+    mbbNo,       // Нет
+    mbbYesToAll, // Да для всех
+    mbbYes);     // Да
   TMessageBoxButtons = set of TMessageBoxButton;
-   // Предопределённые наборы кнопок
-const
-  MBBOKCancelHelp    = [mbbOK, mbbCancel, mbbHelp];
-  MBBYesNoCancelHelp = [mbbYes, mbbNo, mbbCancel, mbbHelp];
+
    // Результат показа окна сообщения
-type
   TMessageBoxResult = (
     mbrYes,       // Пользователь нажал "Да"
     mbrNo,        // Пользователь нажал "Нет"
@@ -317,7 +313,7 @@ type
 
 const
    // Версия программы
-  SAppVersion                     = 'v1.1.4 beta';
+  SAppVersion                     = 'v1.1.5 beta';
    // Расширение и имя файла фотоальбома по умолчанию
   SDefaultExt                     = 'phoa';
   SDefaultFName                   = 'untitled.'+SDefaultExt;

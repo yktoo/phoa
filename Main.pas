@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.14 2004-05-16 11:33:07 dale Exp $
+//  $Id: Main.pas,v 1.15 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -296,6 +296,7 @@ type
     procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
      // Application events
     procedure AppHint(Sender: TObject);
+    procedure AppException(Sender: TObject; E: Exception);
      // Clipboard messages
     procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
     procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
@@ -354,7 +355,7 @@ uses
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udPhoAProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
-  phToolSetting;
+  phToolSetting, udMsgBox;
 
    //===================================================================================================================
    //  TfMain
@@ -381,10 +382,10 @@ uses
     if CurGroup<>nil then
        // Удаление группы
       if ActiveControl=tvGroups then begin
-        if ConfirmIfSettingRequires(ConstVal('SConfirm_DelGroup'), ISettingID_Dlgs_ConfmDelGroup) then
+        if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then
           PerformOperation(TPhoaOp_GroupDelete.Create(FOperations, FPhoA, CurGroup, True));
        // Удаление изображения
-      end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) and ConfirmIfSettingRequires(ConstVal('SConfirm_DelPics'), ISettingID_Dlgs_ConfmDelPics) then
+      end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then
         PerformOperation(TPhoaMultiOp_PicDelete.Create(FOperations, FPhoA, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray)));
   end;
 
@@ -530,12 +531,12 @@ uses
   begin
     iCntBefore := CurGroup.PicIDs.Count;
     PerformOperation(TPhoaMultiOp_PicPaste.Create(FOperations, FPhoA, CurGroup));
-    InfoIfSettingRequires(ConstVal('SNotify_Paste', [CurGroup.PicIDs.Count-iCntBefore]), ISettingID_Dlgs_NotifyPaste);
+    PhoaInfo(False, 'SNotify_Paste', [CurGroup.PicIDs.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
   end;
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
   begin
-    if ConfirmIfSettingRequires(ConstVal('SConfirm_DelView'), ISettingID_Dlgs_ConfmDelView) then
+    if PhoaConfirm(False, 'SConfirm_DelView', ISettingID_Dlgs_ConfmDelView) then
       TPhoaOp_ViewDelete.Create(FOperations, Self);
   end;
 
@@ -628,10 +629,8 @@ uses
   end;
 
   procedure TfMain.aaSortPics(Sender: TObject);
-  var g: TPhoaGroup;
   begin
-    if CurGroup=FPhoA.RootGroup then g := nil else g := CurGroup;
-    DoSortPics(FPhoA, g, FOperations, g=FSearchResults);
+    DoSortPics(FPhoA, CurGroup, FOperations, CurGroup=FSearchResults);
   end;
 
   procedure TfMain.aaStats(Sender: TObject);
@@ -647,6 +646,16 @@ uses
   procedure TfMain.aaView(Sender: TObject);
   begin
     if Viewer.ItemIndex>=0 then ViewImage(CurGroup, FPhoA, Viewer.ItemIndex, FOperations, ViewIndex<0);
+  end;
+
+  procedure TfMain.AppException(Sender: TObject; E: Exception);
+  var s: String;
+  begin
+     // Добавляем точку, если в конце не знак препинания (ripped from Application.ShowException)
+    s := E.Message;
+    if (s<>'') and (AnsiLastChar(s)>'.') then s := s+'.';
+     // Кажем сообщение об ошибке
+    PhoaMsgBox(mbkError, s, False, False, [mbbOK]);
   end;
 
   procedure TfMain.AppHint(Sender: TObject);
@@ -763,16 +772,17 @@ uses
   end;
 
   function TfMain.CheckSave: Boolean;
+  var mbr: TMessageBoxResults;
   begin
     Result := FOperations.IsUnmodified;
-    if not Result then
-      case MessageBox(Handle, PChar(ConstVal('SConfirm_FileNotSaved', [DisplayFileName])), PChar(ConstVal('SDlgTitle_Confirm')), MB_ICONEXCLAMATION or MB_YESNOCANCEL) of
-        IDYES: begin
-          aSave.Execute;
-          Result := FOperations.IsUnmodified;
-        end;
-        IDNO: Result := True;
-      end;
+    if not Result then begin
+      mbr := PhoaMsgBox(mbkConfirm, 'SConfirm_FileNotSaved', [DisplayFileName], True, False, [mbbYes, mbbNo, mbbCancel]);
+      if mbrYes in mbr then begin
+        aSave.Execute;
+        Result := FOperations.IsUnmodified;
+      end else if mbrNo in mbr then
+        Result := True;
+    end;
   end;
 
   procedure TfMain.CMFocusChanged(var Msg: TCMFocusChanged);
@@ -903,7 +913,7 @@ uses
   begin
      // Если нет несохранённых данных - проверяем необходимость спрашивания подтверждения
     if FOperations.IsUnmodified then
-      CanClose := ConfirmIfSettingRequires(ConstVal('SConfirm_AppExit'), ISettingID_Dlgs_ConfmAppExit)
+      CanClose := PhoaConfirm(False, 'SConfirm_AppExit', ISettingID_Dlgs_ConfmAppExit)
      // Иначе спрашиваем, сохранять ли данные 
     else
       CanClose := CheckSave;
@@ -923,7 +933,8 @@ uses
     tvGroups.RootNodeCount := 1;
     FRootNode := tvGroups.GetFirst;
      // Настраиваем Application
-    Application.OnHint := AppHint;
+    Application.OnHint      := AppHint;
+    Application.OnException := AppException;
      // Создаём список результатов поиска
     FSearchResults := TPhoaGroup.Create(nil);
      // Create undoable operations list
@@ -1372,8 +1383,10 @@ uses
       iCnt := Viewer.SelCount;
       iCntBefore := gTgt.PicIDs.Count;
       PerformOperation(TPhoaMultiOp_PicDragAndDropToGroup.Create(FOperations, FPhoA, CurGroup, gTgt, PicArrayToIDArray(Viewer.GetSelectedPicArray), bCopy));
-      InfoIfSettingRequires(
-        ConstVal(iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'), [iCnt, gTgt.PicIDs.Count-iCntBefore, iCnt-(gTgt.PicIDs.Count-iCntBefore)]),
+      PhoaInfo(
+        False,
+        iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'),
+        [iCnt, gTgt.PicIDs.Count-iCntBefore, iCnt-(gTgt.PicIDs.Count-iCntBefore)],
         iif(bCopy, ISettingID_Dlgs_NotifyDragCopy, ISettingID_Dlgs_NotifyDragMove));
     end;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.10 2004-05-03 16:34:03 dale Exp $
+//  $Id: phSettings.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,7 +11,7 @@ uses SysUtils, Windows, Classes, Graphics, Controls, Registry, IniFiles, ConsVar
 
 type
    // Exception настроек
-  EPhoaSettingError = class(EPhoaError);
+  EPhoaSettingError = class(EPhoaException);
 
    //===================================================================================================================
    // TPhoaSetting - базовый пункт настройки

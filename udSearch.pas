@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.3 2004-04-18 16:13:35 dale Exp $
+//  $Id: udSearch.pas,v 1.4 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -50,7 +50,7 @@ type
 implementation
 {$R *.dfm}
 uses TypInfo, StrUtils, Mask, ToolEdit, phUtils, ConsVars, udSelKeywords,
-  phSettings;
+  phSettings, udMsgBox;
 
   function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: TPhoaGroup): Boolean;
   begin
@@ -589,7 +589,7 @@ type
   begin
     PerformSearch;
     if FLocalResults.Count=0 then
-      Info(ConstVal('SPicsNotFound'))
+      PhoaInfo(False, 'SPicsNotFound')
     else begin
        // Fill search results
       FLocalResults.CopyToGroup(FResultsGroup);

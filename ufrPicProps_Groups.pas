@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.5 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -35,7 +35,7 @@ type
 
 implementation
 {$R *.dfm}
-uses Main, phUtils, phSettings;
+uses Main, phUtils, phSettings, udMsgBox;
 
 type
    // Данные, ассоциированные с каждым узлом дерева групп
@@ -156,7 +156,7 @@ type
       end;
        // Проверяем количество несвязанных
       Result := iUnlinkedCount=0;
-      if not Result then Error(ConstVal('SErrNotAllPicsLinked', [iUnlinkedCount, EditedPicCount]));
+      if not Result then PhoaError('SErrNotAllPicsLinked', [iUnlinkedCount, EditedPicCount]);
     end;
   end;
 

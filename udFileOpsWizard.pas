@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.7 2004-05-11 03:36:47 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.8 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -266,6 +266,9 @@ type
      // Prop storage
     FErrorOccured: Boolean;
     FChangesMade: Boolean;
+     // Поля для AskOverwrite()
+    FOverwriteFileName: String;
+    FOverwriteResults: TMessageBoxResults;
      // Процедуры, выполняющие операцию для отдельного изображения
     procedure DoCopyMovePic(Pic: TPhoaPic);
     procedure DoDelPicAndFile(Pic: TPhoaPic);
@@ -277,6 +280,8 @@ type
     procedure DoDeletePic(Pic: TPhoaPic);
      // Обновляет ссылку на файл (предварительно проверяя допустимость этого)
     procedure DoUpdateFileLink(Pic: TPhoaPic; const sNewFileName: String);
+     // Спрашивает возможность перезаписи файла (вызывается в Synchronize())
+    procedure AskOverwrite;
   protected
     procedure Execute; override;
   public
@@ -303,7 +308,7 @@ uses
   ufrWzPage_Processing, ufrWzPageFileOps_SelTask, ufrWzPageFileOps_SelPics, ufrWzPageFileOps_SelFolder,
   ufrWzPageFileOps_MoveOptions, ufrWzPageFileOps_DelOptions, ufrWzPageFileOps_RepairOptions,
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
-  ufrWzPageFileOps_MoveOptions2, phSettings;
+  ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
 
   function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; const aViewerSelPicIDs: TIDArray; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
   begin
@@ -371,6 +376,11 @@ uses
    // TFileOpThread
    //===================================================================================================================
 
+  procedure TFileOpThread.AskOverwrite;
+  begin
+    FOverwriteResults := PhoaMsgBox(mbkConfirmWarning, 'SConfirm_FileOverwrite', [FOverwriteFileName], True, False, [mbbYes, mbbYesToAll, mbbNo, mbbNoToAll, mbbCancel]);
+  end;
+
   constructor TFileOpThread.Create(Wizard: TdFileOpsWizard);
   begin
     inherited Create(True);
@@ -436,15 +446,28 @@ uses
       case FWizard.MoveFile_OverwriteMode of
         fomfomNever: if FileExists(sTargetFile) then FileOpError('SErrTargetFileExists', [sTargetFile]);
         fomfomPrompt:
-          if FileExists(sTargetFile) then
-            case Application.MessageBox(PChar(ConstVal('SConfirm_FileOverwrite', [sTargetFile])), PChar(ConstVal('SDlgTitle_Confirm')), MB_YESNOCANCEL or MB_ICONQUESTION) of
-              ID_YES: {nothing};
-              ID_NO: FileOpError('SLogEntry_UserDeniedFileOverwrite', [sTargetFile]);
-              else begin
-                FWizard.InterruptProcessing;
-                FileOpError('SLogEntry_UserAbort', []);
-              end;
+          if FileExists(sTargetFile) then begin
+            FOverwriteFileName := sTargetFile;
+            Synchronize(AskOverwrite);
+             // "Да"
+            if mbrYes in FOverwriteResults then
+              { do nothing }
+             // "Да для всех"
+            else if mbrYesToAll in FOverwriteResults then
+              FWizard.MoveFile_OverwriteMode := fomfomAlways
+             // "Нет"
+            else if mbrNo in FOverwriteResults then
+              FileOpError('SLogEntry_UserDeniedFileOverwrite', [sTargetFile])
+             // "Нет для всех"
+            else if mbrNoToAll in FOverwriteResults then begin
+              FWizard.MoveFile_OverwriteMode := fomfomNever;
+              FileOpError('SErrTargetFileExists', [sTargetFile]);
+             // "Отмена"
+            end else begin
+              FWizard.InterruptProcessing;
+              FileOpError('SLogEntry_UserAbort', []);
             end;
+          end;
       end;
        // Копируем файл
       if not CopyFile(PChar(sSrcPath+sFile), PChar(sTargetFile), False) then RaiseLastOSError;
@@ -967,7 +990,7 @@ uses
          // При попадании на страницу выбора ссылок сначала производим выборку файлов
         IWzFileOpsPageID_RepairSelLinks: Repair_SelectFiles;
          // Перед началом обработки проверяем необходимсоть подтверждения
-        IWzFileOpsPageID_Processing: Result := ConfirmIfSettingRequires(ConstVal('SConfirm_PerformFileOperation'), aFileOpConfirmSettingIDs[FFileOpKind]);
+        IWzFileOpsPageID_Processing: Result := PhoaConfirm(True, 'SConfirm_PerformFileOperation', aFileOpConfirmSettingIDs[FFileOpKind]);
       end;
       if Result then
         case CurPageID of

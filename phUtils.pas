@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.10 2004-05-11 03:36:47 dale Exp $
+//  $Id: phUtils.pas,v 1.11 2004-05-20 11:50:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -11,22 +11,13 @@ uses
   SysUtils, Windows, Messages, Classes, Controls, Graphics, GraphicEx, GR32, StdCtrls, ConsVars, VirtualTrees, VirtualShellUtilities;
 
    // Exception raising
-  procedure PhoaError(const sMsg: String; const aParams: Array of const);
+  procedure PhoaException(const sMsg: String; const aParams: Array of const);
 
    // Min/max values
   function Max(i1, i2: Integer): Integer;
   function Min(i1, i2: Integer): Integer;
   function MinS(s1, s2: Single): Single;
   function MaxS(s1, s2: Single): Single;
-
-  procedure Info(const sMessage: String);
-   // Отображает информационное сообщение, если значение пункта установки iSettingID равно True
-  procedure InfoIfSettingRequires(const sMessage: String; iSettingID: Integer);
-  procedure Error(const sMessage: String);
-  function  Confirm(const sMessage: String): Boolean;
-   // Отображает сообщение подтверждения, если значение пункта установки iSettingID равно True, иначе просто возвращает
-   //   True
-  function  ConfirmIfSettingRequires(const sMessage: String; iSettingID: Integer): Boolean;
 
   procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
@@ -135,9 +126,9 @@ uses
   procedure OpenWebsite;
 
 implementation
-uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
+uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
 
-  procedure PhoaError(const sMsg: String; const aParams: Array of const);
+  procedure PhoaException(const sMsg: String; const aParams: Array of const);
 
      function RetAddr: Pointer;
      asm
@@ -145,7 +136,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
      end;
 
   begin
-    raise EPhoaError.CreateFmt(sMsg, aParams) at RetAddr;
+    raise EPhoaException.CreateFmt(sMsg, aParams) at RetAddr;
   end;
 
   function Max(i1, i2: Integer): Integer;
@@ -168,35 +159,6 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
     if s1>s2 then Result := s1 else Result := s2;
   end;
 
-   //-------------------------------------------------------------------------------------------------------------------
-   // Message boxes
-   //-------------------------------------------------------------------------------------------------------------------
-
-  procedure Info(const sMessage: String);
-  begin
-    Application.MessageBox(PChar(sMessage), PChar(ConstVal('SDlgTitle_Info')), MB_OK or MB_ICONINFORMATION);
-  end;
-
-  procedure InfoIfSettingRequires(const sMessage: String; iSettingID: Integer);
-  begin
-    if SettingValueBool(iSettingID) then Info(sMessage);
-  end;
-
-  procedure Error(const sMessage: String);
-  begin
-    Application.MessageBox(PChar(sMessage), PChar(ConstVal('SDlgTitle_Error')), MB_OK or MB_ICONERROR);
-  end;
-
-  function Confirm(const sMessage: String): Boolean;
-  begin
-    Result := Application.MessageBox(PChar(sMessage), PChar(ConstVal('SDlgTitle_Confirm')), MB_OKCANCEL or MB_ICONQUESTION)=IDOK;
-  end;
-
-  function ConfirmIfSettingRequires(const sMessage: String; iSettingID: Integer): Boolean;
-  begin
-    Result := not SettingValueBool(iSettingID) or Confirm(sMessage);
-  end;
-  
    //-------------------------------------------------------------------------------------------------------------------
    // History
    //-------------------------------------------------------------------------------------------------------------------
@@ -394,7 +356,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
             Delete(sRelName, 1, i);
             if sOneDir='..\' then begin
               i := LastDelimiter('\', Result);
-              if i=0 then PhoaError(ConstVal('SErrInvalidPicFileName'), [sRelFileName]);
+              if i=0 then PhoaException(ConstVal('SErrInvalidPicFileName'), [sRelFileName]);
               Delete(Result, i, MaxInt);
             end else
               Result := Result+'\'+Copy(sOneDir, 1, Length(sOneDir)-1);
@@ -470,7 +432,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
     else begin
       if bTime then dt := StrToTimeDef(sText, -1) else dt := StrToDateDef(sText, -1);
       Result := dt>=0;
-      if Result then dtResult := dt else Error(ConstVal(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]));
+      if Result then dtResult := dt else PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
     end;
   end;
 
@@ -701,7 +663,7 @@ type
       try
         NS := TNamespace.CreateFromFileName(sFileName);
       except
-        Error(ConstVal('SErrFileNotFoundFmt', [sFileName]));
+        PhoaError('SErrFileNotFoundFmt', [sFileName]);
       end;
       if NS<>nil then Result := NS.ShowContextMenu(fMain, nil, nil, nil);
     finally

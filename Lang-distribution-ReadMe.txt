@@ -1,8 +1,8 @@
-$Id: Lang-distribution-ReadMe.txt,v 1.2 2004-04-15 12:54:10 dale Exp $
+$Id: Lang-distribution-ReadMe.txt,v 1.3 2004-05-20 11:50:54 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
 Dmitry Kann :: http://phoa.narod.ru
 Notes on language files distribution
-Applicable to PhoA version 1.1.4 beta
+Applicable to PhoA version 1.1.5 beta
 ------------------------------------------------------------------------------------------------------------------------
 
 For RUSSIAN: См. далее по тексту
@@ -10,7 +10,7 @@ For RUSSIAN: См. далее по тексту
 The distribution includes the following files:
 
   - dttm\dttm.exe                - The DaleTech Translation Manager 
-  - *.dtls                       - DaleTech language snapshots
+  - *.xdtls                      - DaleTech XML language snapshots
   - IS-install\phoa.iss          - PhoA setup script
   - IS-install\eula-eng.rtf      - Original English End-User License Agreement
   - IS-install\eula-rus.rtf      - Original Russian End-User License Agreement
@@ -19,8 +19,16 @@ The distribution includes the following files:
 Localizing the main program files
 ------------------------------------------------------------------------------------------------------------------------
 
+* Note for translators of previous PhoA versions:
+*   Language files since PhoA 1.1.4 beta are of XML format and have different
+*   extension (.xdtls instead of .dtls). This allowed to achieve correct
+*   version controlling and diffing using CVS (while it has very poor support
+*   for versioning binary files). Don't try to open or edit those files with 
+*   previous versions of Translation Manager as it is unable to open XML
+*   language files. Also, save the translated files only as .xdtls files.
+
 Generally, you use the Translation Manager (dttm.exe) to open the accompanying
-*.dtls files.
+*.xdtls files.
 
 Then you must add the language you want to translate to by selecting the
 Edit | Add language... menu item. I highly recommend highlighting the English
@@ -46,17 +54,11 @@ of all your work as often as you change the files. Well, you're warned ;)
 Localizing the setup script
 ------------------------------------------------------------------------------------------------------------------------
 
-You open the supplied phoa.iss file in any text editor capable of editing
+You open the supplied SetupMessages.txt file in any text editor capable of editing
 plain-text files in your language.
 
-Then you should carefully read through this file to determine which entries you
-are to translate. The file is pretty self-explanatory, but if it isn't clear
-yet, feel free to ask me.
-
-Note on [Languages] section: you don't need to specify MessagesFile value, I'll
-do it myself once the translation is finished. Only give an appropriate
-two-letter language code for Name value, then use it as values for Languages
-entries below.
+Then you should find the section for the language you translate to. The file is
+pretty self-explanatory, but if it isn't clear yet, feel free to ask me.
 
 Localizing the End-User License Agreement
 ------------------------------------------------------------------------------------------------------------------------
@@ -92,7 +94,7 @@ Dmitry Kann, phoa@narod.ru
 Пакет включает в себя следующие файлы:
 
   - dttm\dttm.exe                - The DaleTech Translation Manager 
-  - *.dtls                       - Языковые файлы DaleTech
+  - *.xdtls                      - Языковые файлы DaleTech формата XML
   - IS-install\phoa.iss          - Установочный сценарий PhoA
   - IS-install\eula-eng.rtf      - Оригинальное Лицензионное Соглашение на английском языке
   - IS-install\eula-rus.rtf      - Оригинальное Лицензионное Соглашение на русском языке
@@ -101,8 +103,16 @@ Dmitry Kann, phoa@narod.ru
 Локализация основных файлов программы
 ------------------------------------------------------------------------------------------------------------------------
 
+* Примечание для переводчиков предыдущих версий PhoA:
+*   Языковые файлы, начиная с версии PhoA 1.1.4 beta, являются файлами формата XML
+*   и имеют другое расширение (.xdtls вместо .dtls). Это позволило реализовать
+*   надлежащий контроль версий в CVS (для бинарных файлов поддержка там очень
+*   ограниченна). Не пытайтесь открывать или редактировать эти файлы старыми версиями
+*   Translation Manager, поскольку он не может открывать языковые файлы формата XML.
+*   Кроме того, сохраняйте переведённые файлы только как файлы .xdtls.
+
 Если кратко, вы должны использовать Translation Manager (dttm.exe), чтобы открывать и
-редактировать прилагаемые файлы *.dtls.
+редактировать прилагаемые файлы *.xdtls.
 
 Потом вы должны добавить язык, на который вы выполняете перевод, выбрав пункт меню
 Edit | Add language... Я очень рекомендую выделить сначала столбец с языком, который
@@ -130,16 +140,11 @@ Edit | Add language... Я очень рекомендую выделить сначала столбец с языком, кот
 Локализация сценария установки
 ------------------------------------------------------------------------------------------------------------------------
 
-Вы должны открыть прилагаемый файл phoa.iss любым текстовым редактором, способным
+Вы должны открыть прилагаемый файл SetupMessages.txt любым текстовым редактором, способным
 редактировать неформатированные текстовые файлы на вашем языке.
 
-Потом вам нужно тщательно "перечитать" этот файл, чтобы определить записи, подлежащие переводу.
-Формат файла сам по себе вполне понятен, но при любых неясностях вы можете обратиться ко мне.
-
-Примечание по разделу [Languages]: вам не требуется указывать значение MessagesFile, я сделаю 
-это сам по окончании перевода. Вам требуется только дать подходящиее двухбуквенное обозначение
-языка в качестве значения Name, и впоследствии использовать его в качестве значений элементов
-Languages.
+Потом вам нужно найти раздел, соответствующий языку, на который вы переводите. Формат файла
+сам по себе достаточно понятен, но при любых неясностях вы можете обратиться ко мне.
 
 Локализация Лицензионного Соглашения
 ------------------------------------------------------------------------------------------------------------------------
