@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.4 2004-10-15 13:49:35 dale Exp $
+//  $Id: phOps.pas,v 1.5 2004-10-15 13:55:58 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1054,7 +1054,7 @@ uses
     for i := 0 to Group.Pics.Count-1 do UndoFile.WriteInt(Group.Pics[i].ID);
     Group.PicsX.Clear;
      // Каскадно удаляем группы
-    for i := 0 to Group.Groups.Count-1 do TPhoaOp_InternalGroupDelete.Create(Operations, Project, Group.GroupsX[i], Changes);
+    for i := Group.Groups.Count-1 downto 0 do TPhoaOp_InternalGroupDelete.Create(Operations, Project, Group.GroupsX[i], Changes);
      // Удаляем группу
     Group.Owner := nil;
      // Добавляем флаги изменений
