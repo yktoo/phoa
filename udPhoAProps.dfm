@@ -1,4 +1,5 @@
 inherited dPhoAProps: TdPhoAProps
+  ActiveControl = eThumbSizeX
   Caption = 'Properties: photo album'
   ClientHeight = 296
   ClientWidth = 386
