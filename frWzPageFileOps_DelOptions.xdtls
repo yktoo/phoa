@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="frWzPageFileOps_DelOptions">
+    <propEntries>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries/>
+    <compEntries>
+      <compEntry name="cbDeleteToRecycleBin">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Delete files to the Rec&amp;ycle Bin"/>
+              <tranEntry langID="1049" value="&amp;Удалять файлы в Корзину"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

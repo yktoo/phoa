@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="fImgView">
+    <propEntries>
+      <propEntry name="Caption">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpFile">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries>
+      <propEntry name="SDefaultCaption">
+        <tranEntries>
+          <tranEntry langID="1049" value="Просмотр изображения"/>
+          <tranEntry langID="1033" value="View picture"/>
+          <tranEntry langID="1031" value="Bild anzeigen"/>
+          <tranEntry langID="1046" value="Ver imagem"/>
+          <tranEntry langID="1058" value="Перегляд зображення"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SError">
+        <tranEntries>
+          <tranEntry langID="1049" value="ОШИБКА"/>
+          <tranEntry langID="1033" value="ERROR"/>
+          <tranEntry langID="1031" value="FEHLER"/>
+          <tranEntry langID="1046" value="ERRO"/>
+          <tranEntry langID="1058" value="ПОМИЛКА"/>
+        </tranEntries>
+      </propEntry>
+    </constEntries>
+    <compEntries>
+      <compEntry name="aClose">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Закрыть"/>
+              <tranEntry langID="1033" value="&amp;Close"/>
+              <tranEntry langID="1031" value="&amp;SchlieЯen"/>
+              <tranEntry langID="1046" value="&amp;Fechar"/>
+              <tranEntry langID="1058" value="&amp;Закрити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Закрыть|Закрыть окно просмотра"/>
+              <tranEntry langID="1033" value="Close|Close viewing window"/>
+              <tranEntry langID="1031" value="SchlieЯen|Anzeigefenster schlieЯen"/>
+              <tranEntry langID="1046" value="Fechar|Fechar janela de visualizaзгo"/>
+              <tranEntry langID="1058" value="Закрити|Закрити вікно перегляду"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aEdit">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Изменить..."/>
+              <tranEntry langID="1033" value="&amp;Edit..."/>
+              <tranEntry langID="1031" value="&amp;Bearbeiten..."/>
+              <tranEntry langID="1046" value="E&amp;ditar..."/>
+              <tranEntry langID="1058" value="З&amp;мінити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Изменить...|Изменить текущее изображение"/>
+              <tranEntry langID="1033" value="Edit...|Edit current picture"/>
+              <tranEntry langID="1031" value="Bearbeiten...|Das aktuelle Bild bearbeiten"/>
+              <tranEntry langID="1046" value="Editar...|Editar imagem atual"/>
+              <tranEntry langID="1058" value="Змінити...|Змінити поточне зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aFirstPic">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="П&amp;ервое изображение"/>
+              <tranEntry langID="1033" value="&amp;First picture"/>
+              <tranEntry langID="1031" value="&amp;Erstes Bild"/>
+              <tranEntry langID="1046" value="&amp;Primeira imagem"/>
+              <tranEntry langID="1058" value="П&amp;ерше зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Первое изображение|Перейти к первому изображению в группе"/>
+              <tranEntry langID="1033" value="First picture|Jump to the first picture in the group"/>
+              <tranEntry langID="1031" value="Erstes Bild|Zum ersten Bild in der Gruppe gehen"/>
+              <tranEntry langID="1046" value="Primeira imagem|Pular para primeira imagem no grupo"/>
+              <tranEntry langID="1058" value="Перше зображення|Перейти до першого зображення в групі"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aFullScreen">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Полно&amp;экранный режим"/>
+              <tranEntry langID="1033" value="F&amp;ullscreen mode"/>
+              <tranEntry langID="1031" value="&amp;Vollbildmodus"/>
+              <tranEntry langID="1046" value="Modo de tela &amp;cheia"/>
+              <tranEntry langID="1058" value="Повно&amp;єкранний режим"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Полноэкранный режим|Включить/выключить полноэкранный режим"/>
+              <tranEntry langID="1033" value="Fullscreen mode|Toggle fullscreen mode"/>
+              <tranEntry langID="1031" value="Vollbildmodus|Wechseln in den Vollbildmodus"/>
+              <tranEntry langID="1046" value="Modo de tela cheia|Alternar para modo de tela cheia"/>
+              <tranEntry langID="1058" value="Повноєкранний режим|Включити/виключити повноєкранний режим"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aHelp">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Справ&amp;ка"/>
+              <tranEntry langID="1033" value="&amp;Help"/>
+              <tranEntry langID="1031" value="&amp;Hilfe"/>
+              <tranEntry langID="1046" value="&amp;Ajuda"/>
+              <tranEntry langID="1058" value="Довід&amp;ка"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aLastPic">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Пос&amp;леднее изображение"/>
+              <tranEntry langID="1033" value="&amp;Last picture"/>
+              <tranEntry langID="1031" value="&amp;Letztes Bild"/>
+              <tranEntry langID="1046" value="&amp;Ъltima imagem"/>
+              <tranEntry langID="1058" value="Ос&amp;таннє зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Последнее изображение|Перейти к последнему изображению в группе"/>
+              <tranEntry langID="1033" value="Last picture|Jump to the last picture in the group"/>
+              <tranEntry langID="1031" value="Letztes Bild|Zum letzten Bild in der Gruppe gehen"/>
+              <tranEntry langID="1046" value="Ъltima imagem|Pular para ъltima imagem no grupo"/>
+              <tranEntry langID="1058" value="Останнє зображення|Перейти до останнього зображення в групі"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="alMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aNextPic">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Следующее изображение"/>
+              <tranEntry langID="1033" value="&amp;Next picture"/>
+              <tranEntry langID="1031" value="&amp;Nдchstes Bild"/>
+              <tranEntry langID="1046" value="Prу&amp;xima imagem"/>
+              <tranEntry langID="1058" value="Н&amp;аступне зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Следующее изображение|Перейти к следующему изображению в группе"/>
+              <tranEntry langID="1033" value="Next picture|Advance to the next picture in the group"/>
+              <tranEntry langID="1031" value="Nдchstes Bild|Weiter zum nдchsten Bild in der Gruppe"/>
+              <tranEntry langID="1046" value="Prуxima imagem|Ir para ъltima imagem no grupo"/>
+              <tranEntry langID="1058" value="Следующее изображение|Перейти к следующему изображению в группе"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aPrevPic">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Предыдущее изображение"/>
+              <tranEntry langID="1033" value="&amp;Previous picture"/>
+              <tranEntry langID="1031" value="Vor&amp;heriges Bild"/>
+              <tranEntry langID="1046" value="&amp;Imagem anterior"/>
+              <tranEntry langID="1058" value="&amp;Попереднє зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Предыдущее изображение|Перейти к предыдущему изображению в группе"/>
+              <tranEntry langID="1033" value="Previous picture|Rewind to the previous picture in the group"/>
+              <tranEntry langID="1031" value="Vorheriges Bild|Zurьck zum vorherigen Bild in der Gruppe"/>
+              <tranEntry langID="1046" value="Imagem anterior|Retroceder para imagem anterior no grupo"/>
+              <tranEntry langID="1058" value="Попереднє зображення|Перейти до попереднього зображення в групі"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aRefresh">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Обновить"/>
+              <tranEntry langID="1033" value="&amp;Reload"/>
+              <tranEntry langID="1031" value="&amp;Neu laden"/>
+              <tranEntry langID="1046" value="&amp;Recarregar"/>
+              <tranEntry langID="1058" value="&amp;Обновити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Обновить|Обновить текущее изображение"/>
+              <tranEntry langID="1033" value="Reload|Reload current picture from the file"/>
+              <tranEntry langID="1031" value="Neu laden|Das aktuelle Bild neu laden"/>
+              <tranEntry langID="1046" value="Recarregar|Recarregar imagem atual do arquivo"/>
+              <tranEntry langID="1058" value="Обновити|Обновити поточне зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aRelocateInfo">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="И&amp;зменить положение информации"/>
+              <tranEntry langID="1033" value="Rel&amp;ocate info bar"/>
+              <tranEntry langID="1031" value="Informationsleiste vers&amp;chieben"/>
+              <tranEntry langID="1046" value="Reposicionar &amp;barra de informaзгo"/>
+              <tranEntry langID="1058" value="Змінити по&amp;ложення інформаціі"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Изменить положение или размер информационного блока"/>
+              <tranEntry langID="1033" value="Change position and size of the information bar"/>
+              <tranEntry langID="1031" value="Position und GrцЯe der Informationsleiste дndern"/>
+              <tranEntry langID="1046" value="Mudar posiзгo e tamanho da barra de informaзгo"/>
+              <tranEntry langID="1058" value="Змінити положення або розмір інформаційного блоку"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aSettings">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Настройки программы..."/>
+              <tranEntry langID="1033" value="Pro&amp;gram settings..."/>
+              <tranEntry langID="1031" value="&amp;Optionen..."/>
+              <tranEntry langID="1046" value="&amp;Opзхes..."/>
+              <tranEntry langID="1058" value="Наст&amp;роювання програми"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Настройки программы...|Просмотреть/изменить настройки программы"/>
+              <tranEntry langID="1033" value="Program settings...|View/change program settings"/>
+              <tranEntry langID="1031" value="Optionen...|Optionen anzeigen/verдndern"/>
+              <tranEntry langID="1046" value="Opзхes...|Ver/mudar opзхes"/>
+              <tranEntry langID="1058" value="Настроювання програми...|Переглянути/змінити настроювання програми"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aShowInfo">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Sho&amp;w info"/>
+              <tranEntry langID="1049" value="Отобра&amp;жать информацию"/>
+              <tranEntry langID="1058" value="Отобра&amp;жать информацию"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Show info|Display the picture's description"/>
+              <tranEntry langID="1049" value="Отображать информацию|Показывать описания изображений"/>
+              <tranEntry langID="1058" value="Отображать информацию|Показывать описания изображений"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aSlideShow">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Slide show"/>
+              <tranEntry langID="1049" value="Пока&amp;з слайдов"/>
+              <tranEntry langID="1031" value="&amp;Diashow"/>
+              <tranEntry langID="1046" value="&amp;Show de slides"/>
+              <tranEntry langID="1058" value="Показ слай&amp;дів"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Slide show|Toggle slide show mode (automatically advance to next picture)"/>
+              <tranEntry langID="1049" value="Показ слайдов|Включить/выключить автоматический показ слайдов"/>
+              <tranEntry langID="1031" value="Diashow|In den Diashow Modus wechseln (automatisch zum nдchsten Bild gehen)"/>
+              <tranEntry langID="1046" value="Show de slides|Alternar para modo show de slides (avanзo automбtico de imagens)"/>
+              <tranEntry langID="1058" value="Показ слайдів|Уключити/виключити автоматичний показ слайдів"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomActual">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="М&amp;асштаб 1:1"/>
+              <tranEntry langID="1033" value="Zoom &amp;actual"/>
+              <tranEntry langID="1031" value="&amp;tatsдchlicher Zoom"/>
+              <tranEntry langID="1046" value="&amp;Tamanho real"/>
+              <tranEntry langID="1058" value="Мас&amp;штаб 1:1"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Масштаб 1:1|Установить масштаб 1:1"/>
+              <tranEntry langID="1033" value="Zoom actual|Set magnification to 1:1"/>
+              <tranEntry langID="1031" value="tatsдchlicher Zoom|Zoom auf 1:1 setzen"/>
+              <tranEntry langID="1046" value="Tamanho real|Ajustar ampliaзгo para 1:1"/>
+              <tranEntry langID="1058" value="Масштаб 1:1|Встановити масштаб 1:1"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomFit">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Мас&amp;штаб по размеру окна"/>
+              <tranEntry langID="1033" value="Zoo&amp;m best fit"/>
+              <tranEntry langID="1031" value="Zoo&amp;m anpassen"/>
+              <tranEntry langID="1046" value="Melhor ajuste de Zoo&amp;m"/>
+              <tranEntry langID="1058" value="Масшта&amp;б за розміром вікна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Масштаб по размеру окна|Установить масштаб по размеру окна"/>
+              <tranEntry langID="1033" value="Zoom best fit|Set magnification for image to fit in the window"/>
+              <tranEntry langID="1031" value="Zoom anpassen|Passt den Zoom der FenstergrцЯe an"/>
+              <tranEntry langID="1046" value="Melhor zoom|Ajustar ampliaзгo para imagem caber na janela"/>
+              <tranEntry langID="1058" value="Масштаб за розміром вікна|Встановити масштаб за розміром вікна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomIn">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Увеличить"/>
+              <tranEntry langID="1033" value="Zoom &amp;in"/>
+              <tranEntry langID="1031" value="Zoom &amp;in"/>
+              <tranEntry langID="1046" value="Mais &amp;Zoom"/>
+              <tranEntry langID="1058" value="Зб&amp;ільшити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Увеличить|Увеличить изображение"/>
+              <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
+              <tranEntry langID="1031" value="Zoom in|Das Bild vergrцЯern"/>
+              <tranEntry langID="1046" value="Maior zoom|ampliar imagem"/>
+              <tranEntry langID="1058" value="Збільшити|Збільшити зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomOut">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="У&amp;меньшить"/>
+              <tranEntry langID="1033" value="Zoom ou&amp;t"/>
+              <tranEntry langID="1031" value="Zoom ou&amp;t"/>
+              <tranEntry langID="1046" value="M&amp;enos Zoom"/>
+              <tranEntry langID="1058" value="Зме&amp;ншити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Уменьшить|Уменьшить изображение"/>
+              <tranEntry langID="1033" value="Zoom out|Zoom image out"/>
+              <tranEntry langID="1031" value="Zoom out|Aus dem Bild herauszoomen"/>
+              <tranEntry langID="1046" value="Menor zoom|Diminuir imagem"/>
+              <tranEntry langID="1058" value="Зменшити|Зменшити зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bClose">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bEdit">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bFirstPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bFullScreen">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bHelp">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bLastPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bNextPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bPrevPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bRefresh">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bRelocateInfo">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bSettings">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bSlideShow">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bZoomActual">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bZoomFit">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bZoomIn">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bZoomOut">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dkBottom">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dkLeft">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dkRight">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dkTop">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="eCounter">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="EditCaption">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Текущее/всего изображений"/>
+              <tranEntry langID="1033" value="Current/total pictures"/>
+              <tranEntry langID="1031" value="Bilder aktuell/gesamt"/>
+              <tranEntry langID="1046" value="Corrente/total de imagens"/>
+              <tranEntry langID="1058" value="Поточне/усього зображень"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value="0/0"/>
+              <tranEntry langID="1033" value="0/0"/>
+              <tranEntry langID="1031" value="0/0"/>
+              <tranEntry langID="1046" value="0/0"/>
+              <tranEntry langID="1058" value="0/0"/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="iMain">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmClose">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmEdit">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmFirstPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmFullScreen">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmHelp">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmLastPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmNextPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmPrevPic">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmRefresh">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmRelocateInfo">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSep1">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSep2">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSep3">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSep4">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSettings">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmShowInfo">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmZoomActual">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmZoomFit">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmZoomIn">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmZoomOut">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="iSlideShow">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pmMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbMain">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Панель инструментов"/>
+              <tranEntry langID="1033" value="Toolbar"/>
+              <tranEntry langID="1031" value="Symbolleiste"/>
+              <tranEntry langID="1046" value="Barra de ferramentas"/>
+              <tranEntry langID="1058" value="Панель інструментів"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ChevronHint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Ещё кнопки|"/>
+              <tranEntry langID="1033" value="More buttons|"/>
+              <tranEntry langID="1031" value="Weitere Schaltflдchen|"/>
+              <tranEntry langID="1046" value="Mais botхes|"/>
+              <tranEntry langID="1058" value="Ще кнопки|"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbSepClose">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbSepCounter">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbSepEdit">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbSepSlideShow">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbSepZoomIn">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="frWzPageFileOps_SelTask">
+    <propEntries>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries/>
+    <compEntries>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lCopyFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Copies the files of pictures you select, in the specified folder. Use this option to prepare photo album to write onto a CD or DVD"/>
+              <tranEntry langID="1049" value="Копирует файлы выбранных Вами изображений в заданную папку. Используйте эту опцию, чтобы подготовить фотоальбом для записи на CD или DVD"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lDeleteFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Deletes pictures you select, and physically deletes corresponding files. Use this option to delete unwanted picture files"/>
+              <tranEntry langID="1049" value="Удаляет выбранные Вами изображения и физически стирает соответствующие файлы с диска. Используйте эту опцию для удаления ненужных изображений"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lMoveFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately"/>
+              <tranEntry langID="1049" value="Перемещает файлы выбранных Вами изображений в заданную папку и соответствующим образом исправляет ссылки изображений на них"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lNBUndoable">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="• NB: These operations are not undoable!"/>
+              <tranEntry langID="1049" value="• ВНИМАНИЕ: эти операции не могут быть впоследствии отменены!"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lRebuildThumbs">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rereads the picture files, recreates the thumbnails and updates the file-related information, such as image dimensions"/>
+              <tranEntry langID="1049" value="Перечитывает файлы изображений, перестраивает эскизы и обновляет информацию, связанную с файлом — такую, как размеры изображения"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lRepairFileLinks">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Allows you to repair broken file links by finding the files in the specified folder, and, optionally, to delete pictures no longer associated with valid (existent) files"/>
+              <tranEntry langID="1049" value="Позволяет восстановить испорченные ссылки на файлы путём поиска подходящих файлов в заданной папке, а также удалить изображения, ссылающиеся на несуществующие файлы"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbCopyFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Copy picture files to a folder"/>
+              <tranEntry langID="1049" value="&amp;Копировать файлы изображений в папку"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbDeleteFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Delete pictures and files"/>
+              <tranEntry langID="1049" value="&amp;Удалить изображения и файлы"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbMoveFiles">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Move picture files to a folder"/>
+              <tranEntry langID="1049" value="&amp;Переместить файлы изображений в папку"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbRebuildThumbs">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Rebuild thumbnails"/>
+              <tranEntry langID="1049" value="Пе&amp;рестроить эскизы"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="rbRepairFileLinks">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Re&amp;pair picture file links"/>
+              <tranEntry langID="1049" value="&amp;Восстановить ссылки на файлы"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="frWzPageFileOps_MoveOptions2">
+    <propEntries>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1049" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries/>
+    <compEntries>
+      <compEntry name="cbDeleteOriginal">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Delete original files"/>
+              <tranEntry langID="1049" value="&amp;Удалять исходные файлы"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbDeleteToRecycleBin">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Delete to the rec&amp;ycle bin"/>
+              <tranEntry langID="1049" value="Удал&amp;ять в Корзину"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1049" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbNoOriginalFileMode">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1033" value="Treat as an error\nUpdate the link only if the target file exists\nUpdate the link anyway\n"/>
+              <tranEntry langID="1049" value="Считать ошибкой\nОбновить ссылку только если файл назначения существует\nОбновить ссылку в любом случае\n"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbOverwriteMode">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1033" value="Skip the current picture\nPrompt to overwrite the file\nAlways overwrite the file\n"/>
+              <tranEntry langID="1049" value="Пропускать текущее изображение\nВыдать запрос на перезапись файла\nВсегда перезаписывать файл\n"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbUseCDOptions">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Set up &amp;CD/DVD creation options as well"/>
+              <tranEntry langID="1049" value="Настроить также опции записи на C&amp;D/DVD"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lNoOriginalFileMode">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="If the &amp;original file does not exist:"/>
+              <tranEntry langID="1049" value="&amp;Если исходный файл не существует:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lOverwriteMode">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="If the target file already e&amp;xists:"/>
+              <tranEntry langID="1049" value="Если файл назна&amp;чения уже существует:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

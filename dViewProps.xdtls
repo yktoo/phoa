@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="dViewProps">
+    <propEntries>
+      <propEntry name="Caption">
+        <tranEntries>
+          <tranEntry langID="1049" value="Свойства: представление фотоальбома"/>
+          <tranEntry langID="1033" value="Properties: photo album view"/>
+          <tranEntry langID="1031" value="Eigenschaften: Fotoalbum Ansicht"/>
+          <tranEntry langID="1046" value="Propriedades: visualizaзгo do бlbum"/>
+          <tranEntry langID="1058" value="Властивості: представлення фотоальбому"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpFile">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries>
+      <propEntry name="SColName_GroupProperty">
+        <tranEntries>
+          <tranEntry langID="1033" value="Picture property"/>
+          <tranEntry langID="1049" value="Свойство изображения"/>
+          <tranEntry langID="1031" value="Bildeigenschaft"/>
+          <tranEntry langID="1046" value="Propriedade da imagem"/>
+          <tranEntry langID="1058" value="Властивість зображення"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SColName_GroupUnowned">
+        <tranEntries>
+          <tranEntry langID="1049" value="Неклассиф. в отд. папке"/>
+          <tranEntry langID="1033" value="Unclassified in own folder"/>
+          <tranEntry langID="1031" value="Nicht klassifizierte in eigenem Ordner"/>
+          <tranEntry langID="1046" value="Nгo classificado na prуpria pasta"/>
+          <tranEntry langID="1058" value="Некласиф. в окр. папці"/>
+        </tranEntries>
+      </propEntry>
+    </constEntries>
+    <compEntries>
+      <compEntry name="bCancel">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Отмена"/>
+              <tranEntry langID="1033" value="Cancel"/>
+              <tranEntry langID="1031" value="Abbrechen"/>
+              <tranEntry langID="1046" value="Cancelar"/>
+              <tranEntry langID="1058" value="Відміна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bHelp">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Справка"/>
+              <tranEntry langID="1033" value="Help"/>
+              <tranEntry langID="1031" value="Hilfe"/>
+              <tranEntry langID="1046" value="Ajuda"/>
+              <tranEntry langID="1058" value="Довідка"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bOK">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="ОК"/>
+              <tranEntry langID="1033" value="OK"/>
+              <tranEntry langID="1031" value="OK"/>
+              <tranEntry langID="1046" value="OK"/>
+              <tranEntry langID="1058" value="ОК"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bvBottom">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="eName">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="frSorting">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries>
+          <compEntry name="ipmDelete">
+            <propEntries>
+              <propEntry name="Caption">
+                <tranEntries>
+                  <tranEntry langID="1049" value="&amp;Удалить"/>
+                  <tranEntry langID="1033" value="&amp;Delete"/>
+                  <tranEntry langID="1031" value="&amp;Lцschen"/>
+                  <tranEntry langID="1046" value="&amp;Excluir"/>
+                  <tranEntry langID="1058" value="&amp;Видалити"/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="ipmMoveDown">
+            <propEntries>
+              <propEntry name="Caption">
+                <tranEntries>
+                  <tranEntry langID="1049" value="Сдвинуть в&amp;низ"/>
+                  <tranEntry langID="1033" value="Move do&amp;wn"/>
+                  <tranEntry langID="1031" value="Nach &amp;unten"/>
+                  <tranEntry langID="1046" value="Mover &amp;para baixo"/>
+                  <tranEntry langID="1058" value="Зрушити &amp;униз"/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="ipmMoveUp">
+            <propEntries>
+              <propEntry name="Caption">
+                <tranEntries>
+                  <tranEntry langID="1049" value="Сдвинуть &amp;вверх"/>
+                  <tranEntry langID="1033" value="Move &amp;up"/>
+                  <tranEntry langID="1031" value="Nach &amp;oben"/>
+                  <tranEntry langID="1046" value="Mover &amp;para cima"/>
+                  <tranEntry langID="1058" value="Зрушити в&amp;гору"/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="ipmSep">
+            <propEntries>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="ipmsmProp">
+            <propEntries>
+              <propEntry name="Caption">
+                <tranEntries>
+                  <tranEntry langID="1049" value="&amp;Свойство изображения"/>
+                  <tranEntry langID="1033" value="&amp;Picture property"/>
+                  <tranEntry langID="1031" value="&amp;Bildeigenschaft"/>
+                  <tranEntry langID="1046" value="&amp;Propriedade da imagem"/>
+                  <tranEntry langID="1058" value="В&amp;ластивість зображення"/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="lMain">
+            <propEntries>
+              <propEntry name="Caption">
+                <tranEntries>
+                  <tranEntry langID="1049" value="По&amp;рядок сортировки изображений в группе:"/>
+                  <tranEntry langID="1033" value="&amp;Sort pictures in each group by:"/>
+                  <tranEntry langID="1031" value="&amp;Sortiere Bilder in jeder Gruppe nach:"/>
+                  <tranEntry langID="1046" value="&amp;Classificar imagem em cada grupo por:"/>
+                  <tranEntry langID="1058" value="По&amp;рядок сортування зображень у групі:"/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="HelpKeyword">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="pmMain">
+            <propEntries/>
+            <compEntries/>
+          </compEntry>
+          <compEntry name="tvMain">
+            <propEntries>
+              <propEntry name="ClipboardFormats">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="HelpKeyword">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+              <propEntry name="Hint">
+                <tranEntries>
+                  <tranEntry langID="1049" value=""/>
+                  <tranEntry langID="1033" value=""/>
+                  <tranEntry langID="1031" value=""/>
+                  <tranEntry langID="1046" value=""/>
+                  <tranEntry langID="1058" value=""/>
+                </tranEntries>
+              </propEntry>
+            </propEntries>
+            <compEntries/>
+          </compEntry>
+        </compEntries>
+      </compEntry>
+      <compEntry name="ipmDelete">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Удалить"/>
+              <tranEntry langID="1033" value="&amp;Delete"/>
+              <tranEntry langID="1031" value="&amp;Lцschen"/>
+              <tranEntry langID="1046" value="&amp;Excluir"/>
+              <tranEntry langID="1058" value="&amp;Видалити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmMoveDown">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Сдвинуть в&amp;низ"/>
+              <tranEntry langID="1033" value="Move do&amp;wn"/>
+              <tranEntry langID="1031" value="Nach &amp;unten"/>
+              <tranEntry langID="1046" value="Mover &amp;para baixo"/>
+              <tranEntry langID="1058" value="Зрушити &amp;униз"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmMoveUp">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Сдвинуть &amp;вверх"/>
+              <tranEntry langID="1033" value="Move &amp;up"/>
+              <tranEntry langID="1031" value="Nach &amp;oben"/>
+              <tranEntry langID="1046" value="Mover &amp;para cima"/>
+              <tranEntry langID="1058" value="Зрушити в&amp;гору"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSep">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmsmProp">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Свойство изображения"/>
+              <tranEntry langID="1033" value="&amp;Picture property"/>
+              <tranEntry langID="1031" value="&amp;Bildeigenschaft"/>
+              <tranEntry langID="1046" value="&amp;Propriedad da imagem"/>
+              <tranEntry langID="1058" value="В&amp;ластивість зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lGrouping">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Порядок группировки изображений:"/>
+              <tranEntry langID="1033" value="&amp;Picture grouping order:"/>
+              <tranEntry langID="1031" value="&amp;Gruppierungsordnung:"/>
+              <tranEntry langID="1046" value="&amp;Ordem de agrupamento das imagens:"/>
+              <tranEntry langID="1058" value="&amp;Порядок угруповання зображень:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lName">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Наименование:"/>
+              <tranEntry langID="1033" value="&amp;Name:"/>
+              <tranEntry langID="1031" value="&amp;Name:"/>
+              <tranEntry langID="1046" value="&amp;Nome:"/>
+              <tranEntry langID="1058" value="&amp;Найменування:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pButtonsBottom">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pmGrouping">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tvGrouping">
+        <propEntries>
+          <propEntry name="ClipboardFormats">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

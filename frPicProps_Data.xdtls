@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="frPicProps_Data">
+    <propEntries>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries/>
+    <compEntries>
+      <compEntry name="cbAuthor">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbFilmNumber">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbMedia">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbPlace">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Items">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="eDate">
+        <propEntries>
+          <propEntry name="ButtonHint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="CalendarHints">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="eFrameNumber">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="eTime">
+        <propEntries>
+          <propEntry name="EditMask">
+            <tranEntries>
+              <tranEntry langID="1049" value="!99:99:99;1;…"/>
+              <tranEntry langID="1033" value="!99:99:99;1;…"/>
+              <tranEntry langID="1031" value="!99:99:99;1;…"/>
+              <tranEntry langID="1046" value="!99:99:99;1;…"/>
+              <tranEntry langID="1058" value="!99:99:99;1;…"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value="  :  :  "/>
+              <tranEntry langID="1033" value="  :  :  "/>
+              <tranEntry langID="1031" value="  :  :  "/>
+              <tranEntry langID="1046" value="  :  :  "/>
+              <tranEntry langID="1058" value="  :  :  "/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lAuthor">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Автор:"/>
+              <tranEntry langID="1033" value="&amp;Author:"/>
+              <tranEntry langID="1031" value="&amp;Autor:"/>
+              <tranEntry langID="1046" value="&amp;Autor:"/>
+              <tranEntry langID="1058" value="&amp;Автор:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lDate">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Дата:"/>
+              <tranEntry langID="1033" value="&amp;Date:"/>
+              <tranEntry langID="1031" value="&amp;Datum:"/>
+              <tranEntry langID="1046" value="&amp;Data:"/>
+              <tranEntry langID="1058" value="&amp;Дата:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lDesc">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Описание (для отображения):"/>
+              <tranEntry langID="1033" value="D&amp;escription (for displaying):"/>
+              <tranEntry langID="1031" value="B&amp;eschreibung (zum Anzeigen):"/>
+              <tranEntry langID="1046" value="D&amp;escriзгo (para visualizar):"/>
+              <tranEntry langID="1058" value="&amp;Опис (для відображення):"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lFilmNumber">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Номер или название плёнки:"/>
+              <tranEntry langID="1033" value="&amp;Film number or name:"/>
+              <tranEntry langID="1031" value="&amp;Filmnummer oder -name:"/>
+              <tranEntry langID="1046" value="Nъmero ou nome do &amp;Filme:"/>
+              <tranEntry langID="1058" value="&amp;Номер або назва плівки:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lFrameNumber">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Номе&amp;р кадра:"/>
+              <tranEntry langID="1033" value="F&amp;rame number:"/>
+              <tranEntry langID="1031" value="F&amp;rame Nummer:"/>
+              <tranEntry langID="1046" value="Nъme&amp;ro do quadro:"/>
+              <tranEntry langID="1058" value="Номе&amp;р кадру:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lMedia">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Наименование или код нос&amp;ителя:"/>
+              <tranEntry langID="1033" value="&amp;Media name or code:"/>
+              <tranEntry langID="1031" value="&amp;Medienname oder -code:"/>
+              <tranEntry langID="1046" value="Nъmero ou cуdigo da &amp;Mнdia:"/>
+              <tranEntry langID="1058" value="Найменування або код нос&amp;ія:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lNotes">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Примечания (дополнительные сведения):"/>
+              <tranEntry langID="1033" value="&amp;Notes (additional info):"/>
+              <tranEntry langID="1031" value="A&amp;nmerkungen (zusдtzliche Informationen):"/>
+              <tranEntry langID="1046" value="&amp;Notas (informaзгo adicional):"/>
+              <tranEntry langID="1058" value="&amp;Примітки (додаткові зведення):"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lPlace">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Место:"/>
+              <tranEntry langID="1033" value="&amp;Place:"/>
+              <tranEntry langID="1031" value="&amp;Ort:"/>
+              <tranEntry langID="1046" value="&amp;Lugar:"/>
+              <tranEntry langID="1058" value="&amp;Місце:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="lTime">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Время:"/>
+              <tranEntry langID="1033" value="&amp;Time:"/>
+              <tranEntry langID="1031" value="&amp;Zeit:"/>
+              <tranEntry langID="1046" value="&amp;Hora:"/>
+              <tranEntry langID="1058" value="&amp;Час:"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="mDesc">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Lines">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="mNotes">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ImeName">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Lines">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

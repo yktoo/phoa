@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="frPicProps_View">
+    <propEntries>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries/>
+    <compEntries>
+      <compEntry name="alMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomActual">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="М&amp;асштаб 1:1"/>
+              <tranEntry langID="1033" value="Zoom &amp;actual"/>
+              <tranEntry langID="1031" value="&amp;Tatsдchlicher Zoom"/>
+              <tranEntry langID="1046" value="Tamanho Re&amp;al"/>
+              <tranEntry langID="1058" value="М&amp;асштаб 1:1"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Установить масштаб 1:1"/>
+              <tranEntry langID="1033" value="Set zoom to 1:1"/>
+              <tranEntry langID="1031" value="Zoom auf 1:1 stellen"/>
+              <tranEntry langID="1046" value="Ajustar zoom 1:1"/>
+              <tranEntry langID="1058" value="Встановити масштаб 1:1"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomFit">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;В размер окна"/>
+              <tranEntry langID="1033" value="&amp;Fit window"/>
+              <tranEntry langID="1031" value="Dem &amp;Fenster anpassen"/>
+              <tranEntry langID="1046" value="&amp;Melhor tamanho"/>
+              <tranEntry langID="1058" value="&amp;У розмір вікна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Установить масштаб по размерам окна"/>
+              <tranEntry langID="1033" value="Set zoom to fit window"/>
+              <tranEntry langID="1031" value="Zoom auf FenstergrцЯe einstellen"/>
+              <tranEntry langID="1046" value="Ajustar zoom para caber na janela "/>
+              <tranEntry langID="1058" value="Встановити масштаб по розмірах вікна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomIn">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="&amp;Увеличить"/>
+              <tranEntry langID="1033" value="Zoom &amp;in"/>
+              <tranEntry langID="1031" value="Zoom &amp;in"/>
+              <tranEntry langID="1046" value="&amp;Ampliar"/>
+              <tranEntry langID="1058" value="&amp;Збільшити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Увеличить|Увеличить изображение"/>
+              <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
+              <tranEntry langID="1031" value="Zoom in|VergrцЯert das Bild"/>
+              <tranEntry langID="1046" value="Ampliar|Ampliaзгo da imagem vista"/>
+              <tranEntry langID="1058" value="Збільшити|Збільшити зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aZoomOut">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="У&amp;меньшить"/>
+              <tranEntry langID="1033" value="Zoom ou&amp;t"/>
+              <tranEntry langID="1031" value="Zoom ou&amp;t"/>
+              <tranEntry langID="1046" value="&amp;Reduzir"/>
+              <tranEntry langID="1058" value="З&amp;меншити"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Уменьшить|Уменьшить изображение"/>
+              <tranEntry langID="1033" value="Zoom out|Zoom image out"/>
+              <tranEntry langID="1031" value="Zoom out|Zoomt heraus"/>
+              <tranEntry langID="1046" value="Reduzir|Reduзгo da imagem vista"/>
+              <tranEntry langID="1058" value="Зменшити|Зменшити зображення"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bViewZoomActual">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bViewZoomFit">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bViewZoomIn">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bViewZoomOut">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="cbViewFile">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="EditCaption">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Файл для просмотра"/>
+              <tranEntry langID="1033" value="File to view"/>
+              <tranEntry langID="1031" value="Angezeigtes Bild"/>
+              <tranEntry langID="1046" value="Visualizar arquivo"/>
+              <tranEntry langID="1058" value="Файл для перегляду"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Strings">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Text">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="iMain">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pmMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbMain">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="ChevronHint">
+            <tranEntries>
+              <tranEntry langID="1049" value="Ещё кнопки|"/>
+              <tranEntry langID="1033" value="More buttons|"/>
+              <tranEntry langID="1031" value="Weitere Schaltflдchen|"/>
+              <tranEntry langID="1046" value="Mais botхes|"/>
+              <tranEntry langID="1058" value="Ще кнопки|"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>

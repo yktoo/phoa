@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<DTTMProject generator="DTLangTools v1.0">
+  <compEntry name="dStats">
+    <propEntries>
+      <propEntry name="Caption">
+        <tranEntries>
+          <tranEntry langID="1049" value="Статистика фотоальбома"/>
+          <tranEntry langID="1033" value="Photo album statistics"/>
+          <tranEntry langID="1031" value="Fotoalbum: Statistiken"/>
+          <tranEntry langID="1046" value="Estatнstica"/>
+          <tranEntry langID="1058" value="Статистика фотоальбому"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpFile">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="HelpKeyword">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value=""/>
+          <tranEntry langID="1033" value=""/>
+          <tranEntry langID="1031" value=""/>
+          <tranEntry langID="1046" value=""/>
+          <tranEntry langID="1058" value=""/>
+        </tranEntries>
+      </propEntry>
+    </propEntries>
+    <constEntries>
+      <propEntry name="SStat_AvgFileSize">
+        <tranEntries>
+          <tranEntry langID="1049" value="Средний размер файла изображения"/>
+          <tranEntry langID="1033" value="Average picture file size"/>
+          <tranEntry langID="1031" value="Durchschnittliche DateigrцЯe"/>
+          <tranEntry langID="1046" value="Tamanho mйdio do arquivo de imagem"/>
+          <tranEntry langID="1058" value="Середній розмір файлу зображення"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_AvgThumbSize">
+        <tranEntries>
+          <tranEntry langID="1049" value="Средний размер эскиза"/>
+          <tranEntry langID="1033" value="Average thumbnail size"/>
+          <tranEntry langID="1031" value="Durchschnittliche ThumbnailgrцЯe"/>
+          <tranEntry langID="1046" value="Tamanho mйdio da miniatura"/>
+          <tranEntry langID="1058" value="Середній розмір ескізу"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_CntDistinctPics">
+        <tranEntries>
+          <tranEntry langID="1049" value="Общее количество различных изображений"/>
+          <tranEntry langID="1033" value="Total number of distinct pictures"/>
+          <tranEntry langID="1031" value="Gesamtzahl verschiedener Bilder"/>
+          <tranEntry langID="1046" value="Total de imagens distintas"/>
+          <tranEntry langID="1058" value="Загальна кількість різних зображень"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_CntNestedGroups">
+        <tranEntries>
+          <tranEntry langID="1033" value="Number of nested groups"/>
+          <tranEntry langID="1049" value="Количество вложенных групп"/>
+          <tranEntry langID="1031" value="Anzahl untergeordneter Gruppen"/>
+          <tranEntry langID="1046" value="Nъmero de grupos aninhados"/>
+          <tranEntry langID="1058" value="Кількість вкладених груп"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_CntPics">
+        <tranEntries>
+          <tranEntry langID="1049" value="Общее количество изображений"/>
+          <tranEntry langID="1033" value="Total number of pictures"/>
+          <tranEntry langID="1031" value="Gesamtzahl aller Bilder"/>
+          <tranEntry langID="1046" value="Total de imagens"/>
+          <tranEntry langID="1058" value="Загальна кількість зображень"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_CntPicsInGroup">
+        <tranEntries>
+          <tranEntry langID="1049" value="Количество изображений в группе"/>
+          <tranEntry langID="1033" value="Number of pictures in the group"/>
+          <tranEntry langID="1031" value="Anzahl der Bilder in dieser Gruppe"/>
+          <tranEntry langID="1046" value="Nъmero de imagens no grupo"/>
+          <tranEntry langID="1058" value="Кількість зображень у групі"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_Group">
+        <tranEntries>
+          <tranEntry langID="1033" value="Current selected group"/>
+          <tranEntry langID="1049" value="Текущая выбранная группа"/>
+          <tranEntry langID="1031" value="Aktuell ausgewдhlte Gruppe"/>
+          <tranEntry langID="1046" value="Grupo Atual selecionado"/>
+          <tranEntry langID="1058" value="Поточна обрана група"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_MaxFileName">
+        <tranEntries>
+          <tranEntry langID="1049" value="Самый большой файл изображения"/>
+          <tranEntry langID="1033" value="Largest picture file"/>
+          <tranEntry langID="1031" value="GrцЯte Datei"/>
+          <tranEntry langID="1046" value="Maior arquivo de imagem"/>
+          <tranEntry langID="1058" value="Найбільший файл зображення"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_MaxFileSize">
+        <tranEntries>
+          <tranEntry langID="1049" value="Размер самого большого файла"/>
+          <tranEntry langID="1033" value="Size of the largest file"/>
+          <tranEntry langID="1031" value="GrцЯe der grцЯten Datei"/>
+          <tranEntry langID="1046" value="Tamanho do maior arquivo"/>
+          <tranEntry langID="1058" value="Розмір найбільшого файлу"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_MinFileName">
+        <tranEntries>
+          <tranEntry langID="1049" value="Самый маленький файл изображения"/>
+          <tranEntry langID="1033" value="Smallest picture file"/>
+          <tranEntry langID="1031" value="Kleinste Datei"/>
+          <tranEntry langID="1046" value="Menor arquivo de imagem"/>
+          <tranEntry langID="1058" value="Найменьший файл зображення"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_MinFileSize">
+        <tranEntries>
+          <tranEntry langID="1049" value="Размер самого маленького файла"/>
+          <tranEntry langID="1033" value="Size of the smallest file"/>
+          <tranEntry langID="1031" value="GrцЯe der kleinsten Datei"/>
+          <tranEntry langID="1046" value="Tamanho do menor arquivo"/>
+          <tranEntry langID="1058" value="Розмір найменьшого файлу"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_PhoaFilename">
+        <tranEntries>
+          <tranEntry langID="1049" value="Файл фотоальбома"/>
+          <tranEntry langID="1033" value="Photo album file"/>
+          <tranEntry langID="1031" value="Fotoalbum Datei"/>
+          <tranEntry langID="1046" value="Arquivo do бlbum"/>
+          <tranEntry langID="1058" value="Файл фотоальбому"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_PhotoAlbum">
+        <tranEntries>
+          <tranEntry langID="1049" value="Фотоальбом"/>
+          <tranEntry langID="1033" value="Photo album"/>
+          <tranEntry langID="1031" value="Fotoalbum"/>
+          <tranEntry langID="1046" value="Бlbum"/>
+          <tranEntry langID="1058" value="Фотоальбом"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_TotalFileSize">
+        <tranEntries>
+          <tranEntry langID="1033" value="Total picture files size"/>
+          <tranEntry langID="1049" value="Суммарный размер файлов изображений"/>
+          <tranEntry langID="1031" value="GesamtgrцЯe aller Bilder"/>
+          <tranEntry langID="1046" value="Tamanho total dos arquivos"/>
+          <tranEntry langID="1058" value="Сумарний розмір файлів зображень"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStat_TotalThumbSize">
+        <tranEntries>
+          <tranEntry langID="1049" value="Суммарный размер эскизов"/>
+          <tranEntry langID="1033" value="Total thumbnails size"/>
+          <tranEntry langID="1031" value="GesamtgrцЯe aller Thumbnails"/>
+          <tranEntry langID="1046" value="Tamanho total das miniaturas"/>
+          <tranEntry langID="1058" value="Сумарний розмір ескізів"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStats_DistinctPics">
+        <tranEntries>
+          <tranEntry langID="1049" value="Количество различных изображений"/>
+          <tranEntry langID="1033" value="Number of distinct pictures"/>
+          <tranEntry langID="1031" value="Anzahl verschiedener Bilder"/>
+          <tranEntry langID="1046" value="Nъmero de imagens distintas"/>
+          <tranEntry langID="1058" value="Кількість різноманітних зображень"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SStats_PhoaFileRevision">
+        <tranEntries>
+          <tranEntry langID="1049" value="Версия файла фотоальбома"/>
+          <tranEntry langID="1033" value="Photo album file revision"/>
+          <tranEntry langID="1031" value="Fotoalbum Dateiversion"/>
+          <tranEntry langID="1046" value="Revisгo do arquivo do бlbum"/>
+          <tranEntry langID="1058" value="Версія файлу фотоальбому"/>
+        </tranEntries>
+      </propEntry>
+    </constEntries>
+    <compEntries>
+      <compEntry name="bCancel">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Отмена"/>
+              <tranEntry langID="1033" value="Cancel"/>
+              <tranEntry langID="1031" value="Abbrechen"/>
+              <tranEntry langID="1046" value="Cancelar"/>
+              <tranEntry langID="1058" value="Відміна"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bHelp">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="Справка"/>
+              <tranEntry langID="1033" value="Help"/>
+              <tranEntry langID="1031" value="Hilfe"/>
+              <tranEntry langID="1046" value="Ajuda"/>
+              <tranEntry langID="1058" value="Довідка"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bOK">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1049" value="ОК"/>
+              <tranEntry langID="1033" value="OK"/>
+              <tranEntry langID="1031" value="OK"/>
+              <tranEntry langID="1046" value="OK"/>
+              <tranEntry langID="1058" value="ОК"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="dtlsMain">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tvMain">
+        <propEntries>
+          <propEntry name="ClipboardFormats">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1031" value=""/>
+              <tranEntry langID="1046" value=""/>
+              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+    </compEntries>
+  </compEntry>
+</DTTMProject>
