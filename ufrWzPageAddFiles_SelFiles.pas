@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.15 2004-10-14 08:11:51 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.16 2004-10-14 11:05:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -248,7 +248,7 @@ uses
     if Namespace.Folder then
       AllowAsChild := not Namespace.Browsable // Отсеиваем .ZIP-псевдопапки
     else
-      AllowAsChild := FileFormatList.GraphicFromExtension(ExtractFileExt(Namespace.FileName))<>nil;
+      AllowAsChild := FileFormatList.GraphicFromExtension(Namespace.FileName)<>nil;
   end;
 
 end.
