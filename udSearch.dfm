@@ -1,20 +1,20 @@
 inherited dSearch: TdSearch
-  Left = 478
-  Top = 244
+  Left = 480
+  Top = 287
   Caption = 'Find pictures'
-  ClientHeight = 435
-  ClientWidth = 525
+  ClientHeight = 464
+  ClientWidth = 640
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
-    Top = 398
-    Width = 525
+    Top = 427
+    Width = 640
   end
   object gbSearch: TGroupBox [1]
     Left = 12
     Top = 8
-    Width = 502
+    Width = 617
     Height = 41
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Perform search'
@@ -50,21 +50,21 @@ inherited dSearch: TdSearch
     end
   end
   inherited pButtonsBottom: TPanel
-    Top = 400
-    Width = 525
+    Top = 429
+    Width = 640
     TabOrder = 1
     DesignSize = (
-      525
+      640
       35)
     inherited bCancel: TButton
-      Left = 364
+      Left = 479
     end
     inherited bOK: TButton
-      Left = 284
+      Left = 399
       Caption = 'Find'
     end
     inherited bHelp: TButton
-      Left = 442
+      Left = 557
     end
     object bReset: TButton
       Left = 8
@@ -79,16 +79,17 @@ inherited dSearch: TdSearch
   object pcCriteria: TPageControl
     Left = 12
     Top = 56
-    Width = 501
-    Height = 333
+    Width = 616
+    Height = 362
     ActivePage = tsExpression
+    Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     OnChange = DlgDataChange
     object tsSimple: TTabSheet
       Caption = 'Simple search'
       DesignSize = (
-        493
-        305)
+        608
+        334)
       object lCriteria: TLabel
         Left = 4
         Top = 4
@@ -99,8 +100,8 @@ inherited dSearch: TdSearch
       object tvCriteria: TVirtualStringTree
         Left = 3
         Top = 20
-        Width = 479
-        Height = 280
+        Width = 594
+        Height = 309
         Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 2
         Header.Font.Charset = DEFAULT_CHARSET
@@ -132,7 +133,7 @@ inherited dSearch: TdSearch
           end
           item
             Position = 2
-            Width = 169
+            Width = 280
           end>
         WideDefaultText = ''
       end
@@ -142,9 +143,9 @@ inherited dSearch: TdSearch
       ImageIndex = 1
       object eExpression: TSynEdit
         Left = 0
-        Top = 0
-        Width = 493
-        Height = 305
+        Top = 23
+        Width = 608
+        Height = 311
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -159,16 +160,42 @@ inherited dSearch: TdSearch
         Gutter.Font.Style = []
         OnChange = DlgDataChange
       end
+      object dkExprTop: TTBXDock
+        Left = 0
+        Top = 0
+        Width = 608
+        Height = 23
+        AllowDrag = False
+        object tbExprMain: TTBXToolbar
+          Left = 0
+          Top = 0
+          Caption = 'Toolbar'
+          Images = fMain.ilActionsSmall
+          TabOrder = 0
+          object smExprInsertProp: TTBXSubmenuItem
+            Caption = 'Insert &property'
+            Hint = 'Insert a picture property into the expression'
+            Options = [tboDropdownArrow]
+          end
+          object smExprInsertOperator: TTBXSubmenuItem
+            Caption = 'Insert &operator'
+            Hint = 'Insert an operator into the expression'
+            Options = [tboDropdownArrow]
+          end
+        end
+      end
     end
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
       '*.SecondaryShortCuts')
+    StoreList.Strings = (
+      '*.ChevronHint')
     Left = 116
-    Top = 400
+    Top = 432
     LangData = {
-      070064536561726368010100000003000000070043617074696F6E0110000000
+      070064536561726368010100000003000000070043617074696F6E0114000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
       6243616E63656C01010000000C000000070043617074696F6E000300624F4B01
       010000000F000000070043617074696F6E0005006248656C7001010000001200
@@ -181,6 +208,11 @@ inherited dSearch: TdSearch
       000000070043617074696F6E000A007063437269746572696100000800747353
       696D706C65010100000028000000070043617074696F6E000C00747345787072
       657373696F6E010100000029000000070043617074696F6E000B006545787072
-      657373696F6E0000}
+      657373696F6E00000900646B45787072546F7000000A007462457870724D6169
+      6E01020000002A000000070043617074696F6E2B0000000B0043686576726F6E
+      48696E74001000736D45787072496E7365727450726F7001020000002C000000
+      070043617074696F6E2E000000040048696E74001400736D45787072496E7365
+      72744F70657261746F7201020000002D000000070043617074696F6E2F000000
+      040048696E7400}
   end
 end

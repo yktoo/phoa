@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: phPhoa.pas,v 1.7 2004-11-19 13:01:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,6 +31,7 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   Nov 19, 2004 - dale - added new sorting properties (thumbnail width, height and dimensions) and sorting prop constants
 //   Jun 06, 2004 - dale - added a chunk for Group Description property
 //   Jun 02, 2004 - dale - added a chunk for Group ID property
 //   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties
@@ -305,6 +306,33 @@ const
   IPhChunk_ViewSortings_Close      = $c063; // Empty    Close-chunk for photo album view sortings
   IPhChunk_ViewSorting_Close       = $c064; // Empty    Close-chunk for single photo album view sorting
 
+   // Sorting property values
+  IPhSortingProp_ID                =  0; // Picture ID
+  IPhSortingProp_FileName          =  1; // Picture filename
+  IPhSortingProp_FullFileName      =  2; // Picture filename with path
+  IPhSortingProp_FilePath          =  3; // Picture file path
+  IPhSortingProp_FileSize          =  4; // Picture file size
+  IPhSortingProp_FileSizeBytes     =  5; // Picture file size in bytes (for sorting is just the same as 'Picture file size')
+  IPhSortingProp_PicWidth          =  6; // Image width
+  IPhSortingProp_PicHeight         =  7; // Image height
+  IPhSortingProp_PicDims           =  8; // Image dimensions
+  IPhSortingProp_Format            =  9; // Pixel format
+  IPhSortingProp_Date              = 10; // Date
+  IPhSortingProp_Time              = 11; // Time
+  IPhSortingProp_Place             = 12; // Place
+  IPhSortingProp_FilmNumber        = 13; // Film number
+  IPhSortingProp_FrameNumber       = 14; // Frame number
+  IPhSortingProp_Author            = 15; // Author
+  IPhSortingProp_Description       = 16; // Description
+  IPhSortingProp_Notes             = 17; // Notes
+  IPhSortingProp_Media             = 18; // Media
+  IPhSortingProp_Keywords          = 19; // Keywords (keywords are always ordered alphabetically, case-insensitively)
+  IPhSortingProp_Rotation          = 20; // Rotation
+  IPhSortingProp_Flips             = 21; // Flips
+  IPhSortingProp_ThumbWidth        = 22; // Thumbnail image width
+  IPhSortingProp_ThumbHeight       = 23; // Thumbnail image height
+  IPhSortingProp_ThumbDims         = 24; // Thumbnail image dimensions
+
 type
    // Local chunk entry, used in aPhChunks[]
   PPhChunkEntry = ^TPhChunkEntry;
@@ -428,32 +456,7 @@ const
    //   9    Media name/code
    //  10    Keywords
    //
-   // Possible values for Sorting Property are (see note below):
-   //
-   // Value  Description
-   // -----  --------------
-   //   0    ID
-   //   1    Picture filename
-   //   2    Picture filename with path
-   //   3    Picture file path
-   //   4    Picture file size
-   //   5    Picture file size in bytes (for sorting is just the same as 'Picture file size')
-   //   6    Image width
-   //   7    Image height
-   //   8    Image dimensions
-   //   9    Pixel format
-   //  10    Date
-   //  11    Time
-   //  12    Place
-   //  13    Film number
-   //  14    Frame number
-   //  15    Author
-   //  16    Description
-   //  17    Notes
-   //  18    Media
-   //  19    Keywords (keywords are always ordered alphabetically, case-insensitively)
-   //  20    Rotation
-   //  21    Flips
+   // Possible values for Sorting Property are ones declared with IPhSortingProp_XXX constants (see note below):
    //
    // --------
    // * Note on 'enumerated' values: the Reader should IGNORE values with

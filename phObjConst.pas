@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObjConst.pas,v 1.3 2004-10-19 15:03:31 dale Exp $
+//  $Id: phObjConst.pas,v 1.4 2004-11-19 13:01:06 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phObjConst;
 
 interface
 
-uses phIntf;
+uses phIntf, phPhoa;
 
 const
    // Размеры и качество эскиза
@@ -30,57 +30,63 @@ const
     '270°'); // pr270
   
   asPicFlipText: Array[TPicFlip] of String = (
-    'H',  // pflHorz
-    'V'); // pflVert
+    'H',  // pflHorz                                          
+    'V'); // pflVert                                          
 
    // Таблицы перекодировки
    // TPicProperty <-> Chunked sorting prop
   aXlat_PicPropertyToChunkSortingProp: Array[TPicProperty] of Word = (
-     0,  // ppID
-     1,  // ppFileName
-     2,  // ppFullFileName
-     3,  // ppFilePath
-     4,  // ppFileSize
-     5,  // ppFileSizeBytes
-     6,  // ppPicWidth
-     7,  // ppPicHeight
-     8,  // ppPicDims
-     9,  // ppFormat
-    10,  // ppDate
-    11,  // ppTime
-    12,  // ppPlace
-    13,  // ppFilmNumber
-    14,  // ppFrameNumber
-    15,  // ppAuthor
-    16,  // ppDescription
-    17,  // ppNotes
-    18,  // ppMedia
-    19,  // ppKeywords
-    20,  // ppRotation
-    21); // ppFlips
-  aXlat_ChunkSortingPropToPicProperty: Array[0..21] of TPicProperty = (
-    ppID,            //  0  ID
-    ppFileName,      //  1  Picture filename
-    ppFullFileName,  //  2  Picture filename with path
-    ppFilePath,      //  3  Picture file path
-    ppFileSize,      //  4  Picture file size
-    ppFileSizeBytes, //  5  Picture file size in bytes
-    ppPicWidth,      //  6  Image width
-    ppPicHeight,     //  7  Image height
-    ppPicDims,       //  8  Image dimensions
-    ppFormat,        //  9  Pixel format
-    ppDate,          // 10  Date
-    ppTime,          // 11  Time
-    ppPlace,         // 12  Place
-    ppFilmNumber,    // 13  Film number
-    ppFrameNumber,   // 14  Frame number
-    ppAuthor,        // 15  Author
-    ppDescription,   // 16  Description
-    ppNotes,         // 17  Notes
-    ppMedia,         // 18  Media
-    ppKeywords,      // 19  Keywords
-    ppRotation,      // 20  Rotation
-    ppFlips);        // 21  Flips
+    IPhSortingProp_ID,            // ppID
+    IPhSortingProp_FileName,      // ppFileName
+    IPhSortingProp_FullFileName,  // ppFullFileName
+    IPhSortingProp_FilePath,      // ppFilePath
+    IPhSortingProp_FileSize,      // ppFileSize
+    IPhSortingProp_FileSizeBytes, // ppFileSizeBytes
+    IPhSortingProp_PicWidth,      // ppPicWidth
+    IPhSortingProp_PicHeight,     // ppPicHeight
+    IPhSortingProp_PicDims,       // ppPicDims
+    IPhSortingProp_ThumbWidth,    // ppThumbWidth
+    IPhSortingProp_ThumbHeight,   // ppThumbHeight
+    IPhSortingProp_ThumbDims,     // ppThumbDims
+    IPhSortingProp_Format,        // ppFormat
+    IPhSortingProp_Date,          // ppDate
+    IPhSortingProp_Time,          // ppTime
+    IPhSortingProp_Place,         // ppPlace
+    IPhSortingProp_FilmNumber,    // ppFilmNumber
+    IPhSortingProp_FrameNumber,   // ppFrameNumber
+    IPhSortingProp_Author,        // ppAuthor
+    IPhSortingProp_Description,   // ppDescription
+    IPhSortingProp_Notes,         // ppNotes
+    IPhSortingProp_Media,         // ppMedia
+    IPhSortingProp_Keywords,      // ppKeywords
+    IPhSortingProp_Rotation,      // ppRotation
+    IPhSortingProp_Flips);        // ppFlips
+  aXlat_ChunkSortingPropToPicProperty: Array[0..24] of TPicProperty = (
+    ppID,            //  0  IPhSortingProp_ID           
+    ppFileName,      //  1  IPhSortingProp_FileName
+    ppFullFileName,  //  2  IPhSortingProp_FullFileName
+    ppFilePath,      //  3  IPhSortingProp_FilePath
+    ppFileSize,      //  4  IPhSortingProp_FileSize
+    ppFileSizeBytes, //  5  IPhSortingProp_FileSizeBytes
+    ppPicWidth,      //  6  IPhSortingProp_PicWidth
+    ppPicHeight,     //  7  IPhSortingProp_PicHeight
+    ppPicDims,       //  8  IPhSortingProp_PicDims
+    ppFormat,        //  9  IPhSortingProp_Format
+    ppDate,          // 10  IPhSortingProp_Date
+    ppTime,          // 11  IPhSortingProp_Time
+    ppPlace,         // 12  IPhSortingProp_Place
+    ppFilmNumber,    // 13  IPhSortingProp_FilmNumber
+    ppFrameNumber,   // 14  IPhSortingProp_FrameNumber
+    ppAuthor,        // 15  IPhSortingProp_Author
+    ppDescription,   // 16  IPhSortingProp_Description
+    ppNotes,         // 17  IPhSortingProp_Notes
+    ppMedia,         // 18  IPhSortingProp_Media
+    ppKeywords,      // 19  IPhSortingProp_Keywords
+    ppRotation,      // 20  IPhSortingProp_Rotation
+    ppFlips,         // 21  IPhSortingProp_Flips
+    ppThumbWidth,    // 22  IPhSortingProp_ThumbWidth
+    ppThumbHeight,   // 23  IPhSortingProp_ThumbHeight
+    ppThumbDims);    // 24  IPhSortingProp_ThumbDims
 
    // Свойства, поддерживаемые ревизией 2
   GBPropsRev2: TPicGroupByProperties = [

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.57 2004-10-30 07:31:45 dale Exp $
+//  $Id: phObj.pas,v 1.58 2004-11-19 13:01:06 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -441,22 +441,24 @@ type
 
   procedure TPhotoAlbumPic.CleanupProps(Props: TPicProperties);
   begin
-    if [ppFileSize, ppFileSizeBytes]*Props<>[] then FFileSize     := 0;
-    if [ppPicWidth, ppPicDims]*Props<>[]       then FImageSize.cx := 0;
-    if [ppPicHeight, ppPicDims]*Props<>[]      then FImageSize.cy := 0;
-    if ppFormat      in Props                  then FImageFormat  := ppfCustom;
-    if ppDate        in Props                  then FDate         := 0;
-    if ppTime        in Props                  then FTime         := 0;
-    if ppPlace       in Props                  then FPlace        := '';
-    if ppFilmNumber  in Props                  then FFilmNumber   := '';
-    if ppFrameNumber in Props                  then FFrameNumber  := '';
-    if ppAuthor      in Props                  then FAuthor       := '';
-    if ppMedia       in Props                  then FMedia        := '';
-    if ppDescription in Props                  then FDescription  := '';
-    if ppNotes       in Props                  then FNotes        := '';
+    if [ppFileSize, ppFileSizeBytes]*Props<>[] then FFileSize         := 0;
+    if [ppPicWidth,  ppPicDims]*Props<>[]       then FImageSize.cx    := 0;
+    if [ppPicHeight, ppPicDims]*Props<>[]      then FImageSize.cy     := 0;
+    if [ppThumbWidth,  ppThumbDims]*Props<>[]  then FThumbnailSize.cx := 0;
+    if [ppThumbHeight, ppThumbDims]*Props<>[]  then FThumbnailSize.cy := 0;
+    if ppFormat      in Props                  then FImageFormat      := ppfCustom;
+    if ppDate        in Props                  then FDate             := 0;
+    if ppTime        in Props                  then FTime             := 0;
+    if ppPlace       in Props                  then FPlace            := '';
+    if ppFilmNumber  in Props                  then FFilmNumber       := '';
+    if ppFrameNumber in Props                  then FFrameNumber      := '';
+    if ppAuthor      in Props                  then FAuthor           := '';
+    if ppMedia       in Props                  then FMedia            := '';
+    if ppDescription in Props                  then FDescription      := '';
+    if ppNotes       in Props                  then FNotes            := '';
     if ppKeywords    in Props                  then FKeywords.Clear;
-    if ppRotation    in Props                  then FRotation     := pr0;
-    if ppFlips       in Props                  then FFlips        := [];
+    if ppRotation    in Props                  then FRotation         := pr0;
+    if ppFlips       in Props                  then FFlips            := [];
   end;
 
   constructor TPhotoAlbumPic.Create;
@@ -564,6 +566,9 @@ type
       ppPicWidth:      if FImageSize.cx>0 then Result := IntToStr(FImageSize.cx);
       ppPicHeight:     if FImageSize.cy>0 then Result := IntToStr(FImageSize.cy);
       ppPicDims:       if (FImageSize.cx>0) and (FImageSize.cy>0) then Result := Format('%dx%d', [FImageSize.cx, FImageSize.cy]);
+      ppThumbWidth:    if FThumbnailSize.cx>0 then Result := IntToStr(FThumbnailSize.cx);
+      ppThumbHeight:   if FThumbnailSize.cy>0 then Result := IntToStr(FThumbnailSize.cy);
+      ppThumbDims:     if (FThumbnailSize.cx>0) and (FThumbnailSize.cy>0) then Result := Format('%dx%d', [FThumbnailSize.cx, FThumbnailSize.cy]);
       ppFormat:        Result := PixelFormatName(FImageFormat);
       ppDate:          if FDate>0 then Result := DateToStr (PhoaDateToDate(FDate));
       ppTime:          if FTime>0 then Result := TimeToStrX(PhoaTimeToTime(FTime));
@@ -589,6 +594,8 @@ type
       ppFileSizeBytes: Result := FFileSize;
       ppPicWidth:      if FImageSize.cx>0 then Result := FImageSize.cx;
       ppPicHeight:     if FImageSize.cy>0 then Result := FImageSize.cy;
+      ppThumbWidth:    if FThumbnailSize.cx>0 then Result := FThumbnailSize.cx;
+      ppThumbHeight:   if FThumbnailSize.cy>0 then Result := FThumbnailSize.cy;
       ppFormat:        Result := Byte(FImageFormat);
       ppDate:          if FDate>0 then Result := FDate;
       ppTime:          if FTime>0 then Result := FTime;
@@ -678,25 +685,27 @@ type
   var SrcKeywords: IPhoaKeywordList;
   begin
     case PicProp of
-      ppFileName:      FFileName     := ExtractFilePath(FFileName)+Value;
-      ppFullFileName:  FFileName     := Value;
-      ppFilePath:      FFileName     := IncludeTrailingPathDelimiter(Value)+ExtractFileName(FFileName);
-      ppFileSizeBytes: FFileSize     := VarToInt(Value);
-      ppPicWidth:      FImageSize.cx := VarToInt(Value);
-      ppPicHeight:     FImageSize.cy := VarToInt(Value);
-      ppFormat:        FImageFormat  := TPhoaPixelFormat(Byte(Value));
-      ppDate:          FDate         := VarToInt(Value);
-      ppTime:          FTime         := VarToInt(Value);
-      ppPlace:         FPlace        := VarToStr(Value);
-      ppFilmNumber:    FFilmNumber   := VarToStr(Value);
-      ppFrameNumber:   FFrameNumber  := VarToStr(Value);
-      ppAuthor:        FAuthor       := VarToStr(Value);
-      ppDescription:   FDescription  := VarToStr(Value);
-      ppNotes:         FNotes        := VarToStr(Value);
-      ppMedia:         FMedia        := VarToStr(Value);
+      ppFileName:      FFileName         := ExtractFilePath(FFileName)+Value;
+      ppFullFileName:  FFileName         := Value;
+      ppFilePath:      FFileName         := IncludeTrailingPathDelimiter(Value)+ExtractFileName(FFileName);
+      ppFileSizeBytes: FFileSize         := VarToInt(Value);
+      ppPicWidth:      FImageSize.cx     := VarToInt(Value);
+      ppPicHeight:     FImageSize.cy     := VarToInt(Value);
+      ppThumbWidth:    FThumbnailSize.cx := VarToInt(Value);
+      ppThumbHeight:   FThumbnailSize.cy := VarToInt(Value);
+      ppFormat:        FImageFormat      := TPhoaPixelFormat(Byte(Value));
+      ppDate:          FDate             := VarToInt(Value);
+      ppTime:          FTime             := VarToInt(Value);
+      ppPlace:         FPlace            := VarToStr(Value);
+      ppFilmNumber:    FFilmNumber       := VarToStr(Value);
+      ppFrameNumber:   FFrameNumber      := VarToStr(Value);
+      ppAuthor:        FAuthor           := VarToStr(Value);
+      ppDescription:   FDescription      := VarToStr(Value);
+      ppNotes:         FNotes            := VarToStr(Value);
+      ppMedia:         FMedia            := VarToStr(Value);
       ppKeywords:      if VarSupports(Value, IPhoaKeywordList, SrcKeywords) then FKeywords.Assign(SrcKeywords);
-      ppRotation:      FRotation     := TPicRotation(Byte(Value));
-      ppFlips:         FFlips        := TPicFlips(Byte(Value));
+      ppRotation:      FRotation         := TPicRotation(Byte(Value));
+      ppFlips:         FFlips            := TPicFlips(Byte(Value));
       else             PhoaException(SPhObjErrMsg_PicPropIsReadOnly, [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
     end;
   end;
@@ -766,11 +775,11 @@ type
            // Picture props
           IPhChunk_Pic_ID:            if ppID          in PProps                  then FID                 := vValue;
           IPhChunk_Pic_ThumbnailData: if ppFileName    in PProps                  then FThumbnailData      := vValue;
-          IPhChunk_Pic_ThumbWidth:    if ppFileName    in PProps                  then FThumbnailSize.cx   := vValue;
-          IPhChunk_Pic_ThumbHeight:   if ppFileName    in PProps                  then FThumbnailSize.cy   := vValue;
+          IPhChunk_Pic_ThumbWidth:    if [ppThumbWidth,  ppThumbDims]*PProps<>[]  then FThumbnailSize.cx   := vValue;
+          IPhChunk_Pic_ThumbHeight:   if [ppThumbHeight, ppThumbDims]*PProps<>[]  then FThumbnailSize.cy   := vValue;
           IPhChunk_Pic_PicFileName:   if ppFileName    in PProps                  then FFileName           := XFilename(vValue);
           IPhChunk_Pic_PicFileSize:   if [ppFileSize, ppFileSizeBytes]*PProps<>[] then FFileSize           := vValue;
-          IPhChunk_Pic_PicWidth:      if [ppPicWidth, ppPicDims]*PProps<>[]       then FImageSize.cx       := vValue;
+          IPhChunk_Pic_PicWidth:      if [ppPicWidth,  ppPicDims]*PProps<>[]      then FImageSize.cx       := vValue;
           IPhChunk_Pic_PicHeight:     if [ppPicHeight, ppPicDims]*PProps<>[]      then FImageSize.cy       := vValue;
           IPhChunk_Pic_PicFormat:     if ppFormat      in PProps                  then Byte(FImageFormat)  := vValue;
           IPhChunk_Pic_Date:          if ppDate        in PProps                  then FDate               := vValue;
@@ -820,11 +829,11 @@ type
     end else begin
       if ppID          in PProps                                                  then Streamer.WriteChunkInt   (IPhChunk_Pic_ID,            FID);
       if ppFileName    in PProps                                                  then Streamer.WriteChunkString(IPhChunk_Pic_ThumbnailData, FThumbnailData);
-      if ppFileName    in PProps                                                  then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbWidth,    FThumbnailSize.cx);
-      if ppFileName    in PProps                                                  then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbHeight,   FThumbnailSize.cy);
+      if ([ppThumbWidth,  ppThumbDims]*PProps<>[])  and (FThumbnailSize.cx>0)     then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbWidth,    FThumbnailSize.cx);
+      if ([ppThumbHeight, ppThumbDims]*PProps<>[])  and (FThumbnailSize.cy>0)     then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbHeight,   FThumbnailSize.cy);
       if ppFileName    in PProps                                                  then Streamer.WriteChunkString(IPhChunk_Pic_PicFileName,   XFilename);
       if ([ppFileSize, ppFileSizeBytes]*PProps<>[]) and (FFileSize>0)             then Streamer.WriteChunkInt   (IPhChunk_Pic_PicFileSize,   FFileSize);
-      if ([ppPicWidth, ppPicDims]*PProps<>[])       and (FImageSize.cx>0)         then Streamer.WriteChunkInt   (IPhChunk_Pic_PicWidth,      FImageSize.cx);
+      if ([ppPicWidth,  ppPicDims]*PProps<>[])      and (FImageSize.cx>0)         then Streamer.WriteChunkInt   (IPhChunk_Pic_PicWidth,      FImageSize.cx);
       if ([ppPicHeight, ppPicDims]*PProps<>[])      and (FImageSize.cy>0)         then Streamer.WriteChunkInt   (IPhChunk_Pic_PicHeight,     FImageSize.cy);
       if (ppFormat      in PProps)                  and (FImageFormat<>ppfCustom) then Streamer.WriteChunkByte  (IPhChunk_Pic_PicFormat,     Byte(FImageFormat));
       if (ppDate        in PProps)                  and (FDate>0)                 then Streamer.WriteChunkInt   (IPhChunk_Pic_Date,          FDate);
@@ -2431,6 +2440,9 @@ type
         ppPicWidth:        Result := Pic1.ImageSize.cx-Pic2.ImageSize.cx;
         ppPicHeight:       Result := Pic1.ImageSize.cy-Pic2.ImageSize.cy;
         ppPicDims:         Result := (Pic1.ImageSize.cx*Pic1.ImageSize.cy)-(Pic2.ImageSize.cx*Pic2.ImageSize.cy);
+        ppThumbWidth:      Result := Pic1.ThumbnailSize.cx-Pic2.ThumbnailSize.cx;
+        ppThumbHeight:     Result := Pic1.ThumbnailSize.cy-Pic2.ThumbnailSize.cy;
+        ppThumbDims:       Result := (Pic1.ThumbnailSize.cx*Pic1.ThumbnailSize.cy)-(Pic2.ThumbnailSize.cx*Pic2.ThumbnailSize.cy);
         ppFormat:          Result := Byte(Pic1.ImageFormat)-Byte(Pic2.ImageFormat);
         ppDate:            Result := Pic1.Date-Pic2.Date;
         ppTime:            Result := Pic1.Time-Pic2.Time;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.1 2004-11-16 14:37:55 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.2 2004-11-19 13:01:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -72,14 +72,6 @@ type
    // Вид оператора
   TOperatorKind = (
     okAnd, okOr, okNot, okIn, okStartsWith, okEndsWith, okContains, okIsEmpty, okEQ, okNotEQ, okLT, okLE, okGT, okGE);
-
-   // Вид поля
-  TFieldKind = (
-    fkID, fkAuthor, fkDate, fkTime, fkDescription,
-    fkFileName, fkFileSize, fkFilmNumber, fkFlips, fkFrameNumber,
-    fkImageFormat, fkImageWidth, fkImageHeight,
-    fkKeywords, fkMedia, fkNotes, fkPlace, fkRotation,
-    fkThumbnailWidth, fkThumbnailHeight);
 
    // Тип данных  
   TDatatype = (dtString, dtInteger, dtFloat, dtDate, dtTime, dtBoolean, dtList);
@@ -298,8 +290,8 @@ type
 
   TPhoaParsedField = class(TPhoaParsedOperand)
   protected
-     // Вид поля
-    FKind: TFieldKind;
+     // Свойство изображения
+    FProp: TPicProperty;
     function  AsString(Pic: IPhoaPic): String; override;
     function  AsDate(Pic: IPhoaPic): Integer; override;
     function  AsTime(Pic: IPhoaPic): Integer; override;
@@ -308,7 +300,7 @@ type
     function  GetDatatype: TDatatype; override;
     function  GetDescription: String; override;
   public
-    constructor Create(const sKind: String; iPos: Integer);
+    constructor Create(const sPropName: String; iPos: Integer);
   end;
 
   TPhoaParsedValue = class(TPhoaParsedOperand)
@@ -366,16 +358,12 @@ const
   ASOperatorKinds: Array [TOperatorKind] of String = (
     'AND', 'OR', 'NOT', 'IN', 'STARTSWITH', 'ENDSWITH', 'CONTAINS', 'ISEMPTY',
     '=', '<>', '<', '<=', '>', '>=');
-  ASFieldKinds: Array [TFieldKind] of String = (
-    'ID', 'AUTHOR', 'DATE', 'TIME', 'DESCRIPTION', 'FILENAME', 'FILESIZE', 'FILMNUMBER', 'FLIPS', 'FRAMENUMBER',
-    'IMAGEFORMAT', 'IMAGEWIDTH', 'IMAGEHEIGHT', 'KEYWORDS', 'MEDIA', 'NOTES', 'PLACE', 'ROTATION', 'THUMBNAILWIDTH',
-    'THUMBNAILHEIGHT');
   OSUnaryOperators = [okNot, okIsEmpty];
-  FKSStringFields  = [fkAuthor, fkDescription, fkFileName, fkFilmNumber, fkFrameNumber, fkMedia, fkNotes, fkPlace];
-  FKSIntegerFields = [fkID, fkFileSize, fkImageWidth, fkImageHeight, fkThumbnailWidth, fkThumbnailHeight];
-  FKSDateFields    = [fkDate];
-  FKSTimeFields    = [fkTime];
-  FKSListFields    = [fkKeywords];
+  PPStringProps  = [ppAuthor, ppDescription, ppFileName, ppFilmNumber, ppFrameNumber, ppMedia, ppNotes, ppPlace];
+  PPIntegerProps = [ppID, ppFileSize, ppPicWidth, ppPicHeight, ppThumbWidth, ppThumbHeight];
+  PPDateProps    = [ppDate];
+  PPTimeProps    = [ppTime];
+  PPListProps    = [ppKeywords];
    // dtString, dtInteger, dtFloat, dtDate, dtTime, dtBoolean, dtList
   DatatypeCastMap: Array [TDatatype, TDatatype] of TDatatype = (
     (dtString,  dtInteger, dtFloat,   dtDate,    dtTime,    dtString,  dtString),
@@ -396,7 +384,7 @@ resourcestring
   SPhoaParseError_InvalidCharacter            = 'Недопустимый символ: %s';
   SPhoaParseError_InvalidOperator             = 'Недопустимый оператор: %s';
   SPhoaParseError_InvalidOperatorKind         = 'Недопустимый вид оператора';
-  SPhoaParseError_InvalidField                = 'Недопустимое поле: %s';
+  SPhoaParseError_InvalidProperty             = 'Недопустимое свойство изображения: %s';
   SPhoaParseError_StringLiteralNotTerminated  = 'Строковый литерал не завершён';
   SPhoaParseError_ListNotTerminated           = 'Список не завершён';
   SPhoaParseError_ListItemExpected            = 'Ожидался элемент списка';
@@ -717,10 +705,10 @@ resourcestring
   function TPhoaParsedField.AsDate(Pic: IPhoaPic): Integer;
   begin
     Result := 0;
-    if FKind in FKSDateFields then begin
+    if FProp in PPDateProps then begin
       if Pic<>nil then
-        case FKind of
-          fkDate: Result := Pic.Date;
+        case FProp of
+          ppDate: Result := Pic.Date;
         end;
     end else
       InvalidDatatype;
@@ -729,15 +717,15 @@ resourcestring
   function TPhoaParsedField.AsInteger(Pic: IPhoaPic): Integer;
   begin
     Result := 0;
-    if FKind in FKSIntegerFields then begin
+    if FProp in PPIntegerProps then begin
       if Pic<>nil then
-        case FKind of
-          fkID:              Result := Pic.ID;
-          fkFileSize:        Result := Pic.FileSize;
-          fkImageWidth:      Result := Pic.ImageSize.cx;
-          fkImageHeight:     Result := Pic.ImageSize.cy;
-          fkThumbnailWidth:  Result := Pic.ThumbnailSize.cx;
-          fkThumbnailHeight: Result := Pic.ThumbnailSize.cy;
+        case FProp of
+          ppID:          Result := Pic.ID;
+          ppFileSize:    Result := Pic.FileSize;
+          ppPicWidth:    Result := Pic.ImageSize.cx;
+          ppPicHeight:   Result := Pic.ImageSize.cy;
+          ppThumbWidth:  Result := Pic.ThumbnailSize.cx;
+          ppThumbHeight: Result := Pic.ThumbnailSize.cy;
         end;
     end else
       InvalidDatatype;
@@ -745,10 +733,11 @@ resourcestring
 
   function TPhoaParsedField.AsList(Pic: IPhoaPic): IPhoaKeywordList;
   begin
-    if FKind in FKSListFields then begin
+    Result := nil;
+    if FProp in PPListProps then begin
       if Pic<>nil then
-        case FKind of
-          fkKeywords: Result := Pic.Keywords;
+        case FProp of
+          ppKeywords: Result := Pic.Keywords;
         end;
     end else
       InvalidDatatype;
@@ -757,17 +746,17 @@ resourcestring
   function TPhoaParsedField.AsString(Pic: IPhoaPic): String;
   begin
     Result := '';
-    if FKind in FKSStringFields then begin
+    if FProp in PPStringProps then begin
       if Pic<>nil then
-        case FKind of
-          fkAuthor:      Result := Pic.Author;
-          fkDescription: Result := Pic.Description;
-          fkFileName:    Result := Pic.FileName;
-          fkFilmNumber:  Result := Pic.FilmNumber;
-          fkFrameNumber: Result := Pic.FrameNumber;
-          fkMedia:       Result := Pic.Media;
-          fkNotes:       Result := Pic.Notes;
-          fkPlace:       Result := Pic.Place;
+        case FProp of
+          ppAuthor:      Result := Pic.Author;
+          ppDescription: Result := Pic.Description;
+          ppFileName:    Result := Pic.FileName;
+          ppFilmNumber:  Result := Pic.FilmNumber;
+          ppFrameNumber: Result := Pic.FrameNumber;
+          ppMedia:       Result := Pic.Media;
+          ppNotes:       Result := Pic.Notes;
+          ppPlace:       Result := Pic.Place;
         end;
     end else
       InvalidDatatype;
@@ -776,44 +765,33 @@ resourcestring
   function TPhoaParsedField.AsTime(Pic: IPhoaPic): Integer;
   begin
     Result := 0;
-    if FKind in FKSTimeFields then begin
+    if FProp in PPTimeProps then begin
       if Pic<>nil then
-        case FKind of
-          fkTime: Result := Pic.Time;
+        case FProp of
+          ppTime: Result := Pic.Time;
         end;
     end else
       InvalidDatatype;
   end;
 
-  constructor TPhoaParsedField.Create(const sKind: String; iPos: Integer);
-  var
-    s: String;
-    bFind: Boolean;
-    fk: TFieldKind;
+  constructor TPhoaParsedField.Create(const sPropName: String; iPos: Integer);
   begin
     inherited Create(iPos);
-    s := UpperCase(sKind);
-    bFind := False;
-    for fk := Low(TFieldKind) to High(TFieldKind) do
-      if ASFieldKinds[fk]=s then begin
-        FKind := fk;
-        bFind := True;
-        Break;
-      end;
-    if not bFind then PhoaParseError(iPos, SPhoaParseError_InvalidField, [sKind]);
+    FProp := StrToPicProp(sPropName, False);
+    if not (FProp in [Low(FProp)..High(FProp)]) then PhoaParseError(iPos, SPhoaParseError_InvalidProperty, [sPropName]);
   end;
 
   function TPhoaParsedField.GetDatatype: TDatatype;
   begin
-    if FKind in FKSStringFields then
+    if FProp in PPStringProps then
       Result := dtString
-    else if FKind in FKSListFields then
+    else if FProp in PPListProps then
       Result := dtList
-    else if FKind in FKSIntegerFields then
+    else if FProp in PPIntegerProps then
       Result := dtInteger
-    else if FKind in FKSDateFields then
+    else if FProp in PPDateProps then
       Result := dtDate
-    else if FKind in FKSTimeFields then
+    else if FProp in PPTimeProps then
       Result := dtTime
     else begin
       InvalidDatatype;
@@ -824,7 +802,7 @@ resourcestring
 
   function TPhoaParsedField.GetDescription: String;
   begin
-    Result := Format('[%d] field %s', [Position, ASFieldKinds[FKind]]);
+    Result := Format('[%d] property %s', [Position, PicPropToStr(FProp, True)]);
   end;
 
    //===================================================================================================================

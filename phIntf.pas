@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.15 2004-10-23 14:05:08 dale Exp $
+//  $Id: phIntf.pas,v 1.16 2004-11-19 13:01:05 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,9 +8,12 @@ unit phIntf;
 
 interface
 
-uses Windows;
+uses Windows, SysUtils;
 
 type
+   // Exception class
+  EPhIntfException = class(Exception);
+
    // Picture property
   TPicProperty = (
     ppID,
@@ -22,6 +25,9 @@ type
     ppPicWidth,
     ppPicHeight,
     ppPicDims,
+    ppThumbWidth,
+    ppThumbHeight,
+    ppThumbDims,
     ppFormat,
     ppDate,
     ppTime,
@@ -462,6 +468,80 @@ type
     property Views: IPhoaViewList read GetViews;
   end;
 
+const
+   // Picture property names. DO NOT LOCALIZE!
+  SPicPropName_ID            = 'ID';
+  SPicPropName_FileName      = 'FileName';
+  SPicPropName_FullFileName  = 'FullFileName';
+  SPicPropName_FilePath      = 'FilePath';
+  SPicPropName_FileSize      = 'FileSize';
+  SPicPropName_FileSizeBytes = 'FileSizeBytes';
+  SPicPropName_PicWidth      = 'PicWidth';
+  SPicPropName_PicHeight     = 'PicHeight';
+  SPicPropName_PicDims       = 'PicDims';
+  SPicPropName_ThumbWidth    = 'ThumbWidth';
+  SPicPropName_ThumbHeight   = 'ThumbHeight';
+  SPicPropName_ThumbDims     = 'ThumbDims';
+  SPicPropName_Format        = 'Format';
+  SPicPropName_Date          = 'Date';
+  SPicPropName_Time          = 'Time';
+  SPicPropName_Place         = 'Place';
+  SPicPropName_FilmNumber    = 'FilmNumber';
+  SPicPropName_FrameNumber   = 'FrameNumber';
+  SPicPropName_Author        = 'Author';
+  SPicPropName_Description   = 'Description';
+  SPicPropName_Notes         = 'Notes';
+  SPicPropName_Media         = 'Media';
+  SPicPropName_Keywords      = 'Keywords';
+  SPicPropName_Rotation      = 'Rotation';
+  SPicPropName_Flips         = 'Flips';
+
+  asPicPropNames: Array[TPicProperty] of String = (
+    SPicPropName_ID,            // ppID
+    SPicPropName_FileName,      // ppFileName
+    SPicPropName_FullFileName,  // ppFullFileName
+    SPicPropName_FilePath,      // ppFilePath
+    SPicPropName_FileSize,      // ppFileSize
+    SPicPropName_FileSizeBytes, // ppFileSizeBytes
+    SPicPropName_PicWidth,      // ppPicWidth
+    SPicPropName_PicHeight,     // ppPicHeight
+    SPicPropName_PicDims,       // ppPicDims
+    SPicPropName_ThumbWidth,    // ppThumbWidth
+    SPicPropName_ThumbHeight,   // ppThumbHeight
+    SPicPropName_ThumbDims,     // ppThumbDims
+    SPicPropName_Format,        // ppFormat
+    SPicPropName_Date,          // ppDate
+    SPicPropName_Time,          // ppTime
+    SPicPropName_Place,         // ppPlace
+    SPicPropName_FilmNumber,    // ppFilmNumber
+    SPicPropName_FrameNumber,   // ppFrameNumber
+    SPicPropName_Author,        // ppAuthor
+    SPicPropName_Description,   // ppDescription
+    SPicPropName_Notes,         // ppNotes
+    SPicPropName_Media,         // ppMedia
+    SPicPropName_Keywords,      // ppKeywords
+    SPicPropName_Rotation,      // ppRotation
+    SPicPropName_Flips);        // ppFlips
+
+   // Translation TPicProperty<->Property name
+  function  PicPropToStr(Prop: TPicProperty; bStrict: Boolean): String;
+  function  StrToPicProp(const sPropName: String; bStrict: Boolean): TPicProperty;
+
 implementation
+
+  function PicPropToStr(Prop: TPicProperty; bStrict: Boolean): String;
+  begin
+    if Prop in [Low(Prop)..High(Prop)] then Result := asPicPropNames[Prop]
+    else if not bStrict then Result := ''
+    else raise EPhIntfException.CreateFmt('Invalid picture property value (%d)', [Byte(Prop)]);
+  end;
+
+  function StrToPicProp(const sPropName: String; bStrict: Boolean): TPicProperty;
+  begin
+    for Result := Low(Result) to High(Result) do
+      if SameText(sPropName, asPicPropNames[Result]) then Exit;
+    if bStrict then raise EPhIntfException.CreateFmt('Invalid picture property name ("%s")', [sPropName]);
+    Result := TPicProperty(-1);
+  end;
 
 end.

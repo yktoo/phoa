@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicFilterHighlighter.pas,v 1.2 2004-11-16 17:49:05 dale Exp $
+//  $Id: phPicFilterHighlighter.pas,v 1.3 2004-11-19 13:01:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,16 +29,16 @@ type
 
   TSynPicFilterSyn = class(TSynCustomHighlighter)
   private
-    fRange: TRangeState;
-    fLine: PChar;
-    fLineNumber: Integer;
-    fProcTable: array[#0..#255] of TProcTableProc;
+    FRange: TRangeState;
+    FLine: PChar;
+    FLineNumber: Integer;
+    FProcTable: array[#0..#255] of TProcTableProc;
     Run: LongInt;
-    fStringLen: Integer;
-    fToIdent: PChar;
-    fTokenPos: Integer;
-    fTokenID: TtkTokenKind;
-    fKeywords: TSynHashEntryList;
+    FStringLen: Integer;
+    FToIdent: PChar;
+    FTokenPos: Integer;
+    FTokenID: TtkTokenKind;
+    FKeywords: TSynHashEntryList;
      // Prop storage
     FCommentAttri: TSynHighlighterAttributes;
     FKeyAttri: TSynHighlighterAttributes;
@@ -48,7 +48,7 @@ type
     FStringAttri: TSynHighlighterAttributes;
     FSymbolAttri: TSynHighlighterAttributes;
     function KeyHash(ToHash: PChar): Integer;
-    function KeyComp(const aKey: string): Boolean;
+    function KeyComp(const aKey: String): Boolean;
     procedure AsciiCharProc;
     procedure CRProc;
     procedure IdentProc;
@@ -63,26 +63,26 @@ type
     function  IdentKind(MayBe: PChar): TtkTokenKind;
     procedure MakeMethodTables;
     procedure AnsiCProc;
-    procedure DoAddKeyword(AKeyword: string; AKind: integer);
+    procedure DoAddKeyword(AKeyword: String; AKind: integer);
   protected
     function GetIdentChars: TSynIdentChars; override;
   public
-    class function GetLanguageName: string; override;
+    class function GetLanguageName: String; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function  GetDefaultAttribute(Index: integer): TSynHighlighterAttributes; override;
     function  GetEol: Boolean; override;
     function  GetRange: Pointer; override;
-    function  GetToken: string; override;
+    function  GetToken: String; override;
     function  GetTokenAttribute: TSynHighlighterAttributes; override;
     function  GetTokenID: TtkTokenKind;
     function  GetTokenKind: integer; override;
     function  GetTokenPos: Integer; override;
-    function  IsKeyword(const AKeyword: string): boolean; override;              // DJLP 2000-08-09
+    function  IsKeyword(const AKeyword: String): boolean; override;              // DJLP 2000-08-09
     procedure Next; override;
     procedure ResetRange; override;
-    procedure SetLine(NewValue: string; LineNumber: Integer); override;
+    procedure SetLine(NewValue: String; LineNumber: Integer); override;
     procedure SetRange(Value: Pointer); override;
   published
     property CommentAttri:  TSynHighlighterAttributes read FCommentAttri  write FCommentAttri;
@@ -104,8 +104,8 @@ var
 const
   SFilterKeywords: String = 'and,or,not,in,startswith,endswith,contains,isempty';
   SFilterPicProps: String =
-   'id,author,date,time,description,filename,filesize,filmnumber,flips,framenumber,imageformat,imagewidth,imageheight,'+
-   'keywords,media,notes,place,rotation,thumbnailwidth,thumbnailheight';
+    'id,author,date,time,description,filename,filesize,filmnumber,flips,framenumber,imageformat,imagewidth,imageheight,'+
+    'keywords,media,notes,place,rotation,thumbnailwidth,thumbnailheight';
 
   procedure MakeIdentTable;
   var c: char;
@@ -119,8 +119,8 @@ const
     Identifiers['$'] := True;
     FillChar(mHashTable, SizeOf(mHashTable), 0);
     mHashTable['_'] := 1;
-    for c := 'a' to 'z' do mHashTable[c] := 2 + Ord(c) - Ord('a');
-    for c := 'A' to 'Z' do mHashTable[c] := 2 + Ord(c) - Ord('A');
+    for c := 'a' to 'z' do mHashTable[c] := 2+Ord(c)-Ord('a');
+    for c := 'A' to 'Z' do mHashTable[c] := 2+Ord(c)-Ord('A');
   end;
 
   function TSynPicFilterSyn.KeyHash(ToHash: PChar): Integer;
@@ -130,19 +130,19 @@ const
       Result := 2*Result+mHashTable[ToHash^];
       Inc(ToHash);
     end;
-    Result := Result and $FF; // 255
-    fStringLen := ToHash - fToIdent;
+    Result := Result and $FF;
+    FStringLen := ToHash-FToIdent;
   end;
 
-  function TSynPicFilterSyn.KeyComp(const aKey: string): Boolean;
+  function TSynPicFilterSyn.KeyComp(const aKey: String): Boolean;
   var
     c: integer;
     pKey1, pKey2: PChar;
   begin
-    pKey1 := fToIdent;
-    // Note: fStringLen is always > 0 !
+    pKey1 := FToIdent;
+    // Note: FStringLen is always > 0 !
     pKey2 := pointer(aKey);
-    for c := 1 to fStringLen do begin
+    for c := 1 to FStringLen do begin
       if mHashTable[pKey1^]<>mHashTable[pKey2^] then begin
         Result := FALSE;
         Exit;
@@ -156,12 +156,12 @@ const
   function TSynPicFilterSyn.IdentKind(MayBe: PChar): TtkTokenKind;
   var Entry: TSynHashEntry;
   begin
-    fToIdent := MayBe;
-    Entry := fKeywords[KeyHash(MayBe)];
+    FToIdent := MayBe;
+    Entry := FKeywords[KeyHash(MayBe)];
     while Assigned(Entry) do begin
-      if Entry.KeywordLen > fStringLen then
+      if Entry.KeywordLen > FStringLen then
         break
-      else if Entry.KeywordLen = fStringLen then
+      else if Entry.KeywordLen = FStringLen then
         if KeyComp(Entry.Keyword) then begin
           Result := TtkTokenKind(Entry.Kind);
           exit;
@@ -176,27 +176,27 @@ const
   begin
     for c := #0 to #255 do
       case c of
-         #0:        fProcTable[c] := NullProc;
-        #10:        fProcTable[c] := LFProc;
-        #13:        fProcTable[c] := CRProc;
-        #39:        fProcTable[c] := AsciiCharProc;
-        #34:        fProcTable[c] := StringProc;
+         #0:        FProcTable[c] := NullProc;
+        #10:        FProcTable[c] := LFProc;
+        #13:        FProcTable[c] := CRProc;
+        #39:        FProcTable[c] := AsciiCharProc;
+        #34:        FProcTable[c] := StringProc;
         '$', 'A'..'Z', 'a'..'z', '_':
-                    fProcTable[c] := IdentProc;
-        '0'..'9':   fProcTable[c] := NumberProc;
+                    FProcTable[c] := IdentProc;
+        '0'..'9':   FProcTable[c] := NumberProc;
         #1..#9, #11, #12, #14..#32:
-                    fProcTable[c] := SpaceProc;
-        '-':        fProcTable[c] := MinusProc;
+                    FProcTable[c] := SpaceProc;
+        '-':        FProcTable[c] := MinusProc;
         '=', '>', '<', '|', '+', '/', '&', '^', '%', '*', '!', '{', '}', '.', ',', ';', '?', '(', ')', '[', ']', '~',
-          ':', '@': fProcTable[c] := SymbolProc;
-        else        fProcTable[c] := UnknownProc;
+          ':', '@': FProcTable[c] := SymbolProc;
+        else        FProcTable[c] := UnknownProc;
       end;
   end;
 
   constructor TSynPicFilterSyn.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
-    fKeywords := TSynHashEntryList.Create;
+    FKeywords := TSynHashEntryList.Create;
     EnumerateKeywords(Ord(tkKey),      SFilterKeywords, IdentChars, DoAddKeyword);
     EnumerateKeywords(Ord(tkProperty), SFilterPicProps, IdentChars, DoAddKeyword);
     DefHighlightChange(Self);
@@ -234,88 +234,88 @@ const
 
     SetAttributesOnChange(DefHighlightChange);
     MakeMethodTables;
-    fRange := rsUnknown;
+    FRange := rsUnknown;
   end;
 
   destructor TSynPicFilterSyn.Destroy;
   begin
-    fKeywords.Free;
+    FKeywords.Free;
     inherited Destroy;
   end;
 
-  procedure TSynPicFilterSyn.SetLine(NewValue: string; LineNumber: Integer);
+  procedure TSynPicFilterSyn.SetLine(NewValue: String; LineNumber: Integer);
   begin
-    fLine := PChar(NewValue);
+    FLine := PChar(NewValue);
     Run := 0;
-    fLineNumber := LineNumber;
+    FLineNumber := LineNumber;
     Next;
   end;
 
   procedure TSynPicFilterSyn.AsciiCharProc;
   begin
     // Oracle SQL allows strings to go over multiple lines
-    if fLine[Run] = #0 then
+    if FLine[Run] = #0 then
       NullProc
     else begin
-      fTokenID := tkString;
-       // else it's end of multiline string
-      if (Run > 0) or (fRange <> rsString) or (fLine[Run] <> #39) then begin
-        fRange := rsString;
+      FTokenID := tkString;
+       // else it's end of multiline String
+      if (Run > 0) or (FRange <> rsString) or (FLine[Run] <> #39) then begin
+        FRange := rsString;
         repeat
           Inc(Run);
-        until fLine[Run] in [#0, #10, #13, #39];
+        until FLine[Run] in [#0, #10, #13, #39];
       end;
-      if fLine[Run] = #39 then begin
+      if FLine[Run] = #39 then begin
         Inc(Run);
-        fRange := rsUnknown;
+        FRange := rsUnknown;
       end;
     end;
   end;
 
   procedure TSynPicFilterSyn.CRProc;
   begin
-    fTokenID := tkSpace;
+    FTokenID := tkSpace;
     Inc(Run);
-    if fLine[Run] = #10 then Inc(Run);
+    if FLine[Run] = #10 then Inc(Run);
   end;
 
   procedure TSynPicFilterSyn.IdentProc;
   begin
-    fTokenID := IdentKind(fLine+Run);
-    Inc(Run, fStringLen);
-    if fTokenID = tkComment then begin
-      while not (fLine[Run] in [#0, #10, #13]) do Inc(Run);
+    FTokenID := IdentKind(FLine+Run);
+    Inc(Run, FStringLen);
+    if FTokenID = tkComment then begin
+      while not (FLine[Run] in [#0, #10, #13]) do Inc(Run);
     end else
-      while Identifiers[fLine[Run]] do Inc(Run);
+      while Identifiers[FLine[Run]] do Inc(Run);
   end;
 
   procedure TSynPicFilterSyn.LFProc;
   begin
-    fTokenID := tkSpace;
+    FTokenID := tkSpace;
     Inc(Run);
   end;
 
   procedure TSynPicFilterSyn.MinusProc;
   begin
     Inc(Run);
-    if fLine[Run]='-' then begin
-      fTokenID := tkComment;
+    if FLine[Run]='-' then begin
+      FTokenID := tkComment;
       repeat
         Inc(Run);
-      until fLine[Run] in [#0, #10, #13];
+      until FLine[Run] in [#0, #10, #13];
     end else
-      fTokenID := tkSymbol;
+      FTokenID := tkSymbol;
   end;
 
   procedure TSynPicFilterSyn.NullProc;
   begin
-    fTokenID := tkNull;
+    FTokenID := tkNull;
   end;
 
   procedure TSynPicFilterSyn.NumberProc;
   begin
     Inc(Run);
-    fTokenID := tkNumber;
+    FTokenID := tkNumber;
     while FLine[Run] in ['0'..'9', '.', '-'] do begin
       case FLine[Run] of
         '.': if FLine[Run+1]='.' then break;
@@ -326,20 +326,20 @@ const
 
   procedure TSynPicFilterSyn.SpaceProc;
   begin
-    fTokenID := tkSpace;
+    FTokenID := tkSpace;
     repeat
       Inc(Run);
-    until (fLine[Run] > #32) or (fLine[Run] in [#0, #10, #13]);
+    until (FLine[Run] > #32) or (FLine[Run] in [#0, #10, #13]);
   end;
 
   procedure TSynPicFilterSyn.StringProc;
   begin
-    fTokenID := tkString;
+    FTokenID := tkString;
     Inc(Run);
-    while not (fLine[Run] in [#0, #10, #13]) do begin
-      case fLine[Run] of
-        '\': if fLine[Run+1]=#34 then Inc(Run);
-        #34: if fLine[Run+1]<>#34 then begin
+    while not (FLine[Run] in [#0, #10, #13]) do begin
+      case FLine[Run] of
+        '\': if FLine[Run+1]=#34 then Inc(Run);
+        #34: if FLine[Run+1]<>#34 then begin
           Inc(Run);
           break;
         end;
@@ -351,36 +351,36 @@ const
   procedure TSynPicFilterSyn.SymbolProc;
   begin
     Inc(Run);
-    fTokenID := tkSymbol;
+    FTokenID := tkSymbol;
   end;
 
   procedure TSynPicFilterSyn.UnknownProc;
   begin
     Inc(Run);
-    fTokenID := tkUnknown;
+    FTokenID := tkUnknown;
   end;
 
   procedure TSynPicFilterSyn.AnsiCProc;
   begin
-    case fLine[Run] of
+    case FLine[Run] of
        #0: NullProc;
       #10: LFProc;
       #13: CRProc;
       else begin
-        fTokenID := tkComment;
+        FTokenID := tkComment;
         repeat
-          if (fLine[Run] = '*') and (fLine[Run + 1] = '/') then begin
-            fRange := rsUnknown;
+          if (FLine[Run] = '*') and (FLine[Run + 1] = '/') then begin
+            FRange := rsUnknown;
             Inc(Run, 2);
             break;
           end;
           Inc(Run);
-        until fLine[Run] in [#0, #10, #13];
+        until FLine[Run] in [#0, #10, #13];
       end;
     end;
   end;
 
-  function TSynPicFilterSyn.IsKeyword(const AKeyword: string): boolean;
+  function TSynPicFilterSyn.IsKeyword(const AKeyword: String): boolean;
   var tk: TtkTokenKind;
   begin
     tk := IdentKind(PChar(AKeyword));
@@ -389,11 +389,11 @@ const
 
   procedure TSynPicFilterSyn.Next;
   begin
-    fTokenPos := Run;
-    case fRange of
+    FTokenPos := Run;
+    case FRange of
       rsComment: AnsiCProc;
       rsString:  AsciiCharProc;
-      else       fProcTable[fLine[Run]];
+      else       FProcTable[FLine[Run]];
     end;
   end;
 
@@ -411,25 +411,25 @@ const
 
   function TSynPicFilterSyn.GetEol: Boolean;
   begin
-    Result := fTokenID = tkNull;
+    Result := FTokenID=tkNull;
   end;
 
   function TSynPicFilterSyn.GetRange: Pointer;
   begin
-    Result := Pointer(fRange);
+    Result := Pointer(FRange);
   end;
 
-  function TSynPicFilterSyn.GetToken: string;
+  function TSynPicFilterSyn.GetToken: String;
   var
     Len: LongInt;
   begin
-    Len := Run - fTokenPos;
-    Setstring(Result, (FLine + fTokenPos), Len);
+    Len := Run - FTokenPos;
+    Setstring(Result, (FLine + FTokenPos), Len);
   end;
 
   function TSynPicFilterSyn.GetTokenID: TtkTokenKind;
   begin
-    Result := fTokenId;
+    Result := FTokenID;
   end;
 
   function TSynPicFilterSyn.GetTokenAttribute: TSynHighlighterAttributes;
@@ -449,22 +449,22 @@ const
 
   function TSynPicFilterSyn.GetTokenKind: integer;
   begin
-    Result := Ord(fTokenId);
+    Result := Ord(FTokenID);
   end;
 
   function TSynPicFilterSyn.GetTokenPos: Integer;
   begin
-    Result := fTokenPos;
+    Result := FTokenPos;
   end;
 
   procedure TSynPicFilterSyn.ResetRange;
   begin
-    fRange := rsUnknown;
+    FRange := rsUnknown;
   end;
 
   procedure TSynPicFilterSyn.SetRange(Value: Pointer);
   begin
-    fRange := TRangeState(Value);
+    FRange := TRangeState(Value);
   end;
 
   function TSynPicFilterSyn.GetIdentChars: TSynIdentChars;
@@ -472,16 +472,16 @@ const
     Result := TSynValidStringChars+['$'];
   end;
 
-  class function TSynPicFilterSyn.GetLanguageName: string;
+  class function TSynPicFilterSyn.GetLanguageName: String;
   begin
     Result := 'PhoA Parsing PicFilter Expression';
   end;
 
-  procedure TSynPicFilterSyn.DoAddKeyword(AKeyword: string; AKind: integer);
+  procedure TSynPicFilterSyn.DoAddKeyword(AKeyword: String; AKind: integer);
   var HashValue: integer;
   begin
     HashValue := KeyHash(PChar(AKeyword));
-    fKeywords[HashValue] := TSynHashEntry.Create(AKeyword, AKind);
+    FKeywords[HashValue] := TSynHashEntry.Create(AKeyword, AKind);
   end;
 
 initialization

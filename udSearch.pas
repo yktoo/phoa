@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.20 2004-11-16 14:37:55 dale Exp $
+//  $Id: udSearch.pas,v 1.21 2004-11-19 13:01:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,9 +9,10 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
-  phDlg, StdCtrls, VirtualTrees, ExtCtrls, ComCtrls, DKLang, SynEdit;
+  phDlg, StdCtrls, VirtualTrees, ExtCtrls, ComCtrls, DKLang, SynEdit,
+  TB2Dock, TB2Toolbar, TBX, TB2Item;
 
 type
   TdSearch = class(TPhoaDialog)
@@ -27,6 +28,10 @@ type
     tsExpression: TTabSheet;
     tsSimple: TTabSheet;
     tvCriteria: TVirtualStringTree;
+    dkExprTop: TTBXDock;
+    tbExprMain: TTBXToolbar;
+    smExprInsertProp: TTBXSubmenuItem;
+    smExprInsertOperator: TTBXSubmenuItem;
     procedure bResetClick(Sender: TObject);
     procedure tvCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
@@ -43,11 +48,17 @@ type
     procedure PerformSearch;
      // Сбрасывает критерии в первоначальное состояние
     procedure ResetCriteria;
+     // Событие клика на пункте вставки свойства изображения в выражение
+    procedure ExprInsertPropClick(Sender: TObject); 
   protected
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    function  GetFormRegistrySection: String; override;
+    function  GetSizeable: Boolean; override;
+    procedure SettingsStore(rif: TRegIniFile); override;
+    procedure SettingsRestore(rif: TRegIniFile); override;
   end;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
@@ -57,7 +68,7 @@ implementation
 uses
   TypInfo, StrUtils, Mask, ToolEdit,
   phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox,
-  phParsingPicFilter;
+  phParsingPicFilter, Main;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
@@ -604,6 +615,11 @@ type
     end;
   end;
 
+  procedure TdSearch.ExprInsertPropClick(Sender: TObject);
+  begin
+    eExpression.SelText := '$'+PicPropToStr(TPicProperty(TComponent(Sender).Tag), True);
+  end;
+
   procedure TdSearch.FinalizeDialog;
   begin
     FLocalResults := nil;
@@ -621,6 +637,16 @@ type
       ((pcCriteria.ActivePage=tsExpression) and (eExpression.Lines.Count>0)); 
   end;
 
+  function TdSearch.GetFormRegistrySection: String;
+  begin
+    Result := SRegSearch_Root;
+  end;
+
+  function TdSearch.GetSizeable: Boolean;
+  begin
+    Result := True;
+  end;
+
   procedure TdSearch.InitializeDialog;
 
     function NewSL: TStringList;
@@ -628,6 +654,28 @@ type
       Result := TStringList.Create;
       Result.Sorted     := True;
       Result.Duplicates := dupIgnore;
+    end;
+
+     // Добавляет пункты меню "Вставить свойство"
+    procedure AddExprInsertPropItems;
+    var
+      pp: TPicProperty;
+      tbi: TTBCustomItem;
+    begin
+      for pp := Low(pp) to High(pp) do begin
+        tbi := TTBXItem.Create(Self);
+        with tbi do begin
+          Caption    := Format('$%s - %s', [PicPropToStr(pp, True), PicPropName(pp)]);
+          Tag        := Byte(pp);
+          OnClick    := ExprInsertPropClick;
+        end;
+        smExprInsertProp.Add(tbi);
+      end;
+    end;
+
+    procedure AddExprInsertOperatorItems;
+    begin
+      //!!!
     end;
 
   begin
@@ -647,8 +695,11 @@ type
      // Инициализируем дерево
     ApplyTreeSettings(tvCriteria);
     tvCriteria.RootNodeCount := High(aSearchCriteria)+1;
+     // Создаём пункты меню "Вставить свойство" и "Вставить оператор"
+    AddExprInsertPropItems;
+    AddExprInsertOperatorItems;
      // Инициализируем выражение
-    eExpression.Highlighter := TSynPicFilterSyn.Create(Self); 
+    eExpression.Highlighter := TSynPicFilterSyn.Create(Self);
     eExpression.Text        := sSearchExpression; 
   end;
 
@@ -803,6 +854,18 @@ type
         IntCond := IntDefCond;
       end;
     tvCriteria.Invalidate;
+  end;
+
+  procedure TdSearch.SettingsRestore(rif: TRegIniFile);
+  begin
+    inherited SettingsRestore(rif);
+    pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
+  end;
+
+  procedure TdSearch.SettingsStore(rif: TRegIniFile);
+  begin
+    inherited SettingsStore(rif);
+    rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);
   end;
 
   procedure TdSearch.tvCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
