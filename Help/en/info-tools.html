@@ -1,14 +1,15 @@
-<!-- $Id: info-tools.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: info-tools.html,v 1.2 2004-11-10 21:17:05 dale Exp $ -->
 {[%hh_hdr_en:Tools]}
 
-<p align=justify>A <b>tool</b> in <b>PhoA</b> is an user-defined (and user-configurable) command. Tools introduce the following features:
+<p align=justify>A <b>tool</b> in <b>PhoA</b> is an user-defined (and user-configurable) command. Tools introduce the
+  following features:
 <ul>
   <li>They may be of various <a href="#tool-kinds">kinds</a>.</li>
   <li>They are applicable to files matching the <a href="#masks">specified masks</a>.</li>
   <li>They are displayed in menus; in which exactly depends on <a href="#usages">tool usage flags</a> set.</li>
   <li>They are available only when there are pictures selected.</li>
-  <li>They have a name and a hint (except <a href="#ptkSeparator">separator item</a>). The name is used as a menu item caption while the hint
-    is displayed in the status bar when you select that item.</li>
+  <li>They have a name and a hint (except <a href="#ptkSeparator">separator item</a>). The name is used as a menu item
+      caption while the hint is displayed in the status bar when you select that item.</li>
 </ul>
 
 {[%hh_h2:<a name=tool-kinds>Tool kinds</a>]}
@@ -37,32 +38,37 @@
 <h3><a name=ptkPrint>Standard Print action</a></h3>
 <p align=justify>Executes <b>print</b> action associated with the file the tool is applied to.
 
-<div class=nb><b>NB:</b> You can configure the default action and standard actions by <b>Folder options</b> dialog accessible from Windows Explorer
-  <b>Tools</b> menu (<b>File types</b> tab).</div>
+<div class=nb><b>NB:</b> You can configure the default action and standard actions by <b>Folder options</b> dialog
+  accessible from Windows Explorer <b>Tools</b> menu (<b>File types</b> tab).</div>
 
 <h3><a name=ptkCustom>Custom action</a></h3>
-<p align=justify>You specify the application and its parameters using <a href="intf-tool-props.html">Tool properties dialog</a> by yourself.
+<p align=justify>You specify the application and its parameters using <a href="intf-tool-props.html">Tool properties
+  dialog</a> by yourself.
 
 {[%hh_h2:<a name=masks>File masks</a>]}
-<p align=justify>A tool is only accessible (and visible, as with <a href="#ptkSeparator">separator item</a>) when <b>all</b> the selected
-  pictures match its masks - if even a single file doesn't match, the tool becomes hidden. This behaviour allows to configure tools to process
-  only the files of particular type.
+<p align=justify>A tool is only accessible (and visible, as with <a href="#ptkSeparator">separator item</a>) when
+  <b>all</b> the selected pictures match its masks - if even a single file doesn't, the tool becomes hidden. This
+  behaviour allows to configure tools to process only the files of particular type.
 <p align=justify>You can learn about file mask rules <a href="info-file-masks.html">here</a>.
 
 <div class=nb><b>NB:</b> An empty mask (a mask containing no characters) matches <i>any file</i>.</div>
 
 {[%hh_h2:<a name=usages>Tool usages</a>]}
-<p align=justify><b>PhoA</b> tools can be displayed in a number of menus. You configure by yourself where exactly tool action item appears:
+<p align=justify><b>PhoA</b> tools can be displayed in a number of menus. You configure by yourself where exactly tool
+  action item appears:
 <ul>
   <li><i>In Tools menu</i>: the item is displayed in <b>Tools</b> submenu of main menu.</li>
-  <li><i>In Picture Groups popup menu</i>: the command appears in group tree context menu, which is accessible with right mouse click.</li>
-  <li><i>In Thumbnails Window popup menu</i>: the command appears in thumbnail viewer context menu, which is accessible with right mouse click.</li>
+  <li><i>In Picture Groups popup menu</i>: the command appears in group tree context menu, which is accessible with
+      right mouse click.</li>
+  <li><i>In Thumbnails Window popup menu</i>: the command appears in thumbnail viewer context menu, which is accessible
+      with right mouse click.</li>
   <li><i>In View mode popup menu</i>: the tool appears in context menu, which is accessible with right mouse click in
-    <a href="intf-view-mode.html">View mode</a>.</li>
+      <a href="intf-view-mode.html">View mode</a>.</li>
 </ul>
-<p align=justify>If Group Tree pane was active when you invoked a tool, the tool is applied to <b>all pictures in the group</b>. If Thumbnail Window
-  was active, the tool is applied to <b>selected pictures only</b>.
-<p align=justify>The order of tool menu items is determined from their order in <a href="setup-tools.html">Tool editor</a> list.
+<p align=justify>If Group Tree pane was active when you invoked a tool, the tool is applied to <b>all pictures in the
+  group</b>. If Thumbnail Window was active, the tool is applied to <b>selected pictures only</b>.
+<p align=justify>The order of tool menu items is determined from their order in <a href="setup-tools.html">Tool
+  editor</a> list.
 
 {[%hh_seealso_en]}
   <a href="setup-tools.html">Program settings :: Tools</a><br>

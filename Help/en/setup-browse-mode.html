@@ -1,98 +1,98 @@
-<!-- $Id: setup-browse-mode.html,v 1.8 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: setup-browse-mode.html,v 1.9 2004-11-10 21:17:05 dale Exp $ -->
 {[%hh_hdr_en:Program settings :: Browse mode]}
 
 <table class=plain border=0>
-<tr class=tblhdr><td colspan=2><b>Picture group trees</b></td></tr>
-<tr>
-  <td class=command>Tooltips</td>
-  <td>Configures usage and appearance of tooltips in the trees displaying picture groups:
-    <ul>
-      <li><b>None</b> - tooltips disabled.</li>
-      <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that
-          you are able to view it whole.</li>
-      <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below).
-          Additionally, the photo album description is displayed for the photo album node when you hover it.</li>
-    </ul>
-  </td>
-</tr>
-<tr>
-  <td class=command>Display in tooltips</td>
-  <td>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected
-      properties</b> mode.</td>
-</tr>
-<tr class=tblhdr><td colspan=2><b>Thumbnail view window</b></td></tr>
-<tr>
-  <td class=command>Background color</td>
-  <td>Determines the thumbnail pane background color.</td>
-</tr>
-<tr>
-  <td class=command>Thumbnail background color</td>
-  <td>Determines the background color for single thumbnails.</td>
-</tr>
-<tr>
-  <td class=command>Thumbnail font color</td>
-  <td>Determines the font color for thumbnail labels.</td>
-</tr>
-<tr>
-  <td class=command>Drag'n'Drop</td>
-  <td>Enables or disables drag'n'drop operations with the thumbnails.</td>
-</tr>
-<tr>
-  <td class=command>Show thumbnail tooltips</td>
-  <td>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
-      The tooltips display picture properties as configured below.</td>
-</tr>
-<tr>
-  <td class=command>Display in tooltips</td>
-  <td>The list of <a href="general-pic-data.html">properties</a> from which you can choose those to display in thumbnail
-      tooltips.</td>
-</tr>
-<tr>
-  <td class=command>Picture details displayed on the thumbnails</td>
-  <td>By using these options you can select whether to display, and which <a href="general-pic-data.html">picture properties</a>
-      in each thumbnail corner.</td>
-</tr>
-<tr>
-  <td class=command>Thumbnail background border style</td>
-  <td>Determines the style used to draw the frame of the thumbnail background rectangle.</td>
-</tr>
-<tr>
-  <td class=command>Thumbnail background border custom color</td>
-  <td>When the option <b>Thumbnail background border style</b> is set to <i>Custom color</i>, the value of this setting
-      is used to draw the frame of the thumbnail background rectangle.</td>
-</tr>
-<tr>
-  <td class=command>Show thumbnail shadow</td>
-  <td>If on, a shadow is painted behind the thumbnail image using the settings below.</td>
-</tr>
-<tr>
-  <td class=command>Shadow blur radius</td>
-  <td>The radius of a blur used for painting the thumbnail shadow, in pixels.</td>
-</tr>
-<tr>
-  <td class=command>Horizontal/vertical shadow offset</td>
-  <td>Offset of the thumbnail shadow relative to the thumbnail image, in pixels.</td>
-</tr>
-<tr>
-  <td class=command>Shadow color</td>
-  <td>A color used to paint the thumbnail shadow. The default is black.</td>
-</tr>
-<tr>
-  <td class=command>Shadow opacity</td>
-  <td>A value ranged 0 to 255 specifying the opacity of the thumbnail shadow.</td>
-</tr>
-<tr>
-  <td class=command>Resampling filter</td>
-  <td>Determines interpolation filter used for <a href="info-resampling.html">resampling</a> source images when
-      creating thumbnails.</td>
-</tr>
-<tr>
-  <td class=command>Max. undo count</td>
-  <td>Determines the size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done
-      to the photo album. You can undo no more than specified number of sequential changes (when undo buffer gets full,
-      the least recent changes' data are unrolled). Large buffer requested may result in large need of room (memory) to
-      store it (the most memory-consuming operations are picture deleting and editing).</td>
-</tr>
+  <tr class=tblhdr><td colspan=2><b>Picture group trees</b></td></tr>
+  <tr>
+    <td class=command>Tooltips</td>
+    <td>Configures usage and appearance of tooltips in the trees displaying picture groups:
+      <ul>
+        <li><b>None</b> - tooltips disabled.</li>
+        <li><b>Display if item is truncated at window edge</b> - highlights the item not fitting into the window so that
+            you are able to view it whole.</li>
+        <li><b>Display with selected properties</b> - the tooltips contain group properties you select (see below).
+            Additionally, the photo album description is displayed for the photo album node when you hover it.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class=command>Display in tooltips</td>
+    <td>The list of group properties to select from. Applicable only if tooltips use the <b>Display with selected
+        properties</b> mode.</td>
+  </tr>
+  <tr class=tblhdr><td colspan=2><b>Thumbnail view window</b></td></tr>
+  <tr>
+    <td class=command>Background color</td>
+    <td>Determines the thumbnail pane background color.</td>
+  </tr>
+  <tr>
+    <td class=command>Thumbnail background color</td>
+    <td>Determines the background color for single thumbnails.</td>
+  </tr>
+  <tr>
+    <td class=command>Thumbnail font color</td>
+    <td>Determines the font color for thumbnail labels.</td>
+  </tr>
+  <tr>
+    <td class=command>Drag'n'Drop</td>
+    <td>Enables or disables drag'n'drop operations with the thumbnails.</td>
+  </tr>
+  <tr>
+    <td class=command>Show thumbnail tooltips</td>
+    <td>This function enables pop-up tooltips for thumbnails when mouse stays still over a thumbnail for a time.
+        The tooltips display picture properties as configured below.</td>
+  </tr>
+  <tr>
+    <td class=command>Display in tooltips</td>
+    <td>The list of <a href="general-pic-data.html">properties</a> from which you can choose those to display in
+        thumbnail tooltips.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture details displayed on the thumbnails</td>
+    <td>By using these options you can select whether to display, and which <a href="general-pic-data.html">picture
+        properties</a> in each thumbnail corner.</td>
+  </tr>
+  <tr>
+    <td class=command>Thumbnail background border style</td>
+    <td>Determines the style used to draw the frame of the thumbnail background rectangle.</td>
+  </tr>
+  <tr>
+    <td class=command>Thumbnail background border custom color</td>
+    <td>When the option <b>Thumbnail background border style</b> is set to <i>Custom color</i>, the value of this
+        setting is used to draw the frame of the thumbnail background rectangle.</td>
+  </tr>
+  <tr>
+    <td class=command>Show thumbnail shadow</td>
+    <td>If on, a shadow is painted behind the thumbnail image using the settings below.</td>
+  </tr>
+  <tr>
+    <td class=command>Shadow blur radius</td>
+    <td>The radius of a blur used for painting the thumbnail shadow, in pixels.</td>
+  </tr>
+  <tr>
+    <td class=command>Horizontal/vertical shadow offset</td>
+    <td>Offset of the thumbnail shadow relative to the thumbnail image, in pixels.</td>
+  </tr>
+  <tr>
+    <td class=command>Shadow color</td>
+    <td>A color used to paint the thumbnail shadow. The default is black.</td>
+  </tr>
+  <tr>
+    <td class=command>Shadow opacity</td>
+    <td>A value ranged 0 to 255 specifying the opacity of the thumbnail shadow.</td>
+  </tr>
+  <tr>
+    <td class=command>Resampling filter</td>
+    <td>Determines interpolation filter used for <a href="info-resampling.html">resampling</a> source images when
+        creating thumbnails.</td>
+  </tr>
+  <tr>
+    <td class=command>Max. undo count</td>
+    <td>Determines the size of undo buffer used to <a href="intf-browse-mode-tasks.html#undo">roll back changes</a> done
+        to the photo album. You can undo no more than specified number of sequential changes (when undo buffer gets
+        full, the least recent changes' data are unrolled). Large buffer requested may result in large need of room
+        (memory) to store it (the most memory-consuming operations are picture deleting and editing).</td>
+  </tr>
 </table>
 
 {[%hh_seealso_en]}

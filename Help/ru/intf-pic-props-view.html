@@ -1,40 +1,59 @@
-<!-- $Id: intf-pic-props-view.html,v 1.8 2004-11-10 16:07:51 dale Exp $ -->
+<!-- $Id: intf-pic-props-view.html,v 1.9 2004-11-10 21:17:05 dale Exp $ -->
 {[%hh_hdr_ru:Окно свойств изображения :: Просмотр и настройка]}
 
 <p align=justify>Здесь вы можете просмотреть любое из выделенных изображений в выбранном масштабе, а также настроить
-  <a href="info-transform.html">преобразования</a>, применяемые к изображению при <a href="intf-view-mode.html">просмотре</a>. Файл
-  изображения (если изображений несколько) выбирается из выпадающего списка в верхней части страницы.
+  <a href="info-transform.html">преобразования</a>, применяемые к изображению при
+  <a href="intf-view-mode.html">просмотре</a>. Файл изображения (если изображений несколько) выбирается из выпадающего
+  списка в верхней части страницы.
 
-<h3>{[%hh_ii:ZoomIn]} Увеличить</h3>
-<p align=justify>Увеличивает изображение на величину, указанную в <a href="setup-view-mode.html">настройках просмотра</a>.
+{[%hh_h2:Элементы интерфейса]}
 
-<h3>{[%hh_ii:ZoomOut]} Уменьшить</h3>
-<p align=justify>Уменьшает изображение на величину, указанную в <a href="setup-view-mode.html">настройках просмотра</a>.
-
-<h3>{[%hh_ii:ZoomActual]} Масштаб 1:1</h3>
-<p align=justify>Отображает изображение в масштабе <b>1:1</b> (когда каждый пиксел изображения соответствует одному пикселу на экране).
-
-<h3>{[%hh_ii:ZoomFit]} В размер окна</h3>
-<p align=justify>Масштабирует изображение так, чтобы оно точно вписалось в окно. Это режим по умолчанию.
-
-<h3>{[%hh_ii:Rotate0]} Без поворота</h3>
-<p align=justify>Не применять <a href="info-transform.html#rotation">поворота</a> к изображению при его отображении.
-
-<h3>{[%hh_ii:Rotate90]} Повернуть по часовой стрелке на 90&deg;</h3>
-<p align=justify>Применить <a href="info-transform.html#rotation">поворот</a> по часовой стрелке на 90&deg; к изображению при его отображении.
-
-<h3>{[%hh_ii:Rotate180]} Повернуть на 180&deg;</h3>
-<p align=justify>Применить <a href="info-transform.html#rotation">поворот</a> на 180&deg; к изображению при его отображении.
-
-<h3>{[%hh_ii:Rotate270]} Повернуть против часовой стрелки на 90&deg;</h3>
-<p align=justify>Применить <a href="info-transform.html#rotation">поворот</a> против часовой стрелки на 90&deg; (или по часовой стрекле на 270&deg;)
-  к изображению при его отображении.
-
-<h3>{[%hh_ii:FlipHorz]} Отразить горизонтально</h3>
-<p align=justify>Применить горизонтальное <a href="info-transform.html#flips">отражение</a> к изображению при его отображении.
-
-<h3>{[%hh_ii:FlipVert]} Отразить вертикально</h3>
-<p align=justify>Применить вертикальное <a href="info-transform.html#flips">отражение</a> к изображению при его отображении.
+<table class=plain border=0>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomIn]} Увеличить</td>
+    <td>Увеличивает изображение на величину, указанную в <a href="setup-view-mode.html">настройках просмотра</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomOut]} Уменьшить</td>
+    <td>Уменьшает изображение на величину, указанную в <a href="setup-view-mode.html">настройках просмотра</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomActual]} Масштаб 1:1</td>
+    <td>Отображает изображение в масштабе <b>1:1</b> (когда каждый пиксел изображения соответствует одному пикселу на
+        экране).</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomFit]} В размер окна</td>
+    <td>Масштабирует изображение так, чтобы оно точно вписалось в окно. Это режим по умолчанию.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate0]} Без поворота</td>
+    <td>Не применять <a href="info-transform.html#rotation">поворота</a> к изображению при его отображении.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate90]} Повернуть по часовой стрелке на 90&deg;</td>
+    <td>Применить <a href="info-transform.html#rotation">поворот</a> по часовой стрелке на 90&deg; к изображению при его
+        отображении.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate180]} Повернуть на 180&deg;</td>
+    <td>Применить <a href="info-transform.html#rotation">поворот</a> на 180&deg; к изображению при его отображении.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate270]} Повернуть против часовой стрелки на 90&deg;</td>
+    <td>Применить <a href="info-transform.html#rotation">поворот</a> против часовой стрелки на 90&deg; (или по часовой
+        стрелке на 270&deg;) к изображению при его отображении.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:FlipHorz]} Отразить горизонтально</td>
+    <td>Применить горизонтальное <a href="info-transform.html#flips">отражение</a> к изображению при его
+        отображении.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:FlipVert]} Отразить вертикально</td>
+    <td>Применить вертикальное <a href="info-transform.html#flips">отражение</a> к изображению при его отображении.</td>
+  </tr>
+</table>
 
 <div class=nb><b>NB:</b>
   <ul>

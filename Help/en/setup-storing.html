@@ -1,32 +1,36 @@
-<!-- $Id: setup-storing.html,v 1.3 2004-06-14 06:15:29 dale Exp $ -->
+<!-- $Id: setup-storing.html,v 1.4 2004-11-10 21:17:05 dale Exp $ -->
 {[%hh_hdr_en:Storing the program settings in a file]}
 
-<p align=justify><b>PhoA</b> program like most Windows applications automatically stores customized settings in the System Registry. These settings
-  cover not only specified in <a href="setup-general.html">Program settings dialog</a> ones, but also some other interface options such as window
-  sizes, toolbar positions and history lists.
+<p align=justify><b>PhoA</b> program like most Windows applications automatically stores customized settings in the
+  System Registry. These settings cover not only specified in <a href="setup-general.html">Program settings dialog</a>
+  ones, but also some other interface options such as window sizes, toolbar positions and history lists.
 
-<p align=justify>As a bonus you can store settings in a file - it is useful eg when you run the program on another computer and don't want to
-  set up all the parameters again.
+<p align=justify>As a bonus you can store settings in a file - it is useful eg when you run the program on another
+  computer and don't want to set up all the parameters again.
 
-<p align=justify><b>PhoA</b> allows storing current program settings as a regular Windows ini file. You perform this by selecting <b>File |
-  Save current settings to file...</b> menu item, or by pressing <b>Shift+Ctrl+S</b> shortcut keys. This invokes standard File Save dialog to
-  enter the name of a file to save settings to. By default the program uses <b>phoa.ini</b> file.
+<p align=justify><b>PhoA</b> allows storing current program settings as a regular Windows ini file. You perform this by
+  selecting <b>File | Save current settings to file...</b> menu item, or by pressing <b>Shift+Ctrl+S</b> shortcut keys.
+  This invokes standard File Save dialog to enter the name of a file to save settings to. By default the program uses
+  <b>phoa.ini</b> file.
 
-<p align=justify>If it is possible to save settings to a file, it is indeed to load them from a file too. You load settings by selecting 
-  <b>File | Load settings from file...</b> menu item, or using <b>Shift+Ctrl+O</b> shortcut keys. The dialog that appears you fill the file you
-  have previously saved settings to. By default the <b>phoa.ini</b> file is suggested.
+<p align=justify>If it is possible to save settings to a file, it is indeed to load them from a file too. You load
+  settings by selecting <b>File | Load settings from file...</b> menu item, or using <b>Shift+Ctrl+O</b> shortcut keys.
+  The dialog that appears you fill the file you have previously saved settings to. By default the <b>phoa.ini</b> file
+  is suggested.
 
-<p align=justify>The <b>phoa.ini</b> file have a special meaning: if it is present in the same folder as the program (<b>phoa.exe</b>) itself, 
-  it gets loaded when <b>PhoA</b> starts. This default behaviour can be changed in <a href="setup-general.html">General program settings</a> -
-  the <b>Load settings from phoa.ini if it is present in the program folder, on startup</b> can be turned off which means no <b>phoa.ini</b>
-  autoloading occurs.
+<p align=justify>The <b>phoa.ini</b> file have a special meaning: if it is present in the same folder as the program
+  (<b>phoa.exe</b>) itself, it gets loaded when <b>PhoA</b> starts. This default behaviour can be changed in
+  <a href="setup-general.html">General program settings</a> - the <b>Load settings from phoa.ini if it is present in the
+  program folder, on startup</b> can be turned off which means no <b>phoa.ini</b> autoloading occurs.
 
 <div class=nb><b>NB:</b>
   <ul>
-    <li>It might be already obvious that settings are being loaded in the following order: at first data are loaded from the Registry,
-        and then (if this is enabled) - from <b>phoa.ini</b>. Thus all settings not covered by the file are taken from the Registry.</li>
-    <li>An ini-file stores settings not related to the local machine only. Window sizes, positions, states, toolbar positions and visibility, and
-        also the <a href="setup-tools.html">Tools settings</a> are always being stored locally in the Registry.</li>
+    <li>It might be already obvious that settings are being loaded in the following order: at first data are loaded from
+        the Registry, and then (if this is enabled) - from <b>phoa.ini</b>. Thus all settings not covered by the file
+        are taken from the Registry.</li>
+    <li>An ini-file stores settings not related to the local machine only. Window sizes, positions, states, toolbar
+        positions and visibility, and also the <a href="setup-tools.html">Tools settings</a> are always being stored
+        locally in the Registry.</li>
   </ul>
 </div>
 

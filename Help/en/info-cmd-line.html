@@ -1,14 +1,18 @@
-<!-- $Id: info-cmd-line.html,v 1.4 2004-11-10 14:38:38 dale Exp $ -->
+<!-- $Id: info-cmd-line.html,v 1.5 2004-11-10 21:17:05 dale Exp $ -->
 {[%hh_hdr_en:Command line parameters]}
 
-<p align=justify><b>PhoA</b> supports a number of command line parameters. The general format of the command line is as following:
-<p align=center><b>phoa.exe [<i>key1</i> [<i>key_value1</i>] [<i>key2</i> [<i>key_value2</i>]] ... ] [<i>photo_album_file</i>]</b>,
+<p align=justify><b>PhoA</b> supports a number of command line parameters. The general format of the command line is as
+  following:
+<p align=center><b>phoa.exe [<i>key1</i> [<i>key_value1</i>] [<i>key2</i> [<i>key_value2</i>]] ... ]
+  [<i>photo_album_file</i>]</b>,
 <p align=justify>where:
 <ul>
-  <li><b><i>keyN</i></b> - a character prepended with a dash (<b>-</b>). <a href="#keys">See below</a> for the list of available keys.</li>
-  <li><b><i>key_valueN</i></b> - a character string specifying the key value. Some keys don't allow values while some do. Hence the rest ones
-      allow optional value.</li>
-  <li><b><i>photo_album_file</i></b> - optional photo album file name which will be loaded after program is started.</li>
+  <li><b><i>keyN</i></b> - a character prepended with a dash (<b>-</b>). <a href="#keys">See below</a> for the list of
+      available keys.</li>
+  <li><b><i>key_valueN</i></b> - a character string specifying the key value. Some keys don't allow values while some
+      do. Hence the rest ones allow optional value.</li>
+  <li><b><i>photo_album_file</i></b> - optional photo album file name which will be loaded after program is
+      started.</li>
 </ul>
 
 {[%hh_h2:<a name=keys>Available keys</a>]}
@@ -68,9 +72,11 @@
 <div class=nb><b>NB:</b>
   <ul>
     <li>The command line parameters are separated with spaces.</li>
-    <li>If a parameter value or photo album file name contain spaces you need to enclose them in double quotes as in examples above.</li>
-    <li>You can specify the photo album file name anywhere in the command line but make sure the program doesn't consider it a key value.
-        Eg., you may write it at the start of the parameter list or right after the key value (because a key may have only one value).</li>
+    <li>If a parameter value or photo album file name contain spaces you need to enclose them in double quotes as in
+        examples above.</li>
+    <li>You can specify the photo album file name anywhere in the command line but make sure the program doesn't
+        consider it a key value. E.g., you may write it at the start of the parameter list or right after the key value
+        (because a key may have only one value).</li>
     <li>The program displays errors found in command line parameters upon start.</li>
   </ul>
 </div>
