@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.34 2005-02-13 19:16:38 dale Exp $
+//  $Id: udSearch.pas,v 1.35 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1046,7 +1046,7 @@ type
     FPreserveEndEdit := True;
     try
       s := (Sender as TComboEdit).Text;
-      if SelectPhoaKeywords((FTree.Owner as TdSearch).FApp.Project, s) then TComboEdit(Sender).Text := s;
+      if SelectPhoaKeywords((FTree.Owner as TdSearch).FApp.ProjectX, s) then TComboEdit(Sender).Text := s;
     finally
       FPreserveEndEdit := False;
     end;
@@ -1270,8 +1270,8 @@ type
         FLocalResults.Clear;
         for i := 0 to iSrchCount-1 do begin
           case SearchArea of
-            saAll:      Pic := FApp.Project.PicsX[i];
-            saCurGroup: Pic := FApp.CurGroup.PicsX[i];
+            saAll:      Pic := FApp.ProjectX.PicsX[i];
+            saCurGroup: Pic := FApp.CurGroupX.PicsX[i];
             else        Pic := FResultsGroup.PicsX[i];
           end;
           if Matches(Pic) then FLocalResults.Add(Pic, True);

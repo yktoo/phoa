@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udProjectProps.pas,v 1.2 2004-12-31 13:38:58 dale Exp $
+//  $Id: udProjectProps.pas,v 1.3 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -75,7 +75,7 @@ uses ConsVars, phUtils, Main;
     inherited InitializeDialog;
     HelpContext := IDH_intf_album_props;
      // Настраиваем контролы
-    Project := FApp.Project;
+    Project := FApp.ProjectX;
     eThumbSizeX.AsInteger   := Project.ThumbnailSize.cx;
     eThumbSizeY.AsInteger   := Project.ThumbnailSize.cy;
     tbThumbQuality.Position := Project.ThumbnailQuality;

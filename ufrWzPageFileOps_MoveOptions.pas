@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.14 2005-02-12 15:36:37 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.15 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -193,7 +193,7 @@ uses phUtils, udFileOpsWizard, udMsgBox;
        // Ищем и заносим в LPath самый длинный общий путь
       case Wiz.SelPicMode of
          // -- Выбранные во вьюере изображения - заносим путь к текущей выбранной группе
-        fospmSelPics: FillPath(Wiz.App.CurGroup, LPath);
+        fospmSelPics: FillPath(Wiz.App.CurGroupX, LPath);
          // -- Все изображения - заносим только сам фотоальбом/представление
         fospmAll: LPath.Add(Wiz.App.Project.ViewRootGroup);
          // -- Выбранные группы - проходим по всем выбранным группам, выделяя общий путь

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.17 2004-12-31 13:38:58 dale Exp $
+//  $Id: udPicProps.pas,v 1.18 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -189,7 +189,7 @@ type TWinControlCast = class(TWinControl);
       end;
      // Если не нашли - ищем среди всех изображений фотоальбома
     Result := 0;
-    ProjPics := App.Project.PicsX;
+    ProjPics := App.ProjectX.PicsX;
     for i := 0 to ProjPics.Count-1 do
        // Нашли такой файл
       if ReverseCompare(ProjPics[i].FileName, sFileName) then begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.18 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -108,7 +108,7 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p^ := FApp.Project.RootGroupX 
+      p^ := FApp.ProjectX.RootGroupX 
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p^ := pp^.GroupsX[Node.Index];

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.15 2004-12-31 13:38:58 dale Exp $
+//  $Id: phSettings.pas,v 1.16 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -269,7 +269,7 @@ const
     end;
      // Если нужно и присутствует ini-файл, подгружаем настройки из него
     if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
-      sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
+      sAutoLoadIniFile := sApplicationPath+SDefaultIniFileName;
       if FileExists(sAutoLoadIniFile) then IniLoadSettings(sAutoLoadIniFile);
     end;
   end;

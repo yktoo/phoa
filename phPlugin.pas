@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPlugin.pas,v 1.1 2005-02-13 19:16:38 dale Exp $
+//  $Id: phPlugin.pas,v 1.2 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@
 unit phPlugin;
 
 interface
-uses SysUtils;
+
+uses phIntf;
 
 type
 
@@ -47,7 +48,7 @@ type
    //===================================================================================================================
 
   IPhoaPlugin = interface(IInterface)
-    ['{B8F84EC7-5675-429D-88B1-13F819AB2E3C}']
+    ['{B8F84EC7-5675-429D-88B1-13F819AB2E3D}']
      // Prop handlers
     function  GetPluginClass: IPhoaPluginClass;
      // Props

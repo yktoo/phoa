@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.20 2005-02-13 19:16:39 dale Exp $
+//  $Id: udStats.pas,v 1.21 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -201,11 +201,11 @@ uses phUtils, Main, phPhoa, phSettings;
           AddPhoaFileProps(n1);
           tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FApp.Project.FileRevision))].sName));
         tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FApp.Project.Pics.Count));
-        AddGroupStats(FApp.Project.RootGroupX, n0);
+        AddGroupStats(FApp.ProjectX.RootGroupX, n0);
        // -- Текущая группа
       if (FApp.CurGroup<>nil) and (FApp.CurGroup.ID<>FApp.Project.RootGroup.ID) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));
-        AddGroupStats(FApp.CurGroup, n0);
+        AddGroupStats(FApp.CurGroupX, n0);
       end;
        // Разворачиваем всё дерево
       tvMain.FullExpand;

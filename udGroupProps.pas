@@ -67,7 +67,7 @@ uses ConsVars, phUtils, Main;
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_group_props;
-    Group := FApp.CurGroup;
+    Group := FApp.CurGroupX;
     eID.Text                := IntToStr(Group.ID);
     eText.Text              := Group.Text;
     mDescription.Lines.Text := Group.Description;

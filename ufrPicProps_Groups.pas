@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.18 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.19 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -199,7 +199,7 @@ type
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p.Group := App.Project.RootGroupX
+      p.Group := App.ProjectX.RootGroupX
     else begin
       pp := Sender.GetNodeData(ParentNode);
       p.Group := pp.Group.GroupsX[Node.Index];

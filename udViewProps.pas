@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
+//  $Id: udViewProps.pas,v 1.18 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -140,7 +140,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
     else
       FApp.PerformOperation(
         'ViewEdit',
-        ['View', FApp.Project.CurrentViewX, 'Name', eName.Text, 'FilterExpression', sExpression,
+        ['View', FApp.ProjectX.CurrentViewX, 'Name', eName.Text, 'FilterExpression', sExpression,
          'Groupings', FGroupings, 'Sortings', frSorting.Sortings]);
     inherited ButtonClick_OK;
   end;
@@ -220,7 +220,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
       ipmsmProp.Add(tbi);
     end;
     if not FIsAdding then begin
-      View := FApp.Project.CurrentViewX;
+      View := FApp.ProjectX.CurrentViewX;
       eName.Text := View.Name;
       FGroupings.Assign(View.Groupings);
       frSorting.Sortings.Assign(View.Sortings);

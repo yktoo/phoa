@@ -1060,6 +1060,7 @@ var
   procedure LoadJPEGFromStream(Bitmap32: TBitmap32; MemStream: TMemoryStream);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
+uses ConsVars;
 
    // used only for reading 32 bit JPEGs
   procedure RGBA2BGRA(pData: Pointer; Width, Height: Integer);
@@ -1371,7 +1372,7 @@ implementation /////////////////////////////////////////////////////////////////
   var hLib: HMODULE;
   begin
      // Грузим библиотеку
-    hLib := LoadLibrary(PChar(ExtractFilePath(ParamStr(0))+'\Plugins\ijl15.dll'));
+    hLib := LoadLibrary(PChar(sApplicationPath+SRelativePluginPath+'ijl15.dll'));
     Result := hLib<>0;
      // Если удалось, подключаем функции
     if Result then begin
@@ -1383,7 +1384,6 @@ implementation /////////////////////////////////////////////////////////////////
       ijlErrorStr      := BindLibProc(hLib, 'ijlErrorStr');
     end;
   end;
-
 
 initialization
   bIJL_Available := LoadIJLLib;

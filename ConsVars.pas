@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.89 2005-02-05 16:16:52 dale Exp $
+//  $Id: ConsVars.pas,v 1.90 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -340,6 +340,9 @@ const
   SRelativeLangFilesPath          = 'Language\';
    // Расширение языковых файлов
   SLangFileExt                    = 'lng';
+
+   // Путь к каталогу с плагинами
+  SRelativePluginPath             = 'Plugins\';
 
    // Перевод строки
   S_CRLF                          = #13#10;
@@ -867,6 +870,8 @@ var
   DKWeb: IDKWeb;
    // Специфичные для программы установки формата
   AppFormatSettings: TFormatSettings;
+   // Путь, по которому запущено приложение
+  sApplicationPath: String;
 
    // Составляет описание изображения Pic из свойств Props, выбирая только указанные данные.
    //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
@@ -1289,7 +1294,7 @@ type
   begin
      // Сканируем языковые файлы
     ShowProgressInfo('SMsg_ScanningLanguages', []);
-    LangManager.ScanForLangFiles(ExtractFilePath(ParamStr(0))+SRelativeLangFilesPath, '*.'+SLangFileExt, False);
+    LangManager.ScanForLangFiles(sApplicationPath+SRelativeLangFilesPath, '*.'+SLangFileExt, False);
      // Находим пункт списка "Язык интерфейса"
     LangSetting := RootSetting.Settings[ISettingID_Gen_Language];
      // Добавляем настройки выбора языка
@@ -1302,6 +1307,8 @@ type
   end;
 
 initialization
+   // Получаем каталог приложения
+  sApplicationPath := ExtractFilePath(ParamStr(0)); 
    // Грузим курсоры
   with Screen do begin
     Cursors[crHand]     := LoadCursor(HInstance, 'CRHAND');

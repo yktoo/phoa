@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.75 2005-02-13 19:16:38 dale Exp $
+//  $Id: Main.pas,v 1.76 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,7 +31,7 @@ type
 
   TAppStates = set of TAppState;
 
-  TfMain = class(TForm, IPhotoAlbumApp)
+  TfMain = class(TForm, IPhoaApp, IPhoaMutableApp, IPhotoAlbumApp)
     aAbout: TAction;
     aCopy: TAction;
     aCut: TAction;
@@ -369,19 +369,58 @@ type
      // Viewer events
     procedure ViewerSelectionChange(Sender: TObject);
     procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
+     // IPhoaApp
+    function  IPhoaApp.GetCurGroup       = IApp_GetCurGroup;
+    function  IPhoaApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhoaApp.GetProject        = IApp_GetProject;
+    function  IPhoaApp.GetSelectedPics   = IApp_GetSelectedPics;
+    function  IPhoaApp.GetViewedPics     = IApp_GetViewedPics;
+    function  IApp_GetCurGroup: IPhoaPicGroup;
+    function  IApp_GetFocusedControl: TPhoaAppFocusedControl;
+    function  IApp_GetProject: IPhoaProject;
+    function  IApp_GetSelectedPics: IPhoaPicList;
+    function  IApp_GetViewedPics: IPhoaPicList;
+     // IPhoaMutableApp
+    function  IPhoaMutableApp.GetCurGroup       = IApp_GetCurGroup;
+    function  IPhoaMutableApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhoaMutableApp.GetProject        = IApp_GetProject;
+    function  IPhoaMutableApp.GetSelectedPics   = IApp_GetSelectedPics;
+    function  IPhoaMutableApp.GetViewedPics     = IApp_GetViewedPics;
+    function  IPhoaMutableApp.GetCurGroupM      = IApp_GetCurGroupM;
+    function  IPhoaMutableApp.GetProjectM       = IApp_GetProjectM;
+    function  IPhoaMutableApp.GetSelectedPicsM  = IApp_GetSelectedPicsM;
+    function  IPhoaMutableApp.GetViewedPicsM    = IApp_GetViewedPicsM;
+    procedure IPhoaMutableApp.SetCurGroupM      = IApp_SetCurGroupM;
+    function  IApp_GetCurGroupM: IPhoaMutablePicGroup;
+    function  IApp_GetProjectM: IPhoaMutableProject;
+    function  IApp_GetSelectedPicsM: IPhoaMutablePicList;
+    function  IApp_GetViewedPicsM: IPhoaMutablePicList;
+    procedure IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
      // IPhotoAlbumApp
-    procedure IPhotoAlbumApp.PerformOperation  = PerformOperation;
-    function  IPhotoAlbumApp.GetCurGroup       = GetCurGroup;
-    function  IPhotoAlbumApp.GetFocusedControl = GetFocusedControl;
-    function  IPhotoAlbumApp.GetImageList      = IApp_GetImageList;
+    function  IPhotoAlbumApp.GetCurGroup       = IApp_GetCurGroup;
+    function  IPhotoAlbumApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhotoAlbumApp.GetProject        = IApp_GetProject;
     function  IPhotoAlbumApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhotoAlbumApp.GetViewedPics     = IApp_GetViewedPics;
-    procedure IPhotoAlbumApp.SetCurGroup       = SetCurGroup;
+    function  IPhotoAlbumApp.GetCurGroupM      = IApp_GetCurGroupM;
+    function  IPhotoAlbumApp.GetProjectM       = IApp_GetProjectM;
+    function  IPhotoAlbumApp.GetSelectedPicsM  = IApp_GetSelectedPicsM;
+    function  IPhotoAlbumApp.GetViewedPicsM    = IApp_GetViewedPicsM;
+    procedure IPhotoAlbumApp.SetCurGroupM      = IApp_SetCurGroupM;
+    procedure IPhotoAlbumApp.PerformOperation  = IApp_PerformOperation;
+    function  IPhotoAlbumApp.GetCurGroupX      = IApp_GetCurGroupX;
+    function  IPhotoAlbumApp.GetImageList      = IApp_GetImageList;
+    function  IPhotoAlbumApp.GetProjectX       = IApp_GetProjectX;
+    function  IPhotoAlbumApp.GetSelectedPicsX  = IApp_GetSelectedPicsX;
+    function  IPhotoAlbumApp.GetViewedPicsX    = IApp_GetViewedPicsX;
+    procedure IPhotoAlbumApp.SetCurGroupX      = IApp_SetCurGroupX;
+    procedure IApp_PerformOperation(const sOpName: String; const aParams: Array of Variant);
+    function  IApp_GetCurGroupX: IPhotoAlbumPicGroup;
     function  IApp_GetImageList: TCustomImageList;
-    function  IApp_GetProject: IPhotoAlbumProject;
-    function  IApp_GetSelectedPics: IPhotoAlbumPicList;
-    function  IApp_GetViewedPics: IPhotoAlbumPicList;
+    function  IApp_GetProjectX: IPhotoAlbumProject;
+    function  IApp_GetSelectedPicsX: IPhotoAlbumPicList;
+    function  IApp_GetViewedPicsX: IPhotoAlbumPicList;
+    procedure IApp_SetCurGroupX(Value: IPhotoAlbumPicGroup);
      // Message handlers
     procedure WMChangeCBChain(var Msg: TWMChangeCBChain); message WM_CHANGECBCHAIN;
     procedure WMDrawClipboard(var Msg: TWMDrawClipboard); message WM_DRAWCLIPBOARD;
@@ -390,10 +429,7 @@ type
     procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
      // Property handlers
     function  GetFileName: String;
-    function  GetFocusedControl: TPhoaAppFocusedControl;
     function  GetDisplayFileName: String;
-    function  GetCurGroup: IPhotoAlbumPicGroup;
-    procedure SetCurGroup(Value: IPhotoAlbumPicGroup);
     function  GetCurGroupID: Integer;
     procedure SetCurGroupID(Value: Integer);
   public
@@ -404,7 +440,7 @@ type
     procedure RefreshViewer;
      // Props
      // -- Текущая выбранная группа в дереве; nil, если нет
-    property CurGroup: IPhotoAlbumPicGroup read GetCurGroup write SetCurGroup;
+    property CurGroupX: IPhotoAlbumPicGroup read IApp_GetCurGroupX write IApp_SetCurGroupX;
      // -- ID текущей выбранной группы в дереве; 0, если нет
     property CurGroupID: Integer read GetCurGroupID write SetCurGroupID;
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
@@ -412,7 +448,7 @@ type
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
     property FileName: String read GetFileName;
      // -- Текущий сфокусированный контрол
-    property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
+    property FocusedControl: TPhoaAppFocusedControl read IApp_GetFocusedControl;
      // -- Просмотрщик эскизов
     property Viewer: TThumbnailViewer read FViewer;
   end;
@@ -428,7 +464,7 @@ uses
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
-  phToolSetting, udMsgBox, udGroupProps;
+  phToolSetting, udMsgBox, udGroupProps, phPluginUsage;
 
    // Загружает ImageList из PNG-ресурса, если он ещё не загружен
   procedure MakeImagesLoaded(const sResourceName: String; Images: TCustomImageList);
@@ -473,21 +509,21 @@ uses
   procedure TfMain.aaCut(Sender: TObject);
   begin
     TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics, TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats))));
-    PerformOperation('PicDelete', ['Group', CurGroup, 'Pics', Viewer.SelectedPics]);
+    PerformOperation('PicDelete', ['Group', CurGroupX, 'Pics', Viewer.SelectedPics]);
   end;
 
   procedure TfMain.aaDelete(Sender: TObject);
   begin
-    if CurGroup<>nil then
+    if CurGroupX<>nil then
       case FocusedControl of
          // Удаление группы
         pafcGroupTree:
           if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then
-            PerformOperation('GroupDelete', ['Group', CurGroup]);
+            PerformOperation('GroupDelete', ['Group', CurGroupX]);
          // Удаление изображений
         pafcThumbViewer:
           if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then
-            PerformOperation('PicDelete', ['Group', CurGroup, 'Pics', Viewer.SelectedPics]);
+            PerformOperation('PicDelete', ['Group', CurGroupX, 'Pics', Viewer.SelectedPics]);
       end;
   end;
 
@@ -644,17 +680,17 @@ uses
     Params: IPhoaOperationParams;
     NewGroup: IPhotoAlbumPicGroup;
   begin
-    Params := NewPhoaOperationParams(['Group', CurGroup]);
+    Params := NewPhoaOperationParams(['Group', CurGroupX]);
     PerformOperation('GroupNew', Params);
      // Входим в режим редактирования имени добавленной группы
     Params.ObtainValIntf('NewGroup', IPhotoAlbumPicGroup, NewGroup);
-    CurGroup := NewGroup;
+    CurGroupX := NewGroup;
     if tvGroups.FocusedNode<>nil then tvGroups.EditNode(tvGroups.FocusedNode, -1);
   end;
 
   procedure TfMain.aaNewPic(Sender: TObject);
   begin
-    AddFiles(Self, CurGroup, FUndo, nil);
+    AddFiles(Self, CurGroupX, FUndo, nil);
   end;
 
   procedure TfMain.aaOpen(Sender: TObject);
@@ -674,9 +710,9 @@ uses
   procedure TfMain.aaPaste(Sender: TObject);
   var iCntBefore: Integer;
   begin
-    iCntBefore := CurGroup.Pics.Count;
-    PerformOperation('PicPaste', ['Group', CurGroup]);
-    PhoaInfo(False, 'SNotify_Paste', [CurGroup.Pics.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
+    iCntBefore := CurGroupX.Pics.Count;
+    PerformOperation('PicPaste', ['Group', CurGroupX]);
+    PhoaInfo(False, 'SNotify_Paste', [CurGroupX.Pics.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
   end;
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
@@ -749,7 +785,7 @@ uses
 
   procedure TfMain.aaSortPics(Sender: TObject);
   begin
-    DoSortPics(Self, FUndo, CurGroup=FSearchResults);
+    DoSortPics(Self, FUndo, CurGroupX=FSearchResults);
   end;
 
   procedure TfMain.aaStats(Sender: TObject);
@@ -810,7 +846,7 @@ uses
       StateChanged([asFileNameChangePending]);
     end;
      // Настраиваем Help-файл
-    Application.HelpFile := ExtractFilePath(ParamStr(0))+ConstVal('SHelpFileName');
+    Application.HelpFile := sApplicationPath+ConstVal('SHelpFileName');
   end;
 
   procedure TfMain.ApplySettings;
@@ -1122,6 +1158,9 @@ uses
       RootSetting.Modified := True;
       ApplySettings;
       ApplyLanguage;
+       // Загружаем плагины
+      ShowProgressInfo('SMsg_LoadingPlugins', []);
+      ScanForPlugins;
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
@@ -1167,15 +1206,10 @@ uses
     mruOpen.SaveToRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
   end;
 
-  function TfMain.GetCurGroup: IPhotoAlbumPicGroup;
-  begin
-    Result := GetNodeGroup(tvGroups.FocusedNode);
-  end;
-
   function TfMain.GetCurGroupID: Integer;
   var Group: IPhotoAlbumPicGroup;
   begin
-    Group := GetCurGroup;
+    Group := CurGroupX;
     if Group=nil then Result := 0 else Result := Group.ID;
   end;
 
@@ -1188,13 +1222,6 @@ uses
   function TfMain.GetFileName: String;
   begin
     Result := FProject.FileName;
-  end;
-
-  function TfMain.GetFocusedControl: TPhoaAppFocusedControl;
-  begin
-    if      ActiveControl=tvGroups then Result := pafcGroupTree
-    else if ActiveControl=FViewer  then Result := pafcThumbViewer
-    else                                Result := pafcNone;
   end;
 
   function TfMain.GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
@@ -1226,24 +1253,93 @@ uses
     end;
   end;
 
+  function TfMain.IApp_GetCurGroup: IPhoaPicGroup;
+  begin
+    Result := GetNodeGroup(tvGroups.FocusedNode);
+  end;
+
+  function TfMain.IApp_GetCurGroupM: IPhoaMutablePicGroup;
+  begin
+    Result := GetNodeGroup(tvGroups.FocusedNode);
+  end;
+
+  function TfMain.IApp_GetCurGroupX: IPhotoAlbumPicGroup;
+  begin
+    Result := GetNodeGroup(tvGroups.FocusedNode);
+  end;
+
+  function TfMain.IApp_GetFocusedControl: TPhoaAppFocusedControl;
+  begin
+    if      ActiveControl=tvGroups then Result := pafcGroupTree
+    else if ActiveControl=FViewer  then Result := pafcThumbViewer
+    else                                Result := pafcNone;
+  end;
+
   function TfMain.IApp_GetImageList: TCustomImageList;
   begin
     Result := ilActionsSmall;
   end;
 
-  function TfMain.IApp_GetProject: IPhotoAlbumProject;
+  function TfMain.IApp_GetProject: IPhoaProject;
   begin
     Result := FProject;
   end;
 
-  function TfMain.IApp_GetSelectedPics: IPhotoAlbumPicList;
+  function TfMain.IApp_GetProjectM: IPhoaMutableProject;
+  begin
+    Result := FProject;
+  end;
+
+  function TfMain.IApp_GetProjectX: IPhotoAlbumProject;
+  begin
+    Result := FProject;
+  end;
+
+  function TfMain.IApp_GetSelectedPics: IPhoaPicList;
   begin
     Result := FViewer.SelectedPics;
   end;
 
-  function TfMain.IApp_GetViewedPics: IPhotoAlbumPicList;
+  function TfMain.IApp_GetSelectedPicsM: IPhoaMutablePicList;
+  begin
+    Result := FViewer.SelectedPics;
+  end;
+
+  function TfMain.IApp_GetSelectedPicsX: IPhotoAlbumPicList;
+  begin
+    Result := FViewer.SelectedPics;
+  end;
+
+  function TfMain.IApp_GetViewedPics: IPhoaPicList;
   begin
     Result := FViewedPics;
+  end;
+
+  function TfMain.IApp_GetViewedPicsM: IPhoaMutablePicList;
+  begin
+    Result := FViewedPics;
+  end;
+
+  function TfMain.IApp_GetViewedPicsX: IPhotoAlbumPicList;
+  begin
+    Result := FViewedPics;
+  end;
+
+  procedure TfMain.IApp_PerformOperation(const sOpName: String; const aParams: array of Variant);
+  begin
+    PerformOperation(sOpName, aParams);
+  end;
+
+  procedure TfMain.IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
+  begin
+     // Переадресовываем поиску по ID
+    if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
+  end;
+
+  procedure TfMain.IApp_SetCurGroupX(Value: IPhotoAlbumPicGroup);
+  begin
+     // Переадресовываем поиску по ID
+    if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
   end;
 
   function TfMain.IsShortCut(var Message: TWMKey): Boolean;
@@ -1361,14 +1457,14 @@ uses
      // Выбирает в качестве текущей заданную группу в дереве, если sGroupPath<>''
     procedure SelectGroupByPath(const sGroupPath: String);
     begin
-      if sGroupPath<>'' then CurGroup := FProject.ViewRootGroupX.GroupByPathX[sGroupPath];
+      if sGroupPath<>'' then CurGroupX := FProject.ViewRootGroupX.GroupByPathX[sGroupPath];
     end;
 
      // Выбирает изображение с заданным ID
     procedure SelectPicByID(iID: Integer);
     begin
-      if (iID>0) and (CurGroup<>nil) then begin
-        Viewer.ItemIndex := CurGroup.Pics.IndexOfID(iID);
+      if (iID>0) and (CurGroupX<>nil) then begin
+        Viewer.ItemIndex := CurGroupX.Pics.IndexOfID(iID);
         Viewer.ScrollIntoView;
       end;
     end;
@@ -1479,10 +1575,10 @@ uses
     try
       FViewedPics := nil;
        // Если есть текущая группа
-      if CurGroup<>nil then
+      if CurGroupX<>nil then
          // Не рекурсивный режим
         if not SettingValueBool(ISettingID_Browse_FlatMode) then
-          FViewedPics := CurGroup.PicsX
+          FViewedPics := CurGroupX.PicsX
          // Рекурсивный режим
         else begin
            // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
@@ -1490,7 +1586,7 @@ uses
            // Создаём список изображений для просмотра
           ViewPics := NewPhotoAlbumPicList(False);
            // Рекурсивно наполняем список
-          RecursivelyAddPics(CurGroup);
+          RecursivelyAddPics(CurGroupX);
            // Сохраняем список
           FViewedPics := ViewPics;
         end;
@@ -1544,12 +1640,6 @@ uses
        // Если получилось - восстанавливаем состояние вьюера
       if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
     end;
-  end;
-
-  procedure TfMain.SetCurGroup(Value: IPhotoAlbumPicGroup);
-  begin
-     // Переадресовываем поиску по ID
-    if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
   end;
 
   procedure TfMain.SetCurGroupID(Value: Integer);
@@ -1676,7 +1766,7 @@ uses
       iCntBefore := gTgt.Pics.Count;
       PerformOperation(
         'PicDragAndDropToGroup',
-        ['SourceGroup', CurGroup, 'TargetGroup', gTgt, 'Pics', Viewer.SelectedPics, 'Copy', bCopy]);
+        ['SourceGroup', CurGroupX, 'TargetGroup', gTgt, 'Pics', Viewer.SelectedPics, 'Copy', bCopy]);
       PhoaInfo(
         False,
         iif(bCopy, 'SNotify_DragCopy', 'SNotify_DragMove'),
@@ -1851,7 +1941,7 @@ uses
   begin
     case GetNodeKind(Sender, Node) of
       gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', PhoaUnicodeToAnsi(NewText), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
-      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroup, 'NewText', PhoaUnicodeToAnsi(NewText)]);
+      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroupX, 'NewText', PhoaUnicodeToAnsi(NewText)]);
     end;
   end;
 
@@ -1961,7 +2051,7 @@ uses
       Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop) and not bView;
        // -- Переупорядочивать эскизы можно в группах фотоальбома, если не рекурсивный режим или у текущей группы нет
        //    подгрупп 
-      Viewer.DragInsideEnabled := (gnk in [gnkProject, gnkPhoaGroup]) and (not aFlatMode.Checked or (GetCurGroup.Groups.Count=0));
+      Viewer.DragInsideEnabled := (gnk in [gnkProject, gnkPhoaGroup]) and (not aFlatMode.Checked or (CurGroupX.Groups.Count=0));
     end;
 
      // Настраивает доступность инструментов
@@ -2035,7 +2125,7 @@ uses
   begin
     PerformOperation(
       'PicDragAndDropInsideGroup',
-      ['Group', CurGroup, 'Pics', Viewer.SelectedPics, 'NewIndex', Viewer.DropTargetIndex]);
+      ['Group', CurGroupX, 'Pics', Viewer.SelectedPics, 'NewIndex', Viewer.DropTargetIndex]);
   end;
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.31 2005-02-05 16:16:52 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.32 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -448,7 +448,7 @@ uses
           try
             sFileName := FileList.Files[0];
              // Ищем изображение по имени файла
-            FAddedPic := App.Project.PicsX.ItemsByFileNameX[sFileName];
+            FAddedPic := App.ProjectX.PicsX.ItemsByFileNameX[sFileName];
              // Если не нашли - создаём новое и генерируем эскиз
             if FAddedPic=nil then begin
               FAddedPic := NewPhotoAlbumPic;
@@ -549,7 +549,7 @@ uses
   begin
     inherited InitializeWizard;
     FPics       := NewPhotoAlbumPicList(False);
-    FFreePicID  := FApp.Project.PicsX.MaxPicID+1;
+    FFreePicID  := FApp.ProjectX.PicsX.MaxPicID+1;
      // Настраиваем окно просмотра
     dpPreview.Floating := True;
      // Создаём страницы

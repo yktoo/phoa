@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.29 2005-02-12 15:36:37 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.30 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -511,7 +511,7 @@ uses
           SLRelTargetPaths.Sorted     := True;
           SLRelTargetPaths.Duplicates := dupIgnore;
            // Заполняем SLRelTargetPaths путями назначения
-          AddPathIfPicInGroup(FWizard.App.Project.ViewRootGroupX);
+          AddPathIfPicInGroup(FWizard.App.ProjectX.ViewRootGroupX);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];
@@ -572,9 +572,9 @@ uses
   begin
     FChangesMade := True;
      // Удаляем все ссылки на изображение
-    DelID(FWizard.App.Project.RootGroupX, Pic.ID);
+    DelID(FWizard.App.ProjectX.RootGroupX, Pic.ID);
      // Удаляем изображение из проекта
-    FWizard.App.Project.PicsX.Remove(Pic.ID);
+    FWizard.App.ProjectX.PicsX.Remove(Pic.ID);
   end;
 
   procedure TFileOpThread.DoDelPicAndFile(Pic: IPhotoAlbumPic);
@@ -722,9 +722,9 @@ uses
     FExportedProject.PicsX.DuplicatePics(FSelectedPics);
      // Копируем группы и изображения в них
     case SelPicMode of
-      fospmSelPics:   AddSingleGroup(FExportedProject.RootGroupX, FApp.CurGroup, FApp.CurGroup<>FApp.Project.RootGroup);
-      fospmAll:       FExportedProject.RootGroupX.Assign(FApp.Project.RootGroupX, True, True, True);
-      fospmSelGroups: AddGroup(FExportedProject.RootGroupX, nil, FApp.Project.RootGroupX, True);
+      fospmSelPics:   AddSingleGroup(FExportedProject.RootGroupX, FApp.CurGroupX, FApp.CurGroup<>FApp.Project.RootGroup);
+      fospmAll:       FExportedProject.RootGroupX.Assign(FApp.ProjectX.RootGroupX, True, True, True);
+      fospmSelGroups: AddGroup(FExportedProject.RootGroupX, nil, FApp.ProjectX.RootGroupX, True);
     end;
      // Копируем представления
     if FCDOpt_IncludeViews then FExportedProject.ViewsX.Assign(FApp.Project.Views);
@@ -774,7 +774,7 @@ uses
        // Копируем программу
       if FCDOpt_CopyExecutable then begin
         if CopyFile(
-            PChar(ParamStr(0)),
+            PChar(sApplicationPath+SPhoaExecutableFileName),
             PChar(sDestPath+SPhoaExecutableFileName),
             False) then
           LogSuccess('SLogEntry_ExecutableCopiedOK', [FDestinationFolder])

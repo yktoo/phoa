@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.18 2005-02-12 15:36:37 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.19 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -107,7 +107,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     Wiz := TdFileOpsWizard(StorageForm);
     rbSelPics.Enabled  := Wiz.App.SelectedPics.Count>0;
      // Настраиваем название радиокнопки "Все изображения фотоальбома/представления"
-    View := Wiz.App.Project.CurrentViewX;
+    View := Wiz.App.ProjectX.CurrentViewX;
     if View=nil then
       rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInPhoa')
     else

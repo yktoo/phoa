@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.15 2004-12-31 13:38:58 dale Exp $
+//  $Id: udSortPics.pas,v 1.16 2005-02-14 19:34:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -71,7 +71,7 @@ uses phUtils, ConsVars, Main;
   var Group: IPhotoAlbumPicGroup;
   begin
      // Создаём операцию
-    if rbAllGroups.Checked then Group := FApp.Project.RootGroupX else Group := FApp.CurGroup;
+    if rbAllGroups.Checked then Group := FApp.ProjectX.RootGroupX else Group := FApp.CurGroupX;
     if rbCurGroup.Checked and FDirectSort then begin
       Group.PicsX.SortingsSort(frSorting.Sortings);
       fMain.RefreshViewer;

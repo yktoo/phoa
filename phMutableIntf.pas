@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.13 2005-02-13 19:16:38 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.14 2005-02-14 19:34:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -425,6 +425,29 @@ type
     property ViewRootGroupM: IPhoaMutablePicGroup read GetViewRootGroupM;
      // -- 'Mutable' version of Views
     property ViewsM: IPhoaMutableViewList read GetViewsM;
+  end;
+
+   //===================================================================================================================
+   // An alterable PhoA application
+   //===================================================================================================================
+
+  IPhoaMutableApp = interface(IPhoaApp)
+    ['{21629CF9-B22A-44B3-8DD7-FB9A35D4C004}']
+     // Prop handlers
+    function  GetCurGroupM: IPhoaMutablePicGroup;
+    function  GetProjectM: IPhoaMutableProject;
+    function  GetSelectedPicsM: IPhoaMutablePicList;
+    function  GetViewedPicsM: IPhoaMutablePicList;
+    procedure SetCurGroupM(Value: IPhoaMutablePicGroup);
+     // Props
+     // -- 'Mutable' and writable version of CurGroup
+    property CurGroupM: IPhoaMutablePicGroup read GetCurGroupM write SetCurGroupM;
+     // -- 'Mutable' version of Project
+    property ProjectM: IPhoaMutableProject read GetProjectM;
+     // -- 'Mutable' version of SelectedPics
+    property SelectedPicsM: IPhoaMutablePicList read GetSelectedPicsM;
+     // -- 'Mutable' version of ViewedPics
+    property ViewedPicsM: IPhoaMutablePicList read GetViewedPicsM;
   end;
 
 implementation
