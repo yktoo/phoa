@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.19 2004-05-31 14:36:32 dale Exp $
+//  $Id: Main.pas,v 1.20 2004-05-31 15:04:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -321,6 +321,8 @@ type
     procedure ShowProgressInfo(const sConstName: String; const aParams: Array of const);
      // Вводит в режим просмотра, начиная с текущего изображения
     procedure StartViewMode(InitFlags: TImgViewInitFlags);
+     // Отменяет все "неустойчивые" режимы и возвращается в основной режим просмотра
+    procedure ResetMode;
      // IPhoaViews
     function  GetViewIndex: Integer;
     procedure SetViewIndex(Value: Integer);
@@ -377,22 +379,26 @@ uses
 
   procedure TfMain.aaAbout(Sender: TObject);
   begin
+    ResetMode;
     ShowAbout(SettingValueBool(ISettingID_Dlgs_SplashAboutFade));
   end;
 
   procedure TfMain.aaCopy(Sender: TObject);
   begin
+    ResetMode;
     TPhoaBaseOp_PicCopy.Create(Viewer.GetSelectedPicArray);
   end;
 
   procedure TfMain.aaCut(Sender: TObject);
   begin
+    ResetMode;
     TPhoaBaseOp_PicCopy.Create(Viewer.GetSelectedPicArray);
     PerformOperation(TPhoaMultiOp_PicDelete.Create(FOperations, FPhoA, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray)));
   end;
 
   procedure TfMain.aaDelete(Sender: TObject);
   begin
+    ResetMode;
     if CurGroup<>nil then
        // Удаление группы
       if ActiveControl=tvGroups then begin
@@ -405,6 +411,7 @@ uses
 
   procedure TfMain.aaEdit(Sender: TObject);
   begin
+    ResetMode;
     if ActiveControl=tvGroups then begin
        // Корневой узел
       if tvGroups.FocusedNode=FRootNode then
@@ -419,6 +426,7 @@ uses
 
   procedure TfMain.aaExit(Sender: TObject);
   begin
+    ResetMode;
     Close;
   end;
 
@@ -427,6 +435,7 @@ uses
     View: TPhoaView;
     bPhoaChanged: Boolean;
   begin
+    ResetMode;
     if ViewIndex>=0 then View := FPhoA.Views[ViewIndex] else View := nil;
     if DoFileOperations(FPhoA, CurGroup, View, PicArrayToIDArray(Viewer.GetSelectedPicArray), ActiveControl=Viewer, bPhoaChanged) then
        // Если изменилось содержимое фотоальбома
@@ -437,13 +446,14 @@ uses
         FPhoA.Views.UnprocessAllViews;
          // Перегружаем дерево папок
         LoadGroupTree;
-       // Иначе просто были внесены необратимые изменения (в файловую систему, но не в фотоальбом) - запрещаем откат 
+       // Иначе просто были внесены необратимые изменения (в файловую систему, но не в фотоальбом) - запрещаем откат
       end else
         FOperations.Clear;
   end;
 
   procedure TfMain.aaFind(Sender: TObject);
   begin
+    ResetMode;
     if DoSearch(FPhoA, CurGroup, FSearchResults) then begin
       DisplaySearchResults(False, True);
       RefreshViewer;
@@ -452,16 +462,19 @@ uses
 
   procedure TfMain.aaHelpContents(Sender: TObject);
   begin
+    ResetMode;
     HtmlHelpShowContents;
   end;
 
   procedure TfMain.aaHelpFAQ(Sender: TObject);
   begin
+    ResetMode;
     HtmlHelpContext(IDH_faq);
   end;
 
   procedure TfMain.aaHelpWebsite(Sender: TObject);
   begin
+    ResetMode;
     OpenWebsite;
   end;
 
@@ -470,13 +483,14 @@ uses
     procedure DoIniLoad(const sFileName: String);
     begin
        // Загружаем настройки
-      IniLoadSettings(sFileName); 
+      IniLoadSettings(sFileName);
        // Применяем настройки
       ApplySettings;
       ApplyLanguage;
     end;
 
   begin
+    ResetMode;
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultIniFileExt;
@@ -492,6 +506,7 @@ uses
 
   procedure TfMain.aaIniSaveSettings(Sender: TObject);
   begin
+    ResetMode;
     with TSaveDialog.Create(Self) do
       try
         DefaultExt := SDefaultIniFileExt;
@@ -507,6 +522,7 @@ uses
 
   procedure TfMain.aaNew(Sender: TObject);
   begin
+    ResetMode;
     if not CheckSave then Exit;
     tvGroups.BeginUpdate;
     try
@@ -528,16 +544,19 @@ uses
 
   procedure TfMain.aaNewGroup(Sender: TObject);
   begin
+    ResetMode;
     PerformOperation(TPhoaOp_GroupNew.Create(FOperations, FPhoA, CurGroup));
   end;
 
   procedure TfMain.aaNewPic(Sender: TObject);
   begin
+    ResetMode;
     if SelectFiles(FPhoA, PPhoaGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FOperations) then RefreshViewer;
   end;
 
   procedure TfMain.aaOpen(Sender: TObject);
   begin
+    ResetMode;
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultExt;
@@ -553,6 +572,7 @@ uses
   procedure TfMain.aaPaste(Sender: TObject);
   var iCntBefore: Integer;
   begin
+    ResetMode;
     iCntBefore := CurGroup.PicIDs.Count;
     PerformOperation(TPhoaMultiOp_PicPaste.Create(FOperations, FPhoA, CurGroup));
     PhoaInfo(False, 'SNotify_Paste', [CurGroup.PicIDs.Count-iCntBefore], ISettingID_Dlgs_NotifyPaste);
@@ -560,41 +580,48 @@ uses
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
   begin
+    ResetMode;
     if PhoaConfirm(False, 'SConfirm_DelView', ISettingID_Dlgs_ConfmDelView) then
       TPhoaOp_ViewDelete.Create(FOperations, Self);
   end;
 
   procedure TfMain.aaPhoaView_Edit(Sender: TObject);
   begin
+    ResetMode;
     EditView(FPhoA.Views[ViewIndex], FPhoA, FOperations);
   end;
 
   procedure TfMain.aaPhoaView_MakeGroup(Sender: TObject);
   begin
+    ResetMode;
     MakeGroupFromView(FPhoA, FOperations, Self);
   end;
 
   procedure TfMain.aaPhoaView_New(Sender: TObject);
   begin
+    ResetMode;
     EditView(nil, FPhoA, FOperations);
   end;
 
   procedure TfMain.aaPicOps(Sender: TObject);
   begin
+    ResetMode;
     DoPicOps(FPhoA, FOperations, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
   end;
 
   procedure TfMain.aaRemoveSearchResults(Sender: TObject);
   begin
+    ResetMode;
     DisplaySearchResults(True, False);
   end;
 
   procedure TfMain.aaSave(Sender: TObject);
   begin
+    ResetMode;
      // Если имя файла не задано, выполняем SaveAs
     if FileName='' then
       aaSaveAs(Sender)
-     // Иначе сохраняем файл фотоальбома и помечаем текущее состояние буфера отката как "сохранённое"  
+     // Иначе сохраняем файл фотоальбома и помечаем текущее состояние буфера отката как "сохранённое"
     else begin
       FOperations.BeginUpdate;
       StartWait;
@@ -610,6 +637,7 @@ uses
 
   procedure TfMain.aaSaveAs(Sender: TObject);
   begin
+    ResetMode;
     with TSaveDialog.Create(Self) do
       try
         DefaultExt  := SDefaultExt;
@@ -639,16 +667,19 @@ uses
 
   procedure TfMain.aaSelectAll(Sender: TObject);
   begin
+    ResetMode;
     Viewer.SelectAll;
   end;
 
   procedure TfMain.aaSelectNone(Sender: TObject);
   begin
+    ResetMode;
     Viewer.SelectNone;
   end;
 
   procedure TfMain.aaSettings(Sender: TObject);
   begin
+    ResetMode;
      // В диалоге настроек по умолчанию выбираем кнопку "Режим обзора"
     if EditSettings(ISettingID_Browse) then begin
       ApplySettings;
@@ -659,21 +690,25 @@ uses
 
   procedure TfMain.aaSortPics(Sender: TObject);
   begin
+    ResetMode;
     DoSortPics(FPhoA, CurGroup, FOperations, CurGroup=FSearchResults);
   end;
 
   procedure TfMain.aaStats(Sender: TObject);
   begin
+    ResetMode;
     ShowPhoaStats(FPhoA, CurGroup, Viewer.GetSelectedPicArray);
   end;
 
   procedure TfMain.aaUndo(Sender: TObject);
   begin
+    ResetMode;
     UndoOperations(FOperations.Count-1);
   end;
 
   procedure TfMain.aaView(Sender: TObject);
   begin
+    ResetMode;
     StartViewMode([]);
   end;
 
@@ -894,6 +929,7 @@ uses
 
   procedure TfMain.dtlsMainLanguageChanged(Sender: TObject);
   begin
+    ResetMode;
     ApplyLanguage;
   end;
 
@@ -962,6 +998,7 @@ uses
 
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   begin
+    ResetMode;
      // Если нет несохранённых данных - проверяем необходимость спрашивания подтверждения
     if FOperations.IsUnmodified then
       CanClose := PhoaConfirm(False, 'SConfirm_AppExit', ISettingID_Dlgs_ConfmAppExit)
@@ -1106,6 +1143,7 @@ uses
 
   procedure TfMain.LoadGroupTree;
   begin
+    ResetMode;
     tvGroups.BeginUpdate;
     try
       tvGroups.ReinitNode(FRootNode, True);
@@ -1159,6 +1197,7 @@ uses
 
   procedure TfMain.mruOpenClick(Sender: TObject; const Filename: String);
   begin
+    ResetMode;
     if CheckSave then DoLoad(FileName);
   end;
 
@@ -1201,6 +1240,7 @@ uses
     end;
 
   begin
+    ResetMode;
     tvGroups.BeginUpdate;
     try
       IFlags := Op.InvalidationFlags;
@@ -1321,6 +1361,12 @@ uses
     Viewer.ViewGroup(CurGroup);
   end;
 
+  procedure TfMain.ResetMode;
+  begin
+     // Завершаем inplace-редактирование текста узла в дереве групп
+    tvGroups.EndEditNode;
+  end;
+
   procedure TfMain.SetCurGroup(Value: TPhoaGroup);
   var n: PVirtualNode;
   begin
@@ -1403,6 +1449,7 @@ uses
   procedure TfMain.tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   var p: TPoint;
   begin
+    ResetMode;
     if Node=FRootNode then begin
       with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
       pmPhoaView.Popup(p.x, p.y);
@@ -1646,6 +1693,7 @@ uses
   procedure TfMain.UndoOperations(Index: Integer);
   var i: Integer;
   begin
+    tvGroups.CancelEditNode;
     tvGroups.BeginUpdate;
     try
        // Крутим цикл с конца до указанного индекса
@@ -1694,6 +1742,7 @@ uses
 
   procedure TfMain.WMHelp(var Msg: TWMHelp);
   begin
+    ResetMode;
     HtmlHelpShowContents;
   end;
 
