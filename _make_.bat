@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.2 2004-04-15 12:54:10 dale Exp $
+rem $Id: _make_.bat,v 1.3 2004-05-01 20:10:04 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -12,7 +12,7 @@ rem -H = Output hint messages
 set OPTIONS=-B -W -H
 set SWITCHES=A8B-C-D-G+H+I+J-L-M-O+P+Q-R-T-U-V+W-X+Y-Z1
 set DELPHI=C:\Progra~1\Borland\Delphi7
-set LIBRARY_PATH=%DELPHI%\tb2k\Source;%DELPHI%\tbx;%DELPHI%\Graphics32;%DELPHI%\RX;%DELPHI%\RX\Units;c:\delphi\homepr~1\dtlang~1;%DELPHI%\vtv;%DELPHI%\vst\Source\Common;%DELPHI%\vst\Source\VirtualExplorerTree
+set LIBRARY_PATH=%DELPHI%\tb2k\Source;%DELPHI%\tbx;%DELPHI%\Graphics32;%DELPHI%\RX;%DELPHI%\RX\Units;%DELPHI%\vtv;%DELPHI%\vst\Source\Common;%DELPHI%\vst\Source\VirtualExplorerTree;c:\Delphi\CVSpro~1\dale\dtlang~1
 set COMPILER=%DELPHI%\Bin\dcc32.exe
 
 set HELP_COMPILER="C:\Program Files\HTML Help Workshop\hhc.exe"
