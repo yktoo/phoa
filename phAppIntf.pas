@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.6 2005-03-02 17:13:45 dale Exp $
+//  $Id: phAppIntf.pas,v 1.7 2005-03-03 14:53:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -114,7 +114,7 @@ type
      // Prop handlers
     function  GetAction: IPhoaAction; stdcall;
      // Props
-     // -- Action associated with the item. Can be nil for standard menu items
+     // -- Action associated with the item. Can be nil for built-in menu items
     property Action: IPhoaAction read GetAction;
   end;
 
