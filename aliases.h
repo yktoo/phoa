@@ -33,6 +33,7 @@ IDH_intf_ctl_browser_key        = intf-ctl-browser-key.html
 IDH_intf_ctl_browser_mouse      = intf-ctl-browser-mouse.html
 IDH_intf_ctl_viewer_key         = intf-ctl-viewer-key.html
 IDH_intf_ctl_viewer_mouse       = intf-ctl-viewer-mouse.html
+IDH_intf_expr_editor            = intf-expr-editor.html
 IDH_intf_file_ops               = intf-file-ops.html
 IDH_intf_file_ops_cdopts        = intf-file-ops-cdopts.html
 IDH_intf_file_ops_delopts       = intf-file-ops-delopts.html
