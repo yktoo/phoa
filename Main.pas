@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.34 2004-09-07 18:51:36 dale Exp $
+//  $Id: Main.pas,v 1.35 2004-09-08 15:17:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -133,8 +133,8 @@ type
     bUndo: TTBXSubmenuItem;
     smUndoHistory: TTBXSubmenuItem;
     ilActionsSmall: TTBImageList;
-    ilActionsMiddle: TTBImageList;
-    ilActionsLarge: TTBImageList;
+    ilActionsMiddle: TImageList;
+    ilActionsLarge: TImageList;
     aPhoaView_New: TAction;
     aPhoaView_Edit: TAction;
     aPhoaView_Delete: TAction;
@@ -387,6 +387,32 @@ uses
   udPicProps, udSettings, ufImgView, udSearch, udPhoAProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
   phToolSetting, udMsgBox, udGroupProps;
+
+   // Загружает ImageList из PNG-ресурса, если он ещё не загружен
+  procedure MakeImagesLoaded(const sResourceName: String; Images: TCustomImageList);
+  var
+    PNG: TPNGGraphic;
+    Bmp: TBitmap;
+  begin
+    if Images.Count=0 then begin
+       // Загружаем картинки в PNG
+      PNG := TPNGGraphic.Create;
+      try
+        PNG.LoadFromResourceName(HInstance, sResourceName);
+         // Копируем в битмэп
+        Bmp := TBitmap.Create;
+        try
+          Bmp.Assign(PNG);
+           // Загружаем в ImageList
+          Images.AddMasked(Bmp, clFuchsia);
+        finally
+          Bmp.Free;
+        end;
+      finally
+        PNG.Free;
+      end;
+    end;
+  end;
 
    //===================================================================================================================
    //  TfMain
@@ -844,8 +870,14 @@ uses
      // -- Размер кнопок основной панели
     case SettingValueInt(ISettingID_Gen_ToolbarBtnSize) of
       0: tbMain.Images := ilActionsSmall;
-      1: tbMain.Images := ilActionsMiddle;
-      2: tbMain.Images := ilActionsLarge;
+      1: begin
+        MakeImagesLoaded('PNG_MIDDLE_IMAGES', ilActionsMiddle);
+        tbMain.Images := ilActionsMiddle;
+      end;
+      2: begin
+        MakeImagesLoaded('PNG_LARGE_IMAGES', ilActionsLarge);
+        tbMain.Images := ilActionsLarge;
+      end;
     end;
      // Настраиваем дерево групп
     ApplyTreeSettings(tvGroups);
@@ -1157,7 +1189,7 @@ uses
       LongTimeFormat  := 'hh:nn:ss';
        // Настраиваем fpMain
       fpMain.IniFileName := SRegRoot;
-      fpMain.IniSection  := SRegMainWindow_Root;     
+      fpMain.IniSection  := SRegMainWindow_Root;
        // Создаём фотоальбом
       FPhoA := TPhotoAlbum.Create;
       FViewIndex := -1;
