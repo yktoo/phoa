@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.7 2004-09-23 04:09:45 dale Exp $
+//  $Id: phGUIObj.pas,v 1.8 2004-09-23 13:10:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phGUIObj;
 
 interface
-uses Windows, Messages, SysUtils, Graphics, Classes, Controls, Forms, GR32, phObj, phGraphics, ConsVars;
+uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phObj, phGraphics, ConsVars;
 
 type  
 
@@ -364,7 +364,7 @@ type
   end;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses Math, Themes, TBX, TBXThemes, phUtils, main;
+uses Math, Themes, phUtils;
 
 type
    // Запись кэша эскиза
@@ -826,6 +826,8 @@ type
     case Key of
        // Enter - входим в режим просмотра
       VK_RETURN: if Shift=[] then DoStartViewMode;
+       // Пробел - переключаем выделение
+      VK_SPACE: if Shift=[] then ToggleSelection(FItemIndex);
        // Стрелки - обрабатываем движения
       VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_HOME, VK_END, VK_PRIOR, VK_NEXT: begin
          // Без модификаторов или с Shift, но нет поточного выделения
@@ -1462,7 +1464,8 @@ type
 
   procedure TThumbnailViewer.ToggleSelection(Index: Integer);
   begin
-    if FSelIndexes.IndexOf(Index)>=0 then RemoveFromSelection(Index) else AddToSelection(Index);
+    if Index>=0 then
+      if FSelIndexes.IndexOf(Index)>=0 then RemoveFromSelection(Index) else AddToSelection(Index);
   end;
 
   procedure TThumbnailViewer.UpdateScrollBar;
@@ -1506,7 +1509,10 @@ type
   procedure TThumbnailViewer.WMContextMenu(var Msg: TWMContextMenu);
   begin
      // Вызываем context menu только если не был нажат Ctrl
-    if not FShellCtxMenuOnMouseUp then inherited; 
+    if not FShellCtxMenuOnMouseUp then begin
+      if InvalidPoint(Msg.Pos) then Msg.Pos := PointToSmallPoint(ClientToScreen(CenterPoint(ItemRect(FItemIndex, False))));
+      inherited;
+    end;
   end;
 
   procedure TThumbnailViewer.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
