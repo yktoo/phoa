@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.7 2004-12-02 11:19:43 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.8 2004-12-03 13:50:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -26,7 +26,7 @@ type
   IPhoaParsingPicFilter = interface(IInterface)
     ['{8C0A273B-FF72-433D-92C9-99633D69CA49}']
      // Выполняет разбор выражения
-    procedure ParseExpression(bCheck: Boolean);
+    procedure ParseExpression(bCheck, bRaiseOnError: Boolean);
      // Выполняет проверку разобранного выражения на допустимость
     procedure CheckExpression;
      // Проверяет, не было ли ошибок при разборе выражения, и если были, генерирует Exception
@@ -1065,7 +1065,7 @@ type
     FParseErrorMsg: String;
     FParseErrorPos: Integer;
      // IPhoaParsingPicFilter
-    procedure ParseExpression(bCheck: Boolean);
+    procedure ParseExpression(bCheck, bRaiseOnError: Boolean);
     procedure CheckExpression;
     procedure CheckHasNoErrors;
     function  Matches(Pic: IPhoaPic): Boolean;
@@ -1086,7 +1086,7 @@ type
   procedure TPhoaParsingPicFilter.CheckExpression;
   begin
     if not FParsed then
-      ParseExpression(True)
+      ParseExpression(True, True)
     else begin
       CheckHasNoErrors;
        // Если нет ни одной лексемы - значит, выражение не содержит обрабатываемых символов
@@ -1122,20 +1122,25 @@ type
 
   function TPhoaParsingPicFilter.GetParseErrorLocation: TPoint;
   var
-    i: Integer;
-    c: Char;
+    i, iLen: Integer;
+    c, cLast: Char;
   begin
-    Result.X := 1;
-    Result.Y := 1;
+    Result.x := 1;
+    Result.y := 1;
     i := 1;
-    while i<FParseErrorPos do begin
+    iLen := Length(FExpression);
+    cLast := #0;
+    while (i<FParseErrorPos) and (i<=iLen) do begin
       c := FExpression[i];
+       // Если встретили перевод строки
+      if (c in [#10, #13]) and (not (cLast in [#10, #13]) or (c=cLast)) then begin
+        Result.x := 1;
+        Inc(Result.y);
+       // Иначе приращиваем горизонтальную координату
+      end else
+        Inc(Result.x);
+      cLast := c;
       Inc(i);
-      if c in [#10, #13] then begin
-        Result.X := 1;
-        Inc(Result.Y);
-        if (c=#13) and (i<FParseErrorPos) and (FExpression[i]=#10) then Inc(i);
-      end;
     end;
   end;
 
@@ -1156,7 +1161,7 @@ type
     Item: IPhoaParsedItem;
   begin
      // Выполняем разбор выражения, если оно ещё не разобрано
-    ParseExpression(False);
+    ParseExpression(False, True);
      // Создаем стек результатов вычислений
     Results := TPhoaParsedItemsList.Create;
      // Последовательно берём все разобранные элементы
@@ -1175,7 +1180,7 @@ type
       PhoaParseError(1, SPhoaParseError_InvalidExpression);
   end;
 
-  procedure TPhoaParsingPicFilter.ParseExpression(bCheck: Boolean);
+  procedure TPhoaParsingPicFilter.ParseExpression(bCheck, bRaiseOnError: Boolean);
   var
     iLen, iCurrentPos, iItemPos: Integer;
     Item: IPhoaParsedItem;
@@ -1535,7 +1540,7 @@ type
         FHasErrors := True;
         FParseErrorPos := E.ErrorPos;
         FParseErrorMsg := E.Message;
-        raise;
+        if bRaiseOnError then raise;
       end;
     end;
   end;

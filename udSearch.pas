@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.28 2004-11-25 15:27:54 dale Exp $
+//  $Id: udSearch.pas,v 1.29 2004-12-03 13:50:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs, SynEditTypes,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
   phDlg, SynCompletionProposal, DKLang, TB2Item, TBX, TB2Dock, TB2Toolbar,
   SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls, Menus, ActnList,
@@ -1159,11 +1159,25 @@ type
 
   procedure TdSearch.aaExprSyntaxCheck(Sender: TObject);
   var PicFilter: IPhoaParsingPicFilter;
+
+    function PointToBuferCoord(const p: TPoint): TBufferCoord;
+    begin
+      Result.Line := p.y;
+      Result.Char := p.x;
+    end;
+
   begin
     PicFilter := NewPhoaParsingPicFilter;
+     // Присваиваем и разбираем выражение
     PicFilter.Expression := eExpression.Text;
-    PicFilter.CheckExpression;
-    PhoaInfo(False, 'SMsg_SyntaxOK');
+    PicFilter.ParseExpression(True, False);
+     // Если есть ошибки
+    if PicFilter.HasErrors then begin
+      eExpression.CaretXY := PointToBuferCoord(PicFilter.ParseErrorLocation);
+      PhoaMsgBox(mbkError, PicFilter.ParseErrorMsg, False, False, [mbbOK]);
+     // Иначе сообщаем об успехе
+    end else
+      PhoaInfo(False, 'SMsg_SyntaxOK');
   end;
 
   procedure TdSearch.aaExprUndo(Sender: TObject);
