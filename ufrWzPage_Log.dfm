@@ -6,6 +6,11 @@ inherited frWzPage_Log: TfrWzPage_Log
     Height = 252
     Align = alClient
     Header.AutoSizeIndex = 1
+    Header.Font.Charset = DEFAULT_CHARSET
+    Header.Font.Color = clWindowText
+    Header.Font.Height = -11
+    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
@@ -131,8 +136,8 @@ inherited frWzPage_Log: TfrWzPage_Log
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
-      'lInfo.Caption'
-      '*.SecondaryShortCuts')
+      '*.SecondaryShortCuts'
+      'lInfo.Caption')
     Left = 128
     Top = 8
     LangData = {

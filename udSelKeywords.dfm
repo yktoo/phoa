@@ -1,6 +1,6 @@
 inherited dSelKeywords: TdSelKeywords
   Left = 599
-  Top = 293
+  Top = 248
   Caption = 'Select keywords'
   ClientHeight = 431
   ClientWidth = 354

@@ -1,6 +1,6 @@
 object PhoaWizardForm: TPhoaWizardForm
   Left = 369
-  Top = 280
+  Top = 278
   AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = '<wizard caption>'

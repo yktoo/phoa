@@ -1,5 +1,6 @@
 inherited dViewProps: TdViewProps
   Left = 590
+  Top = 244
   Caption = 'Properties: photo album view'
   ClientHeight = 435
   ClientWidth = 426

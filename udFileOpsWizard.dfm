@@ -1,6 +1,5 @@
 inherited dFileOpsWizard: TdFileOpsWizard
-  Left = 425
-  Top = 340
+  Left = 424
   Caption = 'File operations wizard'
   PixelsPerInch = 96
   TextHeight = 13

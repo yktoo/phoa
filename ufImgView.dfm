@@ -1,5 +1,5 @@
 object fImgView: TfImgView
-  Left = 485
+  Left = 484
   Top = 235
   AutoScroll = False
   ClientHeight = 271
