@@ -2054,6 +2054,14 @@
           <tranEntry langID="1058" value="&amp;Додатково &lt;&lt;"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="SBtn_Help">
+        <tranEntries>
+          <tranEntry langID="1049" value="Справка"/>
+          <tranEntry langID="1033" value="Help"/>
+          <tranEntry langID="1031" value="Help"/>
+          <tranEntry langID="1046" value="Help"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="SBtn_Interrupt">
         <tranEntries>
           <tranEntry langID="1033" value="Interrupt"/>
@@ -2061,6 +2069,43 @@
           <tranEntry langID="1031" value="Unterbrechen"/>
           <tranEntry langID="1046" value="Interromper"/>
           <tranEntry langID="1058" value="Перервати"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SBtn_No">
+        <tranEntries>
+          <tranEntry langID="1049" value="&amp;Нет"/>
+          <tranEntry langID="1033" value="&amp;No"/>
+          <tranEntry langID="1031" value="&amp;No"/>
+          <tranEntry langID="1046" value="&amp;No"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SBtn_NoToAll">
+        <tranEntries>
+          <tranEntry langID="1049" value="Нет для &amp;всех"/>
+          <tranEntry langID="1033" value="No to &amp;all"/>
+          <tranEntry langID="1031" value="No to &amp;all"/>
+          <tranEntry langID="1046" value="No to &amp;all"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SBtn_OK">
+        <tranEntries>
+          <tranEntry langID="1049" value="OK"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SBtn_Yes">
+        <tranEntries>
+          <tranEntry langID="1049" value="&amp;Да"/>
+          <tranEntry langID="1033" value="&amp;Yes"/>
+          <tranEntry langID="1031" value="&amp;Yes"/>
+          <tranEntry langID="1046" value="&amp;Yes"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SBtn_YesToAll">
+        <tranEntries>
+          <tranEntry langID="1049" value="Да для все&amp;х"/>
+          <tranEntry langID="1033" value="Yes to a&amp;ll"/>
+          <tranEntry langID="1031" value="Yes to a&amp;ll"/>
+          <tranEntry langID="1046" value="Yes to a&amp;ll"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SCannotUndo">
@@ -2170,6 +2215,15 @@
           <tranEntry langID="1058" value="PhoA: Підтвердження"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="SDlgTitle_ConfirmWarning">
+        <tranEntries>
+          <tranEntry langID="1049" value="PhoA: Подтверждение"/>
+          <tranEntry langID="1033" value="PhoA: Confirm"/>
+          <tranEntry langID="1031" value="PhoA: Bestдtigen"/>
+          <tranEntry langID="1046" value="PhoA: Confirmar"/>
+          <tranEntry langID="1058" value="PhoA: Підтвердження"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="SDlgTitle_Error">
         <tranEntries>
           <tranEntry langID="1033" value="PhoA: Error"/>
@@ -2228,6 +2282,14 @@
           <tranEntry langID="1033" value="Select a folder"/>
           <tranEntry langID="1031" value="Select a folder"/>
           <tranEntry langID="1046" value="Select a folder"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SDlgTitle_Warning">
+        <tranEntries>
+          <tranEntry langID="1049" value="PhoA: Внимание"/>
+          <tranEntry langID="1033" value="PhoA: Warning"/>
+          <tranEntry langID="1031" value="PhoA: Warning"/>
+          <tranEntry langID="1046" value="PhoA: Warning"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SErrCannotCreateFolder">

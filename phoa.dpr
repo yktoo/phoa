@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.9 2004-04-25 16:28:31 dale Exp $
+//  $Id: phoa.dpr,v 1.10 2004-05-19 13:59:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -57,7 +57,8 @@ uses
   phSettings in 'phSettings.pas',
   phValSetting in 'phValSetting.pas',
   phToolSetting in 'phToolSetting.pas',
-  udToolProps in 'udToolProps.pas' {dToolProps};
+  udToolProps in 'udToolProps.pas' {dToolProps},
+  udMsgBox in 'udMsgBox.pas' {dMsgBox};
 
 {$R *.res}
 

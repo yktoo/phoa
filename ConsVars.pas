@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.21 2004-05-16 11:33:07 dale Exp $
+//  $Id: ConsVars.pas,v 1.22 2004-05-19 13:59:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -83,6 +83,41 @@ type
    // Режим массовой простановки отметки
   TMassCheckMode = (mcmAll, mcmNone, mcmInvert);
 
+   // Вид окна сообщения (влияет на заголовок, значок и звуковой сигнал)
+  TMessageBoxKind = (
+    mbkInfo,           // Информация                      - OK
+    mbkWarning,        // Предупреждение                  - OK
+    mbkConfirm,        // Подтверждение                   - OK/Cancel
+    mbkConfirmWarning, // Предупреждение с подтверждением - OK/Cancel
+    mbkError);         // Ошибка                          - OK
+
+   // Кнопка в окне сообщения 
+  TMessageBoxButton = (
+    mbbYes,      // Да
+    mbbNo,       // Нет
+    mbbOK,       // ОК
+    mbbCancel,   // Отмена
+    mbbYesToAll, // Да для всех
+    mbbNoToAll,  // Нет для всех
+    mbbHelp);    // Справка
+  TMessageBoxButtons = set of TMessageBoxButton;
+   // Предопределённые наборы кнопок
+const
+  MBBOKCancelHelp    = [mbbOK, mbbCancel, mbbHelp];
+  MBBYesNoCancelHelp = [mbbYes, mbbNo, mbbCancel, mbbHelp];
+   // Результат показа окна сообщения
+type
+  TMessageBoxResult = (
+    mbrYes,       // Пользователь нажал "Да"
+    mbrNo,        // Пользователь нажал "Нет"
+    mbrOK,        // Пользователь нажал "ОК"
+    mbrCancel,    // Пользователь нажал "Отмена" или закрыл окно
+    mbrYesToAll,  // Пользователь нажал "Да для всех"
+    mbrNoToAll,   // Пользователь нажал "Нет для всех"
+    mbrDontShow); // Пользователь включил переключатель "Больше не показывать..."
+  TMessageBoxResults = set of TMessageBoxResult;
+
+type
    // Возможные операции с изображениями (доступные через пункт меню Сервис | Операции с изображениями)
   TPictureOperation = (
     popMoveToTarget,     // Переместить выделенные изображения в указанную группу
