@@ -1,13 +1,13 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_lang_distribution.bat,v 1.6 2004-11-11 13:15:27 dale Exp $
+rem $Id: _make_lang_distribution.bat,v 1.7 2004-12-07 14:07:07 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 rem ** Making bundle of language files 
 
-set VERSION=1.1.6beta
+set VERSION=1.1.7beta
 set ZIPNAME=phoa-lang-src-%VERSION%.zip
 
 if exist IS-install\%ZIPNAME% del IS-install\%ZIPNAME%
