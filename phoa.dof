@@ -94,7 +94,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=
+SearchPath=$(DELPHI)\Lib\Debug
 Packages=vcl;rtl;dbrtl;adortl;vcldb;vclx;bdertl;vcldbx;qrpt;teeui;teedb;tee;dss;teeqr;VclSmp;vclshlctrls;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;inetdb;dbexpress;dclOffice2k;visualclx;visualdbclx;RxCtl6;RxDB6;RxBDE6
 Conditionals=
 DebugSourceDirs=
@@ -131,6 +131,8 @@ ProductName=PhoA
 ProductVersion=1.1.6
 Comments=All rights reserved. Refer to http://www.dk-soft.org/ for detailed info or distribution terms.
 VendorWebsite=http://www.dk-soft.org/
+[Excluded Packages]
+C:\Progra~1\Borland\Delphi7\Bpl\tbx_d7.bpl=Toolbar2000 -- TBX Extensions (Alex Denisov)
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
