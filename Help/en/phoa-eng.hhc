@@ -390,19 +390,31 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Picture deletion">
 			<param name="Local" value="tasks-pic-deletion.html">
-			</OBJECT>			
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Picture file link repairing">
 			<param name="Local" value="tasks-pic-file-link-repair.html">
-			</OBJECT>			
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Slide show">
+			<param name="Local" value="tasks-slide-show.html">
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Sorting pictures">
 			<param name="Local" value="tasks-sorting.html">
-			</OBJECT>			
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Configuring thumbnail dimensions and quality">
+			<param name="Local" value="tasks-thumb-adjusting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Using external tools">
+			<param name="Local" value="tasks-tools.html">
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Viewing pictures">
 			<param name="Local" value="tasks-viewing.html">
-			</OBJECT>			
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (Frequently Asked Questions)">
 			<param name="Local" value="info-faq.html">

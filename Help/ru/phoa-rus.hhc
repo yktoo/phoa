@@ -388,22 +388,34 @@
 			<param name="Local" value="tasks-media-preparing.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Удаление изображений">
+			<param name="Name" value="&Oacute;&auml;&agrave;&euml;&aring;&iacute;&egrave;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 			<param name="Local" value="tasks-pic-deletion.html">
-			</OBJECT>			
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Исправление ссылки на файл изображения">
+			<param name="Name" value="&Egrave;&ntilde;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &ntilde;&ntilde;&ucirc;&euml;&ecirc;&egrave; &iacute;&agrave; &ocirc;&agrave;&eacute;&euml; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
 			<param name="Local" value="tasks-pic-file-link-repair.html">
-			</OBJECT>			
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Сортировка изображений">
+			<param name="Name" value="&Iuml;&icirc;&ecirc;&agrave;&ccedil; &ntilde;&euml;&agrave;&eacute;&auml;&icirc;&acirc;">
+			<param name="Local" value="tasks-slide-show.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Ntilde;&icirc;&eth;&ograve;&egrave;&eth;&icirc;&acirc;&ecirc;&agrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 			<param name="Local" value="tasks-sorting.html">
-			</OBJECT>			
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Просмотр изображений">
+			<param name="Name" value="&Egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&aring; &eth;&agrave;&ccedil;&igrave;&aring;&eth;&icirc;&acirc; &egrave;&euml;&egrave; &ecirc;&agrave;&divide;&aring;&ntilde;&ograve;&acirc;&agrave; &yacute;&ntilde;&ecirc;&egrave;&ccedil;&icirc;&acirc;">
+			<param name="Local" value="tasks-thumb-adjusting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Iuml;&icirc;&auml;&ecirc;&euml;&thorn;&divide;&aring;&iacute;&egrave;&aring; &acirc;&iacute;&aring;&oslash;&iacute;&egrave;&otilde; &egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&icirc;&acirc;">
+			<param name="Local" value="tasks-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 			<param name="Local" value="tasks-viewing.html">
-			</OBJECT>			
-  	<LI> <OBJECT type="text/sitemap">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (&divide;&agrave;&ntilde;&ograve;&icirc; &ccedil;&agrave;&auml;&agrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &acirc;&icirc;&iuml;&eth;&icirc;&ntilde;&ucirc;)">
 			<param name="Local" value="info-faq.html">
 			</OBJECT>

@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-eng.hhp,v 1.18 2005-03-09 15:20:05 dale Exp $
+;   $Id: phoa-eng.hhp,v 1.19 2005-03-10 14:59:19 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright DK Software, http://www.dk-soft.org/
@@ -115,7 +115,10 @@ tasks-getting-started.html
 tasks-media-preparing.html
 tasks-pic-deletion.html
 tasks-pic-file-link-repair.html
+tasks-slide-show.html
 tasks-sorting.html
+tasks-thumb-adjusting.html
+tasks-tools.html
 tasks-viewing.html
 
 [ALIAS]
