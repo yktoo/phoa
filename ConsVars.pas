@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.71 2004-10-30 12:07:01 dale Exp $
+//  $Id: ConsVars.pas,v 1.72 2004-11-07 17:31:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -546,6 +546,11 @@ const
   IDH_intf_browse_mode_tasks      = 00080;
   IDH_intf_browse_mode_views      = 00090;
   IDH_intf_browse_mode            = 00100;
+  IDH_intf_controls               = 00110;
+  IDH_intf_ctl_browser_key        = 00112;
+  IDH_intf_ctl_browser_mouse      = 00113;
+  IDH_intf_ctl_viewer_key         = 00115;
+  IDH_intf_ctl_viewer_mouse       = 00116;
   IDH_intf_key_mouse_controls     = 00110;
   IDH_intf_major_modes            = 00120;
   IDH_intf_pic_add                = 00130;

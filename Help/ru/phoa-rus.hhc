@@ -257,11 +257,11 @@
 						<param name="Local" value="intf-file-ops-selfolder.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="&Icirc;&iuml;&ouml;&egrave;&egrave; &ecirc;&icirc;&iuml;&egrave;&eth;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;/&iuml;&aring;&eth;&aring;&igrave;&aring;&ugrave;&aring;&iacute;&egrave;&yuml; (&ntilde;&ograve;&eth;&agrave;&iacute;&egrave;&ouml;&agrave;1)">
+						<param name="Name" value="&Icirc;&iuml;&ouml;&egrave;&egrave; &ecirc;&icirc;&iuml;&egrave;&eth;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;/&iuml;&aring;&eth;&aring;&igrave;&aring;&ugrave;&aring;&iacute;&egrave;&yuml; (&ntilde;&ograve;&eth;&agrave;&iacute;&egrave;&ouml;&agrave; 1)">
 						<param name="Local" value="intf-file-ops-moveopts.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
-						<param name="Name" value="&Icirc;&iuml;&ouml;&egrave;&egrave; &ecirc;&icirc;&iuml;&egrave;&eth;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;/&iuml;&aring;&eth;&aring;&igrave;&aring;&ugrave;&aring;&iacute;&egrave;&yuml; (&ntilde;&ograve;&eth;&agrave;&iacute;&egrave;&ouml;&agrave;2)">
+						<param name="Name" value="&Icirc;&iuml;&ouml;&egrave;&egrave; &ecirc;&icirc;&iuml;&egrave;&eth;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;/&iuml;&aring;&eth;&aring;&igrave;&aring;&ugrave;&aring;&iacute;&egrave;&yuml; (&ntilde;&ograve;&eth;&agrave;&iacute;&egrave;&ouml;&agrave; 2)">
 						<param name="Local" value="intf-file-ops-moveopts2.html">
 						</OBJECT>
 					<LI> <OBJECT type="text/sitemap">
@@ -289,8 +289,26 @@
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ntilde;&icirc;&divide;&aring;&ograve;&agrave;&iacute;&egrave;&yuml; &ecirc;&euml;&agrave;&acirc;&egrave;&oslash; &egrave; &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &igrave;&ucirc;&oslash;&uuml;&thorn;">
-			<param name="Local" value="intf-key-mouse-controls.html">
+			<param name="Local" value="intf-controls.html">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Dstrok;&aring;&aelig;&egrave;&igrave; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave; — &ecirc;&euml;&agrave;&acirc;&egrave;&agrave;&ograve;&oacute;&eth;&agrave;">
+				<param name="Local" value="intf-ctl-browser-key.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Dstrok;&aring;&aelig;&egrave;&igrave; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave; — &igrave;&ucirc;&oslash;&uuml;">
+				<param name="Local" value="intf-ctl-browser-mouse.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Dstrok;&aring;&aelig;&egrave;&igrave; &iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;&agrave; — &ecirc;&euml;&agrave;&acirc;&egrave;&agrave;&ograve;&oacute;&eth;&agrave;">
+				<param name="Local" value="intf-ctl-viewer-key.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Dstrok;&aring;&aelig;&egrave;&igrave; &iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;&agrave; — &igrave;&ucirc;&oslash;&uuml;">
+				<param name="Local" value="intf-ctl-viewer-mouse.html">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
 			<param name="Local" value="theory-transform.html">

@@ -177,7 +177,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="keyboard shortcuts">
 		<param name="Name" value="Keyboard and mouse controls">
-		<param name="Local" value="intf-key-mouse-controls.html">
+		<param name="Local" value="intf-controls.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="keywords">
@@ -248,7 +248,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="mouse controls">
 		<param name="Name" value="Keyboard and mouse controls">
-		<param name="Local" value="intf-key-mouse-controls.html">
+		<param name="Local" value="intf-controls.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="operations">

@@ -184,7 +184,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ecirc;&euml;&agrave;&acirc;&egrave;&agrave;&ograve;&oacute;&eth;&agrave;, &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Сочетания клавиш и управление мышью">
-		<param name="Local" value="intf-key-mouse-controls.html">
+		<param name="Local" value="intf-controls.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ecirc;&euml;&thorn;&divide;&aring;&acirc;&ucirc;&aring; &ntilde;&euml;&icirc;&acirc;&agrave;">
@@ -286,7 +286,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&igrave;&ucirc;&oslash;&uuml;, &oacute;&iuml;&eth;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Сочетания клавиш и управление мышью">
-		<param name="Local" value="intf-key-mouse-controls.html">
+		<param name="Local" value="intf-controls.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iacute;&agrave;&ccedil;&iacute;&agrave;&divide;&aring;&iacute;&egrave;&aring; PhoA">

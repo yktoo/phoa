@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.8 2004-10-30 12:07:01 dale Exp $
+//  $Id: maps.h,v 1.9 2004-11-07 17:31:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -16,7 +16,11 @@
 #define IDH_intf_browse_mode_tasks      00080
 #define IDH_intf_browse_mode_views      00090
 #define IDH_intf_browse_mode            00100
-#define IDH_intf_key_mouse_controls     00110
+#define IDH_intf_controls               00110
+#define IDH_intf_ctl_browser_key        00112
+#define IDH_intf_ctl_browser_mouse      00113
+#define IDH_intf_ctl_viewer_key         00115
+#define IDH_intf_ctl_viewer_mouse       00116
 #define IDH_intf_major_modes            00120
 #define IDH_intf_pic_add                00130
 #define IDH_intf_pic_add_checkfiles     00131

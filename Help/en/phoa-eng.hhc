@@ -289,8 +289,26 @@
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Keyboard and mouse controls">
-			<param name="Local" value="intf-key-mouse-controls.html">
+			<param name="Local" value="intf-controls.html">
 			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Browse mode - Keyboard">
+				<param name="Local" value="intf-ctl-browser-key.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Browse mode - Mouse">
+				<param name="Local" value="intf-ctl-browser-mouse.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="View mode - Keyboard">
+				<param name="Local" value="intf-ctl-viewer-key.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="View mode - Mouse">
+				<param name="Local" value="intf-ctl-viewer-mouse.html">
+				</OBJECT>
+		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Transformations">
 			<param name="Local" value="theory-transform.html">

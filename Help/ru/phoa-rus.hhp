@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-rus.hhp,v 1.9 2004-10-30 12:07:01 dale Exp $
+;   $Id: phoa-rus.hhp,v 1.10 2004-11-07 17:31:17 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -35,6 +35,11 @@ intf-browse-mode-menu-tools.html
 intf-browse-mode-menu-help.html
 intf-browse-mode-tasks.html
 intf-browse-mode-views.html
+intf-controls.html
+intf-ctl-browser-key.html
+intf-ctl-browser-mouse.html
+intf-ctl-viewer-key.html
+intf-ctl-viewer-mouse.html
 intf-file-ops.html
 intf-file-ops-cdopts.html
 intf-file-ops-delopts.html
@@ -52,7 +57,6 @@ intf-file-ops-task-move.html
 intf-file-ops-task-repfl.html
 intf-file-ops-task-rthumb.html
 intf-group-props.html
-intf-key-mouse-controls.html
 intf-major-modes.html
 intf-pic-add.html
 intf-pic-add-checkfiles.html
