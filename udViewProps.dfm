@@ -5,6 +5,7 @@ inherited dViewProps: TdViewProps
   ClientHeight = 435
   ClientWidth = 592
   OldCreateOrder = True
+  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
@@ -28,7 +29,7 @@ inherited dViewProps: TdViewProps
       object lName: TLabel
         Left = 8
         Top = 4
-        Width = 27
+        Width = 31
         Height = 13
         Caption = '&Name:'
         FocusControl = eName
@@ -36,7 +37,7 @@ inherited dViewProps: TdViewProps
       object lGrouping: TLabel
         Left = 8
         Top = 44
-        Width = 107
+        Width = 111
         Height = 13
         Caption = '&Picture grouping order:'
       end
