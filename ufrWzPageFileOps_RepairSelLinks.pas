@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.8 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit ufrWzPageFileOps_RepairSelLinks;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, VirtualTrees,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, ConsVars,
+  phWizard, StdCtrls, ExtCtrls, Mask, VirtualTrees,
   DKLang;
 
 type
@@ -81,7 +81,7 @@ uses phUtils, udFileOpsWizard, phObj, Main;
   procedure TfrWzPageFileOps_RepairSelLinks.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
     s: String;
-    Pic: TPhoaPic;
+    Pic: IPhotoAlbumPic;
     FL: TFileLink;
   begin
     s := '';
@@ -91,7 +91,7 @@ uses phUtils, udFileOpsWizard, phObj, Main;
       case Column of
         0: s := Pic.Props[ppFileName];
         1: s := Pic.Props[ppFilePath];
-        2: s := HumanReadableSize(Pic.PicFileSize);
+        2: s := HumanReadableSize(Pic.FileSize);
       end;
      // Найденный файл
     end else begin

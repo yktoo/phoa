@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.9 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.10 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -134,12 +134,12 @@ const
     procedure FillPropVals;
     var
       i: Integer;
-      Pic: IPhoaPic;
+      Pic: IPhotoAlbumPic;
       Prop: TPicProperty;
     begin
        // Цикл по изображениям
       for i := 0 to EditedPics.Count-1 do begin
-        Pic := EditedPics[i];
+        Pic := EditedPics[i] as IPhotoAlbumPic;
          // Обрабатываем все редактируемые свойства с состоянием pvsUnassigned или pvsUniform
         for Prop := Low(Prop) to High(Prop) do
           if Prop in EditablePicProps then
@@ -148,10 +148,10 @@ const
                  // Значение ещё не присваивалось, это будет первым значением
                 pvsUnassigned: begin
                   State  := pvsUniform;
-                  sValue := TPhoaPic(Pic.Handle).Props[Prop];
+                  sValue := Pic.Props[Prop];
                 end;
                  // Значение уже было, сверяем текущее. Если не совпало - статус устанавливаем pvsVarious
-                pvsUniform: if sValue<>TPhoaPic(Pic.Handle).Props[Prop] then State  := pvsVarious;
+                pvsUniform: if sValue<>Pic.Props[Prop] then State  := pvsVarious;
               end;
       end;
     end;

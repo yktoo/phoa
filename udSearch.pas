@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.11 2004-10-06 14:41:11 dale Exp $
+//  $Id: udSearch.pas,v 1.12 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -647,24 +647,23 @@ type
     SearchArea: TSearchArea;
     Pic: IPhoaPic;
 
-    function Matches(Pic: IPhoaPic): Boolean;
+    function Matches(Pic: IPhotoAlbumPic): Boolean;
     var i: Integer;
     begin
-    
       for i := 0 to High(aSearchCriteria) do begin
         with aSearchCriteria[i] do
           case i of
-            ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                           iID);
-            ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.FileSize,                     iFSize);
-            ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.ImageSize.cx,                 iPicWidth);
-            ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.ImageSize.cy,                 iPicHeight);
-            ICritIdx_FileMasks: Result := MatchesCondition(MskCond, ExtractFileName(Pic.FileName),    FMasks);
-            ICritIdx_Date1:     Result := MatchesCondition(DatCond, Pic.Date,                         iDate1);
-            ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                         iDate2);
-            ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                         iTime1);
-            ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                         iTime2);
-            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, TPhoaPic(Pic.Handle).PicKeywords, SLKeywords);
-            else                Result := MatchesCondition(StrCond, TPhoaPic(Pic.Handle).Props[Prop], sValue);
+            ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                        iID);
+            ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.FileSize,                  iFSize);
+            ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.ImageSize.cx,              iPicWidth);
+            ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.ImageSize.cy,              iPicHeight);
+            ICritIdx_FileMasks: Result := MatchesCondition(MskCond, ExtractFileName(Pic.FileName), FMasks);
+            ICritIdx_Date1:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate1);
+            ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate2);
+            ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime1);
+            ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime2);
+            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.KeywordList,               SLKeywords);
+            else                Result := MatchesCondition(StrCond, Pic.Props[Prop],               sValue);
           end;
          // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
         if not Result then Break;
@@ -722,7 +721,7 @@ type
             saCurGroup: Pic := FCurGroup.Pics[i];
             else        Pic := FResultsGroup.Pics[i];
           end;
-          if Matches(Pic) then FLocalResults.Add(Pic, True);
+          if Matches(Pic as IPhotoAlbumPic) then FLocalResults.Add(Pic, True);
         end;
       finally
         FMasks.Free;

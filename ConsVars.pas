@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.60 2004-10-06 14:41:10 dale Exp $
+//  $Id: ConsVars.pas,v 1.61 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,7 +15,7 @@ uses
 type
   EPhoaException = class(Exception);
 
-   // Свойства изображения
+   // Picture properties
   TPicProperty = (
     ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
     ppFormat, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia,

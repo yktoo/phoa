@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.17 2004-10-06 14:41:10 dale Exp $
+//  $Id: phGUIObj.pas,v 1.18 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -478,7 +478,7 @@ type
        // Скрываем Tooltip, если есть
       Application.CancelHint;
        // Строим описание (добавляем палку, чтобы в StatusBar ничего не попадало)
-//!!!      if idx<0 then Hint := '' else Hint := FPicLinks[idx].GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
+      if idx<0 then Hint := '' else Hint := (FPicList[idx] as IPhotoAlbumPic).GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
       FLastTooltipIdx := idx;
     end;
   end;
@@ -1065,25 +1065,24 @@ type
   procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
   const aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
   var
-    Pic: IPhoaPic;
+    Pic: IPhotoAlbumPic;
     r, rInner: TRect;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
     function DrawDetail(Corner: TThumbCorner; rText: TRect): Integer;
-//!!!    var sProp: String;
+    var sProp: String;
     begin
-//!!!      Result := 0;
-//      if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
-//        sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
-//        if sProp<>'' then begin
-//          Result := Info.Bitmap.TextWidth(sProp)+2;
-//          Info.Bitmap.Textout(
-//            rText,
-//            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
-//            sProp);
-//        end;
-//      end;
-result := 30;
+      Result := 0;
+      if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
+        sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
+        if sProp<>'' then begin
+          Result := Info.Bitmap.TextWidth(sProp)+2;
+          Info.Bitmap.Textout(
+            rText,
+            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
+            sProp);
+        end;
+      end;
     end;
 
      // Отрисовывает на эскизе данные, находящиеся на одной гориз. линии
@@ -1112,7 +1111,7 @@ result := 30;
 
   begin
      // Получаем изображение
-    Pic := FPicList[iIndex];
+    Pic := FPicList[iIndex] as IPhotoAlbumPic;
      // Рисуем рамку
     r := ItemRect;
     Info.Bitmap.Font.Assign(Self.Font);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.6 2004-09-15 18:53:13 dale Exp $
+//  $Id: ufrSorting.pas,v 1.7 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrSorting;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ActiveX,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ActiveX,
   StdCtrls, TB2Item, TBX, Menus, VirtualTrees;
 
 type

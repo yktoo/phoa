@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.42 2004-10-06 14:41:10 dale Exp $
+//  $Id: phObj.pas,v 1.43 2004-10-06 15:28:52 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -16,9 +16,11 @@ type
    //===================================================================================================================
 
   IPhotoAlbumPics = interface;
-   
+
   IPhotoAlbumPic = interface(IPhoaMutablePic)
     ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB631}']
+     // Копирует все данные изображения
+    procedure Assign(SrcPic: IPhotoAlbumPic);
      // Устанавливает список NewList в качестве владельца. При bAllocateNewID=True также распределяет изображению новый
      //    ID, уникальный в списке
     procedure PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
@@ -31,11 +33,28 @@ type
      //      связанные с изображением, т.е. с файлом, сохраняются только при наличии ppFileName in PProps)
     procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
     procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
+     // Сбрасывает указанные свойства в их значения по умолчанию
+    procedure CleanupProps(Props: TPicProperties);
+     // Составляет описание изображения из свойств Props, выбирая только указанные данные.
+     //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
+     //   sPropSep - разделительная строка между отдельными свойствами
+    function  GetPropStrs(Props: TPicProperties; const sNameValSep, sPropSep: String): String;
      // Prop handlers
+    function  GetKeywordList: TStrings; 
     function  GetList: IPhotoAlbumPics;
+    function  GetProps(PicProp: TPicProperty): String;
+    function  GetRawData(PProps: TPicProperties): String;
+    procedure SetProps(PicProp: TPicProperty; const Value: String);
+    procedure SetRawData(PProps: TPicProperties; const Value: String);
      // Props
+     // -- Ключевые слоа изображения
+    property KeywordList: TStrings read GetKeywordList; 
      // -- Список-владелец изображения
     property List: IPhotoAlbumPics read GetList;
+     // -- Свойства изображения по индексу
+    property Props[PicProp: TPicProperty]: String read GetProps write SetProps;
+     // -- Бинарные данные изображения (свойства, указанные в PProps)
+    property RawData[PProps: TPicProperties]: String read GetRawData write SetRawData;
   end;
 
    //===================================================================================================================
@@ -107,7 +126,7 @@ type
      // IPhoaMutablePicList
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean): Integer; overload; stdcall;
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload; stdcall;
-    function  Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer; overload; stdcall; 
+    function  Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer; overload; stdcall;
     function  Insert(Index: Integer; Pic: IPhoaPic; bSkipDuplicates: Boolean): Boolean; stdcall;
     function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
     function  GetSorted: Boolean; stdcall;
@@ -406,32 +425,35 @@ type
     function  IPhotoAlbumPic.GetThumbnailSize     = IPP_GetThumbnailSize;
     function  IPhotoAlbumPic.GetThumbnailData     = IPP_GetThumbnailData;
     function  IPhotoAlbumPic.GetThumbnailDataSize = IPP_GetThumbnailDataSize;
+    procedure IPhotoAlbumPic.Assign               = IPAP_Assign;
+    function  IPhotoAlbumPic.GetPropStrs          = IPAP_GetPropStrs;
+    function  IPhotoAlbumPic.GetKeywordList       = IPAP_GetKeywordList;
     function  IPhotoAlbumPic.GetList              = IPAP_GetList;
+    function  IPhotoAlbumPic.GetProps             = IPAP_GetProps;
+    procedure IPhotoAlbumPic.SetProps             = IPAP_SetProps;
+    function  IPhotoAlbumPic.GetRawData           = IPAP_GetRawData;
+    procedure IPhotoAlbumPic.SetRawData           = IPAP_SetRawData;
     procedure IPhotoAlbumPic.PutToList            = IPAP_PutToList;
     procedure IPhotoAlbumPic.Release              = IPAP_Release;
+    procedure IPhotoAlbumPic.CleanupProps         = IPAP_CleanupProps;
     procedure IPhotoAlbumPic.StreamerLoad         = IPAP_StreamerLoad;
     procedure IPhotoAlbumPic.StreamerSave         = IPAP_StreamerSave;
+    procedure IPAP_Assign(SrcPic: IPhotoAlbumPic);
+    function  IPAP_GetPropStrs(Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+    function  IPAP_GetKeywordList: TStrings;
     function  IPAP_GetList: IPhotoAlbumPics;
+    function  IPAP_GetProps(PicProp: TPicProperty): String;
+    procedure IPAP_SetProps(PicProp: TPicProperty; const Value: String);
+    function  IPAP_GetRawData(PProps: TPicProperties): String;
+    procedure IPAP_SetRawData(PProps: TPicProperties; const Value: String);
     procedure IPAP_PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
     procedure IPAP_Release;
+    procedure IPAP_CleanupProps(Props: TPicProperties);
     procedure IPAP_StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
     procedure IPAP_StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
-     // Prop handlers
-    function  GetRawData(PProps: TPicProperties): String;
-    procedure SetRawData(PProps: TPicProperties; const Value: String);
-    function  GetProps(PicProp: TPicProperty): String;
-    procedure SetProps(PicProp: TPicProperty; const Value: String);
   public
     constructor Create;
     destructor Destroy; override;
-     // Копирует все данные изображения
-    procedure Assign(Src: TPhoaPic);
-     // Составляет описание изображения из свойств Props, выбирая только указанные данные.
-     //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
-     //   sPropSep - разделительная строка между отдельными свойствами
-    function  GetPropStrs(Props: TPicProperties; const sNameValSep, sPropSep: String): String;
-     // Сбрасывает указанные свойства в их значения по умолчанию
-    procedure CleanupProps(Props: TPicProperties);
      // Props
      // -- Уникальный идентификатор
     property ID: Integer read FID;
@@ -467,10 +489,6 @@ type
     property PicRotation: TPicRotation read FPicRotation write FPicRotation;
      // -- Ширина изображения в пикселах
     property PicWidth: Integer read FPicWidth;
-     // -- Свойства по индексу
-    property Props[PicProp: TPicProperty]: String read GetProps write SetProps;
-     // -- Бинарные данные изображения (свойства, указанные в PProps)
-    property RawData[PProps: TPicProperties]: String read GetRawData write SetRawData;
      // -- Реальная высота эскиза
     property ThumbHeight: Integer read FThumbHeight;
      // -- Бинарные JPEG-данные эскиза
@@ -968,7 +986,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaPic);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhotoAlbumPic);
   end;
 
    //===================================================================================================================
@@ -2395,43 +2413,6 @@ uses
    // TPhoaPic
    //===================================================================================================================
 
-  procedure TPhoaPic.Assign(Src: TPhoaPic);
-  begin
-    FID             := Src.FID;
-    FPicAuthor      := Src.FPicAuthor;
-    FPicDateTime    := Src.FPicDateTime;
-    FPicDesc        := Src.FPicDesc;
-    FPicFileName    := Src.FPicFileName;
-    FPicFileSize    := Src.FPicFileSize;
-    FPicFilmNumber  := Src.FPicFilmNumber;
-    FPicFormat      := Src.FPicFormat;
-    FPicFrameNumber := Src.FPicFrameNumber;
-    FPicKeywords.Assign(Src.FPicKeywords);
-    FPicNotes       := Src.FPicNotes;
-    FPicPlace       := Src.FPicPlace;
-    FThumbnailData  := Src.FThumbnailData;
-  end;
-
-  procedure TPhoaPic.CleanupProps(Props: TPicProperties);
-  begin
-    if [ppFileSize, ppFileSizeBytes]*Props<>[] then FPicFileSize        := 0;
-    if [ppPicWidth, ppPicDims]*Props<>[]       then FPicWidth           := 0;
-    if [ppPicHeight, ppPicDims]*Props<>[]      then FPicHeight          := 0;
-    if ppFormat      in Props                  then FPicFormat          := pfCustom;
-    if ppDate        in Props                  then FPicDateTime        := Frac(FPicDateTime);
-    if ppTime        in Props                  then FPicDateTime        := Int(FPicDateTime);
-    if ppPlace       in Props                  then FPicPlace           := '';
-    if ppFilmNumber  in Props                  then FPicFilmNumber      := '';
-    if ppFrameNumber in Props                  then FPicFrameNumber     := '';
-    if ppAuthor      in Props                  then FPicAuthor          := '';
-    if ppMedia       in Props                  then FPicMedia           := '';
-    if ppDescription in Props                  then FPicDesc            := '';
-    if ppNotes       in Props                  then FPicNotes           := '';
-    if ppKeywords    in Props                  then FPicKeywords.Clear; 
-    if ppRotation    in Props                  then FPicRotation        := pr0;
-    if ppFlips       in Props                  then FPicFlips           := [];
-  end;
-
   constructor TPhoaPic.Create;
   begin
     inherited Create;
@@ -2447,7 +2428,55 @@ uses
     inherited Destroy;
   end;
 
-  function TPhoaPic.GetProps(PicProp: TPicProperty): String;
+  procedure TPhoaPic.IPAP_Assign(SrcPic: IPhotoAlbumPic);
+  begin
+    FID             := SrcPic.ID;
+    FPicAuthor      := SrcPic.Author;
+    FPicDateTime    := PhoaDateToDate(SrcPic.Date)+PhoaTimeToTime(SrcPic.Time);
+    FPicDesc        := SrcPic.Description;
+    FPicFileName    := SrcPic.FileName;
+    FPicFileSize    := SrcPic.FileSize;
+    FPicFilmNumber  := SrcPic.FilmNumber;
+//!!!    FPicFormat      := SrcPic.PicFormat;
+    FPicFrameNumber := SrcPic.FrameNumber;
+    FPicKeywords.Assign(SrcPic.KeywordList);
+    FPicNotes       := SrcPic.Notes;
+    FPicPlace       := SrcPic.Place;
+//!!! Rotation? Flips? ...    
+    SetString(FThumbnailData, PChar(SrcPic.ThumbnailData), SrcPic.ThumbnailDataSize);
+  end;
+
+  procedure TPhoaPic.IPAP_CleanupProps(Props: TPicProperties);
+  begin
+    if [ppFileSize, ppFileSizeBytes]*Props<>[] then FPicFileSize        := 0;
+    if [ppPicWidth, ppPicDims]*Props<>[]       then FPicWidth           := 0;
+    if [ppPicHeight, ppPicDims]*Props<>[]      then FPicHeight          := 0;
+    if ppFormat      in Props                  then FPicFormat          := pfCustom;
+    if ppDate        in Props                  then FPicDateTime        := Frac(FPicDateTime);
+    if ppTime        in Props                  then FPicDateTime        := Int(FPicDateTime);
+    if ppPlace       in Props                  then FPicPlace           := '';
+    if ppFilmNumber  in Props                  then FPicFilmNumber      := '';
+    if ppFrameNumber in Props                  then FPicFrameNumber     := '';
+    if ppAuthor      in Props                  then FPicAuthor          := '';
+    if ppMedia       in Props                  then FPicMedia           := '';
+    if ppDescription in Props                  then FPicDesc            := '';
+    if ppNotes       in Props                  then FPicNotes           := '';
+    if ppKeywords    in Props                  then FPicKeywords.Clear;
+    if ppRotation    in Props                  then FPicRotation        := pr0;
+    if ppFlips       in Props                  then FPicFlips           := [];
+  end;
+
+  function TPhoaPic.IPAP_GetKeywordList: TStrings;
+  begin
+    Result := FPicKeywords;
+  end;
+
+  function TPhoaPic.IPAP_GetList: IPhotoAlbumPics;
+  begin
+    Result := IPhotoAlbumPics(FList);
+  end;
+
+  function TPhoaPic.IPAP_GetProps(PicProp: TPicProperty): String;
   begin
     Result := '';
     case PicProp of
@@ -2476,7 +2505,7 @@ uses
     end;
   end;
 
-  function TPhoaPic.GetPropStrs(Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+  function TPhoaPic.IPAP_GetPropStrs(Props: TPicProperties; const sNameValSep, sPropSep: String): String;
   var
     Prop: TPicProperty;
     sVal: String;
@@ -2484,7 +2513,7 @@ uses
     Result := '';
     for Prop := Low(Prop) to High(Prop) do
       if Prop in Props then begin
-        sVal := GetProps(Prop);
+        sVal := IPAP_GetProps(Prop);
         if sVal<>'' then begin
           if sNameValSep<>'' then sVal := PicPropName(Prop)+sNameValSep+sVal;
           AccumulateStr(Result, sPropSep, sVal);
@@ -2492,7 +2521,7 @@ uses
       end;
   end;
 
-  function TPhoaPic.GetRawData(PProps: TPicProperties): String;
+  function TPhoaPic.IPAP_GetRawData(PProps: TPicProperties): String;
   var
     Stream: TStringStream;
     Streamer: TPhoaStreamer;
@@ -2513,11 +2542,6 @@ uses
     end;
   end;
 
-  function TPhoaPic.IPAP_GetList: IPhotoAlbumPics;
-  begin
-    Result := IPhotoAlbumPics(FList);
-  end;
-
   procedure TPhoaPic.IPAP_PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
   begin
     if FList<>Pointer(NewList) then begin
@@ -2533,6 +2557,42 @@ uses
   procedure TPhoaPic.IPAP_Release;
   begin
     IPAP_PutToList(nil, False);
+  end;
+
+  procedure TPhoaPic.IPAP_SetProps(PicProp: TPicProperty; const Value: String);
+  begin
+    case PicProp of
+      ppFullFileName: FPicFileName           := Value;
+      ppDate:         if Value='' then FPicDateTime := Frac(FPicDateTime) else FPicDateTime := StrToDate(Value)+Frac(FPicDateTime);
+      ppTime:         if Value='' then FPicDateTime := Int(FPicDateTime)  else FPicDateTime := StrToTime(Value)+Int(FPicDateTime);
+      ppPlace:        FPicPlace              := Value;
+      ppFilmNumber:   FPicFilmNumber         := Value;
+      ppFrameNumber:  FPicFrameNumber        := Value;
+      ppAuthor:       FPicAuthor             := Value;
+      ppDescription:  FPicDesc               := Value;
+      ppNotes:        FPicNotes              := Value;
+      ppMedia:        FPicMedia              := Value;
+      ppKeywords:     FPicKeywords.CommaText := Value;
+      else            PhoaException('Picture property %s cannot be written', [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
+    end;
+  end;
+
+  procedure TPhoaPic.IPAP_SetRawData(PProps: TPicProperties; const Value: String);
+  var
+    Stream: TStringStream;
+    Streamer: TPhoaStreamer;
+  begin
+    Stream := TStringStream.Create(Value);
+    try
+      Streamer := TPhoaStreamer.Create(Stream, psmRead, '');
+      try
+        IPAP_StreamerLoad(Streamer, False, PProps);
+      finally
+        Streamer.Free;
+      end;
+    finally
+      Stream.Free;
+    end;
   end;
 
   procedure TPhoaPic.IPAP_StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
@@ -2565,7 +2625,7 @@ uses
      // *** New format
     end else begin
        // Revert props to their defaults because they might be not saved due to their emptiness
-      CleanupProps(PProps);
+      IPAP_CleanupProps(PProps);
        // Read chunked data
       while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
         case Code of
@@ -2764,7 +2824,7 @@ uses
   var Prop: TPicProperty;
   begin
     Prop := PropNameToPicProperty(pcPropName);
-    if Prop in PPAllProps then Result := PAnsiChar(Props[Prop]) else Result := nil;
+    if Prop in PPAllProps then Result := PAnsiChar(IPAP_GetProps(Prop)) else Result := nil;
   end;
 
   function TPhoaPic.IPP_GetRotation: TPicRotation;
@@ -2793,42 +2853,6 @@ uses
     Result := TimeToPhoaTime(FPicDateTime);
   end;
 
-  procedure TPhoaPic.SetProps(PicProp: TPicProperty; const Value: String);
-  begin
-    case PicProp of
-      ppFullFileName: FPicFileName           := Value;
-      ppDate:         if Value='' then FPicDateTime := Frac(FPicDateTime) else FPicDateTime := StrToDate(Value)+Frac(FPicDateTime);
-      ppTime:         if Value='' then FPicDateTime := Int(FPicDateTime)  else FPicDateTime := StrToTime(Value)+Int(FPicDateTime);
-      ppPlace:        FPicPlace              := Value;
-      ppFilmNumber:   FPicFilmNumber         := Value;
-      ppFrameNumber:  FPicFrameNumber        := Value;
-      ppAuthor:       FPicAuthor             := Value;
-      ppDescription:  FPicDesc               := Value;
-      ppNotes:        FPicNotes              := Value;
-      ppMedia:        FPicMedia              := Value;
-      ppKeywords:     FPicKeywords.CommaText := Value;
-      else            PhoaException('Picture property %s cannot be written', [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
-    end;
-  end;
-
-  procedure TPhoaPic.SetRawData(PProps: TPicProperties; const Value: String);
-  var
-    Stream: TStringStream;
-    Streamer: TPhoaStreamer;
-  begin
-    Stream := TStringStream.Create(Value);
-    try
-      Streamer := TPhoaStreamer.Create(Stream, psmRead, '');
-      try
-        IPAP_StreamerLoad(Streamer, False, PProps);
-      finally
-        Streamer.Free;
-      end;
-    finally
-      Stream.Free;
-    end;
-  end;
-
    //===================================================================================================================
    // TPhotoAlbumPics
    //===================================================================================================================
@@ -2849,7 +2873,7 @@ uses
        // Создаём экземпляр изображения
       Pic := TPhoaPic.Create;
        // Копируем в него данные исходного изображения
-      TPhoaPic(Pic.Handle).Assign(TPhoaPic(PicList[i].Handle));
+      Pic.Assign(PicList[i] as IPhotoAlbumPic);
        // После этого (ID присвоен) - заносим в список
       Pic.PutToList(Self, False);
     end;
@@ -3216,7 +3240,7 @@ uses
       with ParentGroup.Groups do
         if Count=0 then Group := nil else Group := Items[Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      sPropVal := TPhoaPic(Pic.Handle).Props[PicProp];
+      sPropVal := (Pic as IPhotoAlbumPic).Props[PicProp];
       if (Group=nil) or not AnsiSameText(Group.Text, sPropVal) then begin
         Group := TPhoaGroup.Create(ParentGroup, 0);
         Group.Text := sPropVal;
@@ -3597,11 +3621,11 @@ uses
   procedure TPhotoAlbum.RemoveUnlinkedPics(UndoOperations: TPhoaOperations);
   var
     i: Integer;
-    Pic: IPhoaPic;
+    Pic: IPhotoAlbumPic;
   begin
     i := 0;
     while i<FPics.Count do begin
-      Pic := FPics[i];
+      Pic := FPics[i] as IPhotoAlbumPic;
       if not FRootGroup.IsPicLinked(Pic.ID, True) then TPhoaOp_InternalPicRemoving.Create(UndoOperations, Self, Pic) else Inc(i);
     end;
   end;
@@ -4279,13 +4303,13 @@ uses
    // TPhoaOp_InternalPicRemoving
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalPicRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaPic);
+  constructor TPhoaOp_InternalPicRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhotoAlbumPic);
   begin
     inherited Create(List, PhoA);
      // Сохраняем данные изображения
-    UndoFile.WriteStr(TPhoaPic(Pic.Handle).RawData[PPAllProps]);
+    UndoFile.WriteStr(Pic.RawData[PPAllProps]);
      // Выполняем операцию
-    (Pic as IPhotoAlbumPic).Release;
+    Pic.Release;
   end;
 
   procedure TPhoaOp_InternalPicRemoving.RollbackChanges;
@@ -4295,7 +4319,7 @@ uses
      // Создаём изображение
     Pic := TPhoaPic.Create;
      // Загружаем данные
-    TPhoaPic(Pic.Handle).RawData[PPAllProps] := UndoFile.ReadStr;
+    Pic.RawData[PPAllProps] := UndoFile.ReadStr;
      // Кладём в список (ID уже загружен)
     Pic.PutToList(FPhoA.Pics, False);
   end;
@@ -4307,7 +4331,7 @@ uses
   constructor TPhoaOp_InternalEditPicProps.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: IPhoaPicList; ChangeList: TPicPropertyChanges);
   var
     iPic, iChg: Integer;
-    Pic: IPhoaPic;
+    Pic: IPhotoAlbumPic;
     ChangedProps: TPicProperties;
   begin
     inherited Create(List, PhoA);
@@ -4319,12 +4343,12 @@ uses
      // Цикл по изображениям
     for iPic := 0 to Pics.Count-1 do begin
        // Запоминаем старые данные
-      Pic := Pics[iPic];
+      Pic := Pics[iPic] as IPhotoAlbumPic;
       UndoFile.WriteInt(Pic.ID);
-      UndoFile.WriteStr(TPhoaPic(Pic.Handle).RawData[ChangedProps]);
+      UndoFile.WriteStr(Pic.RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
-        with ChangeList[iChg]^ do TPhoaPic(Pic.Handle).Props[Prop] := sNewValue;
+        with ChangeList[iChg]^ do Pic.Props[Prop] := sNewValue;
     end;
   end;
 
@@ -4341,7 +4365,7 @@ uses
     for i := 0 to UndoFile.ReadInt-1 do begin
       iPicID   := UndoFile.ReadInt;
       sPicData := UndoFile.ReadStr;
-      TPhoaPic(FPhoA.Pics.ItemsByID[iPicID].Handle).RawData[ChangedProps] := sPicData;
+      (FPhoA.Pics.ItemsByID[iPicID] as IPhotoAlbumPic).RawData[ChangedProps] := sPicData;
     end;
   end;
 

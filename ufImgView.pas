@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.29 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufImgView.pas,v 1.30 2004-10-06 15:28:52 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -203,7 +203,7 @@ type
      // Слой перемещения информации
     FRBLayer: TRubberbandLayer;
      // Текущее отображаемое изображение
-    FPic: IPhoaPic;
+    FPic: IPhotoAlbumPic;
      // Предыдущее просмотренное скэшированное изображение, имя его файла и его преобразования
     FCachedBitmap: TBitmap32;
     FCachedBitmapFilename: String;
@@ -879,13 +879,13 @@ uses
   var sCaption: String;
   begin
      // Настраиваем Caption / составляем описание
-//!!!    if FErroneous then begin
+   if FErroneous then begin
       sCaption := '';
       FPicDesc := '';
-//    end else begin
-//!!!      sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
-//      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
-//    end;
+    end else begin
+      sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
+      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
+    end;
     if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик
     eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.Pics.Count]);
@@ -951,7 +951,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FGroup.Pics[FPicIdx];
+    FPic := FGroup.Pics[FPicIdx] as IPhotoAlbumPic;
      // Определяем, есть ли изображение в кэше 
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
