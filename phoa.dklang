@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.36 2004-11-25 08:45:00 dale Exp $
+;  $Id: phoa.dklang,v 1.37 2004-11-25 15:27:53 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -323,6 +323,16 @@ aExprUndo.Hint=00000075,Undo|Undo the last change
 aExprRedo.Caption=00000073,&Redo
 aExprRedo.Category=00000082,Expression search
 aExprRedo.Hint=00000076,Redo|Redo the last undone change
+aExprNew.Caption=00000087,&New
+aExprNew.Category=00000086,Expression search
+aExprNew.Hint=00000088,New|Clear the expression
+aExprOpen.Caption=00000090,&Open...
+aExprOpen.Category=00000089,Expression search
+aExprOpen.Hint=00000091,Open...|Open a text file containing the search expression
+aExprSaveAs.Caption=00000093,Save &as...
+aExprSaveAs.Category=00000092,Expression search
+aExprSaveAs.Hint=00000094,Save as...|Save the expression to a file
+mruExprOpen.Prefix=00000095,MRU
 
 [dProjectProps]
 Caption=00000003,Properties: photo album
@@ -905,8 +915,10 @@ SDlgTitle_Error=PhoA: Error
 SDlgTitle_Info=PhoA: Info
 SDlgTitle_OpenIni=Open settings file
 SDlgTitle_OpenPhoa=Open photo album file
+SDlgTitle_OpenSearchExpr=Open search expression
 SDlgTitle_SaveIni=Save settings file
 SDlgTitle_SavePhoa=Save photo album file as
+SDlgTitle_SaveSearchExprAs=Save search expression as
 SDlgTitle_SelectFolder=Select a folder
 SDlgTitle_Warning=PhoA: Warning
 SErrCannotCreateFolder=Unable to create folder "%s"
@@ -928,6 +940,7 @@ SErrTargetFileExists=Target file "%s" already exists
 SErrUnknownPicFileExtension=Unknown picture file extension for "%s"
 SFileFilter_Ini=Ini files (*.ini)|*.ini
 SFileFilter_OpenPhoa=Photo album files (*.phoa)|*.phoa|All files (*.*)|*.*
+SFileFilter_SearchExpr=Text files (*.txt)|*.txt|All files (*.*)|*.*
 SHelpFileName=phoa-eng.chm
 SImgView_DefaultCaption=View picture
 SImgView_ErrorMsg=ERROR

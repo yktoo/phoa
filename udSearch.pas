@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.27 2004-11-25 08:45:38 dale Exp $
+//  $Id: udSearch.pas,v 1.28 2004-11-25 15:27:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,7 +12,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
   phDlg, SynCompletionProposal, DKLang, TB2Item, TBX, TB2Dock, TB2Toolbar,
-  SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls, Menus, ActnList;
+  SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls, Menus, ActnList,
+  TBXExtItems, TB2MRU;
 
 type
    // Вид поиска
@@ -129,8 +130,11 @@ type
   TdSearch = class(TPhoaDialog)
     aExprCopy: TAction;
     aExprCut: TAction;
+    aExprNew: TAction;
+    aExprOpen: TAction;
     aExprPaste: TAction;
     aExprRedo: TAction;
+    aExprSaveAs: TAction;
     aExprSyntaxCheck: TAction;
     aExprUndo: TAction;
     alMain: TActionList;
@@ -139,8 +143,11 @@ type
     aSimpleCrDelete: TAction;
     bExprCopy: TTBXItem;
     bExprCut: TTBXItem;
+    bExprNew: TTBXItem;
+    bExprOpen: TTBXSubmenuItem;
     bExprPaste: TTBXItem;
     bExprRedo: TTBXItem;
+    bExprSaveAs: TTBXItem;
     bExprSyntaxCheck: TTBXItem;
     bExprUndo: TTBXItem;
     bReset: TButton;
@@ -151,9 +158,12 @@ type
     dkSimpleTop: TTBXDock;
     eExpression: TSynEdit;
     gbSearch: TGroupBox;
+    iMRUExprOpen: TTBXMRUListItem;
     ipmSimpleDelete: TTBXItem;
     ipmsmSimpleProp: TTBXSubmenuItem;
+    mruExprOpen: TTBXMRUList;
     pcCriteria: TPageControl;
+    pmExpression: TTBXPopupMenu;
     pmSimple: TTBXPopupMenu;
     rbAll: TRadioButton;
     rbCurGroup: TRadioButton;
@@ -162,23 +172,27 @@ type
     smExprInsertOperator: TTBXSubmenuItem;
     smExprInsertProp: TTBXSubmenuItem;
     tbExprMain: TTBXToolbar;
+    tbSepExprCut: TTBXSeparatorItem;
     tbSepExprSyntaxCheck: TTBXSeparatorItem;
     tbSepExprUndo: TTBXSeparatorItem;
     tbSimpleMain: TTBXToolbar;
+    TBXSeparatorItem1: TTBXSeparatorItem;
     tsExpression: TTabSheet;
     tsSimple: TTabSheet;
     tvSimpleCriteria: TVirtualStringTree;
-    pmExpression: TTBXPopupMenu;
-    tbSepExprCut: TTBXSeparatorItem;
     procedure aaExprCopy(Sender: TObject);
     procedure aaExprCut(Sender: TObject);
+    procedure aaExprNew(Sender: TObject);
+    procedure aaExprOpen(Sender: TObject);
     procedure aaExprPaste(Sender: TObject);
     procedure aaExprRedo(Sender: TObject);
+    procedure aaExprSaveAs(Sender: TObject);
     procedure aaExprSyntaxCheck(Sender: TObject);
     procedure aaExprUndo(Sender: TObject);
     procedure aaReset(Sender: TObject);
     procedure aaSimpleConvertToExpression(Sender: TObject);
     procedure aaSimpleCrDelete(Sender: TObject);
+    procedure eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure pcCriteriaChange(Sender: TObject);
     procedure pmSimplePopup(Sender: TObject);
     procedure tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -187,8 +201,7 @@ type
     procedure tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvSimpleCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure eExpressionStatusChange(Sender: TObject;
-      Changes: TSynStatusChanges);
+    procedure mruExprOpenClick(Sender: TObject; const Filename: String);
   private
      // Список критериев простого поиска
     FSimpleCriteria: TSimpleSearchCriterionList;
@@ -214,6 +227,9 @@ type
     procedure ExprInsertOpClick(Sender: TObject);
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
+     // Загрузка/сохранение текущего выражения в файле
+    procedure ExpressionLoad(const sFileName: String);
+    procedure ExpressionSave(const sFileName: String);
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
@@ -319,6 +335,17 @@ uses
   TypInfo, StrUtils, Mask, ToolEdit,
   phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox,
   phParsingPicFilter, Main;
+
+var
+   // Списки всех упоминаемых мест, номеров плёнок, авторов, носителей
+  SLPhoaPlaces:        TStringList;
+  SLPhoaFilmNumbers:   TStringList;
+  SLPhoaAuthors:       TStringList;
+  SLPhoaMedia:         TStringList;
+   // Последнее использованное для поиска выражение
+  sSearchExpression:   String;
+   // Файл, использовавшийся в последний раз для загрузки/сохранения файла выражения
+  sLastExpressionFile: String;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
@@ -740,15 +767,6 @@ uses
       rif.WriteString(sSection, Format('%.8d', [i]), TSimpleSearchCriterion(FList[i]).DataString);
   end;
 
-var
-   // Списки всех упоминаемых мест, номеров плёнок, авторов, носителей
-  SLPhoaPlaces: TStringList;
-  SLPhoaFilmNumbers: TStringList;
-  SLPhoaAuthors: TStringList;
-  SLPhoaMedia: TStringList;
-   // Последнее использованное для поиска выражение
-  sSearchExpression: String;
-
    //===================================================================================================================
    // VirtualStringTree EditLink для редакторов свойств
    //===================================================================================================================
@@ -1094,6 +1112,26 @@ type
     eExpression.CutToClipboard;
   end;
 
+  procedure TdSearch.aaExprNew(Sender: TObject);
+  begin
+    eExpression.Clear;
+  end;
+
+  procedure TdSearch.aaExprOpen(Sender: TObject);
+  begin
+    with TOpenDialog.Create(Self) do
+      try
+        DefaultExt := SDefaultSearchExpressionFileExt;
+        FileName   := sLastExpressionFile;
+        Filter     := ConstVal('SFileFilter_SearchExpr');
+        Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
+        Title      := ConstVal('SDlgTitle_OpenSearchExpr');
+        if Execute then ExpressionLoad(FileName);
+      finally
+        Free;
+      end;
+  end;
+
   procedure TdSearch.aaExprPaste(Sender: TObject);
   begin
     eExpression.PasteFromClipboard;
@@ -1102,6 +1140,21 @@ type
   procedure TdSearch.aaExprRedo(Sender: TObject);
   begin
     eExpression.Redo;
+  end;
+
+  procedure TdSearch.aaExprSaveAs(Sender: TObject);
+  begin
+    with TSaveDialog.Create(Self) do
+      try
+        DefaultExt := SDefaultSearchExpressionFileExt;
+        FileName   := sLastExpressionFile;
+        Filter     := ConstVal('SFileFilter_SearchExpr');
+        Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
+        Title      := ConstVal('SDlgTitle_SaveSearchExprAs');
+        if Execute then ExpressionSave(FileName);
+      finally
+        Free;
+      end;
   end;
 
   procedure TdSearch.aaExprSyntaxCheck(Sender: TObject);
@@ -1205,6 +1258,30 @@ type
   procedure TdSearch.eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
   begin
     StateChanged;
+  end;
+
+  procedure TdSearch.ExpressionLoad(const sFileName: String);
+  begin
+    BeginUpdate;
+    try
+      eExpression.Lines.LoadFromFile(sFileName);
+      mruExprOpen.Add(sFileName);
+      sLastExpressionFile := sFileName;
+    finally
+      EndUpdate;
+    end;
+  end;
+
+  procedure TdSearch.ExpressionSave(const sFileName: String);
+  begin
+    BeginUpdate;
+    try
+      eExpression.Lines.SaveToFile(sFileName);
+      mruExprOpen.Add(sFileName);
+      sLastExpressionFile := sFileName;
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TdSearch.ExprInsertOpClick(Sender: TObject);
@@ -1311,6 +1388,11 @@ type
     eExpression.Highlighter   := TSynPicFilterSyn.Create(Self);
     eExpression.Text          := sSearchExpression;
     UpdateSearchKind;
+  end;
+
+  procedure TdSearch.mruExprOpenClick(Sender: TObject; const Filename: String);
+  begin
+    ExpressionLoad(Filename);
   end;
 
   procedure TdSearch.pcCriteriaChange(Sender: TObject);
@@ -1429,6 +1511,7 @@ type
     inherited SettingsRestore(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
     FSimpleCriteria.RegLoad(rif, SRegSearch_SimpleCriteria);
+    mruExprOpen.LoadFromRegIni(rif, 'ExpressionOpenMRU');
   end;
 
   procedure TdSearch.SettingsStore(rif: TRegIniFile);
@@ -1436,6 +1519,7 @@ type
     inherited SettingsStore(rif);
     rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);
     if ModalResult=mrOK then FSimpleCriteria.RegSave(rif, SRegSearch_SimpleCriteria);
+    mruExprOpen.SaveToRegIni(rif, 'ExpressionOpenMRU');
   end;
 
   procedure TdSearch.SimpleCrPicPropClick(Sender: TObject);
@@ -1536,11 +1620,15 @@ type
     aSimpleCrDelete.Enabled            := bSSimple and (GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil);
     aSimpleConvertToExpression.Enabled := bSSimple and bCrExist;
      // Поиск по выражению
-    aExprSyntaxCheck.Enabled           := bSExpr and bExprText;
-    aExprCopy.Enabled                  := bSExpr and bExprSel;
+    aExprNew.Enabled                   := bSExpr and bExprText;
+    aExprOpen.Enabled                  := bSExpr;
+    aExprSaveAs.Enabled                := bSExpr and bExprText;
     aExprCut.Enabled                   := bSExpr and bExprSel;
-    aExprRedo.Enabled                  := bSExpr and eExpression.CanRedo;
+    aExprCopy.Enabled                  := bSExpr and bExprSel;
+    aExprPaste.Enabled                 := bSExpr;
     aExprUndo.Enabled                  := bSExpr and eExpression.CanUndo;
+    aExprRedo.Enabled                  := bSExpr and eExpression.CanRedo;
+    aExprSyntaxCheck.Enabled           := bSExpr and bExprText;
   end;
 
 end.

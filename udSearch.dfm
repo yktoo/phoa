@@ -131,7 +131,7 @@ inherited dSearch: TdSearch
           item
             Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
-            Width = 294
+            Width = 298
             WideText = 'Value'
           end>
         WideDefaultText = ''
@@ -198,6 +198,21 @@ inherited dSearch: TdSearch
           Caption = 'Toolbar'
           Images = fMain.ilActionsSmall
           TabOrder = 0
+          object bExprNew: TTBXItem
+            Action = aExprNew
+          end
+          object bExprOpen: TTBXSubmenuItem
+            Action = aExprOpen
+            DropdownCombo = True
+            object iMRUExprOpen: TTBXMRUListItem
+              MRUList = mruExprOpen
+            end
+          end
+          object bExprSaveAs: TTBXItem
+            Action = aExprSaveAs
+          end
+          object TBXSeparatorItem1: TTBXSeparatorItem
+          end
           object smExprInsertProp: TTBXSubmenuItem
             Caption = 'Insert propert&y'
             DisplayMode = nbdmImageAndText
@@ -254,7 +269,7 @@ inherited dSearch: TdSearch
     Left = 116
     Top = 432
     LangData = {
-      070064536561726368010100000003000000070043617074696F6E012F000000
+      070064536561726368010100000003000000070043617074696F6E0138000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
       6243616E63656C01010000000C000000070043617074696F6E000300624F4B01
       010000000F000000070043617074696F6E0005006248656C7001010000001200
@@ -301,7 +316,15 @@ inherited dSearch: TdSearch
       62457870725061737465000009006245787072436F7079000008006245787072
       43757400000D00746253657045787072556E646F000014007462536570457870
       7253796E746178436865636B00000C00706D45787072657373696F6E00000C00
-      7462536570457870724375740000}
+      7462536570457870724375740000080061457870724E65770103000000570000
+      00070043617074696F6E56000000080043617465676F72795800000004004869
+      6E7400090061457870724F70656E01030000005A000000070043617074696F6E
+      59000000080043617465676F72795B000000040048696E74000B006145787072
+      53617665417301030000005D000000070043617074696F6E5C00000008004361
+      7465676F72795E000000040048696E74000B0062457870725361766541730000
+      090062457870724F70656E0000080062457870724E6577000011005442585365
+      70617261746F724974656D3100000C00694D5255457870724F70656E00000B00
+      6D7275457870724F70656E01010000005F000000060050726566697800}
   end
   object scpMain: TSynCompletionProposal
     Options = [scoLimitToMatchedText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
@@ -361,6 +384,27 @@ inherited dSearch: TdSearch
       ImageIndex = 81
       OnExecute = aaSimpleConvertToExpression
     end
+    object aExprNew: TAction
+      Category = 'Expression search'
+      Caption = '&New'
+      Hint = 'New|Clear the expression'
+      ImageIndex = 0
+      OnExecute = aaExprNew
+    end
+    object aExprOpen: TAction
+      Category = 'Expression search'
+      Caption = '&Open...'
+      Hint = 'Open...|Open a text file containing the search expression'
+      ImageIndex = 1
+      OnExecute = aaExprOpen
+    end
+    object aExprSaveAs: TAction
+      Category = 'Expression search'
+      Caption = 'Save &as...'
+      Hint = 'Save as...|Save the expression to a file'
+      ImageIndex = 3
+      OnExecute = aaExprSaveAs
+    end
     object aExprCut: TAction
       Category = 'Expression search'
       Caption = '&Cut'
@@ -408,6 +452,14 @@ inherited dSearch: TdSearch
   object pmExpression: TTBXPopupMenu
     Images = fMain.ilActionsSmall
     Left = 184
+    Top = 124
+  end
+  object mruExprOpen: TTBXMRUList
+    HidePathExtension = False
+    MaxItems = 15
+    OnClick = mruExprOpenClick
+    Prefix = 'MRU'
+    Left = 256
     Top = 124
   end
 end

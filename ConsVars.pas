@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.80 2004-11-25 08:43:56 dale Exp $
+//  $Id: ConsVars.pas,v 1.81 2004-11-25 15:27:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -324,9 +324,11 @@ const
    // Расширение и имя файла фотоальбома по умолчанию
   SDefaultExt                     = 'phoa';
   SDefaultFName                   = 'untitled.'+SDefaultExt;
-   // Имя ini-файла для сохранения/загрузки параметров по умолчанию
+   // Расширение и имя ini-файла для сохранения/загрузки параметров по умолчанию
   SDefaultIniFileExt              = 'ini';
   SDefaultIniFileName             = 'phoa.'+SDefaultIniFileExt;
+   // Расширение файла для сохранения выражения поиска
+  SDefaultSearchExpressionFileExt = 'txt';
    // Имя исполняемого файла
   SPhoaExecutableFileName         = 'phoa.exe';
 
