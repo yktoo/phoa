@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.19 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.20 2005-01-18 15:46:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -194,7 +194,11 @@ const
     pv := @FPropVals[Prop];
     case Prop of
       ppDate: if TryStrToDate(eDate.Text, dt, AppFormatSettings) then pv.vValue := DateToPhoaDate(dt) else pv.vValue := Null;
-      ppTime: if TryStrToTime(eTime.Text, dt, AppFormatSettings) then pv.vValue := TimeToPhoaTime(dt) else pv.vValue := Null;
+      ppTime:
+        if TryStrToTime(ChangeTimeSeparator(eTime.Text, False), dt, AppFormatSettings) then
+          pv.vValue := TimeToPhoaTime(dt)
+        else
+          pv.vValue := Null;
       ppPlace,
         ppFilmNumber,
         ppFrameNumber,
@@ -218,7 +222,11 @@ const
       if not bStateOnly then
         case Prop of
           ppDate: if VarIsNull(pv.vValue) then eDate.Clear else eDate.Date := PhoaDateToDate(pv.vValue);
-          ppTime: if VarIsNull(pv.vValue) then eTime.Clear else eTime.Text := TimeToStr(PhoaTimeToTime(pv.vValue), AppFormatSettings);
+          ppTime:
+            if VarIsNull(pv.vValue) then
+              eTime.Clear
+            else
+              eTime.Text := ChangeTimeSeparator(TimeToStr(PhoaTimeToTime(pv.vValue), AppFormatSettings), True);
           ppPlace,
             ppFilmNumber,
             ppFrameNumber,

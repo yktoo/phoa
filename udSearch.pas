@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.32 2004-12-31 13:38:58 dale Exp $
+//  $Id: udSearch.pas,v 1.33 2005-01-18 15:46:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -813,7 +813,7 @@ type
     else begin
       case FCriterion.PicProperty of
         ppDate:     s := (FWControl as TDateEdit).Text;
-        ppTime:     s := (FWControl as TMaskEdit).Text;
+        ppTime:     s := ChangeTimeSeparator((FWControl as TMaskEdit).Text, False);
         ppKeywords: s := (FWControl as TComboEdit).Text;
         else        s := (FWControl as TComboBox).Text;
       end;
@@ -939,7 +939,7 @@ type
         Parent     := Tree;
         EditMask   := '!99:99:99;1;_';
         MaxLength  := 8;
-        Text       := FCriterion.ValueStr;
+        Text       := ChangeTimeSeparator(FCriterion.ValueStr, True);
         OnExit     := WControlExit;
         OnKeyDown  := WControlKeyDown;
       end;

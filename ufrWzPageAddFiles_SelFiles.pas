@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.21 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.22 2005-01-18 15:46:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -90,8 +90,8 @@ uses
       cbFileMasks.Text := Wiz.Filter_Masks;
       if Wiz.Filter_DateFrom>0  then eFileDateFrom.Date := Wiz.Filter_DateFrom;
       if Wiz.Filter_DateTo>0    then eFileDateTo.Date   := Wiz.Filter_DateTo;
-      if Wiz.Filter_TimeFrom>=0 then eFileTimeFrom.Text := FormatDateTime('hh:nn', Wiz.Filter_TimeFrom);
-      if Wiz.Filter_TimeTo>=0   then eFileTimeTo.Text   := FormatDateTime('hh:nn', Wiz.Filter_TimeTo);
+      if Wiz.Filter_TimeFrom>=0 then eFileTimeFrom.Text := ChangeTimeSeparator(FormatDateTime('hh:nn', Wiz.Filter_TimeFrom, AppFormatSettings), True);
+      if Wiz.Filter_TimeTo>=0   then eFileTimeTo.Text   := ChangeTimeSeparator(FormatDateTime('hh:nn', Wiz.Filter_TimeTo,   AppFormatSettings), True);
        // Настраиваем расширенные опции
       AdjustAdvancedCtls(Wiz.ShowAdvancedOptions);
     end;
@@ -145,8 +145,8 @@ uses
     Wiz.Filter_Masks        := cbFileMasks.Text;
     Wiz.Filter_DateFrom     := StrToDateDef(eFileDateFrom.Text, -1, AppFormatSettings);
     Wiz.Filter_DateTo       := StrToDateDef(eFileDateTo.Text,   -1, AppFormatSettings);
-    Wiz.Filter_TimeFrom     := StrToTimeDef(eFileTimeFrom.Text, -1, AppFormatSettings);
-    Wiz.Filter_TimeTo       := StrToTimeDef(eFileTimeTo.Text,   -1, AppFormatSettings);
+    Wiz.Filter_TimeFrom     := StrToTimeDef(ChangeTimeSeparator(eFileTimeFrom.Text, False), -1, AppFormatSettings);
+    Wiz.Filter_TimeTo       := StrToTimeDef(ChangeTimeSeparator(eFileTimeTo.Text,   False), -1, AppFormatSettings);
     Wiz.RecurseFolders      := cbRecurseFolders.Checked;
     Wiz.DefaultPath         := tvMain.SelectedPath;
     Wiz.ShowAdvancedOptions := bAdvanced.Tag<>0;

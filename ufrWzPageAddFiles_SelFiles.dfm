@@ -99,7 +99,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 3
-      Text = '  :  '
+      Text = '  *  '
       OnChange = PageDataChange
     end
     object eFileTimeTo: TMaskEdit
@@ -110,7 +110,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       EditMask = '!99:99;1;_'
       MaxLength = 5
       TabOrder = 5
-      Text = '  :  '
+      Text = '  *  '
       OnChange = PageDataChange
     end
   end

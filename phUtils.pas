@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.43 2004-12-31 13:38:58 dale Exp $
+//  $Id: phUtils.pas,v 1.44 2005-01-18 15:46:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -93,6 +93,10 @@ uses
    //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
    //   пустая маска, то в dtResult возвращается -1
   function  CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
+   // Заменяет разделитель времени в строке и возвращает её. При bToSystem=False заменяет системный разделитель на
+   //   AppFormatSettings.TimeSeparator, при bToSystem=True заменяет AppFormatSettings.TimeSeparator на системный
+   //   разделитель времени
+  function  ChangeTimeSeparator(const sTime: String; bToSystem: Boolean): String;
 
    // Возвращает локализованное значение константы по её наименованию
   function  ConstVal(const sConstName: String): String; overload;
@@ -641,17 +645,37 @@ var
   end;
 
   function CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
-  var dt: TDateTime;
   begin
     Result := True;
      // Если не введено ни одной цифры - значит, ввода не было
     if LastDelimiter('0123456789', sText)=0 then
       dtResult := -1
     else begin
-      if bTime then dt := StrToTimeDef(sText, -1, AppFormatSettings) else dt := StrToDateDef(sText, -1, AppFormatSettings);
-      Result := dt>=0;
-      if Result then dtResult := dt else PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
+      if bTime then
+        Result := TryStrToTime(ChangeTimeSeparator(sText, False), dtResult, AppFormatSettings)
+      else
+        Result := TryStrToDate(sText, dtResult, AppFormatSettings);
+      if not Result then PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
     end;
+  end;
+
+  function ChangeTimeSeparator(const sTime: String; bToSystem: Boolean): String;
+  var
+    i: Integer;
+    cFrom, cTo: Char;
+  begin
+    Result := sTime;
+     // Определяем, что на что будем заменять
+    if bToSystem then begin
+      cFrom := AppFormatSettings.TimeSeparator;
+      cTo   := TimeSeparator;
+    end else begin
+      cFrom := TimeSeparator;
+      cTo   := AppFormatSettings.TimeSeparator;
+    end;
+     // Проверяем все символы строки и заменям
+    for i := 1 to Length(Result) do
+      if Result[i]=cFrom then Result[i] := cTo; 
   end;
 
   function ConstVal(const sConstName: String): String;
