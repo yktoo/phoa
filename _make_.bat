@@ -1,10 +1,15 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.5 2004-06-01 13:56:53 dale Exp $
+rem $Id: _make_.bat,v 1.6 2004-06-12 11:51:13 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
 rem ********************************************************************************************************************
+
+rem DaleTech Text Preprocessor defines
+set PREPROCESSOR="C:\Delphi\CVS projects\dale\txpproc\txpproc.exe"
+set PREPROCESSOR_CFG="C:\Delphi\CVS projects\dale\phoa\phoa-txpproc.ini"
+set PREPROCESSOR_OUT="C:\Delphi\CVS projects\dale\phoa\help\processed"
 
 rem -B = Rebuild all
 rem -W = Output warning messages
@@ -32,23 +37,44 @@ if errorlevel == 1 goto :err
 del *.~*
 del *.dcu
 del *.ddp
-del *.bkf
-del *.bkm
 if "%1"=="app" goto success
 
 rem == Compile Help CHM project ==
 :comphelp
-echo.
-echo == Compile Help CHM project (English)
 pushd
 cd Help\en
+echo.
+echo == Preprocess Help files (English)
+rmdir /s /q %PREPROCESSOR_OUT%
+%PREPROCESSOR% *.html %PREPROCESSOR_CFG% %PREPROCESSOR_OUT%
+if errorlevel == 1 goto err
+copy phoa-eng.hhp ..\processed
+copy phoa-eng.hhc ..\processed
+copy phoa-eng.hhk ..\processed
+copy pic-oranization.png ..\processed
+
+cd ..\processed
+echo.
+echo == Compile Help CHM project (English)
 %HELP_COMPILER% phoa-eng.hhp
 if not errorlevel == 1 goto err
 move phoa-eng.chm ..\..
 if errorlevel == 1 goto err
+
+cd ..\ru
+echo.
+echo == Preprocess Help files (Russian)
+rmdir /s /q %PREPROCESSOR_OUT%
+%PREPROCESSOR% *.html %PREPROCESSOR_CFG% %PREPROCESSOR_OUT%
+if errorlevel == 1 goto err
+copy phoa-rus.hhp ..\processed
+copy phoa-rus.hhc ..\processed
+copy phoa-rus.hhk ..\processed
+copy pic-oranization.png ..\processed
+
+cd ..\processed
 echo.
 echo == Compile Help CHM project (Russian)
-cd ..\ru
 %HELP_COMPILER% phoa-rus.hhp
 if not errorlevel == 1 goto err
 move phoa-rus.chm ..\..
@@ -69,3 +95,4 @@ goto success
 :err
 pause
 :success
+rmdir /s /q %PREPROCESSOR_OUT%
