@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.16 2004-11-22 18:47:40 dale Exp $
+//  $Id: phDlg.pas,v 1.17 2004-11-25 08:44:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -50,6 +50,8 @@ type
     procedure ButtonClick_OK; virtual;
     procedure ButtonClick_Cancel; virtual;
     procedure ButtonClick_Help; virtual;
+     // Вызывается при изменении статуса диалога. В базовом классе настраивает разрешённость и вид кнопок
+    procedure UpdateState; virtual;
      // Должна возвращать имя раздела реестра для сохранения настроек. В базовом классе возвращает пустую строку, что
      //   означает, что сохранения настроек не требуется
     function  GetFormRegistrySection: String; virtual;
@@ -66,10 +68,10 @@ type
      // Установка/снятие блокировки изменения Modified
     procedure BeginUpdate;
     procedure EndUpdate;
-     // Настраивает разрешённость и вид кнопок
-    procedure UpdateButtons; virtual;
      // True, если FLockCounter>0
     function  UpdateLocked: Boolean;
+     // Вызывает обновление статуса диалога (отложенное при FLockCounter>0)
+    procedure StateChanged;
      // Props
      // -- Если True, данные в диалоге допустимы. В базовом классе всегда возвращает True
     property DataValid: Boolean read GetDataValid;
@@ -144,7 +146,7 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   procedure TPhoaDialog.EndUpdate;
   begin
     if FLockCounter>0 then Dec(FLockCounter);
-    if FLockCounter=0 then UpdateButtons;
+    if FLockCounter=0 then UpdateState;
   end;
 
   function TPhoaDialog.Execute: Boolean;
@@ -240,21 +242,21 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   procedure TPhoaDialog.SetHasUpdates(Value: Boolean);
   begin
     FHasUpdates := Value;
-    UpdateButtons;
+    StateChanged;
   end;
 
   procedure TPhoaDialog.SetModified(Value: Boolean);
   begin
     if FLockCounter>0 then Exit;
     FModified := Value;
-    UpdateButtons;
+    StateChanged;
   end;
 
   procedure TPhoaDialog.SetOKIgnoresModified(Value: Boolean);
   begin
     if FOKIgnoresModified<>Value then begin
       FOKIgnoresModified := Value;
-      UpdateButtons;
+      StateChanged;
     end;
   end;
 
@@ -262,7 +264,7 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   begin
     if FOKIgnoresDataValidity<>Value then begin
       FOKIgnoresDataValidity := Value;
-      UpdateButtons;
+      StateChanged;
     end;
   end;
 
@@ -282,16 +284,20 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     if Sizeable then rif.WriteString('', 'Position', FormPositionToStr(BoundsRect));
   end;
 
-  procedure TPhoaDialog.UpdateButtons;
+  procedure TPhoaDialog.StateChanged;
   begin
-    if FLockCounter>0 then Exit;
-    bOK.Enabled := (OKIgnoresModified or Modified) and (OKIgnoresDataValidity or DataValid);
-    bCancel.Caption := ConstVal(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
+    if FLockCounter=0 then UpdateState;
   end;
 
   function TPhoaDialog.UpdateLocked: Boolean;
   begin
     Result := FLockCounter>0;
+  end;
+
+  procedure TPhoaDialog.UpdateState;
+  begin
+    bOK.Enabled := (OKIgnoresModified or Modified) and (OKIgnoresDataValidity or DataValid);
+    bCancel.Caption := ConstVal(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
   end;
 
   procedure TPhoaDialog.WMHelp(var Msg: TWMHelp);
