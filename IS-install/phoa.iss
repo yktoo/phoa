@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.5 2004-04-23 12:41:43 dale Exp $
+;   $Id: phoa.iss,v 1.6 2004-04-29 04:46:43 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -31,7 +31,7 @@
 
 [Languages]
   Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf
-  Name: "ru"; MessagesFile: compiler:Russian.isl;             LicenseFile: eula-rus.rtf
+  Name: "ru"; MessagesFile: compiler:Languages\Russian.isl;   LicenseFile: eula-rus.rtf
   Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-deu.rtf
   Name: "br"; MessagesFile: compiler:BrazilianPortuguese.isl; LicenseFile: eula-brp.rtf
   Name: "ua"; MessagesFile: compiler:Ukrainian.isl;           LicenseFile: eula-ukr.rtf
