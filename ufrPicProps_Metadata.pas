@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.6 2004-06-01 14:05:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -37,7 +37,7 @@ type
     procedure UpdateDesc;
   protected
     procedure InitializePage; override;
-    procedure FinalizePage; override;
+    function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   end;
@@ -61,11 +61,9 @@ type
     if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPicCount;
   end;
 
-  procedure TfrPicProps_Metadata.FinalizePage;
+  function TfrPicProps_Metadata.GetRegistrySection: String;
   begin
-     // Сохраняем панели инструментов
-    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegPicProps_Toolbars);
-    inherited FinalizePage;
+    Result := SRegWizPage_PicProp_Metadata;
   end;
 
   procedure TfrPicProps_Metadata.InitializePage;
@@ -77,8 +75,6 @@ type
     tvMain.Images := FileImages;
      // Кэшируем настройки
     FExpandAll := SettingValueBool(ISettingID_Dlgs_PP_ExpMetadata);
-     // Восстанавливаем панели инструментов
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegPicProps_Toolbars);
      // Обновляем описание
     UpdateDesc;
   end;
