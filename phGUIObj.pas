@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.4 2004-09-21 03:30:28 dale Exp $
+//  $Id: phGUIObj.pas,v 1.5 2004-09-21 13:13:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -119,7 +119,7 @@ type
     FTopOffset: Integer;
     FThumbnailSize: TSize;
     FThumbBackAlpha: Byte;
-    FThumbBackBorderStyle: TThumbBackBorderStyle; //DEPRECATED !!!
+    FThumbBackBorderStyle: TThumbBackBorderStyle; 
 
 
      // Painting stage handlers
@@ -972,7 +972,7 @@ type
 
   procedure TThumbnailViewer.Paint_EraseBackground(const Info: TThumbnailViewerPaintInfo);
   begin
-    CurrentTheme.PaintBackgnd(Info.Bitmap.Canvas, Info.RClient, Info.RClient, Info.RClip, Color, False, VT_UNKNOWN);
+    Info.Bitmap.FillRectS(Info.RClip, Color32(Color));
   end;
 
   procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
@@ -1049,7 +1049,6 @@ type
     Pic := FPicLinks[iIndex];
      // Рисуем рамку
     r := ItemRect;
-//    if (idx=FItemIndex) and bFocused then DrawFocusRect(r);
     Info.Bitmap.Font.Assign(Self.Font);
     Info.Bitmap.Font.Color := iif(bSelected, aSelectedFontClr[Info.bFocused], FThumbFontColor);
     iLineHeight := Info.Bitmap.TextHeight('Wg');
@@ -1131,6 +1130,8 @@ type
            // Находим область эскиза
           rThumb := ItemRect(i);
           if IsRectEmpty(rThumb) then Break;
+           // Рисуем FocusRect
+{!!!}           if (i=FItemIndex) and Info.bFocused then Info.Bitmap.Canvas.DrawFocusRect(rThumb);
           InflateRect(rThumb, -IThumbMarginH, -IThumbMarginV);
            // Если область эскиза пересекается с ClipRect - рисуем этот эскиз
           if RectsOverlap(rThumb, Info.RClip) then begin
@@ -1365,9 +1366,9 @@ type
   begin
     Value := GetValidTopOffset(Value);
     if FTopOffset<>Value then begin
+      ScrollWindowEx(Handle, 0, FTopOffset-Value, nil, nil, 0, nil, SW_INVALIDATE);
       FTopOffset := Value;
       UpdateScrollBar;
-      Invalidate;
     end;
   end;
 

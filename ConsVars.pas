@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.54 2004-09-21 03:30:28 dale Exp $
+//  $Id: ConsVars.pas,v 1.55 2004-09-21 13:13:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1055,7 +1055,9 @@ uses
   procedure AddStretchFilterSettings(Owner: TPhoaIntSetting);
   begin
     TPhoaMutexIntSetting.Create(Owner, 0, 'Nearest Neighbor',   Byte(sfNearest));
+    TPhoaMutexIntSetting.Create(Owner, 0, 'Draft',              Byte(sfDraft));
     TPhoaMutexIntSetting.Create(Owner, 0, 'Linear',             Byte(sfLinear));
+    TPhoaMutexIntSetting.Create(Owner, 0, 'Cosine',             Byte(sfCosine));
     TPhoaMutexIntSetting.Create(Owner, 0, 'B-spline (bicubic)', Byte(sfSpline));
     TPhoaMutexIntSetting.Create(Owner, 0, 'Lanczos',            Byte(sfLanczos));
     TPhoaMutexIntSetting.Create(Owner, 0, 'Mitchell',           Byte(sfMitchell));
