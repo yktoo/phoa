@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.11 2004-10-22 12:43:18 dale Exp $
+//  $Id: phOps.pas,v 1.12 2004-10-22 20:29:30 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -362,7 +362,7 @@ type
    //     NewDescription: String              - новое описание группы
    //===================================================================================================================
 
-  TPhoaOp_GroupEdit = class(TPhoaOp_GroupRename)
+  TPhoaOp_GroupEdit = class(TPhoaOperation)
   protected
     procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
@@ -1470,17 +1470,24 @@ type
     inherited Perform(Params, Changes);
      // Запоминаем данные отката
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
+    OpGroup := Group;
+    UndoFile.WriteStr(Group.Text);
     UndoFile.WriteStr(Group.Description);
      // Выполняем операцию
+    Group.Text        := Params.ValStr['NewText'];
     Group.Description := Params.ValStr['NewDescription'];
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
   end;
 
   procedure TPhoaOp_GroupEdit.RollbackChanges(var Changes: TPhoaOperationChanges);
+  var Group: IPhotoAlbumPicGroup;
   begin
-     // Получаем группу и восстанавливаем описание
-    OpGroup.Description := UndoFile.ReadStr;
+     // Получаем группу
+    Group := OpGroup;
+     // Восстанавливаем свойства
+    Group.Text        := UndoFile.ReadStr;
+    Group.Description := UndoFile.ReadStr;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
     inherited RollbackChanges(Changes);

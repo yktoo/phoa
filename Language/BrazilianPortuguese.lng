@@ -203,7 +203,7 @@ SourceLANGID=1033
 00000024=&Operação:
 00000029=Mover as imagens selecionadas para o grupo indicado\nCopiar as imagens selecionadas para o grupo indicado\nExcluir as imagens selecionadas do grupo indicado\nDeixar somente as imagens selecionadas no grupo indicado (corte)\n
 
-[dPhoAProps]
+[dProjectProps]
 00000003=Propriedades: Álbum
 00000012=Fechar
 00000015=OK

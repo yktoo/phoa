@@ -377,7 +377,7 @@ SourceLANGID=1033
 00000024=&Operation:
 00000029=Ausgewählte Bilder in die unten angegebene Gruppe verschieben\nAusgewählte Bilder in die unten angegebene Gruppe kopieren\nAusgewählte Bilder aus der unten angegebenen Gruppe löschen\nNur ausgewählte Bilder in der unten angegebenen Gruppe lassen (intersect)\n
 
-[dPhoAProps]
+[dProjectProps]
 00000003=Eigenschaften: Fotoalbum
 00000012=Schließen
 00000015=OK

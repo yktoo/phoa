@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.27 2004-10-21 12:42:00 dale Exp $
+//  $Id: phGUIObj.pas,v 1.28 2004-10-22 20:29:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -958,13 +958,14 @@ type
   var idx: Integer;
   begin
     SetFocus;
+    if Button=mbMiddle then Exit;
     idx := ItemAtPos(x, y);
     FStartPos := Point(x, y);
-     // Если нажат Alt - начинаем выделение (marqueing)
-    if ssAlt in Shift then begin
+     // Если нажат Alt[+Shift] (но не Ctrl+Alt) - начинаем выделение (marqueing)
+    if Shift*[ssAlt, ssCtrl]=[ssAlt] then begin
       if Button=mbLeft then MarqueingStart;
      // Если нажат Ctrl
-    end else if ssCtrl in Shift then begin
+    end else if Shift*[ssShift, ssCtrl, ssAlt]=[ssCtrl] then begin
        // Если левая кнопка - переключаем выделение эскиза, на котором кликнули
       if Button=mbLeft then begin
         ToggleSelection(idx);
@@ -984,10 +985,10 @@ type
         end;
       end;
      // Если нажат Shift - выделяем подряд идущие эскизы
-    end else if ssShift in Shift then
+    end else if Shift*[ssShift, ssCtrl, ssAlt]=[ssShift] then
       if FStreamSelStart>=0 then SelectRange(FStreamSelStart, idx, False) else SetItemIndex(idx)
      // Не нажато кнопок
-    else begin
+    else if Shift*[ssShift, ssCtrl, ssAlt]=[] then begin
       if (idx<0) or not IndexSelected[idx] then begin
         SetItemIndex(idx);
         FNoMoveItemIndex := -1;

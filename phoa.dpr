@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.29 2004-10-21 12:42:00 dale Exp $
+//  $Id: phoa.dpr,v 1.30 2004-10-22 20:29:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -20,7 +20,7 @@ uses
   udSettings in 'udSettings.pas' {dSettings},
   ufImgView in 'ufImgView.pas' {fImgView},
   udSearch in 'udSearch.pas' {dSearch},
-  udPhoAProps in 'udPhoAProps.pas' {dPhoAProps},
+  udProjectProps in 'udProjectProps.pas' {dProjectProps},
   udAbout in 'udAbout.pas' {dAbout},
   ChmHlp in 'ChmHlp.pas',
   udPicOps in 'udPicOps.pas' {dPicOps},

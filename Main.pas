@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.59 2004-10-22 12:50:24 dale Exp $
+//  $Id: Main.pas,v 1.60 2004-10-22 20:29:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -19,6 +19,18 @@ uses
   TB2Dock, TB2Toolbar;
 
 type
+   // Состояние приложения
+  TAppState = (
+    asInitialized,               // Инициализация окончена
+    asActionChangePending,       // Ожидается изменение доступности Actions
+    asFileNameChangePending,     // Ожидается изменение имени файла
+    asModifiedChangePending,     // Ожидается изменение состояния изменённости проекта
+    asViewerSelChangePending,    // Ожидается изменение выделения вьюера
+    asGroupsPopupToolsValidated, // Инструменты popup-меню групп прошли проверку на доступность текущим выделенным изображениям
+    asPicsPopupToolsValidated);  // Инструменты popup-меню вьюера прошли проверку на доступность текущим выделенным изображениям
+
+  TAppStates = set of TAppState; 
+
   TfMain = class(TForm, IPhotoAlbumApp)
     aAbout: TAction;
     aCopy: TAction;
@@ -284,12 +296,10 @@ type
     FUndo: TPhoaUndo;
      // Набор свойств, которые требуется отображать в подсказках дерева групп
     FGroupTreeHintProps: TGroupProperties;
-     // Флаги, указывающие на то, что инструменты popup-меню групп и вьюера прошли проверку на доступность текущим
-     //   выделенным изображениям
-    FGroupsPopupToolsValidated: Boolean;
-    FPicsPopupToolsValidated: Boolean;
-     // Флаг того, что инициализация формы окончена
-    FInitialized: Boolean;
+     // Счётчик блокировки обновления
+    FUpdateLock: Integer;
+     // Состояние приложения
+    FAppState: TAppStates;
      // Prop storage
     FViewer: TThumbnailViewer;
      // Применяет параметры настройки языка
@@ -311,10 +321,10 @@ type
     procedure DoSave(const sFileName: String; iRevisionNumber: Integer);
      // Обрабатывает параметры командной строки
     procedure ProcessCommandLine;
-     // Настраивает разрешённость Actions и настраивает Caption формы
-    procedure EnableActions;
-     // Настраивает доступность инструментов
-    procedure EnableTools;
+     // Изменяет текущее состояние приложения
+    procedure StateChanged(EnterStates: TAppStates; LeaveStates: TAppStates = []);
+     // Обновляет состояние формы
+    procedure UpdateState;
      // Настраивает доступность инструментов для заданного контейнерного пункта
     procedure DoEnableTools(Item: TTBCustomItem);
      // Выполняет заданную операцию
@@ -346,7 +356,11 @@ type
     procedure ResetMode;
      // Находит и возвращает узел в tvGroups по ID группы; nil, если нет такого
     function  FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
+     // Установка/снятие блокировки обновления состояния
+    procedure BeginUpdate;
+    procedure EndUpdate;
      // Application events
+    procedure AppActionExecute(Action: TBasicAction; var Handled: Boolean); 
     procedure AppHint(Sender: TObject);
     procedure AppException(Sender: TObject; E: Exception);
     procedure AppIdle(Sender: TObject; var Done: Boolean);
@@ -373,7 +387,6 @@ type
     procedure WMHelp(var Msg: TWMHelp);                   message WM_HELP;
     procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
      // Property handlers
-    procedure SetFileName(const Value: String);
     function  GetFileName: String;
     function  GetFocusedControl: TPhoaAppFocusedControl;
     function  GetDisplayFileName: String;
@@ -395,7 +408,7 @@ type
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
     property DisplayFileName: String read GetDisplayFileName;
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
-    property FileName: String read GetFileName write SetFileName;
+    property FileName: String read GetFileName;
      // -- Текущий сфокусированный контрол
     property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
      // -- Просмотрщик эскизов
@@ -410,7 +423,7 @@ implementation
 uses
   GraphicStrings, Clipbrd, Math, Registry, jpeg, TypInfo, ChmHlp, // GraphicStrings => GraphicEx constants
   phUtils, phPhoa,
-  udPicProps, udSettings, ufImgView, udSearch, udPhoAProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
+  udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
   phToolSetting, udMsgBox, udGroupProps;
 
@@ -446,13 +459,11 @@ uses
 
   procedure TfMain.aaAbout(Sender: TObject);
   begin
-    ResetMode;
     ShowAbout(SettingValueBool(ISettingID_Dlgs_SplashAboutFade));
   end;
 
   procedure TfMain.aaCopy(Sender: TObject);
   begin
-    ResetMode;
     TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics, TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats))));
   end;
 
@@ -464,14 +475,13 @@ uses
 
   procedure TfMain.aaDelete(Sender: TObject);
   begin
-    ResetMode;
     if CurGroup<>nil then
       case FocusedControl of
          // Удаление группы
         pafcGroupTree:
           if PhoaConfirm(False, 'SConfirm_DelGroup', ISettingID_Dlgs_ConfmDelGroup) then
             PerformOperation('GroupDelete', ['Group', CurGroup]);
-         // Удаление изображения
+         // Удаление изображений
         pafcThumbViewer:
           if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then
             PerformOperation('PicDelete', ['Group', CurGroup, 'Pics', Viewer.SelectedPics]);
@@ -480,12 +490,11 @@ uses
 
   procedure TfMain.aaEdit(Sender: TObject);
   begin
-    ResetMode;
     case FocusedControl of
        // Редактирование групп
       pafcGroupTree:
         case GetNodeKind(tvGroups, tvGroups.FocusedNode) of
-          gnkPhoA:      EditPhoA    (Self, FUndo);
+          gnkProject:   EditProject (Self, FUndo);
           gnkView:      EditView    (Self, FUndo);
           gnkPhoaGroup: EditPicGroup(Self, FUndo);
         end;
@@ -496,31 +505,34 @@ uses
 
   procedure TfMain.aaExit(Sender: TObject);
   begin
-    ResetMode;
     Close;
   end;
 
   procedure TfMain.aaFileOperations(Sender: TObject);
   var bProjectChanged: Boolean;
   begin
-    ResetMode;
-    if DoFileOperations(Self, bProjectChanged) then
-       // Если изменилось содержимое фотоальбома
-      if bProjectChanged then begin
-         // Помечаем текущее состояние как изменённое без возможности отката
-        FUndo.SetNonUndoable;
-         // Перестраиваем представления
-        FProject.Views.Invalidate;
-         // Перегружаем дерево папок
-        LoadGroupTree;
-       // Иначе просто были внесены необратимые изменения (в файловую систему, но не в фотоальбом) - запрещаем откат
-      end else
-        FUndo.Clear;
+    BeginUpdate;
+    try
+      if DoFileOperations(Self, bProjectChanged) then
+         // Если изменилось содержимое фотоальбома
+        if bProjectChanged then begin
+           // Помечаем текущее состояние как изменённое без возможности отката
+          FUndo.SetNonUndoable;
+           // Перестраиваем представления
+          FProject.Views.Invalidate;
+           // Перегружаем дерево папок
+          LoadGroupTree;
+         // Иначе просто были внесены необратимые изменения (в файловую систему, но не в фотоальбом) - запрещаем откат
+        end else
+          FUndo.Clear;
+        StateChanged([asActionChangePending, asModifiedChangePending]);
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TfMain.aaFind(Sender: TObject);
   begin
-    ResetMode;
     if DoSearch(Self, FSearchResults) then DisplaySearchResults(False, True);
   end;
 
@@ -533,37 +545,31 @@ uses
 
   procedure TfMain.aaHelpCheckUpdates(Sender: TObject);
   begin
-    ResetMode;
     DKWeb.Open_VerCheck;
   end;
 
   procedure TfMain.aaHelpContents(Sender: TObject);
   begin
-    ResetMode;
     HtmlHelpShowContents;
   end;
 
   procedure TfMain.aaHelpFAQ(Sender: TObject);
   begin
-    ResetMode;
     HtmlHelpContext(IDH_faq);
   end;
 
   procedure TfMain.aaHelpProductWebsite(Sender: TObject);
   begin
-    ResetMode;
     DKWeb.Open_ViewInfo;
   end;
 
   procedure TfMain.aaHelpSupport(Sender: TObject);
   begin
-    ResetMode;
     DKWeb.Open_Support;
   end;
 
   procedure TfMain.aaHelpVendorWebsite(Sender: TObject);
   begin
-    ResetMode;
     DKWeb.Open_Index;
   end;
 
@@ -574,12 +580,16 @@ uses
        // Загружаем настройки
       IniLoadSettings(sFileName);
        // Применяем настройки
-      ApplySettings;
-      ApplyLanguage;
+      BeginUpdate;
+      try
+        ApplySettings;
+        ApplyLanguage;
+      finally
+        EndUpdate;
+      end;
     end;
 
   begin
-    ResetMode;
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultIniFileExt;
@@ -595,7 +605,6 @@ uses
 
   procedure TfMain.aaIniSaveSettings(Sender: TObject);
   begin
-    ResetMode;
     with TSaveDialog.Create(Self) do
       try
         DefaultExt := SDefaultIniFileExt;
@@ -611,9 +620,8 @@ uses
 
   procedure TfMain.aaNew(Sender: TObject);
   begin
-    ResetMode;
     if not CheckSave then Exit;
-    tvGroups.BeginUpdate;
+    BeginUpdate;
     try
        // Стираем результаты поиска
       DisplaySearchResults(True, False);
@@ -623,10 +631,11 @@ uses
        // Очищаем буфер отката
       FUndo.Clear;
       FUndo.SetSavepoint;
+      StateChanged([asActionChangePending, asModifiedChangePending]);
        // Загружаем список представлений
       ReloadViewList;
     finally
-      tvGroups.EndUpdate;
+      EndUpdate;
     end;
   end;
 
@@ -645,13 +654,11 @@ uses
 
   procedure TfMain.aaNewPic(Sender: TObject);
   begin
-    ResetMode;
     AddFiles(Self, FUndo);
   end;
 
   procedure TfMain.aaOpen(Sender: TObject);
   begin
-    ResetMode;
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultExt;
@@ -674,50 +681,42 @@ uses
 
   procedure TfMain.aaPhoaView_Delete(Sender: TObject);
   begin
-    ResetMode;
     if PhoaConfirm(False, 'SConfirm_DelView', ISettingID_Dlgs_ConfmDelView) then PerformOperation('ViewDelete', []);
   end;
 
   procedure TfMain.aaPhoaView_Edit(Sender: TObject);
   begin
-    ResetMode;
     EditView(Self, FUndo);
   end;
 
   procedure TfMain.aaPhoaView_MakeGroup(Sender: TObject);
   begin
-    ResetMode;
     MakeGroupFromView(Self, FUndo);
   end;
 
   procedure TfMain.aaPhoaView_New(Sender: TObject);
   begin
-    ResetMode;
     AddView(Self, FUndo);
   end;
 
   procedure TfMain.aaPicOps(Sender: TObject);
   begin
-    ResetMode;
     DoPicOps(Self, FUndo);
   end;
 
   procedure TfMain.aaRemoveSearchResults(Sender: TObject);
   begin
-    ResetMode;
     DisplaySearchResults(True, False);
   end;
 
   procedure TfMain.aaSave(Sender: TObject);
   begin
-    ResetMode;
      // Если имя файла не задано, выполняем SaveAs. Иначе сохраняем файл фотоальбома
     if FileName='' then aSaveAs.Execute else DoSave(FProject.FileName, FProject.FileRevision);
   end;
 
   procedure TfMain.aaSaveAs(Sender: TObject);
   begin
-    ResetMode;
     with TSaveDialog.Create(Self) do
       try
         DefaultExt  := SDefaultExt;
@@ -734,36 +733,27 @@ uses
 
   procedure TfMain.aaSelectAll(Sender: TObject);
   begin
-    ResetMode;
     Viewer.SelectAll;
   end;
 
   procedure TfMain.aaSelectNone(Sender: TObject);
   begin
-    ResetMode;
     Viewer.ClearSelection;
   end;
 
   procedure TfMain.aaSettings(Sender: TObject);
   begin
-    ResetMode;
      // В диалоге настроек по умолчанию выбираем кнопку "Режим обзора"
-    if EditSettings(ISettingID_Browse) then begin
-      ApplySettings;
-       // Применяем разрёшённость Drag'n'Drop у Viewer
-      EnableActions;
-    end;
+    if EditSettings(ISettingID_Browse) then ApplySettings;
   end;
 
   procedure TfMain.aaSortPics(Sender: TObject);
   begin
-    ResetMode;
     DoSortPics(Self, FUndo, CurGroup=FSearchResults);
   end;
 
   procedure TfMain.aaStats(Sender: TObject);
   begin
-    ResetMode;
     ShowProjectStats(Self);
   end;
 
@@ -780,6 +770,11 @@ uses
   procedure TfMain.aaViewSlideShow(Sender: TObject);
   begin
     StartViewMode([ivifSlideShow]);
+  end;
+
+  procedure TfMain.AppActionExecute(Action: TBasicAction; var Handled: Boolean);
+  begin
+    ResetMode;
   end;
 
   procedure TfMain.AppException(Sender: TObject; E: Exception);
@@ -805,15 +800,14 @@ uses
 
   procedure TfMain.ApplyLanguage;
   begin
-     // Настраиваем прочие свойства
-    if FInitialized then begin
+    if asInitialized in FAppState then begin
        // Перестраиваем представления, т.к. они содержат локализуемые названия узлов
       FProject.Views.Invalidate;
        // Перерисовываем дерево
       tvGroups.ReinitChildren(nil, True);
       tvGroups.Invalidate;
        // Обновляем заголовок окна
-      EnableActions;
+      StateChanged([asFileNameChangePending]);
     end;
      // Настраиваем Help-файл
     Application.HelpFile := ExtractFilePath(ParamStr(0))+ConstVal('SHelpFileName');
@@ -833,73 +827,79 @@ uses
     end;
 
   begin
-     // Настраиваем язык интерфейса
-    LangManager.LanguageID := SettingValueInt(ISettingID_Gen_Language);
-     // Настраиваем тему
-    with (RootSetting.Settings[ISettingID_Gen_Theme] as TPhoaListSetting) do TBXSetTheme(VariantText); 
-     // Настраиваем основной шрифт программы
-    FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
-    ToolbarFont.Assign(Font);
-     // Настраиваем текущую кодовую страницу
-    cMainCodePage := CharsetToCP(Font.Charset);
-     // Настраиваем список последних открывавшихся файлов
-    mruOpen.MaxItems := SettingValueInt(ISettingID_Gen_OpenMRUCount);
-     // Настраиваем максимальное количество операций в буфере отмены
-    FUndo.MaxCount := SettingValueInt(ISettingID_Browse_MaxUndoCount); 
-     // Настраиваем подсказки
-    Application.HintHidePause := SettingValueInt(ISettingID_Gen_TooltipDisplTime);
-     // Настраиваем доки/панели инструментов
-     // -- Перетаскиваемость
-    ApplyToolbarSettings(dkTop);
-    ApplyToolbarSettings(dkLeft);
-    ApplyToolbarSettings(dkRight);
-    ApplyToolbarSettings(dkBottom);
-     // -- Размер кнопок основной панели
-    case SettingValueInt(ISettingID_Gen_ToolbarBtnSize) of
-      0: tbMain.Images := ilActionsSmall;
-      1: begin
-        MakeImagesLoaded('PNG_MIDDLE_IMAGES', ilActionsMiddle);
-        tbMain.Images := ilActionsMiddle;
+    BeginUpdate;
+    try
+       // Настраиваем язык интерфейса
+      LangManager.LanguageID := SettingValueInt(ISettingID_Gen_Language);
+       // Настраиваем тему
+      with (RootSetting.Settings[ISettingID_Gen_Theme] as TPhoaListSetting) do TBXSetTheme(VariantText); 
+       // Настраиваем основной шрифт программы
+      FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+      ToolbarFont.Assign(Font);
+       // Настраиваем текущую кодовую страницу
+      cMainCodePage := CharsetToCP(Font.Charset);
+       // Настраиваем список последних открывавшихся файлов
+      mruOpen.MaxItems := SettingValueInt(ISettingID_Gen_OpenMRUCount);
+       // Настраиваем максимальное количество операций в буфере отмены
+      FUndo.MaxCount := SettingValueInt(ISettingID_Browse_MaxUndoCount); 
+       // Настраиваем подсказки
+      Application.HintHidePause := SettingValueInt(ISettingID_Gen_TooltipDisplTime);
+       // Настраиваем доки/панели инструментов
+       // -- Перетаскиваемость
+      ApplyToolbarSettings(dkTop);
+      ApplyToolbarSettings(dkLeft);
+      ApplyToolbarSettings(dkRight);
+      ApplyToolbarSettings(dkBottom);
+       // -- Размер кнопок основной панели
+      case SettingValueInt(ISettingID_Gen_ToolbarBtnSize) of
+        0: tbMain.Images := ilActionsSmall;
+        1: begin
+          MakeImagesLoaded('PNG_MIDDLE_IMAGES', ilActionsMiddle);
+          tbMain.Images := ilActionsMiddle;
+        end;
+        2: begin
+          MakeImagesLoaded('PNG_LARGE_IMAGES', ilActionsLarge);
+          tbMain.Images := ilActionsLarge;
+        end;
       end;
-      2: begin
-        MakeImagesLoaded('PNG_LARGE_IMAGES', ilActionsLarge);
-        tbMain.Images := ilActionsLarge;
+       // Настраиваем дерево групп
+      ApplyTreeSettings(tvGroups);
+      tvGroups.HintMode := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+      FGroupTreeHintProps := IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps));
+       // Обновляем режим отображения
+      UpdateFlatModeAction;
+       // Настраиваем Viewer
+      with Viewer do begin
+        BeginUpdate;
+        try
+          ThumbBackBorderStyle  := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
+          ThumbBackBorderColor  := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
+          Color                 := SettingValueInt (ISettingID_Browse_ViewerBkColor);
+          ThumbBackColor        := SettingValueInt (ISettingID_Browse_ViewerThBColor);
+          ThumbFontColor        := SettingValueInt (ISettingID_Browse_ViewerThFColor);
+          ThumbShadowVisible    := SettingValueBool(ISettingID_Browse_ViewerThShadow);
+          ThumbShadowBlurRadius := SettingValueInt(ISettingID_Browse_ViewerThShRadius);
+          ThumbShadowOffset     := Point(SettingValueInt(ISettingID_Browse_ViewerThShOffsX), SettingValueInt(ISettingID_Browse_ViewerThShOffsY));
+          ThumbShadowColor      := SettingValueInt(ISettingID_Browse_ViewerThShColor);
+          ThumbShadowOpacity    := SettingValueInt(ISettingID_Browse_ViewerThShOpact);
+          ShowThumbTooltips     := SettingValueBool(ISettingID_Browse_ViewerTooltips);
+          ThumbTooltipProps     := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
+          SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);
+          SetupViewerCorner(tcRightTop,    ISettingID_Browse_ViewerThRTProp);
+          SetupViewerCorner(tcLeftBottom,  ISettingID_Browse_ViewerThLBProp);
+          SetupViewerCorner(tcRightBottom, ISettingID_Browse_ViewerThRBProp);
+        finally
+          EndUpdate;
+        end;
       end;
+       // Применяем инструменты
+      if RootSetting.Settings[ISettingID_Tools].Modified then ApplyTools;
+       // Помечаем все настройки как неизменённые
+      RootSetting.Modified := False;
+      StateChanged([asActionChangePending]);
+    finally
+      EndUpdate;
     end;
-     // Настраиваем дерево групп
-    ApplyTreeSettings(tvGroups);
-    tvGroups.HintMode := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
-    FGroupTreeHintProps := IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps));
-     // Обновляем режим отображения
-    UpdateFlatModeAction; 
-     // Настраиваем Viewer
-    with Viewer do begin
-      BeginUpdate;
-      try
-        ThumbBackBorderStyle  := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
-        ThumbBackBorderColor  := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
-        Color                 := SettingValueInt (ISettingID_Browse_ViewerBkColor);
-        ThumbBackColor        := SettingValueInt (ISettingID_Browse_ViewerThBColor);
-        ThumbFontColor        := SettingValueInt (ISettingID_Browse_ViewerThFColor);
-        ThumbShadowVisible    := SettingValueBool(ISettingID_Browse_ViewerThShadow);
-        ThumbShadowBlurRadius := SettingValueInt(ISettingID_Browse_ViewerThShRadius);
-        ThumbShadowOffset     := Point(SettingValueInt(ISettingID_Browse_ViewerThShOffsX), SettingValueInt(ISettingID_Browse_ViewerThShOffsY));
-        ThumbShadowColor      := SettingValueInt(ISettingID_Browse_ViewerThShColor);
-        ThumbShadowOpacity    := SettingValueInt(ISettingID_Browse_ViewerThShOpact);
-        ShowThumbTooltips     := SettingValueBool(ISettingID_Browse_ViewerTooltips);
-        ThumbTooltipProps     := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
-        SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);
-        SetupViewerCorner(tcRightTop,    ISettingID_Browse_ViewerThRTProp);
-        SetupViewerCorner(tcLeftBottom,  ISettingID_Browse_ViewerThLBProp);
-        SetupViewerCorner(tcRightBottom, ISettingID_Browse_ViewerThRBProp);
-      finally
-        EndUpdate;
-      end;
-    end;
-     // Применяем инструменты
-    if RootSetting.Settings[ISettingID_Tools].Modified then ApplyTools;
-     // Помечаем все настройки как неизменённые
-    RootSetting.Modified := False;
   end;
 
   procedure TfMain.ApplyTools;
@@ -918,6 +918,11 @@ uses
       if ptuGroupPopupMenu    in Tool.Usages then AddToolItem(Tool, giTools_GroupsMenu, ToolItemClick);
       if ptuThViewerPopupMenu in Tool.Usages then AddToolItem(Tool, giTools_PicsMenu,   ToolItemClick);
     end;
+  end;
+
+  procedure TfMain.BeginUpdate;
+  begin
+    Inc(FUpdateLock); 
   end;
 
   procedure TfMain.bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
@@ -945,7 +950,7 @@ uses
 
   procedure TfMain.CMFocusChanged(var Msg: TCMFocusChanged);
   begin
-    EnableActions;
+    StateChanged([asActionChangePending]);
   end;
 
   procedure TfMain.DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
@@ -991,112 +996,66 @@ uses
 
   procedure TfMain.DoLoad(const sFileName: String);
   begin
-    tvGroups.BeginSynch;
+    BeginUpdate;
     try
-      tvGroups.BeginUpdate;
-      StartWait;
+      tvGroups.BeginSynch;
       try
+        tvGroups.BeginUpdate;
+        StartWait;
         try
-           // Уничтожаем результаты поиска
-          DisplaySearchResults(True, False);
-           // Загружаем файл
-          FProject.LoadFromFile(ExpandUNCFileName(sFileName));
-          UpdateThumbnailSize;
-           // Очищаем буфер отката
-          FUndo.Clear;
-          FUndo.SetSavepoint;
-           // Регистрируем файл в списке MRU
-          mruOpen.Add(sFileName);
+          try
+             // Уничтожаем результаты поиска
+            DisplaySearchResults(True, False);
+             // Загружаем файл
+            FProject.LoadFromFile(ExpandUNCFileName(sFileName));
+            UpdateThumbnailSize;
+             // Очищаем буфер отката
+            FUndo.Clear;
+            FUndo.SetSavepoint;
+             // Регистрируем файл в списке MRU
+            mruOpen.Add(sFileName);
+            StateChanged([asActionChangePending, asFileNameChangePending, asModifiedChangePending]);
+          finally
+             // Перегружаем список представлений
+            ReloadViewList;
+          end;
         finally
-           // Перегружаем список представлений
-          ReloadViewList;
+          StopWait;
+          tvGroups.EndUpdate;
         end;
       finally
-        StopWait;
-        tvGroups.EndUpdate;
+        tvGroups.EndSynch;
       end;
     finally
-      tvGroups.EndSynch;
+      EndUpdate;
     end;
-    EnableActions;
   end;
 
   procedure TfMain.DoSave(const sFileName: String; iRevisionNumber: Integer);
   begin
      // Предупреждаем пользователя, если он сохраняет в более старую ревизию
     if (iRevisionNumber<IPhFileRevisionNumber) and not PhoaConfirm(True, 'SConfirm_SavingOldFormatFile', ISettingID_Dlgs_ConfmOldFile) then Exit;
-    StartWait;
+    BeginUpdate;
     try
-      FProject.SaveToFile(sFileName, SProject_Generator, SProject_Remark, iRevisionNumber);
-      FUndo.SetSavepoint;
+      StartWait;
+      try
+        FProject.SaveToFile(sFileName, SProject_Generator, SProject_Remark, iRevisionNumber);
+        FUndo.SetSavepoint;
+         // Регистрируем имя файла в списке MRU
+        mruOpen.Add(sFileName);
+        StateChanged([asActionChangePending, asFileNameChangePending, asModifiedChangePending]);
+      finally
+        StopWait;
+      end;
     finally
-      StopWait;
+      EndUpdate;
     end;
-     // Регистрируем имя файла в списке MRU
-    mruOpen.Add(sFileName);
-    EnableActions;
   end;
 
-  procedure TfMain.EnableActions;
-  const asUnmod: Array[Boolean] of String[1] = ('*', '');
-  var
-    bGr, bPic, bPics, bPicSel, bView: Boolean;
-    FCtl: TPhoaAppFocusedControl;
-    gnk: TGroupNodeKind;
+  procedure TfMain.EndUpdate;
   begin
-    if not FInitialized or (csDestroying in ComponentState) or (tsUpdating in tvGroups.TreeStates) or Viewer.UpdateLocked then Exit;
-     // Определяем сфокусированный контрол
-    FCtl := FocusedControl;
-    bGr  := FCtl=pafcGroupTree;
-    bPic := FCtl=pafcThumbViewer;
-     // Определяем текущие выделенные элементы
-    gnk := GetNodeKind(tvGroups, tvGroups.FocusedNode);
-    bPics   := FProject.Pics.Count>0;
-    bPicSel := Viewer.SelectedPics.Count>0;
-    bView   := FProject.ViewIndex>=0;
-     // Настраиваем Actions/Menus
-    aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
-    aUndo.Enabled                := FUndo.CanUndo;
-    smUndoHistory.Enabled        := FUndo.CanUndo;
-    aNewGroup.Enabled            := gnk in [gnkPhoA, gnkPhoaGroup];
-    aNewPic.Enabled              := gnk in [gnkPhoA, gnkPhoaGroup];
-    aDelete.Enabled              := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel);
-    aEdit.Enabled                := (bGr and (gnk in [gnkPhoA, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and bPicSel and not bView);
-    aCut.Enabled                 := (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
-    aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
-    aPaste.Enabled               := (gnk in [gnkPhoA, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
-    aSortPics.Enabled            := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and bPics;
-    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.Pics.Count);
-    aSelectNone.Enabled          := bPicSel;
-    aView.Enabled                := Viewer.ItemIndex>=0;
-    aViewSlideShow.Enabled       := Viewer.ItemIndex>=0;
-    aRemoveSearchResults.Enabled := FSearchNode<>nil;
-    aPicOps.Enabled              := (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel;
-    aFileOperations.Enabled      := bPics;
-    aFind.Enabled                := bPics;
-     // Views
-    aPhoaView_Delete.Enabled     := bView;
-    aPhoaView_Edit.Enabled       := bView;
-    aPhoaView_MakeGroup.Enabled  := bView;
-     // Drag-and-drop
-    Viewer.DragEnabled       := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
-    Viewer.DragInsideEnabled := gnk in [gnkPhoA, gnkPhoaGroup];
-     // Инструменты
-    EnableTools;
-     // Настраиваем Captions
-    Caption := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), asUnmod[FUndo.IsUnmodified], ConstVal('SAppCaption')]);
-    Application.Title := Caption;
-    sbarMain.Panels[1].Caption := ConstVal('SPicCount',         [FProject.Pics.Count]);
-    sbarMain.Panels[2].Caption := ConstVal('SSelectedPicCount', [Viewer.SelectedPics.Count]);
-  end;
-
-  procedure TfMain.EnableTools;
-  begin
-     // Настраиваем инструменты меню "Сервис"
-    DoEnableTools(giTools_ToolsMenu);
-     // Сбрасываем флаги инструментов popup-меню
-    FGroupsPopupToolsValidated := False;
-    FPicsPopupToolsValidated   := False;
+    if FUpdateLock>0 then Dec(FUpdateLock);
+    if FUpdateLock=0 then UpdateState;
   end;
 
   function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
@@ -1128,6 +1087,7 @@ uses
 
   procedure TfMain.FormCreate(Sender: TObject);
   begin
+    BeginUpdate;
     try
        // Настраиваем формат времени
       ShortTimeFormat := 'hh:nn';
@@ -1138,9 +1098,10 @@ uses
        // Создаём фотоальбом
       FProject := NewPhotoAlbumProject;
        // Настраиваем Application
-      Application.OnHint      := AppHint;
-      Application.OnException := AppException;
-      Application.OnIdle      := AppIdle;
+      Application.OnActionExecute := AppActionExecute;
+      Application.OnHint          := AppHint;
+      Application.OnException     := AppException;
+      Application.OnIdle          := AppIdle;
        // Создаём группу - список результатов поиска
       FSearchResults := NewPhotoAlbumPicGroup(nil, IGroupID_SearchResults);
        // Create undoable operations list
@@ -1175,7 +1136,8 @@ uses
         tvGroups.EndSynch;
       end;
     finally
-      FInitialized := True;
+      StateChanged([asInitialized]);
+      EndUpdate;
     end;
   end;
 
@@ -1249,7 +1211,7 @@ uses
       g := PPhotoAlbumPicGroup(Tree.GetNodeData(Node))^;
       if g.Owner=nil then begin
         if g.ID=IGroupID_SearchResults then Result := gnkSearch
-        else if g=FProject.RootGroupX  then Result := gnkPhoA
+        else if g=FProject.RootGroupX  then Result := gnkProject
         else if FProject.ViewIndex>=0  then Result := gnkView;
       end else
         if FProject.ViewIndex>=0 then Result := gnkViewGroup else Result := gnkPhoaGroup;
@@ -1294,14 +1256,20 @@ uses
   procedure TfMain.LoadGroupTree;
   begin
     ResetMode;
-    tvGroups.BeginUpdate;
+    BeginUpdate;
     try
-      tvGroups.ReinitChildren(nil, True);
-      ActivateVTNode(tvGroups, tvGroups.GetFirst);
+      tvGroups.BeginUpdate;
+      try
+        tvGroups.ReinitChildren(nil, True);
+        ActivateVTNode(tvGroups, tvGroups.GetFirst);
+        StateChanged([asActionChangePending]);
+      finally
+        tvGroups.EndUpdate;
+      end;
+      RefreshViewer;
     finally
-      tvGroups.EndUpdate;
+      EndUpdate;
     end;
-    RefreshViewer;
   end;
 
   procedure TfMain.mruOpenClick(Sender: TObject; const Filename: String);
@@ -1322,53 +1290,58 @@ uses
     iCurRoot, iCurGroupID: Integer;
     pGroupOffset: TPoint;
   begin
-    StartWait;
+    BeginUpdate;
     try
-       // Сохраняем текущее состояние интерфейса
-      iCurRoot     := Integer(FProject.ViewRootGroupX); // Избегаем создания ссылки, он ведь нам только для проверки
-      iCurGroupID  := CurGroupID;
-      pGroupOffset := tvGroups.OffsetXY;
-      ViewerData   := Viewer.SaveDisplay;
-       // Создаём (выполняем операцию)
-      Changes := [];
+      StartWait;
       try
-        OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
-      finally
-         // Отрабатываем результирущие изменения всех операций
-        ProcessOpChanges(Changes);
-      end;
-       // Восстанавливаем состояние интерфейса
-      if iCurRoot=Integer(FProject.ViewRootGroupX) then begin
-         // Восстанавливаем текущую группу
-        tvGroups.BeginUpdate;
+         // Сохраняем текущее состояние интерфейса
+        iCurRoot     := Integer(FProject.ViewRootGroupX); // Избегаем создания ссылки, он ведь нам только для проверки
+        iCurGroupID  := CurGroupID;
+        pGroupOffset := tvGroups.OffsetXY;
+        ViewerData   := Viewer.SaveDisplay;
+         // Создаём (выполняем операцию)
+        Changes := [];
         try
-          CurGroupID := iCurGroupID;
-          tvGroups.OffsetXY := pGroupOffset;
+          OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
         finally
-          tvGroups.EndUpdate;
+           // Отрабатываем результирущие изменения всех операций
+          ProcessOpChanges(Changes);
+          StateChanged([asActionChangePending, asModifiedChangePending]);
         end;
-         // Если получилось - восстанавливаем состояние вьюера
-        if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
+         // Восстанавливаем состояние интерфейса
+        if iCurRoot=Integer(FProject.ViewRootGroupX) then begin
+           // Восстанавливаем текущую группу
+          tvGroups.BeginUpdate;
+          try
+            CurGroupID := iCurGroupID;
+            tvGroups.OffsetXY := pGroupOffset;
+          finally
+            tvGroups.EndUpdate;
+          end;
+           // Если получилось - восстанавливаем состояние вьюера
+          if CurGroupID=iCurGroupID then Viewer.RestoreDisplay(ViewerData);
+        end;
+      finally
+        StopWait;
       end;
     finally
-      StopWait;
-      EnableActions;
+      EndUpdate;
     end;
   end;
 
   procedure TfMain.pmGroupsPopup(Sender: TObject);
   begin
-    if not FGroupsPopupToolsValidated then begin
+    if not (asGroupsPopupToolsValidated in FAppState) then begin
       DoEnableTools(giTools_GroupsMenu);
-      FGroupsPopupToolsValidated := True;
+      StateChanged([asGroupsPopupToolsValidated]);
     end;
   end;
 
   procedure TfMain.pmPicsPopup(Sender: TObject);
   begin
-    if not FPicsPopupToolsValidated then begin
+    if not (asPicsPopupToolsValidated in FAppState) then begin
       DoEnableTools(giTools_PicsMenu);
-      FPicsPopupToolsValidated := True;
+      StateChanged([asPicsPopupToolsValidated]);
     end;
   end;
 
@@ -1403,72 +1376,81 @@ uses
     end;
 
   begin
-     // Разбираем параметры командной строки
-    CmdLine := TPhoaCommandLine.Create;
+    BeginUpdate;
     try
-       // Если указан файл - загружаем его
-      if clkOpenPhoa in CmdLine.Keys then begin
-        sPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
-        ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
-        DoLoad(sPhoaFile);
-         // -- Если указано представление - выбираем его
-        if clkSelectView  in CmdLine.Keys then SelectViewByName(CmdLine.KeyValues[clkSelectView]);
-         // -- Если указана группа - ищем и выделяем её
-        if clkSelectGroup in CmdLine.Keys then SelectGroupByPath(CmdLine.KeyValues[clkSelectGroup]);
-         // -- Если указан ID изображения - ищем и выделяем его
-        if clkSelectPicID in CmdLine.Keys then SelectPicByID(StrToIntDef(CmdLine.KeyValues[clkSelectPicID], 0));
-         // -- Если указан режим просмотра, готовим инициализационные флаги
-        if clkViewMode in CmdLine.Keys then begin
-          ImgViewInitFlags := [];
-           // ---- Просмотр слайдов
-          if clkSlideShow   in CmdLine.Keys then Include(ImgViewInitFlags, ivifSlideShow);
-           // ---- Полноэкранный режим
-          if clkFullScreen  in CmdLine.Keys then
-            if CmdLine.KeyValues[clkFullScreen]='0' then
-              Include(ImgViewInitFlags, ivifForceWindow)
-            else
-              Include(ImgViewInitFlags, ivifForceFullscreen);
-           // ---- Отправляем отложенное сообщение о необходимости входа в режим просмотра
-          PostMessage(Handle, WM_STARTVIEWMODE, Byte(ImgViewInitFlags), 0);
-        end;
-       // Иначе создаём новый проект
-      end else
-        aNew.Execute;
+       // Разбираем параметры командной строки
+      CmdLine := TPhoaCommandLine.Create;
+      try
+         // Если указан файл - загружаем его
+        if clkOpenPhoa in CmdLine.Keys then begin
+          sPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
+          ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
+          DoLoad(sPhoaFile);
+           // -- Если указано представление - выбираем его
+          if clkSelectView  in CmdLine.Keys then SelectViewByName(CmdLine.KeyValues[clkSelectView]);
+           // -- Если указана группа - ищем и выделяем её
+          if clkSelectGroup in CmdLine.Keys then SelectGroupByPath(CmdLine.KeyValues[clkSelectGroup]);
+           // -- Если указан ID изображения - ищем и выделяем его
+          if clkSelectPicID in CmdLine.Keys then SelectPicByID(StrToIntDef(CmdLine.KeyValues[clkSelectPicID], 0));
+           // -- Если указан режим просмотра, готовим инициализационные флаги
+          if clkViewMode in CmdLine.Keys then begin
+            ImgViewInitFlags := [];
+             // ---- Просмотр слайдов
+            if clkSlideShow   in CmdLine.Keys then Include(ImgViewInitFlags, ivifSlideShow);
+             // ---- Полноэкранный режим
+            if clkFullScreen  in CmdLine.Keys then
+              if CmdLine.KeyValues[clkFullScreen]='0' then
+                Include(ImgViewInitFlags, ivifForceWindow)
+              else
+                Include(ImgViewInitFlags, ivifForceFullscreen);
+             // ---- Отправляем отложенное сообщение о необходимости входа в режим просмотра
+            PostMessage(Handle, WM_STARTVIEWMODE, Byte(ImgViewInitFlags), 0);
+          end;
+         // Иначе создаём новый проект
+        end else
+          aNew.Execute;
+      finally
+        CmdLine.Free;
+      end;
     finally
-      CmdLine.Free;
+      EndUpdate;
     end;
-    EnableActions;
   end;
 
   procedure TfMain.ProcessOpChanges(Changes: TPhoaOperationChanges);
   begin
-     // Изменились свойства проекта - нас интересуют только размерэ эскизов
-    if pocProjectProps in Changes then UpdateThumbnailSize;
-     // Изменился список изображений проекта - уничтожаем результаты поиска
-    if pocProjectPicList in Changes then DisplaySearchResults(True, False);
-     // Изменился список представлений - перегружаем его, обновляем индекс представления и перегружаем группы/Viewer
-    if pocViewList in Changes then
-      ReloadViewList
-     // Изменился индекс представления - обновляем его и перегружаем группы/Viewer
-    else if pocViewIndex in Changes then
-      UpdateViewIndex
-     // Изменилась структура групп - перегружаем дерево и Viewer
-    else if pocGroupStructure in Changes then
-      LoadGroupTree
-    else begin
-       // Изменения свойств группы/списка изображений - надо просто обновить каждый узел дерева
-      if [pocGroupProps, pocGroupPicList]*Changes<>[] then tvGroups.InvalidateChildren(nil, True);
-       // Изменился список изображений группы - перегружаем Viewer
-      if pocGroupPicList in Changes then
-        RefreshViewer
-       // Изменились только свойства изображений
-      else if pocPicProps in Changes then begin
-         // Перерисовываем Viewer
-        FViewer.Invalidate;
-         // Сбрасываем представления (закладываемся исключительно на то, что менять св-ва изображений при отображении
-         //   представления нельзя! Иначе нужно перегружать также и дерево)
-        FProject.Views.Invalidate;
+    BeginUpdate;
+    try
+       // Изменились свойства проекта - нас интересуют только размерэ эскизов
+      if pocProjectProps in Changes then UpdateThumbnailSize;
+       // Изменился список изображений проекта - уничтожаем результаты поиска
+      if pocProjectPicList in Changes then DisplaySearchResults(True, False);
+       // Изменился список представлений - перегружаем его, обновляем индекс представления и перегружаем группы/Viewer
+      if pocViewList in Changes then
+        ReloadViewList
+       // Изменился индекс представления - обновляем его и перегружаем группы/Viewer
+      else if pocViewIndex in Changes then
+        UpdateViewIndex
+       // Изменилась структура групп - перегружаем дерево и Viewer
+      else if pocGroupStructure in Changes then
+        LoadGroupTree
+      else begin
+         // Изменения свойств группы/списка изображений - надо просто обновить каждый узел дерева
+        if [pocGroupProps, pocGroupPicList]*Changes<>[] then tvGroups.InvalidateChildren(nil, True);
+         // Изменился список изображений группы - перегружаем Viewer
+        if pocGroupPicList in Changes then
+          RefreshViewer
+         // Изменились только свойства изображений
+        else if pocPicProps in Changes then begin
+           // Перерисовываем Viewer
+          FViewer.Invalidate;
+           // Сбрасываем представления (закладываемся исключительно на то, что менять св-ва изображений при отображении
+           //   представления нельзя! Иначе нужно перегружать также и дерево)
+          FProject.Views.Invalidate;
+        end;
       end;
+    finally
+      EndUpdate;
     end;
   end;
 
@@ -1494,26 +1476,31 @@ uses
     end;
 
   begin
-    FViewedPics := nil;
-     // Если есть текущая группа
-    if CurGroup<>nil then
-       // Не рекурсивный режим
-      if not SettingValueBool(ISettingID_Browse_FlatMode) then
-        FViewedPics := CurGroup.PicsX
-       // Рекурсивный режим
-      else begin
-         // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
-        UniquePics := NewPhotoAlbumPicList(True);
-         // Создаём список изображений для просмотра
-        ViewPics := NewPhotoAlbumPicList(False);
-         // Рекурсивно наполняем список
-        RecursivelyAddPics(CurGroup);
-         // Сохраняем список
-        FViewedPics := ViewPics;
-      end;
-     // Обновляем вьюер
-    FViewer.ReloadPicList(FViewedPics);
-    EnableActions;
+    BeginUpdate;
+    try
+      FViewedPics := nil;
+       // Если есть текущая группа
+      if CurGroup<>nil then
+         // Не рекурсивный режим
+        if not SettingValueBool(ISettingID_Browse_FlatMode) then
+          FViewedPics := CurGroup.PicsX
+         // Рекурсивный режим
+        else begin
+           // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
+          UniquePics := NewPhotoAlbumPicList(True);
+           // Создаём список изображений для просмотра
+          ViewPics := NewPhotoAlbumPicList(False);
+           // Рекурсивно наполняем список
+          RecursivelyAddPics(CurGroup);
+           // Сохраняем список
+          FViewedPics := ViewPics;
+        end;
+       // Обновляем вьюер
+      FViewer.ReloadPicList(FViewedPics);
+      StateChanged([asActionChangePending]);
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TfMain.ReloadViewList;
@@ -1558,11 +1545,6 @@ uses
     ActivateVTNode(tvGroups, n);
   end;
 
-  procedure TfMain.SetFileName(const Value: String);
-  begin
-    FProject.FileName := Value;
-  end;
-
   procedure TfMain.SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
   var Group: IPhotoAlbumPicGroup;
   begin
@@ -1588,6 +1570,12 @@ uses
     end;
   end;
 
+  procedure TfMain.StateChanged(EnterStates: TAppStates; LeaveStates: TAppStates = []);
+  begin
+    FAppState := FAppState+EnterStates-LeaveStates;
+    UpdateState;
+  end;
+
   procedure TfMain.ToolItemClick(Sender: TObject);
   begin
      // Создаём массив ссылок на изображения и выполняем инструмент
@@ -1596,8 +1584,8 @@ uses
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   begin
-    if GetNodeKind(tvGroups, Node) in [gnkPhoA, gnkView] then begin
-      ItemColor := clBtnFace;
+    if GetNodeKind(tvGroups, Node) in [gnkProject, gnkView] then begin
+      ItemColor  := clBtnFace;
       EraseAction := eaColor;
     end;
   end;
@@ -1611,7 +1599,7 @@ uses
   var p: TPoint;
   begin
     ResetMode;
-    if GetNodeKind(tvGroups, Node) in [gnkPhoA, gnkView] then begin
+    if GetNodeKind(tvGroups, Node) in [gnkProject, gnkView] then begin
       with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
       pmPhoaView.Popup(p.x, p.y);
     end;
@@ -1644,7 +1632,6 @@ uses
   begin
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
-    gTgt := GetNodeGroup(nTgt);
      // Перетаскивание группы
     if Sender=Source then begin
        // Вычисляем и помещаем в nTgt нового родителя, в iNewIndex - новый индекс в родителе, в AM - режим перемещения
@@ -1662,11 +1649,12 @@ uses
        // Если перемещаем ближе к концу среди детей того же родителя, уменьшаем индекс на 1
       if (Mode in [dmAbove, dmBelow]) and (nTgt=nSrc.Parent) and (iNewIndex>Integer(nSrc.Index)) then Dec(iNewIndex);
        // Перемещаем
-      PerformOperation('GroupDragAndDrop', ['Group', GetNodeGroup(nSrc), 'NewParentGroup', gTgt, 'NewIndex', iNewIndex]);
+      PerformOperation('GroupDragAndDrop', ['Group', GetNodeGroup(nSrc), 'NewParentGroup', GetNodeGroup(nTgt), 'NewIndex', iNewIndex]);
       Effect := DROPEFFECT_NONE;
      // Перетаскивание изображений
     end else if Source=Viewer then begin
       bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
+      gTgt := GetNodeGroup(nTgt);
       iCnt := Viewer.SelectedPics.Count;
       iCntBefore := gTgt.Pics.Count;
       PerformOperation(
@@ -1697,11 +1685,11 @@ uses
       if (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
         case Mode of
            // НАД узлом - нельзя вставлять над фотоальбомом и над следующим за nSrc узлом
-          dmAbove:  Accept := (gnkTgt<>gnkPhoA) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
+          dmAbove:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
            // НА узле - нельзя таскать в родителя исходного узла
           dmOnNode: Accept := nSrc.Parent<>nTgt;
            // ПОД узлом - нельзя вставлять под фотоальбомом и под предыдущим перед nSrc узлом
-          dmBelow:  Accept := (gnkTgt<>gnkPhoA) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
+          dmBelow:  Accept := (gnkTgt<>gnkProject) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
         end;
          // nTgt не может быть ребёнком nSrc
         while Accept and (nTgt<>nil) do begin
@@ -1745,7 +1733,7 @@ uses
   var s: String;
   begin
     case GetNodeKind(Sender, Node) of
-      gnkPhoA:      s := FProject.Description;
+      gnkProject:   s := FProject.Description;
       gnkPhoaGroup: s := GetPicGroupPropStrs(GetNodeGroup(Node), FGroupTreeHintProps, ': ', S_CRLF);
       else          s := '';
     end;
@@ -1756,7 +1744,7 @@ uses
   const
     aiImgIdx: Array[TGroupNodeKind] of Integer = (
       -1,             // gnkNone
-      iiPhoA,         // gnkPhoA
+      iiPhoA,         // gnkProject
       iiView,         // gnkView
       iiFolderSearch, // gnkSearch
       iiFolder,       // gnkPhoaGroup
@@ -1776,7 +1764,7 @@ uses
     case TextType of
       ttNormal:
         case GetNodeKind(Sender, Node) of
-          gnkPhoA:        s := ConstVal('SPhotoAlbumNode');
+          gnkProject:     s := ConstVal('SPhotoAlbumNode');
           gnkView:        s := FProject.CurrentView.Name;
           gnkSearch:      s := ConstVal('SSearchResultsNode');
           gnkPhoaGroup,
@@ -1836,16 +1824,114 @@ uses
     Changes: TPhoaOperationChanges;
   begin
     ResetMode;
-     // Крутим цикл по операциям (с конца до указанного индекса), накапливая изменения
-    Changes := [];
-    for i := FUndo.Count-1 downto Index do FUndo[i].Undo(Changes);
-     // Отрабатываем результирущие изменения всех операций
-    ProcessOpChanges(Changes);
+    BeginUpdate;
+    try
+       // Крутим цикл по операциям (с конца до указанного индекса), накапливая изменения
+      Changes := [];
+      for i := FUndo.Count-1 downto Index do FUndo[i].Undo(Changes);
+       // Отрабатываем результирущие изменения всех операций
+      ProcessOpChanges(Changes);
+      StateChanged([asActionChangePending, asModifiedChangePending]);
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TfMain.UpdateFlatModeAction;
   begin
     aFlatMode.Checked := SettingValueBool(ISettingID_Browse_FlatMode);
+  end;
+
+  procedure TfMain.UpdateState;
+
+     // Настраивает доступность Actions
+    procedure Adjust_Actions;
+    var
+      bGr, bPic, bPics, bPicSel, bView: Boolean;
+      FCtl: TPhoaAppFocusedControl;
+      gnk: TGroupNodeKind;
+    begin
+       // Определяем сфокусированный контрол
+      FCtl := FocusedControl;
+      bGr  := FCtl=pafcGroupTree;
+      bPic := FCtl=pafcThumbViewer;
+       // Определяем текущие выделенные элементы
+      gnk := GetNodeKind(tvGroups, tvGroups.FocusedNode);
+      bPics   := FProject.Pics.Count>0;
+      bPicSel := Viewer.SelectedPics.Count>0;
+      bView   := FProject.ViewIndex>=0;
+       // Настраиваем Actions/Menus
+      aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
+      aUndo.Enabled                := FUndo.CanUndo;
+      smUndoHistory.Enabled        := FUndo.CanUndo;
+      aNewGroup.Enabled            := gnk in [gnkProject, gnkPhoaGroup];
+      aNewPic.Enabled              := gnk in [gnkProject, gnkPhoaGroup];
+      aDelete.Enabled              := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel);
+      aEdit.Enabled                := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPicSel and not bView);
+      aCut.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
+      aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
+      aPaste.Enabled               := (gnk in [gnkProject, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
+      aSortPics.Enabled            := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPics;
+      aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<CurGroup.Pics.Count);
+      aSelectNone.Enabled          := bPicSel;
+      aView.Enabled                := Viewer.ItemIndex>=0;
+      aViewSlideShow.Enabled       := Viewer.ItemIndex>=0;
+      aRemoveSearchResults.Enabled := FSearchNode<>nil;
+      aPicOps.Enabled              := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel;
+      aFileOperations.Enabled      := bPics;
+      aFind.Enabled                := bPics;
+       // Views
+      aPhoaView_Delete.Enabled     := bView;
+      aPhoaView_Edit.Enabled       := bView;
+      aPhoaView_MakeGroup.Enabled  := bView;
+       // Drag-and-drop
+      Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+      Viewer.DragInsideEnabled := gnk in [gnkProject, gnkPhoaGroup];
+    end;
+
+     // Настраивает доступность инструментов
+    procedure Adjust_Tools;
+    begin
+       // Настраиваем инструменты меню "Сервис"
+      DoEnableTools(giTools_ToolsMenu);
+       // Сбрасываем флаги валидности инструментов popup-меню
+      FAppState := FAppState-[asGroupsPopupToolsValidated, asPicsPopupToolsValidated];
+    end;
+
+     // Настраивает Caption/Application.Title
+    procedure Adjust_Title;
+    var s: String;
+    begin
+      s := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), iif(FUndo.IsUnmodified, '', '*'), ConstVal('SAppCaption')]);
+      Caption           := s;
+      Application.Title := s;
+    end;
+
+     // Настраивает информацию о текущем выделении
+    procedure Adjust_SelInfo;
+    begin
+      sbarMain.Panels[1].Caption := ConstVal('SPicCount',         [FProject.Pics.Count]);
+      sbarMain.Panels[2].Caption := ConstVal('SSelectedPicCount', [Viewer.SelectedPics.Count]);
+    end;
+
+  begin
+    if not (asInitialized in FAppState) or (FUpdateLock>0) or (csDestroying in ComponentState) then Exit;
+     // Если есть изменения в состоянии Actions
+    if asActionChangePending in FAppState then begin
+      Adjust_Actions;
+      Adjust_Tools;
+      Exclude(FAppState, asActionChangePending);
+    end;
+     // Если есть изменения имени файла/состояния "изменённости" проекта
+    if FAppState*[asFileNameChangePending, asModifiedChangePending]<>[] then begin
+      Adjust_Title;
+      FAppState := FAppState-[asFileNameChangePending, asModifiedChangePending];
+    end;
+     // Если есть изменение выделения вьюера
+    if asViewerSelChangePending in FAppState then begin
+      Adjust_SelInfo;
+      Exclude(FAppState, asViewerSelChangePending);
+    end;
   end;
 
   procedure TfMain.UpdateThumbnailSize;
@@ -1856,12 +1942,18 @@ uses
   procedure TfMain.UpdateViewIndex;
   var i, iIndex: Integer;
   begin
-    iIndex := FProject.ViewIndex;
-     // Настраиваем птицу в меню представлений
-    iPhoaView_SetDefault.Checked := iIndex<0;
-    for i := 0 to gipmPhoaViewViews.Count-1 do gipmPhoaViewViews[i].Checked := i=iIndex;
-     // Перегружаем дерево папок
-    LoadGroupTree;
+    BeginUpdate;
+    try
+      iIndex := FProject.ViewIndex;
+       // Настраиваем птицу в меню представлений
+      iPhoaView_SetDefault.Checked := iIndex<0;
+      for i := 0 to gipmPhoaViewViews.Count-1 do gipmPhoaViewViews[i].Checked := i=iIndex;
+       // Перегружаем дерево папок
+      LoadGroupTree;
+      StateChanged([asActionChangePending]);
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TfMain.ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -1873,7 +1965,7 @@ uses
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);
   begin
-    EnableActions;
+    StateChanged([asViewerSelChangePending]);
   end;
 
   procedure TfMain.WMChangeCBChain(var Msg: TWMChangeCBChain);
@@ -1889,7 +1981,7 @@ uses
 
   procedure TfMain.WMDrawClipboard(var Msg: TWMDrawClipboard);
   begin
-    EnableActions;
+    StateChanged([asActionChangePending]);
      // Invoke the next viewer in chain
     if FHNextClipbrdViewer<>0 then SendMessage(FHNextClipbrdViewer, WM_DRAWCLIPBOARD, 0, 0);
   end;
@@ -1897,10 +1989,7 @@ uses
   procedure TfMain.WMHelp(var Msg: TWMHelp);
   begin
      // Игнорируем нажатия Shift/Ctrl/Alt+F1
-    if (GetKeyState(VK_SHIFT) or GetKeyState(VK_CONTROL) or GetKeyState(VK_MENU)) and $80=0 then begin
-      ResetMode;
-      HtmlHelpShowContents;
-    end;
+    if (GetKeyState(VK_SHIFT) or GetKeyState(VK_CONTROL) or GetKeyState(VK_MENU)) and $80=0 then aHelpContents.Execute;
   end;
 
   procedure TfMain.WMStartViewMode(var Msg: TWMStartViewMode);

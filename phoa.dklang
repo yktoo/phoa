@@ -1,10 +1,3 @@
-;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.21 2004-10-15 13:49:35 dale Exp $
-;-----------------------------------------------------------------------------------------------------------------------
-;  PhoA image arranging and searching tool
-;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
-;***********************************************************************************************************************
-
 [fMain]
 Caption=00000003,PhoA
 tbMain.Caption=00000008,Toolbar
@@ -141,49 +134,6 @@ aViewSlideShow.Caption=00000220,Vie&w slide show
 aViewSlideShow.Category=00000219,Edit
 aViewSlideShow.Hint=00000221,View slide show|Start view mode with slide show
 
-[dAbout]
-Caption=00000003,About
-lOK.Caption=00000012,OK
-
-[dFileOpsWizard]
-Caption=00000003,File operations wizard
-bCancel.Caption=00000017,Cancel
-bNext.Caption=00000020,Next >
-bHelp.Caption=00000023,Help
-bBack.Caption=00000026,< Back
-
-[dGroupProps]
-Caption=00000003,Properties: Picture group
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-lID.Caption=00000021,&ID:
-lText.Caption=00000024,&Text:
-lDesc.Caption=00000027,&Description:
-
-[dMsgBox]
-cbDontShowAgain.Caption=00000012,Don't &show this message again
-
-[dPhoAProps]
-Caption=00000003,Properties: photo album
-bCancel.Caption=00000012,Close
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-lDesc.Caption=00000021,&Description:
-lThumbSize.Caption=00000024,&Thumbnail size (WxH):
-lThumbQuality.Caption=00000030,&Thumbnail quality:
-lThQuality1.Caption=00000033,lower\nless size
-lThQuality2.Caption=00000036,higher\ngreater size
-
-[dPicOps]
-Caption=00000003,Picture operations
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-lGroup.Caption=00000021,&Group:
-lOp.Caption=00000024,&Operation:
-cbOp.Items=00000029,Move selected pictures to the group specified below\nCopy selected pictures to the group specified below\nDelete selected pictures from the group specified below\nLeave only selected pictures to the group specified below (intersect)\n
-
 [dPicProps]
 Caption=00000003,Properties: picture
 bCancel.Caption=00000012,Close
@@ -196,229 +146,11 @@ bPgData.Caption=00000032,Data
 bPgKeywords.Caption=00000034,Keywords
 bPgGroups.Caption=00000036,Groups
 
-[dSearch]
-Caption=00000003,Find pictures
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,Find
-bHelp.Caption=00000018,Help
-lCriteria.Caption=00000021,&Search criteria:
-gbSearch.Caption=00000027,Perform search
-rbAll.Caption=00000030,In the &photo album
-rbCurGroup.Caption=00000033,In the &current group
-rbSearchResults.Caption=00000036,In the search &results
-bReset.Caption=00000039,&Reset
-
-[dSelKeywords]
-Caption=00000003,Select keywords
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-lMain.Caption=00000021,&Select one or more keywords from the complete list:
-bReset.Caption=00000024,&Reset
-
-[dSelPhoaGroup]
-Caption=00000003,Select picture group
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-lGroup.Caption=00000021,&Group:
-
 [dSettings]
 Caption=00000003,Program settings
 bCancel.Caption=00000012,Close
 bOK.Caption=00000015,OK
 bHelp.Caption=00000018,Help
-
-[dSortPics]
-Caption=00000003,Sort pictures
-bCancel.Caption=00000012,Cancel
-bOK.Caption=00000015,OK
-bHelp.Caption=00000018,Help
-bReset.Caption=00000021,&Reset
-gbWhereToSort.Caption=00000024,Where to sort pictures
-rbCurGroup.Caption=00000027,In t&he current group
-rbAllGroups.Caption=00000030,In &all photo album groups
-frSorting.lMain.Caption=00000035,&Sort pictures by:
-frSorting.tvMain.Header.Columns[0].Text=00000047,Picture property
-frSorting.tvMain.Header.Columns[1].Text=00000048,Sort direction
-frSorting.ipmsmProp.Caption=00000039,&Picture property
-frSorting.ipmDelete.Caption=00000041,&Delete
-frSorting.ipmMoveUp.Caption=00000044,Move &up
-frSorting.ipmMoveDown.Caption=00000046,Move do&wn
-
-[frWzPageFileOps_SelTask]
-lCopyFiles.Caption=00000007,Copies the files of pictures you select, in the specified folder. Use this option to prepare photo album to write onto a CD or DVD
-lMoveFiles.Caption=00000010,Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately
-lDeleteFiles.Caption=00000013,Deletes pictures you select, and physically deletes corresponding files. Use this option to delete unwanted picture files
-lRepairFileLinks.Caption=00000016,Allows you to repair broken file links by finding the files in the specified folder, and, optionally, to delete pictures no longer associated with valid (existent) files
-lNBUndoable.Caption=00000019,• NB: These operations are not undoable!
-lRebuildThumbs.Caption=00000022,Rereads the picture files, recreates the thumbnails and updates the file-related information, such as image dimensions
-rbCopyFiles.Caption=00000025,&Copy picture files to a folder
-rbMoveFiles.Caption=00000028,&Move picture files to a folder
-rbDeleteFiles.Caption=00000031,&Delete pictures and files
-rbRepairFileLinks.Caption=00000034,Re&pair picture file links
-rbRebuildThumbs.Caption=00000037,&Rebuild thumbnails
-
-[frWzPageFileOps_SelPics]
-rbSelPics.Caption=00000064,&Selected pictures
-rbSelGroups.Caption=00000067,Pictures in selected &groups:
-gbValidity.Caption=00000070,File link validity filter
-rbValidityAny.Caption=00000073,All selected &pictures
-rbValidityValid.Caption=00000076,Only pictures having &valid (existent) file linked
-rbValidityInvalid.Caption=00000079,Only pictures having &NO valid (existent) file linked
-aCheckAll.Caption=00000081,&Check all groups
-aCheckAll.Hint=00000083,Set check to all the groups having pictures
-aUncheckAll.Caption=00000085,&Uncheck all groups
-aUncheckAll.Hint=00000087,Remove check from all the groups
-aInvertChecks.Caption=00000089,&Invert group checks
-aInvertChecks.Hint=00000091,Toggle each group's check
-
-[frWzPageFileOps_SelFolder]
-bCreateFolder.Caption=00000014,&Create folder
-
-[frWzPageFileOps_RepairSelLinks]
-cbDeleteUnmatched.Caption=00000013,&Delete pictures having no matching file (only affects pictures with no valid file linked)
-
-[frWzPageFileOps_RepairOptions]
-gbMatchFindingOptions.Caption=00000007,Searching for the matching file
-rbSearchByName.Caption=00000010,Match file by its &name
-rbSearchBySize.Caption=00000013,Match file by its si&ze
-rbSearchByNameSize.Caption=00000016,Match file by both name and siz&e
-cbLookSubfolders.Caption=00000019,&Look in the subfolders of the destination folder
-gbAlreadyInUseMode.Caption=00000022,If a matching file found but is in use by another picture
-rbSkipFilesInUse.Caption=00000025,S&kip it and look for the next match
-rbRelinkFilesInUse.Caption=00000028,Delete the picture the file was linked to, and relink it to the ne&w picture
-
-[frWzPageFileOps_MoveOptions2]
-lOverwriteMode.Caption=00000007,If the target file already e&xists:
-lNoOriginalFileMode.Caption=00000010,If the &original file does not exist:
-cbDeleteOriginal.Caption=00000013,&Delete original files
-cbDeleteToRecycleBin.Caption=00000016,Delete to the rec&ycle bin
-cbUseCDOptions.Caption=00000019,Set up &CD/DVD creation options as well
-cbOverwriteMode.Items=00000024,Skip the current picture\nPrompt to overwrite the file\nAlways overwrite the file\n
-cbNoOriginalFileMode.Items=00000029,Treat as an error\nUpdate the link only if the target file exists\nUpdate the link anyway\n
-
-[frWzPageFileOps_MoveOptions]
-gbFileArranging.Caption=00000007,File arranging
-lBaseFolder.Caption=00000010,Use path &relative to:
-lBaseGroup.Caption=00000013,Use path r&elative to group:
-lReplaceChar.Caption=00000016,Replace &unallowed symbols with the char:
-rbPutFlatly.Caption=00000019,&Put all the files into the destination folder
-rbMaintainFolderLayout.Caption=00000022,&Maintain original folder layout
-rbMaintainGroupLayout.Caption=00000025,Arran&ge files into folders maintaining group layout
-cbAllowDuplicating.Caption=00000028,Allo&w multiple copies of the file
-
-[frWzPageFileOps_DelOptions]
-cbDeleteToRecycleBin.Caption=00000007,Delete files to the Rec&ycle Bin
-
-[frWzPageFileOps_CDOptions]
-lMediaLabel.Caption=00000007,&Label the media as:
-lPhoaDesc.Caption=00000010,&Photo album description:
-cbCopyExecutable.Caption=00000013,Copy the p&rogram itself to the destination folder
-cbCreatePhoa.Caption=00000016,Create a photo album &file with selected pictures to:
-cbCreateAutorun.Caption=00000023,Create &autorun.inf file for autoplaying the CD/DVD, in the destination folder
-cbIncludeViews.Caption=00000034,Also include existing &views
-cbCopyIniSettings.Caption=00000037,Copy the current program settings to phoa.&ini
-
-[frWzPageAddFiles_SelFiles]
-gbFilter.Caption=00000007,File selection filter
-lFileDateFrom.Caption=00000010,&File modified from:
-lFileMasks.Caption=00000013,&File masks (delimited with ';'):
-lPresence.Caption=00000016,&Photo album presence:
-lFileDateTo.Caption=00000019,&to:
-cbPresence.Items=00000029,Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n
-cbRecurseFolders.Caption=00000055,&Recurse subfolders
-tvMain.Header.Columns[0].Text=00000056,Name
-tvMain.Header.Columns[1].Text=00000057,Size
-tvMain.Header.Columns[2].Text=00000058,Modified
-
-[frWzPageAddFiles_CheckFiles]
-tvFiles.Header.Columns[0].Text=00000023,File
-tvFiles.Header.Columns[1].Text=00000024,Path
-tvFiles.Header.Columns[2].Text=00000025,Size
-tvFiles.Header.Columns[3].Text=00000026,Date
-aFilesCheckAll.Caption=00000012,Check &all files
-aFilesCheckAll.Hint=00000014,Set check to all the files in the list
-aFilesUncheckAll.Caption=00000016,&Uncheck all files
-aFilesUncheckAll.Hint=00000018,Remove check from all the files
-aFilesInvertChecks.Caption=00000020,&Invert file checks
-aFilesInvertChecks.Hint=00000022,Toggle each file's check
-
-[frWzPage_Log]
-aCopy.Caption=00000122,&Copy
-aCopy.Hint=00000124,Copy|Copy current record to clipboard
-aFind.Caption=00000166,&Find...
-aFind.Hint=00000168,Find...|Show Find Text dialog
-aSaveToFile.Caption=00000183,&Save to file...
-aSaveToFile.Hint=00000185,Save to file...|Save the log to a selected file
-aDisplayErrorsOnly.Caption=00000187,&Display errors only
-aDisplayErrorsOnly.Hint=00000189,Display errors only|Hide successfully added picture entries
-
-[frPicProps_View]
-tbMain.Caption=00000008,Main Toolbar
-cbViewFile.Hint=00000062,File to view
-tbTools.Caption=00000066,Tools
-aZoomIn.Caption=00000069,Zoom &in
-aZoomIn.Category=00000068,Zoom
-aZoomIn.Hint=00000071,Zoom in|Enlarge the image
-aZoomOut.Caption=00000073,Zoom ou&t
-aZoomOut.Category=00000072,Zoom
-aZoomOut.Hint=00000075,Zoom out|Zoom image out
-aZoomActual.Caption=00000077,Zoom &actual
-aZoomActual.Category=00000076,Zoom
-aZoomActual.Hint=00000079,Set zoom to 1:1
-aZoomFit.Caption=00000081,&Fit window
-aZoomFit.Category=00000080,Zoom
-aZoomFit.Hint=00000083,Set zoom to fit window
-aRotate0.Caption=00000085,&No rotation
-aRotate0.Category=00000084,Tools
-aRotate0.Hint=00000087,No rotation|Don't apply rotation to the image
-aRotate90.Caption=00000089,Rotate CW by &90°
-aRotate90.Category=00000088,Tools
-aRotate90.Hint=00000091,Rotate CW by 90°|Rotate the image clockwise by 90°
-aRotate180.Caption=00000093,Rotate by &180°
-aRotate180.Category=00000092,Tools
-aRotate180.Hint=00000095,Rotate by 180°|Rotate the image by 180°
-aRotate270.Caption=00000097,Rotate CCW by 9&0°
-aRotate270.Category=00000096,Tools
-aRotate270.Hint=00000099,Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)
-aFlipHorz.Caption=00000101,Flip &horizontally
-aFlipHorz.Category=00000100,Tools
-aFlipHorz.Hint=00000103,Flip horizontally|Flip the image horizontally
-aFlipVert.Caption=00000105,Flip &vertically
-aFlipVert.Category=00000104,Tools
-aFlipVert.Hint=00000107,Flip vertically|Flip the image vertically
-
-[frPicProps_Metadata]
-dpDesc.Caption=00000053,Description
-ipmShowDescPanel.Caption=00000057,Description panel
-ipmShowDescPanel.Hint=00000058,Description panel|Show/hide the Description panel
-
-[frPicProps_Keywords]
-tbMain.ChevronHint=00000009,More buttons|
-aEdit.Caption=00000130,&Edit
-aEdit.Hint=00000132,Edit keyword|Edit selected keyword
-aCheckedOnly.Caption=00000137,C&hecked only
-aCheckedOnly.Hint=00000139,Checked only|Display only checked keywords
-aAdd.Caption=00000141,&Add
-aAdd.Hint=00000143,Add a keyword|Add new keyword to selected pictures
-aCheckAll.Caption=00000145,&Check all
-aCheckAll.Hint=00000147,Check all|Check all the keywords in the list
-aUncheckAll.Caption=00000149,&Uncheck all
-aUncheckAll.Hint=00000151,Uncheck all|Remove check from all the keywords in the list
-aInvertCheck.Caption=00000153,&Invert
-aInvertCheck.Hint=00000155,Invert check|Toggle keyword check
-
-[frPicProps_Data]
-lPlace.Caption=00000007,&Place:
-lDesc.Caption=00000010,D&escription (for displaying):
-lFilmNumber.Caption=00000013,&Film number or name:
-lFrameNumber.Caption=00000016,F&rame number:
-lAuthor.Caption=00000019,&Author:
-lNotes.Caption=00000022,&Notes (additional info):
-lDate.Caption=00000025,&Date:
-lTime.Caption=00000028,&Time:
-lMedia.Caption=00000031,&Media name or code:
 
 [fImgView]
 tbMain.Caption=00000008,Main Toolbar
@@ -528,6 +260,67 @@ eSlideShowInterval.EditCaption=00000298,Slide sho&w interval:
 eSlideShowInterval.Hint=00000299,Slide show interval|Slide show interval in seconds
 eSlideShowInterval.Postfix=00000300,s
 
+[dSearch]
+Caption=00000003,Find pictures
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,Find
+bHelp.Caption=00000018,Help
+lCriteria.Caption=00000021,&Search criteria:
+gbSearch.Caption=00000027,Perform search
+rbAll.Caption=00000030,In the &photo album
+rbCurGroup.Caption=00000033,In the &current group
+rbSearchResults.Caption=00000036,In the search &results
+bReset.Caption=00000039,&Reset
+
+[dProjectProps]
+Caption=00000003,Properties: photo album
+bCancel.Caption=00000012,Close
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+lDesc.Caption=00000021,&Description:
+lThumbSize.Caption=00000024,&Thumbnail size (WxH):
+lThumbQuality.Caption=00000030,&Thumbnail quality:
+lThQuality1.Caption=00000033,lower\nless size
+lThQuality2.Caption=00000036,higher\ngreater size
+
+[dAbout]
+Caption=00000003,About
+lOK.Caption=00000012,OK
+
+[dPicOps]
+Caption=00000003,Picture operations
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+lGroup.Caption=00000021,&Group:
+lOp.Caption=00000024,&Operation:
+cbOp.Items=00000029,Move selected pictures to the group specified below\nCopy selected pictures to the group specified below\nDelete selected pictures from the group specified below\nLeave only selected pictures to the group specified below (intersect)\n
+
+[dSortPics]
+Caption=00000003,Sort pictures
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+bReset.Caption=00000021,&Reset
+gbWhereToSort.Caption=00000024,Where to sort pictures
+rbCurGroup.Caption=00000027,In t&he current group
+rbAllGroups.Caption=00000030,In &all photo album groups
+frSorting.lMain.Caption=00000035,&Sort pictures by:
+frSorting.tvMain.Header.Columns[0].Text=00000047,Picture property
+frSorting.tvMain.Header.Columns[1].Text=00000048,Sort direction
+frSorting.ipmsmProp.Caption=00000039,&Picture property
+frSorting.ipmDelete.Caption=00000041,&Delete
+frSorting.ipmMoveUp.Caption=00000044,Move &up
+frSorting.ipmMoveDown.Caption=00000046,Move do&wn
+
+[dSelKeywords]
+Caption=00000003,Select keywords
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+lMain.Caption=00000021,&Select one or more keywords from the complete list:
+bReset.Caption=00000024,&Reset
+
 [dViewProps]
 Caption=00000003,Properties: photo album view
 bCancel.Caption=00000012,Cancel
@@ -548,6 +341,207 @@ ipmsmProp.Caption=00000049,&Picture property
 ipmDelete.Caption=00000051,&Delete
 ipmMoveUp.Caption=00000054,Move &up
 ipmMoveDown.Caption=00000056,Move do&wn
+
+[dSelPhoaGroup]
+Caption=00000003,Select picture group
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+lGroup.Caption=00000021,&Group:
+
+[fAddFilesWizard]
+Caption=00000003,Add pictures wizard
+bCancel.Caption=00000017,Cancel
+bNext.Caption=00000020,Next >
+bHelp.Caption=00000023,Help
+bBack.Caption=00000026,< Back
+
+[frWzPageAddFiles_SelFiles]
+gbFilter.Caption=00000007,File selection filter
+lFileDateFrom.Caption=00000010,&File modified from:
+lFileMasks.Caption=00000013,&File masks (delimited with ';'):
+lPresence.Caption=00000016,&Photo album presence:
+lFileDateTo.Caption=00000019,&to:
+cbPresence.Items=00000029,Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n
+cbRecurseFolders.Caption=00000055,&Recurse subfolders
+tvMain.Header.Columns[0].Text=00000056,Name
+tvMain.Header.Columns[1].Text=00000057,Size
+tvMain.Header.Columns[2].Text=00000058,Modified
+
+[frWzPageAddFiles_CheckFiles]
+tvFiles.Header.Columns[0].Text=00000023,File
+tvFiles.Header.Columns[1].Text=00000024,Path
+tvFiles.Header.Columns[2].Text=00000025,Size
+tvFiles.Header.Columns[3].Text=00000026,Date
+aFilesCheckAll.Caption=00000012,Check &all files
+aFilesCheckAll.Hint=00000014,Set check to all the files in the list
+aFilesUncheckAll.Caption=00000016,&Uncheck all files
+aFilesUncheckAll.Hint=00000018,Remove check from all the files
+aFilesInvertChecks.Caption=00000020,&Invert file checks
+aFilesInvertChecks.Hint=00000022,Toggle each file's check
+
+[frPicProps_Metadata]
+dpDesc.Caption=00000053,Description
+ipmShowDescPanel.Caption=00000057,Description panel
+ipmShowDescPanel.Hint=00000058,Description panel|Show/hide the Description panel
+
+[frPicProps_View]
+tbMain.Caption=00000008,Main Toolbar
+cbViewFile.Hint=00000062,File to view
+tbTools.Caption=00000066,Tools
+aZoomIn.Caption=00000069,Zoom &in
+aZoomIn.Category=00000068,Zoom
+aZoomIn.Hint=00000071,Zoom in|Enlarge the image
+aZoomOut.Caption=00000073,Zoom ou&t
+aZoomOut.Category=00000072,Zoom
+aZoomOut.Hint=00000075,Zoom out|Zoom image out
+aZoomActual.Caption=00000077,Zoom &actual
+aZoomActual.Category=00000076,Zoom
+aZoomActual.Hint=00000079,Set zoom to 1:1
+aZoomFit.Caption=00000081,&Fit window
+aZoomFit.Category=00000080,Zoom
+aZoomFit.Hint=00000083,Set zoom to fit window
+aRotate0.Caption=00000085,&No rotation
+aRotate0.Category=00000084,Tools
+aRotate0.Hint=00000087,No rotation|Don't apply rotation to the image
+aRotate90.Caption=00000089,Rotate CW by &90°
+aRotate90.Category=00000088,Tools
+aRotate90.Hint=00000091,Rotate CW by 90°|Rotate the image clockwise by 90°
+aRotate180.Caption=00000093,Rotate by &180°
+aRotate180.Category=00000092,Tools
+aRotate180.Hint=00000095,Rotate by 180°|Rotate the image by 180°
+aRotate270.Caption=00000097,Rotate CCW by 9&0°
+aRotate270.Category=00000096,Tools
+aRotate270.Hint=00000099,Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)
+aFlipHorz.Caption=00000101,Flip &horizontally
+aFlipHorz.Category=00000100,Tools
+aFlipHorz.Hint=00000103,Flip horizontally|Flip the image horizontally
+aFlipVert.Caption=00000105,Flip &vertically
+aFlipVert.Category=00000104,Tools
+aFlipVert.Hint=00000107,Flip vertically|Flip the image vertically
+
+[frPicProps_Data]
+lPlace.Caption=00000007,&Place:
+lDesc.Caption=00000010,D&escription (for displaying):
+lFilmNumber.Caption=00000013,&Film number or name:
+lFrameNumber.Caption=00000016,F&rame number:
+lAuthor.Caption=00000019,&Author:
+lNotes.Caption=00000022,&Notes (additional info):
+lDate.Caption=00000025,&Date:
+lTime.Caption=00000028,&Time:
+lMedia.Caption=00000031,&Media name or code:
+
+[frPicProps_Keywords]
+tbMain.ChevronHint=00000009,More buttons|
+aEdit.Caption=00000130,&Edit
+aEdit.Hint=00000132,Edit keyword|Edit selected keyword
+aCheckedOnly.Caption=00000137,C&hecked only
+aCheckedOnly.Hint=00000139,Checked only|Display only checked keywords
+aAdd.Caption=00000141,&Add
+aAdd.Hint=00000143,Add a keyword|Add new keyword to selected pictures
+aCheckAll.Caption=00000145,&Check all
+aCheckAll.Hint=00000147,Check all|Check all the keywords in the list
+aUncheckAll.Caption=00000149,&Uncheck all
+aUncheckAll.Hint=00000151,Uncheck all|Remove check from all the keywords in the list
+aInvertCheck.Caption=00000153,&Invert
+aInvertCheck.Hint=00000155,Invert check|Toggle keyword check
+
+[frWzPage_Log]
+aCopy.Caption=00000122,&Copy
+aCopy.Hint=00000124,Copy|Copy current record to clipboard
+aFind.Caption=00000166,&Find...
+aFind.Hint=00000168,Find...|Show Find Text dialog
+aSaveToFile.Caption=00000183,&Save to file...
+aSaveToFile.Hint=00000185,Save to file...|Save the log to a selected file
+aDisplayErrorsOnly.Caption=00000187,&Display errors only
+aDisplayErrorsOnly.Hint=00000189,Display errors only|Hide successfully added picture entries
+
+[dStats]
+Caption=00000003,Photo album statistics
+bCancel.Caption=00000012,Cancel
+bOK.Caption=00000015,OK
+bHelp.Caption=00000018,Help
+
+[dFileOpsWizard]
+Caption=00000003,File operations wizard
+bCancel.Caption=00000017,Cancel
+bNext.Caption=00000020,Next >
+bHelp.Caption=00000023,Help
+bBack.Caption=00000026,< Back
+
+[frWzPageFileOps_SelTask]
+lCopyFiles.Caption=00000007,Copies the files of pictures you select, in the specified folder. Use this option to prepare photo album to write onto a CD or DVD
+lMoveFiles.Caption=00000010,Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately
+lDeleteFiles.Caption=00000013,Deletes pictures you select, and physically deletes corresponding files. Use this option to delete unwanted picture files
+lRepairFileLinks.Caption=00000016,Allows you to repair broken file links by finding the files in the specified folder, and, optionally, to delete pictures no longer associated with valid (existent) files
+lNBUndoable.Caption=00000019,• NB: These operations are not undoable!
+lRebuildThumbs.Caption=00000022,Rereads the picture files, recreates the thumbnails and updates the file-related information, such as image dimensions
+rbCopyFiles.Caption=00000025,&Copy picture files to a folder
+rbMoveFiles.Caption=00000028,&Move picture files to a folder
+rbDeleteFiles.Caption=00000031,&Delete pictures and files
+rbRepairFileLinks.Caption=00000034,Re&pair picture file links
+rbRebuildThumbs.Caption=00000037,&Rebuild thumbnails
+
+[frWzPageFileOps_SelPics]
+rbSelPics.Caption=00000064,&Selected pictures
+rbSelGroups.Caption=00000067,Pictures in selected &groups:
+gbValidity.Caption=00000070,File link validity filter
+rbValidityAny.Caption=00000073,All selected &pictures
+rbValidityValid.Caption=00000076,Only pictures having &valid (existent) file linked
+rbValidityInvalid.Caption=00000079,Only pictures having &NO valid (existent) file linked
+aCheckAll.Caption=00000081,&Check all groups
+aCheckAll.Hint=00000083,Set check to all the groups having pictures
+aUncheckAll.Caption=00000085,&Uncheck all groups
+aUncheckAll.Hint=00000087,Remove check from all the groups
+aInvertChecks.Caption=00000089,&Invert group checks
+aInvertChecks.Hint=00000091,Toggle each group's check
+
+[frWzPageFileOps_SelFolder]
+bCreateFolder.Caption=00000014,&Create folder
+
+[frWzPageFileOps_MoveOptions]
+gbFileArranging.Caption=00000007,File arranging
+lBaseFolder.Caption=00000010,Use path &relative to:
+lBaseGroup.Caption=00000013,Use path r&elative to group:
+lReplaceChar.Caption=00000016,Replace &unallowed symbols with the char:
+rbPutFlatly.Caption=00000019,&Put all the files into the destination folder
+rbMaintainFolderLayout.Caption=00000022,&Maintain original folder layout
+rbMaintainGroupLayout.Caption=00000025,Arran&ge files into folders maintaining group layout
+cbAllowDuplicating.Caption=00000028,Allo&w multiple copies of the file
+
+[frWzPageFileOps_DelOptions]
+cbDeleteToRecycleBin.Caption=00000007,Delete files to the Rec&ycle Bin
+
+[frWzPageFileOps_RepairOptions]
+gbMatchFindingOptions.Caption=00000007,Searching for the matching file
+rbSearchByName.Caption=00000010,Match file by its &name
+rbSearchBySize.Caption=00000013,Match file by its si&ze
+rbSearchByNameSize.Caption=00000016,Match file by both name and siz&e
+cbLookSubfolders.Caption=00000019,&Look in the subfolders of the destination folder
+gbAlreadyInUseMode.Caption=00000022,If a matching file found but is in use by another picture
+rbSkipFilesInUse.Caption=00000025,S&kip it and look for the next match
+rbRelinkFilesInUse.Caption=00000028,Delete the picture the file was linked to, and relink it to the ne&w picture
+
+[frWzPageFileOps_CDOptions]
+lMediaLabel.Caption=00000007,&Label the media as:
+lPhoaDesc.Caption=00000010,&Photo album description:
+cbCopyExecutable.Caption=00000013,Copy the p&rogram itself to the destination folder
+cbCreatePhoa.Caption=00000016,Create a photo album &file with selected pictures to:
+cbCreateAutorun.Caption=00000023,Create &autorun.inf file for autoplaying the CD/DVD, in the destination folder
+cbIncludeViews.Caption=00000034,Also include existing &views
+cbCopyIniSettings.Caption=00000037,Copy the current program settings to phoa.&ini
+
+[frWzPageFileOps_RepairSelLinks]
+cbDeleteUnmatched.Caption=00000013,&Delete pictures having no matching file (only affects pictures with no valid file linked)
+
+[frWzPageFileOps_MoveOptions2]
+lOverwriteMode.Caption=00000007,If the target file already e&xists:
+lNoOriginalFileMode.Caption=00000010,If the &original file does not exist:
+cbDeleteOriginal.Caption=00000013,&Delete original files
+cbDeleteToRecycleBin.Caption=00000016,Delete to the rec&ycle bin
+cbUseCDOptions.Caption=00000019,Set up &CD/DVD creation options as well
+cbOverwriteMode.Items=00000024,Skip the current picture\nPrompt to overwrite the file\nAlways overwrite the file\n
+cbNoOriginalFileMode.Items=00000029,Treat as an error\nUpdate the link only if the target file exists\nUpdate the link anyway\n
 
 [dToolProps]
 Caption=00000003,Properties: Tool
@@ -573,18 +567,17 @@ cbUsageViewMode.Caption=00000093,Show in View mode popup menu
 odRunCommand.Filter=00000100,Applications (*.bat;*.com;*.exe)|*.bat;*.com;*.exe|All files (*.*)|*.*
 odRunCommand.Title=00000102,Select an application
 
-[dStats]
-Caption=00000003,Photo album statistics
+[dMsgBox]
+cbDontShowAgain.Caption=00000012,Don't &show this message again
+
+[dGroupProps]
+Caption=00000003,Properties: Picture group
 bCancel.Caption=00000012,Cancel
 bOK.Caption=00000015,OK
 bHelp.Caption=00000018,Help
-
-[fAddFilesWizard]
-Caption=00000003,Add pictures wizard
-bCancel.Caption=00000017,Cancel
-bNext.Caption=00000020,Next >
-bHelp.Caption=00000023,Help
-bBack.Caption=00000026,< Back
+lID.Caption=00000021,&ID:
+lText.Caption=00000024,&Text:
+lDesc.Caption=00000027,&Description:
 
 [$CONSTANTS]
 dfpArchive=Archive
