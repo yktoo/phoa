@@ -1,38 +1,42 @@
-<!-- $Id: tasks-pic-deletion.html,v 1.1 2005-03-09 15:20:05 dale Exp $ -->
+<!-- $Id: tasks-pic-deletion.html,v 1.2 2005-03-14 17:27:42 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Picture deletion]}
 
-<p align=justify>Удаление изображений применительно к <b>PhoA</b> является не вполне очевидной задачей.
+<p align=justify>It would be better to clarify some things about deleting pictures in <b>PhoA</b>.
 
-<p align=justify>Дело в том, что в группах фотоальбома содержатся ссылки на изображения, в то время как само изображение
-  ссылается на соответствующий дисковый файл.
+<p align=justify>As a matter of fact, photo album groups contain links to the pictures, while a picture links a 
+  corresponding disk file.
 
-<p align=justify>Поэтому удаление изображения из какой-либо группы никоим образом не означает удаления его из
-  фотоальбома. Из фотоальбома изображение будет удалено только после удаления его из всех групп, где оно содержится.
+<p align=justify>Hence when you delete a picture from a group, this does not mean the picture is removed from the album.
+  The picture is actually removed from the photo album only when it is completely removed from all its groups.
 
-<p align=justify>Более того, даже полное удаление изображения из всех групп фотоальбома не удаляет соответствующий файл
-  изображения: он так и продолжает покоиться себе на диске.
+<p align=justify>Moreover, when you completely remove a picture from the album, this does not delete the corresponding
+  file so it remains on the disk.
 
-<p align=justify>Чтобы выяснить, в каких группах содержится то или иное изображение, воспользуйтесь закладкой
-  <a href="intf-pic-props-groups.html"><b>Группы</b></a> окна свойств изображений. А как удалить ненужные изображения
-  (например, неудачные фотографии) вместе с файлами, читайте далее.
+<p align=justify>In order to find out which groups a picture is belonging to you can use the
+  <a href="intf-pic-props-groups.html"><b>Groups</b></a> page of the Picture properties dialog. And how do you remove
+  unneeded pictures (for example, bad photos) with corresponding files is described below.
 
-{[%hh_h2:Операция удаления файлов изображений]}
+{[%hh_h2:Delete picture files operation]}
 
-<p align=justify>Для удаления изображений вместе с файлами в <b>PhoA</b> существует Мастер файловых операций.
+<p align=justify>In order to delete pictures with corresponding files <b>PhoA</b> provides the File operations wizard.
 
 <ol>
-  <li>Выделите эскизы, которые вы хотели бы удалить.
+  <li>Select thumbnails you would like to delete.
 
-  <li>Запустите <b>Мастер операций с файлами изображений</b>. Делается это выбором пункта меню <b>Сервис | Операции с
-      файлами изображений</b>.
+  <li>Launch the <b>File operations wizard</b>. You do it by selecting the <b>Tools | File operations...</b> menu item.
 
-  <li>На первой странице Мастера выберите <b>Удалить изображения и файлы</b> и нажмите <b>Далее</b>.
+  <li>On the first page of the wizard select <b>Delete pictures and files</b> and click <b>Next</b>.
 
-  <li>Если в момент вызова Мастера было активно окно эскизов, то по умолчанию будет выбран пункт <b>Выбранные
-      изображения</b> &mdash; то, что вам и было нужно.
+  <li>If at the moment you started the wizard the thumbnail window was active, the <b>Selected pictures</b> radio button
+      will be checked by default. That is just the same you need.
 
-  <li>На следующей странице вы можете выбрать, удалять ли файлы окончательно, или перемещать их в Корзину &mdash; на
-      случай, если вы передумаете. После нажатия <b>Далее</b> программа начнёт удаление изображений и их файлов.
+  <li>On the next page you can select whether files are wiped completely or just moved to the Recycle Bin (in the latter
+      case you can undo the deletion later). After clicking <b>Next</b> the program will start picture and file
+      deletion.
 </ol>
+
+{[%hh_seealso_en]}
+  <a href="intf-pic-props-groups.html">Picture properties dialog :: Groups</a><br>
+  <a href="intf-file-ops-task-del.html">Delete picture files operation</a><br>
 
 {[%hh_ftr_en]}
