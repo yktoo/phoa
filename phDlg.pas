@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.13 2004-09-17 14:07:32 dale Exp $
+//  $Id: phDlg.pas,v 1.14 2004-10-14 08:11:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -30,7 +30,7 @@ type
      // Prop storage
     FHasUpdates: Boolean;
     FModified: Boolean;
-    FOKIgnoresOKIgnoresDataValidity: Boolean;
+    FOKIgnoresDataValidity: Boolean;
     FOKIgnoresModified: Boolean;
      // Message handlers
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
@@ -69,7 +69,7 @@ type
      // -- True, если в диалоге пользователь изменил какие-то данные
     property Modified: Boolean read FModified write SetModified;
      // -- Если True, разрешённость кнопки ОК не зависит от DataValid
-    property OKIgnoresDataValidity: Boolean read FOKIgnoresOKIgnoresDataValidity write SetOKIgnoresOKIgnoresDataValidity;
+    property OKIgnoresDataValidity: Boolean read FOKIgnoresDataValidity write SetOKIgnoresOKIgnoresDataValidity;
      // -- Если True, разрешённость кнопки ОК не зависит от Modified
     property OKIgnoresModified: Boolean read FOKIgnoresModified write SetOKIgnoresModified;
   end;
@@ -214,8 +214,8 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
 
   procedure TPhoaDialog.SetOKIgnoresOKIgnoresDataValidity(Value: Boolean);
   begin
-    if FOKIgnoresOKIgnoresDataValidity<>Value then begin
-      FOKIgnoresOKIgnoresDataValidity := Value;
+    if FOKIgnoresDataValidity<>Value then begin
+      FOKIgnoresDataValidity := Value;
       UpdateButtons;
     end;
   end;
