@@ -1,5 +1,7 @@
 ;== English ===========================================================================================================
 en.CompMain=Main Files
+en.CompPlugins=Plugins
+en.CompIJL=Intel JPEG Library (fast JPEG decoder)
 en.CompHelp=Help Files
 en.CompHelpEn=English
 en.CompHelpRu=Russian
@@ -16,6 +18,8 @@ en.LangID=1033
 
 ;== Russian ===========================================================================================================
 ru.CompMain=Основные файлы
+ru.CompPlugins=Подключаемые модули (plugins)
+ru.CompIJL=Intel JPEG Library (быстрый JPEG-декодер)
 ru.CompHelp=Файлы Справочной системы
 ru.CompHelpEn=Английский язык
 ru.CompHelpRu=Русский язык
@@ -32,6 +36,8 @@ ru.LangID=1049
 
 ;== German ============================================================================================================
 de.CompMain=Programmdateien
+de.CompPlugins=Plugins
+de.CompIJL=Intel JPEG Library (fast JPEG decoder)
 de.CompHelp=Hilfedateien
 de.CompHelpEn=Englisch
 de.CompHelpRu=Russisch
@@ -48,6 +54,8 @@ de.LangID=1031
 
 ;== Brazilian Portuguese ==============================================================================================
 br.CompMain=Arquivos principais
+br.CompPlugins=Plugins
+br.CompIJL=Intel JPEG Library (fast JPEG decoder)
 br.CompHelp=Arquivos de ajuda
 br.CompHelpEn=Inglкs
 br.CompHelpRu=Russo
@@ -64,6 +72,8 @@ br.LangID=1046
 
 ;== Ukrainian =========================================================================================================
 ua.CompMain=Основні файли
+ua.CompPlugins=Plugins
+ua.CompIJL=Intel JPEG Library (fast JPEG decoder)
 ua.CompHelp=Файли  ДовідковоЇ системи
 ua.CompHelpEn=Англійска мова
 ua.CompHelpRu=Російска мова

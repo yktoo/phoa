@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.12 2004-11-10 10:31:45 dale Exp $
+;   $Id: phoa.iss,v 1.13 2004-11-23 16:19:44 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -45,16 +45,19 @@
   Name: associate;          Description: {cm:AssocFileExtension,PhoA,.phoa};
 
 [Components]
-  Name: main;    Description: {cm:CompMain};        Types: full compact custom; Flags: fixed
-  Name: help;    Description: {cm:CompHelp};        Types: full
-  Name: help\en; Description: {cm:CompHelpEn};      Types: full
-  Name: help\ru; Description: {cm:CompHelpRu};      Types: full
-  Name: sample;  Description: {cm:CompSampleAlbum}; Types: full
-  Name: api;     Description: {cm:CompPhoaAPI};     Types: full
+  Name: main;        Description: {cm:CompMain};        Types: full compact custom; Flags: fixed
+  Name: plugins;     Description: {cm:CompPlugins};     Types: full compact
+  Name: plugins\ijl; Description: {cm:CompIJL};         Types: full compact
+  Name: help;        Description: {cm:CompHelp};        Types: full
+  Name: help\en;     Description: {cm:CompHelpEn};      Types: full
+  Name: help\ru;     Description: {cm:CompHelpRu};      Types: full
+  Name: sample;      Description: {cm:CompSampleAlbum}; Types: full
+  Name: api;         Description: {cm:CompPhoaAPI};     Types: full
 
 [Files]
 ;Application files
   Source: "..\phoa.exe";                DestDir: "{app}";              Components: main
+  Source: "..\Plugins\ijl15.dll";       DestDir: "{app}\Plugins";      Components: plugins\ijl
   Source: "..\Language\Russian.lng";    DestDir: "{app}\Language";     Components: main
   Source: "..\phoa-eng.chm";            DestDir: "{app}";              Components: help\en
   Source: "..\phoa-rus.chm";            DestDir: "{app}";              Components: help\ru
