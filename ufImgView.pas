@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.17 2004-06-03 20:33:39 dale Exp $
+//  $Id: ufImgView.pas,v 1.18 2004-06-04 14:18:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -831,15 +831,7 @@ uses
   procedure TfImgView.DP_ApplyTransforms;
   begin
      // Сообщение об ошибке не преобразовываем
-    if not FErroneous then begin
-      FTransform.BeginUpdate;
-      try
-        FTransform.Rotation := FPic.PicRotation;
-        FTransform.Flips    := FPic.PicFlips;
-      finally
-        FTransform.EndUpdate;
-      end;
-    end;
+    if not FErroneous then FTransform.ApplyValues(FPic.PicRotation, FPic.PicFlips);
   end;
 
   procedure TfImgView.DP_ComputeDimensions;
@@ -904,7 +896,9 @@ uses
 
   procedure TfImgView.DP_LoadImage;
   var
-    FPrevPic: TPhoaPic;
+    PrevPic: TPhoaPic;
+    PrevRotation: TPicRotation;
+    PrevFlips: TPicFlips;
     bmpDecoded, bmpPrevTemp: TBitmap32;
     bPicInCache: Boolean;
 
@@ -941,19 +935,24 @@ uses
 
   begin
      // Сохраняем прежнее изображение
-    FPrevPic := FPic;
+    PrevPic := FPic;
      // Находим текущее изображение
     FPic := FPhoA.Pics.PicByID(FGroup.PicIDs[FPicIdx]);
      // Определяем, есть ли изображение в кэше 
     bPicInCache := FCachedBitmapFilename=FPic.PicFileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
     if not bPicInCache then FDecodeThread.QueuedFileName := FPic.PicFileName;
-     // Если изображения не совпадают, сохраняем старое изображение
-    if not FErroneous and FCacheBehindPic and (FPrevPic<>nil) and (FPrevPic<>FPic) then begin
+     // Если изображения не совпадают, сохраняем старое изображение и преобразования
+    if not FErroneous and FCacheBehindPic and (PrevPic<>nil) and (PrevPic<>FPic) then begin
       bmpPrevTemp := TBitmap32.Create;
       bmpPrevTemp.Assign(iMain.Bitmap);
-    end else
-      bmpPrevTemp := nil;
+      PrevRotation := FTransform.Rotation;
+      PrevFlips    := FTransform.Flips;
+    end else begin
+      bmpPrevTemp  := nil;
+      PrevRotation := pr0;;
+      PrevFlips    := [];
+    end;
      // Если изображение скэшировано, копируем его и учитываем применённые преобразования
     if bPicInCache then begin
       try
@@ -966,16 +965,12 @@ uses
      // Иначе сбрасываем текущие параметры преобразования
     end else
       FTransform.InitValues(pr0, []);
-     // Освобождаем кэш и сохраняем в кэше старое изображение 
+     // Освобождаем кэш и сохраняем в кэше старое изображение и преобразования 
     FCachedBitmap.Free;
-    FCachedBitmap := bmpPrevTemp;
-    if bmpPrevTemp=nil then
-      FCachedBitmapFilename := ''
-    else begin
-      FCachedBitmapFilename := FPrevPic.PicFileName;
-      FCachedRotation       := FTransform.Rotation;
-      FCachedFlips          := FTransform.Flips;
-    end;
+    FCachedBitmap   := bmpPrevTemp;
+    FCachedRotation := PrevRotation;
+    FCachedFlips    := PrevFlips;
+    if bmpPrevTemp=nil then FCachedBitmapFilename := '' else FCachedBitmapFilename := PrevPic.PicFileName;
      // Если не взяли из кэша, дожидаемся окончания загрузки изображения фоновым потоком
     if not bPicInCache then begin
       StartWait;

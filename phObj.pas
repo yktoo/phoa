@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.16 2004-06-03 20:33:39 dale Exp $
+//  $Id: phObj.pas,v 1.17 2004-06-04 14:18:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1605,7 +1605,7 @@ resourcestring
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
   TypInfo, Variants, Math, Registry, DateUtils, StrUtils, Clipbrd, ShellAPI, Themes, JPEG, VirtualDataObject,
-  phUtils, phSettings, udMsgBox;
+  phUtils, phSettings, udMsgBox, phGraphics;
 
 type
    // Запись кэша эскиза

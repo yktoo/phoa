@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.2 2004-05-29 06:20:51 dale Exp $
+//  $Id: phGraphics.pas,v 1.3 2004-06-04 14:18:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -7,14 +7,17 @@
 unit phGraphics;
 
 interface
-uses Windows, Graphics, GR32;
+uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars;
 
 type
 
-   // Байтовая карта одного цветового канала (вход -> выход) 
+   // Байтовая карта одного цветового канала (вход -> выход)
   TChannelByteMap = Array[Byte] of Byte;
 
+   //===================================================================================================================
    // Карта цветов по каналам
+   //===================================================================================================================
+
   TColor32Map = class(TObject)
   private
      // Prop storage
@@ -38,6 +41,52 @@ type
     property MapG: TChannelByteMap read FMapG;
     property MapB: TChannelByteMap read FMapB;
     property MapA: TChannelByteMap read FMapA;
+  end;
+
+   //===================================================================================================================
+   // Преобразование изображения (набор параметров преобразования)
+   //===================================================================================================================
+
+  TPicTransform = class(TObject)
+  private
+     // Счётчик блокировки применения преобразования
+    FApplyLock: Integer;
+     // Последнее применённое [абсолютное] значение поворота
+    FAppliedRotation: TPicRotation;
+     // Последнее применённое [абсолютное] значение отражений
+    FAppliedFlips: TPicFlips;
+     // Prop storage
+    FBitmap: TBitmap32;
+    FFlips: TPicFlips;
+    FRotation: TPicRotation;
+    FOnApplied: TNotifyEvent;
+     // Поворачивает изображение на ARotation и отражает в соответствии флагами AFlips
+    procedure ApplyRelativeTransform(ARotation: TPicRotation; AFlips: TPicFlips);
+     // Применяет преобразования к изображению
+    procedure ApplyTransform;
+     // Prop handlers
+    procedure SetFlips(Value: TPicFlips);
+    procedure SetRotation(Value: TPicRotation);
+  public
+    constructor Create(ABitmap: TBitmap32);
+     // Установка/снятие блокировки применения
+    procedure BeginUpdate;
+    procedure EndUpdate;
+     // Инициализирует свойства как исходные (т.е. соответствующие текущему состоянию Bitmap)
+    procedure InitValues(ARotation: TPicRotation; AFlips: TPicFlips);
+     // Применяет свойства преобразования одновременно
+    procedure ApplyValues(ARotation: TPicRotation; AFlips: TPicFlips);
+     // Переключает один из флагов отражения
+    procedure ToggleFlip(Flip: TPicFlip);
+     // Props
+     // -- Изображение, к которому применяется преобразование
+    property Bitmap: TBitmap32 read FBitmap;
+     // -- Отражения изображения относительно исходного
+    property Flips: TPicFlips read FFlips write SetFlips;
+     // -- Поворот изображения относительно исходного
+    property Rotation: TPicRotation read FRotation write SetRotation;
+     // -- Событие применения преобразования
+    property OnApplied: TNotifyEvent read FOnApplied write FOnApplied;
   end;
 
 const
@@ -102,6 +151,109 @@ uses phUtils;
   begin
     inherited Create;
     BuildLinear;
+  end;
+
+   //===================================================================================================================
+   // TPicTransform
+   //===================================================================================================================
+
+  procedure TPicTransform.ApplyRelativeTransform(ARotation: TPicRotation; AFlips: TPicFlips);
+  begin
+     // Поворот на 180° и оба флипа дают исходное изображение
+    if (FBitmap<>nil) and ((ARotation<>pr180) or (AFlips<>[pflHorz, pflVert])) then begin
+      case ARotation of
+        pr90:  FBitmap.Rotate90;
+        pr180: FBitmap.Rotate180;
+        pr270: FBitmap.Rotate270;
+      end;
+      if pflHorz in AFlips then FBitmap.FlipHorz;
+      if pflVert in AFlips then FBitmap.FlipVert;
+    end;
+  end;
+
+  procedure TPicTransform.ApplyTransform;
+  var
+    fl: TPicFlip;
+    NewRotation: TPicRotation;
+    NewFlips: TPicFlips;
+  begin
+    if FBitmap<>nil then begin
+       // Вычисляем разницу в повороте и кладём её в NewRotation
+      NewRotation := FRotation;
+      if NewRotation<FAppliedRotation then Inc(NewRotation, Byte(Succ(High(NewRotation))));
+      Dec(NewRotation, Byte(FAppliedRotation));
+       // -- Если есть один из флипов, вращаем в противоположную сторону
+      if (FAppliedFlips<>[]) and (FAppliedFlips<>[pflHorz, pflVert]) then Byte(NewRotation) := Byte(Succ(High(NewRotation)))-Byte(NewRotation);
+       // Вычисляем разницу в отражениях и кладём её в NewFlips
+      NewFlips := FFlips;
+      for fl := Low(fl) to High(fl) do
+        if (fl in FAppliedFlips)=(fl in NewFlips) then Exclude(NewFlips, fl) else Include(NewFlips, fl);
+       // Применяем разницу в преобразованиях
+      ApplyRelativeTransform(NewRotation, NewFlips);
+    end;
+     // Сохраняем текущие значение как последние применённые
+    FAppliedRotation := FRotation;
+    FAppliedFlips    := FFlips;
+     // Вызываем событие OnApplied
+    if Assigned(FOnApplied) then FOnApplied(Self); 
+  end;
+
+  procedure TPicTransform.ApplyValues(ARotation: TPicRotation; AFlips: TPicFlips);
+  begin
+    if (FRotation<>ARotation) or (FFlips<>AFlips) then begin
+      FRotation := ARotation;
+      FFlips    := AFlips;
+      if FApplyLock=0 then ApplyTransform;
+    end;
+  end;
+
+  procedure TPicTransform.BeginUpdate;
+  begin
+    Inc(FApplyLock);
+  end;
+
+  constructor TPicTransform.Create(ABitmap: TBitmap32);
+  begin
+    inherited Create;
+    FBitmap   := ABitmap;
+  end;
+
+  procedure TPicTransform.EndUpdate;
+  begin
+    if FApplyLock>0 then begin
+      Dec(FApplyLock);
+      if FApplyLock=0 then ApplyTransform;
+    end;
+  end;
+
+  procedure TPicTransform.InitValues(ARotation: TPicRotation; AFlips: TPicFlips);
+  begin
+    FRotation        := ARotation;
+    FAppliedRotation := ARotation;
+    FFlips           := AFlips;
+    FAppliedFlips    := AFlips;
+  end;
+
+  procedure TPicTransform.SetFlips(Value: TPicFlips);
+  begin
+    if FFlips<>Value then begin
+      FFlips := Value;
+      if FApplyLock=0 then ApplyTransform;
+    end;
+  end;
+
+  procedure TPicTransform.SetRotation(Value: TPicRotation);
+  begin
+    if FRotation<>Value then begin
+      FRotation := Value;
+      if FApplyLock=0 then ApplyTransform;
+    end;
+  end;
+
+  procedure TPicTransform.ToggleFlip(Flip: TPicFlip);
+  begin
+    if Flip in FFlips then Exclude(FFlips, Flip) else Include(FFlips, Flip);
+    if FApplyLock=0 then ApplyTransform;
   end;
 
 end.

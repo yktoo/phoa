@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.11 2004-06-03 20:33:39 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.12 2004-06-04 14:18:18 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
-  phObj,
+  phObj, phGraphics,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
   TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DTLangTools;
 
@@ -93,6 +93,8 @@ type
      //   отражения из Transform не нужно
     FNoFlipHorz: Boolean;
     FNoFlipVert: Boolean;
+     // True в процессе отображения изображения
+    FDisplayingImage: Boolean;
      // Возвращает коэффициент оптимального масштаба изображения
     function  BestFitZoomFactor: Single;
      // Загружает и отображает изображение
@@ -357,6 +359,7 @@ uses phUtils, Main, phSettings;
      // Запрещаем изменения Modified
     BeginUpdate;
     StartWait;
+    FDisplayingImage := True;
     try
       FPic := EditedPics[cbViewFile.ItemIndex];
        // Загружаем изображение
@@ -370,16 +373,13 @@ uses phUtils, Main, phSettings;
        // Определяем требуемое преобразование
       GetRequiredTransform(FPic, Rotation, Flips);
        // Применяем преобразование
-      FTransform.BeginUpdate;
-      try
-        FTransform.InitValues(pr0, []);
-        FTransform.Rotation := Rotation;
-        FTransform.Flips    := Flips;
-      finally
-         // Этот вызов применяет преобразование и устанавливает масштаб
-        FTransform.EndUpdate;
-      end;
+      FTransform.InitValues(pr0, []);
+      FTransform.ApplyValues(Rotation, Flips);
+       // Настраиваем размеры изображения
+      AdjustView;
+      UpdateTransformActions;
     finally
+      FDisplayingImage := False;
       StopWait;
       EndUpdate;
       EnableActions;
@@ -415,9 +415,10 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_View.TransformApplied(Sender: TObject);
   begin
+    if FDisplayingImage then Exit;
     AdjustView;
     UpdateTransformActions;
-    Modified; // Не сработает в процессе отображения, т.к. там действует BeginUpdate
+    Modified;
   end;
 
   procedure TfrPicProps_View.UpdateTransformActions;
