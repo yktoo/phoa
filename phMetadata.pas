@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phMetadata.pas,v 1.3 2004-04-17 05:00:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -8,9 +8,9 @@
 //
 // Image Metadata parsing routines
 //
-// The whole code (c)2003 Dmitry Kann, except where otherwise explicitly noted. The EXIF format is a Japan Electronic
+// The whole code Copyright ©Dmitry Kann, except where otherwise explicitly noted. The EXIF format is a Japan Electronic
 //   Industry Development Association (JEIDA) standard, revised June 1998 as version 2.1, and is not covered by this
-//   copyright nor GPL 2 terms.
+//   copyright nor by GPL 2 terms.
 //
 // Home sites:
 //   http://devtools.narod.ru/
@@ -22,7 +22,7 @@
 //   Sep 08, 2003
 //     The first open source release of the unit
 //
-//   Sep ??, 2003
+//   Sep 17, 2003
 //     Added some tags. Many tags became documented thanks to JEIDA specifications
 //     Added support for non-regular tags: Unicode, raw binary, Version etc.
 //     The code officially became covered with GPL 2 License, either supplied along with this unit, or available at
