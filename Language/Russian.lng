@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.2
-LastModified=2004-10-23 22:21:27
+LastModified=2004-10-30 12:52:16
 SourceLANGID=1033
 
 [fMain]
@@ -427,6 +427,10 @@ SourceLANGID=1033
 00000299=Задержка показа|Задержка показа изображения в секундах
 00000300=с
 00000301=&Вид
+00000302=Ещё кнопки|
+00000303=Ещё кнопки|
+00000304=Ещё кнопки|
+00000305=Ещё кнопки|
 
 [fAddFilesWizard]
 00000003=Мастер добавления изображений

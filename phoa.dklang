@@ -1,9 +1,9 @@
 [fMain]
 Caption=00000003,PhoA
 tbMain.Caption=00000008,Toolbar
-tbMain.ChevronHint=00000009,More buttons|
+tbMain.ChevronHint=00000009,More Buttons|
 tbMenu.Caption=00000017,Menu
-tbMenu.ChevronHint=00000018,More buttons|
+tbMenu.ChevronHint=00000018,More Buttons|
 smFile.Caption=00000019,&File
 smEdit.Caption=00000024,&Edit
 smUndoHistory.Caption=00000026,U&ndo history
@@ -154,6 +154,7 @@ bHelp.Caption=00000018,Help
 
 [fImgView]
 tbMain.Caption=00000008,Main Toolbar
+tbMain.ChevronHint=00000303,More Buttons|
 aEdit.Caption=00000130,&Edit...
 aEdit.Category=00000129,Edit
 aEdit.Hint=00000132,Edit...|Edit current picture
@@ -162,6 +163,7 @@ aSettings.Category=00000149,Edit
 aSettings.Hint=00000152,Program settings...|View/change program settings
 eCounter.Hint=00000162,Current/total pictures
 tbTools.Caption=00000165,Transformations
+tbTools.ChevronHint=00000304,More Buttons|
 aNextPic.Caption=00000169,&Next picture
 aNextPic.Category=00000168,Advance
 aNextPic.Hint=00000171,Next picture|Advance to the next picture in the group
@@ -228,6 +230,7 @@ aStoreTransform.Caption=00000253,Store &transformations
 aStoreTransform.Category=00000252,Tools
 aStoreTransform.Hint=00000255,Store transformations|Store current transformations applied, to the picture
 tbSlideShow.Caption=00000267,Slide Show
+tbSlideShow.ChevronHint=00000305,More Buttons|
 aSlideShowForward.Caption=00000271,&Forward
 aSlideShowForward.Category=00000270,Slide show
 aSlideShowForward.Hint=00000279,Forward|Set forward Slide Show direction
@@ -241,6 +244,7 @@ aSlideShowCyclic.Caption=00000277,&Cyclic slide show
 aSlideShowCyclic.Category=00000276,Slide show
 aSlideShowCyclic.Hint=00000278,Cyclic slide show|Wrap around the image sequnce in Slide Show mode
 tbMenu.Caption=00000282,Main Menu
+tbMenu.ChevronHint=00000302,More Buttons|
 smHelp.Caption=00000287,&Help
 smTools.Caption=00000286,&Tools
 smZoom.Caption=00000284,&Zoom
