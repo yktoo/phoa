@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.94 2005-03-13 10:37:55 dale Exp $
+//  $Id: ConsVars.pas,v 1.95 2005-04-03 10:46:47 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -664,7 +664,16 @@ const
   IDH_setup_view_mode             = 04070;
   IDH_tasks                       = 05000;
   IDH_tasks_getting_started       = 05010;
-  IDH_tasks_media_preparing       = 05020;
+  IDH_tasks_group_creation        = 05020;
+  IDH_tasks_media_preparing       = 05030;
+  IDH_tasks_pic_deletion          = 05040;
+  IDH_tasks_pic_file_link_repair  = 05050;
+  IDH_tasks_pic_rotating          = 05060;
+  IDH_tasks_slide_show            = 05070;
+  IDH_tasks_sorting               = 05080;
+  IDH_tasks_thumb_adjusting       = 05090;
+  IDH_tasks_tools                 = 05100;
+  IDH_tasks_viewing               = 05110;
 
    // ID страниц Мастера добавления файлов
   IWzAddFilesPageID_SelFiles      = 1;

@@ -93,4 +93,14 @@ IDH_setup_tools                 = setup-tools.html
 IDH_setup_view_mode             = setup-view-mode.html
 IDH_tasks                       = tasks.html
 IDH_tasks_getting_started       = tasks-getting-started.html
+IDH_tasks_group_creation        = tasks-group-creation.html
 IDH_tasks_media_preparing       = tasks-media-preparing.html
+IDH_tasks_pic_deletion          = tasks-pic-deletion.html
+IDH_tasks_pic_file_link_repair  = tasks-pic-file-link-repair.html
+IDH_tasks_pic_rotating          = tasks-pic-rotating.html
+IDH_tasks_slide_show            = tasks-slide-show.html
+IDH_tasks_sorting               = tasks-sorting.html
+IDH_tasks_thumb_adjusting       = tasks-thumb-adjusting.html
+IDH_tasks_tools                 = tasks-tools.html
+IDH_tasks_viewing               = tasks-viewing.html
+

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.18 2005-03-13 10:37:55 dale Exp $
+//  $Id: maps.h,v 1.19 2005-04-03 10:46:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -100,4 +100,14 @@
 #define IDH_setup_view_mode             04070
 #define IDH_tasks                       05000
 #define IDH_tasks_getting_started       05010
-#define IDH_tasks_media_preparing       05020
+#define IDH_tasks_group_creation        05020
+#define IDH_tasks_media_preparing       05030
+#define IDH_tasks_pic_deletion          05040
+#define IDH_tasks_pic_file_link_repair  05050
+#define IDH_tasks_pic_rotating          05060
+#define IDH_tasks_slide_show            05070
+#define IDH_tasks_sorting               05080
+#define IDH_tasks_thumb_adjusting       05090
+#define IDH_tasks_tools                 05100
+#define IDH_tasks_viewing               05110
+

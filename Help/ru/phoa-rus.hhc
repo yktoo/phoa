@@ -396,6 +396,10 @@
 				<param name="Local" value="tasks-thumb-adjusting.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Ntilde;&icirc;&ccedil;&auml;&agrave;&iacute;&egrave;&aring; &atilde;&eth;&oacute;&iuml;&iuml;">
+				<param name="Local" value="tasks-group-creation.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Iuml;&icirc;&acirc;&icirc;&eth;&icirc;&ograve; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 				<param name="Local" value="tasks-pic-rotating.html">
 				</OBJECT>
