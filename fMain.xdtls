@@ -1146,6 +1146,14 @@
           <tranEntry langID="1058" value="Довжина списку останніх файлів, що відкривалися"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="ISettingID_Gen_Theme">
+        <tranEntries>
+          <tranEntry langID="1049" value="Визуальная тема:"/>
+          <tranEntry langID="1033" value="Visual theme:"/>
+          <tranEntry langID="1031" value="Visual theme:"/>
+          <tranEntry langID="1046" value="Visual theme:"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="ISettingID_Gen_ToolbarBSz16">
         <tranEntries>
           <tranEntry langID="1049" value="Маленькие (16x16)"/>

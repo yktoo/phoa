@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.40 2004-06-09 14:49:02 dale Exp $
+//  $Id: ConsVars.pas,v 1.41 2004-06-11 14:19:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -680,6 +680,7 @@ const
   ISettingID_Gen_Intf                  = 0;    // Интерфейс
     ISettingID_Gen_Language            = 0041; // Язык интерфейса
     ISettingID_Gen_MainFont            = 0042; // Шрифт программы
+    ISettingID_Gen_Theme               = 0045; // Тема интерфейса
     ISettingID_Gen_TooltipDisplTime    = 0050; // Продолжительность отображения всплывающих подсказок, мс
     ISettingID_Gen_OpenMRUCount        = 0061; // Длина списка последних открытых файлов
     ISettingID_Gen_LookupPhoaIni       = 0062; // Загружать ли настройки из phoa.ini в каталоге запуска
@@ -945,7 +946,10 @@ var
   procedure InitSettings;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
+uses
+  TypInfo, Forms,
+  TBXThemes, TBXDefaultTheme, TBXOfficeXPTheme, TBXStripesTheme, TBXAluminumTheme,
+  phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -969,6 +973,11 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
    //===================================================================================================================
    // Settings
    //===================================================================================================================
+
+  procedure AdjustThemeSetting(Setting: TPhoaListSetting);
+  begin
+    GetAvailableTBXThemes(Setting.Variants);
+  end;
 
   procedure AddPicPropSettings(Owner: TPhoaIntSetting);
   var Prop: TPicProperty;
@@ -1110,6 +1119,8 @@ type
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US}, MinInt, MaxInt);
         Lvl3 := TPhoaFontSetting.Create(Lvl2, ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
+        Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_Theme,             '@ISettingID_Gen_Theme', 0 {Default?}, False);
+        AdjustThemeSetting(Lvl3 as TPhoaListSetting);
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_Gen_TooltipDisplTime,  '@ISettingID_Gen_TooltipDisplTime', 5000, 100, MaxInt);
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_Gen_OpenMRUCount,      '@ISettingID_Gen_OpenMRUCount', 10, 0, 15);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Gen_LookupPhoaIni,     '@ISettingID_Gen_LookupPhoaIni', True);

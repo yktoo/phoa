@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.25 2004-06-09 14:50:58 dale Exp $
+//  $Id: Main.pas,v 1.26 2004-06-11 14:19:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -344,7 +344,8 @@ type
     function  GetCurGroup: TPhoaGroup;
     procedure SetCurGroup(Value: TPhoaGroup);
     function  GetCurRootGroup: TPhoaGroup;
-  public
+  public 
+    function  IsShortCut(var Message: TWMKey): Boolean; override;
      // Выполняет операцию и обновляет визуальные объекты согласно флагам операции
     procedure PerformOperation(Op: TPhoaOperation);
      // Применяет параметры настройки
@@ -774,6 +775,8 @@ uses
   begin
      // Настраиваем язык интерфейса
     dtlsMain.Language := SettingValueInt(ISettingID_Gen_Language);
+     // Настраиваем тему
+    with (RootSetting.Settings[ISettingID_Gen_Theme] as TPhoaListSetting) do TBXSetTheme(VariantText); 
      // Настраиваем основной шрифт программы
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
     ToolbarFont.Assign(Font);
@@ -1164,6 +1167,12 @@ uses
   function TfMain.GetViews: TPhoaViews;
   begin
     Result := FPhoA.Views;
+  end;
+
+  function TfMain.IsShortCut(var Message: TWMKey): Boolean;
+  begin
+     // Запрещаем Shortcuts в процессе редактирования текста в дереве групп
+    if tvGroups.IsEditing then Result := False else Result := inherited IsShortCut(Message);
   end;
 
   procedure TfMain.LoadGroupTree;
