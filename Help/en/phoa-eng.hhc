@@ -15,44 +15,44 @@
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="The purpose of the program">
-			<param name="Local" value="intro.html">
+			<param name="Local" value="general-intro.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="How it works">
-			<param name="Local" value="how-it-works.html">
+			<param name="Local" value="general-how-it-works.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Supported file formats">
-			<param name="Local" value="file-formats.html">
+			<param name="Local" value="general-file-formats.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Thumbnails">
-			<param name="Local" value="thumbnails.html">
+			<param name="Local" value="general-thumbnails.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Major program modes">
-			<param name="Local" value="major-modes.html">
+			<param name="Local" value="general-major-modes.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="PhoA features and advantages">
-			<param name="Local" value="advantages.html">
+			<param name="Local" value="general-advantages.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="System requirements">
-			<param name="Local" value="requirements.html">
+			<param name="Local" value="general-requirements.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Picture data">
-			<param name="Local" value="pic-data.html">
+			<param name="Local" value="general-pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Revision History">
-			<param name="Local" value="rev-history.html">
+			<param name="Local" value="general-rev-history.html">
 			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="License Agreement">
-			<param name="Local" value="eula-eng.html">
+			<param name="Local" value="general-license.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -101,7 +101,7 @@
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Autofilling the picture properties">
-				<param name="Local" value="pic-prop-autofill.html">
+				<param name="Local" value="info-pic-prop-autofill.html">
 				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
@@ -337,7 +337,7 @@
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Transformations">
-			<param name="Local" value="theory-transform.html">
+			<param name="Local" value="info-transform.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Command line parameters">
@@ -345,23 +345,23 @@
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Metadata">
-			<param name="Local" value="theory-metadata.html">
+			<param name="Local" value="info-metadata.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Resampling">
-			<param name="Local" value="theory-resampling.html">
+			<param name="Local" value="info-resampling.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="File masks">
-			<param name="Local" value="theory-file-masks.html">
+			<param name="Local" value="info-file-masks.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html">
+			<param name="Local" value="info-tools.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (Frequently Asked Questions)">
-			<param name="Local" value="faq.html">
+			<param name="Local" value="info-faq.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

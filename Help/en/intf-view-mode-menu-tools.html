@@ -1,4 +1,4 @@
-<!-- $Id: intf-view-mode-menu-tools.html,v 1.2 2004-11-09 14:51:34 dale Exp $ -->
+<!-- $Id: intf-view-mode-menu-tools.html,v 1.3 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_en:View mode :: Tools menu]}
 
 <p align=justify>This menu contains commands for invoking some tool functions.
@@ -9,81 +9,81 @@
     <td nowrap>Description</td>
   </tr>
   <tr>
-    <td><a name=slide_show></a><b>{[%hh_ii:SlideShow]} Slide show | Slide show</b></td>
+    <td class=command><a name=slide_show></a>{[%hh_ii:SlideShow]} Slide show | Slide show</td>
     <td>Starts or stops the slide show - a mode when the program changes the pictures automatically after a certain
         interval, and in the specified direction (see below).</td>
   </tr>
   <tr>
-    <td><a name=slide_show_backward></a><b>{[%hh_ii:SlideShowBackward]} Slide show | Forward</b></td>
+    <td class=command><a name=slide_show_backward></a>{[%hh_ii:SlideShowBackward]} Slide show | Forward</td>
     <td>Sets the slide show direction to <i>Forward</i> (from the first picture to the last one). In contrast with the 
         <a href="setup-view-mode.html">setting value</a>, this option affects only the current viewing session.</td>
   </tr>
   <tr>
-    <td><a name=slide_show_random></a><b>{[%hh_ii:SlideShowRandom]} Slide show | Random</b></td>
+    <td class=command><a name=slide_show_random></a>{[%hh_ii:SlideShowRandom]} Slide show | Random</td>
     <td>Sets the slide show direction to <i>Random</i>. In contrast with the
         <a href="setup-view-mode.html">setting value</a>, this option affects only the current viewing session.</td>
   </tr>
   <tr>
-    <td><a name=slide_show_forward></a><b>{[%hh_ii:SlideShowForward]} Slide show | Backward</b></td>
+    <td class=command><a name=slide_show_forward></a>{[%hh_ii:SlideShowForward]} Slide show | Backward</td>
     <td>Sets the slide show direction to <i>Backward</i> (from the last picture to the first one). In contrast with the 
         <a href="setup-view-mode.html">setting value</a>, this option affects only the current viewing session.</td>
   </tr>
   <tr>
-    <td><a name=slide_show_cyclic></a><b>{[%hh_ii:SlideShowCyclic]} Slide show | Cyclic slide show</b></td>
+    <td class=command><a name=slide_show_cyclic></a>{[%hh_ii:SlideShowCyclic]} Slide show | Cyclic slide show</td>
     <td>If this option is on, the slide show loops indefinitely. Otherwise it ends up once the last, or first picture is
         reached (it depends on the slide show direction). When the slide show direction is set to <i>Random</i>, the
         slide show never terminates automatically. In contrast with the
         <a href="setup-view-mode.html">setting value</a>, this option affects only the current viewing session.</td>
   </tr>
   <tr>
-    <td><a name=slide_show_interval></a><b>Slide show | Slide show interval</b></td>
+    <td class=command><a name=slide_show_interval></a>Slide show | Slide show interval</td>
     <td>Specifies the time, in seconds, during which to display a picture. In contrast with the
         <a href="setup-view-mode.html">setting value</a>, this option affects only the current viewing session.</td>
   </tr>
   <tr>
-    <td><a name=rotate_0></a><b>{[%hh_ii:Rotate0]} Transformations | No rotation</b></td>
+    <td class=command><a name=rotate_0></a>{[%hh_ii:Rotate0]} Transformations | No rotation</td>
     <td>Cancels the rotation for the current picture. Doesn't affect the next display of this picture. To apply the
         rotation permanently, use the <a href=#store_transform>Store transformations</a> command.</td>
   </tr>
   <tr>
-    <td><a name=rotate_90></a><b>{[%hh_ii:Rotate90]} Transformations | Rotate CW by 90&deg;</b></td>
+    <td class=command><a name=rotate_90></a>{[%hh_ii:Rotate90]} Transformations | Rotate CW by 90&deg;</td>
     <td>Rotates the current picture clockwise by 90&deg;. Doesn't affect the next display of this picture. To apply the
         rotation permanently, use the <a href=#store_transform>Store transformations</a> command.</td>
   </tr>
   <tr>
-    <td><a name=rotate_180></a><b>{[%hh_ii:Rotate180]} Transformations | Rotate by 180&deg;</b></td>
+    <td class=command><a name=rotate_180></a>{[%hh_ii:Rotate180]} Transformations | Rotate by 180&deg;</td>
     <td>Rotates the current picture by 180&deg;. Doesn't affect the next display of this picture. To apply the rotation
         permanently, use the <a href=#store_transform>Store transformations</a> command.</td>
   </tr>
   <tr>
-    <td><a name=rotate_270></a><b>{[%hh_ii:Rotate270]} Transformations | Rotate CCW by 90&deg;</b></td>
+    <td class=command><a name=rotate_270></a>{[%hh_ii:Rotate270]} Transformations | Rotate CCW by 90&deg;</td>
     <td>Rotates the current picture counter-clockwise by 90&deg; (or clockwise by 270&deg;). Doesn't affect the next
         display of this picture. To apply the rotation permanently, use the <a href=#store_transform>Store
         transformations</a> command.</td>
   </tr>
   <tr>
-    <td><a name=flip_horz></a><b>{[%hh_ii:FlipHorz]} Transformations | Flip horizontally</b></td>
+    <td class=command><a name=flip_horz></a>{[%hh_ii:FlipHorz]} Transformations | Flip horizontally</td>
     <td>Applies a horizontal flip (along the vertical axis) to the current picture. Doesn't affect the next display of
         this picture. To apply the flip permanently, use the <a href=#store_transform>Store transformations</a>
         command.</td>
   </tr>
   <tr>
-    <td><a name=flip_vert></a><b>{[%hh_ii:FlipVert]} Transformations | Flip vertically</b></td>
+    <td class=command><a name=flip_vert></a>{[%hh_ii:FlipVert]} Transformations | Flip vertically</td>
     <td>Applies a vertical flip (along the horizontal axis) to the current picture. Doesn't affect the next display of
         this picture. To apply the flip permanently, use the <a href=#store_transform>Store transformations</a>
         command.</td>
   </tr>
   <tr>
-    <td><a name=store_transform></a><b>{[%hh_ii:StoreTransform]} Transformations | Store transformations</b></td>
-    <td>Stores all the <a href="theory-transform.html">transformations</a> applied by the above items of this submenu,
+    <td class=command><a name=store_transform></a>{[%hh_ii:StoreTransform]} Transformations | Store transformations</td>
+    <td>Stores all the <a href="info-transform.html">transformations</a> applied by the above items of this submenu,
         to the displayed pictures. The picture afterwards will be displayed having the same transformations
         applied.</td>
   </tr>
   <tr>
-    <td><a name=settings></a><b>{[%hh_ii:Props]} Program settings</b></td>
+    <td class=command><a name=settings></a>{[%hh_ii:Props]} Program settings</td>
     <td>Opens the Program settings dialog, the <a href="setup-view-mode.html">View mode settings page</a>.</td>
   </tr>
-  <tr><td colspan=2>Below are the <a href="theory-tools.html">tool</a> items (if any).</td></tr>
+  <tr><td colspan=2>Below are the <a href="info-tools.html">tool</a> items (if any).</td></tr>
 </table>
 
 {[%hh_ftr_en]}

@@ -1,0 +1,379 @@
+<!-- $Id: general-rev-history.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+{[%hh_hdr_en:Revision History]}
+
+<p align=justify>This document summarizes the differences between versions of <b>PhoA</b> in reverse chronological order.
+
+<p align=justify><a href="#phoa-formats">Photo album file version differences</a>
+
+{[%hh_h2:Program versions]}
+<table class=plain border=0>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.6 beta</b><br>[Nov 09, 2004]</td>
+  <td>
+    <ul>
+      <li>Completely reworked program localization mechanism. All you need to do to add a new interface language is place
+          a transaltion file into the Language folder. The translation file itself is a plain text one, accessible with
+          any text editor; but you are strongly recommended to use <b>DKLang Translation Editor</b> (available on the
+          site) for this purpose since it provides a number of additional, translation-specific features.</li>
+      <li>About 80% rewrite of internal program design. This might affect the number of bugs ;)</li>
+      <li>Undo data are now stored to the disk, not to memory. This allowed to increase the default undo buffer size to 100
+          operations.</li>
+      <li>Thumbnail window: smooth scrolling; <b>Ctrl+Arrows/PgUp/PgDn/Home/End</b> now moves the focus leaving the selection
+          intact; <b>Shift+Alt+Arrows/PgUp/PgDn/Home/End</b> creates rectangular selection; <b>Space/Ctrl+Space</b> toggles
+          focused thumbnail selection; <b>Ctrl+Mouse wheel</b> scrolls one screen per detent.</li>
+      <li>Enabled file drag'n'drop into the group tree.</li>
+      <li>New resampling filters: <b>Draft</b> (more precise than Nearest neighbor but significantly faster than Bilinear/Bicubic)
+          and <b>Cosine</b>.</li>
+      <li>Additional thumbnail appearance settings: thumbnail background border style and color.</li>
+      <li>A possibility of Picture properties dialog default page selection.</li>
+      <li>A possibility of picture data editing while a view is active.</li>
+      <li>Thumbnail caching in the Browse mode is no longer pertinent. Things showed it caused big problems under Win9x.</li>
+      <!--li>File operations wizard: <b>Repairing file links for selected pictures</b> allows to repair &quot;lost&quot; file links caused by
+          physically relocated files. The program searches matched files by their name and/or size. Also option for removing unrepaired pictures
+          is present.</li-->
+      <li>Pressing the <b>Enter</b> key in the Browse mode when thumbnail window is active starts viewing of the current picture.
+          Pressing <b>Shift+Ctrl+Enter</b> enters the View mode and starts slide show.</li>
+      <li>Pressing the <b>Enter</b> key in the View mode exits back to the Browse mode provided the last viewed picture is selected
+          in the thumbnails window.</li>
+      <li>Tons of minor fixes.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.5 beta</b><br>[Jun 14, 2004]</td>
+  <td>
+    <ul>
+      <li>A possibility for nondestructive picture rotation by multiples of 90&deg; and for horizontal and vertical flipping during
+          viewing. Also the transformations may be stored with the picture in the photo album file. Transformation controls on the
+          <b>View</b> page (now <b>View &amp; Adjust</b>) of Picture properties dialog.</li>
+      <li>New picture group properties: ID (an unique numeric identifier), text description, number of pictures and nested groups; the group
+          properties dialog; options for configuring and displaying the group tooltips.</li>
+      <li>Improved message boxes: there is the <b>Don't show this message again</b> checkbox wherever it is appllicable.</li>
+      <li>A possibility for switching the visual theme for toolbars and the status bar.</li>
+      <li>Pressing <b>Ctrl+Enter</b> in dialogs acts as clicking on <b>OK</b>. This allows for applying the changes when caret is in a multiline edit box.</li>
+      <li>A possibility for autofilling the picture transformations (rotation and flips) according to metadata.</li>
+      <li>File operations wizard: the confirm file overwrite dialog now has also <b>Yes to all</b> and <b>No to all</b> buttons.</li>
+      <li>Splash screen at program startup displaying the current startup status.</li>
+      <li>Options for animating the splash screen and <b>About</b> dialog fadeout.</li>
+      <li>Support for command line keys.</li>
+      <li><b>View | Remove Search Results</b> menu item.</li>
+      <li>Extended TIFF support.</li>
+      <li>Minor changes and fixes.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.4 beta</b><br>[May 16, 2004]</td>
+  <td>
+    <ul>
+      <li>File operations wizard: options for selecting pictures with existent or nonexistent files on the picture selection page.</li>
+      <li>File masks have been extended: symbol <b>!</b> at the start of the mask inverts its meaning.</li>
+      <li>Right mouse click when <b>Ctrl</b> is pressed invokes shell context menu for the current file for both browse (click on a thumbnail image) and
+          view (click on image) modes.</li>
+      <li>View window in <b>Always on top</b> mode now doesn't obscure Picture properties and Program settings dialogs.</li>
+      <li>Program settings use inplace editing now. Eg., picture properties to display on thumbnails are now being selected from the dropdown list.</li>
+      <li>Browse mode options <b>Thumbnail background color</b> and <b>Thumbnail font color</b>.</li>
+      <li>View mode option <b>Keep mouse cursor over the toolbar button on window resize</b>.</li>
+      <li>View mode option <b>Show picture info</b> and <b>Show info</b> command in the view mode.</li>
+      <li>Add pictures wizard option <b>Show hidden files and folders</b>.</li>
+      <li>Wizard log pages display record number, total number of records and number of failed entries. Also Copy to clipboard and Find text features 
+          implemented.</li>
+      <li>Clipboard options allow to specify which formats are placed into the clipboard on <b>Copy</b> and <b>Cut</b> operations. Possible formats are:
+          PhoA pictures, shell file objects (this allows you to simply copy the necessary files for selected pictures into any folder), plain-text file
+          path list, thumbnail image.</li>
+      <li>Implemented invoking the external programs - <i>tools</i>: <b>Tools</b> page in the settings dialog; a possibility to include additional items
+          in <b>Tools</b> and popup menus.</li>
+      <li>Fixed invoking the help in dialogs with F1 key.</li>
+      <li>Fixed Access Violation when the root group contains pictures and <b>File | New</b> menu item is selected.</li>
+      <li>Fixed display of file sizes over 2 GB in <b>Statistics</b>.</li>
+      <li>New images for buttons, menu items etc.</li>
+      <li>Reorganized documentation.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.3 beta</b><br>[Mar 29, 2004]</td>
+  <td>
+    <ul>
+      <li>New interface language: <b>Ukrainian</b> (translation by Serge Mikulin).</li>
+      <li>File operations Wizard added allowing to perform the following operation with picture files:
+        <ul>
+          <li><b>Copying files of selected pictures</b> into single folder / maintaining original folder layout relatively to specified folder / maintaining picture
+            group hierarchy relatively to specified group (incl. possibility for creating multiple copies of a file when this file is contained in several groups).</li>
+          <li><b>Moving picture files of selected pictures</b> - with the same options as copying; the moving updates file links in corresponding pictures.
+            There is also option for deleting the original files (wipe or recycle).</li>
+          <li><b>Deleting files of selected pictures</b>, including corresponding pictures.</li>
+          <li><b>Rebuilding thumbnails for selected pictures</b> - this operation is also handled by the Wizard.</li>
+        </ul>
+        Moreover, copying and moving also allow to automatically create a separate photo album for the files being copied or moved, to copy the program executable
+        and to create autorun.inf file - the File operations Wizard makes preparing a CD or DVD a snap.
+      </li>
+      <li>Possibility for storing and loading settings to/from an ini-file. Also option for autoloading settings from phoa.ini on program startup, if this file is
+          present in the program directory.</li>
+      <li><b>Picture operations</b> dialog displays faster.</li>
+      <li>Add pictures Wizard now remembers last settings used.</li>
+      <li>Toolbar dragging option now affects the View mode toolbar.</li>
+      <li>Possibility for sorting the search results.</li>
+      <li>Minor fixes.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.2</b><br>[Feb 07, 2004]</td>
+  <td>
+    <ul>
+      <li>New interface languages: <b>German</b> (by Dominik Mayer) and <b>Brazilian Portuguese</b> (by Cesar Boschetti). Now PhoA supports 4 languages!</li>
+      <li>Background decoding thread's priority has been lowered. The result is that the picture already decoded is displayed significantly faster.</li>
+      <li>A stupid memory leak removed - the background decoding thread didn't terminate when viewing is finished.</li>
+      <li>Search by picture dimensions bugs fixed. Searching the file mask now checks just the file's name, not its full path.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.1b</b><br>[Sep 17, 2003]</td>
+  <td>
+    <ul>
+      <li>New options for trees/lists: <b>Incremental search on typing</b> and <b>Incremental search cleanup delay</b>.</li>
+      <li>In the <b>Picture properties dialog</b> the first control on the page gets focused automatically.</li>
+      <li>Changes to <b>Picture properties | Metadata</b>: description panel, metatag code is now displayed.</li>
+      <li>Changes to <b>Picture properties | View</b>: wheel scaling is fixed.</li>
+      <li>Changes to <b>Picture properties | Keywords</b>: <b>Checked only</b> switch; new keywords are painted navy only when not highlighted.</li>
+      <li>Changes to <b>Picture properties | Groups</b>: speeded up the first time display.</li>
+      <li>An attempt made to fix font displaying in both Unicode- and non-Unicode-systems for various codepages/charsets.</li>
+      <li>Dialogs have been changed. Fixed large system font issues.</li>
+      <li>EXIF-tags list has been expanded, many tags have got descriptions.</li>
+      <li>Support for &quot;non-regular&quot; metatags: Unicode (WinXP-tags), Versions etc.</li>
+      <li>Fixed issue with PhoA denied to open 0.x version photo albums.</li>
+      <li>Fixed view mode bug: predecoding malfunctioned.</li>
+      <li>Fixed search bug: date, time and keyword searches were not working properly.</li>
+      <li>Fixed some memory leaks.</li>
+      <li>Minor changes.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.1.1a</b><br>[Sep 08, 2003]</td>
+  <td>
+    <ul>
+      <li>Photo album file format changed - now it is very expandable and meant not to be changed frequently.</li>
+      <li>Modifications to folder tree appearance:
+        <ul>
+          <li><b>Views</b> toolbar has been removed. Instead of it there is now a dropdown button beside the photo album node invoking views menu.</li>
+          <li>Pictures are now can be placed directly to the photo album node, having no group created.</li>
+          <li>Number of images is displayed beside the group name.</li>
+          <li>Altered Drag'n'Drop functioning: to insert a node as a sibling of another node (above or below), you'll have to drag the node to the
+              free area on the right side of nodes, and then the insertion point is drawn as a line. To make a node a child of another node you drag this
+              node right over the target node, then the target node gets highlighted. There's no more Shift button used (i mean while dragging ;)</li>
+          <li>When a node is being dragged the target node expands if you leave mouse over the target for a time. Also when mouse rests near the
+              top or bottom edge (while dragging) the group tree starts to scroll.</li>
+          <li>Cosmetic changes (root items are drawn bold, Drag'n'Drop uses blended source folder image etc.)</li>
+          <li>Lists are adjustable.</li>
+        </ul>
+      </li>
+      <li>Picture adding and editing have been completely separated. The goal was to remove compromises in the interface. Pictures are always being added
+        with the defaults, you may edit them afterwards.</li>
+      <li>Changes to the Add pictures dialog:
+        <ul>
+          <li>The dialog became the wizard. On the first stage you select picture files and/or folder, on the second one you may exactly determine which
+              files are to be added.</li>
+          <li>When adding pictures you can filter them by photo album presence, by name or extension, by date/time file modified.</li>
+          <li>Picture addition is performed in the separate thread which has improved the response to user actions.</li>
+          <li>Addition process is being logged, the log can be saved to a text file.</li>
+        </ul>
+      </li>
+      <li>Fully functional support for JPEG-image metadata <b>EXIF 2.1</b> - data placed to image files by almost any digicam as well as by modern
+          graphic editors. Metadata can be used for filling some picture properties.</li>
+      <li>Many changes to Edit pictures dialog. In a nutshell:
+        <ul>
+          <li>Dialog became multipaged.</li>
+          <li><b>File properties</b> page allows you to view file properties info.</li>
+          <li><b>Metadata</b> page displays all the EXIF data contained in JPEG files.</li>
+          <li><b>View</b> page enables file viewing for any selected file.</li>
+          <li><b>Data</b> page is just a thing that was Edit pictures dialog + new properties.</li>
+          <li><b>Keywords</b> page allows you to modify keyword list by adding, removing and editing single keywords for any number of pictures at
+              once.</li>
+          <li><b>Groups</b> page shows photo album group tree in which you can easily determine groups pictures belong to, or change these belongings.</li>
+        </ul>
+      </li>
+      <li>Program settings were extended aloud.</li>
+      <li>You may now reorder pictures inside group using Drag'n'Drop (in the thumbnails pane).</li>
+      <li>Views now support automated sorting the pictures inside each group.</li>
+      <li>Thumbnail pane always selects the first thumbnail by default.</li>
+      <li>Undo history dialog has been removed: now you can undo any number of changes by clicking the dropdown button near the <b>Undo</b> toolbar button
+          or with <b>Edit | Undo history</b> submenu.</li>
+      <li>All other trees displaying picture groups also have been altered - now they all look like the main tree.</li>
+      <li>The status bar displays the total number of distinct pictures in the photo album.</li>
+      <li>Local toolbar in the view mode.</li>
+      <li>Enhanced support for XP themes in toolbars and the thumbnail pane.</li>
+      <li>Lots of fixes, minor changes and new bugs.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.0.2a</b><br>[Jun 02, 2003]</td>
+  <td>
+    <ul>
+      <li>By a lot of complaints against thumbnail quality there's resampling filtering option to eliminate shrinked picture's fuzziness. Possible filters
+          are: Nearest Neighbor, Linear, B-spline (bicubic), Lanczos, Mitchell. As a side effect, owing to some smoothing of the thumbnail, its size
+          (because of JPEG-compression) reduced by 10 thru 25% (eg, when using B-spline interpolation the decrease is 20-25%).</li>
+      <li>Significantly increased speed of rescaling and scrolling pictures. In the view mode you can also choose any of the resampling filters
+          listed above.</li>
+      <li>Added option for decoding pictures in background: a separate thread is responsible for decoding the next picture while you are watching
+          current one. This technique minimizes time required to advance to the next picture (but requires more memory).</li>
+      <li>Added option for caching-behind viewed pictures, which minimizes time to rewind to the previous picture (but also takes more memory).</li>
+      <li>The support for <b>.gif</b> files was not included. Fixed.</li>
+      <li>Added support for <b>.msk</b> (Paint Shop Pro mask), <b>.tub</b> (Paint Shop Pro picture tube), <b>.pfr</b> (Paint Shop Pro picture
+          frame) file formats.</li>
+      <li>View info painting is completely changed. Now information is always positioned over the picture, optionally on a translucent background,
+          and you can visually position information bar.</li>
+      <li>In multimonitor systems dialog windows were mispositioned. Fixed.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 1.0.1a</b><br>[May 17, 2003]</td>
+  <td>
+    <p align=justify>Huge number of differences resulted in program version and time taken to release it.
+    <ul>
+      <li><b>Views!</b> Completely new picture arranging algorithm. Now you can classify a heap of pictures into folders with minimum efforts. The
+          only requirement is that pictures' properties are properly filled. Possible grouping conditions are: by picture file path, by date (in various
+          ways), by place, by keywords etc. Groupings may be cascaded, ie may be applied one by one, number of groupings is a matter of sanity.
+          The result of the grouping (folder tree along with their pictures) may be easily put into any photo album group, and after then you can
+          tweak them in usual way.</li>
+      <li>Photo album file (.phoa) format has been changed. Photo album files since version 1.0.1a contain views' data, and they are incompatible with
+          the earlier <b>PhoA</b> versions. The program also supports saving files in PhoA 0.x format, which is choosed while saving the file (File |
+          Save as...); accordingly, in this case views are not saved.</li>
+      <li><b>Sorting</b> now can be performed by any number of criteria; it is organized in the similar way as views' groupings. The list of sorting
+          criteria has been significantly extended.</li>
+      <li>You can now tweak thumbnail tooltips in Browse mode; you can choose which details are displayed.</li>
+      <li>Picture info in View mode is now also more adjustable.</li>
+      <li>Three options on <b>toolbar buttons size</b> (small/middle/large).</li>
+      <li>Massively extended support for <b>picture file formats</b>. Now almost all possible formats are supported (briefly: Windows bitmap (BMP,
+          RLE, DIB), OS/2 bitmap, TIFF, GFI fax, SGI, Autodesk, Truevision Targa, ZSoft Paintbrush, Word 5.x, Kodak Photo-CD, Portable pixel/gray map,
+          Dr. Halo CUT, CompuServe GIF, SGI Wavefront, Photoshop, Paint Shop Pro, Portable network graphic PNG; for details refer to the
+          <a href="general-file-formats.html">file formats discussion</a>).</li>
+      <li>New algorithms for <b>keyword processing</b> (keywords containing spaces and/or commas are to be quoted; when selecting them from the list
+          such keywords are quoted automatically; keywords are no longer converted to lowercase in the Select keywords dialog, though keywords are still
+          compared case-insensitively).</li>
+      <li>A number of minor fixes (including fixed Access Violation in some cases while browsing).</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 0.10 beta</b><br>[Jan 09, 2003]</td>
+  <td>
+    <ul>
+      <li>The fully operational <b>undo engine</b> is built into PhoA.</li>
+      <li>New button &quot;Add all&quot; in the  <a href="intf-pic-add.html">Add picture dialog</a>, allowing unconditional addition of all picture
+        files selected (using defaults).</li>
+      <li><b>Clipboard functionality</b> implemented (cut, copy, paste).</li>
+      <li>Minor fixes (Browse mode; photo album stats).</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 0.03</b><br>[Oct 20, 2002]</td>
+  <td>
+    <ul>
+      <li>Completely bilingual version (English & Russian), including Setup program and Help System files.</li>
+      <li>Implemented Slide Show mode.</li>
+      <li>Minor changes.</li>
+    </ul>
+  </td>
+</tr>
+<!------------------------------------------------------------------------------------------------------------------->
+<tr>
+  <td nowrap><b>PhoA 0.02b</b><br>[Sep 06, 2002]</td>
+  <td>
+    <ul>
+      <li>The first public release.</li>
+    </ul>
+  </td>
+</tr>
+</table>      
+
+{[%hh_h2:<a name=phoa-formats>Photo album file version differences</a>]}
+<p align=justify>Photo album (<b>.phoa</b>) file format is being changed as the program is developed. Different photo album file
+  versions differ in the data being saved. The table below describes the differences in photo album file formats.
+
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td>Program version</td>
+    <td>Internal format revision</td>
+    <td>Format name</td>
+    <td>New features compared to the prior versions</td>
+  </tr>
+  <tr>
+    <td align=center><b>PhoA 1.1.5 beta</b></td>
+    <td align=center><b>0003</b></td>
+    <td>PhoA 1.1+</td>
+    <td>
+      New picture properties:
+      <ul>
+        <li>Picture rotation.</li>
+        <li>Picture flips.</li>
+      </ul>
+      New group properties:
+      <ul>
+        <li>Group ID.</li>
+        <li>Group description.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align=center><b>PhoA 1.1.1a</b></td>
+    <td align=center><b>0003</b></td>
+    <td>PhoA 1.1+</td>
+    <td>
+      New picture properties:
+      <ul>
+        <li>Picture width.</li>
+        <li>Picture height.</li>
+        <li>Picture time.</li>
+        <li>Picture author.</li>
+        <li>Picture media name/code.</li>
+        <li>Picture notes.</li>
+      </ul>
+      Views:
+      <ul>  
+        <li>New picture grouping properties: time hour, time minute, author, media.</li>
+        <li>Possibility to sort pictures in the view groups.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align=center><b>PhoA 1.0.1a</b></td>
+    <td align=center><b>0002</b></td>
+    <td>PhoA 1.0.x</td>
+    <td>
+      Views:
+      <ul>
+        <li>View list.</li>
+        <li>View name.</li>
+        <li>View grouping list.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align=center><b>PhoA 0.02b</b></td>
+    <td align=center><b>0001</b></td>
+    <td>PhoA 0.x</td>
+    <td>The first release of the program.</td>
+  </tr>
+</table>
+
+{[%hh_seealso_en]}
+  <a href="general-file-formats.html">File formats</a><br>
+
+{[%hh_ftr_en]}

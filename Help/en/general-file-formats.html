@@ -1,0 +1,198 @@
+<!-- $Id: general-file-formats.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+{[%hh_hdr_en:Supported file formats]}
+
+<link rel="stylesheet" type="text/css" href="../main.css">
+<link rel="dummy" type="image/gif" href="../x-minus.gif">
+<script language=javascript>
+  function divToggle(img, divName){ 
+    var div = document.all[divName];
+    div.style.display = div.style.display=='none'?'':'none';
+    img.src = div.style.display=='none'?'../x-plus.gif':'../x-minus.gif'; }
+</script>
+
+<p align=justify>As was mentioned above, <b>PhoA</b> program works with photo album files having <b>.phoa</b> extension - such file holds:
+<ul>
+  <li>photo album description text and settings;</li>
+  <li>picture list along with their descriptions;</li>
+  <li>folders-groups hierarchy, each holding a set of links to photo album images;</li>
+  <li>views' structures (PhoA version 1.0.1+).</li>
+</ul>
+<p align=justify><b>.phoa</b> files cannot be viewed directly and are opened only in <b>PhoA</b>. But starting with <b>PhoA</b> version <b>1.1.1a</b>
+  that is possible to create your own tools due to open <b>PhoA</b> file format specifications. Refer to program's
+  <a href="http://phoa.narod.ru/en" target=_blank>home site</a> for more detailed information.
+
+<p align=justify>Current version recognises the following formats as source image files (click a plus-button to expand the details):
+<div style="padding-left: 32px">
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divBMP')"> Standard Windows and OS/2 bitmap images (<b>*.bmp, *.rle, *.dib</b>)
+<div id=divBMP style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 4, 8 bits per sample</li>
+  <li>color spaces: indexed, RGB(A)</li>
+  <li>compression formats: uncompressed, RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divJPG')"> JPEG images (<b>*.jpg; *.jpeg; *.jpe</b>)
+<div id=divJPG style="display:none"><ul>
+  <li>byte orders: little endian, big endian</li>
+  <li>sample sizes: 8 bits per sample</li>
+  <li>color spaces: grayscale, RGB</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divTIFF')"> TIFF images (<b>*.tif; *.tiff</b>)
+<div id=divTIFF style="display:none"><ul>
+  <li>byte orders: little endian, big endian</li>
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
+  <li>color spaces: indexed, grayscale, RGB(A), CMYK, L*a*b*</li>
+  <li>compression formats: uncompressed, packed bits, LZW, CCITT T.4 (raw and modified fax group 3, possibly word aligned), ThunderScan, Deflate, new style JPEG</li>
+</ul></div>
+  
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> GFI fax images</a> (<b>*.fax</b>) 
+<div id=divGFI style="display:none"><ul>
+  <li>sample size: 1 bits per sample</li>
+  <li>color space: indexed</li>
+  <li>compression format: CCITT T.4 (raw and modified fax group 3)</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divSGI')"> SGI images</a> (<b>*.bw, *.rgb, *.rgba, *.sgi</b>)
+<div id=divSGI style="display:none"><ul>
+  <li>byte order: big endian</li>
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
+  <li>color spaces: indexed, grayscale, RGB(A)</li>
+  <li>compression formats: uncompressed, RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCEL')"> Autodesk images files</a> (<b>*.cel; *.pic</b>)
+<div id=divCEL style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample size: 8 bits per sample</li>
+  <li>color spaces: indexed</li>
+  <li>compression format: uncompressed</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divTGA')"> Truevision Targa images</a> (<b>*.tga; *.vst; *.icb; *.vda; *.win</b>)
+<div id=divTGA style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 5, 8 bits per sample</li>
+  <li>color spaces: gray scale, indexed, 15 bits RGB (555), 24 bits RGB(A)(888)</li>
+  <li>compression formats: uncompressed, RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPCX')"> ZSoft Paintbrush images</a> (<b>*.pcx, *.pcc</b>)
+<div id=divPCX style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 2, 4, 8 bits per sample</li>
+  <li>color spaces: gray scale, indexed, RGB</li>
+  <li>compression formats: uncompressed, RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divSCR')"> Word 5.x screen capture files</a> (<b>*.scr</b>)
+<div id=divSCR style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 2, 4, 8 bits per sample</li>
+  <li>color spaces: indexed, gray scaleRGB</li>
+  <li>compression formats: uncompressed, RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPCD')"> Kodak Photo-CD images</a> (<b>*.pcd</b>)
+<div id=divPCD style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>samples size: 8 bits per sample</li>
+  <li>color space: YCbCr</li>
+  <li>compression: PCD Huffmann</li>
+  <li>specials:
+    <ul>
+      <li>sizes: all resolutions, from 192 x 128 up to 6144 x 4096 (64 Base vaporware)</li>
+      <li>rotated: clockwise and counter-clockwise</li>
+    </ul>
+  </li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPPM')"> Portable pixel/gray map images</a> (<b>*.ppm, *.pgm, *.pbm</b>)
+<div id=divPPM style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 8 bits per sample</li>
+  <li>color spaces: gray scale, indexed, RGB</li>
+  <li>compression format: uncompressed</li>
+  <li>specials:
+    <ul>
+      <li>ASCII and Binary format</li>
+    </ul>
+  </li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCUT')"> Dr. Halo images</a> (<b>*.cut, *.pal</b>)
+<div id=divCUT style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample size: 8 bits per sample</li>
+  <li>color spaces: indexed</li>
+  <li>compression formats: RLE</li>
+  <li>specials:
+    <ul>
+      <li>external palette file (*.pal) is automatically loaded</li>
+    </ul>
+  </li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGIF')"> CompuServe GIF images</a> (<b>*.gif</b>)
+<div id=divGIF style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 4, 8 bits per sample</li>
+  <li>color spaces: indexed</li>
+  <li>compression format: LZW</li>
+  <li>specials:
+    <ul>
+      <li>interlaced, non-interlaced</li>
+    </ul>
+  </li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divRLA')"> SGI Wavefront images</a> (<b>*.rla, *.rpf</b>)
+<div id=divRLA style="display:none"><ul>
+  <li>byte order: big endian</li>
+  <li>sample size: 8 bits per sample</li>
+  <li>color space: RGB(A)</li>
+  <li>compression formats: RLE</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSD')"> Photoshop images</a> (<b>*.psd, *.pdd</b>)
+<div id=divPSD style="display:none"><ul>
+  <li>byte order: big endian</li>
+  <li>sample sizes: 1, 8, 16 bits per sample</li>
+  <li>color spaces: indexed, RGB, CMYK, CIE L*a*b*</li>
+  <li>compression formats: uncompressed, packed bits</li>
+  <li>special:
+    <ul>
+      <li>duo tone</li>
+    </ul>
+  </li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSP')"> Paint Shop Pro images</a> (<b>*.psp</b>)
+<div id=divPSP style="display:none"><ul>
+  <li>byte order: little endian</li>
+  <li>sample sizes: 1, 4, 8 bits per sample</li>
+  <li>color spaces: indexed, gray scale, RGB</li>
+  <li>compression formats: uncompressed, LZ77</li>
+</ul></div>
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPNG')"> Portable Network Graphic images</a> (<b>*.png</b>)
+<div id=divPNG style="display:none"><ul>
+  <li>byte order: big endian</li>
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
+  <li>color spaces: indexed, grayscale (alpha), RGB(A)</li>
+  <li>compression format: LZ77</li>
+  <li>specials:
+    <ul>
+      <li>supported chunks: IHDR, IDAT, IEND, PLTE, gAMA, tRNS, bKGD</li>
+      <li>transparency support partially for RGB, which is stored as 32 bits format</li>
+    </ul>
+  </li>
+</ul></div>
+</div>
+
+<p align=justify>The powerful image format support is implemented thanks to <a href="http://www.lischke-online.de" target=_blank>Mike
+  Lischke</a>.
+
+<p class=lsmall><a href="general-thumbnails.html">Next &gt;&gt;</a>
+
+{[%hh_ftr_en]}

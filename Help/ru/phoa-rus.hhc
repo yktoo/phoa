@@ -15,44 +15,44 @@
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iacute;&agrave;&ccedil;&iacute;&agrave;&divide;&aring;&iacute;&egrave;&aring; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
-			<param name="Local" value="intro.html">
+			<param name="Local" value="general-intro.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ecirc;&agrave;&ecirc; &yacute;&ograve;&icirc; &eth;&agrave;&aacute;&icirc;&ograve;&agrave;&aring;&ograve;">
-			<param name="Local" value="how-it-works.html">
+			<param name="Local" value="general-how-it-works.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
-			<param name="Local" value="file-formats.html">
+			<param name="Local" value="general-file-formats.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Yacute;&ntilde;&ecirc;&egrave;&ccedil;&ucirc;">
-			<param name="Local" value="thumbnails.html">
+			<param name="Local" value="general-thumbnails.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Dstrok;&aring;&aelig;&egrave;&igrave;&ucirc; &eth;&agrave;&aacute;&icirc;&ograve;&ucirc; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
-			<param name="Local" value="major-modes.html">
+			<param name="Local" value="general-major-modes.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Otilde;&agrave;&eth;&agrave;&ecirc;&ograve;&aring;&eth;&egrave;&ntilde;&ograve;&egrave;&ecirc;&egrave; &egrave; &iuml;&eth;&aring;&egrave;&igrave;&oacute;&ugrave;&aring;&ntilde;&ograve;&acirc;&agrave; PhoA">
-			<param name="Local" value="advantages.html">
+			<param name="Local" value="general-advantages.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Ntilde;&egrave;&ntilde;&ograve;&aring;&igrave;&iacute;&ucirc;&aring; &ograve;&eth;&aring;&aacute;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
-			<param name="Local" value="requirements.html">
+			<param name="Local" value="general-requirements.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Auml;&agrave;&iacute;&iacute;&ucirc;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
-			<param name="Local" value="pic-data.html">
+			<param name="Local" value="general-pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Egrave;&ntilde;&ograve;&icirc;&eth;&egrave;&yuml; &acirc;&aring;&eth;&ntilde;&egrave;&eacute;">
-			<param name="Local" value="rev-history.html">
+			<param name="Local" value="general-rev-history.html">
 			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Euml;&egrave;&ouml;&aring;&iacute;&ccedil;&egrave;&icirc;&iacute;&iacute;&icirc;&aring; &ntilde;&icirc;&atilde;&euml;&agrave;&oslash;&aring;&iacute;&egrave;&aring;">
-			<param name="Local" value="eula-rus.html">
+			<param name="Local" value="general-license.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -101,7 +101,7 @@
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
-				<param name="Local" value="pic-prop-autofill.html">
+				<param name="Local" value="info-pic-prop-autofill.html">
 				</OBJECT>
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
@@ -337,7 +337,7 @@
 		</UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
-			<param name="Local" value="theory-transform.html">
+			<param name="Local" value="info-transform.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc; &ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&icirc;&eacute; &ntilde;&ograve;&eth;&icirc;&ecirc;&egrave;">
@@ -345,23 +345,23 @@
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
-			<param name="Local" value="theory-metadata.html">
+			<param name="Local" value="info-metadata.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Dstrok;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">
-			<param name="Local" value="theory-resampling.html">
+			<param name="Local" value="info-resampling.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
-			<param name="Local" value="theory-file-masks.html">
+			<param name="Local" value="info-file-masks.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
-			<param name="Local" value="theory-tools.html">
+			<param name="Local" value="info-tools.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (&divide;&agrave;&ntilde;&ograve;&icirc; &ccedil;&agrave;&auml;&agrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &acirc;&icirc;&iuml;&eth;&icirc;&ntilde;&ucirc;)">
-			<param name="Local" value="faq.html">
+			<param name="Local" value="info-faq.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

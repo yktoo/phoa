@@ -1,4 +1,4 @@
-<!-- $Id: intf-browse-mode-menu-file.html,v 1.3 2004-11-02 21:17:49 dale Exp $ -->
+<!-- $Id: intf-browse-mode-menu-file.html,v 1.4 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_ru:Режим обзора :: Меню &quot;Файл&quot;]}
 
 <p align=justify>В этом меню собраны команды работы с файлами фотоальбомов.
@@ -9,35 +9,37 @@
     <td nowrap>Описание</td>
   </tr>
   <tr>
-    <td><a name=new></a><b>{[%hh_ii:New]} Новый</b></td>
+    <td class=command><a name=new></a>{[%hh_ii:New]} Новый</td>
     <td>Создание нового фотоальбома. При этом удаляются все группы, изображения и
-      <a href="intf-browse-mode-views.html">представления</a>, а параметры фотоальбома приводятся к заданным по умолчанию.</td>
+      <a href="intf-browse-mode-views.html">представления</a>, а параметры фотоальбома приводятся к заданным по
+      умолчанию.</td>
   </tr>
   <tr>
-    <td><a name=open></a><b>{[%hh_ii:Open]} Открыть...</b></td>
+    <td class=command><a name=open></a>{[%hh_ii:Open]} Открыть...</td>
     <td>Вызывает стандартный диалог открытия файла для выбора файла фотоальбома (с расширением <b>.phoa</b>).</td>
   </tr>
   <tr>
-    <td><a name=save></a><b>{[%hh_ii:Save]} Сохранить</b></td>
-    <td>Сохраняет фотоальбом в текущий открытый файл. Если это новый фотоальбом, при выборе этого пункта выполняется команда
-        <a href=#save_as>Сохранить как...</a></td>
+    <td class=command><a name=save></a>{[%hh_ii:Save]} Сохранить</td>
+    <td>Сохраняет фотоальбом в текущий открытый файл. Если это новый фотоальбом, при выборе этого пункта выполняется
+        команда <a href=#save_as>Сохранить как...</a></td>
   </tr>
   <tr>
-    <td><a name=save_as></a><b>{[%hh_ii:SaveAs]} Сохранить как...</b></td>
-    <td>Вызывает стандартный диалог сохранения файла &mdash; для сохранения текущего фотоальбома в файл с другим именем.</td>
+    <td class=command><a name=save_as></a>{[%hh_ii:SaveAs]} Сохранить как...</td>
+    <td>Вызывает стандартный диалог сохранения файла &mdash; для сохранения текущего фотоальбома в файл с другим
+        именем.</td>
   </tr>
   <tr>
-    <td><a name=save_settings></a><b>{[%hh_ii:SaveSettings]} Сохранить настройки в файл...</b></td>
+    <td class=command><a name=save_settings></a>{[%hh_ii:SaveSettings]} Сохранить настройки в файл...</td>
     <td>Отображает диалог для сохранения текущих настроек программы в файл с расширением <b>.ini</b>,
         <a href="setup-storing.html">подробнее</a>.</td>
   </tr>
   <tr>
-    <td><a name=load_settings></a><b>{[%hh_ii:LoadSettings]} Загрузить настройки из файла...</b></td>
+    <td class=command><a name=load_settings></a>{[%hh_ii:LoadSettings]} Загрузить настройки из файла...</td>
     <td>Отображает диалог для загрузки настроек программы из файла с расширением <b>.ini</b>,
         <a href="setup-storing.html">подробнее</a>.</td>
   </tr>
   <tr>
-    <td><a name=exit></a><b>{[%hh_ii:Exit]} Выход</b></td>
+    <td class=command><a name=exit></a>{[%hh_ii:Exit]} Выход</td>
     <td>Запрашивает подтверждение в случае несохранённого фотоальбома (или если запрос подтверждения при выходе задан в
         <a href="setup-dialogs.html">настройках подтверждений</a>) и завершает работу с программой.</td>
   </tr>

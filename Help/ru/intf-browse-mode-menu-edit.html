@@ -1,4 +1,4 @@
-<!-- $Id: intf-browse-mode-menu-edit.html,v 1.3 2004-11-02 21:17:49 dale Exp $ -->
+<!-- $Id: intf-browse-mode-menu-edit.html,v 1.4 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_ru:Режим обзора :: Меню &quot;Правка&quot;]}
 
 <p align=justify>В этом меню собраны команды для редактирования фотоальбома, а также для перехода в режим просмотра.
@@ -9,43 +9,43 @@
     <td nowrap>Описание</td>
   </tr>
   <tr>
-    <td><a name=undo></a><b>{[%hh_ii:Undo]} Отменить <i>имя_операции</i></b></td>
+    <td class=command><a name=undo></a>{[%hh_ii:Undo]} Отменить <i>имя_операции</i></td>
     <td>Отменяет изменения, сделанные вами при выполнении указанной (последней) операции.</td>
   </tr>
   <tr>
-    <td><a name=undo_history></a><b>{[%hh_ii:UndoHistory]} История изменений</b></td>
+    <td class=command><a name=undo_history></a>{[%hh_ii:UndoHistory]} История изменений</td>
     <td>Предоставляет доступ к списку сделанных изменений, с помощью которого вы можете отменить несколько
         сделанных операций сразу.</td>
   </tr>
   <tr>
-    <td><a name=cut></a><b>{[%hh_ii:Cut]} Вырезать</b></td>
+    <td class=command><a name=cut></a>{[%hh_ii:Cut]} Вырезать</td>
     <td>Удаляет выделенные изображения в <a href="intf-browse-mode-tasks.html#clipboard">буфер обмена</a> (вы можете
         впоследствии вставить их в другую группу).</td>
   </tr>
   <tr>
-    <td><a name=copy></a><b>{[%hh_ii:Copy]} Копировать</b></td>
+    <td class=command><a name=copy></a>{[%hh_ii:Copy]} Копировать</td>
     <td>Копирует выделенные изображения в <a href="intf-browse-mode-tasks.html#clipboard">буфер обмена</a>.</td>
   </tr>
   <tr>
-    <td><a name=paste></a><b>{[%hh_ii:Paste]} Вставить</b></td>
+    <td class=command><a name=paste></a>{[%hh_ii:Paste]} Вставить</td>
     <td>Позволяет добавить изображения из <a href="intf-browse-mode-tasks.html#clipboard">буфера обмена</a> в текущую группу,
       если они там есть. Естественно, добавляются только изображения, новые для текущей группы &mdash; совпадающие изображения
       отсеиваются. Если это указано в <a href="setup-dialogs.html">настройках программы</a>, выводится уведомление о количестве
       реально вставленных изображений.</td>
   </tr>
   <tr>
-    <td><a name=new_group></a><b>{[%hh_ii:NewGroup]} Добавить группу</b></td>
+    <td class=command><a name=new_group></a>{[%hh_ii:NewGroup]} Добавить группу</td>
     <td>Добавление новой группы. Новая папка группы создаётся в текущей выделенной папке. Если, соответственно, выделен узел
         фотоальбома, то группа будет создана в его корневом каталоге. По умолчанию группе даётся имя &quot;Новая группа&quot;,
         которое нужно изменить и нажать клавишу <b>Enter</b>.</td>
   </tr>
   <tr>
-    <td><a name=new_pics><b>{[%hh_ii:NewPic]} Добавить изображения...</b></td>
+    <td class=command><a name=new_pics></a>{[%hh_ii:NewPic]} Добавить изображения...</td>
     <td>Запускает <a href="intf-pic-add.html">Мастер добавления изображений</a>, позволяющий произвести добавление изображений
         (т.&nbsp;е. файлов) в фотоальбом.</td>
   </tr>
   <tr>
-    <td><a name=delete></a><b>{[%hh_ii:Delete]} Удалить</b></td>
+    <td class=command><a name=delete></a>{[%hh_ii:Delete]} Удалить</td>
     <td>
       <ul>
       	<li>Когда активно дерево групп &mdash; удаление группы.</li>
@@ -54,7 +54,7 @@
     </td>
   </tr>
   <tr>
-    <td><a name=edit></a><b>{[%hh_ii:Edit]} Изменить...</b></td>
+    <td class=command><a name=edit></a>{[%hh_ii:Edit]} Изменить...</td>
     <td>
       <ul>
         <li>Когда выделен узел <i>фотоальбома</i> (корневой узел дерева при отображении дерева групп), выбором этого пункта для
@@ -66,31 +66,31 @@
             клавишу <b>Enter</b>).</li>
         <li>Когда выделен узел <a href="intf-browse-mode-views.html">представления</a> (корневой узел дерева при отображении
             представления), с помощью этого пункта вы можете <a href="intf-view-props.html">изменить его свойства</a>.</li>
-        <li>Когда активно окно эскизов, этот пункт отображает <a href="intf-pic-props.html">Окно свойств изображений</a>,
+        <li>Когда активно окно эскизов, этот пункт отображает <a href="intf-pic-props.html">окно свойств изображений</a>,
             позволяющий просмотреть или изменить свойства выделенных изображений.</li>
       </ul>
     </td>
   </tr>
   <tr>
-    <td><a name=sort></a><b>{[%hh_ii:Sort]} Сортировать изображения...</b></td>
+    <td class=command><a name=sort></a>{[%hh_ii:Sort]} Сортировать изображения...</td>
     <td>Предоставляет доступ к <a href="intf-sort-pics.html">окну сортировки изображений</a> для упорядочивания изображений
         группы или всех групп фотоальбома.</td>
   </tr>
   <tr>
-    <td><a name=select_all></a><b>{[%hh_ii:SelectAll]} Выделить все</b></td>
+    <td class=command><a name=select_all></a>{[%hh_ii:SelectAll]} Выделить все</td>
     <td>Выделяет все изображения текущей группы.</td>
   </tr>
   <tr>
-    <td><a name=select_none></a><b>{[%hh_ii:SelectNone]} Снять выделение</b></td>
+    <td class=command><a name=select_none></a>{[%hh_ii:SelectNone]} Снять выделение</td>
     <td>Убирает выделение со всех изображений группы.</td>
   </tr>
   <tr>
-    <td><a name=view_mode></a><b>{[%hh_ii:ViewMode]} Просмотр</b></td>
+    <td class=command><a name=view_mode></a>{[%hh_ii:ViewMode]} Просмотр</td>
     <td>Служит для перехода в <a href="intf-view-mode.html">режим просмотра</a>. Также в режим просмотра можно перейти, сделав
         двойной щелчок мышью на изображении, или нажав <b>Enter</b>, когда активно окно эскизов.</td>
   </tr>
   <tr>
-    <td><a name=slide_show></a><b>{[%hh_ii:SlideShow]} Просмотр слайдов</b></td>
+    <td class=command><a name=slide_show></a>{[%hh_ii:SlideShow]} Просмотр слайдов</td>
     <td>Запускает <a href="intf-view-mode.html">режим просмотра</a> текущего изображения и включает режим показа слайдов.</td>
   </tr>
 </table>

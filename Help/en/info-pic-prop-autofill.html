@@ -1,0 +1,57 @@
+<!-- $Id: info-pic-prop-autofill.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+{[%hh_hdr_en:Autofilling the picture properties]}
+
+<p align=justify><b>PhoA</b> is capable of automated filling some picture properties. At the moment there are the following autofill possibilities:
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Property</td>
+    <td nowrap>Autofill possibility</td>
+  </tr>
+  <tr>
+    <td><b>Date</b></td>
+    <td>
+      <ul>
+        <li>From the <i>Original date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>From the <i>Dititized date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>From the <i>Date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>Extraction from the picture file name - if it has <i>yyyy-mm-dd hh-mm-ss.*</i> format</li>
+        <li>From file creation date/time</li>
+        <li>From file modification date/time</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><b>Time</b></td>
+    <td>
+      <ul>
+        <li>From the <i>Original date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>From the <i>Dititized date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>From the <i>Date & time</i> <a href="info-metadata.html">EXIF tag</a></li>
+        <li>Extraction from the picture file name - if it has <i>yyyy-mm-dd hh-mm-ss.*</i> format</li>
+        <li>From file creation date/time</li>
+        <li>From file modification date/time</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><b><a href="info-transform.html">Transformations</a></b><br>(rotation, flips)</td>
+    <td>
+      <ul>
+        <li>From the <i>Orientation</i> <a href="info-metadata.html">EXIF tag</a></li>
+      </ul>
+    </td>
+  </tr>
+</table>  
+
+<p align=justify>The program will try to fill a particular <a href="general-pic-data.html">picture property</a>, iterating through items enabled in
+  <a href="setup-dialogs.html">dialog settings</a> in the order they are listed. If a property was filled successfully the program stops iterating.
+<p align=justify>Moreover <b>Overwrite if already specified</b> option also affects autofill.
+
+{[%hh_seealso_en]}
+  <a href="setup-dialogs.html">Program settings :: Dialogs</a><br>
+  <a href="general-pic-data.html">Picture data</a><br>    
+  <a href="info-metadata.html">Metadata</a><br>  
+  <a href="intf-pic-props-metadata.html">Viewing the metadata</a><br>
+  <a href="info-transform.html">Transformations</a><br>
+
+{[%hh_ftr_en]}

@@ -13,12 +13,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="advantages">
 		<param name="Name" value="PhoA advantages">
-		<param name="Local" value="advantages.html">
+		<param name="Local" value="general-advantages.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="autofilling properties">
 		<param name="Name" value="Autofilling the picture properties">
-		<param name="Local" value="pic-prop-autofill.html">
+		<param name="Local" value="info-pic-prop-autofill.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="browse mode">
@@ -49,12 +49,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="copyright">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="disclaimer">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="drag'n'drop">
@@ -69,7 +69,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="FAQ">
 		<param name="Name" value="FAQ (Frequently Asked Questions)">
-		<param name="Local" value="faq.html">
+		<param name="Local" value="info-faq.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="file masks">
@@ -80,17 +80,17 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="description and purpose">
 			<param name="Name" value="File masks">
-			<param name="Local" value="theory-file-masks.html">
+			<param name="Local" value="info-file-masks.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="examples">
 			<param name="Name" value="File masks">
-			<param name="Local" value="theory-file-masks.html#samples">
+			<param name="Local" value="info-file-masks.html#samples">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="usage">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html#masks">
+			<param name="Local" value="info-tools.html#masks">
 			<param name="Name" value="Add pictures wizard :: File selection">
 			<param name="Local" value="intf-pic-add-selfiles.html">
 			<param name="Name" value="Find pictures dialog">
@@ -99,7 +99,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="writing rules">
 			<param name="Name" value="File masks">
-			<param name="Local" value="theory-file-masks.html#rules">
+			<param name="Local" value="info-file-masks.html#rules">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -151,7 +151,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="supported formats">
 			<param name="Name" value="File formats">
-			<param name="Local" value="file-formats.html">
+			<param name="Local" value="general-file-formats.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="viewing properties">
@@ -167,7 +167,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="graphic formats">
 		<param name="Name" value="File formats">
-		<param name="Local" value="file-formats.html">
+		<param name="Local" value="general-file-formats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="group (see picture group)">
@@ -204,7 +204,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="license agreement">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="menu">
@@ -232,12 +232,12 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="autofilling properties from">
 			<param name="Name" value="Autofilling the picture properties">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="description">
 			<param name="Name" value="Metadata">
-			<param name="Local" value="theory-metadata.html">
+			<param name="Local" value="info-metadata.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="viewing">
@@ -248,7 +248,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="modes">
 		<param name="Name" value="Major modes">
-		<param name="Local" value="major-modes.html">
+		<param name="Local" value="general-major-modes.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="mouse controls">
@@ -307,7 +307,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="picture group">
 		<param name="Name" value="How it works">
-		<param name="Local" value="how-it-works.html">
+		<param name="Local" value="general-how-it-works.html">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
@@ -345,12 +345,12 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="autofilling the properties">
 			<param name="Name" value="Autofilling the picture properties">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="data">
 			<param name="Name" value="Picture data">
-			<param name="Local" value="pic-data.html">
+			<param name="Local" value="general-pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="operations">
@@ -386,12 +386,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="principles of work">
 		<param name="Name" value="How it works">
-		<param name="Local" value="how-it-works.html">
+		<param name="Local" value="general-how-it-works.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="program updates">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="properties">
@@ -402,7 +402,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="autofilling">
 			<param name="Name" value="Autofilling the picture properties">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="group">
@@ -433,7 +433,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="purpose of PhoA">
 		<param name="Name" value="Purpose of the program">
-		<param name="Local" value="intro.html">
+		<param name="Local" value="general-intro.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="rebuild thumbnails">
@@ -443,12 +443,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="resampling">
 		<param name="Name" value="Resampling">
-		<param name="Local" value="theory-resampling.html">
+		<param name="Local" value="info-resampling.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="revision">
 		<param name="Name" value="Revision History">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="rolling back changes (see undo)">
@@ -527,7 +527,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="system requirements">
 		<param name="Name" value="System requirements">
-		<param name="Local" value="requirements.html">
+		<param name="Local" value="general-requirements.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="thumbnails">
@@ -538,7 +538,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="description">
 			<param name="Name" value="Thumbnails">
-			<param name="Local" value="thumbnails.html">
+			<param name="Local" value="general-thumbnails.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="dimensions">
@@ -580,17 +580,17 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="description">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html">
+			<param name="Local" value="info-tools.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="file masks">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html#masks">
+			<param name="Local" value="info-tools.html#masks">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="kinds">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html#tool-kinds">
+			<param name="Local" value="info-tools.html#tool-kinds">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="properties dialog">
@@ -600,24 +600,24 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="usage">
 			<param name="Name" value="Tools">
-			<param name="Local" value="theory-tools.html#usages">
+			<param name="Local" value="info-tools.html#usages">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="transformations">
 		<param name="Name" value="Transformations">
-		<param name="Local" value="theory-transform.html">
+		<param name="Local" value="info-transform.html">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="flips">
 			<param name="Name" value="Transformations">
-			<param name="Local" value="theory-transform.html#flips">
+			<param name="Local" value="info-transform.html#flips">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="rotation">
 			<param name="Name" value="Transformations">
-			<param name="Local" value="theory-transform.html#rotation">
+			<param name="Local" value="info-transform.html#rotation">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -628,7 +628,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="version">
 		<param name="Name" value="Revision History">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="view">
@@ -662,12 +662,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="website">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="what's new">
 		<param name="Name" value="Revision History">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 </UL>
 </BODY></HTML>

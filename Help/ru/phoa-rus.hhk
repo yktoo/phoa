@@ -8,12 +8,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="copyright">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="disclaimer">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="drag'n'drop">
@@ -23,12 +23,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="FAQ">
 		<param name="Name" value="FAQ (часто задаваемые вопросы)">
-		<param name="Local" value="faq.html">
+		<param name="Local" value="info-faq.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="license agreement">
 		<param name="Name" value="License Agreement">
-		<param name="Local" value="eula-eng.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="PhoA">
@@ -38,27 +38,27 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
 		<param name="Name" value="Автозаполнение свойств изображений">
-		<param name="Local" value="pic-prop-autofill.html">
+		<param name="Local" value="info-pic-prop-autofill.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&eth;&ntilde;&ecirc;&icirc;&aring; &iuml;&eth;&agrave;&acirc;&icirc;">
 		<param name="Name" value="Лицензионное соглашение">
-		<param name="Local" value="eula-rus.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&acirc;&aring;&eth;&ntilde;&egrave;&yuml;">
 		<param name="Name" value="История версий">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&atilde;&eth;&agrave;&ocirc;&egrave;&divide;&aring;&ntilde;&ecirc;&egrave;&aring; &ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc;">
 		<param name="Name" value="Форматы файлов">
-		<param name="Local" value="file-formats.html">
+		<param name="Local" value="general-file-formats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&atilde;&eth;&oacute;&iuml;&iuml;&agrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 		<param name="Name" value="Как это работает">
-		<param name="Local" value="how-it-works.html">
+		<param name="Local" value="general-how-it-works.html">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
@@ -70,7 +70,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&auml;&agrave;&iacute;&iacute;&ucirc;&aring; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 		<param name="Name" value="Данные изображений">
-		<param name="Local" value="pic-data.html">
+		<param name="Local" value="general-pic-data.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
@@ -91,12 +91,12 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
 			<param name="Name" value="Автозаполнение свойств изображений">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
 			<param name="Name" value="Данные изображений">
-			<param name="Local" value="pic-data.html">
+			<param name="Local" value="general-pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&auml;&icirc;&aacute;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&aring; &acirc; &ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
@@ -143,17 +143,17 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&acirc;&egrave;&auml;&ucirc;">
 			<param name="Name" value="Инструменты">
-			<param name="Local" value="theory-tools.html#tool-kinds">
+			<param name="Local" value="info-tools.html#tool-kinds">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&egrave;&ntilde;&iuml;&icirc;&euml;&uuml;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&aring;">
 			<param name="Name" value="Инструменты">
-			<param name="Local" value="theory-tools.html#usages">
+			<param name="Local" value="info-tools.html#usages">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
 			<param name="Name" value="Инструменты">
-			<param name="Local" value="theory-tools.html#masks">
+			<param name="Local" value="info-tools.html#masks">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave;">
@@ -168,13 +168,13 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
 			<param name="Name" value="Инструменты">
-			<param name="Local" value="theory-tools.html">
+			<param name="Local" value="info-tools.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&egrave;&ntilde;&ograve;&icirc;&eth;&egrave;&yuml;">
 		<param name="Name" value="История версий">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&egrave;&ntilde;&ograve;&icirc;&eth;&egrave;&yuml; &egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&eacute;">
@@ -211,7 +211,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&euml;&egrave;&ouml;&aring;&iacute;&ccedil;&egrave;&icirc;&iacute;&iacute;&icirc;&aring; &ntilde;&icirc;&atilde;&euml;&agrave;&oslash;&aring;&iacute;&egrave;&aring;">
 		<param name="Name" value="Лицензионное соглашение">
-		<param name="Local" value="eula-rus.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
@@ -226,22 +226,22 @@
 			<param name="Name" value="Мастер добавления изображения :: Выбор файлов">
 			<param name="Local" value="intf-pic-add-selfiles.html">
 			<param name="Name" value="Инструменты">
-			<param name="Local" value="theory-tools.html">
+			<param name="Local" value="info-tools.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&icirc;&iuml;&eth;&aring;&auml;&aring;&euml;&aring;&iacute;&egrave;&aring; &egrave; &iacute;&agrave;&ccedil;&iacute;&agrave;&divide;&aring;&iacute;&egrave;&aring;">
 			<param name="Name" value="Маски файлов">
-			<param name="Local" value="theory-file-masks.html">
+			<param name="Local" value="info-file-masks.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&eth;&agrave;&acirc;&egrave;&euml;&agrave; &ntilde;&icirc;&ntilde;&ograve;&agrave;&acirc;&euml;&aring;&iacute;&egrave;&yuml;">
 			<param name="Name" value="Правила составления масок">
-			<param name="Local" value="theory-file-masks.html#rules">
+			<param name="Local" value="info-file-masks.html#rules">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&eth;&egrave;&igrave;&aring;&eth;&ucirc;">
 			<param name="Name" value="Примеры масок">
-			<param name="Local" value="theory-file-masks.html#samples">
+			<param name="Local" value="info-file-masks.html#samples">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -275,12 +275,12 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
 			<param name="Name" value="Автозаполнение свойств изображений">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
 			<param name="Name" value="Метаданные">
-			<param name="Local" value="theory-metadata.html">
+			<param name="Local" value="info-metadata.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;">
@@ -296,7 +296,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iacute;&agrave;&ccedil;&iacute;&agrave;&divide;&aring;&iacute;&egrave;&aring; PhoA">
 		<param name="Name" value="Назначение программы">
-		<param name="Local" value="intro.html">
+		<param name="Local" value="general-intro.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
@@ -343,7 +343,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&icirc;&aacute;&iacute;&icirc;&acirc;&euml;&aring;&iacute;&egrave;&yuml; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
 		<param name="Name" value="Лицензионное соглашение">
-		<param name="Local" value="eula-rus.html">
+		<param name="Local" value="general-license.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&egrave;">
@@ -392,29 +392,29 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iuml;&eth;&aring;&egrave;&igrave;&oacute;&ugrave;&aring;&ntilde;&ograve;&acirc;&agrave; PhoA">
 		<param name="Name" value="Преимущества PhoA">
-		<param name="Local" value="advantages.html">
+		<param name="Local" value="general-advantages.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iuml;&eth;&aring;&icirc;&aacute;&eth;&agrave;&ccedil;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
 		<param name="Name" value="Преобразования">
-		<param name="Local" value="theory-transform.html">
+		<param name="Local" value="info-transform.html">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&icirc;&ograve;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
 			<param name="Name" value="Преобразования :: Отражения">
-			<param name="Local" value="theory-transform.html#flips">
+			<param name="Local" value="info-transform.html#flips">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&icirc;&acirc;&icirc;&eth;&icirc;&ograve;">
 			<param name="Name" value="Преобразования :: Поворот">
-			<param name="Local" value="theory-transform.html#rotation">
+			<param name="Local" value="info-transform.html#rotation">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&iuml;&eth;&egrave;&iacute;&ouml;&egrave;&iuml;&ucirc; &eth;&agrave;&aacute;&icirc;&ograve;&ucirc; PhoA">
 		<param name="Name" value="Как это работает">
-		<param name="Local" value="how-it-works.html">
+		<param name="Local" value="general-how-it-works.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave; &icirc;&aacute;&ccedil;&icirc;&eth;&agrave;">
@@ -435,12 +435,12 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave;&ucirc; &eth;&agrave;&aacute;&icirc;&ograve;&ucirc; &iuml;&eth;&icirc;&atilde;&eth;&agrave;&igrave;&igrave;&ucirc;">
 		<param name="Name" value="Режимы работы программы">
-		<param name="Local" value="major-modes.html">
+		<param name="Local" value="general-major-modes.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&eth;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">
 		<param name="Name" value="Ресэмплинг">
-		<param name="Local" value="theory-resampling.html">
+		<param name="Local" value="info-resampling.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;&agrave;">
@@ -451,7 +451,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&agrave;&acirc;&ograve;&icirc;&ccedil;&agrave;&iuml;&icirc;&euml;&iacute;&aring;&iacute;&egrave;&aring;">
 			<param name="Name" value="Автозаполнение свойств изображений">
-			<param name="Local" value="pic-prop-autofill.html">
+			<param name="Local" value="info-pic-prop-autofill.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&atilde;&eth;&oacute;&iuml;&iuml;&ucirc;">
@@ -482,7 +482,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&egrave;&ntilde;&ograve;&aring;&igrave;&iacute;&ucirc;&aring; &ograve;&eth;&aring;&aacute;&icirc;&acirc;&agrave;&iacute;&egrave;&yuml;">
 		<param name="Name" value="Системные требования">
-		<param name="Local" value="requirements.html">
+		<param name="Local" value="general-requirements.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ntilde;&icirc;&ccedil;&auml;&agrave;&iacute;&egrave;&aring; CD/DVD">
@@ -562,7 +562,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&icirc;&auml;&auml;&aring;&eth;&aelig;&egrave;&acirc;&agrave;&aring;&igrave;&ucirc;&aring; &ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc;">
 			<param name="Name" value="Форматы файлов">
-			<param name="Local" value="file-formats.html">
+			<param name="Local" value="general-file-formats.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc;">
@@ -583,7 +583,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ocirc;&icirc;&eth;&igrave;&agrave;&ograve;&ucirc; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
 		<param name="Name" value="Форматы файлов">
-		<param name="Local" value="file-formats.html">
+		<param name="Local" value="general-file-formats.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&ocirc;&icirc;&ograve;&icirc;&agrave;&euml;&uuml;&aacute;&icirc;&igrave;">
@@ -620,7 +620,7 @@
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&divide;&ograve;&icirc; &iacute;&icirc;&acirc;&icirc;&atilde;&icirc;">
 		<param name="Name" value="История версий">
-		<param name="Local" value="rev-history.html">
+		<param name="Local" value="general-rev-history.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&yacute;&ntilde;&ecirc;&egrave;&ccedil;&ucirc;">
@@ -636,7 +636,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&icirc;&iuml;&egrave;&ntilde;&agrave;&iacute;&egrave;&aring;">
 			<param name="Name" value="Эскизы">
-			<param name="Local" value="thumbnails.html">
+			<param name="Local" value="general-thumbnails.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&iuml;&aring;&eth;&aring;&ntilde;&ograve;&eth;&icirc;&eacute;&ecirc;&agrave;">

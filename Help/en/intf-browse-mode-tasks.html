@@ -1,11 +1,11 @@
-<!-- $Id: intf-browse-mode-tasks.html,v 1.5 2004-11-07 17:31:17 dale Exp $ -->
+<!-- $Id: intf-browse-mode-tasks.html,v 1.6 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_en:Working in the browse mode]}
 
 <p align=justify>The most common tasks were discussed in <a href="intf-browse-mode-menu.html">Browse mode menu commands chapter</a>. I'd like
  to highlight here more specific <b>PhoA</b> topics.
 
 {[%hh_h2:<a name=picdata>Picture data</a>]}
-<p align=justify>As was mentioned in <a href="how-it-works.html">the lyrical part</a>, the program stores picture list independently (to be precise,
+<p align=justify>As was mentioned in <a href="general-how-it-works.html">the lyrical part</a>, the program stores picture list independently (to be precise,
   this is the list elements of which are links to picture files holding the description, thumbnails etc). The group tree is also being stored
   independently. Each single group holds a set of links to pictures so when you <a href="intf-pic-add.html">add a file to the group</a>
   (you work with pictures only by using files), and the file is already being used and described somewhere in the photo alubm the program
@@ -46,25 +46,25 @@
     <td nowrap>Operations available</td>
   </tr>
   <tr>
-    <td><b>PhoA pictures</b></td>
-    <td>An internal program format supporting all the picture properties</td>
+    <td class=command><b>PhoA</b> pictures</td>
+    <td>An internal program format supporting all the picture properties.</td>
     <td>Copy, Cut, Paste</td>
   </tr>
   <tr>
-    <td><b>Picture files</b></td>
+    <td class=command>Picture files</td>
     <td>A system (shell) file format. Files placed to the clipboard can be pasted into any disk folder in Explorer, or any other program supporting file
-        operations</td>
+        operations.</td>
     <td>Copy, Cut</td>
   </tr>
   <tr>
-    <td><b>Picture file paths</b></td>
-    <td>A plain text list of full paths to the picture files. The list placed to the clipboard can be pasted in any text editor</td>
+    <td class=command>Picture file paths</td>
+    <td>A plain text list of full paths to the picture files. The list placed to the clipboard can be pasted in any text editor.</td>
     <td>Copy, Cut</td>
   </tr>
   <tr>
-    <td><b>Thumbnail bitmap</b></td>
+    <td class=command>Thumbnail bitmap</td>
     <td>A regular bitmap image of the thumbnail currently selected. The bitmap is placed into the clipboard only if there's a single picture selected.
-        The image placed to the clipboard can be pasted in any graphic editor</td>
+        The image placed to the clipboard can be pasted in any graphic editor.</td>
     <td>Copy, Cut (for a single picture only)</td>
   </tr>
 </table>

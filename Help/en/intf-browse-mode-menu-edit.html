@@ -1,4 +1,4 @@
-<!-- $Id: intf-browse-mode-menu-edit.html,v 1.2 2004-11-02 21:17:49 dale Exp $ -->
+<!-- $Id: intf-browse-mode-menu-edit.html,v 1.3 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_en:Browse mode menu commands :: Edit menu]}
 
 <p align=justify>This menu contains the photo album editing commands, and also commands for switching to the View mode.
@@ -9,41 +9,41 @@
     <td nowrap>Description</td>
   </tr>
   <tr>
-    <td><a name=undo></a><b>{[%hh_ii:Undo]} Undo <i>operation</i></b></td>
+    <td class=command><a name=undo></a>{[%hh_ii:Undo]} Undo <i>operation</i></td>
     <td>Rolls back the changes to the photo album caused by indicated (the most recent) operation.</td>
   </tr>
   <tr>
-    <td><a name=undo_history></a><b>{[%hh_ii:UndoHistory]} Undo history</b></td>
+    <td class=command><a name=undo_history></a>{[%hh_ii:UndoHistory]} Undo history</td>
     <td>Contains the list of changes made allowing you to roll back a number of sequential changes at once.</td>
   </tr>
   <tr>
-    <td><a name=cut></a><b>{[%hh_ii:Cut]} Cut</b></td>
+    <td class=command><a name=cut></a>{[%hh_ii:Cut]} Cut</td>
     <td>Removes highlighted pictures and places them into the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>
         (you can add them later to another picture group).</td>
   </tr>
   <tr>
-    <td><a name=copy></a><b>{[%hh_ii:Copy]} Copy</b></td>
+    <td class=command><a name=copy></a>{[%hh_ii:Copy]} Copy</td>
     <td>Copies highlighted pictures to the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a>.</td>
   </tr>
   <tr>
-    <td><a name=paste></a><b>{[%hh_ii:Paste]} Paste</b></td>
+    <td class=command><a name=paste></a>{[%hh_ii:Paste]} Paste</td>
     <td>Adds pictures contained in the <a href="intf-browse-mode-tasks.html#clipboard">clipboard</a> (if any) to the current group.
         Obviously, you can only add new pictures to a group so any duplicate is skipped. If this is specified in the
         <a href="setup-dialogs.html">program settings</a>, <b>PhoA</b> notifies you of number of the pictures actually pasted.</td>
   </tr>
   <tr>
-    <td><a name=new_group></a><b>{[%hh_ii:NewGroup]} Add group</b></td>
+    <td class=command><a name=new_group></a>{[%hh_ii:NewGroup]} Add group</td>
     <td>Adds a new picture group. A group is created as a child to the group currently highlighted. Thus, when the
         photo album node is highlighted, a group is created in the photo album's root directory. The default group name
         is &quot;New group&quot;, you change it by editing it and pressing <b>Enter</b>.</td>
   </tr>
   <tr>
-    <td><a name=new_pics></a><b>{[%hh_ii:NewPic]} Add pictures...</b></td>
+    <td class=command><a name=new_pics></a>{[%hh_ii:NewPic]} Add pictures...</td>
     <td>Invokes the <a href="intf-pic-add.html">Add pictures wizard</a> allowing you to add pictures (i.&nbsp;e. files) to the
         photo album.</td>
   </tr>
   <tr>
-    <td><a name=delete></a><b>{[%hh_ii:Delete]} Delete</b></td>
+    <td class=command><a name=delete></a>{[%hh_ii:Delete]} Delete</td>
     <td>
       <ul>
         <li>When group tree is active: remove the current group.</li>
@@ -52,7 +52,7 @@
     </td>
   </tr>
   <tr>
-    <td><a name=edit></a><b>{[%hh_ii:Edit]} Edit...</b></td>
+    <td class=command><a name=edit></a>{[%hh_ii:Edit]} Edit...</td>
     <td>
       <ul>
         <li>When the <i>photo album</i> is selected in the group tree (the root node when picture groups are displayed), this
@@ -69,25 +69,25 @@
     </td>
   </tr>
   <tr>
-    <td><a name=sort></a><b>{[%hh_ii:Sort]} Sort pictures...</b></td>
+    <td class=command><a name=sort></a>{[%hh_ii:Sort]} Sort pictures...</td>
     <td>Arrange (sort) pictures in the current group, or in all photo album groups using the <a href="intf-sort-pics.html">Sort
         pictures dialog</a>.</td>
   </tr>
   <tr>
-    <td><a name=select_all></a><b>{[%hh_ii:SelectAll]} Select all</b></td>
+    <td class=command><a name=select_all></a>{[%hh_ii:SelectAll]} Select all</td>
     <td>Selects all the pictures in the current group.</td>
   </tr>
   <tr>
-    <td><a name=select_none></a><b>{[%hh_ii:SelectNone]} Select none</b></td>
+    <td class=command><a name=select_none></a>{[%hh_ii:SelectNone]} Select none</td>
     <td>Deselects all the selected pictures.</td>
   </tr>
   <tr>
-    <td><a name=view_mode></a><b>{[%hh_ii:ViewMode]} View</b></td>
+    <td class=command><a name=view_mode></a>{[%hh_ii:ViewMode]} View</td>
     <td>Enters the program into the <a href="intf-view-mode.html">View mode</a>. You can also enter the View mode by
         double-clicking a picture, or pressing <b>Enter</b> when thumbnail window is active.</td>
   </tr>
   <tr>
-    <td><a name=slide_show></a><b>{[%hh_ii:SlideShow]} View slide show</b></td>
+    <td class=command><a name=slide_show></a>{[%hh_ii:SlideShow]} View slide show</td>
     <td>Enters the <a href="intf-view-mode.html">View mode</a> and turns the slide show on.</td>
   </tr>
 </table>

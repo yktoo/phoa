@@ -1,111 +1,111 @@
-<!-- $Id: setup-view-mode.html,v 1.6 2004-11-08 10:16:39 dale Exp $ -->
+<!-- $Id: setup-view-mode.html,v 1.7 2004-11-10 10:35:24 dale Exp $ -->
 {[%hh_hdr_en:Program settings :: View mode]}
 
 <table class=plain border=0><tr>
-  <td><b>View window always on top</b></td>
+  <td class=command>View window always on top</td>
   <td>Does not allow the window to fall behind other windows when it's inactive. Affects only the window mode.</td>
 </tr>
 <tr>
-  <td><b>Fullscreen mode</b></td>
+  <td class=command>Fullscreen mode</td>
   <td>When entering view mode the program will set up the fullscreen mode when all other screen elements are hidden
       (including the Taskbar). This can be overriden with the <b>F</b> key or by clicking middle mouse button.</td>
 </tr>
 <tr>
-  <td><b>Keep mouse cursor over the toolbar button on window resize</b></td>
+  <td class=command>Keep mouse cursor over the toolbar button on window resize</td>
   <td>If on, the mouse cursor stays at the same point of the viewer toolbar when the window resizes. This allows you to
       click buttons (such as <b>Next picture</b> or <b>Zoom out</b>) multiple times without having to move the
       mouse.</td>
 </tr>
 <tr>
-  <td><b>Hide mouse cursor in fullscreen</b></td>
+  <td class=command>Hide mouse cursor in fullscreen</td>
   <td>When entering fullscreen mode the program will turn off mouse pointer.</td>
 </tr>
 <tr>
-  <td><b>Window background color</b></td>
+  <td class=command>Window background color</td>
   <td>Determines color for filling the viewing window background. The default is black.</td>
 </tr>
 <tr>
-  <td><b>Show toolbar</b></td>
+  <td class=command>Show toolbar</td>
   <td>Enables or disables view mode toolbar.</td>
 </tr>
 <tr class=tblhdr><td colspan=2><b>Picture advancing</b></td></tr>
 <tr>
-  <td><b>Fit window to image</b></td>
+  <td class=command>Fit window to image</td>
   <td>Resizes window so that it fits the picture (considering current scale). Affects only the window mode.</td>
 </tr>
 <tr>
-  <td><b>Center window on the desktop</b></td>
+  <td class=command>Center window on the desktop</td>
   <td>Places viewing window in the center of the desktop. Affects only the window mode.</td>
 </tr>
 <tr>
-  <td><b>Shrink image to fit</b></td>
+  <td class=command>Shrink image to fit</td>
   <td>If a picture is larger than the viewing window, it will be proportionally reduced (to fit the window).</td>
 </tr>
 <tr>
-  <td><b>Zoom image to fit</b></td>
+  <td class=command>Zoom image to fit</td>
   <td>If a picture is smaller than the viewing window, it will be proportionally enlarged (to fit the window).</td>
 </tr>
 <tr>
-  <td><b>Cyclic viewing</b></td>
+  <td class=command>Cyclic viewing</td>
   <td>If on, the viewing sequence wraps around.</td>
 </tr>
 <tr>
-  <td><b>Predecode next picture in advance</b></td>
+  <td class=command>Predecode next picture in advance</td>
   <td>This option enables background picture decoding thus allowing quick advancing to the next picture (next picture is
       being decoded while viewing current one). This mode requires more memory for storing predecoded image data.</td>
 </tr>
 <tr>
-  <td><b>Cache behind viewed pictures</b></td>
+  <td class=command>Cache behind viewed pictures</td>
   <td>If this option is enabled, last viewed picture is not removed from the memory thus allowing you to quckly revert
       to previous picture. This mode requires more memory for storing cached image data.</td>
 </tr>
 <tr>
-  <td><b>Scale by</b></td>
+  <td class=command>Scale by</td>
   <td>Determines the one step of scaling change (with <b>+</b> and <b>-</b> keys on numeric keypad or with mouse wheel
       when <b>Ctrl</b> depressed).</td>
 </tr>
 <tr>
-  <td><b>Display in window caption</b></td>
-  <td>Allows you to choose which <a href="pic-data.html">picture properties</a> are to be displayed in the window
+  <td class=command>Display in window caption</td>
+  <td>Allows you to choose which <a href="general-pic-data.html">picture properties</a> are to be displayed in the window
       caption bar.</td>
 </tr>
 <tr>
-  <td><b>Picture resampling filter</b></td>
-  <td>Determines interpolation filter used for <a href="theory-resampling.html">resampling</a> (scaling) source images
+  <td class=command>Picture resampling filter</td>
+  <td>Determines interpolation filter used for <a href="info-resampling.html">resampling</a> (scaling) source images
       when viewing them.</td>
 </tr>
 <tr class=tblhdr><td colspan=2><b>View info</b></td></tr>
 <tr>
-  <td><b>Show picture info</b></td>
+  <td class=command>Show picture info</td>
   <td>Enables or disables displaying the information from the properties described below. Can be overriden in the view
       mode by pressing the <b>F2</b> key.</td>
 </tr>
 <tr>
-  <td><b>Picture properties</b></td>
-  <td>Specifies which <a href="pic-data.html">picture properties</a> will be shown in the view mode.</td>
+  <td class=command>Picture properties</td>
+  <td>Specifies which <a href="general-pic-data.html">picture properties</a> will be shown in the view mode.</td>
 </tr>
 <tr>
-  <td><b>Font</b></td>
+  <td class=command>Font</td>
   <td>Determines which font will be used for drawing the picture info.</td>
 </tr>
 <tr>
-  <td><b>Background color</b></td>
+  <td class=command>Background color</td>
   <td>Specifies the color of information bar background. See the next option.</td>
 </tr>
 <tr>
-  <td><b>Background opacity</b></td>
+  <td class=command>Background opacity</td>
   <td>Value ranging from 0 (transparent) to 255 (opaque). Allows to adjust the translucence of information bar
       background.</td>
 </tr>
 <tr class=tblhdr><td colspan=2><b>Slide show</b></td>
 </tr>
 <tr>
-  <td><b>Display time</b></td>
+  <td class=command>Display time</td>
   <td>Determines time intervals (in milliseconds) between picture changes in Slide Show mode (this mode is activated
       by pressing the <b>Pause</b> key in the view mode, with the toolbar button or by context menu).</td>
 </tr>
 <tr>
-  <td><b>Cyclic</b></td>
+  <td class=command>Cyclic</td>
   <td>When on, <b>PhoA</b> automatically rewinds to the first picture in the group after showing the last in Slide Show
       mode, else Slide Show is deactivated once the last picture is reached.</td>
 </tr>

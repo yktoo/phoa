@@ -1,0 +1,181 @@
+<!-- $Id: general-pic-data.html,v 1.1 2004-11-10 10:35:24 dale Exp $ -->
+{[%hh_hdr_en:Picture data]}
+
+<p align=justify>The current version of <b>PhoA</b> allows storage, retrieval and editing (if a field is editable) the following data for each
+  picture. Moreover, if a field is marked as searchable you may <a href="intf-search.html">search</a> pictures by its data.
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Name</td>
+    <td nowrap>Data type</td>
+    <td nowrap>Editable</td>
+    <td nowrap>Searchable</td>
+    <td nowrap>Description</td>
+  </tr>
+  <tr>
+    <td class=command>ID</td>
+    <td>Ordinal</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Internal unique picture identifier. In the photo album always has the only corresponding file name. Used for identifying the picture, and
+        for creating links to it.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture file name</td>
+    <td>Filename string</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Picture file name (without path)</td>
+  </tr>
+  <tr>
+    <td class=command>Full picture file name</td>
+    <td>Filename string</td>
+    <td>No</td>
+    <td>No</td>
+    <td>Picture file name with path. Full file name is an unique value among all photo album pictures.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture file path</td>
+    <td>String</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Only path part of full picture file name.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture file size</td>
+    <td>String</td>
+    <td>No</td>
+    <td>No</td>
+    <td>&quot;Human readable&quot; representation of picture file size, eg <i>212,45 Kbytes</i> or <i>839 bytes</i>.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture file size in bytes</td>
+    <td>Integer</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Picture file size expressed in bytes, eg <i>678233</i>.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture width</td>
+    <td>Integer</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Picture width in pixels.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture height</td>
+    <td>Integer</td>
+    <td>No</td>
+    <td>Yes</td>
+    <td>Picture height in pixels.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture dimensions</td>
+    <td>String</td>
+    <td>No</td>
+    <td>No</td>
+    <td>Pixel dimensions in pixels represented in form <i>Width x Height</i>, eg <i>1024x768</i>.</td>
+  </tr>
+  <tr>
+    <td class=command>Picture format</td>
+    <td>Pixel format</td>
+    <td>No</td>
+    <td>No</td>
+    <td>Pixel format of the image, eg <i>1-bit (monochrome)</i> or <i>Device dependent</i>.</td>
+  </tr>
+  <tr>
+    <td class=command>Date</td>
+    <td>Date</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Date of events on the picture, ranged from Jan 1, 0001 to Dec 31, 9999.</td>
+  </tr>
+  <tr>
+    <td class=command>Time</td>
+    <td>Time</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Time of events on the picture, ranged from 00:00:01 (value of 00:00:00 assumed to be no value) to 23:59:59.</td>
+  </tr>
+  <tr>
+    <td class=command>Place</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Place of the picture.</td>
+  </tr>
+  <tr>
+    <td class=command>Film number or name</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>If the picture was taken with film camera - number assigned to the film containing picture when it was being developed (unique as a rule), 
+        or name given to it by you.</td>
+  </tr>
+  <tr>
+    <td class=command>Frame number</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>If the picture was taken with film camera - number of frame with the picture, eg <i>20</i> or <i>4A</i>.</td>
+  </tr>
+  <tr>
+    <td class=command>Author</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Author's or photographer's, which made the picture, name.</td>
+  </tr>
+  <tr>
+    <td class=command>Media name or code</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Name of the media containing picture file (eg, CD-ROM number).</td>
+  </tr>
+  <tr>
+    <td class=command>Keywords</td>
+    <td>String list</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>List of keywords regarding the picture - people or things, for exapmle. Always alphabetically sorted, comparison is always case
+        insensitive.</td>
+  </tr>    
+  <tr>
+    <td class=command>Description</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Brief description of what is picture displays, designated to be shown while viewing (the recommended purpose).</td>
+  </tr>
+  <tr>
+    <td class=command>Notes</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Any data not contained in other fields.</td>
+  </tr>
+  <tr>
+    <td class=command>Rotation</td>
+    <td>Angle</td>
+    <td>Yes</td>
+    <td>No</td>
+    <td>An image rotation angle for viewing, a multiple of 90&deg;. Refer to <a href="info-transform.html#rotation">Transformations</a>
+        for details.</td>
+  </tr>
+  <tr>
+    <td class=command>Flips</td>
+    <td>Flag set</td>
+    <td>Yes</td>
+    <td>No</td>
+    <td>A set of flags determining the applied picture flips for viewing: [Horizontal, Vertical]. Refer to
+        <a href="info-transform.html#flips">Transformations</a> for details.</td>
+  </tr>
+</table>
+
+{[%hh_seealso_en]}
+  <a href="intf-browse-mode.html">Browse mode</a><br>
+  <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
+  <a href="intf-search.html">Find pictures dialog</a><br>
+  <a href="intf-pic-props.html">Edit pictures dialog</a><br>
+
+{[%hh_ftr_en]}

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.68 2004-11-04 18:54:37 dale Exp $
+//  $Id: Main.pas,v 1.69 2004-11-10 10:35:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -558,7 +558,7 @@ uses
 
   procedure TfMain.aaHelpFAQ(Sender: TObject);
   begin
-    HtmlHelpContext(IDH_faq);
+    HtmlHelpContext(IDH_info_faq);
   end;
 
   procedure TfMain.aaHelpProductWebsite(Sender: TObject);

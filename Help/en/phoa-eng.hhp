@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-eng.hhp,v 1.10 2004-11-08 19:23:36 dale Exp $
+;   $Id: phoa-eng.hhp,v 1.11 2004-11-10 10:35:24 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -18,21 +18,32 @@ Language=0x409 Английский (США)
 Title=PhoA Help System
 
 [FILES]
-advantages.html
-eula-eng.html
-eula-rus.html
-faq.html
-file-formats.html
-how-it-works.html
+general-advantages.html
+general-file-formats.html
+general-how-it-works.html
+general-intro.html
+general-license.html
+general-major-modes.html
+general-pic-data.html
+general-requirements.html
+general-rev-history.html
+general-thumbnails.html
 info-cmd-line.html
+info-faq.html
+info-file-masks.html
+info-metadata.html
+info-pic-prop-autofill.html
+info-resampling.html
+info-tools.html
+info-transform.html
 intf-album-props.html
 intf-browse-mode.html
 intf-browse-mode-menu.html
-intf-browse-mode-menu-file.html
 intf-browse-mode-menu-edit.html
-intf-browse-mode-menu-view.html
-intf-browse-mode-menu-tools.html
+intf-browse-mode-menu-file.html
 intf-browse-mode-menu-help.html
+intf-browse-mode-menu-tools.html
+intf-browse-mode-menu-view.html
 intf-browse-mode-tasks.html
 intf-browse-mode-views.html
 intf-controls.html
@@ -86,12 +97,6 @@ intf-view-mode-menu-view.html
 intf-view-mode-menu-zoom.html
 intf-view-mode-tasks.html
 intf-view-props.html
-intro.html
-major-modes.html
-pic-data.html
-pic-prop-autofill.html
-requirements.html
-rev-history.html
 setup.html
 setup-browse-mode.html
 setup-dialogs.html
@@ -100,12 +105,6 @@ setup-storing.html
 setup-tools.html
 setup-view-mode.html
 start.html
-theory-file-masks.html
-theory-metadata.html
-theory-resampling.html
-theory-tools.html
-theory-transform.html
-thumbnails.html
 
 [ALIAS]
 #include ..\..\aliases.h
