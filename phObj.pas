@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.56 2004-10-23 14:05:08 dale Exp $
+//  $Id: phObj.pas,v 1.57 2004-10-30 07:31:45 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1451,6 +1451,7 @@ type
        // Если уже есть такое в списке, вызываем Exception
       if FindKeyword(sNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'));
        // Иначе сдвигаем на новое место
+      if Index<Result then Dec(Result); 
       FList.Move(Index, Result); 
     end;
      // Настраиваем Change
