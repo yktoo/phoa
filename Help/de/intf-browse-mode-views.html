@@ -1,0 +1,61 @@
+<!-- $Id: intf-browse-mode-views.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+{[%hh_hdr_de:Arbeiten mit Ansichten]}
+
+{[%hh_h2:Einf&uuml;hrung]}
+<p align=justify>Die Fotoalbum - <b>Ansichten</b> &auml;hneln dem Fotoalbum-Gruppenverzeichnis mit dem Unterschied, dass die Gruppen vom Benutzer eingerichtet werden, w&auml;hrend die Hierarchie des Ansichten-Ordners basierend auf Bilddaten und benutzerdefinierten <b>Gruppierungen</b> automatisch erstellt wird. Eine Gruppierung ist eine logische, organisatorische Einheit der Ansichten und kann eine oder mehrere Ebenen im Ordnerverzeichnis darstellen. Beim Erstellen der Hierarchie des Ansichten-Ordners wird <i>jedes</i> Bild einer im Dialog Eigenschaften Fotoalbum Ansicht festgelegten Gruppe zugeteilt (siehe unten).
+
+{[%hh_h2:Eigenschaften Fotoalbum Ansicht]}
+<p align=justify>Wie man im <a href="intf-view-props.html">Dialog Eigenschaften Fotoalbum Ansicht</a> sieht, sind Ansichten unterteilt in Name, Gruppierungsordnung und Sortierliste.
+
+<h3>Name der Ansicht</h3>
+<p align=justify>Der Name wird vom Benutzer gew&auml;hlt und enth&auml;lt Angaben zum Inhalt der Ansicht, z.B. &quot;Nach Ort und Datum&quot;.
+
+<h3>Gruppierungsordnung</h3>
+<p align=justify>Die vollst&auml;ndige Gruppierungsordnung kann angezeigt werden. <b>PhoA</b> unterst&uuml;tzt folgende Gruppierungsarten.
+<ul>
+  <li><b>Gruppierung nach Dateipfad</b><br>
+    Bilder werden Ordnern nach ihrer physikalischen Position zugeordnet.</li>
+  <li><b>Gruppierung nach Jahr</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Jahres enthalten. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Monat</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Monats enthalten. Meist folgt diese Gruppierung auf die Gruppierung nach Jahr, um innerhalb eines Jahres-Ordners Unterordner mit den jeweiligen Monaten des selben Jahres zu erstellen. Man kann diese Gruppierung auch eigenst&auml;ndig verwenden und so Bilder nach dem selben Monat aus unterschiedlichen Jahren ordnen. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Tag</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Tages enthalten. Meist folgt diese Gruppierung auf die Gruppierung nach Jahr und Monat, um innerhalb eines Monats-Unterordners zus&auml;tzliche Tages-Unterordner des selben Monats zu erstellen. Man kann diese Gruppierung auch eigenst&auml;ndig verwenden und so Bilder nach dem selben Tag aus unterschiedlichen Jahren und Monaten ordnen. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Stunden</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder der selben Stunde enthalten (Zeitpunkt der Entstehung des Bildes). Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Minuten</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder der selben Minute enthalten (Zeitpunkt der Entstehung des Bildes). Meist folgt diese Gruppierung auf die Gruppierung nach Stunden, um innerhalb eines Stunden-Ordners Unterordner mit der jeweiligen Minute derselben Stunde zu erstellen. Man kann diese Gruppierung auch eigenst&auml;ndig verwenden und so Bilder nach der selben Minute aus unterschiedlichen Stunden ordnen. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Ort</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Aufnahmeortes enthalten. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Filmnummer</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder der selben Filmnummer enthalten. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Autor</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Autors enthalten. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Medienname oder -code.</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder des selben Mediums enthalten. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+  <li><b>Gruppierung nach Schl&uuml;sselw&ouml;rtern</b><br>
+    Bilder werden Ordnern zugeteilt, die jeweils Bilder mit dem selben Schl&uuml;sselwort enthalten. Dementsprechend kann ein Bild in mehreren Ordnern vorkommen, wenn es mit mehreren Schl&uuml;sselw&ouml;rtern gekennzeichnet wurde. Diese Gruppierung unterst&uuml;tzt die <a href="#unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner.</a></li>
+</ul>
+
+<h3>Sortierliste</h3>
+<p align=justify>Einmal einem Ordner zugeordnet, werden die Bilder in zuf&auml;lliger Reihenfolge gespeichert. Da dies unvorteilhaft ist und die Bilder manuell nicht geordnet werden k&ouml;nnen, bietet <b>PhoA</b> die M&ouml;glichkeit, Gruppierungsergebnisse in jeder Gruppe durch Sortierungen neu zu ordnen. Dies geschieht genauso wie beim <a href="intf-sort-pics.html">Bilder Sortieren</a> im Fotoalbum.
+
+{[%hh_h2:<a name="unclassified">Zuordnung von unklassifizierten Bildern in eigenem Ordner</a>]}
+<p align=justify>Es ist nicht unbedingt notwendig, ein Bild vollst&auml;ndig zu beschreiben. Da jedoch beim Erstellen einer Ansicht jedes Bild verarbeitet und in die Ansicht eingef&uuml;gt wird (siehe oben), gibt es zwei Arten, nicht klassifizierte Bilder zu verwalten, also Bilder, die keine Angaben zu den jeweiligen Gruppierungskriterien enthalten (z.B. kein Datum bei der Gruppierung nach Datum, keine Ortsangabe bei der Gruppierung nach Aufnahmeort, ...):
+<ul>
+  <li>Ist in einer Gruppierung das Kontrollk&auml;stchen &quot;Unklassifizierte Bilder in eigenen Ordner&quot; aktiv, werden die Bilder im jeweiligen Ordner abgelegt (&quot;kein Datum&quot;, &quot;kein Ort&quot;, ...). Die Ordnerebene ist dieselbe wie bei den restlichen, klassifizierten Ordnern.</li>
+  <li>Ist das Kontrollk&auml;stchen nicht aktiv, bleiben nicht klassifizierte Bilder in ihrem urspr&uuml;nglichen Ordner, es wird f&uuml;r sie kein gesonderter Ordner erstellt. Beispiel: ist das Kontrollk&auml;stchen in der Gruppierung nach Datum nicht aktiv, bleibt das Bild im Hauptordner (Ansichten-Ordner). &Ouml;ffnet man dann die Gruppierung nach Aufnahmeort und aktiviert das Kontrollk&auml;stchen, bleibt der &quot;Kein Ort&quot;-Ordner im Hauptordner, wo auch das Bild abgelegt wird. Die restlichen Ordner (mit Ortsangabe) werden im Datum-Ordner erstellt. Die Klassifizierung der Bilder nach Ortsangabe erfolgt also auf verschiedenen Ordnerebenen. </li>
+</ul>
+<p align=justify>Diese Funktion l&auml;sst sich auf Gruppierungen nach Dateipfad nicht anwenden, da es keine Bilder ohne Datei gibt und keine Dateien ohne Zugriffspfad.
+
+{[%hh_h2:Kopieren von Ansichten-Ordnern in das Fotoalbum]}
+<p align=justify><b>PhoA</b> bietet die M&ouml;glichkeit, erstellte Ordner und Bildstrukturen als gew&ouml;hnliche Fotoalbum-Gruppen zu kopieren. Dazu w&auml;hlen Sie im Men&uuml; <b>Anzeigen | Gruppe erstellen...</b> und w&auml;hlen dann im Dialogfeld <a href="intf-sel-phoa-group.html">Gruppe ausw&auml;hlen</a> die Gruppe, in die Sie die Ansichten-Ordner kopieren wollen.
+
+{[%hh_seealso_de]}  
+  <a href="intf-view-props.html">Dialog Eigenschaften: Fotoalbum Ansicht</a><br>
+  <a href="intf-browse-mode.html">Browser Modus</a><br>
+  <a href="intf-browse-mode-tasks.html">Arbeiten im Browser Modus</a><br>
+  <a href="intf-key-mouse-controls.html">Tastenkombinationen und Mausbefehle</a><br>
+  <a href="intf-view-mode-tasks.html">Arbeiten im Anzeigemodus</a><br>
+
+{[%hh_ftr_de]}

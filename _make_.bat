@@ -1,6 +1,6 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.6 2004-06-12 11:51:13 dale Exp $
+rem $Id: _make_.bat,v 1.7 2004-06-29 14:11:49 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -40,6 +40,7 @@ del *.ddp
 if "%1"=="app" goto success
 
 rem == Compile Help CHM project ==
+rem --- English Help
 :comphelp
 pushd
 cd Help\en
@@ -61,6 +62,7 @@ if not errorlevel == 1 goto err
 move phoa-eng.chm ..\..
 if errorlevel == 1 goto err
 
+rem --- Russian Help
 cd ..\ru
 echo.
 echo == Preprocess Help files (Russian)
@@ -79,6 +81,27 @@ echo == Compile Help CHM project (Russian)
 if not errorlevel == 1 goto err
 move phoa-rus.chm ..\..
 if errorlevel == 1 goto err
+
+rem --- German Help
+cd ..\de
+echo.
+echo == Preprocess Help files (German)
+rmdir /s /q %PREPROCESSOR_OUT%
+%PREPROCESSOR% *.html %PREPROCESSOR_CFG% %PREPROCESSOR_OUT%
+if errorlevel == 1 goto err
+copy phoa-deu.hhp ..\processed
+copy phoa-deu.hhc ..\processed
+copy phoa-deu.hhk ..\processed
+copy pic-oranization.png ..\processed
+
+cd ..\processed
+echo.
+echo == Compile Help CHM project (German)
+%HELP_COMPILER% phoa-deu.hhp
+if not errorlevel == 1 goto err
+move phoa-deu.chm ..\..
+if errorlevel == 1 goto err
+
 popd
 if "%1"=="help" goto success
 

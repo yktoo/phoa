@@ -1,0 +1,161 @@
+<!-- $Id: pic-data.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+{[%hh_hdr_de:Bildeigenschaften]}
+
+<p align=justify>Die derzeitige Version von <b>PhoA</b> erlaubt f&uuml;r jedes einzelne Bild das Speichern, Anzeigen und Bearbeiten (sofern das Feld editierbar ist) der folgenden Eigenschaften. Dar&uuml;ber hinaus kann nach Bildern auf der Grundlage dieser Eigenschaften <a href="intf-search.html">gesucht</a> werden, sofern das entsprechende Feld als Suchkriterium zugelassen ist.
+<table class=plain border=0>
+  <tr class=tblhdr>
+    <td nowrap>Name</td>
+    <td nowrap>Datentyp</td>
+    <td nowrap>editierbar</td>
+    <td nowrap>Suchkriterium</td>
+    <td nowrap>Beschreibung</td>
+  </tr>
+  <tr>
+    <td><b>ID</b></td>
+    <td>Zahl</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Interne Identifikationsnummer, einzigartig f&uuml;r jedes Bild. Im Fotoalbum ist sie jeweils mit dem entsprechenden Dateinamen verbunden und wird zur Identifikation des Bildes und zum Herstellen von Verkn&uuml;pfungen zum Bild verwendet.</td>
+  </tr>
+  <tr>
+    <td><b>Bilddateinamen</b></td>
+    <td>Zeichenfolge des Dateinamens</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Bilddateinamen (ohne Pfadangabe)</td>
+  </tr>
+  <tr>
+    <td><b>gesamter Bilddateinamen</b></td>
+    <td>Zeichenfolge des Dateinamens</td>
+    <td>Nein</td>
+    <td>Nein</td>
+    <td>Bilddateinamen mit Pfadangabe. Der gesamte Bilddateiname ist einzigartig f&uuml;r jedes Bild im Fotoalbum.</td>
+  </tr>
+  <tr>
+    <td><b>Bilddateipfad</b></td>
+    <td>Zeichenfolge</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Nur Pfadangabe des gesamten Bilddateinamen.</td>
+  </tr>
+  <tr>
+    <td><b>Bilddateigr&ouml;&szlig;e</b></td>
+    <td>Zeichenfolge</td>
+    <td>Nein</td>
+    <td>Nein</td>
+    <td>&quot;F&uuml;r den Menschen lesbare&quot; Darstellung der Bilddateigr&ouml;sse, z.B. <i>212,45 Kbytes</i> oder <i>839 Bytes</i>.</td>
+  </tr>
+  <tr>
+    <td><b>Bilddateigr&ouml;&szlig;e in Bytes</b></td>
+    <td>Integer</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Bilddateigr&ouml;&szlig;e in Bytes ausgedr&uuml;ckt, z.B.  <i>678233</i>.</td>
+  </tr>
+  <tr>
+    <td><b>Bildbreite</b></td>
+    <td>Integer</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Bildbreite in Pixel ausgedr&uuml;ckt.</td>
+  </tr>
+  <tr>
+    <td><b>Bildh&ouml;he</b></td>
+    <td>Integer</td>
+    <td>Nein</td>
+    <td>Ja</td>
+    <td>Bildh&ouml;he in Pixel ausgedr&uuml;ckt.</td>
+  </tr>
+  <tr>
+    <td><b>Bildabmessungen</b></td>
+    <td>Zeichenfolge</td>
+    <td>Nein</td>
+    <td>Nein</td>
+    <td>Bildabmessungen in Pixel ausgedr&uuml;ckt im Format <i>Breite x H&ouml;he</i>, z.B. <i>1024x768</i>.</td>
+  </tr>
+  <tr>
+    <td><b>Bildformat</b></td>
+    <td>Pixelformat</td>
+    <td>Nein</td>
+    <td>Nein</td>
+    <td>Pixelformat des Bildes, z.B. <i>1-bit (monochrome)</i> oder <i>Ger&auml;teabh&auml;ngig</i>.</td>
+  </tr>
+  <tr>
+    <td><b>Datum</b></td>
+    <td>Datum</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Datum des aufgenommenen Bildes, im Zeitraum vom 1. Januar 0001 bis zum 31. Dezember 9999.</td>
+  </tr>
+  <tr>
+    <td><b>Zeit</b></td>
+    <td>Zeit</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Zeitpunkt des aufgenommenen Bildes, im Zeitraum von 00:00:01 (der Wert 00:00:00 gilt als keine Angabe) bis 23:59:59.</td>
+  </tr>
+  <tr>
+    <td><b>Ort</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Ort an dem das Bild aufgenommen wurde.</td>
+  </tr>
+  <tr>
+    <td><b>Filmnummer oder -name</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Falls das Bild mit einer Filmkamera aufgenommen wurde - die Nummer die dem Film mit dem Bild bei der Entwicklung zugeordnet wurde (in der Regel einzigartig), oder der vergebene Name.</td>
+  </tr>
+  <tr>
+    <td><b>Frame Nummer</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Falls das Bild mit einer Filmkamera aufgenommen wurde - die Nummer des Frames mit dem Bild, z.B. <i>20</i> oder <i>4A</i>.</td>
+  </tr>
+  <tr>
+    <td><b>Autor</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Der Name des Autors bzw. Fotografen, der das Bild aufgenommen hat.</td>
+  </tr>
+  <tr>
+    <td><b>Medienname oder -code</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Name des Mediums auf dem die Bilddatei gespeichert ist (z.B., Nummer einer CD-ROM).</td>
+  </tr>
+  <tr>
+    <td><b>Schl&uuml;sselw&ouml;rter</b></td>
+    <td>Liste von Zeichenfolgen</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Liste der Schl&uuml;sselw&ouml;rter, die einem Bild zugeordnet wurden - Personen oder Sachen z.B. Immer in alphabetischer Reihenfolge, der Vergleich erfolgt unabh&auml;ngig von Gro&szlig;- oder Kleinschreibung.</td>
+  </tr>    
+  <tr>
+    <td><b>Beschreibung</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Kurze Beschreibung des Bildinhaltes, zum Anzeigen w&auml;hrend der Bildansicht (empfohlene Verwendung).</td>
+  </tr>
+  <tr>
+    <td><b>Anmerkungen</b></td>
+    <td>Zeichenfolge</td>
+    <td>Ja</td>
+    <td>Ja</td>
+    <td>Zus&auml;tzliche Informationen, die in keinem anderen Feld angegeben werden k&ouml;nnen.</td>
+  </tr>
+</table>
+
+{[%hh_seealso_de]}  
+  <a href="intf-browse-mode.html">Browser Modus</a><br>
+  <a href="intf-browse-mode-tasks.html">Arbeiten im Browser Modus</a><br>
+  <a href="intf-search.html">Dialog Bildersuche</a><br>
+  <a href="intf-pic-props.html">Dialog Bearbeiten Eigenschaften Bild</a><br>
+
+{[%hh_ftr_de]}
