@@ -300,6 +300,27 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="cbUsageViewMode">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Show in View mode popup menu"/>
+              <tranEntry langID="1049" value="Отображать в контекстном меню режима просмотра"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="dtlsMain">
         <propEntries/>
         <compEntries/>
@@ -548,7 +569,7 @@
           <propEntry name="Caption">
             <tranEntries>
               <tranEntry langID="1033" value="File &amp;masks (empty mask matches all files):"/>
-              <tranEntry langID="1049" value="М&amp;аски файлов (пустая маска значит «Все»):"/>
+              <tranEntry langID="1049" value="М&amp;аски файлов (пустая маска значит «Все файлы»):"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -569,7 +590,7 @@
           <propEntry name="Caption">
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Name (caption; use '&amp;&amp;' to indicate the shortcut key):"/>
-              <tranEntry langID="1049" value="&amp;Наименование (надпись; &quot;&amp;&amp;&quot; означает горячую клавишу):"/>
+              <tranEntry langID="1049" value="&amp;Наименование (надпись; &quot;&amp;&amp;&quot; означает гор. клавишу):"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

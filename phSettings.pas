@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.9 2004-05-01 19:32:12 dale Exp $
+//  $Id: phSettings.pas,v 1.10 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -43,6 +43,9 @@ type
      // "ѕростой" конструктор, не инициализирующий свойств, кроме Owner (используетс€ в "нормальных" конструкторах и в
      //   Assign)
     constructor CreateNew(AOwner: TPhoaSetting); virtual;
+     // Prop handlers
+    function  GetModified: Boolean; virtual;
+    procedure SetModified(Value: Boolean); virtual;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String);
     destructor Destroy; override;
@@ -67,6 +70,8 @@ type
     property ID: Integer read FID;
      // -- »ндекс настройки внутри родител€
     property Index: Integer read GetIndex write SetIndex;
+     // -- True, если значение настройки или любой из дочерних настроек модифицировано
+    property Modified: Boolean read GetModified write SetModified;
      // -- Ќаименование пункта, закодированное по правилам ConstValEx()
     property Name: String read FName;
      // -- ѕункт-владелец данного пункта
@@ -286,6 +291,18 @@ const
     if FOwner=nil then Result := 0 else Result := FOwner.FChildren.IndexOf(Self);
   end;
 
+  function TPhoaSetting.GetModified: Boolean;
+  var i: Integer;
+  begin
+    if FChildren<>nil then
+      for i := 0 to FChildren.Count-1 do
+        if GetChildren(i).Modified then begin
+          Result := True;
+          Exit;
+        end;
+    Result := False;
+  end;
+
   function TPhoaSetting.GetSettings(iID: Integer): TPhoaSetting;
   begin
     Result := FindID(iID);
@@ -328,6 +345,13 @@ const
   procedure TPhoaSetting.SetIndex(Value: Integer);
   begin
     if FOwner<>nil then FOwner.FChildren.Move(GetIndex, Value);
+  end;
+
+  procedure TPhoaSetting.SetModified(Value: Boolean);
+  var i: Integer;
+  begin
+    if FChildren<>nil then
+      for i := 0 to FChildren.Count-1 do GetChildren(i).Modified := Value;
   end;
 
    //===================================================================================================================

@@ -1,21 +1,22 @@
 inherited dSettings: TdSettings
-  Left = 532
-  Top = 322
+  Left = 468
+  Top = 296
   Caption = 'Program settings'
   ClientHeight = 435
-  ClientWidth = 592
+  ClientWidth = 632
   OldCreateOrder = True
   ShowHint = True
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
     Top = 398
-    Width = 592
+    Width = 632
   end
   object pMain: TPanel [1]
     Left = 0
     Top = 0
-    Width = 592
+    Width = 632
     Height = 398
     Align = alClient
     BevelOuter = bvNone
@@ -38,23 +39,32 @@ inherited dSettings: TdSettings
         TabOrder = 0
       end
     end
+    object pEditor: TPanel
+      Left = 27
+      Top = 0
+      Width = 605
+      Height = 398
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
+    end
   end
   inherited pButtonsBottom: TPanel
     Top = 400
-    Width = 592
+    Width = 632
     TabOrder = 1
     DesignSize = (
-      592
+      632
       35)
     inherited bCancel: TButton
-      Left = 433
+      Left = 473
       Caption = 'Close'
     end
     inherited bOK: TButton
-      Left = 353
+      Left = 393
     end
     inherited bHelp: TButton
-      Left = 511
+      Left = 551
     end
   end
   inherited dtlsMain: TDTLanguageSwitcher

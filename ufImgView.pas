@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.6 2004-04-23 19:26:30 dale Exp $
+//  $Id: ufImgView.pas,v 1.7 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -115,6 +115,8 @@ type
     aShowInfo: TAction;
     ipmShowInfo: TTBXItem;
     bShowInfo: TTBXItem;
+    ipmSep5: TTBXSeparatorItem;
+    gipmTools: TTBGroupItem;
     procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure aaNextPic(Sender: TObject);
@@ -224,6 +226,8 @@ type
     FSlideShow: Boolean;
      // Настраивает параметры окна и вычисляет базовые параметры отображения
     procedure ApplySettings;
+     // Настраивает инструменты
+    procedure ApplyTools; 
      // Настраивает видимость курсора мыши
     procedure AdjustCursorVisibility(bForceShow: Boolean);
      // Загружает и буферизирует изображение; рассчитывает коэффициенты масштабирования
@@ -245,11 +249,15 @@ type
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
      // Разрешает/запрещает Actions
     procedure EnableActions;
+     // Настраивает доступность инструментов 
+    procedure EnableTools;
      // Пересоздаёт или удаляет таймер показа слайдов
     procedure RestartShowTimer;
      // Процедуры временного убирания/восстановления стиля TOPMOST окна просмотра, если он есть
     procedure TopmostCancel;
     procedure TopmostRestore;
+     // Событие клика на пункте инструмента
+    procedure ToolItemClick(Sender: TObject);
      // События слоёв
     procedure PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
     procedure RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
@@ -293,7 +301,8 @@ type
 
 implementation
 {$R *.dfm}
-uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
+uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
+  phToolSetting;
 
   procedure ViewImage(Group: TPhoaGroup; PhoA: TPhotoAlbum; iPicIdx: Integer; UndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
@@ -577,6 +586,8 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
     ApplyToolbarSettings(dkLeft);
     ApplyToolbarSettings(dkRight);
     ApplyToolbarSettings(dkBottom);
+     // Настраиваем инструменты
+    ApplyTools; 
      // Настраиваем установки текущей сессии
     RedisplayLock;
     try
@@ -585,6 +596,20 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
     finally
        // Этот вызов загружает изображение
       RedisplayUnlock(True);
+    end;
+  end;
+
+  procedure TfImgView.ApplyTools;
+  var
+    i: Integer;
+    Tool: TPhoaToolSetting;
+  begin
+     // Всё стираем
+    gipmTools.Clear;
+     // Добавляем инструменты
+    for i := 0 to RootSetting.Settings[ISettingID_Tools].ChildCount-1 do begin
+      Tool := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
+      if ptuViewModePopupMenu in Tool.Usages then AddToolItem(Tool, gipmTools, ToolItemClick);
     end;
   end;
 
@@ -842,6 +867,22 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
     aZoomOut.Enabled    := not FErroneous and (ZoomFactor>SMinPicZoom);
     aZoomFit.Enabled    := not FErroneous and (ZoomFactor<>FBestFitZoomFactor);
     aZoomActual.Enabled := not FErroneous and (ZoomFactor<>1.0);
+     // Настраиваем инструменты
+    EnableTools;
+  end;
+
+  procedure TfImgView.EnableTools;
+  var PicLinks: TPhoaPicLinks;
+  begin
+    PicLinks := TPhoaPicLinks.Create(True);
+    try
+       // Добавляем просматриваемое изображение
+      if not FErroneous then PicLinks.Add(FPic);
+       // Настраиваем инструменты
+      AdjustToolAvailability(gipmTools, PicLinks);
+    finally
+      PicLinks.Free;
+    end;
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1079,6 +1120,23 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
   procedure TfImgView.tbMainVisibleChanged(Sender: TObject);
   begin
     SetSettingValueBool(ISettingID_View_ShowToolbar, tbMain.Visible);
+  end;
+
+  procedure TfImgView.ToolItemClick(Sender: TObject);
+  var PicLinks: TPhoaPicLinks;
+  begin
+    if not FErroneous then begin
+       // Создаём массив ссылок на изображения
+      PicLinks := TPhoaPicLinks.Create(True);
+      try
+         // Добавляем просматриваемое изображение
+        PicLinks.Add(FPic);
+         // Выполняем инструмент
+        TPhoaToolSetting(TComponent(Sender).Tag).Execute(PicLinks);
+      finally
+        PicLinks.Free;
+      end;
+    end;
   end;
 
   procedure TfImgView.TopmostCancel;

@@ -555,11 +555,11 @@
       </propEntry>
       <propEntry name="ISettingID_Browse">
         <tranEntries>
-          <tranEntry langID="1049" value="Режим обзора"/>
-          <tranEntry langID="1033" value="Browse mode"/>
-          <tranEntry langID="1031" value="Browser Modus"/>
-          <tranEntry langID="1046" value="Modo de Listagem"/>
-          <tranEntry langID="1058" value="Режим огляду"/>
+          <tranEntry langID="1049" value="Режим\nобзора"/>
+          <tranEntry langID="1033" value="Browse\nmode"/>
+          <tranEntry langID="1031" value="Browser\nModus"/>
+          <tranEntry langID="1046" value="Modo de\nListagem"/>
+          <tranEntry langID="1058" value="Режим\nогляду"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ISettingID_Browse_MaxUndoCount">
@@ -1261,11 +1261,11 @@
       </propEntry>
       <propEntry name="ISettingID_View">
         <tranEntries>
-          <tranEntry langID="1049" value="Режим просмотра"/>
-          <tranEntry langID="1033" value="View mode"/>
+          <tranEntry langID="1049" value="Режим\nпросмотра"/>
+          <tranEntry langID="1033" value="View\nmode"/>
           <tranEntry langID="1031" value="Anzeigemodus"/>
-          <tranEntry langID="1046" value="Modo de visualizaзгo"/>
-          <tranEntry langID="1058" value="Режим перегляду"/>
+          <tranEntry langID="1046" value="Modo de\nvisualizaзгo"/>
+          <tranEntry langID="1058" value="Режим\nперегляду"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ISettingID_View_AlwaysOnTop">
@@ -1960,7 +1960,7 @@
       </propEntry>
       <propEntry name="SAction_Open">
         <tranEntries>
-          <tranEntry langID="1049" value="&amp;Открыть"/>
+          <tranEntry langID="1049" value="О&amp;ткрыть"/>
           <tranEntry langID="1033" value="&amp;Open"/>
           <tranEntry langID="1031" value="&amp;Цffnen"/>
           <tranEntry langID="1046" value="&amp;Abrir"/>
@@ -1969,7 +1969,7 @@
       </propEntry>
       <propEntry name="SAction_Print">
         <tranEntries>
-          <tranEntry langID="1049" value="&amp;Печать"/>
+          <tranEntry langID="1049" value="Пе&amp;чать"/>
           <tranEntry langID="1033" value="&amp;Print"/>
           <tranEntry langID="1031" value="&amp;Print"/>
           <tranEntry langID="1046" value="&amp;Print"/>
@@ -1997,6 +1997,15 @@
           <tranEntry langID="1033" value="Print|Print the selected pictures"/>
           <tranEntry langID="1031" value="Print|Print the selected pictures"/>
           <tranEntry langID="1046" value="Print|Print the selected pictures"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SAll">
+        <tranEntries>
+          <tranEntry langID="1049" value="(все)"/>
+          <tranEntry langID="1033" value="(all)"/>
+          <tranEntry langID="1031" value="(all)"/>
+          <tranEntry langID="1046" value="(all)"/>
+          <tranEntry langID="1058" value="(усе)"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SAppCaption">
@@ -2281,6 +2290,14 @@
           <tranEntry langID="1031" value="Dieses Schlьsselwort ist schon in der Liste"/>
           <tranEntry langID="1046" value="Palavra-chave jб existente na lista"/>
           <tranEntry langID="1058" value="Таке ключове слово вже є в списку"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SErrExecutingToolFailed">
+        <tranEntries>
+          <tranEntry langID="1049" value="Ошибка выполнения инструмента &quot;%s&quot; для файла &quot;%s&quot;: %s"/>
+          <tranEntry langID="1033" value="Error executing tool &quot;%s&quot; for file &quot;%s&quot;: %s"/>
+          <tranEntry langID="1031" value="Error executing tool &quot;%s&quot; for file &quot;%s&quot;: %s"/>
+          <tranEntry langID="1046" value="Error executing tool &quot;%s&quot; for file &quot;%s&quot;: %s"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SErrFileNotFound">
@@ -3368,7 +3385,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Help"/>
               <tranEntry langID="1033" value="Help"/>
-              <tranEntry langID="1031" value="Hilfe"/>
+              <tranEntry langID="1031" value="Help"/>
               <tranEntry langID="1046" value="Help"/>
               <tranEntry langID="1058" value="Help"/>
             </tranEntries>
@@ -3418,7 +3435,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -3468,7 +3485,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -3518,7 +3535,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -3568,7 +3585,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -3618,7 +3635,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="File"/>
               <tranEntry langID="1033" value="File"/>
-              <tranEntry langID="1031" value="Datei"/>
+              <tranEntry langID="1031" value="File"/>
               <tranEntry langID="1046" value="File"/>
               <tranEntry langID="1058" value="File"/>
             </tranEntries>
@@ -3751,7 +3768,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Help"/>
               <tranEntry langID="1033" value="Help"/>
-              <tranEntry langID="1031" value="Hilfe"/>
+              <tranEntry langID="1031" value="Help"/>
               <tranEntry langID="1046" value="Help"/>
               <tranEntry langID="1058" value="Help"/>
             </tranEntries>
@@ -3801,7 +3818,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Help"/>
               <tranEntry langID="1033" value="Help"/>
-              <tranEntry langID="1031" value="Hilfe"/>
+              <tranEntry langID="1031" value="Help"/>
               <tranEntry langID="1046" value="Help"/>
               <tranEntry langID="1058" value="Help"/>
             </tranEntries>
@@ -3923,7 +3940,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="File"/>
               <tranEntry langID="1033" value="File"/>
-              <tranEntry langID="1031" value="Datei"/>
+              <tranEntry langID="1031" value="File"/>
               <tranEntry langID="1046" value="File"/>
               <tranEntry langID="1058" value="File"/>
             </tranEntries>
@@ -3973,7 +3990,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4012,7 +4029,7 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value="Д&amp;обавить изображение..."/>
+              <tranEntry langID="1049" value="Д&amp;обавить изображения..."/>
               <tranEntry langID="1033" value="A&amp;dd pictures..."/>
               <tranEntry langID="1031" value="&amp;Bild hinzufьgen..."/>
               <tranEntry langID="1046" value="Adicionar i&amp;magens..."/>
@@ -4023,7 +4040,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4039,11 +4056,11 @@
           </propEntry>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1049" value="Добавить изображение...|Д&amp;обавить новый файл изображения"/>
+              <tranEntry langID="1049" value="Добавить изображения...|Добавить новые файлы изображений в текущую группу"/>
               <tranEntry langID="1033" value="Add pictures...|Open the Add Pictures wizard allowing you to add picture files to the group currently selected"/>
               <tranEntry langID="1031" value="Bild hinzufьgen...|Fьgt eine neue Bilddatei ein"/>
               <tranEntry langID="1046" value="Adicionar imagem...|Adicionar novo arquivo de imagem"/>
-              <tranEntry langID="1058" value="Додати зображення...|Дод&amp;ати новий файл зображення"/>
+              <tranEntry langID="1058" value="Додати зображення...|Додати новий файл зображення"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -4073,7 +4090,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="File"/>
               <tranEntry langID="1033" value="File"/>
-              <tranEntry langID="1031" value="Datei"/>
+              <tranEntry langID="1031" value="File"/>
               <tranEntry langID="1046" value="File"/>
               <tranEntry langID="1058" value="File"/>
             </tranEntries>
@@ -4123,7 +4140,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4173,7 +4190,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="View"/>
               <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value="Ansicht"/>
+              <tranEntry langID="1031" value="View"/>
               <tranEntry langID="1046" value="View"/>
               <tranEntry langID="1058" value="View"/>
             </tranEntries>
@@ -4223,7 +4240,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="View"/>
               <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value="Ansicht"/>
+              <tranEntry langID="1031" value="View"/>
               <tranEntry langID="1046" value="View"/>
               <tranEntry langID="1058" value="View"/>
             </tranEntries>
@@ -4273,7 +4290,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="View"/>
               <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value="Ansicht"/>
+              <tranEntry langID="1031" value="View"/>
               <tranEntry langID="1046" value="View"/>
               <tranEntry langID="1058" value="View"/>
             </tranEntries>
@@ -4323,7 +4340,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="View"/>
               <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value="Ansicht"/>
+              <tranEntry langID="1031" value="View"/>
               <tranEntry langID="1046" value="View"/>
               <tranEntry langID="1058" value="View"/>
             </tranEntries>
@@ -4423,7 +4440,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="File"/>
               <tranEntry langID="1033" value="File"/>
-              <tranEntry langID="1031" value="Datei"/>
+              <tranEntry langID="1031" value="File"/>
               <tranEntry langID="1046" value="File"/>
               <tranEntry langID="1058" value="File"/>
             </tranEntries>
@@ -4473,7 +4490,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="File"/>
               <tranEntry langID="1033" value="File"/>
-              <tranEntry langID="1031" value="Datei"/>
+              <tranEntry langID="1031" value="File"/>
               <tranEntry langID="1046" value="File"/>
               <tranEntry langID="1058" value="File"/>
             </tranEntries>
@@ -4523,7 +4540,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4573,7 +4590,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4673,7 +4690,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4773,7 +4790,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
@@ -4823,7 +4840,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Edit"/>
               <tranEntry langID="1033" value="Edit"/>
-              <tranEntry langID="1031" value="Bearbeiten"/>
+              <tranEntry langID="1031" value="Edit"/>
               <tranEntry langID="1046" value="Edit"/>
               <tranEntry langID="1058" value="Edit"/>
             </tranEntries>

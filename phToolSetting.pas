@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.7 2004-05-01 19:32:12 dale Exp $
+//  $Id: phToolSetting.pas,v 1.8 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -8,8 +8,8 @@ unit phToolSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ActiveX,
-  ConsVars, phSettings;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ActiveX, TB2Item, TBX,
+  ConsVars, phSettings, phObj;
 
 type
    // Вид инструмента
@@ -28,7 +28,8 @@ type
   TPhoaToolUsage = (
     ptuToolsMenu,          // В меню "Сервис"
     ptuGroupPopupMenu,     // В popup-меню дерева групп
-    ptuThViewerPopupMenu); // В popup-меню окна эскизов
+    ptuThViewerPopupMenu,  // В popup-меню окна эскизов
+    ptuViewModePopupMenu); // В popup-меню режима просмотра
   TPhoaToolUsages = set of TPhoaToolUsage;
 
    //===================================================================================================================
@@ -38,6 +39,10 @@ type
   PPhoaToolSetting = ^TPhoaToolSetting;
   TPhoaToolSetting = class(TPhoaSetting)
   private
+     // Состояние изменённости данных
+    FModified: Boolean;
+     // Маски, соответствующие текущим Masks. nil, если не созданы
+    FMaskObj: TPhoaMasks;
      // Prop storage
     FHint: String;
     FKind: TPhoaToolKind;
@@ -49,35 +54,53 @@ type
     FUsages: TPhoaToolUsages;
      // Возвращает имя секции для сохранения/загрузки настроек
     function GetStoreSection: String;
+     // Prop handlers
+    procedure SetHint(const Value: String);
+    procedure SetKind(Value: TPhoaToolKind);
+    procedure SetMasks(const Value: String);
+    procedure SetName(const Value: String);
+    procedure SetRunCommand(const Value: String);
+    procedure SetRunFolder(const Value: String);
+    procedure SetRunParameters(const Value: String);
+    procedure SetRunShowCommand(Value: Integer);
+    procedure SetUsages(Value: TPhoaToolUsages);
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
+    function  GetModified: Boolean; override;
+    procedure SetModified(Value: Boolean); override;
   public
     constructor Create(AOwner: TPhoaSetting; const sName, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String;
                        AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
     procedure Assign(Source: TPhoaSetting); override;
     procedure RegLoad(RegIniFile: TRegIniFile); override;
     procedure RegSave(RegIniFile: TRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
+     // Возвращает True, если инструмент подходит всем файлам из PicLinks
+    function  MatchesFiles(PicLinks: TPhoaPicLinks): Boolean;
+     // Выполняет инструмент для заданных изображений
+    procedure Execute(PicLinks: TPhoaPicLinks);
      // Props
      // -- Подсказка. Закодирована по правилам ConstValEx()
-    property Hint: String read FHint write FHint;
+    property Hint: String read FHint write SetHint;
      // -- Вид инструмента
-    property Kind: TPhoaToolKind read FKind write FKind;
+    property Kind: TPhoaToolKind read FKind write SetKind;
      // -- Наименование, доступное для записи. Закодировано по правилам ConstValEx()
-    property Name: String read FName write FName;
+    property Name read FName write SetName;
      // -- Команда запуска (для Kind=ptkCustom)
-    property RunCommand: String read FRunCommand write FRunCommand;
+    property RunCommand: String read FRunCommand write SetRunCommand;
      // -- Каталог запуска (для Kind=ptkCustom)
-    property RunFolder: String read FRunFolder write FRunFolder;
+    property RunFolder: String read FRunFolder write SetRunFolder;
      // -- Параметры запуска (для Kind=ptkCustom)
-    property RunParameters: String read FRunParameters write FRunParameters;
+    property RunParameters: String read FRunParameters write SetRunParameters;
      // -- Команда показа при запуске (состояние окна SW_xxx)
-    property RunShowCommand: Integer read FRunShowCommand write FRunShowCommand;
+    property RunShowCommand: Integer read FRunShowCommand write SetRunShowCommand;
      // -- Маски файлов, для которых применим инструмент
-    property Masks: String read FMasks write FMasks;
+    property Masks: String read FMasks write SetMasks;
      // -- Где отображается пункт инструмента
-    property Usages: TPhoaToolUsages read FUsages write FUsages;
+    property Usages: TPhoaToolUsages read FUsages write SetUsages;
   end;
 
    //===================================================================================================================
@@ -85,8 +108,13 @@ type
    //===================================================================================================================
 
   TPhoaToolPageSetting = class(TPhoaPageSetting)
+  private
+     // Состояние изменённости данных
+    FModified: Boolean;
   protected
     function  GetEditorClass: TWinControlClass; override;
+    function  GetModified: Boolean; override;
+    procedure SetModified(Value: Boolean); override;
   public
     procedure RegLoad(RegIniFile: TRegIniFile); override;
     procedure RegSave(RegIniFile: TRegIniFile); override;
@@ -103,8 +131,23 @@ type
    // Возвращает название вида инструмента
   function PhoaToolKindName(Kind: TPhoaToolKind): String;
 
+   // Создаёт пункт меню инструмента Tool и добавляет его в состав дочерних пунктов пункта Item
+  procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
+   // Настраивает видимость инструментов по их доступности (применимости) к набору ссылок на изображения
+  procedure AdjustToolAvailability(Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+
+const
+   // Соответствие значков виду инструмента
+  aToolImageIndexes: Array[TPhoaToolKind] of Integer = (
+    iiSeparator, // ptkSeparator
+    iiOK,        // ptkDefault
+    iiOpen,      // ptkOpen
+    iiEdit,      // ptkEdit
+    iiPrint,     // ptkPrint
+    iiAction);   // ptkCustom
+
 implementation
-uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
+uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms;
 
   function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
   begin
@@ -123,7 +166,8 @@ uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
     Result :=
       iif(ptuToolsMenu in Usages,         'M', '')+
       iif(ptuGroupPopupMenu in Usages,    'G', '')+
-      iif(ptuThViewerPopupMenu in Usages, 'V', '');
+      iif(ptuThViewerPopupMenu in Usages, 'V', '')+
+      iif(ptuViewModePopupMenu in Usages, 'W', '');
   end;
 
   function PhoaToolUsagesFromStr(const sUsages: String): TPhoaToolUsages;
@@ -132,11 +176,39 @@ uses TypInfo, phUtils, TB2Item, TBX, Main, Menus, udToolProps;
     if AnsiStrScan(PChar(sUsages), 'M')<>nil then Include(Result, ptuToolsMenu);
     if AnsiStrScan(PChar(sUsages), 'G')<>nil then Include(Result, ptuGroupPopupMenu);
     if AnsiStrScan(PChar(sUsages), 'V')<>nil then Include(Result, ptuThViewerPopupMenu);
+    if AnsiStrScan(PChar(sUsages), 'W')<>nil then Include(Result, ptuViewModePopupMenu);
   end;
 
   function PhoaToolKindName(Kind: TPhoaToolKind): String;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)));
+  end;
+
+  procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
+  var ti: TTBCustomItem;
+  begin
+    if Tool.Kind=ptkSeparator then
+      ti := TTBXSeparatorItem.Create(Item)
+    else begin
+      ti := TTBXItem.Create(Item);
+      ti.Caption    := ConstValEx(Tool.Name);
+      ti.Hint       := ConstValEx(Tool.Hint);
+      ti.ImageIndex := aToolImageIndexes[Tool.Kind];
+      ti.OnClick    := AOnClick;
+    end;
+    ti.Tag := Integer(Tool);
+    Item.Add(ti);
+  end;
+
+  procedure AdjustToolAvailability(Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+  var
+    i: Integer;
+    ti: TTBCustomItem;
+  begin
+    for i := 0 to Item.Count-1 do begin
+      ti := Item[i];
+      ti.Visible := TPhoaToolSetting(ti.Tag).MatchesFiles(PicLinks);
+    end;
   end;
 
 type
@@ -197,6 +269,13 @@ type
    // TPhoaToolSetting
    //===================================================================================================================
 
+  procedure TPhoaToolSetting.AfterConstruction;
+  begin
+    inherited AfterConstruction;
+     // После создания FModified должна всегда быть False
+    FModified := False;
+  end;
+
   procedure TPhoaToolSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
@@ -204,6 +283,7 @@ type
       FHint           := TPhoaToolSetting(Source).FHint;
       FKind           := TPhoaToolSetting(Source).FKind;
       FMasks          := TPhoaToolSetting(Source).FMasks;
+      FModified       := TPhoaToolSetting(Source).FModified;
       FRunCommand     := TPhoaToolSetting(Source).FRunCommand;
       FRunFolder      := TPhoaToolSetting(Source).FRunFolder;
       FRunParameters  := TPhoaToolSetting(Source).FRunParameters;
@@ -233,6 +313,40 @@ type
     FUsages         := [ptuToolsMenu];
   end;
 
+  destructor TPhoaToolSetting.Destroy;
+  begin
+    FMaskObj.Free;
+    inherited Destroy;
+  end;
+
+  procedure TPhoaToolSetting.Execute(PicLinks: TPhoaPicLinks);
+  var
+    i, iRes: Integer;
+    sFileName, sQFileName: String;
+  begin
+    if FKind<>ptkSeparator then begin
+      iRes := 0; // Satisfy the compiler
+      for i := 0 to PicLinks.Count-1 do begin
+        sFileName  := PicLinks[i].PicFileName;
+        sQFileName := AnsiQuotedStr(sFileName, '"');
+        case FKind of
+          ptkDefault: iRes := ShellExecute(Application.Handle, nil,     PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+          ptkOpen:    iRes := ShellExecute(Application.Handle, 'open',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+          ptkEdit:    iRes := ShellExecute(Application.Handle, 'edit',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+          ptkPrint:   iRes := ShellExecute(Application.Handle, 'print', PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+          ptkCustom:  iRes := ShellExecute(Application.Handle, nil,     PChar(FRunCommand), PChar(FRunParameters+' '+sQFileName), PChar(FRunFolder), SW_SHOWNORMAL);
+        end;
+         // Проверяем результат
+        if iRes<=32 then PhoaError(ConstVal('SErrExecutingToolFailed'), [FName, sFileName, SysErrorMessage(GetLastError)]);
+      end;
+    end;
+  end;
+
+  function TPhoaToolSetting.GetModified: Boolean;
+  begin
+    Result := FModified or inherited GetModified;
+  end;
+
   function TPhoaToolSetting.GetStoreSection: String;
   begin
     Result := Format('%s\Item%.3d', [SRegPrefs_Tools, Index]);
@@ -246,6 +360,29 @@ type
   procedure TPhoaToolSetting.IniSave(IniFile: TIniFile);
   begin
     { Инструменты не поддерживают хранение в Ini-файлах }
+  end;
+
+  function TPhoaToolSetting.MatchesFiles(PicLinks: TPhoaPicLinks): Boolean;
+  var i: Integer;
+  begin
+     // Если выбранных изображений нет - не подходит
+    if PicLinks.Count=0 then
+      Result := False
+    else begin
+       // Создаём маски, если нужно
+      if FMaskObj=nil then FMaskObj := TPhoaMasks.Create(FMasks);
+       // Если маска пустая - подходит всегда
+      Result := FMaskObj.Empty;
+       // Иначе перебираем все файлы: должны подходить все
+      if not Result then begin
+        Result := True;
+        for i := 0 to PicLinks.Count-1 do
+          if not FMaskObj.Matches(PicLinks[i].PicFileName) then begin
+            Result := False;
+            Break;
+          end;
+        end;
+    end;
   end;
 
   procedure TPhoaToolSetting.RegLoad(RegIniFile: TRegIniFile);
@@ -283,6 +420,85 @@ type
     inherited RegSave(RegIniFile);
   end;
 
+  procedure TPhoaToolSetting.SetHint(const Value: String);
+  begin
+    if FHint<>Value then begin
+      FHint := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetKind(Value: TPhoaToolKind);
+  begin
+    if FKind<>Value then begin
+      FKind := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetMasks(const Value: String);
+  begin
+    if FMasks<>Value then begin
+      FMasks := Value;
+      FreeAndNil(FMaskObj);
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetModified(Value: Boolean);
+  begin
+    FModified := Value;
+    inherited SetModified(Value);
+  end;
+
+  procedure TPhoaToolSetting.SetName(const Value: String);
+  begin
+    if FName<>Value then begin
+      FName := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetRunCommand(const Value: String);
+  begin
+    if FRunCommand<>Value then begin
+      FRunCommand := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetRunFolder(const Value: String);
+  begin
+    if FRunFolder<>Value then begin
+      FRunFolder := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetRunParameters(const Value: String);
+  begin
+    if FRunParameters<>Value then begin
+      FRunParameters := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetRunShowCommand(Value: Integer);
+  begin
+    if FRunShowCommand<>Value then begin
+      FRunShowCommand := Value;
+      FModified := True;
+    end;
+  end;
+
+  procedure TPhoaToolSetting.SetUsages(Value: TPhoaToolUsages);
+  begin
+    if FUsages<>Value then begin
+      FUsages := Value;
+      FModified := True;
+    end;
+  end;
+
    //===================================================================================================================
    // TPhoaToolPageSetting
    //===================================================================================================================
@@ -290,6 +506,11 @@ type
   function TPhoaToolPageSetting.GetEditorClass: TWinControlClass;
   begin
     Result := TPhoaToolSettingEditor;
+  end;
+
+  function TPhoaToolPageSetting.GetModified: Boolean;
+  begin
+    Result := FModified or inherited GetModified;
   end;
 
   procedure TPhoaToolPageSetting.IniLoad(IniFile: TIniFile);
@@ -322,6 +543,12 @@ type
     RegIniFile.WriteInteger(SRegPrefs_Tools, 'Count', ChildCount);
      // Сохраняем всех детей
     inherited RegSave(RegIniFile);
+  end;
+
+  procedure TPhoaToolPageSetting.SetModified(Value: Boolean);
+  begin
+    FModified := Value;
+    inherited SetModified(Value);
   end;
 
    //===================================================================================================================
@@ -398,6 +625,7 @@ type
     if n<>nil then begin
       GetSetting(n).Free;
       DeleteNode(n);
+      FRootSetting.Modified := True;
     end;
   end;
 
@@ -457,7 +685,10 @@ type
 
   procedure TPhoaToolSettingEditor.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer);
   begin
-    if (Kind in [ikNormal, ikSelected]) and (Column=0) and (Integer(Node.Index)<FRootSetting.ChildCount) then Index := iiTool;
+    if (Kind in [ikNormal, ikSelected]) and (Node.Index<RootNodeCount-1) then
+      case Column of
+        1: Index := aToolImageIndexes[GetSetting(Node).Kind];
+      end;
   end;
 
   procedure TPhoaToolSettingEditor.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -469,12 +700,12 @@ type
     Setting := GetSetting(Node);
     if Setting<>nil then
       case Column of
-         // Текст
-        0: s := ConstValEx(Setting.Name);
+         // Маски
+        0: if Setting.Masks='' then s := ConstVal('SAll') else s := Setting.Masks;
          // Вид
         1: s := PhoaToolKindName(Setting.Kind);
-         // Маски
-        2: s := Setting.Masks;
+         // Имя
+        2: s := ConstValEx(Setting.Name);
          // Приложение
         3: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
       end;
@@ -484,7 +715,7 @@ type
   procedure TPhoaToolSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
      // Если это не последний "пустой" пункт, сохраняем пункт TPhoaToolSetting в Node.Data
-    if Integer(Node.Index)<FRootSetting.ChildCount then PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
+    if Node.Index<RootNodeCount-1 then PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
      // Настраиваем CheckType и CheckState - кнопку
     Node.CheckType := ctButton;
   end;
@@ -530,6 +761,8 @@ type
 
   procedure TPhoaToolSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
   begin
+     // Preadjust the bounds to eliminate flicker
+    BoundsRect       := ParentCtl.ClientRect;
     Parent           := ParentCtl;
     FOnSettingChange := AOnSettingChange;
   end;
@@ -543,14 +776,12 @@ type
   begin
     BeginUpdate;
     try
-       // Удаляем все узлы
-      Clear;
        // Устанавливаем количество записей в корневом каталоге (+1 - на пустую строку для добавления)
       RootNodeCount := FRootSetting.ChildCount+1;
        // Инициализируем все узлы
       ReinitChildren(nil, True);
-       // Выделяем первый узел
-      ActivateVTVNode(Self, GetFirst);
+       // Если нет выделения, выделяем первый узел
+      if FocusedNode=nil then ActivateVTVNode(Self, GetFirst);
     finally
       EndUpdate;
     end;
@@ -584,16 +815,16 @@ type
   begin
     with Header do begin
       with Columns.Add do begin
-        Width := 150;
-        Text  := ConstVal('SText_Name');
+        Width := 80;
+        Text  := ConstVal('SText_Masks');
       end;
       with Columns.Add do begin
-        Width := 70;
+        Width := 200;
         Text  := ConstVal('SText_Kind');
       end;
       with Columns.Add do begin
-        Width := 80;
-        Text  := ConstVal('SText_Masks');
+        Width := 150;
+        Text  := ConstVal('SText_Name');
       end;
       Columns.Add.Text := ConstVal('SText_Application');
       AutoSizeIndex := 3;

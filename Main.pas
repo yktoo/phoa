@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.10 2004-05-01 04:03:24 dale Exp $
+//  $Id: Main.pas,v 1.11 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -100,7 +100,7 @@ type
     pGroups: TPanel;
     aFind: TAction;
     iFind: TTBXItem;
-    iToolsSep: TTBXSeparatorItem;
+    iToolsSep1: TTBXSeparatorItem;
     aSelectAll: TAction;
     aSelectNone: TAction;
     iSelectNone: TTBXItem;
@@ -174,6 +174,13 @@ type
     iFileSep3: TTBXSeparatorItem;
     iIniLoadSettings: TTBXItem;
     iIniSaveSettings: TTBXItem;
+    iToolsSep2: TTBXSeparatorItem;
+    giTools_ToolsMenu: TTBGroupItem;
+    ipmGroupsSep3: TTBXSeparatorItem;
+    giTools_GroupsMenu: TTBGroupItem;
+    ipmGroupsNewPic: TTBXItem;
+    ipmPicsSep4: TTBXSeparatorItem;
+    giTools_PicsMenu: TTBGroupItem;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -251,6 +258,10 @@ type
     FViewIndex: Integer;
      // Добавляет в настройки пункты выбора языка интерфейса
     procedure LoadLanguageSettings;
+     // Применяет параметры настройки языка
+    procedure ApplyLanguage;
+     // Применяет параметры настройки инструментов
+    procedure ApplyTools;
      // Проверяет необходимость сохранения файла фотоальбома. Возвращает True, если можно продолжать
     function  CheckSave: Boolean;
      // Загружает иерархию групп из фотоальбома в tvGroups
@@ -259,6 +270,13 @@ type
     procedure DoLoad(const sFileName: String);
      // Настраивает разрешённость Actions и настраивает Caption формы
     procedure EnableActions;
+     // Настраивает доступность инструментов 
+    procedure EnableTools;
+     // Создаёт список изображений:
+     //   если активно дерево групп - то всех изображений группы
+     //   если активен вьюер - то выделенных во вьюере изображений
+     //   иначе возвращает пустой список
+    function  GetSelectedPicLinks: TPhoaPicLinks;
      // Отображает результаты поиска. Если bForceRemove=True, удаляет узел результатов, иначе, при bDoSelectNode=True,
      //   выделяет узел
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
@@ -277,6 +295,8 @@ type
      // События списка операций
     procedure OperationsStatusChange(Sender: TObject);
     procedure OperationsListChange(Sender: TObject);
+     // Событие клика на пункте инструмента
+    procedure ToolItemClick(Sender: TObject);
      // IPhoaViews
     function  GetViewIndex: Integer;
     procedure SetViewIndex(Value: Integer);
@@ -618,6 +638,22 @@ uses
     sbarMain.Panels[0].Caption := Application.Hint;
   end;
 
+  procedure TfMain.ApplyLanguage;
+  begin
+     // Настраиваем прочие свойства
+    if Assigned(FRootNode) then begin
+       // Перестраиваем представления, т.к. они содержат локализуемые названия узлов
+      FPhoA.Views.UnprocessAllViews;
+       // Перерисовываем дерево
+      tvGroups.ReinitChildren(nil, True);
+      tvGroups.Invalidate;
+       // Обновляем заголовок окна
+      EnableActions;
+    end;
+     // Настраиваем Help-файл
+    Application.HelpFile := ExtractFilePath(ParamStr(0))+ConstVal('SHelpFileName');
+  end;
+
   procedure TfMain.ApplySettings;
 
     procedure SetupViewerCorner(Corner: TThumbCorner; iSettingID: Integer);
@@ -676,6 +712,28 @@ uses
       finally
         EndUpdate;
       end;
+    end;
+     // Применяем инструменты
+    if RootSetting.Settings[ISettingID_Tools].Modified then ApplyTools; 
+     // Помечаем все настройки как неизменённые
+    RootSetting.Modified := False;
+  end;
+
+  procedure TfMain.ApplyTools;
+  var
+    i: Integer;
+    Tool: TPhoaToolSetting;
+  begin
+     // Всё стираем
+    giTools_ToolsMenu.Clear;
+    giTools_GroupsMenu.Clear;
+    giTools_PicsMenu.Clear;
+     // Добавляем инструменты
+    for i := 0 to RootSetting.Settings[ISettingID_Tools].ChildCount-1 do begin
+      Tool := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
+      if ptuToolsMenu         in Tool.Usages then AddToolItem(Tool, giTools_ToolsMenu,  ToolItemClick);
+      if ptuGroupPopupMenu    in Tool.Usages then AddToolItem(Tool, giTools_GroupsMenu, ToolItemClick);
+      if ptuThViewerPopupMenu in Tool.Usages then AddToolItem(Tool, giTools_PicsMenu,   ToolItemClick);
     end;
   end;
 
@@ -750,18 +808,7 @@ uses
 
   procedure TfMain.dtlsMainLanguageChanged(Sender: TObject);
   begin
-     // Настраиваем прочие свойства
-    if Assigned(FRootNode) then begin
-       // Перестраиваем представления, т.к. они содержат локализуемые названия узлов
-      FPhoA.Views.UnprocessAllViews;
-       // Перерисовываем дерево
-      tvGroups.ReinitChildren(nil, True);
-      tvGroups.Invalidate;
-       // Обновляем заголовок окна
-      EnableActions;
-    end;
-     // Настраиваем Help-файл
-    Application.HelpFile := ExtractFilePath(ParamStr(0))+ConstVal('SHelpFileName');
+    ApplyLanguage;
   end;
 
   procedure TfMain.EnableActions;
@@ -803,10 +850,30 @@ uses
     aPhoaView_MakeGroup.Enabled := not bPicGroups;
      // Drag-and-drop
     Viewer.DragEnabled := bPicGroups and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+     // Инструменты
+    EnableTools; 
      // Настраиваем Captions
     Caption := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), asUnmod[FOperations.IsUnmodified], ConstVal('SAppCaption')]);
     Application.Title := Caption;
     sbarMain.Panels[1].Caption := ConstVal('SPicCount', [FPhoA.Pics.Count]);
+  end;
+
+  procedure TfMain.EnableTools;
+  var PicLinks: TPhoaPicLinks;
+  begin
+    PicLinks := GetSelectedPicLinks;
+    try
+       // Если активны группы - настраиваем popup-меню групп
+      if tvGroups.Focused then
+        AdjustToolAvailability(giTools_GroupsMenu, PicLinks)
+       // Если активны группы - настраиваем popup-меню вьюера
+      else if Viewer.Focused then
+        AdjustToolAvailability(giTools_PicsMenu, PicLinks);
+       // Настраиваем инструменты меню "Сервис"
+      AdjustToolAvailability(giTools_ToolsMenu, PicLinks);
+    finally
+      PicLinks.Free;
+    end;
   end;
 
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -892,8 +959,9 @@ uses
       if FileExists(sAutoLoadIniFile) then IniRestoreSettings(sAutoLoadIniFile);
     end;
      // Применяем настройки
+    RootSetting.Modified := True;
     ApplySettings;
-    dtlsMainLanguageChanged(nil);
+    ApplyLanguage;
      // If command line specifies a file, then load it; else load view list and select "Picture groups"
     if ParamCount>0 then DoLoad(ParamStr(1)) else LoadViewList(-1);
     EnableActions;
@@ -935,6 +1003,22 @@ uses
     Result := FPhoA.FileName;
   end;
 
+  function TfMain.GetSelectedPicLinks: TPhoaPicLinks;
+  begin
+    Result := TPhoaPicLinks.Create(True);
+    try
+       // Если активны группы - составляем список ссылок на изображения текущей группы
+      if tvGroups.Focused then begin
+        if CurGroup<>nil then Result.AddFromGroup(FPhoA, CurGroup, False);
+       // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
+      end else if Viewer.Focused then
+        Result.AddFromPicIDs(FPhoA, PicArrayToIDArray(Viewer.GetSelectedPicArray), False);
+    except
+      Result.Free;
+      raise;
+    end;
+  end;
+
   function TfMain.GetViewIndex: Integer;
   begin
     Result := FViewIndex;
@@ -963,7 +1047,7 @@ uses
     end;
      // Применяем настройки
     ApplySettings;
-    dtlsMainLanguageChanged(nil);
+    ApplyLanguage;
   end;
 
   procedure TfMain.IniStoreSettings(const sIniFileName: String);
@@ -1145,6 +1229,19 @@ uses
     for i := 0 to gipmPhoaViewViews.Count-1 do gipmPhoaViewViews[i].Checked := i=Value;
      // Перегружаем дерево папок
     LoadGroupTree;
+  end;
+
+  procedure TfMain.ToolItemClick(Sender: TObject);
+  var PicLinks: TPhoaPicLinks;
+  begin
+     // Создаём массив ссылок на изображения
+    PicLinks := GetSelectedPicLinks;
+    try
+       // Выполняем инструмент
+      TPhoaToolSetting(TComponent(Sender).Tag).Execute(PicLinks);
+    finally
+      PicLinks.Free;
+    end;
   end;
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);

@@ -39,8 +39,7 @@
         </tranEntries>
       </propEntry>
     </propEntries>
-    <constEntries>
-    </constEntries>
+    <constEntries/>
     <compEntries>
       <compEntry name="bCancel">
         <propEntries>

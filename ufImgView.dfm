@@ -561,6 +561,10 @@ object fImgView: TfImgView
     object ipmClose: TTBXItem
       Action = aClose
     end
+    object ipmSep5: TTBXSeparatorItem
+    end
+    object gipmTools: TTBGroupItem
+    end
   end
   object dtlsMain: TDTLanguageSwitcher
     Language = 1033

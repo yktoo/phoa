@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.7 2004-04-23 19:26:29 dale Exp $
+//  $Id: phObj.pas,v 1.8 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1453,12 +1453,16 @@ type
   TPhoaMasks = class(TObject)
   private
     FMasks: TList;
+    function GetEmpty: Boolean;
   public
      // Принимает на вход список масок, разделённых символом ';'
     constructor Create(const sMasks: String);
     destructor Destroy; override;
      // Возвращает True, если имя файла соответствует любой из масок
     function Matches(const sFilename: String): Boolean;
+     // Props
+     // -- True, если нет реальных масок, и Matches вернёт True в любом случае
+    property Empty: Boolean read GetEmpty;
   end;
 
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
@@ -5807,6 +5811,8 @@ var
     FPicLinks.AddFromGroup(FPhoA, Group, True);
      // Стираем кэш эскизов
     LimitCacheSize(0);
+     // Скроллим в начало
+    FTopIndex := 0;
      // Пересчитываем layout
     CalcLayout;
      // Если в группе есть изображения, выделяем первое, иначе удаляем выделение
@@ -6336,11 +6342,16 @@ var
     inherited Destroy;
   end;
 
+  function TPhoaMasks.GetEmpty: Boolean;
+  begin
+    Result := FMasks.Count=0;
+  end;
+
   function TPhoaMasks.Matches(const sFilename: String): Boolean;
   var i: Integer;
   begin
-     // Если была пустая маска - считаем подходящим любой файл
-    Result := FMasks.Count=0;
+     // Если масок нет - считаем подходящим любой файл
+    Result := Empty;
      // Иначе проверяем все маски по порядку - авось какая-то подойдёт
     if not Result then
       for i := 0 to FMasks.Count-1 do begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.10 2004-05-01 19:32:12 dale Exp $
+//  $Id: udSettings.pas,v 1.11 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -19,6 +19,8 @@ type
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
     fpMain: TFormPlacement;
+    pEditor: TPanel;
+    procedure FormShow(Sender: TObject);
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
@@ -32,6 +34,8 @@ type
     procedure CreateNavBar;
      // Событие нажатия NavBar-кнопки
     procedure NavBarButtonClick(Sender: TObject);
+     // Событие изменения данных настроек
+    procedure SettingChange(Sender: TObject);
      // Prop handlers
     procedure SetCurPageSetting(Value: TPhoaPageSetting);
   protected
@@ -98,6 +102,11 @@ uses phUtils, Main, TypInfo;
     inherited FinalizeDialog;
   end;
 
+  procedure TdSettings.FormShow(Sender: TObject);
+  begin
+    ActiveControl := FEditor;
+  end;
+
   procedure TdSettings.InitializeDialog;
   begin
     inherited InitializeDialog;
@@ -120,7 +129,9 @@ uses phUtils, Main, TypInfo;
   end;
 
   procedure TdSettings.SetCurPageSetting(Value: TPhoaPageSetting);
-  var i: Integer;
+  var
+    i: Integer;
+    PrevEditor: TWinControl;
   begin
     FCurPageSetting := Value;
      // Нажимаем соотв. кнопку
@@ -130,14 +141,26 @@ uses phUtils, Main, TypInfo;
     HelpContext := FCurPageSetting.HelpContext;
      // Загружаем редактор, если класс сменился
     if (FEditor=nil) or (FEditor.ClassType<>FCurPageSetting.EditorClass) then begin
-      FreeAndNil(FEditor);
-      FEditor := FCurPageSetting.EditorClass.Create(Self);
-      (FEditor as IPhoaSettingEditor).InitAndEmbed(pMain, DlgDataChange);
+       // Запоминаем прежний редактор
+      PrevEditor := FEditor;
+      try
+         // Создаём новый
+        FEditor := FCurPageSetting.EditorClass.Create(Self);
+        (FEditor as IPhoaSettingEditor).InitAndEmbed(pEditor, SettingChange);
+      finally
+         // Убиваем старый редактор после создания нового, чтобы не мельтешило
+        FreeAndNil(PrevEditor);
+      end;
     end;
      // Инициализируем редактор
     (FEditor as IPhoaSettingEditor).RootSetting := FCurPageSetting;
-     // Устанавливаем фокус на редактор
-//    ActiveControl := FEditor;
+     // Устанавливаем фокус
+    if Visible then ActiveControl := FEditor;
+  end;
+
+  procedure TdSettings.SettingChange(Sender: TObject);
+  begin
+    Modified := FLocalRootSetting.Modified;
   end;
 
 end.

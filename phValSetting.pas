@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.6 2004-05-01 19:32:12 dale Exp $
+//  $Id: phValSetting.pas,v 1.7 2004-05-03 16:34:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -20,11 +20,17 @@ type
   protected
      // Данные
     FData: Integer;
+     // Состояние изменённости данных
+    FModified: Boolean;
      // Prop handlers
     function  GetAsString: String; virtual; abstract;
     procedure SetAsString(const sValue: String); virtual; abstract;
     function  GetDisplayString: String; virtual;
+    function  GetModified: Boolean; override;
+    procedure SetModified(Value: Boolean); override;
   public
+    procedure AfterConstruction; override;
+    procedure Assign(Source: TPhoaSetting); override;
     procedure RegLoad(RegIniFile: TRegIniFile); override;
     procedure RegSave(RegIniFile: TRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
@@ -126,7 +132,7 @@ type
      // Prop handlers
     function  GetVariantIndex: Integer;
     function  GetVariantText: String;
-    procedure SetVariantIndex(Value: Integer);
+    procedure SetVariantIndex(iValue: Integer);
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
     function  GetDisplayString: String; override;
@@ -277,9 +283,27 @@ type
    // TPhoaValSetting
    //===================================================================================================================
 
+  procedure TPhoaValSetting.AfterConstruction;
+  begin
+    inherited AfterConstruction;
+     // После создания FModified должна всегда быть False
+    FModified := False;
+  end;
+
+  procedure TPhoaValSetting.Assign(Source: TPhoaSetting);
+  begin
+    inherited Assign(Source);
+    if Source is TPhoaValSetting then FModified := TPhoaValSetting(Source).FModified;
+  end;
+
   function TPhoaValSetting.GetDisplayString: String;
   begin
     Result := GetAsString;
+  end;
+
+  function TPhoaValSetting.GetModified: Boolean;
+  begin
+    Result := FModified or inherited GetModified;
   end;
 
   procedure TPhoaValSetting.IniLoad(IniFile: TIniFile);
@@ -304,6 +328,12 @@ type
   begin
     if ID<>0 then RegIniFile.WriteString(SRegPrefs_Root, Name, AsString);
     inherited RegSave(RegIniFile);
+  end;
+
+  procedure TPhoaValSetting.SetModified(Value: Boolean);
+  begin
+    FModified := Value;
+    inherited SetModified(Value);
   end;
 
    //===================================================================================================================
@@ -350,7 +380,11 @@ type
 
   procedure TPhoaIntSetting.SetValue(Value: Integer);
   begin
-    FData := Min(Max(Value, FMinValue), FMaxValue);
+    Value := Min(Max(Value, FMinValue), FMaxValue);
+    if FData<>Value then begin
+      FData := Value;
+      FModified := True;
+    end;
   end;
 
    //===================================================================================================================
@@ -363,7 +397,7 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaBoolSetting 
+   // TPhoaBoolSetting
    //===================================================================================================================
 
   procedure TPhoaBoolSetting.Assign(Source: TPhoaSetting);
@@ -400,17 +434,20 @@ type
 
   procedure TPhoaBoolSetting.SetValue(Value: Boolean);
   begin
-    FData := Byte(Value);
+    if (FData<>0)<>Value then begin
+      FData := Byte(Value);
+      FModified := True;
+    end;
   end;
 
    //===================================================================================================================
-   // TPhoaStrSetting 
+   // TPhoaStrSetting
    //===================================================================================================================
 
   procedure TPhoaStrSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
-    if Source is TPhoaStrSetting then SetValue(TPhoaStrSetting(Source).Value); 
+    if Source is TPhoaStrSetting then String(FData) := TPhoaStrSetting(Source).Value;
   end;
 
   constructor TPhoaStrSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
@@ -442,11 +479,14 @@ type
 
   procedure TPhoaStrSetting.SetValue(const Value: String);
   begin
-    String(FData) := Value;
+    if String(FData)<>Value then begin
+      String(FData) := Value;
+      FModified := True;
+    end;
   end;
 
    //===================================================================================================================
-   // TPhoaListSetting 
+   // TPhoaListSetting
    //===================================================================================================================
 
   procedure TPhoaListSetting.Assign(Source: TPhoaSetting);
@@ -494,16 +534,16 @@ type
     if idx<0 then Result := '' else Result := FVariants[idx];
   end;
 
-  procedure TPhoaListSetting.SetVariantIndex(Value: Integer);
+  procedure TPhoaListSetting.SetVariantIndex(iValue: Integer);
   begin
     if FRefObject then
-      if Value<0 then FData := -1 else FData := Integer(FVariants.Objects[Value])
+      if iValue<0 then Value := -1 else Value := Integer(FVariants.Objects[iValue])
     else
-      FData := Value;
+      Value := iValue;
   end;
 
    //===================================================================================================================
-   // TPhoaFontSetting 
+   // TPhoaFontSetting
    //===================================================================================================================
 
   function TPhoaFontSetting.GetDisplayString: String;
@@ -890,6 +930,8 @@ type
 
   procedure TPhoaValSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
   begin
+     // Preadjust the bounds to eliminate flicker
+    BoundsRect       := ParentCtl.ClientRect;
     Parent           := ParentCtl;
     FOnSettingChange := AOnSettingChange;
   end;
