@@ -1,48 +1,11 @@
 inherited frPicProps_View: TfrPicProps_View
   Height = 298
   OnMouseWheel = FrameMouseWheel
-  object tbMain: TTBXToolbar
-    Left = 0
-    Top = 0
-    Width = 576
-    Height = 22
-    Align = alTop
-    ChevronHint = 'More buttons|'
-    Images = fMain.ilActionsSmall
-    SystemFont = False
-    TabOrder = 1
-    object cbViewFile: TTBXComboBoxItem
-      EditWidth = 330
-      Hint = 'File to view'
-      ShowImage = True
-      OnChange = cbViewFileChange
-      DropDownList = True
-      MinListWidth = 330
-      ShowListImages = True
-      OnAdjustImageIndex = cbViewFileAdjustImageIndex
-    end
-    object bViewZoomIn: TTBXItem
-      Action = aZoomIn
-      DisplayMode = nbdmImageAndText
-    end
-    object bViewZoomOut: TTBXItem
-      Action = aZoomOut
-      DisplayMode = nbdmImageAndText
-    end
-    object bViewZoomActual: TTBXItem
-      Action = aZoomActual
-      DisplayMode = nbdmImageAndText
-    end
-    object bViewZoomFit: TTBXItem
-      Action = aZoomFit
-      DisplayMode = nbdmImageAndText
-    end
-  end
   object iMain: TImage32
-    Left = 0
-    Top = 22
-    Width = 576
-    Height = 276
+    Left = 9
+    Top = 52
+    Width = 558
+    Height = 237
     Align = alClient
     BitmapAlign = baCustom
     PopupMenu = pmMain
@@ -54,6 +17,94 @@ inherited frPicProps_View: TfrPicProps_View
     OnMouseMove = iMainMouseMove
     OnMouseUp = iMainMouseUp
     OnResize = iMainResize
+  end
+  object dkTop: TTBXDock
+    Left = 0
+    Top = 0
+    Width = 576
+    Height = 52
+    object tbMain: TTBXToolbar
+      Left = 0
+      Top = 0
+      Align = alTop
+      Caption = 'Main Toolbar'
+      Images = fMain.ilActionsSmall
+      SystemFont = False
+      TabOrder = 0
+      object cbViewFile: TTBXComboBoxItem
+        EditWidth = 330
+        Hint = 'File to view'
+        ShowImage = True
+        OnChange = cbViewFileChange
+        DropDownList = True
+        MinListWidth = 330
+        ShowListImages = True
+        OnAdjustImageIndex = cbViewFileAdjustImageIndex
+      end
+      object bViewZoomIn: TTBXItem
+        Action = aZoomIn
+        DisplayMode = nbdmImageAndText
+      end
+      object bViewZoomOut: TTBXItem
+        Action = aZoomOut
+        DisplayMode = nbdmImageAndText
+      end
+      object bViewZoomActual: TTBXItem
+        Action = aZoomActual
+        DisplayMode = nbdmImageAndText
+      end
+      object bViewZoomFit: TTBXItem
+        Action = aZoomFit
+        DisplayMode = nbdmImageAndText
+      end
+    end
+    object tbTools: TTBXToolbar
+      Left = 0
+      Top = 26
+      Caption = 'Tools'
+      DockPos = -8
+      DockRow = 1
+      Images = fMain.ilActionsSmall
+      TabOrder = 1
+      object TBXItem3: TTBXItem
+        ImageIndex = 66
+      end
+      object TBXItem2: TTBXItem
+        ImageIndex = 67
+      end
+      object TBXItem1: TTBXItem
+        ImageIndex = 68
+      end
+      object TBXSeparatorItem1: TTBXSeparatorItem
+      end
+      object TBXItem5: TTBXItem
+        ImageIndex = 69
+      end
+      object TBXItem4: TTBXItem
+        ImageIndex = 70
+      end
+    end
+  end
+  object dkLeft: TTBXDock
+    Left = 0
+    Top = 52
+    Width = 9
+    Height = 237
+    Position = dpLeft
+  end
+  object dkRight: TTBXDock
+    Left = 567
+    Top = 52
+    Width = 9
+    Height = 237
+    Position = dpRight
+  end
+  object dkBottom: TTBXDock
+    Left = 0
+    Top = 289
+    Width = 576
+    Height = 9
+    Position = dpBottom
   end
   object alMain: TActionList
     Images = fMain.ilActionsSmall

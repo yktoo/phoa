@@ -1,6 +1,6 @@
 inherited dSearch: TdSearch
-  Left = 525
-  Top = 291
+  Left = 491
+  Top = 244
   Caption = 'Find pictures'
   ClientHeight = 435
   ClientWidth = 525

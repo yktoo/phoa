@@ -256,11 +256,11 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value="Просмотр"/>
-              <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value="Anzeigen"/>
-              <tranEntry langID="1046" value="Visualizar"/>
-              <tranEntry langID="1058" value="Перегляд"/>
+              <tranEntry langID="1049" value="Просмотр и\nнастройка"/>
+              <tranEntry langID="1033" value="View &amp;&amp; Adjust"/>
+              <tranEntry langID="1031" value="Anzeigen &amp;&amp; Adjust"/>
+              <tranEntry langID="1046" value="Visualizar &amp;&amp; Adjust"/>
+              <tranEntry langID="1058" value="Перегляд и\nнастройка"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -269,6 +269,22 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bvBottom">
+        <propEntries>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -282,6 +298,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -290,6 +307,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -326,6 +344,26 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="pButtonsBottom">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="pMain">
         <propEntries>
           <propEntry name="Caption">
@@ -334,6 +372,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -342,6 +381,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -350,6 +390,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -367,6 +408,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -375,6 +417,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -383,6 +426,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -396,6 +440,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -404,6 +449,7 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>

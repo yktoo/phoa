@@ -1,5 +1,5 @@
 object PhoaWizardForm: TPhoaWizardForm
-  Left = 469
+  Left = 424
   Top = 241
   AutoScroll = False
   BorderIcons = [biSystemMenu]

@@ -1,4 +1,5 @@
 inherited fAddFilesWizard: TfAddFilesWizard
+  Left = 384
   Caption = 'Add pictures'
   ClientWidth = 632
   OnCloseQuery = FormCloseQuery

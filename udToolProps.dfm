@@ -1,5 +1,5 @@
 inherited dToolProps: TdToolProps
-  Left = 553
+  Left = 424
   Top = 248
   Caption = 'Properties: Tool'
   ClientHeight = 371

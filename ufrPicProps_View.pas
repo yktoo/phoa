@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.6 2004-05-29 06:20:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -15,20 +15,31 @@ uses
 
 type
   TfrPicProps_View = class(TPicPropsDialogPage)
-    tbMain: TTBXToolbar;
-    bViewZoomIn: TTBXItem;
-    bViewZoomOut: TTBXItem;
-    bViewZoomActual: TTBXItem;
-    bViewZoomFit: TTBXItem;
     iMain: TImage32;
     alMain: TActionList;
     aZoomIn: TAction;
     aZoomOut: TAction;
     aZoomActual: TAction;
     aZoomFit: TAction;
-    cbViewFile: TTBXComboBoxItem;
     pmMain: TTBXPopupMenu;
     dtlsMain: TDTLanguageSwitcher;
+    dkTop: TTBXDock;
+    tbMain: TTBXToolbar;
+    cbViewFile: TTBXComboBoxItem;
+    bViewZoomIn: TTBXItem;
+    bViewZoomOut: TTBXItem;
+    bViewZoomActual: TTBXItem;
+    bViewZoomFit: TTBXItem;
+    dkLeft: TTBXDock;
+    dkRight: TTBXDock;
+    dkBottom: TTBXDock;
+    tbTools: TTBXToolbar;
+    TBXItem1: TTBXItem;
+    TBXItem2: TTBXItem;
+    TBXItem3: TTBXItem;
+    TBXSeparatorItem1: TTBXSeparatorItem;
+    TBXItem4: TTBXItem;
+    TBXItem5: TTBXItem;
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);

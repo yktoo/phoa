@@ -1,5 +1,5 @@
 inherited dStats: TdStats
-  Left = 417
+  Left = 404
   Top = 239
   Caption = 'Photo album statistics'
   ClientHeight = 435

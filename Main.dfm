@@ -1,6 +1,6 @@
 object fMain: TfMain
-  Left = 550
-  Top = 324
+  Left = 401
+  Top = 294
   AutoScroll = False
   Caption = 'PhoA'
   ClientHeight = 385

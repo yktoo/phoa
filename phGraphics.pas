@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.1 2004-05-28 13:30:13 dale Exp $
+//  $Id: phGraphics.pas,v 1.2 2004-05-29 06:20:51 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -45,7 +45,6 @@ const
   BColor_Alpha_Opaque      = $FF;
 
 implementation
-
 uses phUtils;
 
    //===================================================================================================================
@@ -53,36 +52,29 @@ uses phUtils;
    //===================================================================================================================
 
   function TColor32Map.ApplyToColor(c: TColor32): TColor32;
-//  type TColor32Rec = packed record b,g,r,a: Byte; end;
-//  var
-//    cc: TColor32Rec absolute c;
-//    cr: TColor32Rec absolute Result;
-  begin
-//    TColor32Rec(Result).a := FMapA[TColor32Rec(c).a];
-//    TColor32Rec(Result).b := FMapB[TColor32Rec(c).b];
-//    TColor32Rec(Result).g := FMapG[TColor32Rec(c).g];
-//    TColor32Rec(Result).r := FMapR[TColor32Rec(c).r];
-
   asm
+     // EAX = Self
+     // EDX = C
+     // out: EAX
+    mov ebx, edx
     xor edx, edx
-    mov Result,edx
      // Put B value
-    mov dl, byte ptr [c+0]
+    mov dl, bl
     mov dl, byte ptr [eax+FMapB+edx]
     mov byte ptr [Result+0], dl
      // Put G value
-    mov dl, byte ptr [c+1]
+    mov dl, bh
     mov dl, byte ptr [eax+FMapG+edx]
     mov byte ptr [Result+1], dl
      // Put R value
-    mov dl, byte ptr [c+2]
+    bswap ebx
+    mov dl, bh
     mov dl, byte ptr [eax+FMapR+edx]
     mov byte ptr [Result+2], dl
      // Put A value
-    mov dl, byte ptr [c+3]
+    mov dl, bl
     mov dl, byte ptr [eax+FMapA+edx]
     mov byte ptr [Result+3], dl
-  end;
   end;
 
   procedure TColor32Map.BuildLinear;
@@ -103,7 +95,7 @@ uses phUtils;
   procedure TColor32Map.ChannelBuildLinear(var Map: TChannelByteMap);
   var b: Byte;
   begin
-    for b := Low(Byte) to High(Byte) do Map[b] := iif(b<128, b*2, 255);
+    for b := Low(b) to High(b) do Map[b] := b;
   end;
 
   constructor TColor32Map.Create;
