@@ -75,7 +75,7 @@ inherited dSearch: TdSearch
     Top = 56
     Width = 616
     Height = 362
-    ActivePage = tsExpression
+    ActivePage = tsSimple
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = pcCriteriaChange
@@ -101,8 +101,10 @@ inherited dSearch: TdSearch
         TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toExtendedFocus, toRightClickSelect]
+        OnBeforeCellPaint = tvSimpleCriteriaBeforeCellPaint
         OnChecked = tvSimpleCriteriaChecked
         OnCreateEditor = tvSimpleCriteriaCreateEditor
+        OnEditing = tvSimpleCriteriaEditing
         OnFocusChanged = tvSimpleCriteriaFocusChanged
         OnGetText = tvSimpleCriteriaGetText
         OnPaintText = tvSimpleCriteriaPaintText
@@ -123,7 +125,7 @@ inherited dSearch: TdSearch
           item
             Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
-            Width = 298
+            Width = 294
             WideText = 'Value'
           end>
         WideDefaultText = ''
@@ -142,6 +144,7 @@ inherited dSearch: TdSearch
           TabOrder = 0
           object bSimpleReset: TTBXItem
             Action = aSimpleReset
+            DisplayMode = nbdmImageAndText
           end
           object bSimpleCrDelete: TTBXItem
             Action = aSimpleCrDelete
@@ -270,6 +273,7 @@ inherited dSearch: TdSearch
     object aSimpleReset: TAction
       Caption = '&Reset'
       Hint = 'Reset|Clear entered criteria'
+      ImageIndex = 0
       OnExecute = aaSimpleReset
     end
     object aSimpleCrDelete: TAction

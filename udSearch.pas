@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.30 2004-12-06 20:22:45 dale Exp $
+//  $Id: udSearch.pas,v 1.31 2004-12-09 14:19:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs, 
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phDlg, ActnList, TBX, Menus, TB2Item, DKLang, TB2Dock, TB2Toolbar,
   VirtualTrees, ComCtrls, StdCtrls, ExtCtrls, ufrExprPicFilter;
 
@@ -154,8 +154,10 @@ type
     procedure aaSimpleReset(Sender: TObject);
     procedure pcCriteriaChange(Sender: TObject);
     procedure pmSimplePopup(Sender: TObject);
+    procedure tvSimpleCriteriaBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvSimpleCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
+    procedure tvSimpleCriteriaEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
     procedure tvSimpleCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -211,6 +213,10 @@ const
     sscDateTimeSpecified, sscDateTimeNotSpecified, sscDateTimeLess, sscDateTimeLessEqual, sscDateTimeEqual,
     sscDateTimeNotEqual, sscDateTimeGreaterEqual, sscDateTimeGreater];
   SSCListConditions           = [sscListSpecified, sscListNotSpecified, sscListAny, sscListNone, sscListAll];
+   // Набор условий, не поддерживающих значения
+  SSCNoValueConditions        = [
+    sscInvalid, sscStrSpecified, sscStrNotSpecified, sscDateTimeSpecified, sscDateTimeNotSpecified, sscListSpecified,
+    sscListNotSpecified];
    // Наборы условий критериев в зависимости от типа данных свойства избражения
   aSSConditionsByDatatype: Array[TPicPropDatatype] of TSimpleSearchConditions = (
     SSCStringConditions,   // ppdtString
@@ -506,11 +512,12 @@ var
       case FCondition of
         sscListSpecified:    Result := PicKeywords.Count>0;
         sscListNotSpecified: Result := PicKeywords.Count=0;
-        sscListAny, sscListNone, sscListAll: begin
-          Result := FCondition=sscListNone;
-           // Если список (значение критерия) задан
-          if (FValue_Keywords=nil) or (FValue_Keywords.Count=0) then begin
-             // Проверяем каждое слово
+        sscListAny, sscListNone, sscListAll:
+           // Если список (значение критерия) не задан
+          if (FValue_Keywords=nil) or (FValue_Keywords.Count=0) then
+            Result := FCondition=sscListNone
+           // Иначе проверяем каждое слово
+          else begin 
             Result := FCondition in [sscListNone, sscListAll];
             for i := 0 to FValue_Keywords.Count-1 do
               if (PicKeywords.IndexOf(FValue_Keywords[i])>=0) xor (Condition=sscListAll) then begin
@@ -518,7 +525,6 @@ var
                 Break;
               end;
           end;
-        end;
         else InvalidDatatype;
       end;
     end;
@@ -813,7 +819,7 @@ type
       end;
       FCriterion.ValueStr := s;
     end;
-    FTree.InvalidateNode(FNode);
+    FTree.Invalidate; // Условие также влияет на доступность редактора значения
     FWControl.Hide;
   end;
 
@@ -1330,6 +1336,20 @@ type
     StateChanged;
   end;
 
+  procedure TdSearch.tvSimpleCriteriaBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  var Crit: TSimpleSearchCriterion;
+  begin
+    if (Column=IColIdx_Simple_Value) and ((Sender.FocusedNode<>Node) or (Sender.FocusedColumn<>Column)) then begin
+      Crit := GetSimpleCriterion(Node);
+       // Закрашиваем серым ячейку значения для условий, не нуждающихся в значении
+      if (Crit<>nil) and (Crit.Condition in SSCNoValueConditions) then
+        with TargetCanvas do begin
+          Brush.Color := clBtnFace;
+          FillRect(CellRect);
+        end;
+    end;
+  end;
+
   procedure TdSearch.tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   var p: TPoint;
   begin
@@ -1344,11 +1364,24 @@ type
     EditLink := TSimpleCriterionEditLink.Create(GetSimpleCriterion(Node));
   end;
 
+  procedure TdSearch.tvSimpleCriteriaEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+  var Crit: TSimpleSearchCriterion;
+  begin
+    Crit := GetSimpleCriterion(Node);
+    Allowed :=
+       // Не в процессе инициализации
+      not UpdateLocked and
+       // Не виртуальная строка
+      (Crit<>nil) and
+       // Редактор есть у условия или у значения при соответствующем условии
+      ((Column=IColIdx_Simple_Condition) or ((Column=IColIdx_Simple_Value) and not (Crit.Condition in SSCNoValueConditions)));
+  end;
+
   procedure TdSearch.tvSimpleCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   begin
     StateChanged;
      // Редактируем ячейку, в которую входим
-    if not UpdateLocked and (GetSimpleCriterion(Node)<>nil) then Sender.EditNode(Node, Column);
+    Sender.EditNode(Node, Column);
   end;
 
   procedure TdSearch.tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -1366,7 +1399,7 @@ type
       case Column of
         IColIdx_Simple_Property:  s := Crit.PicPropertyName;
         IColIdx_Simple_Condition: s := Crit.ConditionName;
-        IColIdx_Simple_Value:     s := Crit.ValueStr;
+        IColIdx_Simple_Value:     if not (Crit.Condition in SSCNoValueConditions) then s := Crit.ValueStr;
       end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
