@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.77 2005-02-15 14:15:35 dale Exp $
+//  $Id: Main.pas,v 1.78 2005-02-19 13:30:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
   ActiveX, XPMan,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps,
+  phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps,
   ConsVars,
   DKLang, ImgList, TB2Item, Placemnt, TB2MRU, TBXExtItems, Menus,
   TBX, ActnList, TBXStatusBars, VirtualTrees, TBXDkPanels, TBXLists,
@@ -372,20 +372,26 @@ type
      // IPhoaApp
     function  IPhoaApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhoaApp.GetMenu           = IApp_GetMenu;
     function  IPhoaApp.GetProject        = IApp_GetProject;
     function  IPhoaApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhoaApp.GetViewedPics     = IApp_GetViewedPics;
+    procedure IPhoaApp.SetCurGroup       = IApp_SetCurGroup;
     function  IApp_GetCurGroup: IPhoaPicGroup;
     function  IApp_GetFocusedControl: TPhoaAppFocusedControl;
+    function  IApp_GetMenu: IPhoaMenu;
     function  IApp_GetProject: IPhoaProject;
     function  IApp_GetSelectedPics: IPhoaPicList;
     function  IApp_GetViewedPics: IPhoaPicList;
+    procedure IApp_SetCurGroup(Value: IPhoaPicGroup);
      // IPhoaMutableApp
     function  IPhoaMutableApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaMutableApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhoaMutableApp.GetProject        = IApp_GetProject;
+    function  IPhoaMutableApp.GetMenu           = IApp_GetMenu;
     function  IPhoaMutableApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhoaMutableApp.GetViewedPics     = IApp_GetViewedPics;
+    procedure IPhoaMutableApp.SetCurGroup       = IApp_SetCurGroup;
     function  IPhoaMutableApp.GetCurGroupM      = IApp_GetCurGroupM;
     function  IPhoaMutableApp.GetProjectM       = IApp_GetProjectM;
     function  IPhoaMutableApp.GetSelectedPicsM  = IApp_GetSelectedPicsM;
@@ -399,9 +405,11 @@ type
      // IPhotoAlbumApp
     function  IPhotoAlbumApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhotoAlbumApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhotoAlbumApp.GetMenu           = IApp_GetMenu;
     function  IPhotoAlbumApp.GetProject        = IApp_GetProject;
     function  IPhotoAlbumApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhotoAlbumApp.GetViewedPics     = IApp_GetViewedPics;
+    procedure IPhotoAlbumApp.SetCurGroup       = IApp_SetCurGroup;
     function  IPhotoAlbumApp.GetCurGroupM      = IApp_GetCurGroupM;
     function  IPhotoAlbumApp.GetProjectM       = IApp_GetProjectM;
     function  IPhotoAlbumApp.GetSelectedPicsM  = IApp_GetSelectedPicsM;
@@ -1160,7 +1168,7 @@ uses
       ApplyLanguage;
        // Загружаем плагины
       ShowProgressInfo('SMsg_LoadingPlugins', []);
-      PluginsInitialize;
+      PluginsInitialize(Self);
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
@@ -1282,6 +1290,11 @@ uses
     Result := ilActionsSmall;
   end;
 
+  function TfMain.IApp_GetMenu: IPhoaMenu;
+  begin
+    Result := nil; {!!!!}
+  end;
+
   function TfMain.IApp_GetProject: IPhoaProject;
   begin
     Result := FProject;
@@ -1332,16 +1345,20 @@ uses
     PerformOperation(sOpName, aParams);
   end;
 
-  procedure TfMain.IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
+  procedure TfMain.IApp_SetCurGroup(Value: IPhoaPicGroup);
   begin
      // Переадресовываем поиску по ID
     if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
   end;
 
+  procedure TfMain.IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
+  begin
+    IApp_SetCurGroup(Value);
+  end;
+
   procedure TfMain.IApp_SetCurGroupX(Value: IPhotoAlbumPicGroup);
   begin
-     // Переадресовываем поиску по ID
-    if Value=nil then CurGroupID := 0 else CurGroupID := Value.ID;
+    IApp_SetCurGroup(Value);
   end;
 
   function TfMain.IsShortCut(var Message: TWMKey): Boolean;

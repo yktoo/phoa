@@ -1,9 +1,12 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.21 2005-02-14 19:34:08 dale Exp $
+//  $Id: phIntf.pas,v 1.22 2005-02-19 13:30:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
+// This unit contains fundamental PhoA entity interface declarations and API, such as picture, picture group, view and
+// project
+
 unit phIntf;
 
 interface
@@ -519,34 +522,6 @@ type
     property ViewRootGroup: IPhoaPicGroup read GetViewRootGroup;
      // -- Photo album views
     property Views: IPhoaViewList read GetViews;
-  end;
-
-   //===================================================================================================================
-   // PhoA application interface
-   //===================================================================================================================
-
-   // Control currently focused in the application
-  TPhoaAppFocusedControl = (pafcNone, pafcGroupTree, pafcThumbViewer);
-
-  IPhoaApp = interface(IInterface)
-    ['{D931B4CD-F8F0-48F7-B844-F1BECAC0E045}']
-     // Prop handlers
-    function  GetCurGroup: IPhoaPicGroup;
-    function  GetFocusedControl: TPhoaAppFocusedControl;
-    function  GetProject: IPhoaProject;
-    function  GetSelectedPics: IPhoaPicList;
-    function  GetViewedPics: IPhoaPicList;
-     // Props
-     // -- Group curently selected
-    property CurGroup: IPhoaPicGroup read GetCurGroup;
-     // -- Control currently focused
-    property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
-     // -- Active project
-    property Project: IPhoaProject read GetProject;
-     // -- Pictures (thumbnails) currently selected
-    property SelectedPics: IPhoaPicList read GetSelectedPics;
-     // -- Pictures (thumbnails) currently displayed
-    property ViewedPics: IPhoaPicList read GetViewedPics;
   end;
 
 const

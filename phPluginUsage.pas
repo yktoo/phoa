@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.2 2005-02-15 14:15:35 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.3 2005-02-19 13:30:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phPluginUsage;
 
 interface
-uses Windows, SysUtils, Classes, phPlugin;
+uses Windows, SysUtils, Classes, phIntf, phAppIntf, phMutableIntf, phNativeIntf, phPlugin;
 
 type
 
@@ -32,7 +32,7 @@ var
   PluginModules: IPhoaPluginModuleList;
 
    // Создаёт PluginModules и сканирует каталог плагинов, регистрируя в нём PluginModules найденные
-  procedure PluginsInitialize;
+  procedure PluginsInitialize(App: IPhotoAlbumApp);
    // Выгружает все плагины
   procedure PluginsFinalize;
 
@@ -57,11 +57,14 @@ type
 
   T_PluginModuleInfoList = class(TList)
   private
+     // Приложение
+    FApp: IPhotoAlbumApp;
+     // Prop handlers
     function GetItems(Index: Integer): P_PluginModuleInfo;
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
-    constructor Create;
+    constructor Create(AApp: IPhotoAlbumApp);
     function  Add(hLib: HINST; Module: IPhoaPluginModule): Integer;
      // Регистрирует плагин. Возвращает True, если указанный файл действительно является плагин-библиотекой
     function  RegisterPluginLib(const sPluginLib: String): Boolean;
@@ -79,7 +82,7 @@ type
     p.Module := Module;
   end;
 
-  constructor T_PluginModuleInfoList.Create;
+  constructor T_PluginModuleInfoList.Create(AApp: IPhotoAlbumApp);
 
      // Рекурсивная процедура сканирования плагинов
     procedure ScanPluginDir(const sDir: String);
@@ -105,6 +108,7 @@ type
 
   begin
     inherited Create;
+    FApp := AApp;
      // Сканируем каталог плагинов
     ScanPluginDir(sApplicationPath+SRelativePluginPath);
   end;
@@ -139,7 +143,7 @@ type
       GetModuleProc := GetProcAddress(hLib, 'PhoaGetPluginModule');
        // Если удалось - регистрируем модуль
       if Assigned(GetModuleProc) then begin
-        Add(hLib, GetModuleProc);
+        Add(hLib, GetModuleProc(FApp));
         Result := True;
        // Иначе выгружаем билиотеку
       end else
@@ -159,14 +163,14 @@ type
     function  GetCount: Integer;
     function  GetItems(Index: Integer): IPhoaPluginModule;
   public
-    constructor Create;
+    constructor Create(AApp: IPhotoAlbumApp);
     destructor Destroy; override;
   end;
 
-  constructor TPhoaPluginModuleList.Create;
+  constructor TPhoaPluginModuleList.Create(AApp: IPhotoAlbumApp);
   begin
     inherited Create;
-    FList := T_PluginModuleInfoList.Create;
+    FList := T_PluginModuleInfoList.Create(AApp);
   end;
 
   destructor TPhoaPluginModuleList.Destroy;
@@ -187,9 +191,9 @@ type
 
    //===================================================================================================================
 
-  procedure PluginsInitialize;
+  procedure PluginsInitialize(App: IPhotoAlbumApp);
   begin
-    PluginModules := TPhoaPluginModuleList.Create;
+    PluginModules := TPhoaPluginModuleList.Create(App);
   end;
 
   procedure PluginsFinalize;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.14 2005-02-14 19:34:08 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.15 2005-02-19 13:30:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phMutableIntf;
 
 interface
 
-uses Windows, phIntf;
+uses Windows, phIntf, phAppIntf;
 
 type
   IPhoaMutableKeywordList = interface;
@@ -440,7 +440,7 @@ type
     function  GetViewedPicsM: IPhoaMutablePicList;
     procedure SetCurGroupM(Value: IPhoaMutablePicGroup);
      // Props
-     // -- 'Mutable' and writable version of CurGroup
+     // -- 'Mutable' version of CurGroup
     property CurGroupM: IPhoaMutablePicGroup read GetCurGroupM write SetCurGroupM;
      // -- 'Mutable' version of Project
     property ProjectM: IPhoaMutableProject read GetProjectM;
