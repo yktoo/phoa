@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.26 2004-06-22 12:59:58 dale Exp $
+//  $Id: phObj.pas,v 1.27 2004-06-24 13:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -668,6 +668,8 @@ type
     FSavepoint: Boolean;
      // Prop handlers
     function GetInvalidationFlags: TUndoInvalidationFlags; virtual;
+     // Основная процедура отката изменений, внесённых операцией. В базовом классе не делает ничего 
+    procedure RollbackChanges; virtual;
      // Props
      // -- Возвращает группу, соответствующую GroupID
     property OpGroup: TPhoaGroup read GetOpGroup write SetOpGroup;
@@ -676,10 +678,9 @@ type
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
     destructor Destroy; override;
-    procedure Undo; virtual;
-     // Процедуры позиционирования файла данных
-    procedure BeginFileUndo;
-    procedure EndFileUndo;
+     // Процедура, откатывающая изменения, внесённые операцией (вызовом RollbackChanges()), и уничтожающая
+     //   объект-операцию
+    procedure Undo; 
      // Наименование операции
     function Name: String;
      // Props
@@ -768,10 +769,10 @@ type
   protected
      // Отдельные операции
     FOperations: TPhoaOperations;
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
     destructor Destroy; override;
-    procedure Undo; override;
      // Props
     property Operations: TPhoaOperations read FOperations;
   end;
@@ -787,9 +788,9 @@ type
   TPhoaOp_GroupNew = class(TPhoaOperation)
   protected
     function  GetInvalidationFlags: TUndoInvalidationFlags; override;
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; CurGroup: TPhoaGroup);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -797,9 +798,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_GroupRename = class(TPhoaOperation)
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText: String);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -807,12 +809,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_GroupEdit = class(TPhoaOp_GroupRename)
-  private
-     // Старое описание группы
-    FOldDescription: String;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText, sNewDescription: String);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -827,18 +827,11 @@ type
     FUnlinkedPicRemoves: TPhoaOperations;
      // Список ID изображений группы
     FPicIDs: TIntegerList;
-     // Текст группы
-    FGroupText: String;
-     // Описание группы
-    FGroupDescription: String;
-     // Индекс группы во владельце
-    FGroupIndex: Integer;
-     // True, если узел был развёрнут
-    FExpanded: Boolean;
      // Внутренняя (оптимизированная на использование заранее известного Owner-а) процедура отката
-    procedure InternalUndo(gOwner: TPhoaGroup);
+    procedure InternalRollback(gOwner: TPhoaGroup);
   protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
+    procedure RollbackChanges; override;
   public
      // Параметр bPerform контролирует, выполнять ли удаление (а также поиск неиспользуемых изображений). Должен быть
      //   True при вызове для изначальной операции удаления группы. Для вложенных групп конструктор вызывается уже с
@@ -846,7 +839,6 @@ type
      //   сохранения всей структуры удаляемых групп)
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; bPerform: Boolean);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -854,9 +846,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_InternalPicRemoving = class(TPhoaOperation)
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -886,9 +879,10 @@ type
     FChangedProps: TPicProperties;
      // Список прежних значений свойств
     FSavedProps: Array of TInternalPicPropSaveRec;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; ChangeList: TPicPropertyChanges);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -901,10 +895,11 @@ type
   private
      // Список прежних ключевых слов, Objects[] - ID изображений
     FSavedKeywords: TStringList;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; Keywords: TKeywordList);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -918,9 +913,10 @@ type
      // Прежние значения свойств преобразования
     FSavedRotation: TPicRotation;
     FSavedFlips: TPicFlips;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic; NewRotation: TPicRotation; NewFlips: TPicFlips);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -944,10 +940,11 @@ type
     FAddedPic: TPhoaPic;
      // Регистрирует изображение в группе, если его там не было, и запоминает данные отката
     procedure RegisterPic(Group: TPhoaGroup; Pic: TPhoaPic);
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sFilename: String); overload;
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pic: TPhoaPic); overload;
-    procedure Undo; override;
      // Props
      // -- Созданное изображение при создании из файла
     property AddedPic: TPhoaPic read FAddedPic;
@@ -961,10 +958,11 @@ type
   private
      // Список ID и индексов изображений в группе (в виде ID1, индекс1, ID2, индекс2, ...)
     FIDsAndIndexes: TIntegerList;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -975,10 +973,11 @@ type
   private
      // Список ID изображений, реально добавленных в группу 
     FAddedIDs: TIntegerList;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1019,9 +1018,10 @@ type
     FOldThumbnailQuality: Byte;
      // Старое описание фотоальбома
     FOldDescription: String;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; iNewThWidth, iNewThHeight: Integer; bNewThQuality: Byte; const sNewDescription: String);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1041,10 +1041,11 @@ type
   private
      // Список старого порядка следования изображений группы
     FOldPicIDs: TIntegerList;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Sortings: TPhoaSortings);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1069,9 +1070,9 @@ type
     FOldIndex: Integer;
   protected
     function GetInvalidationFlags: TUndoInvalidationFlags; override;
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group, NewParentGroup: TPhoaGroup; iNewIndex: Integer);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1091,10 +1092,11 @@ type
   private
      // Список старых и новых индексов изображений в группе (в виде old_index1, new_index1, old_index2, new_index2, ...)
     FIndexes: TIntegerList;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray; idxNew: Integer);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1127,9 +1129,10 @@ type
     FPrevViewIndex: Integer;
      // Индекс созданного представления
     FNewViewIndex: Integer;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; ViewsIntf: IPhoaViews; const sName: String; Groupings: TPhoaGroupings; Sortings: TPhoaSortings);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1146,11 +1149,12 @@ type
     FOldSortings: TPhoaSortings;
      // Новый индекс представления
     FNewViewIndex: Integer;
+  protected
+    procedure RollbackChanges; override;
   public
      // Если NewGroupings=nil и NewSortings=nil, значит, это просто переименование представления
     constructor Create(List: TPhoaOperations; View: TPhoaView; ViewsIntf: IPhoaViews; const sNewName: String; NewGroupings: TPhoaGroupings; NewSortings: TPhoaSortings);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1165,10 +1169,11 @@ type
     FOldName: String;
     FOldGroupings: TPhoaGroupings;
     FOldSortings: TPhoaSortings;
+  protected
+    procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; ViewsIntf: IPhoaViews);
     destructor Destroy; override;
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -1179,10 +1184,11 @@ type
   private
      // Интерфейс списка представлений
     FViewsIntf: IPhoaViews;
+  protected
+    procedure RollbackChanges; override;
   public
      // Group - группа, куда помещать папки представления
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; ViewsIntf: IPhoaViews);
-    procedure Undo; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4086,7 +4092,7 @@ var
 
   function TPhoaUndoFile.ReadBool: Boolean;
   begin
-    ReadCheckDatatype(pufdByte);
+    ReadCheckDatatype(pufdBool);
     Result := phObj.ReadByte(FStream)<>0;
   end;
 
@@ -4151,11 +4157,6 @@ var
    // TPhoaOperation
    //-------------------------------------------------------------------------------------------------------------------
 
-  procedure TPhoaOperation.BeginFileUndo;
-  begin
-    UndoFile.BeginUndo(FUndoDataPosition);
-  end;
-
   constructor TPhoaOperation.Create(List: TPhoaOperations; PhoA: TPhotoAlbum);
   begin
     FList := List;
@@ -4168,11 +4169,6 @@ var
   begin
     FList.Remove(Self);
     inherited Destroy;
-  end;
-
-  procedure TPhoaOperation.EndFileUndo;
-  begin
-    UndoFile.EndUndo;
   end;
 
   function TPhoaOperation.GetInvalidationFlags: TUndoInvalidationFlags;
@@ -4200,6 +4196,11 @@ var
     Result := ConstVal(ClassName);
   end;
 
+  procedure TPhoaOperation.RollbackChanges;
+  begin
+    { does nothing }
+  end;
+
   procedure TPhoaOperation.SetOpGroup(Value: TPhoaGroup);
   begin
     FOpGroupID := Value.ID;
@@ -4212,7 +4213,20 @@ var
 
   procedure TPhoaOperation.Undo;
   begin
-    Free;
+    try
+       // Позиционируем undo-файл в запомненную позицию
+      UndoFile.BeginUndo(FUndoDataPosition);
+      try
+         // Откатываем изменения
+        RollbackChanges;
+      finally
+         // Возвращаем позицию в undo-файле на место
+        UndoFile.EndUndo;
+      end;
+    finally
+       // Уничтожаем объект
+      Destroy;
+    end;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4371,10 +4385,10 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaMultiOp.Undo;
+  procedure TPhoaMultiOp.RollbackChanges;
   begin
+    inherited RollbackChanges;
     FOperations.UndoAll;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4399,11 +4413,11 @@ var
       uifUReinitParent];               // Undo flags
   end;
 
-  procedure TPhoaOp_GroupNew.Undo;
+  procedure TPhoaOp_GroupNew.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Удаляем группу операции
     OpGroup.Free;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4414,22 +4428,17 @@ var
   begin
     inherited Create(List, PhoA);
      // Запоминаем данные отката
-    UndoFile.WriteStr(Group.Text);
     OpGroup := Group;
+    UndoFile.WriteStr(Group.Text);
      // Выполняем операцию
-    Group.Text := sNewText;    
+    Group.Text := sNewText;
   end;
 
-  procedure TPhoaOp_GroupRename.Undo;
+  procedure TPhoaOp_GroupRename.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Получаем группу и восстанавливаем текст
-    BeginFileUndo;
-    try
-      OpGroup.Text := UndoFile.ReadStr;
-    finally
-      EndFileUndo;
-    end;
-    inherited Undo;
+    OpGroup.Text := UndoFile.ReadStr;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4439,16 +4448,17 @@ var
   constructor TPhoaOp_GroupEdit.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText, sNewDescription: String);
   begin
     inherited Create(List, PhoA, Group, sNewText);
-     // Выполняем операцию и запоминаем данные отката
-    FOldDescription := Group.Description;
+     // Запоминаем данные отката
+    UndoFile.WriteStr(Group.Description);
+     // Выполняем операцию
     Group.Description := sNewDescription;
   end;
 
-  procedure TPhoaOp_GroupEdit.Undo;
+  procedure TPhoaOp_GroupEdit.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Получаем группу и восстанавливаем описание
-    OpGroup.Description := FOldDescription;
-    inherited Undo;
+    OpGroup.Description := UndoFile.ReadStr;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4460,12 +4470,12 @@ var
   begin
     inherited Create(List, PhoA);
      // Запоминаем данные удаляемой группы
-    OpGroup           := Group;
-    OpParentGroup     := Group.Owner;
-    FGroupText        := Group.Text;
-    FGroupDescription := Group.Description;
-    FGroupIndex       := Group.Index;
-    FExpanded         := Group.Expanded;
+    OpGroup       := Group;
+    OpParentGroup := Group.Owner;
+    UndoFile.WriteStr (Group.Text);
+    UndoFile.WriteStr (Group.Description);
+    UndoFile.WriteInt (Group.Index);
+    UndoFile.WriteBool(Group.Expanded);
      // Запоминаем содержимое (ID изображений)
     if Group.PicIDs.Count>0 then begin
       FPicIDs := TIntegerList.Create(False);
@@ -4473,7 +4483,7 @@ var
     end;
      // Запоминаем список каскадно удаляемых узлов
     if Group.Groups.Count>0 then begin
-      FCascadedDeletes    := TPhoaOperations.Create(List.UndoFile);
+      FCascadedDeletes := TPhoaOperations.Create(List.UndoFile);
       for i := 0 to Group.Groups.Count-1 do TPhoaOp_GroupDelete.Create(FCascadedDeletes, PhoA, Group.Groups[i], False);
     end;
      // Выполняем операцию
@@ -4497,34 +4507,34 @@ var
   function TPhoaOp_GroupDelete.GetInvalidationFlags: TUndoInvalidationFlags;
   begin
     Result := [
-      uifXReinitParent, uifXReinitRecursive, // Execution flags
+      uifXReinitParent, uifXReinitRecursive,  // Execution flags
       uifUReinitParent, uifUReinitRecursive]; // Undo flags
   end;
 
-  procedure TPhoaOp_GroupDelete.InternalUndo(gOwner: TPhoaGroup);
+  procedure TPhoaOp_GroupDelete.InternalRollback(gOwner: TPhoaGroup);
   var
     i: Integer;
     g: TPhoaGroup;
   begin
      // Восстанавливаем группу
     g := TPhoaGroup.Create(gOwner, OpGroupID);
-    g.Text        := FGroupText;
-    g.Description := FGroupDescription;
-    g.Index       := FGroupIndex;
-    g.Expanded    := FExpanded;
+    g.Text        := UndoFile.ReadStr;
+    g.Description := UndoFile.ReadStr;
+    g.Index       := UndoFile.ReadInt;
+    g.Expanded    := UndoFile.ReadBool;
     if FPicIDs<>nil then g.PicIDs.Assign(FPicIDs);
      // Восстанавливаем каскадно удалённые группы
     if FCascadedDeletes<>nil then
-      for i := 0 to FCascadedDeletes.Count-1 do TPhoaOp_GroupDelete(FCascadedDeletes[i]).InternalUndo(g);
+      for i := 0 to FCascadedDeletes.Count-1 do TPhoaOp_GroupDelete(FCascadedDeletes[i]).InternalRollback(g);
   end;
 
-  procedure TPhoaOp_GroupDelete.Undo;
+  procedure TPhoaOp_GroupDelete.RollbackChanges;
   begin
+    inherited RollbackChanges;
+     // Восстанавливаем ветку групп/узлов
+    InternalRollback(OpParentGroup);
      // Восстанавливаем удалённые (несвязанные) изображения
     if FUnlinkedPicRemoves<>nil then FUnlinkedPicRemoves.UndoAll;
-     // Восстанавливаем ветку групп/узлов
-    InternalUndo(OpParentGroup);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4540,24 +4550,19 @@ var
     Pic.Free;
   end;
 
-  procedure TPhoaOp_InternalPicRemoving.Undo;
+  procedure TPhoaOp_InternalPicRemoving.RollbackChanges;
   var Pic: TPhoaPic;
   begin
-    BeginFileUndo;
+    inherited RollbackChanges;
+     // Создаём изображение и загружаем данные
+    Pic := TPhoaPic.Create(FPhoA);
     try
-       // Создаём изображение и загружаем данные
-      Pic := TPhoaPic.Create(FPhoA);
-      try
-        Pic.RawData[PPAllProps] := UndoFile.ReadStr;
-        Pic.List := FPhoA.Pics; // Assign the List AFTER props have been read because List sorts pics by IDs
-      except
-        Pic.Free;
-        raise;
-      end;
-    finally
-      EndFileUndo;
+      Pic.RawData[PPAllProps] := UndoFile.ReadStr;
+      Pic.List := FPhoA.Pics; // Assign the List AFTER props have been read because List sorts pics by IDs
+    except
+      Pic.Free;
+      raise;
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4585,13 +4590,13 @@ var
     end;
   end;
 
-  procedure TPhoaOp_InternalEditPicProps.Undo;
+  procedure TPhoaOp_InternalEditPicProps.RollbackChanges;
   var i: Integer;
   begin
+    inherited RollbackChanges;
      // Возвращаем данные изменённых изображений
     for i := 0 to High(FSavedProps) do
       with FSavedProps[i] do FPhoA.Pics.PicByID(iPicID).RawData[FChangedProps] := sPicData;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4680,13 +4685,13 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_InternalEditPicKeywords.Undo;
+  procedure TPhoaOp_InternalEditPicKeywords.RollbackChanges;
   var i: Integer;
   begin
+    inherited RollbackChanges;
      // Возвращаем КС изменённым изображениям
     for i := 0 to FSavedKeywords.Count-1 do
       FPhoA.Pics.PicByID(Integer(FSavedKeywords.Objects[i])).PicKeywords.CommaText := FSavedKeywords[i];
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4705,13 +4710,13 @@ var
     Pic.PicFlips    := NewFlips; 
   end;
 
-  procedure TPhoaOp_StoreTransform.Undo;
+  procedure TPhoaOp_StoreTransform.RollbackChanges;
   var Pic: TPhoaPic;
   begin
+    inherited RollbackChanges;
     Pic := PhoA.Pics.PicByID(FPicID);
     Pic.PicRotation := FSavedRotation;
     Pic.PicFlips    := FSavedFlips;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4778,8 +4783,9 @@ var
     end;
   end;
 
-  procedure TPhoaOp_InternalPicAdd.Undo;
+  procedure TPhoaOp_InternalPicAdd.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Если реально операция была сделана
     if FPicID>0 then begin
        // Удаляем из группы
@@ -4787,7 +4793,6 @@ var
        // Если быдо добавлено новое изображение, удаляем и из фотоальбома
       if not FExisting then FPhoA.Pics.PicByID(FPicID).Free;
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4819,11 +4824,12 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_InternalPicFromGroupRemoving.Undo;
+  procedure TPhoaOp_InternalPicFromGroupRemoving.RollbackChanges;
   var
     i: Integer;
     g: TPhoaGroup;
   begin
+    inherited RollbackChanges;
     g := OpGroup;
      // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
     i := FIDsAndIndexes.Count-2; // i указывает на ID, i+1 - на индекс
@@ -4831,7 +4837,6 @@ var
       g.PicIDs.Insert(FIDsAndIndexes[i+1], FIDsAndIndexes[i]);
       Dec(i, 2);
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -4855,15 +4860,15 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_InternalPicToGroupAdding.Undo;
+  procedure TPhoaOp_InternalPicToGroupAdding.RollbackChanges;
   var
     i: Integer;
     g: TPhoaGroup;
   begin
+    inherited RollbackChanges;
      // Удаляем добавленные изображения
     g := OpGroup;
     for i := FAddedIDs.Count-1 downto 0 do g.PicIDs.Remove(FAddedIDs[i]);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5094,15 +5099,15 @@ var
     end;
   end;
 
-  procedure TPhoaOp_PhoAEdit.Undo;
+  procedure TPhoaOp_PhoAEdit.RollbackChanges;
   begin
+    inherited RollbackChanges;
     with FPhoA do begin
       ThumbnailWidth   := FOldThumbnailWidth;
       ThumbnailHeight  := FOldThumbnailHeight;
       ThumbnailQuality := FOldThumbnailQuality;
       Description      := FOldDescription;
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5160,11 +5165,11 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_InternalGroupPicSort.Undo;
+  procedure TPhoaOp_InternalGroupPicSort.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Восстанавливаем старый порядок следования ID изображений в группе
     OpGroup.PicIDs.Assign(FOldPicIDs);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5212,14 +5217,14 @@ var
     Result := [uifUReinitAll];
   end;
 
-  procedure TPhoaOp_GroupDragAndDrop.Undo;
+  procedure TPhoaOp_GroupDragAndDrop.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Восстанавливаем положение группы
     with OpGroup do begin
       Owner := OpParentGroup;
       Index := FOldIndex;
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5264,11 +5269,12 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_PicDragAndDropInsideGroup.Undo;
+  procedure TPhoaOp_PicDragAndDropInsideGroup.RollbackChanges;
   var
     i: Integer;
     g: TPhoaGroup;
   begin
+    inherited RollbackChanges;
     g := OpGroup;
      // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
     i := FIndexes.Count-2; // i указывает на idxOld, i+1 - на idxNew
@@ -5276,7 +5282,6 @@ var
       g.PicIDs.Move(FIndexes[i+1], FIndexes[i]);
       Dec(i, 2);
     end;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5300,13 +5305,13 @@ var
     ViewsIntf.LoadViewList(FNewViewIndex);
   end;
 
-  procedure TPhoaOp_ViewNew.Undo;
+  procedure TPhoaOp_ViewNew.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Удаляем представление
     FViewsIntf.Views.Delete(FNewViewIndex);
      // Перегружаем список и восстанавливаем прежнее выбранное представление
     FViewsIntf.LoadViewList(FPrevViewIndex);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5351,9 +5356,10 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_ViewEdit.Undo;
+  procedure TPhoaOp_ViewEdit.RollbackChanges;
   var View: TPhoaView;
   begin
+    inherited RollbackChanges;
      // Восстанавливаем представление
     View := FViewsIntf.Views[FNewViewIndex];
     View.Name := FOldName;
@@ -5364,7 +5370,6 @@ var
     FViewsIntf.Views.Sort;
      // Перегружаем список
     FViewsIntf.LoadViewList(View.Index);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5396,9 +5401,10 @@ var
     inherited Destroy;
   end;
 
-  procedure TPhoaOp_ViewDelete.Undo;
+  procedure TPhoaOp_ViewDelete.RollbackChanges;
   var View: TPhoaView;
   begin
+    inherited RollbackChanges;
      // Создаём представление
     View := TPhoaView.Create(FViewsIntf.Views);
     View.Name := FOldName;
@@ -5408,7 +5414,6 @@ var
     FViewsIntf.Views.Sort;
      // Перегружаем список
     FViewsIntf.LoadViewList(View.Index);
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5435,13 +5440,13 @@ var
     ViewsIntf.ViewIndex := -1;
   end;
 
-  procedure TPhoaOp_ViewMakeGroup.Undo;
+  procedure TPhoaOp_ViewMakeGroup.RollbackChanges;
   begin
+    inherited RollbackChanges;
      // Удаляем корневую группу копии представления
     OpGroup.Free;
      // Загружаем дерево папок
     FViewsIntf.ViewIndex := -1;
-    inherited Undo;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
