@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: udSettings.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -22,19 +22,19 @@ type
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
     tvMain: TVirtualStringTree;
+    procedure EmbedControlNotify(Sender: TObject);
     procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvMainAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvMainFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-    procedure EmbedControlNotify(Sender: TObject);
+    procedure tvMainGetCellIsEmpty(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var IsEmpty: Boolean);
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
      // Узел, соответствующего текущей нажатой NavBar-кнопке
-    FCurSetting: TPhoaSetting;
+    FCurSetting: TPhoaPageSetting;
      // Индекс кнопки навигатора, которую следует выбрать по умочанию
     FDefNavBtnIndex: Integer;
      // Контрол для редактирования значения текущего узла
@@ -45,7 +45,7 @@ type
      // Создаёт кнопкtи навигации (уровень 0 из ConsVars.aPhoaSettings[])
     procedure CreateNavBar;
      // Загружает в tvMain дерево настроек, относящихся к детям узла Setting
-    procedure LoadSettingTree(Setting: TPhoaSetting);
+    procedure LoadSettingTree(PageSetting: TPhoaPageSetting);
      // Событие нажатия NavBar-кнопки
     procedure NavBarButtonClick(Sender: TObject);
      // Декодирует строку текста сообразно правилам (если требуется, то с использованием констант)
@@ -70,8 +70,6 @@ type
 
 const
   ISetting_ValueGap        = 4;   // Отступ между текстом и значением пункта настройки, в пикселах
-
-  CValueBackColor          = $f7f7f7; // Цвет фона значения настройки
 
 implementation
 {$R *.dfm}
@@ -118,15 +116,15 @@ type
   var
     i: Integer;
     tbi: TTBXCustomItem;
-    PS: TPhoaSetting;
+    PPS: TPhoaPageSetting;
   begin
     for i := 0 to FLocalRootSetting.ChildCount-1 do begin
-      PS := FLocalRootSetting.Children[i];
+      PPS := FLocalRootSetting.Children[i] as TPhoaPageSetting;
       tbi := TTBXItem.Create(Self);
-      tbi.Caption     := DecodeSettingText(PS.Name);
-      tbi.HelpContext := PS.HelpContext;
-      tbi.ImageIndex  := PS.ImageIndex;
-      tbi.Tag         := Integer(PS);
+      tbi.Caption     := DecodeSettingText(PPS.Name);
+      tbi.HelpContext := PPS.HelpContext;
+      tbi.ImageIndex  := PPS.ImageIndex;
+      tbi.Tag         := Integer(PPS);
       tbi.OnClick     := NavBarButtonClick;
       if i<9 then tbi.ShortCut := 16433+i; // Ctrl+1..9 keys
       tbNav.Items.Add(tbi);
@@ -153,7 +151,6 @@ type
 
      // Создаёт и присваивает в FEditorControl Control заданного класса в качестве редактора значения настройки
     procedure NewControl(CtlClass: TWinControlClass);
-    var RAvail: TRect;
 
       procedure BindKeyEvent(const sPropName: String; Event: TKeyEvent);
       begin
@@ -166,26 +163,17 @@ type
       end;
 
     begin
-       // Прикидываем границы контрола
-      RAvail := tvMain.GetDisplayRect(CurNode, -1, True);
-      RAvail.Left  := RAvail.Right+ISetting_ValueGap;
-      RAvail.Right := tvMain.ClientWidth;
        // Создаём контрол, если его ещё нет, или он другого класса
       if (FEditorControl=nil) or (FEditorControl.ClassType<>CtlClass) then begin
         FreeAndNil(FEditorControl);
         FEditorControl := CtlClass.Create(Self);
         FEditorControl.Parent := tvMain;
       end;
-      with FEditorControl do begin
-         // Настраиваем размер
-        SetBounds(
-          RAvail.Left,
-          (RAvail.Top+RAvail.Bottom-Height) div 2,
-          Min(RAvail.Right-RAvail.Left, Setting.EditorWidth),
-          Height);
-         // Tag должен указывать на соответствующий узел
-        Tag := Integer(CurNode);
-      end;
+       // Настраиваем размер
+      FEditorControl.BoundsRect := tvMain.GetDisplayRect(CurNode, 1, False);
+       // Tag должен указывать на соответствующий узел
+      FEditorControl.Tag := Integer(CurNode);
+       // Привязываем события
       BindNotifyEvent('OnEnter',   EmbedControlNotify);
       BindNotifyEvent('OnExit',    EmbedControlNotify);
       BindKeyEvent   ('OnKeyDown', EmbeddedControlKeyDown);
@@ -236,7 +224,6 @@ type
     begin
       NewControl(TSettingButton);
       with TSettingButton(FEditorControl) do begin
-        Height    := 23;
         Caption   := GetFirstWord(Setting.ValueStr, '/');
         OnClick   := EmbeddedFontButtonClick;
       end;
@@ -348,16 +335,16 @@ type
      // Создаём кнопки навигации
     CreateNavBar;
      // Выбираем стартовую кнопку
-    LoadSettingTree(FLocalRootSetting[FDefNavBtnIndex]);
+    LoadSettingTree(FLocalRootSetting[FDefNavBtnIndex] as TPhoaPageSetting);
   end;
 
-  procedure TdSettings.LoadSettingTree(Setting: TPhoaSetting);
+  procedure TdSettings.LoadSettingTree(PageSetting: TPhoaPageSetting);
   var i: Integer;
   begin
-    FCurSetting := Setting;
+    FCurSetting := PageSetting;
      // Нажимаем соотв. кнопку
     for i := 0 to tbNav.Items.Count-1 do
-      with tbNav.Items[i] do Checked := Tag=Integer(Setting);
+      with tbNav.Items[i] do Checked := Tag=Integer(PageSetting);
      // Загружаем дерево
     with tvMain do begin
       BeginUpdate;
@@ -365,7 +352,7 @@ type
          // Удаляем все узлы
         Clear;
          // Устанавливаем количество записей в корневом каталоге
-        RootNodeCount := Setting.ChildCount;
+        RootNodeCount := PageSetting.ChildCount;
          // Инициализируем все узлы
         ReinitChildren(nil, True);
          // Выделяем первый узел
@@ -377,45 +364,27 @@ type
       if Self.Visible then SetFocus;
     end;
      // Настраиваем HelpContext
-    HelpContext := Setting.HelpContext;
+    HelpContext := PageSetting.HelpContext;
   end;
 
   procedure TdSettings.NavBarButtonClick(Sender: TObject);
   begin
-    LoadSettingTree(TPhoaSetting(TComponent(Sender).Tag));
+    LoadSettingTree(TPhoaPageSetting(TComponent(Sender).Tag));
   end;
 
   procedure TdSettings.tvMainAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
   var Setting: TPhoaSetting;
-
-    procedure DoDraw(cBkColor: TColor; const sText: String);
-    var r: TRect;
-    begin
-      if sText<>'' then begin
-         // Настраиваем Canvas
-        with TargetCanvas do begin
-          Pen.Color   := iif(vsSelected in Node.States, clHighlight, clGrayText);
-          Font.Color  := Pen.Color;
-          Brush.Color := cBkColor;
-        end;
-         // Получаем прямоугольник текста в TargetCanvas
-        r := Sender.GetDisplayRect(Node, -1, True);
-        r  := Rect(r.Right+ISetting_ValueGap, CellRect.Top, r.Right+ISetting_ValueGap+(TargetCanvas.TextWidth(sText)+6), CellRect.Bottom);
-        TargetCanvas.RoundRect(r.Left, r.Top, r.Right, r.Bottom, 7, 7);
-        DrawText(TargetCanvas.Handle, PChar(sText), -1, r, DT_CENTER or DT_VCENTER or DT_SINGLELINE or DT_NOPREFIX);
-      end;
-    end;
-
   begin
-     // Получаем пункт
-    Setting := PPhoaSetting(Sender.GetNodeData(Node))^;
-     // "Дорисовываем"
-    case Setting.Datatype of
-      sdtComboIdx,
-        sdtComboObj: DoDraw(CValueBackColor,  DecodeSettingText(Setting.VariantText));
-      sdtColor:      DoDraw(Setting.ValueInt, '         ');
-      sdtInt:        DoDraw(CValueBackColor,  IntToStr(Setting.ValueInt));
-      sdtFont:       DoDraw(CValueBackColor,  GetFirstWord(Setting.ValueStr, '/'));
+    if Column=1 then begin
+       // Получаем пункт
+      Setting := PPhoaSetting(Sender.GetNodeData(Node))^;
+       // Если это "Цвет", рисуем квадратик соответствующего цвета
+      if Setting.Datatype=sdtColor then
+        with TargetCanvas do begin
+          Pen.Color   := clBlack;
+          Brush.Color := Setting.ValueInt;
+          Rectangle(CellRect.Left+2, (CellRect.Top+CellRect.Bottom-14) div 2, CellRect.Left+16, (CellRect.Top+CellRect.Bottom+14) div 2);
+        end;
     end;
   end;
 
@@ -448,14 +417,30 @@ type
     PostMessage(Handle, WM_EMBEDCONTROL, 0, 0);
   end;
 
-  procedure TdSettings.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+  procedure TdSettings.tvMainGetCellIsEmpty(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var IsEmpty: Boolean);
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := PPhoaSetting(Sender.GetNodeData(Node))^.ImageIndex;
+     // Ячейка значения не пустая, если настройка редактируется редактором
+    if Column=1 then IsEmpty := not (PPhoaSetting(Sender.GetNodeData(Node))^.Datatype in EditableSettingDatatypes);
   end;
 
   procedure TdSettings.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  var
+    s: String;
+    Setting: TPhoaSetting;
   begin
-    CellText := AnsiToUnicodeCP(DecodeSettingText(PPhoaSetting(Sender.GetNodeData(Node))^.Name), cMainCodePage);
+    s := '';
+    Setting := PPhoaSetting(Sender.GetNodeData(Node))^;
+    case Column of
+      0: s := DecodeSettingText(Setting.Name);
+      1:
+        case Setting.Datatype of
+          sdtComboIdx,
+            sdtComboObj: s := DecodeSettingText(Setting.VariantText);
+          sdtInt:        s := IntToStr(Setting.ValueInt);
+          sdtFont:       s := GetFirstWord(Setting.ValueStr, '/');
+        end;
+    end;
+    CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   procedure TdSettings.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

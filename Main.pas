@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: Main.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -625,7 +625,7 @@ uses
       i: Integer;
       tcd: TThumbCornerDetail;
     begin
-      i := RootSetting.Settings[iSettingID].ValueInt;
+      i := RootSetting.ValueIntByID[iSettingID];
       tcd.bDisplay := (i>=Byte(Low(TPicProperty))) and (i<=Byte(High(TPicProperty)));
       if tcd.bDisplay then tcd.Prop := TPicProperty(i);
       Viewer.ThumbCornerDetails[Corner] := tcd;
@@ -633,16 +633,16 @@ uses
 
   begin
      // Настраиваем язык интерфейса
-    dtlsMain.Language := RootSetting.Settings[ISettingID_Gen_Language].ValueInt;
+    dtlsMain.Language := RootSetting.ValueIntByID[ISettingID_Gen_Language];
      // Настраиваем основной шрифт программы
-    FontFromStr(Font, RootSetting.Settings[ISettingID_Gen_MainFont].ValueStr);
+    FontFromStr(Font, RootSetting.ValueStrByID[ISettingID_Gen_MainFont]);
     ToolbarFont.Assign(Font);
      // Настраиваем текущую кодовую страницу
     cMainCodePage := CharsetToCP(Font.Charset);
      // Настраиваем список последних открывавшихся файлов
-    mruOpen.MaxItems := RootSetting.Settings[ISettingID_Gen_OpenMRUCount].ValueInt;
+    mruOpen.MaxItems := RootSetting.ValueIntByID[ISettingID_Gen_OpenMRUCount];
      // Настраиваем подсказки
-    Application.HintHidePause := RootSetting.Settings[ISettingID_Gen_TooltipDisplTime].ValueInt;
+    Application.HintHidePause := RootSetting.ValueIntByID[ISettingID_Gen_TooltipDisplTime];
      // Настраиваем доки/панели инструментов
      // -- Перетаскиваемость
     ApplyToolbarSettings(dkTop);
@@ -650,7 +650,7 @@ uses
     ApplyToolbarSettings(dkRight);
     ApplyToolbarSettings(dkBottom);
      // -- Размер кнопок основной панели
-    case RootSetting.Settings[ISettingID_Gen_ToolbarBtnSize].ValueInt of
+    case RootSetting.ValueIntByID[ISettingID_Gen_ToolbarBtnSize] of
       0: tbMain.Images := ilActionsSmall;
       1: tbMain.Images := ilActionsMiddle;
       2: tbMain.Images := ilActionsLarge;
@@ -661,14 +661,14 @@ uses
     with Viewer do begin
       BeginUpdate;
       try
-        ThickThumbBorder  := RootSetting.Settings[ISettingID_Browse_ViewerThBorder].ValueBool;
-        CacheThumbnails   := RootSetting.Settings[ISettingID_Browse_ViewerCacheThs].ValueBool;
-        ThumbCacheSize    := RootSetting.Settings[ISettingID_Browse_ViewerCacheSze].ValueInt;
-        Color             := RootSetting.Settings[ISettingID_Browse_ViewerBkColor].ValueInt;
-        ThumbBackColor    := RootSetting.Settings[ISettingID_Browse_ViewerThBColor].ValueInt;
-        ThumbFontColor    := RootSetting.Settings[ISettingID_Browse_ViewerThFColor].ValueInt;
-        ShowThumbTooltips := RootSetting.Settings[ISettingID_Browse_ViewerTooltips].ValueBool;
-        ThumbTooltipProps := IntToPicProps(RootSetting.Settings[ISettingID_Browse_ViewerTipProps].ValueInt);
+        ThickThumbBorder  := RootSetting.ValueBoolByID[ISettingID_Browse_ViewerThBorder];
+        CacheThumbnails   := RootSetting.ValueBoolByID[ISettingID_Browse_ViewerCacheThs];
+        ThumbCacheSize    := RootSetting.ValueIntByID [ISettingID_Browse_ViewerCacheSze];
+        Color             := RootSetting.ValueIntByID [ISettingID_Browse_ViewerBkColor];
+        ThumbBackColor    := RootSetting.ValueIntByID [ISettingID_Browse_ViewerThBColor];
+        ThumbFontColor    := RootSetting.ValueIntByID [ISettingID_Browse_ViewerThFColor];
+        ShowThumbTooltips := RootSetting.ValueBoolByID[ISettingID_Browse_ViewerTooltips];
+        ThumbTooltipProps := IntToPicProps(RootSetting.ValueIntByID[ISettingID_Browse_ViewerTipProps]);
         SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);
         SetupViewerCorner(tcRightTop,    ISettingID_Browse_ViewerThRTProp);
         SetupViewerCorner(tcLeftBottom,  ISettingID_Browse_ViewerThLBProp);
@@ -802,7 +802,7 @@ uses
     aPhoaView_Edit.Enabled      := not bPicGroups;
     aPhoaView_MakeGroup.Enabled := not bPicGroups;
      // Drag-and-drop
-    Viewer.DragEnabled := bPicGroups and RootSetting.Settings[ISettingID_Browse_ViewerDragDrop].ValueBool;
+    Viewer.DragEnabled := bPicGroups and RootSetting.ValueBoolByID[ISettingID_Browse_ViewerDragDrop];
      // Настраиваем Captions
     Caption := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), asUnmod[FOperations.IsUnmodified], ConstVal('SAppCaption')]);
     Application.Title := Caption;
@@ -884,7 +884,7 @@ uses
      // Load toolbars
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegToolbars);
      // Если нужно и присутствует ini-файл, подгружаем настройки из него
-    if RootSetting.Settings[ISettingID_Gen_LookupPhoaIni].ValueBool then begin
+    if RootSetting.ValueBoolByID[ISettingID_Gen_LookupPhoaIni] then begin
       sAutoLoadIniFile := ExtractFilePath(ParamStr(0))+SDefaultIniFileName;
       if FileExists(sAutoLoadIniFile) then IniRestoreSettings(sAutoLoadIniFile);
     end;
@@ -1054,7 +1054,7 @@ uses
   begin
     if tsUpdating in tvGroups.TreeStates then Exit;
      // Ограничиваем количество операций в буфере
-    iMaxCnt := RootSetting.Settings[ISettingID_Browse_MaxUndoCount].ValueInt;
+    iMaxCnt := RootSetting.ValueIntByID[ISettingID_Browse_MaxUndoCount];
     with FOperations do
       while Count>iMaxCnt do Delete(0);
     EnableActions;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phDlg.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -158,7 +158,7 @@ uses phUtils, ChmHlp, ConsVars;
   procedure TPhoaDialog.InitializeDialog;
   begin
      // Настраиваем шрифт
-    FontFromStr(Font, RootSetting.Settings[ISettingID_Gen_MainFont].ValueStr);
+    FontFromStr(Font, RootSetting.ValueStrByID[ISettingID_Gen_MainFont]);
   end;           
 
   procedure TPhoaDialog.Loaded;

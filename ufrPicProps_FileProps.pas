@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -57,7 +57,7 @@ type
     ApplyTreeSettings(tvMain);
     tvMain.NodeDataSize := SizeOf(Pointer);
     tvMain.Images := FileImages;
-    FExpandAll := RootSetting.Settings[ISettingID_Dlgs_PP_ExpFileProps].ValueBool;
+    FExpandAll := RootSetting.ValueBoolByID[ISettingID_Dlgs_PP_ExpFileProps];
   end;
 
   procedure TfrPicProps_FileProps.tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);

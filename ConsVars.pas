@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: ConsVars.pas,v 1.4 2004-04-18 12:09:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -534,14 +534,6 @@ const
     ISettingID_Gen_TreeBS_Rectangle    = 0207; // Стандартные
     ISettingID_Gen_TreeBS_Triangle     = 0208; // Треугольники
     ISettingID_Gen_TreeCheckStyle      = 0209; // Вид переключателей в узлах (на не-XP-системах)
-    ISettingID_Gen_TreeCS_DarkCheck    = 0;    // Dark Check
-    ISettingID_Gen_TreeCS_DarkTick     = 0;    // Dark Tick
-    ISettingID_Gen_TreeCS_Flat         = 0;    // Flat
-    ISettingID_Gen_TreeCS_LightCheck   = 0;    // Light Check
-    ISettingID_Gen_TreeCS_LightTick    = 0;    // Light Tick
-    ISettingID_Gen_TreeCS_Std          = 0;    // Standard
-    ISettingID_Gen_TreeCS_StdFlat      = 0;    // Standard Flat
-    ISettingID_Gen_TreeCS_XP           = 0;    // XP
     ISettingID_Gen_TreeSelStyle        = 0220; // Вид рамки выделения
     ISettingID_Gen_TreeSelDotted       = 0;    // Пунктир
     ISettingID_Gen_TreeSelBlended      = 0;    // Оттенённый прямоугольник
@@ -759,6 +751,9 @@ type
     sdtColor,    // Цвет
     sdtInt,      // Целое число
     sdtFont);    // Шрифт
+const
+   // Типы данных, редактируемые реадктором
+  EditableSettingDatatypes = [sdtComboIdx, sdtComboObj, sdtColor, sdtInt, sdtFont];
 
 type
    // Exception настроек
@@ -774,23 +769,18 @@ type
     FData: Integer;
      // Prop storage
     FOwner: TPhoaSetting;
-    FImageIndex: Integer;
     FDatatype: TSettingDatatype;
     FName: String;
     FMaxValue: Integer;
     FMinValue: Integer;
     FID: Integer;
-    FHelpContext: THelpContext;
     FVariants: TStrings;
-    FEditorWidth: Integer;
      // Добавление / удаление пункта из списка дочерних пунктов
     procedure AddSetting(Item: TPhoaSetting);
     procedure RemoveSetting(Item: TPhoaSetting);
     procedure DeleteSetting(Index: Integer);
      // Очищает список дочерних пунктов
     procedure ClearSettings;
-     // Внутренняя процедура копирования все установок (не копирует данные, передаваемые в конструкторе и не стирает детей)
-    procedure InternalAssign(Source: TPhoaSetting);
      // Ищет пункт по ID среди себя и своих детей. Если не найден, возвращает nil
     function  FindID(iID: Integer): TPhoaSetting;
      // Возвращает значение в виде строки
@@ -810,7 +800,17 @@ type
     function  GetVariantIndex: Integer;
     procedure SetVariantIndex(Value: Integer);
     function  GetVariants: TStrings;
-    function GetVariantText: String;
+    function  GetVariantText: String;
+    function GetValueBoolByID(iID: Integer): Boolean;
+    function GetValueIntByID(iID: Integer): Integer;
+    function GetValueStrByID(iID: Integer): String;
+    procedure SetValueBoolByID(iID: Integer; Value: Boolean);
+    procedure SetValueIntByID(iID: Integer; Value: Integer);
+    procedure SetValueStrByID(iID: Integer; const Value: String);
+  protected
+     // "Простой" конструктор, не инициализирующий свойств, кроме Owner (используется в "нормальных" конструкторах и в
+     //   Assign)
+    constructor CreateNew(AOwner: TPhoaSetting); virtual;
   public
     constructor Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String); overload;
     constructor Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String; bValue: Boolean); overload;
@@ -824,7 +824,7 @@ type
     procedure IniLoad(IniFile: TIniFile);
     procedure IniSave(IniFile: TIniFile);
      // Копирует все установки (включая структуру дочерних узлов) с узла Source
-    procedure Assign(Source: TPhoaSetting);
+    procedure Assign(Source: TPhoaSetting); virtual;
      // Props
      // -- Количество дочерних пунктов
     property ChildCount: Integer read GetChildCount;
@@ -832,14 +832,8 @@ type
     property Children[Index: Integer]: TPhoaSetting read GetChildren; default;
      // -- Тип данных пункта
     property Datatype: TSettingDatatype read FDatatype;
-     // -- Ширина встраиваемого в дерево редактора, в пикселах
-    property EditorWidth: Integer read FEditorWidth write FEditorWidth;
-     // -- HelpContext ID пункта
-    property HelpContext: THelpContext read FHelpContext write FHelpContext;
      // -- ID пункта
     property ID: Integer read FID;
-     // -- ImageIndex пункта
-    property ImageIndex: Integer read FImageIndex write FImageIndex;
      // -- Максимальное и минимальное значения пунктов (только при Datatype=sdtInt)
     property MaxValue: Integer read FMaxValue write SetMaxValue;
     property MinValue: Integer read FMinValue write SetMinValue;
@@ -862,6 +856,30 @@ type
     property ValueBool: Boolean read GetValueBool write SetValueBool;
     property ValueInt:  Integer read GetValueInt  write SetValueInt;
     property ValueStr:  String  read GetValueStr  write SetValueStr;
+     // -- Типизированные значения пунктов, отыскиваемые по заданному ID
+    property ValueBoolByID[iID: Integer]: Boolean read GetValueBoolByID write SetValueBoolByID;
+    property ValueIntByID[iID: Integer]:  Integer read GetValueIntByID  write SetValueIntByID;
+    property ValueStrByID[iID: Integer]:  String  read GetValueStrByID  write SetValueStrByID;
+  end;
+
+  TPhoaSettingClass = class of TPhoaSetting;
+
+   // Пункт корневого пункта настроек, представляющий собой страницу
+  TPhoaPageSetting = class(TPhoaSetting)
+  private
+     // Prop storage
+    FHelpContext: THelpContext;
+    FImageIndex: Integer;
+  protected
+    constructor CreateNew(AOwner: TPhoaSetting); override;
+  public
+    constructor Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext); 
+    procedure Assign(Source: TPhoaSetting); override;
+     // -- HelpContext ID пункта
+    property HelpContext: THelpContext read FHelpContext;
+     // Props
+     // -- ImageIndex пункта
+    property ImageIndex: Integer read FImageIndex;
   end;
 
 var
@@ -922,6 +940,20 @@ const
     for pcf := Low(pcf) to High(pcf) do TPhoaSetting.Create(Owner, sdtParMsk, 0, '#'+GetEnumName(TypeInfo(TPicClipboardFormat), Byte(pcf)));
   end;
 
+  procedure AdjustTreeCheckStyleSetting(Setting: TPhoaSetting);
+  begin
+    with Setting.Variants do begin
+      Add('Dark Check');
+      Add('Dark Tick');
+      Add('Flat');
+      Add('Light Check');
+      Add('Light Tick');
+      Add('Standard');
+      Add('Standard Flat');
+      Add('XP');
+    end;
+  end;
+
   procedure AddStretchFilterSettings(Owner: TPhoaSetting);
   begin
     TPhoaSetting.Create(Owner, sdtMutexInt, 0, 'Nearest Neighbor',   Byte(sfNearest));
@@ -931,10 +963,9 @@ const
     TPhoaSetting.Create(Owner, sdtMutexInt, 0, 'Mitchell',           Byte(sfMitchell));
   end;
 
-  procedure AdjustMagnificationSettings(Setting: TPhoaSetting);
+  procedure AdjustMagnificationSetting(Setting: TPhoaSetting);
   var b: Byte;
   begin
-    Setting.EditorWidth := 80;
     for b := 0 to High(adMagnifications) do Setting.Variants.Add(Format('%d%%', [Trunc((adMagnifications[b]-1)*100)]));
   end;
 
@@ -950,32 +981,32 @@ const
      // Apply options
     with Tree.TreeOptions do begin
        // -- Animation
-      if RootSetting.Settings[ISettingID_Gen_TreeAnimation].ValueBool then
+      if RootSetting.ValueBoolByID[ISettingID_Gen_TreeAnimation] then
         AnimationOptions := AnimationOptions+[toAnimatedToggle]
       else
         AnimationOptions := AnimationOptions-[toAnimatedToggle];
        // -- Wheel panning
-      if RootSetting.Settings[ISettingID_Gen_TreeWhPanning].ValueBool then
+      if RootSetting.ValueBoolByID[ISettingID_Gen_TreeWhPanning] then
         MiscOptions := MiscOptions+[toWheelPanning]
       else
         MiscOptions := MiscOptions-[toWheelPanning];
        // -- Center selection
-      if RootSetting.Settings[ISettingID_Gen_TreeCenterSel].ValueBool then
+      if RootSetting.ValueBoolByID[ISettingID_Gen_TreeCenterSel] then
         SelectionOptions := SelectionOptions+[toCenterScrollIntoView]
       else
         SelectionOptions := SelectionOptions-[toCenterScrollIntoView];
     end;
     with Tree do begin
        // -- Incremental search
-      if RootSetting.Settings[ISettingID_Gen_TreeIncrSearch].ValueBool then begin
+      if RootSetting.ValueBoolByID[ISettingID_Gen_TreeIncrSearch] then begin
         IncrementalSearch        := isVisibleOnly;
-        IncrementalSearchTimeout := RootSetting.Settings[ISettingID_Gen_TreeIncrSrchDelay].ValueInt;
+        IncrementalSearchTimeout := RootSetting.ValueIntByID[ISettingID_Gen_TreeIncrSrchDelay];
       end else
         IncrementalSearch := isNone;
        // -- Button style
-      if RootSetting.Settings[ISettingID_Gen_TreeButtonStyle].ValueInt=0 then ButtonStyle := bsRectangle else ButtonStyle := bsTriangle;
+      if RootSetting.ValueIntByID[ISettingID_Gen_TreeButtonStyle]=0 then ButtonStyle := bsRectangle else ButtonStyle := bsTriangle;
        // -- Check style
-      case RootSetting.Settings[ISettingID_Gen_TreeCheckStyle].ValueInt of
+      case RootSetting.ValueIntByID[ISettingID_Gen_TreeCheckStyle] of
         0: CheckImageKind := ckDarkCheck;
         1: CheckImageKind := ckDarkTick;
         2: CheckImageKind := ckFlat;
@@ -986,7 +1017,7 @@ const
         7: CheckImageKind := ckXP;
       end;
        // -- Multiselection style
-      if RootSetting.Settings[ISettingID_Gen_TreeSelStyle].ValueInt=0 then
+      if RootSetting.ValueIntByID[ISettingID_Gen_TreeSelStyle]=0 then
         DrawSelectionMode := smDottedRectangle
       else
         DrawSelectionMode := smBlendedRectangle;
@@ -996,7 +1027,7 @@ const
   procedure ApplyToolbarSettings(Dock: TTBXDock);
   var i, iMode: Integer;
   begin
-    iMode := RootSetting.Settings[ISettingID_Gen_ToolbarDragStyle].ValueInt;
+    iMode := RootSetting.ValueIntByID[ISettingID_Gen_ToolbarDragStyle];
      // Настраиваем сам док
     Dock.AllowDrag := iMode>0;
      // Настраиваем панели в доке
@@ -1040,15 +1071,26 @@ const
   end;
 
   procedure TPhoaSetting.Assign(Source: TPhoaSetting);
+  var
+    i: Integer;
+    SrcChild: TPhoaSetting;
   begin
      // Стираем детей
     ClearSettings;
-     // Копируем настройки, передаваемые в конструкторе
+     // Копируем настройки
     FDatatype := Source.FDatatype;
     FID       := Source.FID;
     FName     := Source.FName;
-     // Копируем всё остальное
-    InternalAssign(Source);
+    FMaxValue := Source.FMaxValue;
+    FMinValue := Source.FMinValue;
+    if FDatatype=sdtFont then SetValueStr(Source.GetValueStr) else FData := Source.FData;
+    if Source.FVariants=nil then FreeAndNil(FVariants) else GetVariants.Assign(Source.FVariants);
+     // Повторяем то же для детей
+    for i := 0 to Source.ChildCount-1 do begin
+      SrcChild := Source.Children[i];
+       // Вызываем виртуальный конструктор CreateNew того же класса, что и у SrcChild
+      TPhoaSettingClass(SrcChild.ClassType).CreateNew(Self).Assign(SrcChild);
+    end;
   end;
 
   procedure TPhoaSetting.ClearSettings;
@@ -1061,21 +1103,10 @@ const
 
   constructor TPhoaSetting.Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String);
   begin
-    inherited Create;
-    FOwner := AOwner;
-    if FOwner<>nil then FOwner.AddSetting(Self);
-    FDatatype    := ADatatype;
-    FID          := iID;
-    FImageIndex  := -1;
-    FName        := sName;
-     // Инициализируем EditorWidth
-    case ADatatype of
-      sdtComboIdx,
-        sdtComboObj: FEditorWidth := 250;
-      sdtColor:      FEditorWidth := 180;
-      sdtInt:        FEditorWidth := 70;
-      sdtFont:       FEditorWidth := 150;
-    end;
+    CreateNew(AOwner);
+    FDatatype := ADatatype;
+    FID       := iID;
+    FName     := sName;
   end;
 
   constructor TPhoaSetting.Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String; bValue: Boolean);
@@ -1094,6 +1125,13 @@ const
   begin
     Create(AOwner, ADatatype, iID, sName);
     ValueStr := sValue;
+  end;
+
+  constructor TPhoaSetting.CreateNew(AOwner: TPhoaSetting);
+  begin
+    inherited Create;
+    FOwner := AOwner;
+    if FOwner<>nil then FOwner.AddSetting(Self);
   end;
 
   procedure TPhoaSetting.DeleteSetting(Index: Integer);
@@ -1152,16 +1190,31 @@ const
     Result := FData<>0;
   end;
 
+  function TPhoaSetting.GetValueBoolByID(iID: Integer): Boolean;
+  begin
+    Result := Settings[iID].ValueBool;
+  end;
+
   function TPhoaSetting.GetValueInt: Integer;
   begin
     if not (FDatatype in [sdtStatic, sdtMutexInt, sdtComboIdx, sdtComboObj, sdtColor, sdtInt]) then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
     Result := FData;
   end;
 
+  function TPhoaSetting.GetValueIntByID(iID: Integer): Integer;
+  begin
+    Result := Settings[iID].ValueInt;
+  end;
+
   function TPhoaSetting.GetValueStr: String;
   begin
     if FDatatype<>sdtFont then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['String']);
     Result := String(FData);
+  end;
+
+  function TPhoaSetting.GetValueStrByID(iID: Integer): String;
+  begin
+    Result := Settings[iID].ValueStr;
   end;
 
   function TPhoaSetting.GetVariantIndex: Integer;
@@ -1215,27 +1268,6 @@ const
       for i := 0 to FChildren.Count-1 do GetChildren(i).IniSave(IniFile);
   end;
 
-  procedure TPhoaSetting.InternalAssign(Source: TPhoaSetting);
-  var
-    i: Integer;
-    Child, SrcChild: TPhoaSetting;
-  begin
-     // Копируем настройки
-    FEditorWidth := Source.FEditorWidth;
-    FHelpContext := Source.FHelpContext;
-    FImageIndex  := Source.FImageIndex;
-    FMaxValue    := Source.FMaxValue;
-    FMinValue    := Source.FMinValue;
-    if FDatatype=sdtFont then SetValueStr(Source.GetValueStr) else FData := Source.FData;
-    if Source.FVariants=nil then FreeAndNil(FVariants) else GetVariants.Assign(Source.FVariants);
-     // Повторяем то же для детей
-    for i := 0 to Source.ChildCount-1 do begin
-      SrcChild := Source.Children[i];
-      Child := TPhoaSetting.Create(Self, SrcChild.Datatype, SrcChild.ID, SrcChild.Name);
-      Child.InternalAssign(SrcChild);
-    end;
-  end;
-
   procedure TPhoaSetting.RegLoad(RegIniFile: TRegIniFile);
   var
     s: String;
@@ -1284,6 +1316,11 @@ const
     FData := Byte(Value);
   end;
 
+  procedure TPhoaSetting.SetValueBoolByID(iID: Integer; Value: Boolean);
+  begin
+    Settings[iID].ValueBool := Value;
+  end;
+
   procedure TPhoaSetting.SetValueInt(Value: Integer);
   begin
     if not (FDatatype in [sdtStatic, sdtMutexInt, sdtComboIdx, sdtComboObj, sdtColor, sdtInt]) then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
@@ -1294,10 +1331,20 @@ const
     FData := Value;
   end;
 
+  procedure TPhoaSetting.SetValueIntByID(iID: Integer; Value: Integer);
+  begin
+    Settings[iID].ValueInt := Value;
+  end;
+
   procedure TPhoaSetting.SetValueStr(const Value: String);
   begin
     if FDatatype<>sdtFont then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['String']);
     String(FData) := Value;
+  end;
+
+  procedure TPhoaSetting.SetValueStrByID(iID: Integer; const Value: String);
+  begin
+    Settings[iID].ValueStr := Value;
   end;
 
   procedure TPhoaSetting.SetVariantIndex(Value: Integer);
@@ -1311,15 +1358,40 @@ const
     end;
   end;
 
+   //===================================================================================================================
+   // TPhoaPageSetting
+   //===================================================================================================================
+
+  procedure TPhoaPageSetting.Assign(Source: TPhoaSetting);
+  begin
+    inherited Assign(Source);
+    if Source is TPhoaPageSetting then begin
+      FImageIndex  := TPhoaPageSetting(Source).FImageIndex;
+      FHelpContext := TPhoaPageSetting(Source).FHelpContext;
+    end;
+  end;
+
+  constructor TPhoaPageSetting.Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
+  begin
+    inherited Create(AOwner, sdtStatic, iID, sName);
+    FImageIndex  := iImageIndex;
+    FHelpContext := AHelpContext;
+  end;
+
+  constructor TPhoaPageSetting.CreateNew(AOwner: TPhoaSetting);
+  begin
+    inherited CreateNew(AOwner);
+    FImageIndex := -1;
+  end;
+
+   //===================================================================================================================
+
   {$HINTS OFF} // Do not hint abount var not used
   procedure InitSettings;
-  var Lvl0, Lvl1, Lvl2, Lvl3, Lvl4: TPhoaSetting;
+  var Lvl1, Lvl2, Lvl3, Lvl4: TPhoaSetting;
   begin
-    Lvl0 := RootSetting;
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Gen,                   '@ISettingID_Gen');
-    Lvl1.ImageIndex  := iiA_Props;
-    Lvl1.HelpContext := IDH_setup_general;
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Gen, iiA_Props, '@ISettingID_Gen', IDH_setup_general);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US});
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,     ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
@@ -1354,22 +1426,13 @@ const
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeButtonStyle,   '@ISettingID_Gen_TreeButtonStyle',   0);
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeBS_Rectangle,  '@ISettingID_Gen_TreeBS_Rectangle');
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeBS_Triangle,   '@ISettingID_Gen_TreeBS_Triangle');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP});
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_DarkCheck,  '@ISettingID_Gen_TreeCS_DarkCheck');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_DarkTick,   '@ISettingID_Gen_TreeCS_DarkTick');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_Flat,       '@ISettingID_Gen_TreeCS_Flat');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_LightCheck, '@ISettingID_Gen_TreeCS_LightCheck');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_LightTick,  '@ISettingID_Gen_TreeCS_LightTick');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_Std,        '@ISettingID_Gen_TreeCS_Std');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_StdFlat,    '@ISettingID_Gen_TreeCS_StdFlat');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_XP,         '@ISettingID_Gen_TreeCS_XP');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtComboIdx, ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP});
+        AdjustTreeCheckStyleSetting(lvl3);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1);
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Browse,                '@ISettingID_Browse');
-    Lvl1.ImageIndex  := iiA_NewGroup;
-    Lvl1.HelpContext := IDH_setup_browse_mode;
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Browse, iiA_NewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);
@@ -1399,9 +1462,7 @@ const
       Lvl2.MinValue := 1;
       Lvl2.MaxValue := MaxInt;
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_View,                  '@ISettingID_View');
-    Lvl1.ImageIndex  := iiA_ViewMode;
-    Lvl1.HelpContext := IDH_setup_view_mode;
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_View, iiA_ViewMode, '@ISettingID_View', IDH_setup_view_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_KeepCursorOverTB, '@ISettingID_View_KeepCursorOverTB', True);
@@ -1418,7 +1479,7 @@ const
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,     ISettingID_View_Predecode,        '@ISettingID_View_Predecode', True);
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,     ISettingID_View_CacheBehind,      '@ISettingID_View_CacheBehind', True);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtComboIdx, ISettingID_View_ZoomFactor,       '@ISettingID_View_ZoomFactor', 3 {=50%});
-      AdjustMagnificationSettings(Lvl2);
+      AdjustMagnificationSetting(Lvl2);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_CaptionProps,     '@ISettingID_View_CaptionProps', PicPropsToInt([ppFileName]));
       AddPicPropSettings(Lvl2);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_StchFilt,         '@ISettingID_View_StchFilt', Byte(sfNearest));
@@ -1438,9 +1499,7 @@ const
         Lvl3.MaxValue := 600*1000;
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Dialogs,               '@ISettingID_Dialogs');
-    Lvl1.ImageIndex  := iiA_Dialog;
-    Lvl1.HelpContext := IDH_setup_dialogs;
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);
@@ -1471,7 +1530,12 @@ const
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmRebuildTh, '@ISettingID_Dlgs_FOW_CfmRebuildTh', True);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
-  end;
+     //=================================================================================================================
+{
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
+    Lvl1.ImageIndex  := iiA_Dialog;
+    Lvl1.HelpContext := IDH_setup_dialogs;
+}  end;
   {$HINTS ON}
 
 initialization

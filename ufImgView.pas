@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufImgView.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -543,35 +543,35 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main;
   procedure TfImgView.ApplySettings;
   begin
      // Кэшируем значения настроек
-    FBackgroundColor   := RootSetting.Settings[ISettingID_View_BkColor].ValueInt;
-    FZoomFactorChange  := adMagnifications[RootSetting.Settings[ISettingID_View_ZoomFactor].ValueInt];
-    FCaptionProps      := IntToPicProps(RootSetting.Settings[ISettingID_View_CaptionProps].ValueInt);
-    FDoShrinkPic       := RootSetting.Settings[ISettingID_View_ShrinkPicToFit].ValueBool;
-    FDoZoomPic         := RootSetting.Settings[ISettingID_View_ZoomPicToFit].ValueBool;
-    FDefaultFullscreen := RootSetting.Settings[ISettingID_View_Fullscreen].ValueBool;
-    FAlwaysOnTop       := RootSetting.Settings[ISettingID_View_AlwaysOnTop].ValueBool;
-    FKeepCursorOverTB  := RootSetting.Settings[ISettingID_View_KeepCursorOverTB].ValueBool;
-    FHideCursorInFS    := RootSetting.Settings[ISettingID_View_HideCursor].ValueBool;
-    FFitWindowToPic    := RootSetting.Settings[ISettingID_View_FitWindowToPic].ValueBool;
-    FCenterWindow      := RootSetting.Settings[ISettingID_View_CenterWindow].ValueBool;
-    FCyclicViewing     := RootSetting.Settings[ISettingID_View_Cyclic].ValueBool;
-    FPredecodePic      := RootSetting.Settings[ISettingID_View_Predecode].ValueBool;
-    FCacheBehindPic    := RootSetting.Settings[ISettingID_View_CacheBehind].ValueBool;
-    FStretchFilter     := TStretchFilter(RootSetting.Settings[ISettingID_View_StchFilt].ValueInt);
-    FSlideInterval     := RootSetting.Settings[ISettingID_View_SlideInterval].ValueInt;
-    FSlideCyclic       := RootSetting.Settings[ISettingID_View_SlideCyclic].ValueBool;
-    FDefaultShowInfo   := RootSetting.Settings[ISettingID_View_ShowInfo].ValueBool;
+    FBackgroundColor   := RootSetting.ValueIntByID [ISettingID_View_BkColor];
+    FZoomFactorChange  := adMagnifications[RootSetting.ValueIntByID[ISettingID_View_ZoomFactor]];
+    FCaptionProps      := IntToPicProps(RootSetting.ValueIntByID[ISettingID_View_CaptionProps]);
+    FDoShrinkPic       := RootSetting.ValueBoolByID[ISettingID_View_ShrinkPicToFit];
+    FDoZoomPic         := RootSetting.ValueBoolByID[ISettingID_View_ZoomPicToFit];
+    FDefaultFullscreen := RootSetting.ValueBoolByID[ISettingID_View_Fullscreen];
+    FAlwaysOnTop       := RootSetting.ValueBoolByID[ISettingID_View_AlwaysOnTop];
+    FKeepCursorOverTB  := RootSetting.ValueBoolByID[ISettingID_View_KeepCursorOverTB];
+    FHideCursorInFS    := RootSetting.ValueBoolByID[ISettingID_View_HideCursor];
+    FFitWindowToPic    := RootSetting.ValueBoolByID[ISettingID_View_FitWindowToPic];
+    FCenterWindow      := RootSetting.ValueBoolByID[ISettingID_View_CenterWindow];
+    FCyclicViewing     := RootSetting.ValueBoolByID[ISettingID_View_Cyclic];
+    FPredecodePic      := RootSetting.ValueBoolByID[ISettingID_View_Predecode];
+    FCacheBehindPic    := RootSetting.ValueBoolByID[ISettingID_View_CacheBehind];
+    FStretchFilter     := TStretchFilter(RootSetting.ValueIntByID[ISettingID_View_StchFilt]);
+    FSlideInterval     := RootSetting.ValueIntByID [ISettingID_View_SlideInterval];
+    FSlideCyclic       := RootSetting.ValueBoolByID[ISettingID_View_SlideCyclic];
+    FDefaultShowInfo   := RootSetting.ValueBoolByID[ISettingID_View_ShowInfo];
     FShowInfo          := FDefaultShowInfo;
-    FInfoProps         := IntToPicProps(RootSetting.Settings[ISettingID_View_InfoPicProps].ValueInt);
-    FInfoFont          := RootSetting.Settings[ISettingID_View_InfoFont].ValueStr;
-    FInfoBkColor       := RootSetting.Settings[ISettingID_View_InfoBkColor].ValueInt;
-    FInfoBkOpacity     := RootSetting.Settings[ISettingID_View_InfoBkOpacity].ValueInt;
+    FInfoProps         := IntToPicProps(RootSetting.ValueIntByID[ISettingID_View_InfoPicProps]);
+    FInfoFont          := RootSetting.ValueStrByID [ISettingID_View_InfoFont];
+    FInfoBkColor       := RootSetting.ValueIntByID [ISettingID_View_InfoBkColor];
+    FInfoBkOpacity     := RootSetting.ValueIntByID [ISettingID_View_InfoBkOpacity];
      // Настраиваем параметры окна
-    FontFromStr(Font, RootSetting.Settings[ISettingID_Gen_MainFont].ValueStr);
+    FontFromStr(Font, RootSetting.ValueStrByID[ISettingID_Gen_MainFont]);
     Color              := FBackgroundColor;
      // Настраиваем доки/панели инструментов
      // -- Видимость
-    tbMain.Visible     := RootSetting.Settings[ISettingID_View_ShowToolbar].ValueBool;
+    tbMain.Visible     := RootSetting.ValueBoolByID[ISettingID_View_ShowToolbar];
      // -- Перетаскиваемость
     ApplyToolbarSettings(dkTop);
     ApplyToolbarSettings(dkLeft);
@@ -1078,7 +1078,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main;
 
   procedure TfImgView.tbMainVisibleChanged(Sender: TObject);
   begin
-    RootSetting.Settings[ISettingID_View_ShowToolbar].ValueBool := tbMain.Visible;
+    RootSetting.ValueBoolByID[ISettingID_View_ShowToolbar] := tbMain.Visible;
   end;
 
   procedure TfImgView.TopmostCancel;

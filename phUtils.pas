@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: phUtils.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -170,7 +170,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI;
 
   procedure InfoIfSettingRequires(const sMessage: String; iSettingID: Integer);
   begin
-    if RootSetting.Settings[iSettingID].ValueBool then Info(sMessage);
+    if RootSetting.ValueBoolByID[iSettingID] then Info(sMessage);
   end;
 
   procedure Error(const sMessage: String);
@@ -185,7 +185,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI;
 
   function ConfirmIfSettingRequires(const sMessage: String; iSettingID: Integer): Boolean;
   begin
-    Result := not RootSetting.Settings[iSettingID].ValueBool or Confirm(sMessage);
+    Result := not RootSetting.ValueBoolByID[iSettingID] or Confirm(sMessage);
   end;
   
    //-------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -76,7 +76,7 @@ type
     tvMain.NodeDataSize := SizeOf(Pointer);
     tvMain.Images := FileImages;
      // Кэшируем настройки
-    FExpandAll := RootSetting.Settings[ISettingID_Dlgs_PP_ExpMetadata].ValueBool;
+    FExpandAll := RootSetting.ValueBoolByID[ISettingID_Dlgs_PP_ExpMetadata];
      // Восстанавливаем панели инструментов
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegPicProps_Toolbars);
      // Обновляем описание

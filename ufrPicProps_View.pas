@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.3 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -209,7 +209,7 @@ uses phUtils, phObj, ConsVars, Main;
     pmMain.LinkSubitems := tbMain.Items;
     cbViewFile.Images        := FileImages;
     cbViewFile.SubMenuImages := FileImages;
-    FZoomFactorChange := adMagnifications[RootSetting.Settings[ISettingID_View_ZoomFactor].ValueInt];
+    FZoomFactorChange := adMagnifications[RootSetting.ValueIntByID[ISettingID_View_ZoomFactor]];
   end;
 
   procedure TfrPicProps_View.LoadViewImage;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: phObj.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -2429,7 +2429,7 @@ type
        // Создаём, загружаем картинку и превращаем её в Bitmap
       bmpFullSize := LoadGraphicFromFile(FPicFileName);
       try
-        bmpFullSize.StretchFilter := TStretchFilter(RootSetting.Settings[ISettingID_Browse_ViewerStchFilt].ValueInt);
+        bmpFullSize.StretchFilter := TStretchFilter(RootSetting.ValueIntByID[ISettingID_Browse_ViewerStchFilt]);
         FPicWidth  := bmpFullSize.Width;
         FPicHeight := bmpFullSize.Height;
          // Определяем размеры эскиза
@@ -4395,7 +4395,7 @@ var
     StartWait;
     try
       if High(aPics)>=0 then begin
-        pcfs := TPicClipboardFormats(Byte(RootSetting.Settings[ISettingID_Gen_ClipFormats].ValueInt));
+        pcfs := TPicClipboardFormats(Byte(RootSetting.ValueIntByID[ISettingID_Gen_ClipFormats]));
         Clipboard.Open;
         try
            // Помещаем PhoA-данные

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.4 2004-04-18 12:09:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -793,7 +793,7 @@ uses
         end;
     end;
      // Закрываем форму Мастера/показываем протокол
-    if (FCountErrors=0) and RootSetting.Settings[ISettingID_Dlgs_FOW_LogOnErrOnly].ValueBool then
+    if (FCountErrors=0) and RootSetting.ValueBoolByID[ISettingID_Dlgs_FOW_LogOnErrOnly] then
       ModalResult := mrOK
     else
       Controller.SetVisiblePageID(IWzFileOpsPageID_Log, pcmNextBtn);
@@ -966,7 +966,6 @@ uses
   end;
 
   function TdFileOpsWizard.PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean;
-  var Setting: TPhoaSetting;
   begin
     Result := inherited PageChanging(ChangeMethod, iNewPageID);
     if Result and (ChangeMethod=pcmNextBtn) then begin
@@ -978,10 +977,7 @@ uses
          // При попадании на страницу выбора ссылок сначала производим выборку файлов
         IWzFileOpsPageID_RepairSelLinks: Repair_SelectFiles;
          // Перед началом обработки проверяем необходимсоть подтверждения
-        IWzFileOpsPageID_Processing: begin
-          Setting := RootSetting.Settings[aFileOpConfirmSettingIDs[FFileOpKind]];
-          Result := not Setting.ValueBool or Confirm(ConstVal('SConfirm_PerformFileOperation'));
-        end;
+        IWzFileOpsPageID_Processing: Result := ConfirmIfSettingRequires(ConstVal('SConfirm_PerformFileOperation'), aFileOpConfirmSettingIDs[FFileOpKind]);
       end;
       if Result then
         case CurPageID of
