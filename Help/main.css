@@ -1,97 +1,100 @@
 /***********************************************************************************************************************
-    $Id: main.css,v 1.3 2004-05-16 11:33:07 dale Exp $
+    $Id: main.css,v 1.4 2004-06-14 06:17:14 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
     PhoA image arranging and searching tool
     Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
 ***********************************************************************************************************************/
-body              { font-family: Verdana,Arial,serif; 
-                    font-size: 8pt; 
-                    margin: 0 0 0 0;
-                    padding: 0 0 0 0; 
-                    background: url(../bgcorner.png) no-repeat; }
-p                 { font-family: Verdana,Arial,serif;
-                    font-size: 8pt; 
-                    margin-top: 12px;
-                    margin-bottom: 3px; }
-p.copyright       { text-align: center;
-                    font-family: Verdana,Arial,serif;
-                    font-size: 7pt;
-                    color: #6868c5; }
-p.seealsotitle    { font-weight: bold;
-                    margin-top: 20px;
-                    text-align: left; }
-p.seealso         { margin-left: 20px;
-                    margin-top: 2px;
-                    text-align: left; }
-p.lsmall          { text-align: left; 
-                    font-size: 7pt; }
-p.faqq            { text-align: justify;
-                    color: #303080; }
-p.faqa            { text-align: justify; }
-div.nb            { border-left: 4 black double;
-                    border-top: 1 #888888 dotted;
-                    border-right: 1 #888888 dotted;
-                    border-bottom: 1 #888888 dotted;
-                    padding: 3pt 12pt 3pt 12pt;
-                    margin: 6pt;
-                    background-color: #f0f0f0; }
-span.fp           { font-family: Courier New,Courier,fixed;
-                    font-size: 9pt; }
-li                { font-family: Verdana,Arial,serif;
-                    font-size: 8pt; 
-                    text-align: justify; }
-h1                { font-family: Verdana,Arial,serif;
-                    font-size: 10pt;
-                    font-weight: bold;
-                    text-align: left;
-                    padding-top: 3px;
-                    padding-bottom: 3px;
-                    color: #000060; 
-                    border-top: 1 dashed;
-                    border-bottom: 1 dashed; }
-h2                { font-family: Verdana,Arial,serif;
-                    font-size: 9pt;
-                    font-weight: bold; 
-                    text-align: left;
-                    color: #000060; }
-h3                { font-family: Verdana,Arial,serif;
-                    font-size: 8pt;
-                    font-weight: bold; 
-                    text-align: left;
-                    color: #000060; }
-                    text-decoration: underline; }
-a:link            { color: #0000e0;
-                    text-decoration: underline; }
-a:visited         { color: #0000c0;
-                    text-decoration: underline; }
-a:active          { color: #ff60c0;
-                    text-decoration: underline; }
-a:hover           { color: #ff60c0;
-                    text-decoration: underline; }
-table.main        { margin: 0 0 0 0; }
-table.plain       { padding: 3px 5px 3px 5 px; }
-td                { font-family: Verdana,Arial,serif;
-                    font-size: 8pt; }
-td.header         { background-color: #7b91ff; 
-                    height: 32px; 
-                    width: 100%; 
-                    font-family: Verdana,Arial,serif;
-                    font-size: 13pt; 
-                    font-weight: bold;
-                    color: #dfe0ff; 
-                    margin: 0 0 0 0;
-                    padding: 4px 30px 4px 30px; }
-td.hdrshadow      { background: url(../hdr-shadow.gif) #d0d0d0;
-                    height: 6px; 
-                    width: 100%; }
-td.content        { font-family: Verdana,Arial,serif;
-                    font-size: 8pt; 
-                    width: 100%; 
-                    margin: 0 0 0 0; 
-                    padding: 8px 8px 8px 8px; }
-table.plain td    { border-bottom: 1 #f0f0f0 solid;
-                    vertical-align: top; }
-tr.tblhdr td      { font-weight: bold;
-                    padding: 3px 5px 3px 5 px;
-                    border: 1 #888888 solid;
-                    background: url(../table-hdr-bg.gif); }
+body                { font-family: Verdana,Arial,serif; 
+                      font-size: 8pt; 
+                      margin: 0 0 0 0;
+                      padding: 0 0 0 0; 
+                      background: url(../bgcorner.png) no-repeat; }
+p                   { font-family: Verdana,Arial,serif;
+                      font-size: 8pt; 
+                      margin-top: 12px;
+                      margin-bottom: 3px; }
+p.copyright         { text-align: center;
+                      font-family: Verdana,Arial,serif;
+                      font-size: 7pt;
+                      color: #6868c5; }
+p.seealsotitle      { font-weight: bold;
+                      margin-top: 20px;
+                      text-align: left; }
+p.seealso           { margin-left: 20px;
+                      margin-top: 2px;
+                      text-align: left; }
+p.lsmall            { text-align: left; 
+                      font-size: 7pt; }
+p.faqq              { text-align: justify;
+                      color: #303080; }
+p.faqa              { text-align: justify; }
+div.nb              { border-left: 4 black double;
+                      border-top: 1 #888888 dotted;
+                      border-right: 1 #888888 dotted;
+                      border-bottom: 1 #888888 dotted;
+                      padding: 3pt 12pt 3pt 12pt;
+                      margin: 6pt;
+                      background-color: #f0f0f0; }
+span.fp             { font-family: Courier New,Courier,fixed;
+                      font-size: 9pt; }
+li                  { font-family: Verdana,Arial,serif;
+                      font-size: 8pt; 
+                      text-align: justify; }
+h1                  { font-family: Verdana,Arial,serif;
+                      font-size: 10pt;
+                      font-weight: bold;
+                      text-align: left;
+                      padding-top: 3px;
+                      padding-bottom: 3px;
+                      color: #000060; 
+                      border-top: 1 dashed;
+                      border-bottom: 1 dashed; }
+h2                  { font-family: Verdana,Arial,serif;
+                      font-size: 9pt;
+                      font-weight: bold; 
+                      text-align: left;
+                      color: #000060; }
+h3                  { font-family: Verdana,Arial,serif;
+                      font-size: 8pt;
+                      font-weight: bold; 
+                      text-align: left;
+                      color: #000060; }                   
+a                   { text-decoration: underline; }
+a:link              { color: #0000e0; }                   
+a:visited           { color: #0000c0; }
+a:active            { color: #ff60c0; }
+a:hover             { color: #ff60c0; }
+a.copyright         { text-decoration: none; }
+a.copyright:link    { color: #6868c5; }                   
+a.copyright:visited { color: #6868c5; }
+a.copyright:active  { color: #4040ff; 
+                      text-decoration: underline; }
+a.copyright:hover   { color: #4040ff;
+                      text-decoration: underline; }
+table.main          { margin: 0 0 0 0; }
+table.plain         { padding: 3px 5px 3px 5 px; }
+td                  { font-family: Verdana,Arial,serif;
+                      font-size: 8pt; }
+td.header           { background-color: #7b91ff; 
+                      height: 32px; 
+                      width: 100%; 
+                      font-family: Verdana,Arial,serif;
+                      font-size: 13pt; 
+                      font-weight: bold;
+                      color: #dfe0ff; 
+                      margin: 0 0 0 0;
+                      padding: 4px 30px 4px 30px; }
+td.hdrshadow        { background: url(../hdr-shadow.gif) #d0d0d0;
+                      height: 6px; 
+                      width: 100%; }
+td.content          { font-family: Verdana,Arial,serif;
+                      font-size: 8pt; 
+                      width: 100%; 
+                      margin: 0 0 0 0; 
+                      padding: 8px 8px 8px 8px; }
+table.plain td      { border-bottom: 1 #f0f0f0 solid;
+                      vertical-align: top; }
+tr.tblhdr td        { font-weight: bold;
+                      padding: 3px 5px 3px 5 px;
+                      border: 1 #888888 solid;
+                      background: url(../table-hdr-bg.gif); }
