@@ -1,4 +1,4 @@
-<html><!-- $Id: theory-transform.html,v 1.1 2004-06-06 18:12:28 dale Exp $ -->
+<html><!-- $Id: theory-transform.html,v 1.2 2004-06-08 03:46:34 dale Exp $ -->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
   <title>Transformations</title>
@@ -11,26 +11,26 @@
   <tr><td class=content>
   <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Transformations</h1>
 
-  <p align=justify>Äàííàÿ âåðñèÿ <b>PhoA</b> ïîääåðæèâàåò òàê íàçûâàåìûå <b>íåäåñòðóêòèâíûå</b> ïðåîáðàçîâàíèÿ, òî åñòü ïðåîáðàçîâàíèÿ,
-    íå èçìåíÿþùèå èñõîäíûõ ôàéëîâ èçîáðàæåíèé. Òàêèå ïðåîáðàçîâàíèÿ âûïîëíÿþòñÿ íåïîñðåäñòâåííî ïåðåä ïðîñìîòðîì èçîáðàæåíèÿ, â ïàìÿòè.
-  <p align=justify>Çàäàííûå ïðåîáðàçîâàíèÿ âñåãäà âûïîëíÿþòñÿ â îïðåäåë¸ííîì ïîðÿäêå:
+  <p align=justify>The current <b>PhoA</b> version supports socalled <b>nondestructive</b> transformations ie transformations that
+    do not modify the source image files. Such transformations are being applied immediately before the image is viewed, in the
+    memory.
+  <p align=justify>The specified transformations are applied in the predefined order:
   <ol>
-    <li><a href="#rotation">Ïîâîðîò</a></li>
-    <li><a href="#flips">Îòðàæåíèÿ</a></li>
+    <li><a href="#rotation">Rotation</a></li>
+    <li><a href="#flips">Flips</a> (or mirroring)</li>
   </ol>
-  <p align=justify>Âû ìîæåòå ïðèìåíÿòü ïðåîáðàçîâàíèÿ êàê ïðè <a href="intf-view-mode.html">ïðîñìîòðå èçîáðàæåíèÿ</a>, òàê è çàðàíåå,
-    â <a href="intf-pic-props-view.html">äèàëîãå ñâîéñòâ èçîáðàæåíèÿ</a>. Êðîìå òîãî, çàäàííûå ïðè ïðîñìîòðå ïðåîáðàçîâàíèÿ ìîãóò áûòü
-    çàïèñàíû â ñâîéñòâà èçîáðàæåíèÿ ñ ïîìîùüþ êîìàíäû <b>Çàïèñàòü ïðåîáðàçîâàíèÿ</b>.
-  <p align=justify>Ïðåîáðàçîâàíèÿ, ñîõðàí¸ííûå â ñâîéñòâàõ èçîáðàæåíèÿ, âëèÿþò òàêæå è íà îòîáðàæåíèå ýñêèçà ýòîãî èçîáðàæåíèÿ -
-    ê íåìó ïðèìåíÿþòñÿ òå æå ïðåîáðàçîâàíèÿ.
+  <p align=justify>You can apply transformations while <a href="intf-view-mode.html">viewing</a> or beforehand, in the
+    <a href="intf-pic-props-view.html">picture properties dialog</a>. Additionally, you can store the transformations you specify
+    during viewing into the picture properties, by using the <b>Store transformations</b> command.
+  <p align=justify>The transformations stored in the picture properties also affect how the thumbnail is displayed as the same
+    transformations are applied to it.
 
-  <h3><a name=rotation>Ïîâîðîò</a></h3>
-  <p align=justify>Ïðîãðàììà ïîçâîëÿåò ïîâîðà÷èâàòü èçîáðàæåíèÿ íà óãîë, êðàòíûé 90&deg;. Ýòî ïîçâîëÿåò, íàïðèìåð, ïðîñìàòðèâàòü
-    èçîáðàæåíèÿ, ñíÿòûå êàìåðîé, ïîâ¸ðíóòîé îòíîñèòåëüíî èñõîäíîãî èçîáðàæåíèÿ.
+  <h3><a name=rotation>Rotation</a></h3>
+  <p align=justify>The program allows for rotating the pictures by multiples of 90&deg;. This makes possible eg viewing the images
+    taken with the camera rotated relative to source position.
 
-  <h3><a name=flips>Îòðàæåíèÿ</a></h3>
-  <p align=justify>Ðåàëèçîâàíû äâà âàðèàíòà îòðàæåíèÿ: ãîðèçîíòàëüíîå (âäîëü âåðòèêàëüíîé îñè èçîáðàæåíèÿ) è âåðòèêàëüíîå (âäîëü
-    ãîðèçîíòàëüíîé îñè).
+  <h3><a name=flips>Flips</a></h3>
+  <p align=justify>The two flip kinds are implemented: horizontal (along the vertical axis) and vertical (along the horizontal axis).
 
   <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
   <p class=seealso>
