@@ -1,4 +1,4 @@
-<!-- $Id: tasks-tools.html,v 1.3 2005-03-24 14:36:13 dale Exp $ -->
+<!-- $Id: tasks-tools.html,v 1.4 2005-03-25 18:48:32 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Using external tools]}
 
 <p align=justify><b>PhoA</b> is capable of attaching external programs to use for viewing, printing or processing of the
@@ -8,7 +8,7 @@
 
 <p align=justify>There is a variety of tool kinds.
 
-<p align=justify>The major tool kind is represented by so-called <b>default actions</b>. Additionally, there's a
+<p align=justify>The majority of tool kinds is represented by so-called <b>default actions</b>. Additionally, there's a
   possibility of using an arbitrary program as a custom tool.
 
 {[%hh_h2:Default actions]}
@@ -50,42 +50,42 @@
   pictures by the same application at once, while custom tools often spawn a new application instance for each picture.
   The latter case is less convenient.
 
-{[%hh_h2:Заданное действие]}
+{[%hh_h2:Custom action]}
 
-<p align=justify>Этот вид инструментов позволяет задать любую программу для открытия (или обработки) заданного типа
-  файлов. Чаще всего это будет графический редактор или средство просмотра, но может быть и более специфический
-  инструмент, например, программа пакетной обработки изображений.
+<p align=justify>This kind of tool allows for specifying any program to open (or process) a certain type of files. In
+  most case it will be a graphic editor or a viewer. However you can also use more specific tools like a batch image
+  converter.
 
-{[%hh_h2:Пункт-разделитель]}
+{[%hh_h2:Separator item]}
 
-<p align=justify>Это самый незамысловатый вид инструмента и нужен он для создания разделителей в меню.
+<p align=justify>It is a most unpretentious tool kind used to create menu separators.
 
-<p align=justify>Так, с видами инструментов мы разобрались. Теперь есть смысл кратко описать
+<p align=justify>Well that's all for tool kinds. Let's now pass on to
 
-{[%hh_h2:Маски инструментов]}
+{[%hh_h2:Tool masks]}
 
-<p align=justify>Чтобы задать применимость инструментов к разным видам изображений, в <b>PhoA</b> каждому инструменту
-  сопоставлена так называемая <i>маска</i>, которая и определяет, может ли инструмент быть применён к файлам
-  определённого типа. Правила составления масок во многом похожи на соответствующие правила Windows, и используются
-  такие маски во многих местах программы. Подробное описание правил составления масок файлов приведено
-  <a href="info-file-masks.html">здесь</a>.
+<p align=justify>To describe image types for which a tool is applicable to, each tool in <b>PhoA</b> has a so-called
+  <i>mask</i>. Mask writing rules are similar to respective Windows rules, and the masks are used in many cases in the
+  program. Read <a href="info-file-masks.html">here</a> for detailed explanation of mask writing rules.
 
-<p align=justify>Инструмент становится доступным только когда <i>все</i> выделенные изображения подходят под его маску
-  (точнее, маски, так как их может быть несколько).
+<p align=justify>A tool becomes available only when <i>all</i> selected pictures match its mask (masks to be precise as
+  a tool can have assigned a number of masks).
 
-{[%hh_h2:Использование инструмента]}
+{[%hh_h2:Tool usage]}
 
-<p align=justify>Чтобы инструмент был полезен, нужно, чтобы как минимум имелась возможность его вызвать. В <b>PhoA</b>
-  инструменты могут появляться в различных меню. В каких именно &mdash; задаётся в его
-  <a href="info-tools.html">свойствах</a>.
+<p align=justify>In order to make a tool useful you should be able to execute it. <b>PhoA</b> tools can appear in
+  various menus. You configure that in tool's <a href="info-tools.html">properties</a>.
 
-{[%hh_h2:Настройки пользовательского действия]}
+{[%hh_h2:Custom action settings]}
 
-<p align=justify>Как было сказано выше, для данного вида инструментов необходимо указать программу, а также некоторые
-  дополнительные параметры. Подробное описание свойств инструментов приведено
-  <a href="info-tools.html#usages">здесь</a>.
+<p align=justify>Ut supra, custom actions require specifying a program, and some additional parameters. Minute
+  information about tool properties is <a href="info-tools.html#usages">here</a>.
 
-<p align=justify>Указанной программе передаётся в качестве параметра командной строки полный путь к файлу изображения.
-  Большинство программ обработки изображений воспринимают таким образом файлы для открытия или обработки.
+<p align=justify>That program is passed the full picture file path as a command line parameter. Most image processing
+  applications take input file names in such a way.
+
+{[%hh_seealso_en]}
+  <a href="info-tools.html">Tools</a><br>
+  <a href="intf-tool-props.html">Tool properties dialog</a><br>
 
 {[%hh_ftr_en]}
