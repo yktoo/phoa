@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.2 2004-04-25 16:28:31 dale Exp $
+//  $Id: phToolSetting.pas,v 1.3 2004-04-29 13:50:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -8,7 +8,7 @@ unit phToolSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ActiveX,
   ConsVars, phSettings;
 
 type
@@ -156,6 +156,8 @@ type
     procedure DoSettingChange;
      // Возвращает настройку TPhoaToolSetting, связанную с узлом
     function  GetSetting(Node: PVirtualNode): TPhoaToolSetting;
+     // Возвращает True, если узел соответствует реальному пункту настройки
+    function  IsSettingNode(Node: PVirtualNode): Boolean;
      // Настраивает Header
     procedure SetupHeader;
      // Создаёт PopupMenu
@@ -178,6 +180,9 @@ type
     procedure DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates); override;
     procedure DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer); override;
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString); override;
+    function  DoBeforeDrag(Node: PVirtualNode; Column: TColumnIndex): Boolean; override;
+    procedure DoDragDrop(Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode); override;
+    function  DoDragOver(Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -322,13 +327,14 @@ type
     inherited Create(AOwner);
      // Каждый узел хранит TPhoaToolSetting
     FDataOffset := AllocateInternalDataArea(SizeOf(Pointer));
-    Align := alClient;
-    Images := fMain.ilActionsSmall;
+    Align    := alClient;
+    Images   := fMain.ilActionsSmall;
+    DragMode := dmAutomatic;
      // Настраиваем Header
     SetupHeader;
     with TreeOptions do begin
       AutoOptions      := [toAutoDropExpand, toAutoScroll, toAutoTristateTracking, toAutoDeleteMovedNodes];
-      MiscOptions      := [toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning];
+      MiscOptions      := [toCheckSupport, toFullRepaintOnResize, toFullRowDrag, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning];
       PaintOptions     := [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages];
       SelectionOptions := [toFullRowSelect, toRightClickSelect];
     end;
@@ -390,12 +396,52 @@ type
     end;
   end;
 
+  function TPhoaToolSettingEditor.DoBeforeDrag(Node: PVirtualNode; Column: TColumnIndex): Boolean;
+  begin
+    Result := IsSettingNode(Node);
+  end;
+
   procedure TPhoaToolSettingEditor.DoChecked(Node: PVirtualNode);
   var p: TPoint;
   begin
     ActivateVTVNode(Self, Node);
     with GetDisplayRect(Node, -1, False) do p := ClientToScreen(Point(Left, Bottom));
     PopupMenu.Popup(p.x, p.y);
+  end;
+
+  procedure TPhoaToolSettingEditor.DoDragDrop(Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+  var
+    nSrc, nTgt: PVirtualNode;
+    idxNew: Integer;
+    am: TVTNodeAttachMode;
+  begin
+    nSrc := FocusedNode;
+    nTgt := DropTargetNode;
+    idxNew := nTgt.Index;
+    if idxNew>Integer(nSrc.Index) then Dec(idxNew);
+    if Mode=dmBelow then begin
+      Inc(idxNew);
+      am := amInsertAfter;
+    end else
+      am := amInsertBefore;
+    GetSetting(nSrc).Index := idxNew;
+    MoveTo(nSrc, nTgt, am, False);
+    DoSettingChange;
+  end;
+
+  function TPhoaToolSettingEditor.DoDragOver(Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer): Boolean;
+  var nSrc, nTgt: PVirtualNode;
+  begin
+    nSrc := FocusedNode;
+    nTgt := DropTargetNode;
+    Result := (Source=Self) and (nTgt<>nil) and (nSrc<>nTgt);
+    if Result then
+      case Mode of
+        dmAbove: Result := nTgt.Index<>nSrc.Index+1;
+        dmBelow: Result := (nTgt.Index<>nSrc.Index-1) and IsSettingNode(nTgt);
+        else     Result := False;
+      end;
+    Effect := DROPEFFECT_MOVE;
   end;
 
   procedure TPhoaToolSettingEditor.DoFocusChange(Node: PVirtualNode; Column: TColumnIndex);
@@ -481,6 +527,11 @@ type
     Parent           := ParentCtl;
     FOnSettingChange := AOnSettingChange;
     FOnDecodeText    := AOnDecodeText;
+  end;
+
+  function TPhoaToolSettingEditor.IsSettingNode(Node: PVirtualNode): Boolean;
+  begin
+    Result := (Node<>nil) and (Node.Index<RootNodeCount);
   end;
 
   procedure TPhoaToolSettingEditor.LoadTree;
