@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.42 2004-10-23 17:59:13 dale Exp $
+//  $Id: ufImgView.pas,v 1.43 2004-11-09 14:51:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -124,7 +124,7 @@ type
     aShowInfo: TAction;
     bShowInfo: TTBXItem;
     iSepCustomTools: TTBXSeparatorItem;
-    tbTools: TTBXToolbar;
+    tbTransforms: TTBXToolbar;
     aStoreTransform: TAction;
     aRotate0: TAction;
     aRotate90: TAction;
