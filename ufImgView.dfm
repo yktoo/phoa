@@ -499,6 +499,7 @@ object fImgView: TfImgView
   end
   object pmMain: TTBXPopupMenu
     Images = fMain.ilActionsSmall
+    OnPopup = pmMainPopup
     Left = 36
     Top = 48
     object ipmFirstPic: TTBXItem

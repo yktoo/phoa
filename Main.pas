@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.11 2004-05-03 16:34:03 dale Exp $
+//  $Id: Main.pas,v 1.12 2004-05-05 13:58:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -240,6 +240,8 @@ type
     procedure aaFileOperations(Sender: TObject);
     procedure aaIniSaveSettings(Sender: TObject);
     procedure aaIniLoadSettings(Sender: TObject);
+    procedure pmGroupsPopup(Sender: TObject);
+    procedure pmPicsPopup(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -253,6 +255,10 @@ type
     FHNextClipbrdViewer: HWND;
      // Стек операций для отмены
     FOperations: TPhoaOperations;
+     // Флаги, указывающие на то, что инструменты popup-меню групп и вьюера прошли проверку на доступность текущим
+     //   выделенным изображениям
+    FGroupsPopupToolsValidated: Boolean;
+    FPicsPopupToolsValidated: Boolean;
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
@@ -270,8 +276,10 @@ type
     procedure DoLoad(const sFileName: String);
      // Настраивает разрешённость Actions и настраивает Caption формы
     procedure EnableActions;
-     // Настраивает доступность инструментов 
+     // Настраивает доступность инструментов
     procedure EnableTools;
+     // Настраивает доступность инструментов для заданного контейнерного пункта
+    procedure DoEnableTools(Item: TTBCustomItem);
      // Создаёт список изображений:
      //   если активно дерево групп - то всех изображений группы
      //   если активен вьюер - то выделенных во вьюере изображений
@@ -782,6 +790,22 @@ uses
     end;
   end;
 
+  procedure TfMain.DoEnableTools(Item: TTBCustomItem);
+  var PicLinks: TPhoaPicLinks;
+  begin
+     // Если пункт содержит подпункты-инструменты
+    if Item.Count>0 then begin
+       // Создаём список ссылок на изображения
+      PicLinks := GetSelectedPicLinks;
+      try
+         // Настраиваем доступность инструментов
+        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, PicLinks);
+      finally
+        PicLinks.Free;
+      end;
+    end;
+  end;
+
   procedure TfMain.DoLoad(const sFileName: String);
   begin
     FOperations.BeginUpdate;
@@ -851,7 +875,7 @@ uses
      // Drag-and-drop
     Viewer.DragEnabled := bPicGroups and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
      // Инструменты
-    EnableTools; 
+    EnableTools;
      // Настраиваем Captions
     Caption := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), asUnmod[FOperations.IsUnmodified], ConstVal('SAppCaption')]);
     Application.Title := Caption;
@@ -859,21 +883,12 @@ uses
   end;
 
   procedure TfMain.EnableTools;
-  var PicLinks: TPhoaPicLinks;
   begin
-    PicLinks := GetSelectedPicLinks;
-    try
-       // Если активны группы - настраиваем popup-меню групп
-      if tvGroups.Focused then
-        AdjustToolAvailability(giTools_GroupsMenu, PicLinks)
-       // Если активны группы - настраиваем popup-меню вьюера
-      else if Viewer.Focused then
-        AdjustToolAvailability(giTools_PicsMenu, PicLinks);
-       // Настраиваем инструменты меню "Сервис"
-      AdjustToolAvailability(giTools_ToolsMenu, PicLinks);
-    finally
-      PicLinks.Free;
-    end;
+     // Настраиваем инструменты меню "Сервис"
+    DoEnableTools(giTools_ToolsMenu);
+     // Сбрасываем флаги инструментов popup-меню
+    FGroupsPopupToolsValidated := False;
+    FPicsPopupToolsValidated   := False;
   end;
 
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1197,6 +1212,22 @@ uses
     RefreshViewer;
   end;
 
+  procedure TfMain.pmGroupsPopup(Sender: TObject);
+  begin
+    if not FGroupsPopupToolsValidated then begin
+      DoEnableTools(giTools_GroupsMenu);
+      FGroupsPopupToolsValidated := True;
+    end;
+  end;
+
+  procedure TfMain.pmPicsPopup(Sender: TObject);
+  begin
+    if not FPicsPopupToolsValidated then begin
+      DoEnableTools(giTools_PicsMenu);
+      FPicsPopupToolsValidated := True;
+    end;
+  end;
+
   procedure TfMain.RefreshViewer;
   begin
     Viewer.ViewGroup(CurGroup);
@@ -1238,7 +1269,7 @@ uses
     PicLinks := GetSelectedPicLinks;
     try
        // Выполняем инструмент
-      TPhoaToolSetting(TComponent(Sender).Tag).Execute(PicLinks);
+      (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
     finally
       PicLinks.Free;
     end;

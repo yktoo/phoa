@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.8 2004-05-03 16:34:03 dale Exp $
+//  $Id: phToolSetting.pas,v 1.9 2004-05-05 13:58:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -21,7 +21,7 @@ type
     ptkPrint,      // Инструмент, выполняющий печать файла изображения
     ptkCustom);    // Инструмент, задаваемый командной строкой
 const
-  IPhoaToolKindPrefixLen = 3; // Длина префикса элементов TPhoaToolKind
+  IPhoaToolKindPrefixLen = 3; // Длина префикса названий элементов TPhoaToolKind
 
 type
    // Где отображается команда инструмента
@@ -134,7 +134,7 @@ type
    // Создаёт пункт меню инструмента Tool и добавляет его в состав дочерних пунктов пункта Item
   procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
    // Настраивает видимость инструментов по их доступности (применимости) к набору ссылок на изображения
-  procedure AdjustToolAvailability(Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
 
 const
    // Соответствие значков виду инструмента
@@ -196,18 +196,21 @@ uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms;
       ti.ImageIndex := aToolImageIndexes[Tool.Kind];
       ti.OnClick    := AOnClick;
     end;
-    ti.Tag := Integer(Tool);
+     // Tag пункта меню = индексу инструмента в родительском списке, т.е. в странице (прямые ссылки на инструменты тут
+     //   неприменимы, поскольку объекты инструментов меняются при переприсваивании через Assign каждый раз при вызове
+     //   диалога настроек)
+    ti.Tag := Tool.Index;
     Item.Add(ti);
   end;
 
-  procedure AdjustToolAvailability(Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
+  procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; PicLinks: TPhoaPicLinks);
   var
     i: Integer;
     ti: TTBCustomItem;
   begin
     for i := 0 to Item.Count-1 do begin
       ti := Item[i];
-      ti.Visible := TPhoaToolSetting(ti.Tag).MatchesFiles(PicLinks);
+      ti.Visible := (Page[ti.Tag] as TPhoaToolSetting).MatchesFiles(PicLinks);
     end;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.16 2004-05-03 16:34:03 dale Exp $
+//  $Id: ConsVars.pas,v 1.17 2004-05-05 13:58:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -459,6 +459,8 @@ const
   iiPrint                         = 60;
   iiSeparator                     = 61;
   iiAction                        = 62;
+  iiSaveSettings                  = 63;
+  iiLoadSettings                  = 64;
 
    // Help topics
   IDH_start                       = 00001;

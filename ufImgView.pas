@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.7 2004-05-03 16:34:03 dale Exp $
+//  $Id: ufImgView.pas,v 1.8 2004-05-05 13:58:04 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -146,6 +146,7 @@ type
     procedure tbMainVisibleChanged(Sender: TObject);
     procedure iMainResize(Sender: TObject);
     procedure aaShowInfo(Sender: TObject);
+    procedure pmMainPopup(Sender: TObject);
   private
     FGroup: TPhoaGroup;
     FPhoA: TPhotoAlbum;
@@ -249,8 +250,6 @@ type
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
      // Разрешает/запрещает Actions
     procedure EnableActions;
-     // Настраивает доступность инструментов 
-    procedure EnableTools;
      // Пересоздаёт или удаляет таймер показа слайдов
     procedure RestartShowTimer;
      // Процедуры временного убирания/восстановления стиля TOPMOST окна просмотра, если он есть
@@ -867,22 +866,6 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     aZoomOut.Enabled    := not FErroneous and (ZoomFactor>SMinPicZoom);
     aZoomFit.Enabled    := not FErroneous and (ZoomFactor<>FBestFitZoomFactor);
     aZoomActual.Enabled := not FErroneous and (ZoomFactor<>1.0);
-     // Настраиваем инструменты
-    EnableTools;
-  end;
-
-  procedure TfImgView.EnableTools;
-  var PicLinks: TPhoaPicLinks;
-  begin
-    PicLinks := TPhoaPicLinks.Create(True);
-    try
-       // Добавляем просматриваемое изображение
-      if not FErroneous then PicLinks.Add(FPic);
-       // Настраиваем инструменты
-      AdjustToolAvailability(gipmTools, PicLinks);
-    finally
-      PicLinks.Free;
-    end;
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1012,6 +995,22 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
     end;
   end;
 
+  procedure TfImgView.pmMainPopup(Sender: TObject);
+  var PicLinks: TPhoaPicLinks;
+  begin
+     // Настраиваем доступность инструментов в pmMain
+    if gipmTools.Count>0 then begin
+      PicLinks := TPhoaPicLinks.Create(True);
+      try
+         // Добавляем просматриваемое изображение
+        if not FErroneous then PicLinks.Add(FPic);
+        AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, PicLinks);
+      finally
+        PicLinks.Free;
+      end;
+    end;
+  end;
+
   procedure TfImgView.RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
   var sw, sh: Single;
   begin
@@ -1132,7 +1131,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
          // Добавляем просматриваемое изображение
         PicLinks.Add(FPic);
          // Выполняем инструмент
-        TPhoaToolSetting(TComponent(Sender).Tag).Execute(PicLinks);
+        (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(PicLinks);
       finally
         PicLinks.Free;
       end;

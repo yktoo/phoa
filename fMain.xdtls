@@ -5992,11 +5992,11 @@
         <propEntries>
           <propEntry name="ClipboardFormats">
             <tranEntries>
-              <tranEntry langID="1049" value="Virtual Tree Data\n"/>
-              <tranEntry langID="1033" value="Virtual Tree Data\n"/>
+              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1033" value=""/>
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value="Virtual Tree Data\n"/>
+              <tranEntry langID="1058" value=""/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
