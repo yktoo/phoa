@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.27 2004-10-12 12:38:09 dale Exp $
+//  $Id: phoa.dpr,v 1.28 2004-10-14 12:21:02 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -63,12 +63,12 @@ uses
   phGraphics in 'phGraphics.pas',
   udGroupProps in 'udGroupProps.pas' {dGroupProps},
   phGUIObj in 'phGUIObj.pas',
-  phProfileSetting in 'phProfileSetting.pas',
   phIntf in 'phIntf.pas',
   phMutableIntf in 'phMutableIntf.pas',
   phOps in 'phOps.pas',
   phNativeIntf in 'phNativeIntf.pas',
-  phObjConst in 'phObjConst.pas';
+  phObjConst in 'phObjConst.pas',
+  HTMLRender in 'HTMLRender.pas';
 
 {$R *.res}
 

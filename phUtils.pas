@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.33 2004-10-13 14:29:09 dale Exp $
+//  $Id: phUtils.pas,v 1.34 2004-10-14 12:21:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -97,10 +97,6 @@ uses
   function  IntToPicProps(i: Integer): TPicProperties;
    // ¬озвращает наименование свойства изображени€
   function  PicPropName(PicProp: TPicProperty): String;
-   // ¬озвращает текст отражени€ изображени€
-  function  PicFlipText(PicFlip: TPicFlip): String;
-   // ¬озвращает текст отражений изображени€
-  function  PicFlipsText(PicFlips: TPicFlips): String;
    // ѕреобразование TGroupProperties <-> Integer
   function  GroupPropsToInt(GroupProps: TGroupProperties): Integer;
   function  IntToGroupProps(i: Integer): TGroupProperties;
@@ -565,19 +561,6 @@ uses Forms, TypInfo, Registry, ShellAPI, Main, phSettings, udMsgBox, DKLang;
   function PicPropName(PicProp: TPicProperty): String;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
-  end;
-
-  function PicFlipText(PicFlip: TPicFlip): String;
-  begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPicFlip), Byte(PicFlip)));
-  end;
-
-  function PicFlipsText(PicFlips: TPicFlips): String;
-  var fl: TPicFlip;
-  begin
-    Result := '';
-    for fl := Low(fl) to High(fl) do AccumulateStr(Result, ', ', PicFlipText(fl));
-    Result := '['+Result+']';
   end;
 
   function GroupPropsToInt(GroupProps: TGroupProperties): Integer;

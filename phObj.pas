@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.48 2004-10-13 11:03:33 dale Exp $
+//  $Id: phObj.pas,v 1.49 2004-10-14 12:21:02 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -374,13 +374,13 @@ uses
   begin
     if sName<>'' then
       for Result := Low(Result) to High(Result) do
-        if SameText(sName, aPicPropertyNames[Result]) then Exit;
+        if SameText(sName, asPicPropertyNames[Result]) then Exit;
     Result := TPicProperty(-1);
   end;
 
   function PicPropertyToPropName(PProp: TPicProperty): String;
   begin
-    if PProp in PPAllProps then Result := aPicPropertyNames[PProp] else Result := '';
+    if PProp in PPAllProps then Result := asPicPropertyNames[PProp] else Result := '';
   end;
 
   procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
@@ -657,8 +657,8 @@ type
       ppNotes:         Result := FNotes;
       ppMedia:         Result := FMedia;
       ppKeywords:      Result := FKeywords.CommaText;
-//!!!      ppRotation:      Result := asPicRotationText[FRotation];
-//!!!      ppFlips:         Result := PicFlipsText(FFlips);
+      ppRotation:      Result := asPicRotationText[FRotation];
+      ppFlips:         Result := iif(pflHorz in FFlips, asPicFlipText[pflHorz], '')+iif(pflVert in FFlips, asPicFlipText[pflVert], '');
     end;
   end;
 

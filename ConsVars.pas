@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.65 2004-10-12 12:38:09 dale Exp $
+//  $Id: ConsVars.pas,v 1.66 2004-10-14 12:21:02 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,10 +31,6 @@ type
    // Типы данных свойств изображения
   TPicPropertyDatatype = (ppdInteger, ppdString, ppdPixelFormat, ppdDate, ppdTime, ppdStrings);
 
-const
-  asPicRotationText: Array[TPicRotation] of String = ('0°', '90°', '180°', '270°');
-
-type
    // Свойства для автоматического заполнения даты/времени изображения
   TDateTimeAutofillProp = (
     dtapExifDTOriginal,  // EXIF: Original date/time
@@ -831,7 +827,7 @@ uses
   TypInfo, Forms,
   TBXThemes, TBXDefaultTheme, TBXOfficeXPTheme, TBXStripesTheme, TBXAluminumTheme,
   DKLang,
-  phPhoa, phObjConst, phGUIObj, phUtils, phSettings, phValSetting, phProfileSetting, phToolSetting, udAbout;
+  phPhoa, phObjConst, phGUIObj, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
 
   function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const sNameValSep, sPropSep: String): String;
   var
@@ -1186,10 +1182,6 @@ type
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_CfmRebuildTh,   '@ISettingID_Dlgs_FOW_CfmRebuildTh',   True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs,   '@ISettingID_Dlgs_FOW_CfmRepairFLs',   True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly,   '@ISettingID_Dlgs_FOW_LogOnErrOnly',   True);
-     //== Профили ======================================================================================================
-    Lvl1 := TPhoaProfilePageSetting.Create(RootSetting, ISettingID_Profiles, iiProfile, '@ISettingID_Profiles', IDH_setup_tools{#ToDo3: Завести HelpTopic});
-    //#TODO: Регистрация стандартных профилей
-    // Lvl2 := TPhoaProfileSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
      //== Инструменты ==================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_tools);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);

@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.19 2004-10-13 11:03:33 dale Exp $
+;  $Id: phoa.dklang,v 1.20 2004-10-14 12:21:02 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -787,8 +787,6 @@ pcfHDrop=Picture files
 pcfPhoa=PhoA pictures
 pcfPlainList=Picture file paths
 pcfSingleBitmap=Thumbnail bitmap (when single picture selected)
-pflHorz=Horizontally
-pflVert=Vertically
 ppAuthor=Author
 ppDate=Date
 ppDescription=Description

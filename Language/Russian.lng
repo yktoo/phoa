@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.2
-LastModified=2004-10-13 16:07:46
+LastModified=2004-10-14 17:05:08
 SourceLANGID=1033
 
 [fMain]
@@ -787,8 +787,6 @@ pcfHDrop=Файлы изображений
 pcfPhoa=Изображения PhoA
 pcfPlainList=Пути файлов изображений
 pcfSingleBitmap=Эскиз (в случае единственного изображения)
-pflHorz=Горизонтально
-pflVert=Вертикально
 ppAuthor=Автор
 ppDate=Дата
 ppDescription=Описание

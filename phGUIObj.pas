@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.23 2004-10-14 08:12:41 dale Exp $
+//  $Id: phGUIObj.pas,v 1.24 2004-10-14 12:21:02 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -395,7 +395,7 @@ type
   end;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses Math, Themes, phUtils;
+uses Math, Themes, HTMLRender, phUtils;
 
 type
 
@@ -1096,10 +1096,11 @@ type
         sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
         if sProp<>'' then begin
           Result := Info.Bitmap.TextWidth(sProp)+2;
-          Info.Bitmap.Textout(
-            rText,
-            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
-            sProp);
+HTMLDrawText(Info.Bitmap.Canvas, sProp, rText, []);
+//          Info.Bitmap.Textout(
+//            rText,
+//            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
+//            sProp);
         end;
       end;
     end;

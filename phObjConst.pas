@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObjConst.pas,v 1.1 2004-10-12 12:38:09 dale Exp $
+//  $Id: phObjConst.pas,v 1.2 2004-10-14 12:21:03 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -24,7 +24,7 @@ const
   IThumbQuality_Max                = 100;
 
    // Соответствие между именами свойств изображений из phIntf и элементами TPicProperty
-  aPicPropertyNames: Array[TPicProperty] of String = (
+  asPicPropertyNames: Array[TPicProperty] of String = (
     SPhoaPicProp_ID,            // ppID
     SPhoaPicProp_FileName,      // ppFileName
     SPhoaPicProp_FullFileName,  // ppFullFileName
@@ -47,6 +47,16 @@ const
     SPhoaPicProp_Keywords,      // ppKeywords
     SPhoaPicProp_Rotation,      // ppRotation
     SPhoaPicProp_Flips);        // ppFlips
+
+  asPicRotationText: Array[TPicRotation] of String = (
+    '0°',    // pr0
+    '90°',   // pr90
+    '180°',  // pr180
+    '270°'); // pr270
+  
+  asPicFlipText: Array[TPicFlip] of String = (
+    'H',  // pflHorz
+    'V'); // pflVert
 
    // Таблицы перекодировки
    // TPicProperty <-> Chunked sorting prop
