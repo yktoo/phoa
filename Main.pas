@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.38 2004-09-17 14:07:32 dale Exp $
+//  $Id: Main.pas,v 1.39 2004-09-17 20:06:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1178,7 +1178,7 @@ uses
       FViewer.BeginUpdate;
       try
         Group := CurGroup;
-        FViewer.ViewGroup(Group, aFlatMode.Checked);
+        FViewer.ViewGroup(FPhoA, Group, aFlatMode.Checked);
          // Если группа не поменялась, восстанавливаем параметры отображения
         if (Group<>nil) and (Group.ID=FSavedGroupID) then
           FViewer.RestoreDisplay(FViewerSavedSelectedIDs, FViewerSavedFocusedID, FViewerSavedTopIndex);
@@ -1244,7 +1244,6 @@ uses
         Align             := alClient;
 //!!!DisplayMode       := tvdmDetail;
         DragCursor        := crDragMove;
-        PhoA              := FPhoA;
         PopupMenu         := pmPics;
         OnDragDrop        := ViewerDragDrop;
         OnSelectionChange := ViewerSelectionChange;
@@ -1899,7 +1898,7 @@ uses
 
   procedure TfMain.ViewerRefresh;
   begin
-    FViewer.ViewGroup(CurGroup, aFlatMode.Checked);
+    FViewer.ViewGroup(FPhoA, CurGroup, aFlatMode.Checked);
   end;
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.1 2004-09-17 14:07:32 dale Exp $
+//  $Id: phGUIObj.pas,v 1.2 2004-09-17 20:06:13 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -49,25 +49,28 @@ type
 
   TThumbnailViewer = class(TCustomControl)
   private
-     // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
-    FPicLinks: TPhoaPicLinks;
-     // Количество столбцов с эскизами
-    FColCount: Integer;
-     // Список индексов выделенных эскизов
-    FSelIndexes: TIntegerList;
-     // Индекс самого верхнего левого отображаемого эскиза
-    FTopIndex: Integer;
+     // Буферный битмэп для отрисовки содержимого окна контрола
+    FBuffer: TBitmap32;
+     // Размер пункта-эскиза (вместе с отступами, границами и т.п.)
+    FItemSize: TSize;
+     // Полная высота "виртуального" окна (всех эскизов)
+    FVRange: Integer;
      // Общее количество эскизов
     FItemCount: Integer;
-     // Индекс активного эскиза
-    FItemIndex: Integer;
      // Количество эскизов, целиком отображающихся в окне контрола
     FVisibleItems: Integer;
+     // Количество столбцов с эскизами
+    FColCount: Integer;
+
+
+     // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
+    FPicLinks: TPhoaPicLinks;
+     // Список индексов выделенных эскизов
+    FSelIndexes: TIntegerList;
+     // Индекс активного эскиза
+    FItemIndex: Integer;
      // Кэш bmp-изображений эскизов
     FThumbCache: TList;
-     // Ширина и высота ячейки для отрисовывания эскиза (с учётом отступов)
-    FWCell: Integer;
-    FHCell: Integer;
      // Индекс эскиза, с которого началось поточное выделение (Shift+[стрелки] или Shift+[клик])
     FStreamSelStart: Integer;
      // Индекс эскиза, который будет выделен (ItemIndex), если пользователь отожмёт левую кнопку мыши, не сдвинув мышь
@@ -95,7 +98,6 @@ type
      //   контекстное меню
     FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
-    FPhoA: TPhotoAlbum;
     FGroupID: Integer;
     FCacheThumbnails: Boolean;
     FDragInsideEnabled: Boolean;
@@ -110,19 +112,23 @@ type
     FThumbFontColor: TColor;
     FOnStartViewMode: TNotifyEvent;
     FDisplayMode: TThumbViewerDisplayMode;
+    FTopOffset: Integer;
+    FThumbnailSize: TSize; //DEPRECATED !!!
 
 
      // Painting stage handlers
     procedure Paint_EraseBackground(const Info: TThumbnailViewerPaintInfo);
     procedure Paint_Thumbnails(const Info: TThumbnailViewerPaintInfo);
+    procedure Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer);
     procedure Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
-
-
-
-
-
-     // Определяет количество эскизов в строчке
+     // Validates the specified offset and returns the correctly ranged offset value
+    function  GetValidTopOffset(iOffset: Integer): Integer;
+     // Рассчитывает основные параметры отображения эскизов
     procedure CalcLayout;
+     // Возвращает индекс самого верхнего отображаемого эскиза
+    function  GetFirstVisibleIndex: Integer;
+
+
      // Отрисовывает один эскиз
     procedure PaintThumb(idx: Integer; bmp: TBitmap);
      // Убирает выделение со всех эскизов и возвращает True, если оно было
@@ -145,10 +151,6 @@ type
     procedure PutThumbToCache(Pic: TPhoaPic; Bitmap: TBitmap);
      // Урезает размер кэша до iNumber изображений или совсем, если кэширование отключено
     procedure LimitCacheSize(iNumber: Integer);
-     // Возвращает допустимый TopIndex на основе предлагаемого
-    function  GetValidTopIndex(idxOffered: Integer): Integer;
-     // Событие изменения размеров эскиза фотоальбома
-    procedure PhoaThumbDimensionsChanged(Sender: TObject);
      // Настраивает ScrollBar
     procedure UpdateScrollBar;
      // Выделяет диапазон индексов эскизов и сдвигает ItemIndex в idxEnd
@@ -175,11 +177,9 @@ type
     procedure SetBorderStyle(Value: TBorderStyle);
     function  GetSelCount: Integer;
     procedure SetItemIndex(Value: Integer);
-    procedure SetTopIndex(Value: Integer);
     procedure SetCacheThumbnails(Value: Boolean);
     procedure SetThickThumbBorder(Value: Boolean);
     function  GetSelectedIndexes(Index: Integer): Integer;
-    procedure SetPhoA(Value: TPhotoAlbum);
     function  GetIDSelected(iID: Integer): Boolean;
     function  GetSelectedPics(Index: Integer): TPhoaPic;
     function  GetDropTargetIndex: Integer;
@@ -191,6 +191,8 @@ type
     procedure SetThumbBackColor(Value: TColor);
     procedure SetThumbFontColor(Value: TColor);
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
+    procedure SetTopOffset(Value: Integer);
+    procedure SetThumbnailSize(const Value: TSize);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -208,16 +210,16 @@ type
      // Сохраняет текущие параметры отображения и возвращает:
      //   в SelectedIDs - список ID выделенных изображений (может быть nil!)
      //   в iFocusedID  - ID изображения, которому соответствует ItemIndex (0, если нет такого)
-     //   в iTopIndex   - текущий TopIndex
-    procedure SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopIndex: Integer);
+     //   в iTopOffset  - текущий TopOffset
+    procedure SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopOffset: Integer);
      // Восстанавливает параметры отображения; подразумевается возможность использования данных,
      //   полученных в результате предыдущего вызова SaveDisplay():
      //     Если SelectedIDs<>nil, то сразу выделяет изображения с заданными ID
      //     Если iFocusedID>0, устанавливает ItemIndex на изображение с заданным ID
-     //     iTopIndex задаёт желаемый индекс верхнего эскиза
-    procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopIndex: Integer);
+     //     iTopOffset задаёт желаемый индекс верхнего эскиза
+    procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
      // Устанавливает группу Group для просмотра в качестве текущей
-    procedure ViewGroup(Group: TPhoaGroup; bRecurse: Boolean);
+    procedure ViewGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bRecurse: Boolean);
      // Снимает выделение со всех эскизов
     procedure SelectNone;
      // Выделяет все эскизы
@@ -250,8 +252,6 @@ type
     property IDSelected[iID: Integer]: Boolean read GetIDSelected;
      // -- Индекс сфокусированного изображения
     property ItemIndex: Integer read FItemIndex write SetItemIndex;
-     // -- Фотоальбом, с которым связан viewer
-    property PhoA: TPhotoAlbum read FPhoA write SetPhoA;
      // -- Количество выделенных изображений
     property SelCount: Integer read GetSelCount;
      // -- Индексы выделенных изображений в общем списке изображений viewer'а (Index - индекс выделенного изображения,
@@ -267,8 +267,11 @@ type
     property ThumbCornerDetails[Corner: TThumbCorner]: TThumbCornerDetail read GetThumbCornerDetails write SetThumbCornerDetails;
      // -- Данные, отображаемые на всплывающих описаниях эскизов
     property ThumbTooltipProps: TPicProperties read FThumbTooltipProps write SetThumbTooltipProps;
-     // -- Индекс эскиза, находящегося в левом верхнем углу
-    property TopIndex: Integer read FTopIndex write SetTopIndex;
+
+     // -- Размеры эскизов
+    property ThumbnailSize: TSize read FThumbnailSize write SetThumbnailSize;
+     // -- Смещение верхнего края окна относительно начала списка эскизов, в пикселах
+    property TopOffset: Integer read FTopOffset write SetTopOffset;
   published
     property Align;
     property Anchors;
@@ -347,7 +350,7 @@ type
   end;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses Math, Themes, TBX, TBXThemes, phUtils;
+uses Math, Themes, TBX, TBXThemes, phUtils, main;
 
 type
    // Запись кэша эскиза
@@ -389,28 +392,24 @@ type
 
   procedure TThumbnailViewer.CalcLayout;
   var
-    iItemCount, iColCount, idxTop, iLineHeight: Integer;
-    bChg: Boolean;
+    iPrevItemCount, iPrevColCount, iPrevTopOffset, iLineHeight: Integer;
     dc: HDC;
     PrevDisplayMode: TThumbViewerDisplayMode;
   begin
     if (FUpdateLock>0) or not HandleAllocated then Exit;
+    iPrevItemCount  := FItemCount;
+    iPrevColCount   := FColCount;
+    iPrevTopOffset  := FTopOffset;
     PrevDisplayMode := FDisplayMode;
     FLastTooltipIdx := -1;
     Hint := '';
      // Находим размеры ячейки и количество столбцов
-    if FPhoA=nil then begin
-      FWCell := 0;
-      FHCell := 0;
-    end else begin
-      FWCell := FPhoA.ThumbnailWidth;
-      FHCell := FPhoA.ThumbnailHeight;
-    end;
+    FItemSize := FThumbnailSize;
     case FDisplayMode of
       tvdmTile: begin
          // -- Прибавляем отступы на краях эскиза
-        Inc(FWCell, ILThumbMargin+IRThumbMargin);
-        Inc(FHCell, ITThumbMargin+IBThumbMargin);
+        Inc(FItemSize.cx, ILThumbMargin+IRThumbMargin);
+        Inc(FItemSize.cy, ITThumbMargin+IBThumbMargin);
          // -- Находим высоту строки текста
         dc := GetDC(0);
         Canvas.Handle := dc;
@@ -419,31 +418,25 @@ type
         Canvas.Handle := 0;
         ReleaseDC(0, dc);
          // -- Прибавляем отступы на данные изображений
-        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FHCell, iLineHeight);
-        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FHCell, iLineHeight);
+        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FItemSize.cy, iLineHeight);
+        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FItemSize.cy, iLineHeight);
          // Считаем количество столбцов
-        iColCount := Max(1, ClientWidth div FWCell);
+        FColCount := Max(1, ClientWidth div FItemSize.cx);
       end;
       else {tvdmDetail} begin
-        iColCount := 1;
-        FWCell := ClientWidth;
-        Inc(FHCell, ITThumbMargin+IBThumbMargin);
+        FColCount := 1;
+        FItemSize.cx := ClientWidth;
+        Inc(FItemSize.cy, ITThumbMargin+IBThumbMargin);
       end;
     end;
-     // Проверяем наличие изменений
-    iItemCount := FPicLinks.Count;
-    bChg := (FItemCount<>iItemCount) or (PrevDisplayMode<>FDisplayMode) or (FColCount<>iColCount);
-    FItemCount := iItemCount;
-    FColCount  := iColCount;
-    FVisibleItems := (ClientHeight div FHCell)*FColCount;
-     // Рассчитываем новый TopIndex
-    idxTop := GetValidTopIndex(FTopIndex);
-    if idxTop<>FTopIndex then
-      SetTopIndex(idxTop)
-    else begin
-      if bChg then Invalidate;
-      UpdateScrollBar;
-    end;
+     // Обновляем значения
+    FItemCount := FPicLinks.Count;
+    FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
+    FVRange := Ceil(FItemCount/FColCount)*FItemSize.cy;
+    FTopOffset := GetValidTopOffset(FTopOffset);
+     // Обновляем отображаемые данные при наличие изменений
+    if (FItemCount<>iPrevItemCount) or (FDisplayMode<>PrevDisplayMode) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
+    UpdateScrollBar;
   end;
 
   function TThumbnailViewer.ClearSelection: Boolean;
@@ -477,20 +470,22 @@ type
   constructor TThumbnailViewer.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
-    ControlStyle     := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
-    Width            := 100;
-    Height           := 100;
-    TabStop          := True;
-    ParentColor      := False;
-    Color            := clBtnFace;
-    FBorderStyle     := bsSingle;
-    FColCount        := 1;
-    FCacheThumbnails := True;
-    FNoMoveItemIndex := -1;
-    FPicLinks        := TPhoaPicLinks.Create(False);
-    FSelIndexes      := TIntegerList.Create(False);
-    FThumbBackColor  := clBtnFace;
-    FThumbCache      := TList.Create;
+    ControlStyle      := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
+    Width             := 100;
+    Height            := 100;
+    TabStop           := True;
+    ParentColor       := False;
+    Color             := clBtnFace;
+    FBorderStyle      := bsSingle;
+    FColCount         := 1;
+    FCacheThumbnails  := True;
+    FNoMoveItemIndex  := -1;
+    FPicLinks         := TPhoaPicLinks.Create(False);
+    FSelIndexes       := TIntegerList.Create(False);
+    FThumbBackColor   := clBtnFace;
+    FThumbCache       := TList.Create;
+    FThumbnailSize.cx := IDefaultThumbWidth;
+    FThumbnailSize.cy := IDefaultThumbHeight;
   end;
 
   procedure TThumbnailViewer.CreateParams(var Params: TCreateParams);
@@ -528,6 +523,7 @@ type
     LimitCacheSize(0);
     FThumbCache.Free;
     FPicLinks.Free;
+    FBuffer.Free;
     inherited Destroy;
   end;
 
@@ -542,119 +538,119 @@ type
   end;
 
   procedure TThumbnailViewer.DragDrawInsertionPoint(var Coord: TViewerInsertionCoord; bInvalidate: Boolean);
-  var
-    dc: HDC;
-    hp, hOld: HPEN;
-    idx, ix, iy: Integer;
+//  var
+//    dc: HDC;
+//    hp, hOld: HPEN;
+//    idx, ix, iy: Integer;
   begin
-    if Coord.iIndex>=0 then begin
-       // Находим пиксельные координаты
-      idx := Coord.iIndex;
-       // Если не выше клиентской области
-      if idx>=FTopIndex then begin
-        Dec(idx, FTopIndex);
-        ix := (idx mod FColCount)*FWCell;
-        iy := (idx div FColCount)*FHCell;
-         // Если не ниже нижней границы клиентской области
-        if iy<ClientHeight then begin
-           // Неоднозначность?
-          if (ix=0) and Coord.bLower then begin
-            ix := FColCount*FWCell;
-            Dec(iy, FHCell);
-          end;
-           // Отрисовываем
-          dc := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
-          hp := CreatePen(PS_SOLID, 3, ColorToRGB(Color) xor ColorToRGB(CInsertionPoint));
-          hOld := SelectObject(dc, hp);
-          SetROP2(dc, R2_XORPEN);
-          MoveToEx(dc, ix, iy, nil);
-          LineTo(dc, ix, iy+FHCell);
-          MoveToEx(dc, ix-3, iy, nil);
-          LineTo(dc, ix+3, iy);
-          MoveToEx(dc, ix-3, iy+FHCell, nil);
-          LineTo(dc, ix+3, iy+FHCell);
-          SelectObject(dc, hOld);
-          DeleteObject(hp);
-          ReleaseDC(Handle, dc);
-        end;
-      end;
-       // Invalidate coord if needed
-      if bInvalidate then begin
-        Coord.iIndex := -1;
-        Coord.bLower := False;
-      end;
-    end;
+//    if Coord.iIndex>=0 then begin
+//       // Находим пиксельные координаты
+//      idx := Coord.iIndex;
+//       // Если не выше клиентской области
+//      if idx>=FTopIndex then begin
+//        Dec(idx, FTopIndex);
+//        ix := (idx mod FColCount)*FItemSize.cx;
+//        iy := (idx div FColCount)*FItemSize.cy;
+//         // Если не ниже нижней границы клиентской области
+//        if iy<ClientHeight then begin
+//           // Неоднозначность?
+//          if (ix=0) and Coord.bLower then begin
+//            ix := FColCount*FItemSize.cx;
+//            Dec(iy, FItemSize.cy);
+//          end;
+//           // Отрисовываем
+//          dc := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
+//          hp := CreatePen(PS_SOLID, 3, ColorToRGB(Color) xor ColorToRGB(CInsertionPoint));
+//          hOld := SelectObject(dc, hp);
+//          SetROP2(dc, R2_XORPEN);
+//          MoveToEx(dc, ix, iy, nil);
+//          LineTo(dc, ix, iy+FItemSize.cy);
+//          MoveToEx(dc, ix-3, iy, nil);
+//          LineTo(dc, ix+3, iy);
+//          MoveToEx(dc, ix-3, iy+FItemSize.cy, nil);
+//          LineTo(dc, ix+3, iy+FItemSize.cy);
+//          SelectObject(dc, hOld);
+//          DeleteObject(hp);
+//          ReleaseDC(Handle, dc);
+//        end;
+//      end;
+//       // Invalidate coord if needed
+//      if bInvalidate then begin
+//        Coord.iIndex := -1;
+//        Coord.bLower := False;
+//      end;
+//    end;
   end;
 
   procedure TThumbnailViewer.DragOver(Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-  var
-    iCol, iRow: Integer;
-    bLower: Boolean;
-
-    procedure SpeedAdjust;
-    var cTicks: Cardinal;
-    begin
-      cTicks := GetTickCount;
-       // Первый раз не ждём
-      if (FLastDragScrollTicks>0) and (cTicks<FLastDragScrollTicks+IDragScrollDelay) then Sleep(FLastDragScrollTicks+IDragScrollDelay-cTicks);
-      FLastDragScrollTicks := cTicks;
-    end;
-
-     // Прокручивает список эскизов вверх (bUp=True) или вниз (bUp=False)
-    procedure DoScroll(bUp: Boolean);
-    begin
-       // Подстраиваем скорость
-      SpeedAdjust;
-       // Стираем старое место вставки
-      DragDrawInsertionPoint(FOldDragTargetCoord, True);
-       // Прокручиваем
-      SetTopIndex(FTopIndex+iif(bUp, -FColCount, FColCount));
-      Update;
-    end;
-
+//  var
+//    iCol, iRow: Integer;
+//    bLower: Boolean;
+//
+//    procedure SpeedAdjust;
+//    var cTicks: Cardinal;
+//    begin
+//      cTicks := GetTickCount;
+//       // Первый раз не ждём
+//      if (FLastDragScrollTicks>0) and (cTicks<FLastDragScrollTicks+IDragScrollDelay) then Sleep(FLastDragScrollTicks+IDragScrollDelay-cTicks);
+//      FLastDragScrollTicks := cTicks;
+//    end;
+//
+//     // Прокручивает список эскизов вверх (bUp=True) или вниз (bUp=False)
+//    procedure DoScroll(bUp: Boolean);
+//    begin
+//       // Подстраиваем скорость
+//      SpeedAdjust;
+//       // Стираем старое место вставки
+//      DragDrawInsertionPoint(FOldDragTargetCoord, True);
+//       // Прокручиваем
+//      SetTopIndex(FTopIndex+iif(bUp, -FColCount, FColCount));
+//      Update;
+//    end;
+//
   begin
-    if (Source=Self) and FDragInsideEnabled then begin
-      FDragTargetCoord.iIndex := -1;
-      FDragTargetCoord.bLower := False;
-       // Если входим/находимся в контроле
-      if PtInRect(ClientRect, Point(x, y)) then begin
-         // Если у верхней или нижней границ окна, мотаем
-        if (y<IDragScrollAreaMargin) or (y>=ClientHeight-IDragScrollAreaMargin) then DoScroll(y<IDragScrollAreaMargin);
-         // Определяем место вставки
-        if FItemCount>0 then begin
-           // Находим столбец (с округлением)
-          iCol := Round(x/FWCell);
-           // Если справа от эскизов, включаем режим bLower и устанавливаем индекс на эскиз в начале следующей строки
-          bLower := iCol>=FColCount;
-          if bLower then iCol := FColCount;
-           // Находим строку (индекс эскиза в начале строки)
-          iRow := FTopIndex+(y div FHCell)*FColCount;
-           // Если строка содержит эскизы
-          if iRow<FItemCount then begin
-            FDragTargetCoord.iIndex := iRow+iCol;
-             // Если указывает за последний эскиз - надо включить bLower
-            if FDragTargetCoord.iIndex>=FItemCount then begin
-              FDragTargetCoord.iIndex := FItemCount;
-              bLower := True;
-            end;
-            FDragTargetCoord.bLower := bLower;
-          end;
-        end;
-      end;
-       // Если изменилось положение маркера - отрисовываем его
-      if (FDragTargetCoord.iIndex<>FOldDragTargetCoord.iIndex) or (FDragTargetCoord.bLower<>FOldDragTargetCoord.bLower) then begin
-        DragDrawInsertionPoint(FOldDragTargetCoord, False);
-        DragDrawInsertionPoint(FDragTargetCoord, False);
-        FOldDragTargetCoord := FDragTargetCoord;
-      end;
-       // Drop возможен, если есть нормальная координата вставки, и перетаскиваются не все разом, и не единственное
-       //   изображение или место вставки не совпадает с положением этого изображения
-      Accept :=
-        (FDragTargetCoord.iIndex>=0) and
-        (FSelIndexes.Count<FPicLinks.Count) and
-        ((FSelIndexes.Count>1) or ((FSelIndexes[0]<>FDragTargetCoord.iIndex) and (FSelIndexes[0]<>FDragTargetCoord.iIndex-1)));
-    end else
-      inherited DragOver(Source, X, Y, State, Accept);
+//    if (Source=Self) and FDragInsideEnabled then begin
+//      FDragTargetCoord.iIndex := -1;
+//      FDragTargetCoord.bLower := False;
+//       // Если входим/находимся в контроле
+//      if PtInRect(ClientRect, Point(x, y)) then begin
+//         // Если у верхней или нижней границ окна, мотаем
+//        if (y<IDragScrollAreaMargin) or (y>=ClientHeight-IDragScrollAreaMargin) then DoScroll(y<IDragScrollAreaMargin);
+//         // Определяем место вставки
+//        if FItemCount>0 then begin
+//           // Находим столбец (с округлением)
+//          iCol := Round(x/FItemSize.cx);
+//           // Если справа от эскизов, включаем режим bLower и устанавливаем индекс на эскиз в начале следующей строки
+//          bLower := iCol>=FColCount;
+//          if bLower then iCol := FColCount;
+//           // Находим строку (индекс эскиза в начале строки)
+//          iRow := FTopIndex+(y div FItemSize.cy)*FColCount;
+//           // Если строка содержит эскизы
+//          if iRow<FItemCount then begin
+//            FDragTargetCoord.iIndex := iRow+iCol;
+//             // Если указывает за последний эскиз - надо включить bLower
+//            if FDragTargetCoord.iIndex>=FItemCount then begin
+//              FDragTargetCoord.iIndex := FItemCount;
+//              bLower := True;
+//            end;
+//            FDragTargetCoord.bLower := bLower;
+//          end;
+//        end;
+//      end;
+//       // Если изменилось положение маркера - отрисовываем его
+//      if (FDragTargetCoord.iIndex<>FOldDragTargetCoord.iIndex) or (FDragTargetCoord.bLower<>FOldDragTargetCoord.bLower) then begin
+//        DragDrawInsertionPoint(FOldDragTargetCoord, False);
+//        DragDrawInsertionPoint(FDragTargetCoord, False);
+//        FOldDragTargetCoord := FDragTargetCoord;
+//      end;
+//       // Drop возможен, если есть нормальная координата вставки, и перетаскиваются не все разом, и не единственное
+//       //   изображение или место вставки не совпадает с положением этого изображения
+//      Accept :=
+//        (FDragTargetCoord.iIndex>=0) and
+//        (FSelIndexes.Count<FPicLinks.Count) and
+//        ((FSelIndexes.Count>1) or ((FSelIndexes[0]<>FDragTargetCoord.iIndex) and (FSelIndexes[0]<>FDragTargetCoord.iIndex-1)));
+//    end else
+//      inherited DragOver(Source, X, Y, State, Accept);
   end;
 
   procedure TThumbnailViewer.EndUpdate;
@@ -685,6 +681,11 @@ type
   function TThumbnailViewer.GetDropTargetIndex: Integer;
   begin
     Result := FDragTargetCoord.iIndex;
+  end;
+
+  function TThumbnailViewer.GetFirstVisibleIndex: Integer;
+  begin
+    Result := ItemAtPos(0, 0);
   end;
 
   function TThumbnailViewer.GetIDSelected(iID: Integer): Boolean;
@@ -722,15 +723,9 @@ type
     Result := FThumbCornerDetails[Corner];
   end;
 
-  function TThumbnailViewer.GetValidTopIndex(idxOffered: Integer): Integer;
+  function TThumbnailViewer.GetValidTopOffset(iOffset: Integer): Integer;
   begin
-     // Round toward beginning of the row
-    idxOffered := (idxOffered div FColCount)*FColCount;
-     // Determine max. allowed TopIndex
-     //                 (всего строк с эскизами)           - (строк эскизов на экране)
-    Result := FColCount*(Round(Ceil(FItemCount/FColCount)) - ClientHeight div FHCell);
-    if idxOffered<Result then Result := idxOffered;
-    if Result<0 then Result := 0;
+    Result := Max(0, Min(iOffset, FVRange-ClientHeight));
   end;
 
   procedure TThumbnailViewer.InvalidateItem(Index: Integer);
@@ -746,10 +741,10 @@ type
   var iCol: Integer;
   begin
     Result := -1;
-    if (FItemCount>0) then begin
-      iCol := ix div FWCell;
+    if FItemCount>0 then begin
+      iCol := ix div FItemSize.cx;
       if iCol<FColCount then begin
-        Result := FTopIndex+(iy div FHCell)*FColCount+iCol;
+        Result := ((iy+FTopOffset) div FItemSize.cy)*FColCount+iCol;
         if Result>=FItemCount then Result := -1;
       end;
     end;
@@ -759,11 +754,10 @@ type
   var ix, iy: Integer;
   begin
     FillChar(Result, SizeOf(Result), 0);
-    if Index>=FTopIndex then begin
-      Dec(Index, FTopIndex);
-      ix := (Index mod FColCount)*FWCell;
-      iy := (Index div FColCount)*FHCell;
-      if iy<ClientHeight then Result := Rect(ix, iy, ix+FWCell, iy+FHCell);
+    if (Index>=0) and (Index<FItemCount) then begin
+      ix := (Index mod FColCount)*FItemSize.cx;
+      iy := (Index div FColCount)*FItemSize.cy-FTopOffset;
+      if iy<ClientHeight then Result := Rect(ix, iy, ix+FItemSize.cx, iy+FItemSize.cy);
     end;
   end;
 
@@ -807,34 +801,34 @@ type
   end;
 
   procedure TThumbnailViewer.MarqueingEnd;
-  var
-    i: Integer;
-    r, rThumb: TRect;
+//  var
+//    i: Integer;
+//    r, rThumb: TRect;
   begin
-    ReleaseCapture;
-    FMarqueing := False;
-    PaintMarquee;
-    ReleaseDC(Handle, FTempDC);
-     // Если не был нажат Shift, очищаем Selection (выделяем с нуля)
-    if GetKeyState(VK_SHIFT) and $80=0 then ClearSelection;
-     // Select thumbnails that do intersect with marquee
-    r := OrderRect(Rect(FStartPos, FMarqueeCur));
-    i := FTopIndex;
-    while (i<FTopIndex+FVisibleItems+FColCount) and (i<FItemCount) do begin
-      rThumb := ItemRect(i);
-      IntersectRect(rThumb, rThumb, r);
-      if not IsRectEmpty(rThumb) then AddToSelection(i);
-      Inc(i);
-    end;
-    DoSelectionChange;
+//    ReleaseCapture;
+//    FMarqueing := False;
+//    PaintMarquee;
+//    ReleaseDC(Handle, FTempDC);
+//     // Если не был нажат Shift, очищаем Selection (выделяем с нуля)
+//    if GetKeyState(VK_SHIFT) and $80=0 then ClearSelection;
+//     // Select thumbnails that do intersect with marquee
+//    r := OrderRect(Rect(FStartPos, FMarqueeCur));
+//    i := FTopIndex;
+//    while (i<FTopIndex+FVisibleItems+FColCount) and (i<FItemCount) do begin
+//      rThumb := ItemRect(i);
+//      IntersectRect(rThumb, rThumb, r);
+//      if not IsRectEmpty(rThumb) then AddToSelection(i);
+//      Inc(i);
+//    end;
+//    DoSelectionChange;
   end;
 
   procedure TThumbnailViewer.MarqueingStart;
   begin
-    SetCapture(Handle);
-    FTempDC := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
-    FMarqueing := True;
-    FMarqueeCur := FStartPos;
+//    SetCapture(Handle);
+//    FTempDC := GetDCEx(Handle, 0, DCX_CACHE or DCX_CLIPSIBLINGS or DCX_LOCKWINDOWUPDATE);
+//    FMarqueing := True;
+//    FMarqueeCur := FStartPos;
   end;
 
   procedure TThumbnailViewer.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -948,18 +942,21 @@ type
 //    begin
 //      if bmp=nil then begin
 //        bmp := TBitmap.Create;
-//        bmp.Width  := FWCell;
-//        bmp.Height := FHCell;
+//        bmp.Width  := FItemSize.cx;
+//        bmp.Height := FItemSize.cy;
 //      end;
 //    end;
 
   begin
+     // Создаём буферный битмэп, если он ещё не создан
+    if FBuffer=nil then FBuffer := TBitmap32.Create;
+     // Создаём структуру данных для отрисовки 
     with Info do begin
       RClip   := Canvas.ClipRect;
       RClient := ClientRect;
       if IsRectEmpty(RClient) then Exit;
-      Bitmap  := TBitmap32.Create;
-      Bitmap.SetSize(RClient.Right-RClient.Left, RClient.Bottom-RClient.Top);
+      FBuffer.SetSize(RClient.Right-RClient.Left, RClient.Bottom-RClient.Top);
+      Bitmap := FBuffer;
     end;
      // Invoke the painting stages one-by-one
     Paint_EraseBackground(Info);
@@ -999,7 +996,7 @@ type
       bmp.Free;
     end;
      // Стираем неотрисовываемую область справа от эскизов
-//    IntersectRect(r, Rect(FColCount*FWCell, 0, ClientWidth, ClientHeight), rClip);
+//    IntersectRect(r, Rect(FColCount*FItemSize.cx, 0, ClientWidth, ClientHeight), rClip);
 //    if not IsRectEmpty(r) then
 //      with Canvas do begin
 //        Brush.Style := bsSolid;
@@ -1122,18 +1119,18 @@ type
      // Отрисовываем изображение эскиза
     case FDisplayMode of
       tvdmTile: begin
-        r := Rect(ILThumbMargin, ITThumbMargin, FWCell-IRThumbMargin, FHCell-IBThumbMargin);
+        r := Rect(0, 0, FItemSize.cx-ILThumbMargin-IRThumbMargin, FItemSize.cy-ITThumbMargin-IBThumbMargin);
         if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    iLineHeight);
         if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, iLineHeight);
       end;
-      tvdmDetail: r := Rect(ILThumbMargin, ITThumbMargin, ILThumbMargin+FPhoA.ThumbnailWidth, FHCell-IBThumbMargin);
+      tvdmDetail: r := Rect(0, 0, FThumbnailSize.cx, FItemSize.cy-ITThumbMargin-IBThumbMargin);
     end;
     DoPaintThumbnail(r);
      // Рисуем описание
     case FDisplayMode of
       tvdmTile: begin
-        DrawDetailsLR(tcLeftTop,    tcRightTop,    Rect(ILThumbMargin, ITThumbMargin,                    FWCell-IRThumbMargin, ITThumbMargin+iLineHeight));
-        DrawDetailsLR(tcLeftBottom, tcRightBottom, Rect(ILThumbMargin, FHCell-IBThumbMargin-iLineHeight, FWCell-IRThumbMargin, FHCell-IBThumbMargin));
+        DrawDetailsLR(tcLeftTop,    tcRightTop,    Rect(0, 0, FItemSize.cx-ILThumbMargin-IRThumbMargin, iLineHeight));
+        DrawDetailsLR(tcLeftBottom, tcRightBottom, Rect(0, FItemSize.cy-ITThumbMargin-IBThumbMargin-iLineHeight, FItemSize.cx-ILThumbMargin-IRThumbMargin, FItemSize.cy-ITThumbMargin-IBThumbMargin));
       end;
       tvdmDetail: {!!!};
     end;
@@ -1144,27 +1141,55 @@ type
     CurrentTheme.PaintBackgnd(Info.Bitmap.Canvas, Info.RClient, Info.RClient, Info.RClip, Color, False, VT_UNKNOWN);
   end;
 
+  procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer);
+  begin
+    //!!!
+  end;
+
   procedure TThumbnailViewer.Paint_Thumbnails(const Info: TThumbnailViewerPaintInfo);
   var
-    i: Integer;
-    r: TRect;
-  begin
-    for i := 0 to 5 do begin
-      r := Rect(i*100, i*100, (i+1)*100, (i+1)*100);
-      if RectsOverlap(r, Info.RClip) then Info.Bitmap.FillRectT(r.Left, r.Top, r.Right, r.Bottom, $70ffffff); 
+    bmp: TBitmap;
+    rThumb: TRect;
+    idx: Integer;
 
+    procedure MakeBufferBitmap;
+    begin
+      if bmp=nil then begin
+        bmp := TBitmap.Create;
+        bmp.Width  := FItemSize.cx-ILThumbMargin-IRThumbMargin;
+        bmp.Height := FItemSize.cy-ITThumbMargin-IBThumbMargin;
+      end;
+    end;
+
+  begin
+    bmp := nil;
+    try
+       // Отрисовываем эскизы
+      idx := GetFirstVisibleIndex;
+      repeat
+         // Находим область эскиза (выходим вне видимой области экрана)
+        rThumb := ItemRect(idx);
+        if IsRectEmpty(rThumb) then Break;
+         // Находим пересечение эскиза с ClipRect
+        if RectsOverlap(rThumb, Info.RClip) then begin
+           // Если такой эскиз есть - рисуем в буфер и переносим его на экран
+          if idx<FItemCount then begin
+            MakeBufferBitmap;
+            PaintThumb(idx, bmp);
+            BitBlt(Info.Bitmap.Canvas.Handle, rThumb.Left, rThumb.Top, bmp.Width, bmp.Height, bmp.Canvas.Handle, 0, 0, SRCCOPY);
+//            BitBlt(Info.Bitmap.Canvas.Handle, r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top, bmp.Canvas.Handle, r.Left-rThumb.Left, r.Top-rThumb.Top, SRCCOPY);
+          end;
+        end;
+        Inc(idx);
+      until False;
+    finally
+      bmp.Free;
     end;
   end;
 
   procedure TThumbnailViewer.Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
   begin
     Info.Bitmap.DrawTo(Canvas.Handle, 0, 0);
-  end;
-
-  procedure TThumbnailViewer.PhoaThumbDimensionsChanged(Sender: TObject);
-  begin
-    LimitCacheSize(0);
-    CalcLayout;
   end;
 
   procedure TThumbnailViewer.PutThumbToCache(Pic: TPhoaPic; Bitmap: TBitmap);
@@ -1184,7 +1209,7 @@ type
     if FSelIndexes.Remove(Index)>=0 then InvalidateItem(Index);
   end;
 
-  procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopIndex: Integer);
+  procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
   var i, iItemIdx: Integer;
   begin
     ClearSelection;
@@ -1201,12 +1226,12 @@ type
       if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[FSelIndexes.Count-1]
        // Иначе пытаемся выделить самое первое изображение, если оно есть
       else if FPicLinks.Count>0 then iItemIdx := 0;
-    TopIndex := iTopIndex;
+    TopOffset := iTopOffset;
     MoveItemIndex(iItemIdx, True);
     DoSelectionChange;
   end;
 
-  procedure TThumbnailViewer.SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopIndex: Integer);
+  procedure TThumbnailViewer.SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopOffset: Integer);
   var i: Integer;
   begin
     iFocusedID := 0;
@@ -1216,16 +1241,16 @@ type
       if FItemIndex>=0 then iFocusedID := FPicLinks[FItemIndex].ID;
     end else
       SelectedIDs := nil;
-    iTopIndex := FTopIndex;
+    iTopOffset := FTopOffset;
   end;
 
   procedure TThumbnailViewer.ScrollIntoView;
   begin
-    if FItemIndex>=0 then
-       // Если ItemIndex выше окна просмотра
-      if FItemIndex<FTopIndex then SetTopIndex(FItemIndex)
-       // Если ItemIndex ниже окна просмотра
-      else if FTopIndex+FVisibleItems<=FItemIndex then SetTopIndex(((FItemIndex div FColCount)+1)*FColCount-FVisibleItems);
+//    if FItemIndex>=0 then
+//       // Если ItemIndex выше окна просмотра
+//      if FItemIndex<FTopIndex then SetTopIndex(FItemIndex)
+//       // Если ItemIndex ниже окна просмотра
+//      else if FTopIndex+FVisibleItems<=FItemIndex then SetTopIndex(((FItemIndex div FColCount)+1)*FColCount-FVisibleItems);
   end;
 
   procedure TThumbnailViewer.SelectAll;
@@ -1293,16 +1318,6 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.SetPhoA(Value: TPhotoAlbum);
-  begin
-    if FPhoA<>Value then begin
-      if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := nil;
-      FPhoA := Value;
-      if (FPhoA<>nil) then FPhoA.OnThumbDimensionsChanged := PhoaThumbDimensionsChanged;
-      ViewGroup(nil, False);
-    end;
-  end;
-
   procedure TThumbnailViewer.SetShowThumbTooltips(Value: Boolean);
   begin
     if FShowThumbTooltips<>Value then begin
@@ -1350,6 +1365,15 @@ type
     end;
   end;
 
+  procedure TThumbnailViewer.SetThumbnailSize(const Value: TSize);
+  begin
+    if (FThumbnailSize.cx<>Value.cx) or (FThumbnailSize.cy<>Value.cy) then begin
+      FThumbnailSize := Value;
+      LimitCacheSize(0);
+      CalcLayout;
+    end;
+  end;
+
   procedure TThumbnailViewer.SetThumbTooltipProps(Value: TPicProperties);
   begin
     if FThumbTooltipProps<>Value then begin
@@ -1359,11 +1383,11 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.SetTopIndex(Value: Integer);
+  procedure TThumbnailViewer.SetTopOffset(Value: Integer);
   begin
-    Value := GetValidTopIndex(Value);
-    if FTopIndex<>Value then begin
-      FTopIndex := Value;
+    Value := GetValidTopOffset(Value);
+    if FTopOffset<>Value then begin
+      FTopOffset := Value;
       UpdateScrollBar;
       Invalidate;
     end;
@@ -1381,14 +1405,14 @@ type
       cbSize := SizeOf(ScrollInfo);
       fMask  := SIF_ALL;
       nMin   := 0;
-      nMax   := GetValidTopIndex(MaxInt)+FVisibleItems-1;
-      nPage  := FVisibleItems;
-      nPos   := FTopIndex;
+      nMax   := FVRange-1;
+      nPage  := ClientHeight;
+      nPos   := FTopOffset;
     end;
     SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
   end;
 
-  procedure TThumbnailViewer.ViewGroup(Group: TPhoaGroup; bRecurse: Boolean);
+  procedure TThumbnailViewer.ViewGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bRecurse: Boolean);
   var iItemIdx: Integer;
   begin
     BeginUpdate;
@@ -1396,12 +1420,12 @@ type
        // Находим новый GroupID
       if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
        // Копируем ссылки на изображения по их IDs из группы
-      FPicLinks.AddFromGroup(FPhoA, Group, True, bRecurse);
+      FPicLinks.AddFromGroup(PhoA, Group, True, bRecurse);
        // Стираем кэш эскизов
       LimitCacheSize(0);
        // Стираем выделение
       ClearSelection;
-      FTopIndex := 0;
+      FTopOffset := 0;
        // Выделяем первое изображение (если оно есть)
       AddToSelection(0);
       if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[0] else iItemIdx := -1;
@@ -1436,20 +1460,20 @@ type
   end;
 
   procedure TThumbnailViewer.WMVScroll(var Msg: TWMVScroll);
-  var iTopIdx: Integer;
+  var iOffset: Integer;
   begin
     case Msg.ScrollCode of
-      SB_BOTTOM:       iTopIdx := MaxInt;
-      SB_LINEDOWN:     iTopIdx := FTopIndex+FColCount;
-      SB_LINEUP:       iTopIdx := FTopIndex-FColCount;
-      SB_PAGEDOWN:     iTopIdx := FTopIndex+FVisibleItems;
-      SB_PAGEUP:       iTopIdx := FTopIndex-FVisibleItems;
+      SB_BOTTOM:       iOffset := MaxInt;
+      SB_LINEDOWN:     iOffset := FTopOffset+10;
+      SB_LINEUP:       iOffset := FTopOffset-10;
+      SB_PAGEDOWN:     iOffset := FTopOffset+ClientHeight;
+      SB_PAGEUP:       iOffset := FTopOffset-ClientHeight;
       SB_THUMBPOSITION,
-        SB_THUMBTRACK: iTopIdx := Msg.Pos;
-      SB_TOP:          iTopIdx := 0;
+        SB_THUMBTRACK: iOffset := Msg.Pos;
+      SB_TOP:          iOffset := 0;
       else Exit;
     end;
-    SetTopIndex(iTopIdx);
+    TopOffset := iOffset;
   end;
 
   procedure TThumbnailViewer.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
@@ -1472,7 +1496,7 @@ type
         Exit;
       end;
       WM_MOUSEWHEEL: begin
-        if TWMMouseWheel(Msg).WheelDelta>0 then TopIndex := TopIndex-FColCount else TopIndex := TopIndex+FColCount;
+        if TWMMouseWheel(Msg).WheelDelta>0 then TopOffset := TopOffset-FItemSize.cy else TopOffset := TopOffset+FItemSize.cy;
         Exit;
       end;
     end;
