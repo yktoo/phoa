@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.9 2004-06-01 13:27:52 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.10 2004-06-03 12:47:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -65,6 +65,8 @@ type
     procedure aaFlipHorz(Sender: TObject);
     procedure aaFlipVert(Sender: TObject);
   private
+     // Флаг того, что страница проинициализирована
+    FInitialized: Boolean;
      // Кэшированное изменение масштаба
     FZoomFactorChange: Single;
      // Размеры iMain
@@ -85,10 +87,12 @@ type
     procedure LoadViewImage;
      // Находит размеры окна и устанавливает масштаб так, чтобы изображение целиком туда вписалось
     procedure AdjustView;
+     // Настраивает свойство Checked для Actions преобразований
+    procedure UpdateTransformActions;
      // Настраивает доступность Actions
-    procedure EnableActions; 
+    procedure EnableActions;
      // Обработчик события таймера задержки
-    procedure WMTimer(var Msg: TWMTimer); message WM_TIMER; 
+    procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
      // Prop handlers
     function  GetViewOffset: TPoint;
     function  GetViewZoomFactor: Single;
@@ -181,11 +185,15 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   var i: Integer;
   begin
     inherited BeforeDisplay(ChangeMethod);
-     // Считываем имена файлов, если ещё не делали этого
-    if cbViewFile.Strings.Count=0 then begin
+
+    if not FInitialized then begin
+       // Считываем имена файлов, если ещё не делали этого
       for i := 0 to EditedPicCount-1 do cbViewFile.Strings.Add(EditedPics[i].PicFileName);
       cbViewFile.ItemIndex := 0;
+       // Init transform!!!
+      FInitialized := True;
     end;
+
   end;
 
   function TfrPicProps_View.BestFitZoomFactor: Single;
@@ -317,6 +325,16 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
     FImageCursor := aImgViewCursors[(FWScaled>FWView) or (FHScaled>FHView)];
     iMain.Cursor := FImageCursor;
     EnableActions;
+  end;
+
+  procedure TfrPicProps_View.UpdateTransformActions;
+  begin
+//    aRotate0.Checked   := FCurRotation=pr0;
+//    aRotate90.Checked  := FCurRotation=pr90;
+//    aRotate180.Checked := FCurRotation=pr180;
+//    aRotate270.Checked := FCurRotation=pr270;
+//    aFlipHorz.Checked  := pflHorz in FCurFlips;
+//    aFlipVert.Checked  := pflVert in FCurFlips;
   end;
 
   procedure TfrPicProps_View.WMTimer(var Msg: TWMTimer);
