@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phProfileSetting.pas,v 1.1 2004-09-18 19:44:23 dale Exp $
+//  $Id: phProfileSetting.pas,v 1.2 2004-09-22 15:12:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -24,7 +24,7 @@ type
      // Prop storage
 
      // Возвращает имя секции для сохранения/загрузки настроек
-    function GetStoreSection: String;
+//    function GetStoreSection: String;
      // Prop handlers
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
@@ -156,10 +156,10 @@ type
     Result := FModified or inherited GetModified;
   end;
 
-  function TPhoaProfileSetting.GetStoreSection: String;
-  begin
-    Result := Format('%s\Item%.3d', [SRegPrefs_Profiles, Index]);
-  end;
+//  function TPhoaProfileSetting.GetStoreSection: String;
+//  begin
+//    Result := Format('%s\Item%.3d', [SRegPrefs_Profiles, Index]);
+//  end;
 
   procedure TPhoaProfileSetting.IniLoad(IniFile: TIniFile);
   begin

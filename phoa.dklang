@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.13 2004-09-18 19:44:23 dale Exp $
+;  $Id: phoa.dklang,v 1.14 2004-09-22 15:12:33 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -635,7 +635,8 @@ ISettingID_Browse_ViewerCacheThs=Cache thumbnails while viewing
 ISettingID_Browse_ViewerDragDrop=Drag'n'Drop
 ISettingID_Browse_ViewerStchFilt=Resampling filter
 ISettingID_Browse_ViewerThBColor=Thumbnail background color:
-ISettingID_Browse_ViewerThBorder=Thick thumbnail border
+ISettingID_Browse_ViewerThBordCl=Thumbnail background border custom color
+ISettingID_Browse_ViewerThBordSt=Thumbnail background border style
 ISettingID_Browse_ViewerThFColor=Thumbnail font color:
 ISettingID_Browse_ViewerThInfo=Picture details displayed on the thumbnails
 ISettingID_Browse_ViewerThLBProp=At the left bottom corner:
@@ -966,6 +967,14 @@ SWzPageFileOps_RepairSelLinks=Below are original picture files, as well as possi
 SWzPageFileOps_SelFolder=Select the destination folder
 SWzPageFileOps_SelPics=Select pictures for operation
 SWzPageFileOps_SelTask=Select a task
+tbbsColor=Custom color
+tbbsFlat=Flat
+tbbsGroove=Groove
+tbbsNone=None
+tbbsPlain=Plain
+tbbsRaised=Raised
+tbbsSunken=Sunken
+tbbsXP=XP
 TPhoaMultiOp_PicAdd=Add pictures
 TPhoaMultiOp_PicDelete=Delete pictures
 TPhoaMultiOp_PicDragAndDropToGroup=Drag pictures

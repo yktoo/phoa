@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.5 2004-09-21 13:13:14 dale Exp $
+//  $Id: phGUIObj.pas,v 1.6 2004-09-22 15:12:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -34,7 +34,7 @@ type
   end;
 
    // Стиль рамки подложки эскиза
-  TThumbBackBorderStyle = (tbbsFlat, tbbsRaised, tbbsSunken, tbbsPlain, tbbsGroove, tbbsXP, tbbsColor);
+  TThumbBackBorderStyle = (tbbsNone, tbbsFlat, tbbsRaised, tbbsSunken, tbbsPlain, tbbsGroove, tbbsXP, tbbsColor);
 
    // Угол эскиза
   TThumbCorner = (tcLeftTop, tcRightTop, tcLeftBottom, tcRightBottom);
@@ -65,7 +65,10 @@ type
     FVisibleItems: Integer;
      // Количество столбцов с эскизами
     FColCount: Integer;
-
+     // Высота одной строки текста, нарисованного шрифтом контрола
+    FTextLineHeight: Integer;
+     // Флаг валидности параметров шрифта
+    FFontParamsValid: Boolean;
 
      // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
     FPicLinks: TPhoaPicLinks;
@@ -105,7 +108,6 @@ type
     FGroupID: Integer;
     FCacheThumbnails: Boolean;
     FDragInsideEnabled: Boolean;
-    FThickThumbBorder: Boolean;
     FOnSelectionChange: TNotifyEvent;
     FBorderStyle: TBorderStyle;
     FDragEnabled: Boolean;
@@ -118,8 +120,8 @@ type
     FDisplayMode: TThumbViewerDisplayMode;
     FTopOffset: Integer;
     FThumbnailSize: TSize;
-    FThumbBackAlpha: Byte;
-    FThumbBackBorderStyle: TThumbBackBorderStyle; 
+    FThumbBackBorderStyle: TThumbBackBorderStyle;
+    FThumbBackBorderColor: TColor;
 
 
      // Painting stage handlers
@@ -129,6 +131,8 @@ type
     procedure Paint_TransferBuffer(const Info: TThumbnailViewerPaintInfo);
      // Validates the specified offset and returns the correctly ranged offset value
     function  GetValidTopOffset(iOffset: Integer): Integer;
+     // Рассчитывает параметры шрифта
+    procedure CalcFontParams;
      // Рассчитывает основные параметры отображения эскизов
     procedure CalcLayout;
      // Возвращает индекс самого верхнего отображаемого эскиза
@@ -176,13 +180,13 @@ type
     procedure WMVScroll(var Msg: TWMVScroll);                   message WM_VSCROLL;
     procedure WMNCPaint(var Msg: TWMNCPaint);                   message WM_NCPAINT;
     procedure CMDrag(var Msg: TCMDrag);                         message CM_DRAG;
+    procedure CMFontChanged(var Msg: TMessage);                 message CM_FONTCHANGED;
     procedure CMInvalidate(var Msg: TMessage);                  message CM_INVALIDATE;
      // Prop handlers
     procedure SetBorderStyle(Value: TBorderStyle);
     function  GetSelCount: Integer;
     procedure SetItemIndex(Value: Integer);
     procedure SetCacheThumbnails(Value: Boolean);
-    procedure SetThickThumbBorder(Value: Boolean);
     function  GetSelectedIndexes(Index: Integer): Integer;
     function  GetIDSelected(iID: Integer): Boolean;
     function  GetSelectedPics(Index: Integer): TPhoaPic;
@@ -197,8 +201,8 @@ type
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
     procedure SetTopOffset(Value: Integer);
     procedure SetThumbnailSize(const Value: TSize);
-    procedure SetThumbBackAlpha(Value: Byte);
     procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
+    procedure SetThumbBackBorderColor(Value: TColor);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -234,8 +238,9 @@ type
     function  GetSelectedPicArray: TPicArray;
      // Возвращает ItemIndex в точке, или -1, если там нет эскиза
     function  ItemAtPos(ix, iy: Integer): Integer;
-     // Возвращает координаты эскиза с индексом Index (даже если такого эскиза нет в группе!)
-    function  ItemRect(Index: Integer): TRect;
+     // Возвращает координаты эскиза с индексом Index. Если bAllowInvisible=False, то возвращает пустой прямоугольник,
+     //   если эскиз не пересекается с ClientRect
+    function  ItemRect(Index: Integer; bAllowInvisible: Boolean): TRect;
      // Ставит эскиз в очередь на обновление
     procedure InvalidateItem(Index: Integer);
      // Прокручивает содержимое, чтобы было видно ItemIndex
@@ -303,10 +308,8 @@ type
     property ShowHint;
     property TabOrder;
     property TabStop default True;
-     // -- Если True, рамка эскиза рисуется более чётко
-    property ThickThumbBorder: Boolean read FThickThumbBorder write SetThickThumbBorder default False;
-     // -- Непрозрачность фона эскизов
-    property ThumbBackAlpha: Byte read FThumbBackAlpha write SetThumbBackAlpha default $ff;
+     // -- Цвет рамки фона эскиза при ThumbBackBorderStyle=tbbsColor
+    property ThumbBackBorderColor: TColor read FThumbBackBorderColor write SetThumbBackBorderColor default clGray;
      // -- Стиль рамки фона эскиза
     property ThumbBackBorderStyle: TThumbBackBorderStyle read FThumbBackBorderStyle write SetThumbBackBorderStyle default tbbsXP;  
      // -- Цвет фона эскизов
@@ -399,19 +402,42 @@ type
     Inc(FUpdateLock);
   end;
 
+  procedure TThumbnailViewer.CalcFontParams;
+  var Cnv: TCanvas;
+  begin
+     // Находим высоту строки текста
+    Cnv := TCanvas.Create;
+    try
+      Cnv.Handle := GetDC(0);
+      try
+        Cnv.Font.Assign(Font);
+        FTextLineHeight := Cnv.TextHeight('Wg');
+        FFontParamsValid := True;
+      finally
+        ReleaseDC(0, Cnv.Handle);
+        Cnv.Handle := 0;
+      end;
+    finally
+      Cnv.Free;
+    end;
+  end;
+
   procedure TThumbnailViewer.CalcLayout;
   var
-    iPrevItemCount, iPrevColCount, iPrevTopOffset, iLineHeight: Integer;
-    dc: HDC;
+    iPrevItemCount, iPrevColCount, iPrevTopOffset: Integer;
     PrevDisplayMode: TThumbViewerDisplayMode;
   begin
     if (FUpdateLock>0) or not HandleAllocated then Exit;
+     // Сбрасываем Tooltip/Hint
+    FLastTooltipIdx := -1;
+    Hint := '';
+     // Сохраняем старые параметры
     iPrevItemCount  := FItemCount;
     iPrevColCount   := FColCount;
     iPrevTopOffset  := FTopOffset;
     PrevDisplayMode := FDisplayMode;
-    FLastTooltipIdx := -1;
-    Hint := '';
+     // Если параметры шрифта не валидны, инициализируем их
+    if not FFontParamsValid then CalcFontParams;
      // Находим размеры ячейки и количество столбцов
     FItemSize := FThumbnailSize;
     case FDisplayMode of
@@ -419,16 +445,9 @@ type
          // -- Прибавляем отступы на краях эскиза
         Inc(FItemSize.cx, IThumbMarginH*2+IThumbPaddingL+IThumbPaddingR);
         Inc(FItemSize.cy, IThumbMarginV*2+IThumbPaddingT+IThumbPaddingB);
-         // -- Находим высоту строки текста
-        dc := GetDC(0);
-        Canvas.Handle := dc;
-        Canvas.Font.Assign(Font);
-        iLineHeight := Canvas.TextHeight('Wg');
-        Canvas.Handle := 0;
-        ReleaseDC(0, dc);
          // -- Прибавляем отступы на данные изображений
-        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FItemSize.cy, iLineHeight);
-        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FItemSize.cy, iLineHeight);
+        if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(FItemSize.cy, FTextLineHeight);
+        if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Inc(FItemSize.cy, FTextLineHeight);
          // Считаем количество столбцов
         FColCount := Max(1, ClientWidth div FItemSize.cx);
       end;
@@ -443,7 +462,7 @@ type
     FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
     FVRange := Ceil(FItemCount/FColCount)*FItemSize.cy;
     FTopOffset := GetValidTopOffset(FTopOffset);
-     // Обновляем отображаемые данные при наличие изменений
+     // Обновляем отображаемые данные при наличии изменений
     if (FItemCount<>iPrevItemCount) or (FDisplayMode<>PrevDisplayMode) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
     UpdateScrollBar;
   end;
@@ -471,6 +490,11 @@ type
     inherited;
   end;
 
+  procedure TThumbnailViewer.CMFontChanged(var Msg: TMessage);
+  begin
+    FFontParamsValid := False;
+  end;
+
   procedure TThumbnailViewer.CMInvalidate(var Msg: TMessage);
   begin
     if HandleAllocated then InvalidateRect(Handle, nil, True);
@@ -491,7 +515,7 @@ type
     FNoMoveItemIndex      := -1;
     FPicLinks             := TPhoaPicLinks.Create(False);
     FSelIndexes           := TIntegerList.Create(False);
-    FThumbBackAlpha       := $ff{ff !!!};
+    FThumbBackBorderColor := clGray;
     FThumbBackBorderStyle := tbbsXP;
     FThumbBackColor       := clBtnFace;
     FThumbFontColor       := clWindowText;
@@ -744,7 +768,7 @@ type
   var r: TRect;
   begin
     if (FUpdateLock=0) and HandleAllocated then begin
-      r := ItemRect(Index);
+      r := ItemRect(Index, False);
       if not IsRectEmpty(r) then InvalidateRect(Handle, @r, False);
     end;
   end;
@@ -762,14 +786,14 @@ type
     end;
   end;
 
-  function TThumbnailViewer.ItemRect(Index: Integer): TRect;
+  function TThumbnailViewer.ItemRect(Index: Integer; bAllowInvisible: Boolean): TRect;
   var ix, iy: Integer;
   begin
     FillChar(Result, SizeOf(Result), 0);
     if (Index>=0) and (Index<FItemCount) then begin
       ix := (Index mod FColCount)*FItemSize.cx;
       iy := (Index div FColCount)*FItemSize.cy-FTopOffset;
-      if iy<ClientHeight then Result := Rect(ix, iy, ix+FItemSize.cx, iy+FItemSize.cy);
+      if bAllowInvisible or ((iy+FItemSize.cy>0) and (iy<ClientHeight)) then Result := Rect(ix, iy, ix+FItemSize.cx, iy+FItemSize.cy);
     end;
   end;
 
@@ -979,7 +1003,6 @@ type
   const aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
   var
     Pic: TPhoaPic;
-    iLineHeight: Integer;
     r, rInner: TRect;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
@@ -990,8 +1013,11 @@ type
       if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
         sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
         if sProp<>'' then begin
-          Result := Info.Bitmap.Canvas.TextWidth(sProp)+2;
-          DrawText(Info.Bitmap.Canvas.Handle, PChar(sProp), -1, rText, iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS);
+          Result := Info.Bitmap.TextWidth(sProp)+2;
+          Info.Bitmap.Textout(
+            rText,
+            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
+            sProp);
         end;
       end;
     end;
@@ -1006,7 +1032,7 @@ type
     end;
 
      // Отрисовывает эскиз в заданном прямоугольнике 
-    procedure DoPaintThumbnail(const rThumb: TRect);
+    procedure DrawThumbnail(const rThumb: TRect);
     var
       bCacheUsed: Boolean;
       bmpThumb: TBitmap;
@@ -1051,26 +1077,23 @@ type
     r := ItemRect;
     Info.Bitmap.Font.Assign(Self.Font);
     Info.Bitmap.Font.Color := iif(bSelected, aSelectedFontClr[Info.bFocused], FThumbFontColor);
-    iLineHeight := Info.Bitmap.TextHeight('Wg');
+     // Определяем внутренние границы эскиза
+    rInner := Rect(ItemRect.Left+IThumbPaddingL, ItemRect.Top+IThumbPaddingT, ItemRect.Right-IThumbPaddingR, ItemRect.Bottom-IThumbPaddingB);
      // Отрисовываем изображение эскиза
-    rInner := ItemRect;
+    r := rInner; 
     if FDisplayMode=tvdmTile then begin
-      Inc(rInner.Left,   IThumbPaddingL);
-      Dec(rInner.Right,  IThumbPaddingR);
-      if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    iLineHeight);
-      if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, iLineHeight);
+      if FThumbCornerDetails[tcLeftTop].bDisplay    or FThumbCornerDetails[tcRightTop].bDisplay    then Inc(r.Top,    FTextLineHeight);
+      if FThumbCornerDetails[tcLeftBottom].bDisplay or FThumbCornerDetails[tcRightBottom].bDisplay then Dec(r.Bottom, FTextLineHeight);
     end;
-    Inc(rInner.Top,    IThumbPaddingT);
-    Dec(rInner.Bottom, IThumbPaddingB);
-    DoPaintThumbnail(rInner);
+    DrawThumbnail(r);
      // Рисуем описание
     case FDisplayMode of
       tvdmTile: begin
         r := rInner;
-        r.Bottom := r.Top+iLineHeight;
+        r.Bottom := r.Top+FTextLineHeight;
         DrawDetailsLR(tcLeftTop,    tcRightTop,    r);
         r := rInner;
-        r.Top := r.Bottom-iLineHeight;
+        r.Top := r.Bottom-FTextLineHeight;
         DrawDetailsLR(tcLeftBottom, tcRightBottom, r);
       end;
       tvdmDetail: {!!!};
@@ -1084,16 +1107,25 @@ type
     bmpNormal, bmpSelected: TBitmap32; // Заготовки "подложек" эскизов обычного и выделенного
     bSelected: Boolean;
 
+     // Отрисовывает FocusRect эскиза, если эскиз сфокусирован
+    procedure DrawThumbFocusRect(iIndex: Integer; const r: TRect);
+    begin
+      if not Info.bFocused or (i<>FItemIndex) then Exit;
+      with Info.Bitmap.Canvas do begin
+        SetTextColor(Handle, $ffffff);
+        SetBkColor  (Handle, $000000);
+        DrawFocusRect(r);
+      end;
+    end;
+    
      // Возвращает битмэп с "подложкой" эскиза: выделенного или обычного (в зависимости от bSelected); кэширует
      //   созданный битмэп
     function GetThBackBitmap: TBitmap32;
-    const
-      aSelBackClr: Array[Boolean] of TColor = (clBtnShadow,  clHighlight);
-      aEdges: Array[Boolean] of Integer = (BDR_RAISEDINNER, BDR_RAISEDINNER or BDR_RAISEDOUTER);
+    const aSelBackClr: Array[Boolean] of TColor = (clBtnShadow,  clHighlight);
     var
       p: ^TBitmap32;
-      cBack: TColor32;
       r: TRect;
+      iBorderWidth: Integer;
     begin
       p := iif(bSelected, @bmpSelected, @bmpNormal);
        // Если подложка не создана
@@ -1102,19 +1134,25 @@ type
         p^ := TBitmap32.Create;
         r := Rect(0, 0, rThumb.Right-rThumb.Left, rThumb.Bottom-rThumb.Top);
         p^.SetSize(r.Right, r.Bottom);
-         // Рисуем
-        cBack := Color32(iif(bSelected, aSelBackClr[Info.bFocused], FThumbBackColor));
-        if ThemeServices.ThemesEnabled then begin
-          ThemeServices.DrawElement(p^.Canvas.Handle, ThemeServices.GetElementDetails(teEditTextNormal), r);
-          InflateRect(r, -2, -2);
-          p^.FillRectS(r, cBack);
-        end else begin
-          p^.FillRectS(r, cBack);
-          DrawEdge(p^.Canvas.Handle, r, aEdges[FThickThumbBorder], BF_RECT);
+         // Рисуем рамку
+        case FThumbBackBorderStyle of
+          tbbsFlat:   p^.FrameRectS(r, Color32(clBtnShadow));
+          tbbsRaised: DrawEdge(p^.Canvas.Handle, r, BDR_RAISEDINNER, BF_RECT);
+          tbbsSunken: DrawEdge(p^.Canvas.Handle, r, BDR_SUNKENINNER, BF_RECT);
+          tbbsPlain:  DrawEdge(p^.Canvas.Handle, r, BDR_RAISEDINNER or BDR_RAISEDOUTER, BF_RECT);
+          tbbsGroove: DrawEdge(p^.Canvas.Handle, r, BDR_RAISEDINNER or BDR_SUNKENOUTER, BF_RECT);
+          tbbsXP: begin
+            p^.FrameRectS(r, Color32($b99d7f));
+            p^.FrameRectS(r.Left+1, r.Top+1, r.Right-1, r.Bottom-1, Color32(clWindow));
+          end;
+          tbbsColor:  p^.FrameRectS(r, Color32(FThumbBackBorderColor));
         end;
-         // Настраиваем режим отрисовки
-        if FThumbBackAlpha<$ff then p^.DrawMode := dmBlend else p^.DrawMode := dmOpaque;
-        p^.MasterAlpha := FThumbBackAlpha;
+         // Рисуем фон
+        if FThumbBackBorderStyle<>tbbsNone then begin
+          iBorderWidth := iif(FThumbBackBorderStyle in [tbbsPlain, tbbsGroove, tbbsXP], 2, 1);
+          InflateRect(r, -iBorderWidth, -iBorderWidth);
+        end;
+        p^.FillRectS(r, Color32(iif(bSelected, aSelBackClr[Info.bFocused], FThumbBackColor)));
       end;
       Result := p^;
     end;
@@ -1128,12 +1166,12 @@ type
       try
         for i := idxStart to FItemCount-1 do begin
            // Находим область эскиза
-          rThumb := ItemRect(i);
+          rThumb := ItemRect(i, False);
           if IsRectEmpty(rThumb) then Break;
            // Рисуем FocusRect
-{!!!}           if (i=FItemIndex) and Info.bFocused then Info.Bitmap.Canvas.DrawFocusRect(rThumb);
-          InflateRect(rThumb, -IThumbMarginH, -IThumbMarginV);
+          DrawThumbFocusRect(i, rThumb);
            // Если область эскиза пересекается с ClipRect - рисуем этот эскиз
+          InflateRect(rThumb, -IThumbMarginH, -IThumbMarginV);
           if RectsOverlap(rThumb, Info.RClip) then begin
              // Определяем, выделен ли эскиз
             bSelected := FSelIndexes.IndexOf(i)>=0;
@@ -1208,12 +1246,15 @@ type
   end;
 
   procedure TThumbnailViewer.ScrollIntoView;
+  var r: TRect;
   begin
-//    if FItemIndex>=0 then
-//       // Если ItemIndex выше окна просмотра
-//      if FItemIndex<FTopIndex then SetTopIndex(FItemIndex)
-//       // Если ItemIndex ниже окна просмотра
-//      else if FTopIndex+FVisibleItems<=FItemIndex then SetTopIndex(((FItemIndex div FColCount)+1)*FColCount-FVisibleItems);
+     // Получаем границы эскиза
+    r := ItemRect(FItemIndex, True);
+    if not IsRectEmpty(r) then
+       // Если сфокусированный эскиз выше окна просмотра
+      if r.Top<0 then TopOffset := TopOffset+r.Top
+       // Если сфокусированный эскиз ниже окна просмотра
+      else if r.Bottom>ClientHeight then TopOffset := TopOffset+(r.Bottom-ClientHeight);
   end;
 
   procedure TThumbnailViewer.SelectAll;
@@ -1290,19 +1331,11 @@ type
     end;
   end;
 
-  procedure TThumbnailViewer.SetThickThumbBorder(Value: Boolean);
+  procedure TThumbnailViewer.SetThumbBackBorderColor(Value: TColor);
   begin
-    if FThickThumbBorder<>Value then begin
-      FThickThumbBorder := Value;
-      Invalidate;
-    end;
-  end;
-
-  procedure TThumbnailViewer.SetThumbBackAlpha(Value: Byte);
-  begin
-    if FThumbBackAlpha<>Value then begin
-      FThumbBackAlpha := Value;
-      if FPicLinks.Count>0 then Invalidate;
+    if FThumbBackBorderColor<>Value then begin
+      FThumbBackBorderColor := Value;
+      if (FThumbBackBorderStyle=tbbsColor) and (FItemCount>0) then Invalidate;
     end;
   end;
 
@@ -1310,7 +1343,7 @@ type
   begin
     if FThumbBackBorderStyle<>Value then begin
       FThumbBackBorderStyle := Value;
-      if FPicLinks.Count>0 then Invalidate;
+      if FItemCount>0 then Invalidate;
     end;
   end;
 
@@ -1318,7 +1351,7 @@ type
   begin
     if FThumbBackColor<>Value then begin
       FThumbBackColor := Value;
-      if FPicLinks.Count>0 then Invalidate;
+      if FItemCount>0 then Invalidate;
     end;
   end;
 
@@ -1340,7 +1373,7 @@ type
   begin
     if FThumbFontColor<>Value then begin
       FThumbFontColor := Value;
-      if FPicLinks.Count>0 then Invalidate;
+      if FItemCount>0 then Invalidate;
     end;
   end;
 
@@ -1369,6 +1402,8 @@ type
       ScrollWindowEx(Handle, 0, FTopOffset-Value, nil, nil, 0, nil, SW_INVALIDATE);
       FTopOffset := Value;
       UpdateScrollBar;
+       // Invalidate the focused thumbnail for FocusRect to be repainted correctly
+      if Focused then InvalidateItem(FItemIndex);
     end;
   end;
 

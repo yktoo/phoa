@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.39 2004-09-17 20:06:13 dale Exp $
+//  $Id: Main.pas,v 1.40 2004-09-22 15:12:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -891,14 +891,15 @@ uses
     with Viewer do begin
       BeginUpdate;
       try
-        ThickThumbBorder  := SettingValueBool(ISettingID_Browse_ViewerThBorder);
-        CacheThumbnails   := SettingValueBool(ISettingID_Browse_ViewerCacheThs);
-        ThumbCacheSize    := SettingValueInt (ISettingID_Browse_ViewerCacheSze);
-        Color             := SettingValueInt (ISettingID_Browse_ViewerBkColor);
-        ThumbBackColor    := SettingValueInt (ISettingID_Browse_ViewerThBColor);
-        ThumbFontColor    := SettingValueInt (ISettingID_Browse_ViewerThFColor);
-        ShowThumbTooltips := SettingValueBool(ISettingID_Browse_ViewerTooltips);
-        ThumbTooltipProps := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
+        ThumbBackBorderStyle := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
+        ThumbBackBorderColor := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
+        CacheThumbnails      := SettingValueBool(ISettingID_Browse_ViewerCacheThs);
+        ThumbCacheSize       := SettingValueInt (ISettingID_Browse_ViewerCacheSze);
+        Color                := SettingValueInt (ISettingID_Browse_ViewerBkColor);
+        ThumbBackColor       := SettingValueInt (ISettingID_Browse_ViewerThBColor);
+        ThumbFontColor       := SettingValueInt (ISettingID_Browse_ViewerThFColor);
+        ShowThumbTooltips    := SettingValueBool(ISettingID_Browse_ViewerTooltips);
+        ThumbTooltipProps    := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
         SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);
         SetupViewerCorner(tcRightTop,    ISettingID_Browse_ViewerThRTProp);
         SetupViewerCorner(tcLeftBottom,  ISettingID_Browse_ViewerThLBProp);

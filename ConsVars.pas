@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.55 2004-09-21 13:13:14 dale Exp $
+//  $Id: ConsVars.pas,v 1.56 2004-09-22 15:12:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -753,7 +753,8 @@ const
     ISettingID_Browse_ViewerThRTProp   = 1122; // Viewer: Right top corner
     ISettingID_Browse_ViewerThLBProp   = 1123; // Viewer: Left bottom corner
     ISettingID_Browse_ViewerThRBProp   = 1124; // Viewer: Right bottom corner
-    ISettingID_Browse_ViewerThBorder   = 1130; // Viewer: Чёткие границы эскиза
+    ISettingID_Browse_ViewerThBordSt   = 1130; // Viewer: Стиль границы эскиза
+    ISettingID_Browse_ViewerThBordCl   = 1131; // Viewer: Цвет границы эскиза при стиле "Заданный цвет"
     ISettingID_Browse_ViewerCacheThs   = 1140; // Viewer: Кэшировать эскизы при просмотре
     ISettingID_Browse_ViewerCacheSze   = 1141; // Viewer: Размер кэша эскизов
     ISettingID_Browse_ViewerStchFilt   = 1150; // Viewer: Метод ресэмплинга эскизов
@@ -1026,6 +1027,12 @@ uses
       Setting.Variants.AddObject('@'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Pointer(Prop));
   end;
 
+  procedure AddThumbBorderStyleSettings(Owner: TPhoaIntSetting);
+  var BS: TThumbBackBorderStyle;
+  begin
+    for BS := Low(BS) to High(BS) do TPhoaMutexSetting.Create(Owner, 0, '@'+GetEnumName(TypeInfo(TThumbBackBorderStyle), Byte(BS)));
+  end;
+
   procedure AddGroupPropSettings(Owner: TPhoaIntSetting);
   var Prop: TGroupProperty;
   begin
@@ -1212,7 +1219,9 @@ type
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
           Lvl4 := TPhoaListSetting.Create    (Lvl3, ISettingID_Browse_ViewerThRBProp, '@ISettingID_Browse_ViewerThRBProp', Byte(ppDate), lsvtObject);
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
-        Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Browse_ViewerThBorder, '@ISettingID_Browse_ViewerThBorder', True);
+        Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_ViewerThBordSt, '@ISettingID_Browse_ViewerThBordSt', Byte(tbbsXP), Byte(Low(TThumbBackBorderStyle)), Byte(High(TThumbBackBorderStyle)));
+        AddThumbBorderStyleSettings(Lvl3 as TPhoaIntSetting);
+        Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerThBordCl, '@ISettingID_Browse_ViewerThBordCl', clBtnShadow);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Browse_ViewerCacheThs, '@ISettingID_Browse_ViewerCacheThs', True);
           Lvl4 := TPhoaIntEntrySetting.Create(Lvl3, ISettingID_Browse_ViewerCacheSze, '@ISettingID_Browse_ViewerCacheSze', 1000, 1, MaxInt);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest), Byte(Low(TStretchFilter)), Byte(High(TStretchFilter)));
