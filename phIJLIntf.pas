@@ -1044,15 +1044,18 @@ type
   EJPEGDrawError = class(Exception);
   TIJL_Quality = 0..100;
 
-  TIJLJPEGScale = (ijlsFullSize, ijlsHalf, ijlsQuarter, ijlsEighth);
-
 var
    // True, если библиотека IJL найдена и подключена
   bIJL_Available: Boolean;
 
   procedure RGBA2BGRA(pData: Pointer; Width, Height: Integer);
+
   procedure SaveTo24bitJPEGFile(Bitmap32: TBitmap32; const FileName: String; Quality: TIJL_Quality = 75; const Progressive_Passes: Boolean = False);
-  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; JPEGScale: TIJLJPEGScale = ijlsFullSize);
+   // Загружает JPEG-файл в Bitmap32. Если iDesiredWidth=0 или iDesiredHeight=0, загружает файл целиком; иначе загружает
+   //   наименьший кратный размер (1/2, 1/4 или 1/8), чтобы ширина была больше iDesiredWidth, а высота - больше
+   //   iDesiredHeight
+  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; iDesiredWidth, iDesiredHeight: Integer);
+
   procedure Save24bitJPEGToStream(Bitmap32: TBitmap32; MemStream: TMemoryStream; Quality: TIJL_Quality = 75; const Progressive_Passes: Boolean = False);
   procedure LoadJPEGFromStream(Bitmap32: TBitmap32; MemStream: TMemoryStream);
 
@@ -1132,13 +1135,31 @@ implementation /////////////////////////////////////////////////////////////////
     end;
   end;
 
-  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; JPEGScale: TIJLJPEGScale = ijlsFullSize);
+  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; iDesiredWidth, iDesiredHeight: Integer);
   var
     Bitmap: TBitmap;
     DIB: TDIBSection;
     jcprops: TJPEG_CORE_PROPERTIES;
     ret, iWidth, iHeight: Integer;
     ReadType: TIJLIOType;
+
+     // Возвращает True, если изображение можно загрузить частично (часть, определяемую делителем iDivisor). Также в
+     //   этом случае обновляет iWidth, iHeight и ReadType
+    function TryUsePartialLoad(iDivisor: Integer; AReadType: TIJLIOType): Boolean;
+    var iRealWidth, iRealHeight: Integer;
+    begin
+       // Считаем, какие размеры будут у изображения
+      iRealWidth  := (iWidth+iDivisor-1)  div iDivisor;
+      iRealHeight := (iHeight+iDivisor-1) div iDivisor;
+       // Если устраивает - принимаем
+      Result := (iRealWidth>iDesiredWidth) and (iRealHeight>iDesiredHeight);
+      if Result then begin
+        iWidth   := iRealWidth;
+        iHeight  := iRealHeight;
+        ReadType := AReadType;
+      end;
+    end;
+
   begin
     Assert(Bitmap32<>nil, 'Bitmap32 must not be nil');
     if not FileExists(Filename) then raise Exception.Create(Filename+#13+'does not exist');
@@ -1182,26 +1203,14 @@ implementation /////////////////////////////////////////////////////////////////
         end;
       end;
        // Определяем требуемые размеры битмэпа
-      iWidth := jcprops.JPGWidth;
-      iHeight := jcprops.JPGHeight;
-      case JPEGScale of
-        ijlsHalf: begin
-          iWidth     := (iWidth + 1) div 2;
-          iHeight    := (iHeight + 1) div 2;
-          ReadType := IJL_JFILE_READONEHALF;
-        end;
-        ijlsQuarter: begin
-          iWidth     := (iWidth + 3) div 4;
-          iHeight    := (iHeight + 3) div 4;
-          ReadType := IJL_JFILE_READONEQUARTER;
-        end;
-        ijlsEighth: begin
-          iWidth     := (iWidth + 7) div 8;
-          iHeight    := (iHeight + 7) div 8;
-          ReadType := IJL_JFILE_READONEEIGHTH;
-        end;
-        else ReadType := IJL_JFILE_READWHOLEIMAGE;
-      end;
+      iWidth   := jcprops.JPGWidth;
+      iHeight  := jcprops.JPGHeight;
+      ReadType := IJL_JFILE_READWHOLEIMAGE;
+      if (iDesiredWidth>0) and (iDesiredHeight>0) then
+         // Пробуем размер 1/8, потом 1/4, потом 1/2
+        if not TryUsePartialLoad(8, IJL_JFILE_READONEEIGHTH) and not TryUsePartialLoad(4, IJL_JFILE_READONEQUARTER) then
+          TryUsePartialLoad(2, IJL_JFILE_READONEHALF);
+       // Загружаем Bitmap   
       Bitmap.Width  := iWidth;
       Bitmap.Height := iHeight;
       FillChar(DIB, SizeOf(DIB), 0);

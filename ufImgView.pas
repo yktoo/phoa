@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.44 2004-11-23 12:51:41 dale Exp $
+//  $Id: ufImgView.pas,v 1.45 2004-11-23 17:22:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -499,7 +499,7 @@ uses
         try
           FBitmap := TBitmap32.Create;
            // ѕытаемс€ загрузить изображение
-          if not FLoadAborted then LoadGraphicFromFile(FQueuedFileName, FBitmap, LoadProgress);
+          if not FLoadAborted then LoadGraphicFromFile(FQueuedFileName, FBitmap, 0, 0, LoadProgress);
            // ≈сли загрузка была прервана, уничтожаем изображение
           if FLoadAborted then FreeAndNil(FBitmap);
         except

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.14 2004-11-23 14:48:49 dale Exp $
+//  $Id: phGraphics.pas,v 1.15 2004-11-23 17:22:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -105,7 +105,7 @@ type
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32); overload;
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const OnProgress: TProgressEvent);
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; iDesiredWidth, iDesiredHeight: Integer; const OnProgress: TProgressEvent);
 
 const
   BColor_Alpha_Transparent = $00;
@@ -269,7 +269,7 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
        // Создаём, загружаем картинку и превращаем её в Bitmap32
       FullSizeBitmap := TBitmap32.Create;
       try
-        LoadGraphicFromFile(sFileName, FullSizeBitmap, nil);
+        LoadGraphicFromFile(sFileName, FullSizeBitmap, ThumbSize.cx, ThumbSize.cy, nil);
         FullSizeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
         ImageSize.cx := FullSizeBitmap.Width;
         ImageSize.cy := FullSizeBitmap.Height;
@@ -374,7 +374,7 @@ var
     PaintThumbnail(Pic, Bitmap32, r);
   end;
 
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const OnProgress: TProgressEvent);
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; iDesiredWidth, iDesiredHeight: Integer; const OnProgress: TProgressEvent);
   var
     sExt: String;
     GClass: TGraphicClass;
@@ -384,7 +384,7 @@ var
      // Если IJL доступна, JPEG грузим с её помощью (якобы 300% faster) 
     if bIJL_Available and (SameText(sExt, '.JPG') or SameText(sExt, '.JPEG')) then begin
       try
-        LoadJPEGFromFile(Bitmap32, sFileName)
+        LoadJPEGFromFile(Bitmap32, sFileName, iDesiredWidth, iDesiredHeight);
       except
         on e: Exception do PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
       end;

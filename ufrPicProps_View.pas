@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.27 2004-11-23 12:51:41 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.28 2004-11-23 17:22:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -369,7 +369,7 @@ uses phUtils, Main, phSettings;
       FPic := EditedPics[cbViewFile.ItemIndex];
        // Загружаем изображение
       try
-        LoadGraphicFromFile(FPic.FileName, iMain.Bitmap, nil);
+        LoadGraphicFromFile(FPic.FileName, iMain.Bitmap, 0, 0, nil);
         FImageLoaded := True;
       except
         FImageLoaded := False;
