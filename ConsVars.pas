@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.83 2004-12-05 16:17:50 dale Exp $
+//  $Id: ConsVars.pas,v 1.84 2004-12-06 20:22:44 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -436,6 +436,9 @@ const
 
     SRegWizPage_PicProp_Metadata  = 'PicProp_Metadata';
     SRegWizPage_PicProp_View      = 'PicProp_View';
+
+  SRegPicFilterExprEditor_Root    = 'PicFilterExpressionEditor';
+    SRegPFilterExprEditor_OpenMRU = 'OpenMRU';
 
    // Недопустимые в пути к файлу символы
   SInvalidPathChars               = '\/:*?"<>|';

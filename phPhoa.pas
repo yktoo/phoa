@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.8 2004-11-24 11:41:48 dale Exp $
+//  $Id: phPhoa.pas,v 1.9 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -31,11 +31,12 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   Dec 07, 2004 - dale - Added IPhChunk_View_FilterExpression chunk
 //   Nov 24, 2004 - dale - Fixes to TimeToPhoaTime() (now rounds the time value to minimize the errors)
-//   Nov 19, 2004 - dale - added new sorting properties (thumbnail width, height and dimensions) and sorting prop constants
-//   Jun 06, 2004 - dale - added a chunk for Group Description property
-//   Jun 02, 2004 - dale - added a chunk for Group ID property
-//   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties
+//   Nov 19, 2004 - dale - Added new sorting properties (thumbnail width, height and dimensions) and sorting prop constants
+//   Jun 06, 2004 - dale - Added a chunk for Group Description property
+//   Jun 02, 2004 - dale - Added a chunk for Group ID property
+//   May 30, 2004 - dale - Added chunks for picture Rotation and Flips properties
 //**********************************************************************************************************************
 unit phPhoa;
 
@@ -278,6 +279,7 @@ const
   IPhChunk_GroupPic_ID             = $1220; // Int      Link to picture (the picture's ID)
    // Photo album view properties
   IPhChunk_View_Name               = $1301; // StringW  View name
+  IPhChunk_View_FilterExpression   = $1302; // StringW  View picture filter expression
   IPhChunk_ViewGrouping_Prop       = $1310; // Word     View grouping property (see below)
   IPhChunk_ViewGrouping_Unclass    = $1311; // Byte     View grouping switch: place unclassified pictures to a separate folder (0/1)
   IPhChunk_ViewSorting_Prop        = $1320; // Word     View sorting property (see below)
@@ -346,7 +348,7 @@ type
 
    // List of chunks known for the moment, and their datatypes and ranges
 const
-  aPhChunks: Array[0..60] of TPhChunkEntry = (
+  aPhChunks: Array[0..61] of TPhChunkEntry = (
     (wCode: IPhChunk_Remark;                 Datatype: pcdStringW),
     (wCode: IPhChunk_PhoaGenerator;          Datatype: pcdStringB),
     (wCode: IPhChunk_PhoaSavedDate;          Datatype: pcdInt;    iRangeMin: 0;  iRangeMax: 3652058 {Dec 31, 9999}),
@@ -382,6 +384,7 @@ const
     (wCode: IPhChunk_Group_Description;      Datatype: pcdStringW),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_View_Name;              Datatype: pcdStringW),
+    (wCode: IPhChunk_View_FilterExpression;  Datatype: pcdStringW),
     (wCode: IPhChunk_ViewGrouping_Prop;      Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 10),
     (wCode: IPhChunk_ViewGrouping_Unclass;   Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_ViewSorting_Prop;       Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 21),

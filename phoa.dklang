@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.38 2004-12-03 11:30:12 dale Exp $
+;  $Id: phoa.dklang,v 1.39 2004-12-06 20:22:45 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -286,52 +286,15 @@ rbCurGroup.Caption=00000033,In the &current group
 rbSearchResults.Caption=00000036,In the search &results
 tsSimple.Caption=00000040,Simple search
 tsExpression.Caption=00000041,Expression search
-tbExprMain.Caption=00000042,Toolbar
-tbExprMain.ChevronHint=00000043,More Buttons|
-smExprInsertProp.Caption=00000044,Insert propert&y
-smExprInsertProp.Hint=00000046,Insert a picture property into the expression
-smExprInsertOperator.Caption=00000045,Insert &operator
-smExprInsertOperator.Hint=00000047,Insert an operator into the expression
-scpMain.Title=00000051,Properties
 ipmsmSimpleProp.Caption=00000052,&Picture property
 tbSimpleMain.Caption=00000054,Toolbar
 tbSimpleMain.ChevronHint=00000055,More Buttons|
 aSimpleCrDelete.Caption=00000056,&Delete
-aSimpleCrDelete.Category=00000078,Simple search
 aSimpleCrDelete.Hint=00000057,Delete selected criterion
 aSimpleConvertToExpression.Caption=00000058,Convert to e&xpression
-aSimpleConvertToExpression.Category=00000079,Simple search
 aSimpleConvertToExpression.Hint=00000059,Convert selected criteria to search expression
-aReset.Caption=00000063,&Reset
-aReset.Category=00000077,General
-aReset.Hint=00000064,Reset|Clear entered criteria or expression
-aExprSyntaxCheck.Caption=00000065,Syntax check
-aExprSyntaxCheck.Category=00000080,Expression search
-aExprSyntaxCheck.Hint=00000066,Syntax check the expression
-aExprCut.Caption=00000067,&Cut
-aExprCut.Category=00000083,Expression search
-aExprCut.Hint=00000068,Cut|Cut selected text to the clipboard
-aExprCopy.Caption=00000069,Co&py
-aExprCopy.Category=00000084,Expression search
-aExprCopy.Hint=00000070,Copy|Copy selected text to the clipboard
-aExprPaste.Caption=00000071,&Paste
-aExprPaste.Category=00000085,Expression search
-aExprPaste.Hint=00000074,Paste|Paste text from the clipboard
-aExprUndo.Caption=00000072,&Undo
-aExprUndo.Category=00000081,Expression search
-aExprUndo.Hint=00000075,Undo|Undo the last change
-aExprRedo.Caption=00000073,&Redo
-aExprRedo.Category=00000082,Expression search
-aExprRedo.Hint=00000076,Redo|Redo the last undone change
-aExprNew.Caption=00000087,&New
-aExprNew.Category=00000086,Expression search
-aExprNew.Hint=00000088,New|Clear the expression
-aExprOpen.Caption=00000090,&Open...
-aExprOpen.Category=00000089,Expression search
-aExprOpen.Hint=00000091,Open...|Open a text file containing the search expression
-aExprSaveAs.Caption=00000093,Save &as...
-aExprSaveAs.Category=00000092,Expression search
-aExprSaveAs.Hint=00000094,Save as...|Save the expression to a file
+aSimpleReset.Caption=00000063,&Reset
+aSimpleReset.Hint=00000064,Reset|Clear entered criteria
 
 [dProjectProps]
 Caption=00000003,Properties: photo album
@@ -402,6 +365,8 @@ ipmsmProp.Caption=00000049,&Picture property
 ipmDelete.Caption=00000051,&Delete
 ipmMoveUp.Caption=00000054,Move &up
 ipmMoveDown.Caption=00000056,Move do&wn
+tsGeneral.Caption=00000061,General
+tsFilterExpr.Caption=00000062,Filter expression
 
 [dSelPhoaGroup]
 Caption=00000003,Select picture group
@@ -1108,4 +1073,30 @@ TPhoaOp_ViewDelete=Delete view
 TPhoaOp_ViewEdit=Edit view
 TPhoaOp_ViewMakeGroup=Make group from view
 TPhoaOp_ViewNew=Create view
+
+[frExprPicFilter]
+tbExprMain.Caption=00000001,Toolbar
+smInsertProp.Caption=00000002,Insert propert&y
+smInsertProp.Hint=00000003,Insert a picture property into the expression
+smInsertOperator.Caption=00000004,Insert &operator
+smInsertOperator.Hint=00000005,Insert an operator into the expression
+aNew.Caption=00000009,&New
+aNew.Hint=00000010,New|Clear the expression
+aOpen.Caption=00000012,&Open...
+aOpen.Hint=00000013,Open...|Open a text file containing the search expression
+aSaveAs.Caption=00000015,Save &as...
+aSaveAs.Hint=00000016,Save as...|Save the expression to a file
+aCut.Caption=00000018,&Cut
+aCut.Hint=00000019,Cut|Cut selected text to the clipboard
+aCopy.Caption=00000021,Co&py
+aCopy.Hint=00000022,Copy|Copy selected text to the clipboard
+aPaste.Caption=00000024,&Paste
+aPaste.Hint=00000025,Paste|Paste text from the clipboard
+aUndo.Caption=00000027,&Undo
+aUndo.Hint=00000028,Undo|Undo the last change
+aRedo.Caption=00000030,&Redo
+aRedo.Hint=00000031,Redo|Redo the last undone change
+aSyntaxCheck.Caption=00000033,Syntax check
+aSyntaxCheck.Hint=00000034,Syntax check the expression
+scpMain.Title=00000038,Properties
 

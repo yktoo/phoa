@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.72 2004-12-04 17:53:11 dale Exp $
+//  $Id: Main.pas,v 1.73 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1850,7 +1850,7 @@ uses
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
     case GetNodeKind(Sender, Node) of
-      gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', UnicodetoAnsiCP(NewText, cMainCodePage)]);
+      gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', UnicodetoAnsiCP(NewText, cMainCodePage), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
       gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroup, 'NewText', UnicodetoAnsiCP(NewText, cMainCodePage)]);
     end;
   end;

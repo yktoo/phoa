@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.40 2004-11-24 11:42:17 dale Exp $
+//  $Id: phUtils.pas,v 1.41 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phUtils;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities,
+  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
   phIntf, ConsVars, phObj;
 
    // Exception raising
@@ -129,6 +129,9 @@ uses
 
    // Возвращает размер указанного файла, или iDefault, если такого файла не существует
   function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
+
+   // Добавляет к Menu новый пункт
+  function  AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
 
    // Фокусирует и выделяет узел. При bScrollIntoView=True проматывает дерево так, чтобы он был виден. Возвращает True,
    //   если Node<>nil
@@ -766,6 +769,16 @@ var
       Result := FindData.nFileSizeLow;
     end else
       Result := iDefault;
+  end;
+
+  function  AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
+  begin
+    Result := TTBXItem.Create(Menu.Owner);
+    Result.Caption    := sCaption;
+    Result.ImageIndex := iImageIndex;
+    Result.Tag        := iTag;
+    Result.OnClick    := AOnClick;
+    Menu.Add(Result);
   end;
 
   function ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode; bScrollIntoView: Boolean = True): Boolean;

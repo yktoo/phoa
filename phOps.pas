@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.16 2004-12-04 17:53:11 dale Exp $
+//  $Id: phOps.pas,v 1.17 2004-12-06 20:22:45 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -595,9 +595,10 @@ type
    //===================================================================================================================
    // Операция создания представления
    //   Params:
-   //     Name:      String                     - наименование представления
-   //     Groupings: IPhotoAlbumPicGroupingList - список группировок представления
-   //     Sortings:  IPhotoAlbumPicSortingList  - список сортировок представления
+   //     Name:             String                     - наименование представления
+   //     FilterExpression: String                     - выражение фильтра изображений
+   //     Groupings:        IPhotoAlbumPicGroupingList - список группировок представления
+   //     Sortings:         IPhotoAlbumPicSortingList  - список сортировок представления
    //===================================================================================================================
 
   TPhoaOp_ViewNew = class(TPhoaOperation)
@@ -609,10 +610,11 @@ type
    //===================================================================================================================
    // Операция изменения представления
    //   Params:
-   //     View:      IPhotoAlbumView            - изменяемое представление
-   //     Name:      String                     - новое наименование представления
-   //     Groupings: IPhotoAlbumPicGroupingList - новый список группировок представления
-   //     Sortings:  IPhotoAlbumPicSortingList  - новый список сортировок представления
+   //     View:             IPhotoAlbumView            - изменяемое представление
+   //     Name:             String                     - новое наименование представления
+   //     FilterExpression: String                     - новое выражение фильтра изображений
+   //     Groupings:        IPhotoAlbumPicGroupingList - новый список группировок представления
+   //     Sortings:         IPhotoAlbumPicSortingList  - новый список сортировок представления
    //       Если Groupings=nil и Sortings=nil, значит, это просто переименование представления
    //===================================================================================================================
 
@@ -2337,7 +2339,8 @@ type
     UndoStream.WriteInt(Project.ViewIndex);
      // Выполняем операцию
     View := NewPhotoAlbumView(Project.ViewsX);
-    View.Name := Params.ValStr['Name'];
+    View.Name             := Params.ValStr['Name'];
+    View.FilterExpression := Params.ValStr['FilterExpression'];
     View.GroupingsX.Assign(Groupings);
     View.SortingsX.Assign(Sortings);
      // Сохраняем новый индекс представления
@@ -2382,7 +2385,9 @@ type
     Params.ObtainValIntf('Sortings',  IPhotoAlbumPicSortingList,  Sortings,  False);
      // Сохраняем данные отката и применяем изменения
     UndoStream.WriteStr(View.Name);
-    View.Name := Params.ValStr['Name'];
+    UndoStream.WriteStr(View.FilterExpression);
+    View.Name             := Params.ValStr['Name'];
+    View.FilterExpression := Params.ValStr['FilterExpression'];
      // Запоминаем новый индекс представления (ПОСЛЕ присвоения имени, т.к. оно изменяет позицию представления в списке)
     UndoStream.WriteInt(View.Index);
      // Список группировок создаём и сохраняем, если он есть
@@ -2401,30 +2406,32 @@ type
       View.SortingsX.Assign(Sortings);
       View.Invalidate;
     end;
-     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
-    Project.ViewIndex := View.Index;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
+     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
+    Project.ViewIndex := View.Index;
   end;
 
   procedure TPhoaOp_ViewEdit.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
-    sViewName: String;
+    sViewName, sFilterExpression: String;
     iViewIndex: Integer;
     View: IPhotoAlbumView;
   begin
      // Восстанавливаем представление
-    sViewName  := UndoStream.ReadStr;
-    iViewIndex := UndoStream.ReadInt;
+    sViewName         := UndoStream.ReadStr;
+    sFilterExpression := UndoStream.ReadStr;
+    iViewIndex        := UndoStream.ReadInt;
     View := Project.ViewsX[iViewIndex];
-    View.Name := sViewName;
+    View.Name             := sViewName;
+    View.FilterExpression := sFilterExpression;
     if UndoStream.ReadBool then UndoReadGroupings(UndoStream, View.GroupingsX);
     if UndoStream.ReadBool then UndoReadSortings (UndoStream, View.SortingsX);
     View.Invalidate;
-     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
-    Project.ViewIndex := View.Index;
      // Добавляем флаги изменений
     Include(Changes, pocViewList);
+     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
+    Project.ViewIndex := View.Index;
     inherited RollbackChanges(UndoStream, Changes);
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.17 2004-11-21 09:15:51 dale Exp $
+//  $Id: phIntf.pas,v 1.18 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -383,6 +383,7 @@ type
      // Invalidates the built group hierarchy
     procedure Invalidate; stdcall;
      // Prop handlers
+    function  GetFilterExpression: String; stdcall;
     function  GetGroupings: IPhoaPicGroupingList; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetList: IPhoaViewList; stdcall;
@@ -390,6 +391,8 @@ type
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetSortings: IPhoaPicSortingList; stdcall;
      // Props
+     // -- Picture filter expression
+    property FilterExpression: String read GetFilterExpression;
      // -- Picture grouping list
     property Groupings: IPhoaPicGroupingList read GetGroupings;
      // -- View index in its Owner's list

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.29 2004-12-03 13:50:24 dale Exp $
+//  $Id: udSearch.pas,v 1.30 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,11 +9,10 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs, SynEditTypes,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phPicFilterHighlighter,
-  phDlg, SynCompletionProposal, DKLang, TB2Item, TBX, TB2Dock, TB2Toolbar,
-  SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls, Menus, ActnList,
-  TBXExtItems, TB2MRU;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs, 
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
+  phDlg, ActnList, TBX, Menus, TB2Item, DKLang, TB2Dock, TB2Toolbar,
+  VirtualTrees, ComCtrls, StdCtrls, ExtCtrls, ufrExprPicFilter;
 
 type
    // Вид поиска
@@ -128,71 +127,31 @@ type
    //===================================================================================================================
 
   TdSearch = class(TPhoaDialog)
-    aExprCopy: TAction;
-    aExprCut: TAction;
-    aExprNew: TAction;
-    aExprOpen: TAction;
-    aExprPaste: TAction;
-    aExprRedo: TAction;
-    aExprSaveAs: TAction;
-    aExprSyntaxCheck: TAction;
-    aExprUndo: TAction;
     alMain: TActionList;
-    aReset: TAction;
     aSimpleConvertToExpression: TAction;
     aSimpleCrDelete: TAction;
-    bExprCopy: TTBXItem;
-    bExprCut: TTBXItem;
-    bExprNew: TTBXItem;
-    bExprOpen: TTBXSubmenuItem;
-    bExprPaste: TTBXItem;
-    bExprRedo: TTBXItem;
-    bExprSaveAs: TTBXItem;
-    bExprSyntaxCheck: TTBXItem;
-    bExprUndo: TTBXItem;
-    bReset: TButton;
+    aSimpleReset: TAction;
     bSimpleConvertToExpression: TTBXItem;
     bSimpleCrDelete: TTBXItem;
-    dkExprTop: TTBXDock;
+    bSimpleReset: TTBXItem;
     dklcMain: TDKLanguageController;
     dkSimpleTop: TTBXDock;
-    eExpression: TSynEdit;
+    frExprPicFilter: TfrExprPicFilter;
     gbSearch: TGroupBox;
-    iMRUExprOpen: TTBXMRUListItem;
     ipmSimpleDelete: TTBXItem;
     ipmsmSimpleProp: TTBXSubmenuItem;
-    mruExprOpen: TTBXMRUList;
     pcCriteria: TPageControl;
-    pmExpression: TTBXPopupMenu;
     pmSimple: TTBXPopupMenu;
     rbAll: TRadioButton;
     rbCurGroup: TRadioButton;
     rbSearchResults: TRadioButton;
-    scpMain: TSynCompletionProposal;
-    smExprInsertOperator: TTBXSubmenuItem;
-    smExprInsertProp: TTBXSubmenuItem;
-    tbExprMain: TTBXToolbar;
-    tbSepExprCut: TTBXSeparatorItem;
-    tbSepExprSyntaxCheck: TTBXSeparatorItem;
-    tbSepExprUndo: TTBXSeparatorItem;
     tbSimpleMain: TTBXToolbar;
-    TBXSeparatorItem1: TTBXSeparatorItem;
     tsExpression: TTabSheet;
     tsSimple: TTabSheet;
     tvSimpleCriteria: TVirtualStringTree;
-    procedure aaExprCopy(Sender: TObject);
-    procedure aaExprCut(Sender: TObject);
-    procedure aaExprNew(Sender: TObject);
-    procedure aaExprOpen(Sender: TObject);
-    procedure aaExprPaste(Sender: TObject);
-    procedure aaExprRedo(Sender: TObject);
-    procedure aaExprSaveAs(Sender: TObject);
-    procedure aaExprSyntaxCheck(Sender: TObject);
-    procedure aaExprUndo(Sender: TObject);
-    procedure aaReset(Sender: TObject);
     procedure aaSimpleConvertToExpression(Sender: TObject);
     procedure aaSimpleCrDelete(Sender: TObject);
-    procedure eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
+    procedure aaSimpleReset(Sender: TObject);
     procedure pcCriteriaChange(Sender: TObject);
     procedure pmSimplePopup(Sender: TObject);
     procedure tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -201,7 +160,6 @@ type
     procedure tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvSimpleCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure mruExprOpenClick(Sender: TObject; const Filename: String);
   private
      // Список критериев простого поиска
     FSimpleCriteria: TSimpleSearchCriterionList;
@@ -221,19 +179,11 @@ type
     procedure PerformSearch;
      // Событие клика на пункте свойства изображения в pmSimple
     procedure SimpleCrPicPropClick(Sender: TObject);
-     // Событие клика на пункте вставки свойства изображения в выражение
-    procedure ExprInsertPropClick(Sender: TObject);
-     // Событие клика на пункте вставки оператора в выражение
-    procedure ExprInsertOpClick(Sender: TObject);
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
-     // Загрузка/сохранение текущего выражения в файле
-    procedure ExpressionLoad(const sFileName: String);
-    procedure ExpressionSave(const sFileName: String);
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
-    function  GetDataValid: Boolean; override;
     function  GetFormRegistrySection: String; override;
     function  GetSizeable: Boolean; override;
     procedure SettingsStore(rif: TRegIniFile); override;
@@ -344,8 +294,6 @@ var
   SLPhoaMedia:         TStringList;
    // Последнее использованное для поиска выражение
   sSearchExpression:   String;
-   // Файл, использовавшийся в последний раз для загрузки/сохранения файла выражения
-  sLastExpressionFile: String;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
@@ -1102,100 +1050,6 @@ type
    // TfSearch
    //===================================================================================================================
 
-  procedure TdSearch.aaExprCopy(Sender: TObject);
-  begin
-    eExpression.CopyToClipboard;
-  end;
-
-  procedure TdSearch.aaExprCut(Sender: TObject);
-  begin
-    eExpression.CutToClipboard;
-  end;
-
-  procedure TdSearch.aaExprNew(Sender: TObject);
-  begin
-    eExpression.Clear;
-  end;
-
-  procedure TdSearch.aaExprOpen(Sender: TObject);
-  begin
-    with TOpenDialog.Create(Self) do
-      try
-        DefaultExt := SDefaultSearchExpressionFileExt;
-        FileName   := sLastExpressionFile;
-        Filter     := ConstVal('SFileFilter_SearchExpr');
-        Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_OpenSearchExpr');
-        if Execute then ExpressionLoad(FileName);
-      finally
-        Free;
-      end;
-  end;
-
-  procedure TdSearch.aaExprPaste(Sender: TObject);
-  begin
-    eExpression.PasteFromClipboard;
-  end;
-
-  procedure TdSearch.aaExprRedo(Sender: TObject);
-  begin
-    eExpression.Redo;
-  end;
-
-  procedure TdSearch.aaExprSaveAs(Sender: TObject);
-  begin
-    with TSaveDialog.Create(Self) do
-      try
-        DefaultExt := SDefaultSearchExpressionFileExt;
-        FileName   := sLastExpressionFile;
-        Filter     := ConstVal('SFileFilter_SearchExpr');
-        Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_SaveSearchExprAs');
-        if Execute then ExpressionSave(FileName);
-      finally
-        Free;
-      end;
-  end;
-
-  procedure TdSearch.aaExprSyntaxCheck(Sender: TObject);
-  var PicFilter: IPhoaParsingPicFilter;
-
-    function PointToBuferCoord(const p: TPoint): TBufferCoord;
-    begin
-      Result.Line := p.y;
-      Result.Char := p.x;
-    end;
-
-  begin
-    PicFilter := NewPhoaParsingPicFilter;
-     // Присваиваем и разбираем выражение
-    PicFilter.Expression := eExpression.Text;
-    PicFilter.ParseExpression(True, False);
-     // Если есть ошибки
-    if PicFilter.HasErrors then begin
-      eExpression.CaretXY := PointToBuferCoord(PicFilter.ParseErrorLocation);
-      PhoaMsgBox(mbkError, PicFilter.ParseErrorMsg, False, False, [mbbOK]);
-     // Иначе сообщаем об успехе
-    end else
-      PhoaInfo(False, 'SMsg_SyntaxOK');
-  end;
-
-  procedure TdSearch.aaExprUndo(Sender: TObject);
-  begin
-    eExpression.Undo;
-  end;
-
-  procedure TdSearch.aaReset(Sender: TObject);
-  begin
-    case SearchKind of
-      pskSimple: begin
-        FSimpleCriteria.Clear;
-        SyncSimpleCriteria;
-      end;
-      pskExpression: eExpression.Clear;
-    end;
-  end;
-
   procedure TdSearch.aaSimpleConvertToExpression(Sender: TObject);
   var
     s: String;
@@ -1206,7 +1060,7 @@ type
       s := '';
       for i := 0 to FSimpleCriteria.Count-1 do
         AccumulateStr(s, ' and'+S_CRLF, FSimpleCriteria[i].AsExpression);
-      eExpression.Text := s;
+      frExprPicFilter.Expression := s;
       pcCriteria.ActivePage := tsExpression;
       UpdateSearchKind;
     finally
@@ -1224,6 +1078,12 @@ type
     finally
       EndUpdate;
     end;
+  end;
+
+  procedure TdSearch.aaSimpleReset(Sender: TObject);
+  begin
+    FSimpleCriteria.Clear;
+    SyncSimpleCriteria;
   end;
 
   procedure TdSearch.ButtonClick_OK;
@@ -1269,50 +1129,6 @@ type
     inherited Destroy;
   end;
 
-  procedure TdSearch.eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-  begin
-    StateChanged;
-  end;
-
-  procedure TdSearch.ExpressionLoad(const sFileName: String);
-  begin
-    BeginUpdate;
-    try
-      eExpression.Lines.LoadFromFile(sFileName);
-      mruExprOpen.Add(sFileName);
-      sLastExpressionFile := sFileName;
-    finally
-      EndUpdate;
-    end;
-  end;
-
-  procedure TdSearch.ExpressionSave(const sFileName: String);
-  begin
-    BeginUpdate;
-    try
-      eExpression.Lines.SaveToFile(sFileName);
-      mruExprOpen.Add(sFileName);
-      sLastExpressionFile := sFileName;
-    finally
-      EndUpdate;
-    end;
-  end;
-
-  procedure TdSearch.ExprInsertOpClick(Sender: TObject);
-  begin
-    eExpression.SelText := asPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
-  end;
-
-  procedure TdSearch.ExprInsertPropClick(Sender: TObject);
-  begin
-    eExpression.SelText := '$'+PicPropToStr(TPicProperty(TComponent(Sender).Tag), True);
-  end;
-
-  function TdSearch.GetDataValid: Boolean;
-  begin
-    Result := (SearchKind=pskSimple) or ((SearchKind=pskExpression) and (eExpression.Lines.Count>0));
-  end;
-
   function TdSearch.GetFormRegistrySection: String;
   begin
     Result := SRegSearch_Root;
@@ -1333,17 +1149,6 @@ type
 
   procedure TdSearch.InitializeDialog;
 
-     // Добавляет к Menu новый пункт
-    procedure AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iTag: Integer; const AOnClick: TNotifyEvent);
-    var tbi: TTBCustomItem;
-    begin
-      tbi := TTBXItem.Create(Self);
-      tbi.Caption := sCaption;
-      tbi.Tag     := iTag;
-      tbi.OnClick := AOnClick;
-      Menu.Add(tbi);
-    end;
-
      // Создаёт в pmSimple пункты выбора свойства изображения
     procedure CreateSimpleCrPicPropItems;
     var pp: TPicProperty;
@@ -1351,31 +1156,7 @@ type
       for pp := Low(pp) to High(pp) do
          // Если тип данных свойства поддерживает поиск
         if aSSConditionsByDatatype[aPicPropDatatype[pp]]<>[] then
-          AddTBXMenuItem(ipmsmSimpleProp, PicPropName(pp), Byte(pp), SimpleCrPicPropClick);
-    end;
-
-     // Добавляет пункты меню "Вставить свойство" и для scpMain
-    procedure AddExprInsertPropItems;
-    var
-      pp: TPicProperty;
-      sProp: String;
-    begin
-      for pp := Low(pp) to High(pp) do begin
-        sProp := '$'+PicPropToStr(pp, True);
-        AddTBXMenuItem(
-          smExprInsertProp,
-          Format('%s - %s', [sProp, PicPropName(pp)]),
-          Byte(pp),
-          ExprInsertPropClick);
-        scpMain.AddItem(sProp, sProp);
-      end;
-    end;
-
-    procedure AddExprInsertOperatorItems;
-    var ok: TPicFilterOperatorKind;
-    begin
-      for ok := Low(ok) to High(ok) do
-        AddTBXMenuItem(smExprInsertOperator, asPicFilterOperators[ok], Byte(ok), ExprInsertOpClick);
+          AddTBXMenuItem(ipmsmSimpleProp, PicPropName(pp), -1, Byte(pp), SimpleCrPicPropClick);
     end;
 
   begin
@@ -1392,21 +1173,9 @@ type
     SyncSimpleCriteria;
     CreateSimpleCrPicPropItems;
     ActivateFirstVTNode(tvSimpleCriteria);
-     // Создаём пункты меню "Вставить свойство" и "Вставить оператор"
-    AddExprInsertPropItems;
-    AddExprInsertOperatorItems;
-     // Инициализируем выражение
-    scpMain.Font.Assign(Font);
-    scpMain.TitleFont.Assign(Font);
-    pmExpression.LinkSubitems := tbExprMain.Items;
-    eExpression.Highlighter   := TSynPicFilterSyn.Create(Self);
-    eExpression.Text          := sSearchExpression;
+     // Поиск по выражению
+    frExprPicFilter.Expression := sSearchExpression; 
     UpdateSearchKind;
-  end;
-
-  procedure TdSearch.mruExprOpenClick(Sender: TObject; const Filename: String);
-  begin
-    ExpressionLoad(Filename);
   end;
 
   procedure TdSearch.pcCriteriaChange(Sender: TObject);
@@ -1414,7 +1183,7 @@ type
     UpdateSearchKind;
     case SearchKind of
       pskSimple:     tvSimpleCriteria.SetFocus;
-      pskExpression: eExpression.SetFocus;
+      pskExpression: frExprPicFilter.FocusEditor;
     end;
     StateChanged;
   end;
@@ -1439,7 +1208,8 @@ type
             Result := PicFilter.Matches(Pic);
           except
             on e: EPhoaParseError do begin
-              {!!! позиционировать курсор}
+              frExprPicFilter.CaretPos := PicFilter.ParseErrorLocation;
+              frExprPicFilter.FocusEditor;
               raise;
             end;
           end;
@@ -1455,7 +1225,7 @@ type
         pskSimple: FSimpleCriteria.InitializeSearch;
          // Поиск по выражению
         pskExpression: begin
-          sSearchExpression := eExpression.Text;
+          sSearchExpression := frExprPicFilter.Expression;
           PicFilter := NewPhoaParsingPicFilter;
           PicFilter.Expression := sSearchExpression;
         end;
@@ -1525,7 +1295,6 @@ type
     inherited SettingsRestore(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
     FSimpleCriteria.RegLoad(rif, SRegSearch_SimpleCriteria);
-    mruExprOpen.LoadFromRegIni(rif, 'ExpressionOpenMRU');
   end;
 
   procedure TdSearch.SettingsStore(rif: TRegIniFile);
@@ -1533,7 +1302,6 @@ type
     inherited SettingsStore(rif);
     rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);
     if ModalResult=mrOK then FSimpleCriteria.RegSave(rif, SRegSearch_SimpleCriteria);
-    mruExprOpen.SaveToRegIni(rif, 'ExpressionOpenMRU');
   end;
 
   procedure TdSearch.SimpleCrPicPropClick(Sender: TObject);
@@ -1542,7 +1310,7 @@ type
     Crit: TSimpleSearchCriterion;
   begin
      // Получаем текущий критерий
-    n := tvSimpleCriteria.FocusedNode; 
+    n := tvSimpleCriteria.FocusedNode;
     Crit := GetSimpleCriterion(n);
      // Если nil - значит, pmSimple вызвано было для виртуальной строки. Создаём новый критерий
     if Crit=nil then begin
@@ -1621,28 +1389,14 @@ type
   end;
 
   procedure TdSearch.UpdateState;
-  var bSSimple, bSExpr, bCrExist, bExprText, bExprSel: Boolean;
+  var bSSimple, bCrExist: Boolean;
   begin
     inherited UpdateState;
     bSSimple  := SearchKind=pskSimple;
-    bSExpr    := SearchKind=pskExpression;
     bCrExist  := FSimpleCriteria.Count>0;
-    bExprText := eExpression.Lines.Count>0;
-    bExprSel  := bExprText and eExpression.SelAvail;
-    aReset.Enabled                     := (bSSimple and bCrExist) or (bSExpr and bExprText);
-     // Простой поиск
+    aSimpleReset.Enabled               := bSSimple and bCrExist;
     aSimpleCrDelete.Enabled            := bSSimple and (GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil);
     aSimpleConvertToExpression.Enabled := bSSimple and bCrExist;
-     // Поиск по выражению
-    aExprNew.Enabled                   := bSExpr and bExprText;
-    aExprOpen.Enabled                  := bSExpr;
-    aExprSaveAs.Enabled                := bSExpr and bExprText;
-    aExprCut.Enabled                   := bSExpr and bExprSel;
-    aExprCopy.Enabled                  := bSExpr and bExprSel;
-    aExprPaste.Enabled                 := bSExpr;
-    aExprUndo.Enabled                  := bSExpr and eExpression.CanUndo;
-    aExprRedo.Enabled                  := bSExpr and eExpression.CanRedo;
-    aExprSyntaxCheck.Enabled           := bSExpr and bExprText;
   end;
 
 end.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.59 2004-11-24 11:42:17 dale Exp $
+//  $Id: phObj.pas,v 1.60 2004-12-06 20:22:45 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -245,7 +245,8 @@ resourcestring
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
   TypInfo, Math, Registry, DateUtils, Clipbrd, ShellAPI, Themes,
-  phUtils, phSettings, phGraphics, Variants, phObjConst, ConsVars;
+  phUtils, phSettings, phGraphics, Variants, phObjConst, ConsVars,
+  phParsingPicFilter;
 
   procedure PhoaWriteError;
   begin
@@ -2797,7 +2798,8 @@ type
   private
      // Prop storage
     FList: Pointer;
-    FGroupings: IPhotoAlbumPicGroupingList; 
+    FFilterExpression: String;
+    FGroupings: IPhotoAlbumPicGroupingList;
     FName: String;
     FRootGroup: IPhotoAlbumPicGroup;
     FSortings: IPhotoAlbumPicSortingList;
@@ -2805,6 +2807,7 @@ type
     procedure ProcessGroups;
      // IPhoaView
     procedure Invalidate; stdcall;
+    function  GetFilterExpression: String; stdcall;
     function  GetGroupings: IPhoaPicGroupingList; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetList: IPhoaViewList; stdcall;
@@ -2812,11 +2815,12 @@ type
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetSortings: IPhoaPicSortingList; stdcall;
      // IPhoaMutableView
-    procedure Assign(Source: IPhoaView); stdcall;
     function  GetGroupingsM: IPhoaMutablePicGroupingList; stdcall;
     function  GetListM: IPhoaMutableViewList; stdcall;
-    procedure SetName(const Value: String); stdcall;
     function  GetSortingsM: IPhoaMutablePicSortingList; stdcall;
+    procedure Assign(Source: IPhoaView); stdcall;
+    procedure SetFilterExpression(const Value: String); stdcall;
+    procedure SetName(const Value: String); stdcall;
      // IPhotoAlbumView
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
@@ -2851,6 +2855,11 @@ type
     AList.Add(Self);
     FGroupings := NewPhotoAlbumPicGroupingList;
     FSortings  := NewPhotoAlbumPicSortingList;
+  end;
+
+  function TPhotoAlbumView.GetFilterExpression: String;
+  begin
+    Result := FFilterExpression;
   end;
 
   function TPhotoAlbumView.GetGroupings: IPhoaPicGroupingList;
@@ -2942,12 +2951,31 @@ type
     GroupsWithPics: IPhotoAlbumPicGroupList;
     bClassified: Boolean;
 
-     // Помещает сортированный список изображений фотоальбома в корневую группу
+     // Помещает фильтрованный и сортированный список изображений фотоальбома в корневую группу
     procedure FillRootGroup;
+    var
+      PicFilter: IPhoaParsingPicFilter;
+      Pics: IPhoaPicList;
+      TargetList: IPhotoAlbumPicList;
+      Pic: IPhoaPic;
+      i: Integer;
     begin
-      FRootGroup.PicsX.Clear;
-      FRootGroup.PicsX.Add(GetList.Pics, False);
-      FRootGroup.PicsX.CustomSort(PhoaViewSortCompareFunc, Cardinal(Self));
+      TargetList := FRootGroup.PicsX;
+       // Стираем список
+      TargetList.Clear;
+       // Наполняем список [фильтрованными] изображениями
+      Pics := GetList.Pics;
+      if Trim(FFilterExpression)<>'' then begin
+        PicFilter := NewPhoaParsingPicFilter;
+        PicFilter.Expression := FFilterExpression;
+        for i := 0 to Pics.Count-1 do begin
+          Pic := Pics[i];
+          if PicFilter.Matches(Pic) then TargetList.Add(Pic, False);
+        end;
+      end else
+        TargetList.Add(Pics, False);
+       // Сортируем список
+      TargetList.CustomSort(PhoaViewSortCompareFunc, Cardinal(Self));
     end;
 
      // Создаёт дерево по пути к изображению
@@ -3165,6 +3193,11 @@ type
     FRootGroup.FixupIDs;
   end;
 
+  procedure TPhotoAlbumView.SetFilterExpression(const Value: String);
+  begin
+    FFilterExpression := Value;
+  end;
+
   procedure TPhotoAlbumView.SetName(const Value: String);
   var SelfRef: IPhotoAlbumView;
   begin
@@ -3197,6 +3230,8 @@ type
            // Name - устанавливаем сеттером, т.к. при изменении имени должна измениться позиция представления в
            //   списке-владельце
           IPhChunk_View_Name: SetName(vValue);
+           // Filter expression
+          IPhChunk_View_FilterExpression: FFilterExpression := vValue;
            // Groupings
           IPhChunk_ViewGroupings_Open: FGroupings.StreamerLoad(Streamer);
            // Sortings
@@ -3220,8 +3255,9 @@ type
     end else begin
        // Write close-chunk
       Streamer.WriteChunk(IPhChunk_View_Open);
-       // Write name
-      Streamer.WriteChunkString(IPhChunk_View_Name, FName);
+       // Write name, filter expression
+      Streamer.WriteChunkString(IPhChunk_View_Name,             FName);
+      Streamer.WriteChunkString(IPhChunk_View_FilterExpression, FFilterExpression);
        // Write groupings/sortings
       FGroupings.StreamerSave(Streamer);
       FSortings.StreamerSave(Streamer);

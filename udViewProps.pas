@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.13 2004-10-19 15:03:31 dale Exp $
+//  $Id: udViewProps.pas,v 1.14 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phDlg, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, VirtualTrees,
-  ufrSorting, DKLang;
+  ufrSorting, DKLang, ComCtrls, ufrExprPicFilter;
 
 type
   TdViewProps = class(TPhoaDialog)
@@ -28,6 +28,10 @@ type
     eName: TEdit;
     tvGrouping: TVirtualStringTree;
     frSorting: TfrSorting;
+    pcMain: TPageControl;
+    tsGeneral: TTabSheet;
+    tsFilterExpr: TTabSheet;
+    frExprPicFilter: TfrExprPicFilter;
     procedure tvGroupingAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupingChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupingChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -42,6 +46,7 @@ type
     procedure ipmDeleteClick(Sender: TObject);
     procedure ipmMoveUpClick(Sender: TObject);
     procedure ipmMoveDownClick(Sender: TObject);
+    procedure pcMainChange(Sender: TObject);
   private
      // True, если режим добавления представления
     FIsAdding: Boolean;
@@ -76,7 +81,8 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
+uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
+  phParsingPicFilter;
 
   function EditView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
@@ -108,15 +114,34 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
    //===================================================================================================================
 
   procedure TdViewProps.ButtonClick_OK;
+  var
+    sExpression: String;
+    PicFilter: IPhoaParsingPicFilter;
   begin
+     // Проверяем синтаксис выражения фильтра
+    sExpression := frExprPicFilter.Expression;
+    if Trim(sExpression)<>'' then begin
+      PicFilter := NewPhoaParsingPicFilter;
+      PicFilter.Expression := sExpression;
+      try
+        PicFilter.ParseExpression(True, True);
+      except
+        on EPhoaParseError do begin
+          frExprPicFilter.CaretPos := PicFilter.ParseErrorLocation;
+          raise;
+        end;
+      end;
+    end;
+     // Выполняем операцию
     if FIsAdding then
       FApp.PerformOperation(
         'ViewNew',
-        ['Name', eName.Text, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings])
+        ['Name', eName.Text, 'FilterExpression', sExpression, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings])
     else
       FApp.PerformOperation(
         'ViewEdit',
-        ['View', FApp.Project.CurrentViewX, 'Name', eName.Text, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings]);
+        ['View', FApp.Project.CurrentViewX, 'Name', eName.Text, 'FilterExpression', sExpression,
+         'Groupings', FGroupings, 'Sortings', frSorting.Sortings]);
     inherited ButtonClick_OK;
   end;
 
@@ -182,6 +207,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
     inherited InitializeDialog;
     HelpContext := IDH_intf_view_props;
     FGroupings := NewPhotoAlbumPicGroupingList;
+    pcMain.ActivePage := tsGeneral;
      // Создаём пункты меню "Добавить группировку"
     for gbp := Low(gbp) to High(gbp) do begin
       tbi := TTBXItem.Create(Self);
@@ -200,6 +226,8 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
       frSorting.Sortings.Assign(View.Sortings);
       frSorting.SyncSortings;
       frSorting.OnChange := frSortingChange;
+      frExprPicFilter.Expression         := View.FilterExpression;
+      frExprPicFilter.OnExpressionChange := DlgDataChange;
     end;
      // Настраиваем tvGrouping
     ApplyTreeSettings(tvGrouping);
@@ -231,6 +259,12 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
     with tvGrouping do MoveTo(FocusedNode, GetPreviousSibling(FocusedNode), amInsertBefore, False);
     EnableActions;
     Modified := True;
+  end;
+
+  procedure TdViewProps.pcMainChange(Sender: TObject);
+  begin
+    if      pcMain.ActivePage=tsGeneral    then eName.SetFocus
+    else if pcMain.ActivePage=tsFilterExpr then frExprPicFilter.FocusEditor;
   end;
 
   procedure TdViewProps.SyncGroupings;

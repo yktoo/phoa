@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.10 2004-10-19 15:03:31 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.11 2004-12-06 20:22:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -315,9 +315,12 @@ type
      // Prop handlers
     function  GetGroupingsM: IPhoaMutablePicGroupingList; stdcall;
     function  GetListM: IPhoaMutableViewList; stdcall;
-    procedure SetName(const Value: String); stdcall;
     function  GetSortingsM: IPhoaMutablePicSortingList; stdcall;
+    procedure SetFilterExpression(const Value: String); stdcall;
+    procedure SetName(const Value: String); stdcall;
      // Props
+     // -- Writable FilterExpression
+    property FilterExpression: String read GetFilterExpression write SetFilterExpression;
      // -- 'Mutable' version of Groupings
     property GroupingsM: IPhoaMutablePicGroupingList read GetGroupingsM;
      // -- 'Mutable' version of List
