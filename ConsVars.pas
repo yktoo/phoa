@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.42 2004-06-14 06:18:37 dale Exp $
+//  $Id: ConsVars.pas,v 1.43 2004-06-14 10:32:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -786,6 +786,7 @@ const
     ISettingID_Dlgs_APW_ReplaceDate    = 3054; // Переписывать дату, если она уже указана
     ISettingID_Dlgs_APW_AutofillTime   = 3055; // Автоматически заполнять время изображения из свойств:
     ISettingID_Dlgs_APW_ReplaceTime    = 3056; // Переписывать время, если оно уже указано
+    ISettingID_Dlgs_APW_AutofillXfrm   = 3060; // Автоматически заполнять преобразования изображения
   ISettingID_Dlgs_PicProps             = 0;    // Окно свойств изображений
     ISettingID_Dlgs_PP_ExpFileProps    = 3101; // Сразу раскрывать свойства файлов
     ISettingID_Dlgs_PP_ExpMetadata     = 3102; // Сразу раскрывать метаданные изображений
@@ -1241,6 +1242,7 @@ type
         Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Dlgs_APW_AutofillTime, '@ISettingID_Dlgs_APW_AutofillTime', Byte(DTAP_DefaultTimeProps), MinInt, MaxInt);
         AddDateTimeAutofillPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_ReplaceTime,  '@ISettingID_Dlgs_APW_ReplaceTime',  False);
+        Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_APW_AutofillXfrm, '@ISettingID_Dlgs_APW_AutofillXfrm', False);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Dlgs_PicProps,         '@ISettingID_Dlgs_PicProps');
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_PP_ExpFileProps,  '@ISettingID_Dlgs_PP_ExpFileProps',  False);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_PP_ExpMetadata ,  '@ISettingID_Dlgs_PP_ExpMetadata',   False);

@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
-    $Id: main.css,v 1.4 2004-06-14 06:17:14 dale Exp $
+    $Id: main.css,v 1.5 2004-06-14 10:32:01 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
     PhoA image arranging and searching tool
     Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -59,18 +59,21 @@ h3                  { font-family: Verdana,Arial,serif;
                       font-weight: bold; 
                       text-align: left;
                       color: #000060; }                   
-a                   { text-decoration: underline; }
-a:link              { color: #0000e0; }                   
-a:visited           { color: #0000c0; }
-a:active            { color: #ff60c0; }
-a:hover             { color: #ff60c0; }
-a.copyright         { text-decoration: none; }
-a.copyright:link    { color: #6868c5; }                   
-a.copyright:visited { color: #6868c5; }
-a.copyright:active  { color: #4040ff; 
-                      text-decoration: underline; }
-a.copyright:hover   { color: #4040ff;
-                      text-decoration: underline; }
+a                   { text-decoration: none; }
+a:link              { color: #0000c0; 
+                      border-bottom: 1 #6868c5 solid; }
+a:visited           { color: #0000c0;  
+                      border-bottom: 1 #6868c5 solid; }
+a:active            { color: #f0a050;  
+                      border-bottom: 1 #6868c5 solid; }
+a:hover             { color: #f0a050;  
+                      border-bottom: 1 #6868c5 solid; }
+a.copyright:link    { color: #6868c5;
+                      border: none; }
+a.copyright:visited { color: #6868c5;
+                      border: none; }
+a.copyright:active  { color: #f0a050; }
+a.copyright:hover   { color: #f0a050; }
 table.main          { margin: 0 0 0 0; }
 table.plain         { padding: 3px 5px 3px 5 px; }
 td                  { font-family: Verdana,Arial,serif;

@@ -128,7 +128,7 @@
 					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
-				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &egrave;&ccedil;&igrave;&aring;&iacute;&aring;&iacute;&egrave;&yuml; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&yuml;">
+				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 				<param name="Local" value="intf-pic-props.html">
 				</OBJECT>
 			<UL>
@@ -278,6 +278,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&ucirc; &ecirc;&icirc;&igrave;&agrave;&iacute;&auml;&iacute;&icirc;&eacute; &ntilde;&ograve;&eth;&icirc;&ecirc;&egrave;">
 			<param name="Local" value="info-cmd-line.html">
+			<param name="New" value="1">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">

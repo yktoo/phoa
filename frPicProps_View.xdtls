@@ -244,11 +244,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
               <tranEntry langID="1033" value="Zoom"/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -294,11 +294,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
               <tranEntry langID="1033" value="Zoom"/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -344,11 +344,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
               <tranEntry langID="1033" value="Zoom"/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -394,11 +394,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
               <tranEntry langID="1033" value="Zoom"/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -585,6 +585,14 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="gipmMainToolbar">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="gipmToolsToolbar">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="iMain">
         <propEntries>
           <propEntry name="HelpKeyword">
@@ -608,6 +616,16 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmSep">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="pmMain">
         <propEntries/>
         <compEntries/>
@@ -621,15 +639,6 @@
               <tranEntry langID="1031" value="Main Toolbar"/>
               <tranEntry langID="1046" value="Main Toolbar"/>
               <tranEntry langID="1058" value="Îñíîâíàÿ ïàíåëü èíñòðóìåíòîâ"/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="ChevronHint">
-            <tranEntries>
-              <tranEntry langID="1049" value="Åù¸ êíîïêè|"/>
-              <tranEntry langID="1033" value="More buttons|"/>
-              <tranEntry langID="1031" value="Weitere Schaltflächen|"/>
-              <tranEntry langID="1046" value="Mais botões|"/>
-              <tranEntry langID="1058" value="Ùå êíîïêè|"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

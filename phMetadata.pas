@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.5 2004-06-12 08:56:02 dale Exp $
+//  $Id: phMetadata.pas,v 1.6 2004-06-14 10:32:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -179,6 +179,8 @@ const
   EXIF_TAG_DATETIME_ORIGINAL   = $9003;
   EXIF_TAG_DATETIME_DIGITIZED  = $9004;
 
+  EXIF_TAG_ORIENTATION         = $0112;
+
    // Some tags are taken from http://lxr.php.net/source/php4/ext/EXIF/EXIF.c, other from
    //   http://www.ba.wakwak.com/~tsuruzoh/, and some from MSDN,
    //   http://msdn.microsoft.com/library/en-us/gdicpp/GDIPlus 
@@ -225,8 +227,8 @@ const
         'striped and this value is plural'),
     (iTag: $0112; VType: xtvtRegular;     sName: 'Orientation';
       sVList:
-        '1=Portrait (Top Left):2=Portrait (Top Right):3=Portrait (Bottom Right):4=Portrait (Bottom Left):'+
-        '5=Landscape (Left Top):6=Landscape (Right Top):7=Landscape (Right Bottom):8=Landscape (Left Bottom)';
+        '1=1 - Portrait (Top Left):2=2 - Portrait (Top Right):3=3 - Portrait (Bottom Right):4=4 - Portrait (Bottom Left):'+
+        '5=5 - Landscape (Left Top):6=6 - Landscape (Right Top):7=7 - Landscape (Right Bottom):8=8 - Landscape (Left Bottom)';
       sDesc:
         'The orientation of the camera relative to the scene, when the image was captured. The relation is shown for '+
         'the "0th row" of image to visual position'),

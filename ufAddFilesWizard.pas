@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.6 2004-06-09 13:18:34 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.7 2004-06-14 10:32:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -130,10 +130,13 @@ type
     FReplaceDate: Boolean;
     FTimeAutofillProps: TDateTimeAutofillProps;
     FReplaceTime: Boolean;
-     // Prop storage
-    FAddedPic: TPhoaPic;
+    FAutofillXForm: Boolean;
+     // Результат автозаполнения свойств
     FDateFillResult: TDateTimeFillResult;
     FTimeFillResult: TDateTimeFillResult;
+    FXFormFilled: Boolean;
+     // Prop storage
+    FAddedPic: TPhoaPic;
      // Производит автозаполнение свойств изображения
     procedure AutofillPicProps(Pic: TPhoaPic);
   protected
@@ -173,6 +176,23 @@ uses
    //===================================================================================================================
 
   procedure TAddFilesThread.AutofillPicProps(Pic: TPhoaPic);
+  type
+     // Запись о требуемых преобразованиях
+    TTransformRec = record
+      Rotation: TPicRotation; // Требуемый поворот
+      Flips:    TPicFlips;    // Требуемые отражения
+    end;
+  const
+     // Наборы требуемых преобразований в зависимости от значения Exif-тега Orientation ($0112)
+    aExifOrientXforms: Array[1..8] of TTransformRec = (
+      (Rotation: pr0;   Flips: []),         // 1=Portrait (Top Left)
+      (Rotation: pr0;   Flips: [pflHorz]),  // 2=Portrait (Top Right)
+      (Rotation: pr180; Flips: []),         // 3=Portrait (Bottom Right)
+      (Rotation: pr180; Flips: [pflHorz]),  // 4=Portrait (Bottom Left)
+      (Rotation: pr90;  Flips: [pflHorz]),  // 5=Landscape (Left Top)
+      (Rotation: pr270; Flips: []),         // 6=Landscape (Right Top)
+      (Rotation: pr270; Flips: [pflHorz]),  // 7=Landscape (Right Bottom)
+      (Rotation: pr90;  Flips: []));        // 8=Landscape (Left Bottom)
   var
     Metadata: TImageMetadata;
     Namespace: TNamespace;
@@ -292,14 +312,34 @@ uses
       Result := (CurResult=dtfrEmpty) or ((CurResult=dtfrSpecified) and bOverwrite);
     end;
 
+     // Пытается заполнить преобразования изображения из метаданных
+    procedure FillExifTransforms;
+    var
+      idx: Integer;
+      bOrient: Byte;
+    begin
+       // Ищем значение тега
+      idx := Metadata.EXIFData.IndexOfObject(Pointer(EXIF_TAG_ORIENTATION));
+       // Если нашли
+      if idx>=0 then begin
+         // Преобразуем (подпорка: первый символ в ORIENTATION - это цифра [1..8]) 
+        bOrient := StrToIntDef(Copy(Metadata.EXIFData[idx], 1, 1), 0);
+        if bOrient in [Low(aExifOrientXforms)..High(aExifOrientXforms)] then begin
+          Pic.PicRotation := aExifOrientXforms[bOrient].Rotation;
+          Pic.PicFlips    := aExifOrientXforms[bOrient].Flips;
+          FXformFilled := True;
+        end;
+      end;
+    end;
+
   begin
     if Int (Pic.PicDateTime)=0 then FDateFillResult := dtfrEmpty else FDateFillResult := dtfrSpecified;
     if Frac(Pic.PicDateTime)=0 then FTimeFillResult := dtfrEmpty else FTimeFillResult := dtfrSpecified;
+    FXFormFilled := False;
      // Если нужно, создаём объект метаданных
-    if (NeedFill(FDateFillResult, FReplaceDate) and
-       ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FDateAutofillProps<>[])) or
-       (NeedFill(FTimeFillResult, FReplaceTime) and
-       ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FTimeAutofillProps<>[])) then begin
+    if (NeedFill(FDateFillResult, FReplaceDate) and ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FDateAutofillProps<>[])) or
+       (NeedFill(FTimeFillResult, FReplaceTime) and ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FTimeAutofillProps<>[])) or
+       FAutofillXForm then begin
       Metadata := TImageMetadata.Create(Pic.PicFileName);
       try
         if Metadata.StatusCode=IMS_OK then begin
@@ -311,6 +351,8 @@ uses
           if NeedFill(FTimeFillResult, FReplaceTime) and (dtapExifDTOriginal  in FTimeAutofillProps) and FillExifTime(EXIF_TAG_DATETIME_ORIGINAL)  then FTimeFillResult := dtfrEXIF;
           if NeedFill(FTimeFillResult, FReplaceTime) and (dtapExifDTDigitized in FTimeAutofillProps) and FillExifTime(EXIF_TAG_DATETIME_DIGITIZED) then FTimeFillResult := dtfrEXIF;
           if NeedFill(FTimeFillResult, FReplaceTime) and (dtapExifDateTime    in FTimeAutofillProps) and FillExifTime(EXIF_TAG_DATETIME)           then FTimeFillResult := dtfrEXIF;
+           // Преобразования
+          if FAutofillXForm then FillExifTransforms;
         end;
       finally
         Metadata.Free;
@@ -350,6 +392,7 @@ uses
     FReplaceDate       := SettingValueBool(ISettingID_Dlgs_APW_ReplaceDate);
     FTimeAutofillProps := TDateTimeAutofillProps(Byte(SettingValueInt(ISettingID_Dlgs_APW_AutofillTime)));
     FReplaceTime       := SettingValueBool(ISettingID_Dlgs_APW_ReplaceTime);
+    FAutofillXForm     := SettingValueBool(ISettingID_Dlgs_APW_AutofillXfrm);
     Resume;
   end;
 
@@ -369,7 +412,8 @@ uses
             'SLogEntry_AddingOK',
             [FileList.Files[0],
              DateTimeFillResultName(FDateFillResult),
-             DateTimeFillResultName(FTimeFillResult)]);
+             DateTimeFillResultName(FTimeFillResult),
+             ConstVal(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
         except
           on e: Exception do begin
             FAddedPic := nil;

@@ -836,6 +836,14 @@
           <tranEntry langID="1058" value="Автозаповнення часу зображення з (у порядку переваги):"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="ISettingID_Dlgs_APW_AutofillXfrm">
+        <tranEntries>
+          <tranEntry langID="1049" value="Автозаполнение преобразований изображения из метаданных"/>
+          <tranEntry langID="1033" value="Automatically fill picture transformations from metadata"/>
+          <tranEntry langID="1031" value="Automatically fill picture transformations from metadata"/>
+          <tranEntry langID="1046" value="Automatically fill picture transformations from metadata"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="ISettingID_Dlgs_APW_LogOnErrOnly">
         <tranEntries>
           <tranEntry langID="1049" value="Отображать протокол добавления только при наличии ошибок"/>
@@ -2658,11 +2666,11 @@
       </propEntry>
       <propEntry name="SLogEntry_AddingOK">
         <tranEntries>
-          <tranEntry langID="1049" value="Успешно добавлен %s. Автозаполнение даты: %s. Автозаполнение времени: %s."/>
-          <tranEntry langID="1033" value="%s added OK. Date autofill: %s. Time autofill: %s."/>
-          <tranEntry langID="1031" value="%s erfolgreich hinzugefьgt. Datum: %s. Zeit: %s."/>
-          <tranEntry langID="1046" value="%s adicionadas OK. Data automбtica: %s. Hora automбtica: %s."/>
-          <tranEntry langID="1058" value="Успішно доданий %s. Автозаповнення  дати: %s. Автозаповнення часу: %s."/>
+          <tranEntry langID="1049" value="Успешно добавлен %s. Автозаполнение даты: %s. Автозаполнение времени: %s. Автозаполнение преобразований: %s."/>
+          <tranEntry langID="1033" value="%s added OK. Date autofill: %s. Time autofill: %s. Transform autofill: %s."/>
+          <tranEntry langID="1031" value="%s erfolgreich hinzugefьgt. Datum: %s. Zeit: %s. Transform autofill: %s."/>
+          <tranEntry langID="1046" value="%s adicionadas OK. Data automбtica: %s. Hora automбtica: %s. Transform autofill: %s."/>
+          <tranEntry langID="1058" value="Успішно доданий %s. Автозаповнення  дати: %s. Автозаповнення часу: %s. Автозаполнение преобразований: %s."/>
         </tranEntries>
       </propEntry>
       <propEntry name="SLogEntry_AutorunCreatedOK">
@@ -3201,6 +3209,14 @@
           <tranEntry langID="1033" value="Parameters"/>
           <tranEntry langID="1031" value="Parameters"/>
           <tranEntry langID="1046" value="Parameters"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="STransformFilledFromExif">
+        <tranEntries>
+          <tranEntry langID="1049" value="Заполнено из EXIF-тега"/>
+          <tranEntry langID="1033" value="Filled from EXIF tag"/>
+          <tranEntry langID="1031" value="Filled from EXIF tag"/>
+          <tranEntry langID="1046" value="Filled from EXIF tag"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SUnclassified_Author">

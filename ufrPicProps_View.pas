@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.12 2004-06-04 14:18:18 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.13 2004-06-14 10:32:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -48,6 +48,9 @@ type
     aRotate270: TAction;
     aFlipHorz: TAction;
     aFlipVert: TAction;
+    gipmToolsToolbar: TTBGroupItem;
+    gipmMainToolbar: TTBGroupItem;
+    ipmSep: TTBXSeparatorItem;
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure aaZoomActual(Sender: TObject);
@@ -345,7 +348,8 @@ uses phUtils, Main, phSettings;
   procedure TfrPicProps_View.InitializePage;
   begin
     inherited InitializePage;
-    pmMain.LinkSubitems := tbMain.Items;
+    gipmMainToolbar.LinkSubitems  := tbMain.Items;
+    gipmToolsToolbar.LinkSubitems := tbTools.Items;
     cbViewFile.Images        := FileImages;
     cbViewFile.SubMenuImages := FileImages;
     FZoomFactorChange := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];

@@ -51,6 +51,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
       'he specified folder, and, optionally, to delete pictures no long' +
       'er associated with valid (existent) files'
     Transparent = False
+    Visible = False
     WordWrap = True
   end
   object lNBUndoable: TLabel
@@ -115,6 +116,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Re&pair picture file links'
     TabOrder = 4
+    Visible = False
     OnClick = PageDataChange
   end
   object rbRebuildThumbs: TRadioButton

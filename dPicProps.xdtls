@@ -164,11 +164,11 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value="Свойства файла"/>
+              <tranEntry langID="1049" value="Свойства\nфайла"/>
               <tranEntry langID="1033" value="File properties"/>
               <tranEntry langID="1031" value="Dateieigenschaften"/>
-              <tranEntry langID="1046" value="Propriedades do arquivo"/>
-              <tranEntry langID="1058" value="Властивості файлу"/>
+              <tranEntry langID="1046" value="Propriedades\ndo arquivo"/>
+              <tranEntry langID="1058" value="Властивості\nфайлу"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -210,11 +210,11 @@
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value="Ключевые слова"/>
+              <tranEntry langID="1049" value="Ключевые\nслова"/>
               <tranEntry langID="1033" value="Keywords"/>
               <tranEntry langID="1031" value="Schlьsselwцrter"/>
-              <tranEntry langID="1046" value="Palavras-chave"/>
-              <tranEntry langID="1058" value="Ключові слова"/>
+              <tranEntry langID="1046" value="Palavras-\nchave"/>
+              <tranEntry langID="1058" value="Ключові\nслова"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Hint">
@@ -258,8 +258,8 @@
             <tranEntries>
               <tranEntry langID="1049" value="Просмотр и\nнастройка"/>
               <tranEntry langID="1033" value="View &amp;&amp; Adjust"/>
-              <tranEntry langID="1031" value="Anzeigen &amp;&amp; Adjust"/>
-              <tranEntry langID="1046" value="Visualizar &amp;&amp; Adjust"/>
+              <tranEntry langID="1031" value="Anzeigen &amp;&amp;\n Adjust"/>
+              <tranEntry langID="1046" value="Visualizar &amp;&amp;\nAdjust"/>
               <tranEntry langID="1058" value="Перегляд и\nнастройка"/>
             </tranEntries>
           </propEntry>
