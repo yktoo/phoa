@@ -1,38 +1,53 @@
-<!-- $Id: intf-tool-props.html,v 1.3 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: intf-tool-props.html,v 1.4 2004-11-10 14:38:39 dale Exp $ -->
 {[%hh_hdr_en:Tool properties dialog]}
 
-<p align=justify>This window allows you to view or edit a <a href="info-tools.html">tool</a> properties. To display it, select <b>Edit...</b> 
-  menu item on <a href="setup-tools.html">Tools</a> page of <a href="setup.html">Program settings dialog</a>.
+<p align=justify>This window allows you to view or edit a <a href="info-tools.html">tool</a> properties. To display it,
+  select <b>Edit...</b> menu item on <a href="setup-tools.html">Tools</a> page of the <a href="setup.html">Program
+  settings dialog</a>.
 
-<h3>File masks</h3>
-<p align=justify>Determine <a href="info-tools.html#masks">files</a> the tool is applicable to.
+{[%hh_h2:Controls]}
 
-<h3>Kind</h3>
-<p align=justify>Specifies <a href="info-tools.html#tool-kinds">the tool's kind</a>.
-
-<h3>Name</h3>
-<p align=justify>Specifies a menu item caption for the tool. You can mark a character a <i>hotkey</i> by prepending it with an ampersand (<b>&</b>).
-  To include the ampersand itself you'll need to duplicate it.
-
-<h3>Hint</h3>
-<p align=justify>The hint is displayed in the status bar. If the string contains pipe character (<b>|</b>) the status bar displays only the text
-  following it while the preceding text is used for toolbar button's tooltip.
-
-<h3>Command (application)</h3>
-<p align=justify>Is applicable only for <a href="info-tools.html#ptkCustom">custom action</a>. Specifies an executable file to pass picture file
-  names to. You may use <b>Browse...</b> button to select a file.
-
-<h3>Parameters</h3>
-<p align=justify>Specify additional command line parameters being passed to the application.
-
-<h3>Window</h3>
-<p align=justify>Determines main application's window state when it starts.
-
-<h3>Folder</h3>
-<p align=justify>Specifies working folder of the application. <b>Browse...</b> button simplifies folder selection.
-
-<h3>Tool usage</h3>
-<p align=justify>Determines <a href="info-tools.html#usages">which menus</a> will contain the tool items.
+<table class=plain border=0>
+  <tr>
+    <td class=command>File masks</td>
+    <td>Determines <a href="info-tools.html#masks">files</a> the tool is applicable to.</td>
+  </tr>
+  <tr>
+    <td class=command>Kind</td>
+    <td>Specifies a <a href="info-tools.html#tool-kinds">kind</a> of the tool.</td>
+  </tr>
+  <tr>
+    <td class=command>Name</td>
+    <td>Specifies a menu item caption for the tool. You can mark a character a <i>hotkey</i> by prepending it with an
+       ampersand (<b>&amp;</b>). To include the ampersand itself you'll need to duplicate it.</td>
+  </tr>
+  <tr>
+    <td class=command>Hint</td>
+    <td>The hint is displayed in the status bar. If the string contains pipe character (<b>|</b>) the status bar
+        displays only the text following it while the preceding text is used for toolbar button's tooltip.</td>
+  </tr>
+  <tr>
+    <td class=command>Command (application)</td>
+    <td>Is applicable only for <a href="info-tools.html#ptkCustom">custom action</a>. Specifies an executable file to
+        pass picture file names to. You may use <b>Browse...</b> button to select a file.</td>
+  </tr>
+  <tr>
+    <td class=command>Parameters</td>
+    <td>Specify additional command line parameters being passed to the application.</td>
+  </tr>
+  <tr>
+    <td class=command>Window</td>
+    <td>Determines main application's window state when it starts.</td>
+  </tr>
+  <tr>
+    <td class=command>Folder</td>
+    <td>Specifies working folder of the application. <b>Browse...</b> button simplifies folder selection.</td>
+  </tr>
+  <tr>
+    <td class=command>Tool usage</td>
+    <td>Determines <a href="info-tools.html#usages">which menus</a> will contain the tool items.
+  </tr>
+</table>
 
 {[%hh_seealso_en]}
   <a href="info-tools.html">Tools</a><br>

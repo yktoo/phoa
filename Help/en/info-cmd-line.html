@@ -1,4 +1,4 @@
-<!-- $Id: info-cmd-line.html,v 1.3 2004-11-08 10:16:39 dale Exp $ -->
+<!-- $Id: info-cmd-line.html,v 1.4 2004-11-10 14:38:38 dale Exp $ -->
 {[%hh_hdr_en:Command line parameters]}
 
 <p align=justify><b>PhoA</b> supports a number of command line parameters. The general format of the command line is as following:
@@ -15,7 +15,7 @@
 
 <table class=plain border=0>
 <tr>
-  <td nowrap><b>-w <i>view_name</i></b></td>
+  <td class=command nowrap>-w <i>view_name</i></td>
   <td>Activate <a href="intf-browse-mode-views.html">view</a> <i>view_name</i>. If the key is omitted the program
       displays picture groups upon start by default. The view is searched case insensitively.<br>
       <i><u>Example:</u></i><br>
@@ -23,7 +23,7 @@
   </td>
 </tr>
 <tr>
-  <td nowrap><b>-g <i>group_path</i></b></td>
+  <td class=command nowrap>-g <i>group_path</i></td>
   <td>Select a group specified by the <i>group_path</i> in the tree. The path for a group is a string similar to OS file
       path with the difference that it is separated with slash character (<b>/</b>). You may do or do not specify the
       starting slash as this affects none. You are also allowed to specify both ordinary picture group or a view's group
@@ -34,7 +34,7 @@
   </td>
 </tr>
 <tr>
-  <td nowrap><b>-i <i>pic_ID</i></b></td>
+  <td class=command nowrap>-i <i>pic_ID</i></td>
   <td>Select a picture with specified ID in thumbnail window. If the key is omitted the program selects the first
       thumbnail in the list by default.<br>
       <i><u>Example:</u></i><br>
@@ -42,18 +42,18 @@
   </td>
 </tr>
 <tr>
-  <td nowrap><b>-v</b></td>
+  <td class=command nowrap>-v</td>
   <td>Enter the <a href="intf-view-mode.html">View mode</a> upon start. The view mode is allowed only when a there is a
       picture selected.
   </td>
 </tr>
 <tr>
-  <td nowrap><b>-s</b></td>
+  <td class=command nowrap>-s</td>
   <td>Only applicable with <b>-v</b> key. When specified, the program will start the Slide show mode.
   </td>
 </tr>
 <tr>
-  <td nowrap><b>-f [1|0]</b></td>
+  <td class=command nowrap>-f [1|0]</td>
   <td>Only applicable with <b>-v</b> key and specifies whether fullscreen or window mode is used. If you omit this key
       the program will use the default (current) settings for fullscreen mode. If the key is specified with no value or
       with value of <b>1</b> (one) the fullscreen mode will be forced (for the current session only). If the key is

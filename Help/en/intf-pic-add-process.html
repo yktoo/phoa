@@ -1,27 +1,35 @@
-<!-- $Id: intf-pic-add-process.html,v 1.3 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: intf-pic-add-process.html,v 1.4 2004-11-10 14:38:39 dale Exp $ -->
 {[%hh_hdr_en:Add pictures wizard :: Adding pictures]}
 
-<p align=justify>This page is displayed while adding the selected picture files. The program shows picture addition progress and the number
-  of errors occured. You can watch those errors (as well as pictures were added successfully) afterwards on the <a href="intf-pic-add-log.html">log
-  page</a>.
+<p align=justify>This page is displayed while adding the selected picture files. The program shows picture addition
+  progress and the number of errors occured. You can watch those errors (as well as pictures were added successfully)
+  afterwards on the <a href="intf-pic-add-log.html">log page</a>.
 <p align=justify>Moreover the <i>thumbnail</i> created for the picture last added is displayed.
 <div class=nb><b>NB:</b>
   <ul>
-    <li>Picture additiong is performed by a parallel thread; you can interrupt the process only between two pictures being processing, and this
-        slightly slows down the program's response on clicking <b>Interrupt</b> button.</li>
-    <li>You <i>cannot</i> close the wizard window having active picture addition process. You will need to interrupt it using the <b>Interrupt</b>
-        button before you can close the window.</li>
-    <li>Picture addition process performs <a href="info-pic-prop-autofill.html">autofilling the picture data</a>. You can setup the autofill feature
-        in the <a href="setup-dialogs.html">dialog settings</a>; autofill results can be watched at the <a href="intf-pic-add-log.html">log
-        page</a>.</li>
+    <li>Picture additiong is performed by a parallel thread; you can interrupt the process only between two pictures
+        being processing, and this slightly slows down the program's response on clicking <b>Interrupt</b> button.</li>
+    <li>You <i>cannot</i> close the wizard window having active picture addition process. You will need to interrupt it
+        using the <b>Interrupt</b> button before you can close the window.</li>
+    <li>Picture addition process performs <a href="info-pic-prop-autofill.html">autofilling the picture data</a>. You
+        can setup the autofill feature in the <a href="setup-dialogs.html">dialog settings</a>; autofill results can be
+        watched at the <a href="intf-pic-add-log.html">log page</a>.</li>
   </ul>
 </div>
 
-<h3>Interrupt</h3>
-<p align=justify>By clicking this button you stop the addition process. The button becomes <b>Continue</b>, and by clicking it you resume the process.
+{[%hh_h2:Controls]}
 
-<p align=justify>On process completion the program closes wizard window (only when no errors occured and <a href="setup-dialogs.html">settings</a> 
-  specify not to show the log when no errors), or advances to the <a href="intf-pic-add-log.html">log page</a>.
+<table class=plain border=0>
+  <tr>
+    <td class=command>Interrupt</td>
+    <td>By clicking this button you stop the addition process. The button becomes <b>Continue</b>, and by clicking it
+        you resume the process.</td>
+  </tr>
+</table>
+
+<p align=justify>On process completion the program closes wizard window (only when no errors occured and
+  <a href="setup-dialogs.html">settings</a> specify not to show the log when no errors), or advances to the
+  <a href="intf-pic-add-log.html">log page</a>.
 
 <p align=justify><a href="intf-pic-add-log.html">Next &gt;&gt;</a>
 

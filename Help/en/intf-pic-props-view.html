@@ -1,54 +1,71 @@
-<!-- $Id: intf-pic-props-view.html,v 1.6 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: intf-pic-props-view.html,v 1.7 2004-11-10 14:38:39 dale Exp $ -->
 {[%hh_hdr_en:Edit pictures dialog :: View]}
 
-<p align=justify>Here you can view any of the selected picture at the selected scale. Picture file (if there are more than one picture selected)
-  is chosen from the dropdown list.
+<p align=justify>Here you can view any of the selected picture at the selected scale. Picture file (if there are more
+  than one picture selected) is chosen from the dropdown list.
 
-<h3>{[%hh_ii:ZoomIn]} Zoom in</h3>
-<p align=justify>Enlarges picture for value denoted in <a href="setup-view-mode.html">View settings</a>.
+{[%hh_h2:Controls]}
 
-<h3>{[%hh_ii:ZoomOut]} Zoom out</h3>
-<p align=justify>Shrinks picture for value denoted in <a href="setup-view-mode.html">View settings</a>.
-
-<h3>{[%hh_ii:ZoomActual]} Zoom actual</h3>
-<p align=justify>Set the scale to <b>1:1</b>.
-
-<h3>{[%hh_ii:ZoomFit]} Fit window</h3>
-<p align=justify>Scales picture so that it fits the window. This is the default.
-
-<h3>{[%hh_ii:Rotate0]} No rotation</h3>
-<p align=justify>Don't apply <a href="info-transform.html#rotation">rotation</a> to the image when it is displayed.
-
-<h3>{[%hh_ii:Rotate90]} Rotate CW by 90&deg;</h3>
-<p align=justify>Apply a 90&deg; clockwise <a href="info-transform.html#rotation">rotation</a> to the image when it is displayed.
-
-<h3>{[%hh_ii:Rotate180]} Rotate by 180&deg;</h3>
-<p align=justify>Apply a 180&deg; <a href="info-transform.html#rotation">rotation</a> to the image when it is displayed.
-
-<h3>{[%hh_ii:Rotate270]} Rotate CCW by 90&deg;</h3>
-<p align=justify>Apply a 90&deg; counter-clockwise <a href="info-transform.html#rotation">rotation</a> (or 270&deg; clockwise rotation) to the image
-  when it is displayed.
-
-<h3>{[%hh_ii:FlipHorz]} Flip horizontally</h3>
-<p align=justify>Apply a horizontal <a href="info-transform.html#flips">flip</a> to the image when it is displayed.
-
-<h3>{[%hh_ii:FlipVert]} Flip vertically</h3>
-<p align=justify>Apply a vertical <a href="info-transform.html#flips">flip</a> to the image when it is displayed.
+<table class=plain border=0>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomIn]} Zoom in</td>
+    <td>Enlarges picture for value denoted in <a href="setup-view-mode.html">View settings</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomOut]} Zoom out</td>
+    <td>Shrinks picture for value denoted in <a href="setup-view-mode.html">View settings</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomActual]} Zoom actual</td>
+    <td>Set the scale to <b>1:1</b>.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:ZoomFit]} Fit window</td>
+    <td>Scales picture so that it fits the window. This is the default.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate0]} No rotation</td>
+    <td>Don't apply <a href="info-transform.html#rotation">rotation</a> to the image when it is displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate90]} Rotate CW by 90&deg;</td>
+    <td>Apply a 90&deg; clockwise <a href="info-transform.html#rotation">rotation</a> to the image when it is
+        displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate180]} Rotate by 180&deg;</td>
+    <td>Apply a 180&deg; <a href="info-transform.html#rotation">rotation</a> to the image when it is displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:Rotate270]} Rotate CCW by 90&deg;</td>
+    <td>Apply a 90&deg; counter-clockwise <a href="info-transform.html#rotation">rotation</a> (or 270&deg; clockwise
+        rotation) to the image when it is displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:FlipHorz]} Flip horizontally</td>
+    <td>Apply a horizontal <a href="info-transform.html#flips">flip</a> to the image when it is displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>{[%hh_ii:FlipVert]} Flip vertically</td>
+    <td>Apply a vertical <a href="info-transform.html#flips">flip</a> to the image when it is displayed.</td>
+  </tr>
+</table>
 
 <div class=nb><b>NB:</b>
   <ul>
     <li>These commands are also available from the popup menu appearing on right mouse click.</li>
-    <li>Transformation commands are applied to <i>all</i> the selected pictures. If a transformation property (eg. rotation)
-        differs for the selected pictures, the corresponding transformation buttons (rotation buttons in our case) will be in the unpressed state.
-        If you now decide to apply a rotation the rotation will be the same for all the selected pictures.</li>
+    <li>Transformation commands are applied to <i>all</i> the selected pictures. If a transformation property (eg.
+        rotation) among the selected pictures, the corresponding transformation buttons (rotation buttons in our case)
+        will be in the unpressed state. If you now decide to apply a rotation the rotation will be the same for all the
+        selected pictures.</li>
   </ul>
 </div>
 
-<p align=justify>Picture panning (in the case the picture is larger than the window) is performed by dragging it with the mouse.
-  Additionally you can use the mouse wheel to zoom the picture.
+<p align=justify>Picture panning (in the case the picture is larger than the window) is performed by dragging it with
+  the mouse. Additionally you can use the mouse wheel to zoom the picture.
 
-<div class=nb><b>NB:</b> To speed up picture displaying always <b>Nearest neighbor</b> is used for <a href="info-resampling.html">resampling</a>.
-</div>  
+<div class=nb><b>NB:</b> To speed up picture displaying always <b>Nearest neighbor</b> is used for
+  <a href="info-resampling.html">resampling</a>.</div>  
 
 {[%hh_seealso_en]}
   <a href="intf-browse-mode.html">Browse mode</a><br>

@@ -1,25 +1,33 @@
-<!-- $Id: intf-group-props.html,v 1.2 2004-06-14 06:15:29 dale Exp $ -->
+<!-- $Id: intf-group-props.html,v 1.3 2004-11-10 14:38:39 dale Exp $ -->
 {[%hh_hdr_en:Group properties dialog]}
 
 <p align=justify>This dialog allows for viewing or editing picture group properties.
-<p align=justify>To display it use the <b>Edit | Edit...</b> menu item when the group tree is focused and one of the groups
-  is highlighted (but not the photo album, a <a href="intf-browse-mode-views.html">view</a> or
+<p align=justify>To display it use the <b>Edit | Edit...</b> menu item when the group tree is focused and one of the
+  groups is highlighted (but not the photo album, a <a href="intf-browse-mode-views.html">view</a> or
   <a href="intf-search.html">Search</a> results group).
+
+{[%hh_h2:Controls]}
   
-<h3>ID</h3>
-<p align=justify>A read-only field. Displays an unique numeric group identifier used internally by the program and similar to
-  a picture identifier. The group is being assigned the identifier automatically when it is created or loaded from a photo album
-  had been created by an older program version (prior to <b>1.1.5</b>).
+<table class=plain border=0>
+  <tr>
+    <td class=command>ID</td>
+    <td>A read-only field. Displays an unique numeric group identifier used internally by the program and similar to a
+        picture identifier. The group is being assigned the identifier automatically when it is created or loaded from a
+        photo album had been created by an older program version (prior to <b>1.1.5</b>).</td>
+  </tr>
+  <tr>
+    <td class=command>Text</td>
+    <td>Specifies the text (or the name) of the group that is displayed in the tree.</td>
+  </tr>
+  <tr>
+    <td class=command>Description</td>
+    <td>Here you can enter some additional informaton about the pictures contained in the group. The description can be
+        displayed in the tooltips if configured in <a href="setup-general.html">program settings</a>.</td>
+  </tr>
+</table>
 
-<h3>Text</h3>
-<p align=justify>Specifies the text (or the name) of the group that is displayed in the tree.
-
-<h3>Description</h3>
-<p align=justify>Here you can enter some additional informaton about the pictures contained in the group. The description can
-  be displayed in the tooltips if configured in <a href="setup-general.html">program settings</a>.
-
-<div class=nb><b>NB:</b> A group can be renamed alternatively by inplace editing the group name. You enter the rename mode
-  with the <b>F2</b> key or by left mouse click on already <i>highlighted</i> group name in the
+<div class=nb><b>NB:</b> A group can be renamed alternatively by inplace editing the group name. You enter the rename
+  mode with the <b>F2</b> key or by left mouse click on an already <i>highlighted</i> group name in the
   <a href="intf-browse-mode.html">browse mode</a>.</div>
 
 {[%hh_undosup_en]}

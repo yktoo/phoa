@@ -1,4 +1,4 @@
-<!-- $Id: intf-ctl-viewer-key.html,v 1.1 2004-11-07 17:31:17 dale Exp $ -->
+<!-- $Id: intf-ctl-viewer-key.html,v 1.2 2004-11-10 14:38:38 dale Exp $ -->
 {[%hh_hdr_en:Controls :: View mode :: Keyboard]}
 
 <h3><img src="../ico-keyboard.gif" align=absmiddle></h3>
@@ -8,36 +8,114 @@
     <td>Action</td>
     <td>Description</td>
   </tr>
-  <tr><td><b>Alt+Enter</b></td><td>Edit</td><td>Opens <a href="intf-pic-props.html">Edit picture dialog</a> for picture currently displayed.</td></tr>
-  <tr><td><b>Arrow keys</b></td><td>Scroll picture</td><td>Scrolls picture in the given direction (in the case it doesn't fit the window).</td></tr>
-  <tr><td><b>Ctrl+Arrow keys</b></td><td>Quick scroll picture</td><td>Quickly scrolls picture in the given direction (in the case it doesn't fit the
-    window).</td></tr>
-  <tr><td><b>Ctrl+I</b></td><td>Info bar relocation</td><td>Displays resizing handles around info-string allowing you to resize or move it. Pressing
-    it twice or mouse click outside the bar finishes this mode.</td></tr>
-  <tr><td><b>End</b></td><td>Last picture</td><td>Jumps to the last picture in the group.</td></tr>
-  <tr><td><b>Enter</b></td><td>Finish viewing on the current picture</td><td>Like <b>Esc</b>, returns to the <a href="intf-browse-mode.html">browse
-    mode</a>, but focuses the last viewed picture in the thumbnails window.</td></tr>
-  <tr><td><b>Esc</b></td><td>Finish viewing</td><td>Returns to the <a href="intf-browse-mode.html">browse mode</a> leaving the last thumbnail selection
-    intact.</td></tr>
-  <tr><td><b>F</b></td><td>Toggle fullscreen</td><td>Switches between the fullscreen and the window mode.</td></tr>
-  <tr><td><b>F1</b></td><td>Help</td><td>Displays <a href="intf-view-mode.html">view mode help</a>.</td></tr>
-  <tr><td><b>F2</b></td><td>Display info</td><td>Toggles info-string line display.</td></tr>
-  <tr><td><b>F4</b></td><td>Program preferences</td><td>Displays <a href="setup-browse-mode.html">Program preferences dialog</a>.</td></tr>
-  <tr><td><b>F5</b></td><td>Refresh picture</td><td>Reloads current picture from file.</td></tr>
-  <tr><td><b>Home</b></td><td>First picture</td><td>Jumps to the first picture in the group.</td></tr>
-  <tr><td><b>Page Up, BackSpace</b></td><td>Previous picture</td><td>Reverts to the previous picture.</td></tr>
-  <tr><td><b>Page Down, Space</b></td><td>Next picture</td><td>Advances to the next picture.</td></tr>
-  <tr><td><b>Pause</b></td><td>Toggle Slide Show</td><td>Activates or deactivates automatic timed Slide Show mode. Slide Show parameters are set up
-    in the <a href="setup-view-mode.html">view mode settings</a>.</td></tr>
-  <tr><td><b>Shift+Arrow keys</b></td><td>Fine scroll picture</td><td>Slowly scrolls picture in the given direction (in the case it doesn't fit the
-    window).</td></tr>
-  <tr><td><b>+</b> (numeric keypad)</td><td>Zoom in</td><td>Zooms picture in by the value defined in the <a href="setup-view-mode.html">view mode
-    settings</a>.</td></tr>
-  <tr><td><b>-</b> (numeric keypad)</td><td>Zoom out</td><td>Zooms picture out by the value defined in the <a href="setup-view-mode.html">view mode
-    settings</a>.</td></tr>
-  <tr><td><b>*</b> (numeric keypad)</td><td>Zoom best fit</td><td>Scales the picture to best fit the viewing window.</td></tr>
-  <tr><td><b>/</b> (numeric keypad)</td><td>Zoom actual size</td><td>Displays picture at its actual size (so that one picture pixel corresponds to one
-    screen pixel).</td></tr>
+  <tr>
+    <td class=command>Alt+Enter</td>
+    <td>Edit</td>
+    <td>Opens <a href="intf-pic-props.html">Edit picture dialog</a> for picture currently displayed.</td>
+  </tr>
+  <tr>
+    <td class=command>Arrow keys</td>
+    <td>Scroll picture</td>
+    <td>Scrolls picture in the given direction (in the case it doesn't fit the window).</td>
+  </tr>
+  <tr>
+    <td class=command>Ctrl+Arrow keys</td>
+    <td>Quick scroll picture</td>
+    <td>Quickly scrolls picture in the given direction (in the case it doesn't fit the window).</td>
+  </tr>
+  <tr>
+    <td class=command>Ctrl+I</td>
+    <td>Info bar relocation</td>
+    <td>Displays resizing handles around info-string allowing you to resize or move it. Pressing it twice or mouse click
+        outside the bar finishes this mode.</td>
+  </tr>
+  <tr>
+    <td class=command>End</td>
+    <td>Last picture</td>
+    <td>Jumps to the last picture in the group.</td>
+  </tr>
+  <tr>
+    <td class=command>Enter</td>
+    <td>Finish viewing on the current picture</td>
+    <td>Like <b>Esc</b>, returns to the <a href="intf-browse-mode.html">browse mode</a>, but focuses the last viewed
+        picture in the thumbnails window.</td>
+  </tr>
+  <tr>
+    <td class=command>Esc</td>
+    <td>Finish viewing</td>
+    <td>Returns to the <a href="intf-browse-mode.html">browse mode</a> leaving the last thumbnail selection intact.</td>
+  </tr>
+  <tr>
+    <td class=command>F</td>
+    <td>Toggle fullscreen</td>
+    <td>Switches between the fullscreen and the window mode.</td>
+  </tr>
+  <tr>
+    <td class=command>F1</td>
+    <td>Help</td>
+    <td>Displays the <a href="intf-view-mode.html">view mode help</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>F2</td>
+    <td>Display info</td>
+    <td>Toggles info-string line display.</td>
+  </tr>
+  <tr>
+    <td class=command>F4</td>
+    <td>Program preferences</td>
+    <td>Displays the Program settings dialog, <a href="setup-browse-mode.html">browse mode settings page</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>F5</td>
+    <td>Refresh picture</td>
+    <td>Reloads current picture from file.</td>
+  </tr>
+  <tr>
+    <td class=command>Home</td>
+    <td>First picture</td>
+    <td>Jumps to the first picture in the group.</td>
+  </tr>
+  <tr>
+    <td class=command>Page Up, BackSpace</td>
+    <td>Previous picture</td>
+    <td>Reverts to the previous picture.</td>
+  </tr>
+  <tr>
+    <td class=command>Page Down, Space</td>
+    <td>Next picture</td>
+    <td>Advances to the next picture.</td>
+  </tr>
+  <tr>
+    <td class=command>Pause</td>
+    <td>Toggle Slide Show</td>
+    <td>Activates or deactivates automatic timed Slide Show mode. Slide Show parameters are set up in the
+        <a href="setup-view-mode.html">view mode settings</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>Shift+Arrow keys</td>
+    <td>Fine scroll picture</td>
+    <td>Slowly scrolls picture in the given direction (in the case it doesn't fit the window).</td>
+  </tr>
+  <tr>
+    <td class=command>+ (numeric keypad)</td>
+    <td>Zoom in</td>
+    <td>Zooms picture in by the value defined in the <a href="setup-view-mode.html">view mode settings</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>- (numeric keypad)</td>
+    <td>Zoom out</td>
+    <td>Zooms picture out by the value defined in the <a href="setup-view-mode.html">view mode settings</a>.</td>
+  </tr>
+  <tr>
+    <td class=command>* (numeric keypad)</td>
+    <td>Zoom best fit</td>
+    <td>Scales the picture to best fit the viewing window.</td>
+  </tr>
+  <tr>
+    <td class=command>/ (numeric keypad)</td>
+    <td>Zoom actual size</td>
+    <td>Displays picture at its actual size (so that one picture pixel corresponds to one screen pixel).</td>
+  </tr>
 </table>
 
 {[%hh_ftr_en]}

@@ -1,32 +1,44 @@
-<!-- $Id: intf-file-ops-log.html,v 1.2 2004-06-14 06:15:29 dale Exp $ -->
+<!-- $Id: intf-file-ops-log.html,v 1.3 2004-11-10 14:38:38 dale Exp $ -->
 {[%hh_hdr_en:Picture file operations wizard :: Operation log]}
 
 <p align=justify>The log page displays sequentially all the operations performed with the picture files.
 
-<h3>Display errors only</h3>
-<p align=justify>When turned on the log shows only failed entries, otherwise succeeded entries are also shown. The option is convenient when
-  you need to find some errors among a large number of added files.
+{[%hh_h2:Controls]}
 
-<h3>Save to file...</h3>
-<p align=justify>Allows you to write the log to a plain text file.
-<div class=nb><b>NB:</b>
-  <ul>
-    <li>When saving the log <i>all</i> entries are always written, disregarding the <b>Display errors only</b> checkbox.</li>
-    <li>Failed entries are marked with symbols <b>[!]</b> in the file, while succeeded ones have <b>[+]</b> at the beginning. This allows to
-        easily find errors in the log file unless you use to include these characters in file names.</li>
-  </ul>
-</div>
+<table class=plain border=0>
+  <tr>
+    <td class=command>Display errors only</td>
+    <td>When turned on the log shows only failed entries, otherwise succeeded entries are also shown. The option is
+        convenient when you need to find some errors among a large number of added files.</td>
+  </tr>
+  <tr>
+    <td class=command>Save to file...</td>
+    <td>Allows you to write the log to a plain text file.
+        <div class=nb><b>NB:</b>
+          <ul>
+            <li>When saving the log <i>all</i> entries are always written, disregarding the <b>Display errors only</b>
+                checkbox.</li>
+            <li>Failed entries are marked with symbols <b>[!]</b> in the file, while succeeded ones have <b>[+]</b> at
+                the beginning. This allows to easily find errors in the log file unless you use to include these
+                characters in file names.</li>
+          </ul>
+        </div>
+    </td>
+  </tr>
+  <tr class=tblhdr><td colspan=2>The popup menu (accessible with right mouse click) provides additional options:</td></tr>
+  <tr>
+    <td class=command>Copy</td>
+    <td>Copies the line currently selected into the clipboard.</td>
+  </tr>
+  <tr>
+    <td class=command>Find...</td>
+    <td>Displays a standard Find text dialog allowing you to search through the log list, eg. for a particular file
+        name.</td>
+  </tr>
+</table>
 
-<p align=justify>The popup menu (accessible with right mouse click) supplies additional options:
-
-<h3>Copy</h3>
-<p align=justify>Copies the line currently selected into the clipboard.
-
-<h3>Find...</h3>
-<p align=justify>Displays standard Find text dialog allowing you to search through the log list, eg. for a particular file name.
-
-<p align=justify>You can watch the log before all files are added by interrupting the process and then clicking the <b>Next</b> button.
-  Afterwards you can go back (by clicking <b>Back</b>) and then resume the process.
+<p align=justify>You can watch the log before all files are added by interrupting the process and then clicking the
+  <b>Next</b> button. Afterwards you can go back (by clicking <b>Back</b>) and then resume the process.
 
 {[%hh_seealso_en]}
   <a href="intf-file-ops.html">Picture file operations wizard</a><br>

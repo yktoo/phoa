@@ -1,31 +1,44 @@
-<!-- $Id: intf-search.html,v 1.6 2004-11-10 10:35:24 dale Exp $ -->
+<!-- $Id: intf-search.html,v 1.7 2004-11-10 14:38:39 dale Exp $ -->
 {[%hh_hdr_en:Find pictures dialog]}
 
-<p align=justify><b>PhoA</b> has a powerful tool for searching pictures. To display Find pictures dialog you select <b>Tools | Find...</b> menu
-  item or press <b>F3</b> key in the <a href="intf-browse-mode.html">Browse mode</a>.
+<p align=justify><b>PhoA</b> has a powerful tool for searching pictures. To display Find pictures dialog you select
+  <b>Tools | Find...</b> menu item or press <b>F3</b> key in the <a href="intf-browse-mode.html">Browse mode</a>.
 
-<h3>Search criteria list</h3>
-<p align=justify>You enter search criteria in the table with the following data:
-<ul>
-  <li><b>Picture property</b> - one of the <i>searchable</i> item from <a href="general-pic-data.html">picture data</a>, for which the criterion is
-      intended.</li>
-  <li><b>Criterion condition</b> - one of comparison conditions, list of possible values depends on property <a href="#datatypes">data type</a>.</li>
-  <li><b>Criterion value</b> - a value to compare picture property with.</li>
-</ul>
-<p align=justify>Use arrow keys no navigate through the table. To expand the dropdown list use <b>Alt+Down</b> keys.
-<p align=justify>Criterion values may be selected from the dropdown history list.
+{[%hh_h2:Controls]}
 
-<h3>Find</h3>
-<p align=justify>Starts picture searching.
-<p align=justify>Pictures found in search operation (if there are any) fill the <b>Search Results</b> folder that is displayed in the root of
-  the group tree. The Search Results folder implements the same functionality as regular picture group folders except that you cannot add
-  or remove its pictures.
-
-<h3>Reset</h3>
-<p align=justify>Clears all input fields and reverts all values to their defaults.
+<table class=plain border=0>
+  <tr>
+    <td class=command>Search criteria list</td>
+    <td>
+      You enter search criteria in the table with the following data:
+      <ul>
+        <li><b>Picture property</b> - one of the <i>searchable</i> item from <a href="general-pic-data.html">picture
+            data</a>, for which the criterion is intended.</li>
+        <li><b>Criterion condition</b> - one of comparison conditions, list of possible values depends on property
+            <a href="#datatypes">data type</a>.</li>
+        <li><b>Criterion value</b> - a value to compare picture property with.</li>
+      </ul>
+      <p align=justify>Use arrow keys no navigate through the table. To expand the dropdown list use <b>Alt+Down</b>
+        keys.
+      <p align=justify>Criterion values may be selected from the dropdown history list.
+    </td>
+  </tr>
+  <tr>
+    <td class=command>Find</td>
+    <td>Starts picture searching.<br>
+        Pictures found in search operation (if there are any) fill the <b>Search Results</b> folder that is displayed in
+        the root of the group tree. The Search Results folder implements the same functionality as regular picture group
+        folders except that you cannot add or remove its pictures.</td>
+  </tr>
+  <tr>
+    <td class=command>Reset</td>
+    <td>Clears all input fields and reverts all values to their defaults.</td>
+  </tr>
+</table>
 
 {[%hh_h2:<a name=datatypes>Picture properties data types</a>]}
-<p align=justify>According to the <a href="general-pic-data.html">picture data table</a>, <b>PhoA</b> uses the following data types for property values:
+<p align=justify>According to the <a href="general-pic-data.html">picture data table</a>, <b>PhoA</b> uses the following
+  data types for property values:
 
 <table class=plain border=0>
   <tr class=tblhdr>
@@ -33,37 +46,39 @@
     <td nowrap>Description &amp; criteria</td>
   </tr>
   <tr>
-    <td><b>Integer</b> or <b>Ordinal</b></td>
+    <td class=command>Integer or Ordinal</td>
     <td>An integer value can be compared for equality, inequality etc.</td>
   </tr>
   <tr>
-    <td><b>Filename string</b></td>
-    <td>Data may be tested for matching the <i>mask</i>. The mask is written by the <a href="info-file-masks.html">standard <b>PhoA</b> rules</a>.</td>
+    <td class=command>Filename string</td>
+    <td>Data may be tested for matching the <i>mask</i>. The mask is written by the
+        <a href="info-file-masks.html">standard <b>PhoA</b> rules</a>.</td>
   </tr>
   <tr>
-    <td><b>String</b></td>
+    <td class=command>String</td>
     <td>Any literal. Searching string or substring is implemented, case insensitive.</td>
   </tr>
   <tr>
-    <td><b>Pixel format</b></td>
+    <td class=command>Pixel format</td>
     <td>Not a searchable type.</td>
   </tr>
   <tr>
-    <td><b>Date</b></td>
+    <td class=command>Date</td>
     <td>Criteria are similar to number ones.</td>
   </tr>
   <tr>
-    <td><b>Time</b></td>
+    <td class=command>Time</td>
     <td>Criteria are similar to number ones.</td>
   </tr>
   <tr>
-    <td><b>String list</b></td>
-    <td>It is a list of keywords. Keywords may be entered manually or by clicking &quot;<b>...</b>&quot; button in the entry field from the
-      <a href="intf-select-keywords.html">list</a>.</td>
+    <td class=command>String list</td>
+    <td>It is a list of keywords. Keywords may be entered manually or by clicking &quot;<b>...</b>&quot; button in the
+        entry field from the <a href="intf-select-keywords.html">list</a>.</td>
   </tr>
 </table>
 
-<p align=justify>The program select those pictures that conform to all search conditions at once (ie, the <b>AND</b> operator is in effect here).
+<p align=justify>The program select those pictures that conform to all search conditions at once (ie, an <b>AND</b>
+  operator has effect here).
 <p align=justify>To disable a criterion simply delete its value.
 
 {[%hh_seealso_en]}
