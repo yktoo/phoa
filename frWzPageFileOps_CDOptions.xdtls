@@ -97,7 +97,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Create a photo album &amp;file with selected pictures to:"/>
               <tranEntry langID="1049" value="Создать файл &amp;фотоальбома с выбранными изображениями в:"/>
-              <tranEntry langID="1031" value="Eine &amp;Fotoalbum-Datei mit den ausgew&#228;hlten Bildern erstellen in:"/>
+              <tranEntry langID="1031" value="Eine &amp;Fotoalbum-Datei mit den ausgewдhlten Bildern erstellen in:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -121,7 +121,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Also include existing &amp;views"/>
               <tranEntry langID="1049" value="Также &amp;включить в фотоальбом существующие представления"/>
-              <tranEntry langID="1031" value="Auch e&amp;xistierende Ansichten hinzuf&#252;gen"/>
+              <tranEntry langID="1031" value="Auch e&amp;xistierende Ansichten hinzufьgen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

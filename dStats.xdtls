@@ -44,7 +44,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Средний размер файла изображения"/>
           <tranEntry langID="1033" value="Average picture file size"/>
-          <tranEntry langID="1031" value="Durchschnittliche Dateigr&#246;&#223;e"/>
+          <tranEntry langID="1031" value="Durchschnittliche DateigrцЯe"/>
           <tranEntry langID="1046" value="Tamanho mйdio do arquivo de imagem"/>
           <tranEntry langID="1058" value="Середній розмір файлу зображення"/>
         </tranEntries>
@@ -53,7 +53,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Средний размер эскиза"/>
           <tranEntry langID="1033" value="Average thumbnail size"/>
-          <tranEntry langID="1031" value="Durchschnittliche Thumbnailgr&#246;&#223;e"/>
+          <tranEntry langID="1031" value="Durchschnittliche ThumbnailgrцЯe"/>
           <tranEntry langID="1046" value="Tamanho mйdio da miniatura"/>
           <tranEntry langID="1058" value="Середній розмір ескізу"/>
         </tranEntries>
@@ -98,7 +98,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Current selected group"/>
           <tranEntry langID="1049" value="Текущая выбранная группа"/>
-          <tranEntry langID="1031" value="Aktuell ausgew&#228;hlte Gruppe"/>
+          <tranEntry langID="1031" value="Aktuell ausgewдhlte Gruppe"/>
           <tranEntry langID="1046" value="Grupo Atual selecionado"/>
           <tranEntry langID="1058" value="Поточна обрана група"/>
         </tranEntries>
@@ -107,7 +107,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Самый большой файл изображения"/>
           <tranEntry langID="1033" value="Largest picture file"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;te Datei"/>
+          <tranEntry langID="1031" value="GrцЯte Datei"/>
           <tranEntry langID="1046" value="Maior arquivo de imagem"/>
           <tranEntry langID="1058" value="Найбільший файл зображення"/>
         </tranEntries>
@@ -116,7 +116,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер самого большого файла"/>
           <tranEntry langID="1033" value="Size of the largest file"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e der gr&#246;&#223;ten Datei"/>
+          <tranEntry langID="1031" value="GrцЯe der grцЯten Datei"/>
           <tranEntry langID="1046" value="Tamanho do maior arquivo"/>
           <tranEntry langID="1058" value="Розмір найбільшого файлу"/>
         </tranEntries>
@@ -134,7 +134,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер самого маленького файла"/>
           <tranEntry langID="1033" value="Size of the smallest file"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e der kleinsten Datei"/>
+          <tranEntry langID="1031" value="GrцЯe der kleinsten Datei"/>
           <tranEntry langID="1046" value="Tamanho do menor arquivo"/>
           <tranEntry langID="1058" value="Розмір найменьшого файлу"/>
         </tranEntries>
@@ -161,7 +161,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Total picture files size"/>
           <tranEntry langID="1049" value="Суммарный размер файлов изображений"/>
-          <tranEntry langID="1031" value="Gesamtgr&#246;&#223;e aller Bilder"/>
+          <tranEntry langID="1031" value="GesamtgrцЯe aller Bilder"/>
           <tranEntry langID="1046" value="Tamanho total dos arquivos"/>
           <tranEntry langID="1058" value="Сумарний розмір файлів зображень"/>
         </tranEntries>
@@ -170,7 +170,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Суммарный размер эскизов"/>
           <tranEntry langID="1033" value="Total thumbnails size"/>
-          <tranEntry langID="1031" value="Gesamtgr&#246;&#223;e aller Thumbnails"/>
+          <tranEntry langID="1031" value="GesamtgrцЯe aller Thumbnails"/>
           <tranEntry langID="1046" value="Tamanho total das miniaturas"/>
           <tranEntry langID="1058" value="Сумарний розмір ескізів"/>
         </tranEntries>

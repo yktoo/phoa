@@ -244,7 +244,7 @@
                 <tranEntries>
                   <tranEntry langID="1049" value="&amp;Óäàëèòü"/>
                   <tranEntry langID="1033" value="&amp;Delete"/>
-                  <tranEntry langID="1031" value="&amp;L&#246;schen"/>
+                  <tranEntry langID="1031" value="&amp;Löschen"/>
                   <tranEntry langID="1046" value="&amp;Excluir"/>
                   <tranEntry langID="1058" value="&amp;Âèäàëèòè"/>
                 </tranEntries>
@@ -420,7 +420,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Óäàëèòü"/>
               <tranEntry langID="1033" value="&amp;Delete"/>
-              <tranEntry langID="1031" value="&amp;L&#246;schen"/>
+              <tranEntry langID="1031" value="&amp;Löschen"/>
               <tranEntry langID="1046" value="&amp;Excluir"/>
               <tranEntry langID="1058" value="&amp;Âèäàëèòè"/>
             </tranEntries>

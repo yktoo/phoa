@@ -25,7 +25,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Delete files to the Rec&amp;ycle Bin"/>
               <tranEntry langID="1049" value="&amp;Óäàëÿòü ôàéëû â Êîðçèíó"/>
-              <tranEntry langID="1031" value="Dateien in den Papierkorb l&amp;&#246;schen"/>
+              <tranEntry langID="1031" value="Dateien in den Papierkorb l&amp;öschen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

@@ -47,7 +47,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Çàêðûòü"/>
               <tranEntry langID="1033" value="Close"/>
-              <tranEntry langID="1031" value="Schlie&#223;en"/>
+              <tranEntry langID="1031" value="Schließen"/>
               <tranEntry langID="1046" value="Fechar"/>
               <tranEntry langID="1058" value="Çàêðèòè"/>
             </tranEntries>
@@ -212,7 +212,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Êëþ÷åâûå\nñëîâà"/>
               <tranEntry langID="1033" value="Keywords"/>
-              <tranEntry langID="1031" value="Schl&#252;sselw&#246;rter"/>
+              <tranEntry langID="1031" value="Schlüsselwörter"/>
               <tranEntry langID="1046" value="Palavras-\nchave"/>
               <tranEntry langID="1058" value="Êëþ÷îâ³\nñëîâà"/>
             </tranEntries>

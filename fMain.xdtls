@@ -107,7 +107,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Изменён"/>
           <tranEntry langID="1033" value="Modified"/>
-          <tranEntry langID="1031" value="Ge&#228;ndert"/>
+          <tranEntry langID="1031" value="Geдndert"/>
           <tranEntry langID="1046" value="Modificado"/>
           <tranEntry langID="1058" value="Змінено"/>
         </tranEntries>
@@ -116,7 +116,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Только для чтения"/>
           <tranEntry langID="1033" value="Read only"/>
-          <tranEntry langID="1031" value="Schreibgesch&#252;tzt"/>
+          <tranEntry langID="1031" value="Schreibgeschьtzt"/>
           <tranEntry langID="1046" value="Somente leitura"/>
           <tranEntry langID="1058" value="Тільки для читання"/>
         </tranEntries>
@@ -125,7 +125,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер"/>
           <tranEntry langID="1033" value="Size"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e"/>
+          <tranEntry langID="1031" value="GrцЯe"/>
           <tranEntry langID="1046" value="Tamanho"/>
           <tranEntry langID="1058" value="Розмір"/>
         </tranEntries>
@@ -134,7 +134,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Занимаемое место на диске"/>
           <tranEntry langID="1033" value="Size on disk"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e auf Datentr&#228;ger"/>
+          <tranEntry langID="1031" value="GrцЯe auf Datentrдger"/>
           <tranEntry langID="1046" value="Tamanho em disco"/>
           <tranEntry langID="1058" value="Займане місце на диску"/>
         </tranEntries>
@@ -152,7 +152,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Временный"/>
           <tranEntry langID="1033" value="Temporary"/>
-          <tranEntry langID="1031" value="Termpor&#228;r"/>
+          <tranEntry langID="1031" value="Termporдr"/>
           <tranEntry langID="1046" value="Temporбrio"/>
           <tranEntry langID="1058" value="Тимчасовий"/>
         </tranEntries>
@@ -242,7 +242,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Дата/время изменения файла"/>
           <tranEntry langID="1033" value="Date/time file modified"/>
-          <tranEntry langID="1031" value="&#196;nderungsdatum/-zeit"/>
+          <tranEntry langID="1031" value="Дnderungsdatum/-zeit"/>
           <tranEntry langID="1046" value="Dia/hora de modificaзгo"/>
           <tranEntry langID="1058" value="Дата/час зміни файлу"/>
         </tranEntries>
@@ -323,7 +323,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Значение взято из времени изменения файла"/>
           <tranEntry langID="1033" value="Value extracted from file modification time"/>
-          <tranEntry langID="1031" value="Wert aus ?nderungszeit ausgelesen"/>
+          <tranEntry langID="1031" value="Wert aus Ьnderungszeit ausgelesen"/>
           <tranEntry langID="1046" value="Valor extraнdo da hora de modificaзгo do arquivo"/>
           <tranEntry langID="1058" value="Значення узяте з часу зміни файлу"/>
         </tranEntries>
@@ -395,7 +395,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="По ключевым словам"/>
           <tranEntry langID="1033" value="By keywords"/>
-          <tranEntry langID="1031" value="Nach Schl&#252;sselw&#246;rtern"/>
+          <tranEntry langID="1031" value="Nach Schlьsselwцrtern"/>
           <tranEntry langID="1046" value="Por palavra-chave"/>
           <tranEntry langID="1058" value="По ключових словах"/>
         </tranEntries>
@@ -478,7 +478,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Невозможно открыть файл"/>
           <tranEntry langID="1033" value="Unable to open file"/>
-          <tranEntry langID="1031" value="Kann Datei nicht &#246;ffnen"/>
+          <tranEntry langID="1031" value="Kann Datei nicht цffnen"/>
           <tranEntry langID="1046" value="Arquivo nгo pode ser aberto"/>
           <tranEntry langID="1058" value="Неможливо відкрити файл"/>
         </tranEntries>
@@ -505,7 +505,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Заголовок TIFF (внутри EXIF-заголовка) неверен или отсутствует"/>
           <tranEntry langID="1033" value="TIFF header (inside EXIF header) invalid or missing"/>
-          <tranEntry langID="1031" value="TIFF-Header (im EXIF-Header) ung&#252;ltig oder nicht vorhanden"/>
+          <tranEntry langID="1031" value="TIFF-Header (im EXIF-Header) ungьltig oder nicht vorhanden"/>
           <tranEntry langID="1046" value="Cabeзalho do TIFF (dentro do cabeзalho do EXIF) invбlido ou nгo encontrado"/>
           <tranEntry langID="1058" value="Заголовок TIFF (усередині EXIF-заголовка) невірний або відсутній"/>
         </tranEntries>
@@ -550,7 +550,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="больше"/>
           <tranEntry langID="1033" value="is greater than"/>
-          <tranEntry langID="1031" value="ist gr&#246;&#223;er als"/>
+          <tranEntry langID="1031" value="ist grцЯer als"/>
           <tranEntry langID="1046" value="maior que"/>
           <tranEntry langID="1058" value="більше"/>
         </tranEntries>
@@ -559,7 +559,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="больше или равно"/>
           <tranEntry langID="1033" value="is greater than or equal to"/>
-          <tranEntry langID="1031" value="ist gr&#246;&#223;er oder gleich"/>
+          <tranEntry langID="1031" value="ist grцЯer oder gleich"/>
           <tranEntry langID="1046" value="maior ou igual a"/>
           <tranEntry langID="1058" value="більше або дорівнює"/>
         </tranEntries>
@@ -653,7 +653,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Макс. количество операций в буфере отмены:"/>
           <tranEntry langID="1033" value="Max. undo count"/>
-          <tranEntry langID="1031" value="Max. m&#246;gliche Schritte f&#252;r &quot;R&#252;ckg&#228;ngig&quot;"/>
+          <tranEntry langID="1031" value="Max. mцgliche Schritte fьr &quot;Rьckgдngig&quot;"/>
           <tranEntry langID="1046" value="Nнvel mбx. de desfazer"/>
           <tranEntry langID="1058" value="Макс. кількість операцій у буфері відміни:"/>
         </tranEntries>
@@ -680,7 +680,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер кэша эскизов (количество эскизов):"/>
           <tranEntry langID="1033" value="Thumbnail cache size (number of thumbnails):"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e des Thumbnail Zwischenspeichers (Thumbnailanzahl):"/>
+          <tranEntry langID="1031" value="GrцЯe des Thumbnail Zwischenspeichers (Thumbnailanzahl):"/>
           <tranEntry langID="1046" value="Memуria &quot;cache&quot; de miniaturas (nъmero de miniaturas):"/>
           <tranEntry langID="1058" value="Розмір кеша ескізів (кількість ескізів)"/>
         </tranEntries>
@@ -813,7 +813,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Мастер добавления изображений"/>
           <tranEntry langID="1033" value="Add pictures Wizard"/>
-          <tranEntry langID="1031" value="Bilder hinzuf&#252;gen Assistent"/>
+          <tranEntry langID="1031" value="Bilder hinzufьgen Assistent"/>
           <tranEntry langID="1046" value="Assistente adicionar imagens"/>
           <tranEntry langID="1058" value="Майстер додавання зображень"/>
         </tranEntries>
@@ -822,7 +822,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Автозаполнение даты изображения из (в порядке предпочтения):"/>
           <tranEntry langID="1033" value="Automatically fill picture date from (in the order of preference):"/>
-          <tranEntry langID="1031" value="Bilddatum automatisch &#252;bernehmen von (in der gew&#252;nschten Reihenfolge):"/>
+          <tranEntry langID="1031" value="Bilddatum automatisch ьbernehmen von (in der gewьnschten Reihenfolge):"/>
           <tranEntry langID="1046" value="Obter data da imagem automaticamente de (na ordem de preferкncia):"/>
           <tranEntry langID="1058" value="Автозаповнення дати зображення з (у порядку переваги):"/>
         </tranEntries>
@@ -831,7 +831,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Автозаполнение времени изображения из (в порядке предпочтения):"/>
           <tranEntry langID="1033" value="Automatically fill picture time from (in the order of preference):"/>
-          <tranEntry langID="1031" value="Bildzeit automatisch &#252;bernehmen von (in der gew&#252;nschten Reihenfolge):"/>
+          <tranEntry langID="1031" value="Bildzeit automatisch ьbernehmen von (in der gewьnschten Reihenfolge):"/>
           <tranEntry langID="1046" value="Obter hora da imagem automaticamente de (na ordem de preferкncia):"/>
           <tranEntry langID="1058" value="Автозаповнення часу зображення з (у порядку переваги):"/>
         </tranEntries>
@@ -840,7 +840,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Автозаполнение преобразований изображения из метаданных"/>
           <tranEntry langID="1033" value="Automatically fill picture transformations from metadata"/>
-          <tranEntry langID="1031" value="Bildtransformation automatisch von Metadaten &#252;bernehmen"/>
+          <tranEntry langID="1031" value="Bildtransformation automatisch von Metadaten ьbernehmen"/>
           <tranEntry langID="1046" value="Automatically fill picture transformations from metadata"/>
         </tranEntries>
       </propEntry>
@@ -857,7 +857,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Переписывать дату, если она уже указана"/>
           <tranEntry langID="1033" value="Overwrite date if already specified"/>
-          <tranEntry langID="1031" value="Datum, falls bereits angegeben, &#252;berschreiben"/>
+          <tranEntry langID="1031" value="Datum, falls bereits angegeben, ьberschreiben"/>
           <tranEntry langID="1046" value="Sobrescrever data se jб especificada"/>
           <tranEntry langID="1058" value="Переписувати дату, якщо вона вже зазначена"/>
         </tranEntries>
@@ -866,7 +866,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Переписывать время, если оно уже указано"/>
           <tranEntry langID="1033" value="Overwrite time if already specified"/>
-          <tranEntry langID="1031" value="Zeit, falls bereits angegeben, &#252;berschreiben"/>
+          <tranEntry langID="1031" value="Zeit, falls bereits angegeben, ьberschreiben"/>
           <tranEntry langID="1046" value="Sobrescrever hora se jб especificada"/>
           <tranEntry langID="1058" value="Переписувати час, якщо воно вже зазначено"/>
         </tranEntries>
@@ -883,7 +883,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Пропускать страницу отметки файлов"/>
           <tranEntry langID="1033" value="Always skip 'Check files' page"/>
-          <tranEntry langID="1031" value="'Dateien ausw&#228;hlen' Seite immer &#252;berspringen"/>
+          <tranEntry langID="1031" value="'Dateien auswдhlen' Seite immer ьberspringen"/>
           <tranEntry langID="1046" value="Sempre pular pбgina &quot;marcar arquivos&quot;"/>
           <tranEntry langID="1058" value="Пропускати сторінку позначкі файлів"/>
         </tranEntries>
@@ -892,7 +892,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перед выходом (при сохранённом фотоальбоме)"/>
           <tranEntry langID="1033" value="Before exit (when photo album is not modified)"/>
-          <tranEntry langID="1031" value="Vor dem Beenden (wenn das Fotoalbum nicht ver&#228;ndert wurde)"/>
+          <tranEntry langID="1031" value="Vor dem Beenden (wenn das Fotoalbum nicht verдndert wurde)"/>
           <tranEntry langID="1046" value="Antes de sair (quando бlbum nгo for modificado)"/>
           <tranEntry langID="1058" value="Перед виходом (при збереженному фотоальбомі)"/>
         </tranEntries>
@@ -901,7 +901,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перед удалением группы"/>
           <tranEntry langID="1033" value="Before group deletion"/>
-          <tranEntry langID="1031" value="Vor dem L&#246;schen von Gruppen"/>
+          <tranEntry langID="1031" value="Vor dem Lцschen von Gruppen"/>
           <tranEntry langID="1046" value="Antes de excluir grupo"/>
           <tranEntry langID="1058" value="Перед видаленням групи"/>
         </tranEntries>
@@ -910,7 +910,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перед удалением изображений"/>
           <tranEntry langID="1033" value="Before picture deletion"/>
-          <tranEntry langID="1031" value="Vor dem L&#246;schen von Bildern"/>
+          <tranEntry langID="1031" value="Vor dem Lцschen von Bildern"/>
           <tranEntry langID="1046" value="Antes de excluir imagem"/>
           <tranEntry langID="1058" value="Перед видаленням зображень"/>
         </tranEntries>
@@ -919,7 +919,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перед удалением представления"/>
           <tranEntry langID="1033" value="Before view deletion"/>
-          <tranEntry langID="1031" value="Vor dem L&#246;schen von Ansichten"/>
+          <tranEntry langID="1031" value="Vor dem Lцschen von Ansichten"/>
           <tranEntry langID="1046" value="Antes de excluir imagem visualizada"/>
           <tranEntry langID="1058" value="Перед видаленням представлення"/>
         </tranEntries>
@@ -928,7 +928,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перед сохранением файла устаревшей версии"/>
           <tranEntry langID="1033" value="Before saving file of an older version"/>
-          <tranEntry langID="1031" value="Vor dem Speichern von Dateien &#228;lterer Versionen"/>
+          <tranEntry langID="1031" value="Vor dem Speichern von Dateien дlterer Versionen"/>
           <tranEntry langID="1046" value="Antes de salvar arquivo de versгo anterior"/>
           <tranEntry langID="1058" value="Перед збереженням файлу застарілої версіі"/>
         </tranEntries>
@@ -937,7 +937,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждения"/>
           <tranEntry langID="1033" value="Confirmations"/>
-          <tranEntry langID="1031" value="Best&#228;tigungen"/>
+          <tranEntry langID="1031" value="Bestдtigungen"/>
           <tranEntry langID="1046" value="Confirmaзхes"/>
           <tranEntry langID="1058" value="Підтвердження"/>
         </tranEntries>
@@ -954,7 +954,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждение для операции копирования файлов"/>
           <tranEntry langID="1033" value="Confirm Copy files operation"/>
-          <tranEntry langID="1031" value="Kopieren von Dateien best&#228;tigen"/>
+          <tranEntry langID="1031" value="Kopieren von Dateien bestдtigen"/>
           <tranEntry langID="1046" value="Confirm Copy files operation"/>
         </tranEntries>
       </propEntry>
@@ -962,7 +962,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждение для операции удаления файлов"/>
           <tranEntry langID="1033" value="Confirm Delete files operation"/>
-          <tranEntry langID="1031" value="L&#246;schen von Dateien best&#228;tigen"/>
+          <tranEntry langID="1031" value="Lцschen von Dateien bestдtigen"/>
           <tranEntry langID="1046" value="Confirm Delete files operation"/>
         </tranEntries>
       </propEntry>
@@ -970,7 +970,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждение для операции перемещения файлов"/>
           <tranEntry langID="1033" value="Confirm Move files operation"/>
-          <tranEntry langID="1031" value="Verschieben von Dateien best&#228;tigen"/>
+          <tranEntry langID="1031" value="Verschieben von Dateien bestдtigen"/>
           <tranEntry langID="1046" value="Confirm Move files operation"/>
         </tranEntries>
       </propEntry>
@@ -978,7 +978,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждение для операции перестройки эскизов"/>
           <tranEntry langID="1033" value="Confirm Rebuild thumbnails operation"/>
-          <tranEntry langID="1031" value="Wiederherstellen von Thumbnails best&#228;tigen"/>
+          <tranEntry langID="1031" value="Wiederherstellen von Thumbnails bestдtigen"/>
           <tranEntry langID="1046" value="Confirm Rebuild thumbnails operation"/>
         </tranEntries>
       </propEntry>
@@ -986,7 +986,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подтверждение для операции востановления ссылок на файлы"/>
           <tranEntry langID="1033" value="Confirm Repair file links operation"/>
-          <tranEntry langID="1031" value="Dateiverkn&#252;pfungen reparieren best&#228;tigen"/>
+          <tranEntry langID="1031" value="Dateiverknьpfungen reparieren bestдtigen"/>
           <tranEntry langID="1046" value="Confirm Repair file links operation"/>
         </tranEntries>
       </propEntry>
@@ -1065,7 +1065,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Анимированное скрытие диалога «О программе» (Windows 2000+)"/>
           <tranEntry langID="1033" value="Animate About dialog fadeout (Windows 2000+)"/>
-          <tranEntry langID="1031" value="&#220;ber-Dialog Fadeout animieren (Windows 2000+)"/>
+          <tranEntry langID="1031" value="Ьber-Dialog Fadeout animieren (Windows 2000+)"/>
           <tranEntry langID="1046" value="Animate About dialog fadeout (Windows 2000+)"/>
         </tranEntries>
       </propEntry>
@@ -1114,7 +1114,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Интерфейс"/>
           <tranEntry langID="1033" value="User interface"/>
-          <tranEntry langID="1031" value="Benutzeroberfl&#228;che"/>
+          <tranEntry langID="1031" value="Benutzeroberflдche"/>
           <tranEntry langID="1046" value="Interface do usuбrio"/>
           <tranEntry langID="1058" value="Інтерфейс"/>
         </tranEntries>
@@ -1123,7 +1123,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Язык интерфейса"/>
           <tranEntry langID="1033" value="Interface language"/>
-          <tranEntry langID="1031" value="Sprache der Benutzeroberfl&#228;che"/>
+          <tranEntry langID="1031" value="Sprache der Benutzeroberflдche"/>
           <tranEntry langID="1046" value="Idioma"/>
           <tranEntry langID="1058" value="Мова інтерфейсу"/>
         </tranEntries>
@@ -1149,7 +1149,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Длина списка последних открывавшихся файлов:"/>
           <tranEntry langID="1033" value="Recent open files list count:"/>
-          <tranEntry langID="1031" value="Anzahl der zuletzt ge&#246;ffneten Dateien:"/>
+          <tranEntry langID="1031" value="Anzahl der zuletzt geцffneten Dateien:"/>
           <tranEntry langID="1046" value="Nъmero de arquivos recentes abertos:"/>
           <tranEntry langID="1058" value="Довжина списку останніх файлів, що відкривалися"/>
         </tranEntries>
@@ -1184,7 +1184,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Большие (32x32)"/>
           <tranEntry langID="1033" value="Large (32x32)"/>
-          <tranEntry langID="1031" value="Gro&#223; (32x32)"/>
+          <tranEntry langID="1031" value="GroЯ (32x32)"/>
           <tranEntry langID="1046" value="Grande (32x32)"/>
           <tranEntry langID="1058" value="Великі (32x32)"/>
         </tranEntries>
@@ -1193,7 +1193,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер кнопок основной панели"/>
           <tranEntry langID="1033" value="Main toolbar button size"/>
-          <tranEntry langID="1031" value="Gr&#246;&#223;e der Schaltfl&#228;chen in der Symbolleiste"/>
+          <tranEntry langID="1031" value="GrцЯe der Schaltflдchen in der Symbolleiste"/>
           <tranEntry langID="1046" value="Botхes da barra de ferramentas principal"/>
           <tranEntry langID="1058" value="Розмір кнопок основноЇ панелі"/>
         </tranEntries>
@@ -1211,7 +1211,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="В доках и вне доков"/>
           <tranEntry langID="1033" value="Inside and outside the docks (floating)"/>
-          <tranEntry langID="1031" value="Innerhalb und au&#223;erhalb des Docks"/>
+          <tranEntry langID="1031" value="Innerhalb und auЯerhalb des Docks"/>
           <tranEntry langID="1046" value="Dentro e fora da moldura (flutuante)"/>
           <tranEntry langID="1058" value="У доках і поза доками"/>
         </tranEntries>
@@ -1265,7 +1265,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Деревья/списки"/>
           <tranEntry langID="1033" value="Trees/lists"/>
-          <tranEntry langID="1031" value="B&#228;ume/Listen"/>
+          <tranEntry langID="1031" value="Bдume/Listen"/>
           <tranEntry langID="1046" value="Бrvores/Listas"/>
           <tranEntry langID="1058" value="Дерева/списки"/>
         </tranEntries>
@@ -1346,7 +1346,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Оттенённый прямоугольник"/>
           <tranEntry langID="1033" value="Blended rectangle"/>
-          <tranEntry langID="1031" value="Gef&#252;lltes Rechteck"/>
+          <tranEntry langID="1031" value="Gefьlltes Rechteck"/>
           <tranEntry langID="1046" value="Retвngulo"/>
           <tranEntry langID="1058" value="Відтінений прямокутник"/>
         </tranEntries>
@@ -1453,7 +1453,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Подгонять размер окна под размер изображения"/>
           <tranEntry langID="1033" value="Fit window to picture size"/>
-          <tranEntry langID="1031" value="Fenster an Bildgr&#246;&#223;e anpassen"/>
+          <tranEntry langID="1031" value="Fenster an BildgrцЯe anpassen"/>
           <tranEntry langID="1046" value="Ajustar janela а imagem"/>
           <tranEntry langID="1058" value="Підгоняти розмір вікна під розмір зображення"/>
         </tranEntries>
@@ -1498,7 +1498,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Непрозрачность фона (0-255):"/>
           <tranEntry langID="1033" value="Background opacity (0-255):"/>
-          <tranEntry langID="1031" value="Hintergrund Deckf&#228;higkeit (0-255):"/>
+          <tranEntry langID="1031" value="Hintergrund Deckfдhigkeit (0-255):"/>
           <tranEntry langID="1046" value="Opacidade de fundo (0-255):"/>
           <tranEntry langID="1058" value="Непрозорість тла (0-255):"/>
         </tranEntries>
@@ -1525,7 +1525,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удерживать курсор мыши над кнопкой панели инструментов"/>
           <tranEntry langID="1033" value="Keep mouse cursor over the toolbar button on window resize"/>
-          <tranEntry langID="1031" value="Mauszeiger beim ver&#228;ndern der Fenstergr&#246;&#223;e &#252;ber der Symbolleiste behalten."/>
+          <tranEntry langID="1031" value="Mauszeiger beim verдndern der FenstergrцЯe ьber der Symbolleiste behalten."/>
           <tranEntry langID="1046" value="Keep mouse cursor over the toolbar button on window resize"/>
         </tranEntries>
       </propEntry>
@@ -1551,7 +1551,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Предекодировать следующее изображение"/>
           <tranEntry langID="1033" value="Predecode next picture in advance"/>
-          <tranEntry langID="1031" value="N&#228;chstes Bild im Voraus einlesen"/>
+          <tranEntry langID="1031" value="Nдchstes Bild im Voraus einlesen"/>
           <tranEntry langID="1046" value="Predecodificar prуxima imagem antes"/>
           <tranEntry langID="1058" value="Предекодувати наступне зображення"/>
         </tranEntries>
@@ -1577,7 +1577,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Сжимать изображение до размера окна"/>
           <tranEntry langID="1033" value="Shrink picture to fit window"/>
-          <tranEntry langID="1031" value="Bildgr&#246;&#223;e an Fenster anpassen"/>
+          <tranEntry langID="1031" value="BildgrцЯe an Fenster anpassen"/>
           <tranEntry langID="1046" value="Reduzir imagem para ajuste na janela"/>
           <tranEntry langID="1058" value="Стискати зображення до розмиру вікна"/>
         </tranEntries>
@@ -1631,7 +1631,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Растягивать изображение до размера окна"/>
           <tranEntry langID="1033" value="Zoom picture to fit window"/>
-          <tranEntry langID="1031" value="Bild auf Fenstergr&#246;&#223;e zoomen"/>
+          <tranEntry langID="1031" value="Bild auf FenstergrцЯe zoomen"/>
           <tranEntry langID="1046" value="Ampliar imagem para juste na janela"/>
           <tranEntry langID="1058" value="Растягивать изображение до размера окна"/>
         </tranEntries>
@@ -1727,7 +1727,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Эскиз (в случае единственного изображения)"/>
           <tranEntry langID="1033" value="Thumbnail bitmap (when single picture selected)"/>
-          <tranEntry langID="1031" value="Thumbnail Bitmap (wenn einzelnes Bild ausgew&#228;hlt)"/>
+          <tranEntry langID="1031" value="Thumbnail Bitmap (wenn einzelnes Bild ausgewдhlt)"/>
           <tranEntry langID="1046" value="Thumbnail bitmap (when single picture selected)"/>
         </tranEntries>
       </propEntry>
@@ -1807,7 +1807,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Определяется устройством"/>
           <tranEntry langID="1033" value="Device dependent"/>
-          <tranEntry langID="1031" value="Ger&#228;teunabh&#228;ngig"/>
+          <tranEntry langID="1031" value="Gerдteunabhдngig"/>
           <tranEntry langID="1046" value="Depende do dispositivo"/>
           <tranEntry langID="1058" value="Визначаєтся пристроєм"/>
         </tranEntries>
@@ -1877,7 +1877,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер файла изображения"/>
           <tranEntry langID="1033" value="Picture file size"/>
-          <tranEntry langID="1031" value="Dateigr&#246;&#223;e"/>
+          <tranEntry langID="1031" value="DateigrцЯe"/>
           <tranEntry langID="1046" value="Tamanho do arquivo"/>
           <tranEntry langID="1058" value="Розмір файлу зображення"/>
         </tranEntries>
@@ -1886,7 +1886,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Размер файла в байтах"/>
           <tranEntry langID="1033" value="Picture file size in bytes"/>
-          <tranEntry langID="1031" value="Dateigr&#246;&#223;e in Bytes"/>
+          <tranEntry langID="1031" value="DateigrцЯe in Bytes"/>
           <tranEntry langID="1046" value="Tamanho do arquivo em bytes"/>
           <tranEntry langID="1058" value="Розмір файлу в байтах"/>
         </tranEntries>
@@ -1948,7 +1948,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ключевые слова"/>
           <tranEntry langID="1033" value="Keywords"/>
-          <tranEntry langID="1031" value="Schl&#252;sselw&#246;rter"/>
+          <tranEntry langID="1031" value="Schlьsselwцrter"/>
           <tranEntry langID="1046" value="Palavras-chave"/>
           <tranEntry langID="1058" value="Ключові слова"/>
         </tranEntries>
@@ -1984,7 +1984,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Высота изображения"/>
           <tranEntry langID="1033" value="Picture height"/>
-          <tranEntry langID="1031" value="H&#246;he"/>
+          <tranEntry langID="1031" value="Hцhe"/>
           <tranEntry langID="1046" value="Altura da imagem"/>
           <tranEntry langID="1058" value="Висота зображення"/>
         </tranEntries>
@@ -2052,7 +2052,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Стандартное действие «Открыть»"/>
           <tranEntry langID="1033" value="Standard Open action"/>
-          <tranEntry langID="1031" value="Standard &#214;ffnen Aktion"/>
+          <tranEntry langID="1031" value="Standard Цffnen Aktion"/>
           <tranEntry langID="1046" value="Standard Open action"/>
         </tranEntries>
       </propEntry>
@@ -2076,7 +2076,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="&amp;Удалить"/>
           <tranEntry langID="1033" value="&amp;Delete"/>
-          <tranEntry langID="1031" value="&amp;L&#246;schen"/>
+          <tranEntry langID="1031" value="&amp;Lцschen"/>
           <tranEntry langID="1046" value="&amp;Excluir"/>
           <tranEntry langID="1058" value="&amp;Видалити"/>
         </tranEntries>
@@ -2121,7 +2121,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="О&amp;ткрыть"/>
           <tranEntry langID="1033" value="&amp;Open"/>
-          <tranEntry langID="1031" value="&amp;&#214;ffnen"/>
+          <tranEntry langID="1031" value="&amp;Цffnen"/>
           <tranEntry langID="1046" value="&amp;Abrir"/>
           <tranEntry langID="1058" value="В&amp;iдкрити"/>
         </tranEntries>
@@ -2138,7 +2138,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Открыть|Открыть выделенные изображения"/>
           <tranEntry langID="1033" value="Open|Open the selected pictures"/>
-          <tranEntry langID="1031" value="&#214;ffnen|&#214;ffnet die ausgew&#228;hlten Bilder"/>
+          <tranEntry langID="1031" value="Цffnen|Цffnet die ausgewдhlten Bilder"/>
           <tranEntry langID="1046" value="Open|Open the selected pictures"/>
         </tranEntries>
       </propEntry>
@@ -2146,7 +2146,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Печать|Напечатать выделенные изображения"/>
           <tranEntry langID="1033" value="Print|Print the selected pictures"/>
-          <tranEntry langID="1031" value="Drucken|Druckt die ausgew&#228;hlten Bilder"/>
+          <tranEntry langID="1031" value="Drucken|Druckt die ausgewдhlten Bilder"/>
           <tranEntry langID="1046" value="Print|Print the selected pictures"/>
         </tranEntries>
       </propEntry>
@@ -2181,7 +2181,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Close"/>
           <tranEntry langID="1049" value="Закрыть"/>
-          <tranEntry langID="1031" value="Schlie&#223;en"/>
+          <tranEntry langID="1031" value="SchlieЯen"/>
           <tranEntry langID="1046" value="Fechar"/>
           <tranEntry langID="1058" value="Закрити"/>
         </tranEntries>
@@ -2271,7 +2271,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="(нельзя отменить)"/>
           <tranEntry langID="1033" value="(cannot undo)"/>
-          <tranEntry langID="1031" value="(R&#252;ckg&#228;ngig machen nicht m&#246;glich)"/>
+          <tranEntry langID="1031" value="(Rьckgдngig machen nicht mцglich)"/>
           <tranEntry langID="1046" value="(sem desfazer)"/>
           <tranEntry langID="1058" value="(не можна відмінити)"/>
         </tranEntries>
@@ -2289,7 +2289,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удалить выбранную группу?"/>
           <tranEntry langID="1033" value="Delete selected group?"/>
-          <tranEntry langID="1031" value="Die ausgew&#228;hlte Gruppe l?schen?"/>
+          <tranEntry langID="1031" value="Die ausgewдhlte Gruppe l?schen?"/>
           <tranEntry langID="1046" value="Excluir grupo selecionado?"/>
           <tranEntry langID="1058" value="Видалити обрану групу?"/>
         </tranEntries>
@@ -2298,7 +2298,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удалить выделенные изображения?"/>
           <tranEntry langID="1033" value="Delete selected pictures?"/>
-          <tranEntry langID="1031" value="Die ausgew&#228;hlten Bilder l&#246;schen?"/>
+          <tranEntry langID="1031" value="Die ausgewдhlten Bilder lцschen?"/>
           <tranEntry langID="1046" value="Excluir imagem selecionada?"/>
           <tranEntry langID="1058" value="Видалити виділені зображення?"/>
         </tranEntries>
@@ -2307,7 +2307,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удалить текущее представление?"/>
           <tranEntry langID="1033" value="Delete current view?"/>
-          <tranEntry langID="1031" value="Die aktuelle Ansicht l&#246;schen?"/>
+          <tranEntry langID="1031" value="Die aktuelle Ansicht lцschen?"/>
           <tranEntry langID="1046" value="Excluir imagem visualizada?"/>
           <tranEntry langID="1058" value="Видалити поточне представлення?"/>
         </tranEntries>
@@ -2316,7 +2316,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Photo album file &quot;%s&quot; is not saved. Do you wish to save changes?"/>
           <tranEntry langID="1049" value="Файл фотоальбома &quot;%s&quot; не сохранён. Сохранить изменения?"/>
-          <tranEntry langID="1031" value="Die Datei &quot;%s&quot; wurde nicht gespeichert. M&#246;chten Sie die &#196;nderungen sichern?"/>
+          <tranEntry langID="1031" value="Die Datei &quot;%s&quot; wurde nicht gespeichert. Mцchten Sie die Дnderungen sichern?"/>
           <tranEntry langID="1046" value="Arquivo do бlbum &quot;%s&quot; nгo foi salvo. Deseja salvar modificaзхes?"/>
           <tranEntry langID="1058" value="Файл фотоальбому &quot;%s&quot; не збережений. Зберегти зміни?"/>
         </tranEntries>
@@ -2325,7 +2325,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Перезаписать файл &quot;%s&quot;?"/>
           <tranEntry langID="1033" value="Overwrite the file &quot;%s&quot;?"/>
-          <tranEntry langID="1031" value="Die Datei &quot;%s&quot; &#252;berschreiben?"/>
+          <tranEntry langID="1031" value="Die Datei &quot;%s&quot; ьberschreiben?"/>
           <tranEntry langID="1046" value="Overwrite the file &quot;%s&quot;?"/>
           <tranEntry langID="1058" value="Перезаписать файл &quot;%s&quot;?"/>
         </tranEntries>
@@ -2334,7 +2334,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Вы действительно хотите выполнить выбранную операцию?\n\nВНИМАНИЕ! Результаты этой операции не могут быть впоследствии отменены!"/>
           <tranEntry langID="1033" value="Are you sure you want to proceed with the chosen operation?\n\nWARNING! You won't be able to undo this operation!"/>
-          <tranEntry langID="1031" value="Sind Sie sicher, dass Sie den Vorgang fortsetzen m&#246;chten?\n\nWARNUNG! Sie k&#246;nnen diese Operation nicht mehr r&#252;ckg&#228;ngig machen!"/>
+          <tranEntry langID="1031" value="Sind Sie sicher, dass Sie den Vorgang fortsetzen mцchten?\n\nWARNUNG! Sie kцnnen diese Operation nicht mehr rьckgдngig machen!"/>
           <tranEntry langID="1046" value="Are you sure you want to proceed with the chosen operation?\n\nWARNING! You won't be able to undo this operation!"/>
         </tranEntries>
       </propEntry>
@@ -2342,7 +2342,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Warning!\nYou are saving the file format of a program version older than this. If you save the photo album into this file, you may lose some of your data due to the unsupported features of this format.\n  • To save the file in the up-to-date format click Cancel, then use File | Save as... menu item.\n  • To learn more about differences between formats of various PhoA versions please refer to the PhoA help system.\n\nDo you wish to continue?"/>
           <tranEntry langID="1049" value="Внимание!\nВы сохраняете файл формата более ранней версии PhoA, чем эта. При сохранении в этот файл Вы, возможно, потеряете некоторые введённые вами данные из-за того, что они не поддерживаются этим форматом.\n  • Чтобы сохранить файл наиболее современного формата, нажмите «Отмена» и воспользуйтесь командой меню Файл | Сохранить как...\n  • Чтобы узнать подробнее о различиях между форматами разных версий PhoA, обратитесь к справочной системе программы.\n\nПродолжить сохранение файла?"/>
-          <tranEntry langID="1031" value="Warnung!\nSie speichern im Format einer &#228;lteren Dateiversion. Wenn Sie das Fotoalbum in diese Datei speichern, k&#246;nnen Sie einige Ihrer Daten verlieren, die in diesem Format nicht unterst&#252;tzt werden.\n  • Klicken Sie auf Abbrechen um die Datei im aktuellen Format zu speichern, gehen Sie dann auf Datei | Speichern unter...\n  • Beachten Sie das PhoA Hilfssystem um mehr &#252;ber die Unterschiede zwischen den Formaten verschieder PhoA Versionen zu lernen.\n\nWollen Sie fortfahren?"/>
+          <tranEntry langID="1031" value="Warnung!\nSie speichern im Format einer дlteren Dateiversion. Wenn Sie das Fotoalbum in diese Datei speichern, kцnnen Sie einige Ihrer Daten verlieren, die in diesem Format nicht unterstьtzt werden.\n  • Klicken Sie auf Abbrechen um die Datei im aktuellen Format zu speichern, gehen Sie dann auf Datei | Speichern unter...\n  • Beachten Sie das PhoA Hilfssystem um mehr ьber die Unterschiede zwischen den Formaten verschieder PhoA Versionen zu lernen.\n\nWollen Sie fortfahren?"/>
           <tranEntry langID="1046" value="Alerta!\nVocк estб salvando num formato de arquivo de uma versгo anterior do programa.  Se vocк salvar o бlbum neste arquivo, vocк pode perder parte de seus dados devido аs caracterнsticas nгo suportadas pelo formato\n  • Para salvar o arquivo no formato da versгo atual tecle Cancelar e use a opзгo Arquivo|Salvar como... do menu.\n  • Para aprender mais sobre as diferenзas entre as vбrias versхes do PhoA consulte a Ajuda.\n\nDeseja continuar?"/>
           <tranEntry langID="1058" value="Увага!nВи зберігаєте файл формату більш ранньоі версіі PhoA, чим ця. При збереженні в цей файл Ви, можливо, втратите деякі введені Вами дані через те, що вони не підтримуються цим форматом.\n  • Щоб зберегти файл найбільш сучасного формату, натисніть «Відмінити» і скористайтеся командою Файл | Зберегти як...\n  • Щоб довідатися докладніше про розходження між форматами різних версій PhoA, зверніться до довідкової системи програми.\n\nПродовжити збереження файлу?"/>
         </tranEntries>
@@ -2360,7 +2360,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Новое ключевое слово"/>
           <tranEntry langID="1033" value="New keyword"/>
-          <tranEntry langID="1031" value="Neues Schl&#252;sselwort"/>
+          <tranEntry langID="1031" value="Neues Schlьsselwort"/>
           <tranEntry langID="1046" value="Nova palavra-chave"/>
           <tranEntry langID="1058" value="Нове ключове слово"/>
         </tranEntries>
@@ -2369,7 +2369,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="PhoA: Confirm"/>
           <tranEntry langID="1049" value="PhoA: Подтверждение"/>
-          <tranEntry langID="1031" value="PhoA: Best&#228;tigen"/>
+          <tranEntry langID="1031" value="PhoA: Bestдtigen"/>
           <tranEntry langID="1046" value="PhoA: Confirmar"/>
           <tranEntry langID="1058" value="PhoA: Підтвердження"/>
         </tranEntries>
@@ -2378,7 +2378,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="PhoA: Подтверждение"/>
           <tranEntry langID="1033" value="PhoA: Confirm"/>
-          <tranEntry langID="1031" value="PhoA: Best&#228;tigen"/>
+          <tranEntry langID="1031" value="PhoA: Bestдtigen"/>
           <tranEntry langID="1046" value="PhoA: Confirmar"/>
           <tranEntry langID="1058" value="PhoA: Підтвердження"/>
         </tranEntries>
@@ -2405,7 +2405,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Открыть файл настроек"/>
           <tranEntry langID="1033" value="Open settings file"/>
-          <tranEntry langID="1031" value="Konfigurationsdatei &#246;ffnen"/>
+          <tranEntry langID="1031" value="Konfigurationsdatei цffnen"/>
           <tranEntry langID="1046" value="Open settings file"/>
         </tranEntries>
       </propEntry>
@@ -2413,7 +2413,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Открыть файл фотоальбома"/>
           <tranEntry langID="1033" value="Open photo album file"/>
-          <tranEntry langID="1031" value="Fotoalbum &#246;ffnen"/>
+          <tranEntry langID="1031" value="Fotoalbum цffnen"/>
           <tranEntry langID="1046" value="Abrir Бlbum"/>
           <tranEntry langID="1058" value="Відкрити файл фотоальбому"/>
         </tranEntries>
@@ -2439,7 +2439,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выберите папку"/>
           <tranEntry langID="1033" value="Select a folder"/>
-          <tranEntry langID="1031" value="W&#228;hlen Sie einen Ordner"/>
+          <tranEntry langID="1031" value="Wдhlen Sie einen Ordner"/>
           <tranEntry langID="1046" value="Select a folder"/>
         </tranEntries>
       </propEntry>
@@ -2500,7 +2500,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Такое ключевое слово уже есть в списке"/>
           <tranEntry langID="1033" value="This keyword is already in the list"/>
-          <tranEntry langID="1031" value="Dieses Schl&#252;sselwort ist schon in der Liste"/>
+          <tranEntry langID="1031" value="Dieses Schlьsselwort ist schon in der Liste"/>
           <tranEntry langID="1046" value="Palavra-chave jб existente na lista"/>
           <tranEntry langID="1058" value="Таке ключове слово вже є в списку"/>
         </tranEntries>
@@ -2509,7 +2509,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ошибка выполнения инструмента &quot;%s&quot; для файла &quot;%s&quot;: %s"/>
           <tranEntry langID="1033" value="Error executing tool &quot;%s&quot; for file &quot;%s&quot;: %s"/>
-          <tranEntry langID="1031" value="Fehler beim Ausf&#252;hren des Tools &quot;%s&quot; f&#252;r die Datei &quot;%s&quot;: %s"/>
+          <tranEntry langID="1031" value="Fehler beim Ausfьhren des Tools &quot;%s&quot; fьr die Datei &quot;%s&quot;: %s"/>
           <tranEntry langID="1046" value="Error executing tool &quot;%s&quot; for file &quot;%s&quot;: %s"/>
         </tranEntries>
       </propEntry>
@@ -2535,7 +2535,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Файл фотоальбома создан версией программы новее, чем эта. Открытие файла невозможно."/>
           <tranEntry langID="1033" value="The photo album file is created by a program version higher than this. Unable to open the file."/>
-          <tranEntry langID="1031" value="Die Fotoalbum-Datei wurde von einer h&#246;heren Programmversion erstellt. Kann Datei nicht &#246;ffnen."/>
+          <tranEntry langID="1031" value="Die Fotoalbum-Datei wurde von einer hцheren Programmversion erstellt. Kann Datei nicht цffnen."/>
           <tranEntry langID="1046" value="Arquivo criado por programa de versгo superior a esta. O Бlbum nгo pode ser aberto."/>
           <tranEntry langID="1058" value="Файл фотоальбому створений версією програми більш новиї, чим ця. Відкриття файлу неможливо."/>
         </tranEntries>
@@ -2544,7 +2544,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Invalid picture file name: &quot;%s&quot;"/>
           <tranEntry langID="1049" value="Неверное имя файла изображения: &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Ung&#252;ltiger Dateiname: &quot;%s&quot;"/>
+          <tranEntry langID="1031" value="Ungьltiger Dateiname: &quot;%s&quot;"/>
           <tranEntry langID="1046" value="Nome de arquivo de imagem invбlido: &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Невірне им'я файлу зображення: &quot;%s&quot;"/>
         </tranEntries>
@@ -2553,7 +2553,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="%d из %d выбранных изображений не будут находиться ни в одной группе, что недопустимо. Необходимо, чтобы каждое изображение было связано как минимум с одной группой."/>
           <tranEntry langID="1033" value="%d of %d selected pictures won't be placed in a group, which is invalid. All pictures must be linked to at least one group."/>
-          <tranEntry langID="1031" value="%d von %d ausgew&#228;hlten Bildern werden in keine Gruppe aufgenommen, was ung&#252;ltig ist. Alle Bilder m&#252;ssen in mindestens einer Gruppe sein."/>
+          <tranEntry langID="1031" value="%d von %d ausgewдhlten Bildern werden in keine Gruppe aufgenommen, was ungьltig ist. Alle Bilder mьssen in mindestens einer Gruppe sein."/>
           <tranEntry langID="1046" value="%d of %d Imagens selecionadas nгo serгo colocadas em um grupo invбlido. Todas as imagens devem estar ligadas a pelo menos um grupo."/>
           <tranEntry langID="1058" value="%d з %d обраних зображень не будуть знаходитися в жодній групі, що неприпустимо.Необхідно, щоб кожне зображення було зв&quot;язано як мінімум з однією групою."/>
         </tranEntries>
@@ -2562,7 +2562,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Не удалось определить путь назначения для файла &quot;%s&quot;"/>
           <tranEntry langID="1033" value="No target path determined for file &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Kein Zielpfad f&#252;r Datei &quot;%s&quot; angegeben"/>
+          <tranEntry langID="1031" value="Kein Zielpfad fьr Datei &quot;%s&quot; angegeben"/>
           <tranEntry langID="1046" value="No target path determined for file &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Не удалось определить путь назначения для файла &quot;%s&quot;"/>
         </tranEntries>
@@ -2589,7 +2589,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Исходная папка и папка назначения совпадают (&quot;%s&quot;) для файла &quot;%s&quot;"/>
           <tranEntry langID="1033" value="Source and destination folders are the same (&quot;%s&quot;) for file &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Ursprungs- und Zielverzeichnis (&quot;%s&quot;) sind identisch f&#252;r die Datei &quot;%s&quot;"/>
+          <tranEntry langID="1031" value="Ursprungs- und Zielverzeichnis (&quot;%s&quot;) sind identisch fьr die Datei &quot;%s&quot;"/>
           <tranEntry langID="1046" value="Source and destination folders are the same (&quot;%s&quot;) for file &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Исходная папка и папка назначения совпадают (&quot;%s&quot;) для файла &quot;%s&quot;"/>
         </tranEntries>
@@ -2607,7 +2607,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Неизвестное расширение у файла изображения &quot;%s&quot;"/>
           <tranEntry langID="1033" value="Unknown picture file extension for &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Unbekannte Dateierweiterung f&#252;r &quot;%s&quot;"/>
+          <tranEntry langID="1031" value="Unbekannte Dateierweiterung fьr &quot;%s&quot;"/>
           <tranEntry langID="1046" value="Extensгo de arquivo de imagem desconhecido para &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Невідоме розширення у файлу зображення &quot;%s&quot;"/>
         </tranEntries>
@@ -2659,7 +2659,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ошибка при добавлении %s: %s"/>
           <tranEntry langID="1033" value="Adding %s failed: %s"/>
-          <tranEntry langID="1031" value="Hinzuf&#252;gen von %s gescheitert: %s"/>
+          <tranEntry langID="1031" value="Hinzufьgen von %s gescheitert: %s"/>
           <tranEntry langID="1046" value="Adcionar %s falhou: %s"/>
           <tranEntry langID="1058" value="Помилка при додаванні %s: %s"/>
         </tranEntries>
@@ -2668,7 +2668,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Успешно добавлен %s. Автозаполнение даты: %s. Автозаполнение времени: %s. Автозаполнение преобразований: %s."/>
           <tranEntry langID="1033" value="%s added OK. Date autofill: %s. Time autofill: %s. Transform autofill: %s."/>
-          <tranEntry langID="1031" value="%s erfolgreich hinzugef&#252;gt. Datum: %s. Zeit: %s. Transformation: %s."/>
+          <tranEntry langID="1031" value="%s erfolgreich hinzugefьgt. Datum: %s. Zeit: %s. Transformation: %s."/>
           <tranEntry langID="1046" value="%s adicionadas OK. Data automбtica: %s. Hora automбtica: %s. Transform autofill: %s."/>
           <tranEntry langID="1058" value="Успішно доданий %s. Автозаповнення  дати: %s. Автозаповнення часу: %s. Автозаполнение преобразований: %s."/>
         </tranEntries>
@@ -2693,7 +2693,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Исполняемый файл успешно скопирован в папку &quot;%s&quot;"/>
           <tranEntry langID="1033" value="The program executable was successfully copied to folder &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Die ausf&#252;hrbare Programmdatei wurde erfolgreich in den Ordner &quot;%s&quot; kopiert"/>
+          <tranEntry langID="1031" value="Die ausfьhrbare Programmdatei wurde erfolgreich in den Ordner &quot;%s&quot; kopiert"/>
           <tranEntry langID="1046" value="The program executable was successfully copied to folder &quot;%s&quot;"/>
         </tranEntries>
       </propEntry>
@@ -2701,7 +2701,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ошибка копирования исполняемого файла в папку &quot;%s&quot;: %s"/>
           <tranEntry langID="1033" value="Failed to copy the program executable to folder &quot;%s&quot;: %s"/>
-          <tranEntry langID="1031" value="Die ausf&#252;hrbare Programmdatei konnte nicht in den Ordner &quot;%s&quot; kopiert werden: %s"/>
+          <tranEntry langID="1031" value="Die ausfьhrbare Programmdatei konnte nicht in den Ordner &quot;%s&quot; kopiert werden: %s"/>
           <tranEntry langID="1046" value="Failed to copy the program executable to folder &quot;%s&quot;: %s"/>
         </tranEntries>
       </propEntry>
@@ -2718,7 +2718,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Файл &quot;%s&quot; был успешно удалён"/>
           <tranEntry langID="1033" value="File &quot;%s&quot; was successfully deleted"/>
-          <tranEntry langID="1031" value="Datei &quot;%s&quot; wurde erfolgreich gel&#246;scht"/>
+          <tranEntry langID="1031" value="Datei &quot;%s&quot; wurde erfolgreich gelцscht"/>
           <tranEntry langID="1046" value="File &quot;%s&quot; was successfully deleted"/>
           <tranEntry langID="1058" value="Файл &quot;%s&quot; был успешно удалён"/>
         </tranEntries>
@@ -2727,7 +2727,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ошибка при удалении файла &quot;%s&quot;"/>
           <tranEntry langID="1033" value="Unable to delete file &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Datei &quot;%s&quot; kann nicht gel&#246;scht werden"/>
+          <tranEntry langID="1031" value="Datei &quot;%s&quot; kann nicht gelцscht werden"/>
           <tranEntry langID="1046" value="Unable to delete file &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Ошибка при удалении файла &quot;%s&quot;"/>
         </tranEntries>
@@ -2796,7 +2796,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ссылка на файл изображения успешно изменена с &quot;%s&quot; в &quot;%s&quot;"/>
           <tranEntry langID="1033" value="Changed picture file link from &quot;%s&quot; to &quot;%s&quot; successfully"/>
-          <tranEntry langID="1031" value="Bilddateiverkn&#252;pfunge erfolgreich von &quot;%s&quot; nach &quot;%s&quot; ge&#228;ndert"/>
+          <tranEntry langID="1031" value="Bilddateiverknьpfunge erfolgreich von &quot;%s&quot; nach &quot;%s&quot; geдndert"/>
           <tranEntry langID="1046" value="Changed picture file link from &quot;%s&quot; to &quot;%s&quot; successfully"/>
           <tranEntry langID="1058" value="Ссылка на файл изображения успешно изменена с &quot;%s&quot; в &quot;%s&quot;"/>
         </tranEntries>
@@ -2814,7 +2814,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Файл &quot;%s&quot; не существует, удаление не требуется"/>
           <tranEntry langID="1033" value="File &quot;%s&quot; does not exist, no need to delete it"/>
-          <tranEntry langID="1031" value="Datei &quot;%s&quot; existiert nicht, braucht also nicht gel&#246;scht werden"/>
+          <tranEntry langID="1031" value="Datei &quot;%s&quot; existiert nicht, braucht also nicht gelцscht werden"/>
           <tranEntry langID="1046" value="File &quot;%s&quot; does not exist, no need to delete it"/>
         </tranEntries>
       </propEntry>
@@ -2822,7 +2822,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Эскиз для &quot;%s&quot; был успешно перестроен (размер эскиза: %d -&gt; %d, размер файла: %d -&gt; %d)"/>
           <tranEntry langID="1033" value="Thumbnail for &quot;%s&quot; was successfully rebuilt (thumbnail size: %d -&gt; %d, file size: %d -&gt; %d)"/>
-          <tranEntry langID="1031" value="Thumbnail f&#252;r &quot;%s&quot; wurde erfolgreich aktualisiert (Thumbnailgr&#246;&#223;e: %d -&gt; %d, Dateigr&#246;&#223;e: %d -&gt; %d)"/>
+          <tranEntry langID="1031" value="Thumbnail fьr &quot;%s&quot; wurde erfolgreich aktualisiert (ThumbnailgrцЯe: %d -&gt; %d, DateigrцЯe: %d -&gt; %d)"/>
           <tranEntry langID="1046" value="Thumbnail for &quot;%s&quot; was successfully rebuilt (thumbnail size: %d -&gt; %d, file size: %d -&gt; %d)"/>
           <tranEntry langID="1058" value="Эскиз для &quot;%s&quot; был успешно перестроен (размер эскиза: %d -&gt; %d, размер файла: %d -&gt; %d)"/>
         </tranEntries>
@@ -2840,7 +2840,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Пользователь отказал в перезаписи файла &quot;%s&quot;"/>
           <tranEntry langID="1033" value="User denied overwriting the file &quot;%s&quot;"/>
-          <tranEntry langID="1031" value="Benutzer hat das &#220;berschreiben der Datei  &quot;%s&quot; verweigert"/>
+          <tranEntry langID="1031" value="Benutzer hat das Ьberschreiben der Datei  &quot;%s&quot; verweigert"/>
           <tranEntry langID="1046" value="User denied overwriting the file &quot;%s&quot;"/>
           <tranEntry langID="1058" value="Пользователь отказал в перезаписи файла &quot;%s&quot;"/>
         </tranEntries>
@@ -2889,7 +2889,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="    Метатег не выбран. Выберите пункт для просмотра его описания"/>
           <tranEntry langID="1033" value="    No metatag selected. Select an item to view its description"/>
-          <tranEntry langID="1031" value="    Keine Metatags ausgew&#228;hlt. W&#228;hlen Sie einen Eintrag um seine Beschreibung zu sehen"/>
+          <tranEntry langID="1031" value="    Keine Metatags ausgewдhlt. Wдhlen Sie einen Eintrag um seine Beschreibung zu sehen"/>
           <tranEntry langID="1046" value="    Nenhum item selecionado. Selecione um item para ver sua descriзгo"/>
           <tranEntry langID="1058" value="    Метатег не обраний.Виберіть пункт для перегляду його опису"/>
         </tranEntries>
@@ -2898,7 +2898,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="В результате выборки в список не попало ни одного файла"/>
           <tranEntry langID="1033" value="No files selected in the result list"/>
-          <tranEntry langID="1031" value="Keine Dateien in der Ergebnisliste gew&#228;hlt"/>
+          <tranEntry langID="1031" value="Keine Dateien in der Ergebnisliste gewдhlt"/>
           <tranEntry langID="1046" value="Nenhum arquivo selecionado na lista resultante"/>
           <tranEntry langID="1058" value="У результаті вибірки в список не потрапило жодного файлу"/>
         </tranEntries>
@@ -2916,7 +2916,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="«%s» не является допустимой датой"/>
           <tranEntry langID="1033" value="&quot;%s&quot; is not a valid date"/>
-          <tranEntry langID="1031" value="&quot;%s&quot; ist kein g&#252;ltiges Datum"/>
+          <tranEntry langID="1031" value="&quot;%s&quot; ist kein gьltiges Datum"/>
           <tranEntry langID="1046" value="&quot;%s&quot; nгo й uma data vбlida"/>
           <tranEntry langID="1058" value="«%s» не є припустимою датою"/>
         </tranEntries>
@@ -2925,7 +2925,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="«%s» не является допустимым временем"/>
           <tranEntry langID="1033" value="&quot;%s&quot; is not a valid time"/>
-          <tranEntry langID="1031" value="&quot;%s&quot; ist keine g&#252;ltige Zeit"/>
+          <tranEntry langID="1031" value="&quot;%s&quot; ist keine gьltige Zeit"/>
           <tranEntry langID="1046" value="&quot;%s&quot; nгo й uma hora vбlida"/>
           <tranEntry langID="1058" value="«%s» не є припустимим часом"/>
         </tranEntries>
@@ -2934,7 +2934,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Totals: %0:d pictures copied, including:\n  • %1:d were new for the target group;\n  • %2:d were already contained in the target group.\n"/>
           <tranEntry langID="1049" value="Всего скопировано %0:d изображений, из них:\n  • %1:d новых для конечной группы;\n  • %2:d уже содежались в конечной группе.\n"/>
-          <tranEntry langID="1031" value="Gesamt: %0:d Bilder kopiert, einschlie&#223;lich:\n  • %1:d waren in der Zielgruppe neu;\n  • %2:d waren in der Zielgruppe bereits erhalten.\n"/>
+          <tranEntry langID="1031" value="Gesamt: %0:d Bilder kopiert, einschlieЯlich:\n  • %1:d waren in der Zielgruppe neu;\n  • %2:d waren in der Zielgruppe bereits erhalten.\n"/>
           <tranEntry langID="1046" value="Totais: %0:d imagens copiadas, incluindo:\n  • %1:d novas no grupo de destino;\n  • %2:d jб contidas no grupo de destino.\n"/>
           <tranEntry langID="1058" value="Усього скопійовано  %0:d зображень, з них:\n  • %1:d нових для кінцевої группи;\n  • %2:d вже утримувалися в кінцевій группі.\n"/>
         </tranEntries>
@@ -2943,7 +2943,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="Totals: %0:d pictures moved, including:\n  • %1:d were new for the target group;\n  • %2:d were already contained in the target group.\n"/>
           <tranEntry langID="1049" value="Всего перемещено %0:d изображений, из них:\n  • %1:d новых для конечной группы;\n  • %2:d уже содежались в конечной группе.\n"/>
-          <tranEntry langID="1031" value="Gesamt: %0:d Bilder verschoben, einschlie&#223;lich:\n  • %1:d waren in der Zielgruppe neu;\n  • %2:d waren in der Zielgruppe bereits erhalten.\n"/>
+          <tranEntry langID="1031" value="Gesamt: %0:d Bilder verschoben, einschlieЯlich:\n  • %1:d waren in der Zielgruppe neu;\n  • %2:d waren in der Zielgruppe bereits erhalten.\n"/>
           <tranEntry langID="1046" value="Totais: %0:d imagens movidas, incluindo:\n  • %1:d novas no grupo de destino;\n  • %2:d jб contidas no grupo de destino.\n"/>
           <tranEntry langID="1058" value="Усього переміщено  %0:d зображень, з них:\n  • %1:d нових для кінцевої группи;\n  • %2:d вже утримувалися в кінцевій группі.\n"/>
         </tranEntries>
@@ -2952,7 +2952,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Вставлено из буфера обмена: %d изображений"/>
           <tranEntry langID="1033" value="Pasted from the clipboard: %d pictures"/>
-          <tranEntry langID="1031" value="Aus der Zwischenablage eingef&#252;gt: %d Bilder"/>
+          <tranEntry langID="1031" value="Aus der Zwischenablage eingefьgt: %d Bilder"/>
           <tranEntry langID="1046" value="Colado da бrea de transferкncia: %d imagens"/>
           <tranEntry langID="1058" value="Установлено з буфера обміну: %d зображень"/>
         </tranEntries>
@@ -2961,7 +2961,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="содержит"/>
           <tranEntry langID="1033" value="contains"/>
-          <tranEntry langID="1031" value="enth&#228;lt"/>
+          <tranEntry langID="1031" value="enthдlt"/>
           <tranEntry langID="1046" value="contem"/>
           <tranEntry langID="1058" value="містить"/>
         </tranEntries>
@@ -2988,7 +2988,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="не содержит"/>
           <tranEntry langID="1033" value="doesn't contain"/>
-          <tranEntry langID="1031" value="enth&#228;lt nicht"/>
+          <tranEntry langID="1031" value="enthдlt nicht"/>
           <tranEntry langID="1046" value="nгo contem"/>
           <tranEntry langID="1058" value="не містить"/>
         </tranEntries>
@@ -3215,7 +3215,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Заполнено из EXIF-тега"/>
           <tranEntry langID="1033" value="Filled from EXIF tag"/>
-          <tranEntry langID="1031" value="Mit Daten aus EXIF-Tag gef&#252;llt"/>
+          <tranEntry langID="1031" value="Mit Daten aus EXIF-Tag gefьllt"/>
           <tranEntry langID="1046" value="Filled from EXIF tag"/>
         </tranEntries>
       </propEntry>
@@ -3250,7 +3250,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Без ключевых слов"/>
           <tranEntry langID="1033" value="No Keywords"/>
-          <tranEntry langID="1031" value="Keine Schl&#252;sselw&#246;rter"/>
+          <tranEntry langID="1031" value="Keine Schlьsselwцrter"/>
           <tranEntry langID="1046" value="Nenhuma palavra-chave"/>
           <tranEntry langID="1058" value="Без ключових слів"/>
         </tranEntries>
@@ -3286,7 +3286,7 @@
         <tranEntries>
           <tranEntry langID="1033" value="&amp;Undo %s"/>
           <tranEntry langID="1049" value="&amp;Отменить %s"/>
-          <tranEntry langID="1031" value="%s &amp;r&#252;ckg&#228;ngig machen"/>
+          <tranEntry langID="1031" value="%s &amp;rьckgдngig machen"/>
           <tranEntry langID="1046" value="&amp;Desfazer %s"/>
           <tranEntry langID="1058" value="&amp;Відмінити %s"/>
         </tranEntries>
@@ -3295,7 +3295,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Отменить %d изменений"/>
           <tranEntry langID="1033" value="Undo %d actions"/>
-          <tranEntry langID="1031" value="%d Aktionen r&#252;ckg&#228;ngig machen"/>
+          <tranEntry langID="1031" value="%d Aktionen rьckgдngig machen"/>
           <tranEntry langID="1046" value="Desfazer %d aзхes"/>
           <tranEntry langID="1058" value="Відмінити %d змін"/>
         </tranEntries>
@@ -3313,7 +3313,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Добавлено изображений: %d\nПропущено изображений из-за ошибок: %d\nНажмите &quot;Продолжить&quot;, чтобы возобновить процесс"/>
           <tranEntry langID="1033" value="Pictures added: %d\nPictures skipped due to errors: %d\nClick Continue to resume the process"/>
-          <tranEntry langID="1031" value="Bilder hinzugef&#252;gt: %d\nBilder wegen Fehler &#252;bersprungen: %d\nKlicken Sie auf Fortsetzen um den Prozess wiederaufzunehmen"/>
+          <tranEntry langID="1031" value="Bilder hinzugefьgt: %d\nBilder wegen Fehler ьbersprungen: %d\nKlicken Sie auf Fortsetzen um den Prozess wiederaufzunehmen"/>
           <tranEntry langID="1046" value="Imagens adicionadas:  %d\nImagens saltadas devido a erros:  %d\nTecle Continuar para retomar o processo"/>
           <tranEntry langID="1058" value="Додано зображень: %d\nПропущено зображень через помилки: %d\nНатисніть &quot;Продовжити&quot;, щоб відновити процес"/>
         </tranEntries>
@@ -3348,7 +3348,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Успешно обработано изображений: %d\nОшибок при обработке изображений: %d\nНажмите &quot;Продолжить&quot;, чтобы возобновить процесс"/>
           <tranEntry langID="1033" value="Successfully processed pictures: %d\nErrors occured while processing: %d\nClick &quot;Continue&quot; to resume the process"/>
-          <tranEntry langID="1031" value="Bilder erfolgreich verarbeitet: %d\nW&#228;hrend der Verarbeitung  von %d sind Fehler aufgetreten\nKlicken Sie auf &quot;Fortsetzen&quot; um den Prozess wiederaufzunehmen"/>
+          <tranEntry langID="1031" value="Bilder erfolgreich verarbeitet: %d\nWдhrend der Verarbeitung  von %d sind Fehler aufgetreten\nKlicken Sie auf &quot;Fortsetzen&quot; um den Prozess wiederaufzunehmen"/>
           <tranEntry langID="1046" value="Successfully processed pictures: %d\nErrors occured while processing: %d\nClick &quot;Continue&quot; to resume the process"/>
           <tranEntry langID="1058" value="Успешно обработано изображений: %d\nОшибок при обработке изображений: %d\nНажмите &quot;Продолжить&quot;, чтобы возобновить процесс"/>
         </tranEntries>
@@ -3357,7 +3357,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выбрано %d изображений в %d группах; суммарный размер: %s"/>
           <tranEntry langID="1033" value="Selected %d pictures in %d groups; total size: %s"/>
-          <tranEntry langID="1031" value="%d Bilder in %d Gruppen ausgew&#228;hlt; Gesamtgr&#246;&#223;e: %s"/>
+          <tranEntry langID="1031" value="%d Bilder in %d Gruppen ausgewдhlt; GesamtgrцЯe: %s"/>
           <tranEntry langID="1046" value="Selected %d pictures in %d groups; total size: %s"/>
         </tranEntries>
       </propEntry>
@@ -3374,7 +3374,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Поставьте отметку у файлов, которые необходимо добавить"/>
           <tranEntry langID="1033" value="Check the files you want to add to the photo album"/>
-          <tranEntry langID="1031" value="&#220;berpr&#252;fen Sie die Dateien, die Sie zum Fotoalbum hinzuf&#252;gen wollen"/>
+          <tranEntry langID="1031" value="Ьberprьfen Sie die Dateien, die Sie zum Fotoalbum hinzufьgen wollen"/>
           <tranEntry langID="1046" value="Marcar os arquivos que vocк quer adicionar ao бlbum"/>
           <tranEntry langID="1058" value="Поставте позначку у файлів, які необхідно додати"/>
         </tranEntries>
@@ -3383,7 +3383,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выбрано файлов: %d; отмечено файлов: %d"/>
           <tranEntry langID="1033" value="Files selected: %d; files checked: %d"/>
-          <tranEntry langID="1031" value="Dateien ausgew&#228;hlt: %d; Dateien &#252;berpr&#252;ft: %d"/>
+          <tranEntry langID="1031" value="Dateien ausgewдhlt: %d; Dateien ьberprьft: %d"/>
           <tranEntry langID="1046" value="Arquivos selecionados: %d; arquivos marcados: %d"/>
           <tranEntry langID="1058" value="Обрано файлів: %d; визначено файлів: %d"/>
         </tranEntries>
@@ -3392,7 +3392,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Протокол добавления изображений"/>
           <tranEntry langID="1033" value="Picture addition log"/>
-          <tranEntry langID="1031" value="Bilder hinzuf&#252;gen - Log"/>
+          <tranEntry langID="1031" value="Bilder hinzufьgen - Log"/>
           <tranEntry langID="1046" value="Relatуrio de adicionar arquivo"/>
           <tranEntry langID="1058" value="Протокол додавання зображень"/>
         </tranEntries>
@@ -3401,7 +3401,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Добавление изображений"/>
           <tranEntry langID="1033" value="Adding pictures"/>
-          <tranEntry langID="1031" value="F&#252;ge Bilder hinzu"/>
+          <tranEntry langID="1031" value="Fьge Bilder hinzu"/>
           <tranEntry langID="1046" value="Adding pictures"/>
         </tranEntries>
       </propEntry>
@@ -3409,7 +3409,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выберите файлы и/или папки, которые вы хотите добавить в фотоальбом"/>
           <tranEntry langID="1033" value="Select files and/or folders you wish to add to the photo album"/>
-          <tranEntry langID="1031" value="W&#228;hlen Sie die Dateien und/oder Ordner aus, die Sie dem Fotoalbum hinzuf&#252;gen m&#246;chten"/>
+          <tranEntry langID="1031" value="Wдhlen Sie die Dateien und/oder Ordner aus, die Sie dem Fotoalbum hinzufьgen mцchten"/>
           <tranEntry langID="1046" value="Selecione arquivos e/ou pastas que vocк deseja adicionar ao бlbum"/>
           <tranEntry langID="1058" value="Виберіть файли і/або папки, які Ви бажаєте додати у фотоальбом"/>
         </tranEntries>
@@ -3427,7 +3427,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Просмотрите и настройте следующие опции"/>
           <tranEntry langID="1033" value="Check the following options"/>
-          <tranEntry langID="1031" value="&#220;berpr&#252;fen Sie die folgenden Optionen"/>
+          <tranEntry langID="1031" value="Ьberprьfen Sie die folgenden Optionen"/>
           <tranEntry langID="1046" value="Check the following options"/>
           <tranEntry langID="1058" value="Просмотрите и настройте следующие опции"/>
         </tranEntries>
@@ -3436,7 +3436,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выполнение операции"/>
           <tranEntry langID="1033" value="Performing the operation"/>
-          <tranEntry langID="1031" value="Ausf&#252;hren der Operation"/>
+          <tranEntry langID="1031" value="Ausfьhren der Operation"/>
           <tranEntry langID="1046" value="Performing the operation"/>
         </tranEntries>
       </propEntry>
@@ -3444,7 +3444,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Ниже приведены исходные файлы изображений, а также возможные варианты исправления ссылок.\nОтметьте изображения, которые необходимо исправить. В случае, если вариантов исправления несколько, выберите подходящий файл"/>
           <tranEntry langID="1033" value="Below are original picture files, as well as possible repair options.\nCheck the pictures you want to repair. If there are some different options for a picture, select an appropriate file"/>
-          <tranEntry langID="1031" value="Unten sind originale Bilddateien, sowie m&#246;gliche Reaparaturoptionen.\n&#220;berpr&#252;fen Sie die Bilder die Sie reparieren m&#246;chten. Falls verschieden Optionen f&#252;r ein Bild existieren, w&#228;hlen Sie eine geeignete Datei"/>
+          <tranEntry langID="1031" value="Unten sind originale Bilddateien, sowie mцgliche Reaparaturoptionen.\nЬberprьfen Sie die Bilder die Sie reparieren mцchten. Falls verschieden Optionen fьr ein Bild existieren, wдhlen Sie eine geeignete Datei"/>
           <tranEntry langID="1046" value="Below are original picture files, as well as possible repair options.\nCheck the pictures you want to repair. If there are some different options for a picture, select an appropriate file"/>
         </tranEntries>
       </propEntry>
@@ -3452,7 +3452,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выберите папку назначения"/>
           <tranEntry langID="1033" value="Select the destination folder"/>
-          <tranEntry langID="1031" value="W&#228;hlen Sie den Zielordner"/>
+          <tranEntry langID="1031" value="Wдhlen Sie den Zielordner"/>
           <tranEntry langID="1046" value="Select the destination folder"/>
           <tranEntry langID="1058" value="Выберите папку назначения"/>
         </tranEntries>
@@ -3461,7 +3461,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выберите изображения для операции"/>
           <tranEntry langID="1033" value="Select pictures for operation"/>
-          <tranEntry langID="1031" value="W&#228;hlen Sie Bilder f&#252;r die Operation"/>
+          <tranEntry langID="1031" value="Wдhlen Sie Bilder fьr die Operation"/>
           <tranEntry langID="1046" value="Select pictures for operation"/>
           <tranEntry langID="1058" value="Выберите изображения для операции"/>
         </tranEntries>
@@ -3470,7 +3470,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Выберите задачу"/>
           <tranEntry langID="1033" value="Select a task"/>
-          <tranEntry langID="1031" value="W&#228;hlen Sie eine Aufgabe"/>
+          <tranEntry langID="1031" value="Wдhlen Sie eine Aufgabe"/>
           <tranEntry langID="1046" value="Select a task"/>
           <tranEntry langID="1058" value="Выберите задачу"/>
         </tranEntries>
@@ -3479,7 +3479,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Добавление изображений"/>
           <tranEntry langID="1033" value="Add pictures"/>
-          <tranEntry langID="1031" value="Bilder hinzuf&#252;gen"/>
+          <tranEntry langID="1031" value="Bilder hinzufьgen"/>
           <tranEntry langID="1046" value="Adicionar imagens"/>
           <tranEntry langID="1058" value="Додавання зображень"/>
         </tranEntries>
@@ -3488,7 +3488,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удаление изображений"/>
           <tranEntry langID="1033" value="Delete pictures"/>
-          <tranEntry langID="1031" value="Bilder l&#246;schen"/>
+          <tranEntry langID="1031" value="Bilder lцschen"/>
           <tranEntry langID="1046" value="Excluir imagens"/>
           <tranEntry langID="1058" value="Видалення зображень"/>
         </tranEntries>
@@ -3524,7 +3524,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Добавление изображений из буфера обмена"/>
           <tranEntry langID="1033" value="Paste pictures from clipboard"/>
-          <tranEntry langID="1031" value="Bilder aus der Zwischenablage einf&#252;gen"/>
+          <tranEntry langID="1031" value="Bilder aus der Zwischenablage einfьgen"/>
           <tranEntry langID="1046" value="Colar imagens da бrea de transferкncia"/>
           <tranEntry langID="1058" value="Додавання зображень з буфера обміну"/>
         </tranEntries>
@@ -3542,7 +3542,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удаление группы"/>
           <tranEntry langID="1033" value="Delete group"/>
-          <tranEntry langID="1031" value="Gruppe l&#246;schen"/>
+          <tranEntry langID="1031" value="Gruppe lцschen"/>
           <tranEntry langID="1046" value="Excluir grupo"/>
           <tranEntry langID="1058" value="Видалення групи"/>
         </tranEntries>
@@ -3605,7 +3605,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Добавление изображения"/>
           <tranEntry langID="1033" value="Add picture"/>
-          <tranEntry langID="1031" value="Bilder hinzuf&#252;gen"/>
+          <tranEntry langID="1031" value="Bilder hinzufьgen"/>
           <tranEntry langID="1046" value="Adicionar imagens"/>
           <tranEntry langID="1058" value="Додавання зображень"/>
         </tranEntries>
@@ -3622,7 +3622,7 @@
         <tranEntries>
           <tranEntry langID="1049" value="Удаление представления"/>
           <tranEntry langID="1033" value="Delete view"/>
-          <tranEntry langID="1031" value="Ansicht l&#246;schen"/>
+          <tranEntry langID="1031" value="Ansicht lцschen"/>
           <tranEntry langID="1046" value="Excluir visualizaзгo"/>
           <tranEntry langID="1058" value="Видалення представлення"/>
         </tranEntries>
@@ -3662,7 +3662,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;О программе..."/>
               <tranEntry langID="1033" value="&amp;About..."/>
-              <tranEntry langID="1031" value="&amp;&#220;ber..."/>
+              <tranEntry langID="1031" value="&amp;Ьber..."/>
               <tranEntry langID="1046" value="&amp;Sobre o PhoA..."/>
               <tranEntry langID="1058" value="Пр&amp;о програму"/>
             </tranEntries>
@@ -3689,7 +3689,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="О программе...|Информация о программе, версии и об авторских правах"/>
               <tranEntry langID="1033" value="About...|Version and Copyright information"/>
-              <tranEntry langID="1031" value="&#220;ber...|Versions- und Copyright-Information"/>
+              <tranEntry langID="1031" value="Ьber...|Versions- und Copyright-Information"/>
               <tranEntry langID="1046" value="Sobre...|Informaзгo sobre versхes e direitos autorais"/>
               <tranEntry langID="1058" value="Про програму...|Інформація про програму, версію і про авторскі права"/>
             </tranEntries>
@@ -3739,7 +3739,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Копировать|Копировать выделенные изображения в буфер обмена"/>
               <tranEntry langID="1033" value="Copy|Copy selected pictures to the clipboard"/>
-              <tranEntry langID="1031" value="Kopieren|Kopiert die ausgew&#228;hlten Bilder in die Zwischenablage"/>
+              <tranEntry langID="1031" value="Kopieren|Kopiert die ausgewдhlten Bilder in die Zwischenablage"/>
               <tranEntry langID="1046" value="Copiar|Copiar imagens selecionadas para бrea de transferкncia"/>
               <tranEntry langID="1058" value="Копіювати|Копіювати виділені зображення в буфер обміну"/>
             </tranEntries>
@@ -3789,7 +3789,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Вырезать|Вырезать выделенные изображения в буфер обмена"/>
               <tranEntry langID="1033" value="Cut|Cut selected pictures into the clipboard"/>
-              <tranEntry langID="1031" value="Ausschneiden|Entfernt die ausgew&#228;hlten Bilder und kopiert sie in die Zwischenablage"/>
+              <tranEntry langID="1031" value="Ausschneiden|Entfernt die ausgewдhlten Bilder und kopiert sie in die Zwischenablage"/>
               <tranEntry langID="1046" value="Cortar|Cortar imagens selecionadas para бrea de transferкncia"/>
               <tranEntry langID="1058" value="Вирізувати|Вирізувати виділені зображення в буфер обміну"/>
             </tranEntries>
@@ -3812,7 +3812,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Удалить"/>
               <tranEntry langID="1033" value="&amp;Delete"/>
-              <tranEntry langID="1031" value="&amp;L&#246;schen"/>
+              <tranEntry langID="1031" value="&amp;Lцschen"/>
               <tranEntry langID="1046" value="E&amp;xcluir"/>
               <tranEntry langID="1058" value="&amp;Видалити"/>
             </tranEntries>
@@ -3839,7 +3839,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Удалить|Удалить выбранный элемент"/>
               <tranEntry langID="1033" value="Delete|Delete the selected element(s) "/>
-              <tranEntry langID="1031" value="L&#246;schen|L&#246;scht die ausgew&#228;hlten Objekte"/>
+              <tranEntry langID="1031" value="Lцschen|Lцscht die ausgewдhlten Objekte"/>
               <tranEntry langID="1046" value="Excluir|Excluir elemento(s) selecionado(s)"/>
               <tranEntry langID="1058" value="Видалити|Видалити обраний елемент"/>
             </tranEntries>
@@ -3889,7 +3889,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Изменить...|Изменить выбранный элемент"/>
               <tranEntry langID="1033" value="Edit...|Edit selected element(s)"/>
-              <tranEntry langID="1031" value="Bearbeiten...|Bearbeitet die ausgew&#228;hlten Objekte"/>
+              <tranEntry langID="1031" value="Bearbeiten...|Bearbeitet die ausgewдhlten Objekte"/>
               <tranEntry langID="1046" value="Editar...|Editar elemento(s) selecionado(s)"/>
               <tranEntry langID="1058" value="Змінити...|Змінити обраний елемент"/>
             </tranEntries>
@@ -3980,7 +3980,7 @@
               <tranEntry langID="1033" value="File operations...|Open the File Operations Wizard to perform file copying, moving etc., or to repair broken picture file links"/>
               <tranEntry langID="1049" value="Операции с файлами изображений...|Открыть Мастер операций с файлами, позволяющий выполнить копирование, перемещение и другие операции с файлами изображений"/>
               <tranEntry langID="1058" value="Операции с файлами изображений...|Открыть Мастер операций с файлами, позволяющий выполнить копирование, перемещение и другие операции с файлами изображений"/>
-              <tranEntry langID="1031" value="Dateioperationen...|&#214;ffnet den Dateioperationen-Assistenten um Dateien zu kopieren, verschieben, usw., oder um ung&#252;ltige Bilddateiverkn&#252;pfungen zu reparieren"/>
+              <tranEntry langID="1031" value="Dateioperationen...|Цffnet den Dateioperationen-Assistenten um Dateien zu kopieren, verschieben, usw., oder um ungьltige Bilddateiverknьpfungen zu reparieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -4158,7 +4158,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Web-сайт программы|Открыть web-сайт программы в браузере"/>
               <tranEntry langID="1033" value="PhoA Website|Open program home site in the browser"/>
-              <tranEntry langID="1031" value="PhoA Website|&#214;ffnet die Homepage des Programms im Browser"/>
+              <tranEntry langID="1031" value="PhoA Website|Цffnet die Homepage des Programms im Browser"/>
               <tranEntry langID="1046" value="PhoA Website|Ir para home page do programa"/>
               <tranEntry langID="1058" value="Web-сайт програми|Відкрити web-сайт програми в браузері"/>
             </tranEntries>
@@ -4200,7 +4200,7 @@
               <tranEntry langID="1033" value="Load settings from file...|Load program settings from an ini-file"/>
               <tranEntry langID="1049" value="Загрузить настройки из файла...|Загрузить настройки программы из ini-файла"/>
               <tranEntry langID="1058" value="Завантажити настроювання з файлу...|Загрузить настройки программы из ini-файла"/>
-              <tranEntry langID="1031" value="Einstellungen von Datei laden...|L&#228;dt die Programmeinstellungen aus einer ini-Datei"/>
+              <tranEntry langID="1031" value="Einstellungen von Datei laden...|Lдdt die Programmeinstellungen aus einer ini-Datei"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -4307,7 +4307,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Добавить группу"/>
               <tranEntry langID="1033" value="&amp;Add group"/>
-              <tranEntry langID="1031" value="Gruppe &amp;hinzuf&#252;gen"/>
+              <tranEntry langID="1031" value="Gruppe &amp;hinzufьgen"/>
               <tranEntry langID="1046" value="&amp;Adicionar grupo"/>
               <tranEntry langID="1058" value="&amp;Додати групу"/>
             </tranEntries>
@@ -4334,7 +4334,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Добавить группу|Создать новую группу фотографий"/>
               <tranEntry langID="1033" value="Add group|Add new picture group"/>
-              <tranEntry langID="1031" value="Gruppe hinzuf&#252;gen|F&#252;gt dem Fotoalbum eine neue Gruppe hinzu"/>
+              <tranEntry langID="1031" value="Gruppe hinzufьgen|Fьgt dem Fotoalbum eine neue Gruppe hinzu"/>
               <tranEntry langID="1046" value="Adicionar grupo|Adicionar novo grupo de imagens"/>
               <tranEntry langID="1058" value="Додати групу|Створити нову групу фотографій"/>
             </tranEntries>
@@ -4357,7 +4357,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Д&amp;обавить изображения..."/>
               <tranEntry langID="1033" value="A&amp;dd pictures..."/>
-              <tranEntry langID="1031" value="&amp;Bild hinzuf&#252;gen..."/>
+              <tranEntry langID="1031" value="&amp;Bild hinzufьgen..."/>
               <tranEntry langID="1046" value="Adicionar i&amp;magens..."/>
               <tranEntry langID="1058" value="Дод&amp;ати зображення..."/>
             </tranEntries>
@@ -4384,7 +4384,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Добавить изображения...|Добавить новые файлы изображений в текущую группу"/>
               <tranEntry langID="1033" value="Add pictures...|Open the Add Pictures wizard allowing you to add picture files to the group currently selected"/>
-              <tranEntry langID="1031" value="Bild hinzuf&#252;gen...|F&#252;gt eine neue Bilddatei ein"/>
+              <tranEntry langID="1031" value="Bild hinzufьgen...|Fьgt eine neue Bilddatei ein"/>
               <tranEntry langID="1046" value="Adicionar imagem...|Adicionar novo arquivo de imagem"/>
               <tranEntry langID="1058" value="Додати зображення...|Додати новий файл зображення"/>
             </tranEntries>
@@ -4407,7 +4407,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Открыть..."/>
               <tranEntry langID="1033" value="&amp;Open..."/>
-              <tranEntry langID="1031" value="&amp;&#214;ffnen..."/>
+              <tranEntry langID="1031" value="&amp;Цffnen..."/>
               <tranEntry langID="1046" value="&amp;Abrir..."/>
               <tranEntry langID="1058" value="В&amp;ідкрити..."/>
             </tranEntries>
@@ -4434,7 +4434,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Открыть...|Открыть существующий фотоальбом"/>
               <tranEntry langID="1033" value="Open...|Open an existing photo album file"/>
-              <tranEntry langID="1031" value="&#214;ffnen...|&#214;ffnet ein existierendes Fotoalbum"/>
+              <tranEntry langID="1031" value="Цffnen...|Цffnet ein existierendes Fotoalbum"/>
               <tranEntry langID="1046" value="Abrir...|Abrir um бlbum existente"/>
               <tranEntry langID="1058" value="Відкрити...|Відкрити існуючий фотоальбом"/>
             </tranEntries>
@@ -4457,7 +4457,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Вставит&amp;ь"/>
               <tranEntry langID="1033" value="P&amp;aste"/>
-              <tranEntry langID="1031" value="&amp;Einf&#252;gen"/>
+              <tranEntry langID="1031" value="&amp;Einfьgen"/>
               <tranEntry langID="1046" value="C&amp;olar"/>
               <tranEntry langID="1058" value="У&amp;ставити"/>
             </tranEntries>
@@ -4484,7 +4484,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Вставить|Вставить изображения из буфера обмена"/>
               <tranEntry langID="1033" value="Paste|Paste picture(s) from the clipboard"/>
-              <tranEntry langID="1031" value="Einf&#252;gen|F&#252;gt Bilder aus der Zwischenablage ein"/>
+              <tranEntry langID="1031" value="Einfьgen|Fьgt Bilder aus der Zwischenablage ein"/>
               <tranEntry langID="1046" value="Colar|Colar imagem(s) da бrea de transferкncia"/>
               <tranEntry langID="1058" value="Уставити|Уставити зображення з буферу обміну"/>
             </tranEntries>
@@ -4507,7 +4507,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Удалить представление"/>
               <tranEntry langID="1033" value="&amp;Delete view"/>
-              <tranEntry langID="1031" value="Ansicht &amp;l&#246;schen"/>
+              <tranEntry langID="1031" value="Ansicht &amp;lцschen"/>
               <tranEntry langID="1046" value="E&amp;xcluir imagem"/>
               <tranEntry langID="1058" value="Вида&amp;лити представлення"/>
             </tranEntries>
@@ -4534,7 +4534,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Удалить представление|Удалить текущее представление фотоальбома"/>
               <tranEntry langID="1033" value="Delete view|Delete current photo album view"/>
-              <tranEntry langID="1031" value="Ansicht l&#246;schen|L&#246;scht die aktuelle Ansicht"/>
+              <tranEntry langID="1031" value="Ansicht lцschen|Lцscht die aktuelle Ansicht"/>
               <tranEntry langID="1046" value="Excluir imagem|Excluir imagem visualizada"/>
               <tranEntry langID="1058" value="Видалити представлення|Видалити поточне представлення фотоальбому"/>
             </tranEntries>
@@ -4734,7 +4734,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Операции с изображениями...|Позволяет выполнить операции по перемещению, копированию и т. д. выделенных изображений"/>
               <tranEntry langID="1033" value="Picture operations...|Allows you to copy, move etc. selected pictures"/>
-              <tranEntry langID="1031" value="Bildoperationen...|Erm&#246;glicht Ihnen ausgew&#228;hlte Bilder zu kopieren, verschieben usw."/>
+              <tranEntry langID="1031" value="Bildoperationen...|Ermцglicht Ihnen ausgewдhlte Bilder zu kopieren, verschieben usw."/>
               <tranEntry langID="1046" value="Operaзхes com imagem...|Permite copiar, mover etc as imagens selecionadas"/>
               <tranEntry langID="1058" value="Операціі із зображеннями...|Дозволяє виконати операціі по переміщенню, копіюванню і т.п. виділених зображень"/>
             </tranEntries>
@@ -4920,7 +4920,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Выделить все|Выделить все изображения"/>
               <tranEntry langID="1033" value="Select all|Select all pictures"/>
-              <tranEntry langID="1031" value="Alles ausw&#228;hlen|W&#228;hlt alle Bilder aus"/>
+              <tranEntry langID="1031" value="Alles auswдhlen|Wдhlt alle Bilder aus"/>
               <tranEntry langID="1046" value="Selecionar tudo|Seleciona todas as imagens"/>
               <tranEntry langID="1058" value="Виділити все|Виділити всі зображення"/>
             </tranEntries>
@@ -4943,7 +4943,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Снять выделение"/>
               <tranEntry langID="1033" value="Select &amp;none"/>
-              <tranEntry langID="1031" value="&amp;Nichts ausw&#228;hlen"/>
+              <tranEntry langID="1031" value="&amp;Nichts auswдhlen"/>
               <tranEntry langID="1046" value="&amp;Nгo selecionar"/>
               <tranEntry langID="1058" value="&amp;Зняти виділення"/>
             </tranEntries>
@@ -4970,7 +4970,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Снять выделение|Убрать выделение со всех изображений"/>
               <tranEntry langID="1033" value="Select none|Select none of the pictures"/>
-              <tranEntry langID="1031" value="Nichts ausw&#228;hlen|W&#228;hlt keines der Bilder aus"/>
+              <tranEntry langID="1031" value="Nichts auswдhlen|Wдhlt keines der Bilder aus"/>
               <tranEntry langID="1046" value="Nгo selecionar|Nгo selecionar nenhuma imagem"/>
               <tranEntry langID="1058" value="Зняти виділення|Прибрати виділення з усіх зображень"/>
             </tranEntries>
@@ -5143,7 +5143,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Отменить"/>
               <tranEntry langID="1033" value="Undo"/>
-              <tranEntry langID="1031" value="R&#252;ckg&#228;ngig"/>
+              <tranEntry langID="1031" value="Rьckgдngig"/>
               <tranEntry langID="1046" value="Desfazer"/>
               <tranEntry langID="1058" value="Відмінити"/>
             </tranEntries>
@@ -5170,7 +5170,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Отменить|Отменить последнюю сделанную операцию"/>
               <tranEntry langID="1033" value="Undo|Undo the last change"/>
-              <tranEntry langID="1031" value="R&#252;ckg&#228;ngig|Wiederruft die letzte &#196;nderung"/>
+              <tranEntry langID="1031" value="Rьckgдngig|Wiederruft die letzte Дnderung"/>
               <tranEntry langID="1046" value="Desfazer|Desfaz ъltima operaзгo"/>
               <tranEntry langID="1058" value="Відмінити|Відмінити останню зроблену операцію"/>
             </tranEntries>
@@ -5220,7 +5220,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Просмотр|Открыть  файл изображения для просмотра"/>
               <tranEntry langID="1033" value="View|Open picture in view mode"/>
-              <tranEntry langID="1031" value="Anzeigen|Bilder im Anzeigemodus &#246;ffnen"/>
+              <tranEntry langID="1031" value="Anzeigen|Bilder im Anzeigemodus цffnen"/>
               <tranEntry langID="1046" value="Visualizar|Abrir imagem no modo de visualizaзгo"/>
               <tranEntry langID="1058" value="Перегляд|Відкрити файл зображення для перегляду"/>
             </tranEntries>
@@ -6163,7 +6163,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ис&amp;тория изменений"/>
               <tranEntry langID="1033" value="U&amp;ndo history"/>
-              <tranEntry langID="1031" value="R&#252;ckg&#228;ngig &amp;Verlauf"/>
+              <tranEntry langID="1031" value="Rьckgдngig &amp;Verlauf"/>
               <tranEntry langID="1046" value="&amp;Desfazer histуrico"/>
               <tranEntry langID="1058" value="Іс&amp;торія змін"/>
             </tranEntries>
@@ -6172,7 +6172,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Содержит историю сделанных изменений и позволяет отменить несколько операций"/>
               <tranEntry langID="1033" value="Displays list of changes made and allows to undo a number of actions"/>
-              <tranEntry langID="1031" value="Zeigt eine Liste aller gemachten &#196;nderungen und erlaubt einige Aktionen r&#252;ckg&#228;ngig zu machen"/>
+              <tranEntry langID="1031" value="Zeigt eine Liste aller gemachten Дnderungen und erlaubt einige Aktionen rьckgдngig zu machen"/>
               <tranEntry langID="1046" value="Mostra a lista de modificaзхes e permite desfazer um nъmero de aзхes"/>
               <tranEntry langID="1058" value="Містить історію зроблених змін і дозволяє відмінити декілька операцій"/>
             </tranEntries>
@@ -6218,7 +6218,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ещё кнопки|"/>
               <tranEntry langID="1033" value="More buttons|"/>
-              <tranEntry langID="1031" value="Weitere Schaltfl&#228;chen|"/>
+              <tranEntry langID="1031" value="Weitere Schaltflдchen|"/>
               <tranEntry langID="1046" value="Mais botхes|"/>
               <tranEntry langID="1058" value="Ще кнопки|"/>
             </tranEntries>
@@ -6241,7 +6241,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Меню"/>
               <tranEntry langID="1033" value="Menu"/>
-              <tranEntry langID="1031" value="Men&#252;"/>
+              <tranEntry langID="1031" value="Menь"/>
               <tranEntry langID="1046" value="Menu"/>
               <tranEntry langID="1058" value="Меню"/>
             </tranEntries>
@@ -6250,7 +6250,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ещё кнопки|"/>
               <tranEntry langID="1033" value="More buttons|"/>
-              <tranEntry langID="1031" value="Weitere Schaltfl&#228;chen|"/>
+              <tranEntry langID="1031" value="Weitere Schaltflдchen|"/>
               <tranEntry langID="1046" value="Mais botхes|"/>
               <tranEntry langID="1058" value="Ще кнопки|"/>
             </tranEntries>

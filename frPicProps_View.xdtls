@@ -249,7 +249,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Ì&amp;àñøòàá 1:1"/>
               <tranEntry langID="1033" value="Zoom &amp;actual"/>
-              <tranEntry langID="1031" value="&amp;Tats&#228;chlicher Zoom"/>
+              <tranEntry langID="1031" value="&amp;Tatsächlicher Zoom"/>
               <tranEntry langID="1046" value="Tamanho Re&amp;al"/>
               <tranEntry langID="1058" value="Ì&amp;àñøòàá 1:1"/>
             </tranEntries>
@@ -326,7 +326,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Óñòàíîâèòü ìàñøòàá ïî ðàçìåðàì îêíà"/>
               <tranEntry langID="1033" value="Set zoom to fit window"/>
-              <tranEntry langID="1031" value="Zoom auf Fenstergr&#246;&#223;e einstellen"/>
+              <tranEntry langID="1031" value="Zoom auf Fenstergröße einstellen"/>
               <tranEntry langID="1046" value="Ajustar zoom para caber na janela "/>
               <tranEntry langID="1058" value="Âñòàíîâèòè ìàñøòàá ïî ðîçì³ðàõ â³êíà"/>
             </tranEntries>
@@ -376,7 +376,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Óâåëè÷èòü|Óâåëè÷èòü èçîáðàæåíèå"/>
               <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
-              <tranEntry langID="1031" value="Zoom in|Vergr&#246;&#223;ert das Bild"/>
+              <tranEntry langID="1031" value="Zoom in|Vergrößert das Bild"/>
               <tranEntry langID="1046" value="Ampliar|Ampliação da imagem vista"/>
               <tranEntry langID="1058" value="Çá³ëüøèòè|Çá³ëüøèòè çîáðàæåííÿ"/>
             </tranEntries>

@@ -92,7 +92,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Отображать только ошибки|Скрыть записи об успешно добавленных изображениях"/>
               <tranEntry langID="1033" value="Display errors only|Hide successfully added picture entries"/>
-              <tranEntry langID="1031" value="Nur Fehler anzeigen|Alle Eintr&#228;ge erfolgreich hinzugef&#252;gter Bilder verstecken"/>
+              <tranEntry langID="1031" value="Nur Fehler anzeigen|Alle Eintrдge erfolgreich hinzugefьgter Bilder verstecken"/>
               <tranEntry langID="1046" value="Mostrar somente erros|Ocultar imagens adicionadas com sucesso"/>
               <tranEntry langID="1058" value="Відображувати тільки помилки|Сховати запису про успішно додані зображення"/>
             </tranEntries>
@@ -182,7 +182,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Сохранить в файл...|Сохранить протокол в выбранный файл"/>
               <tranEntry langID="1033" value="Save to file...|Save the log to a selected file"/>
-              <tranEntry langID="1031" value="In Datei speichern...|Das Logbuch in eine ausgew&#228;hlte Datei speichern"/>
+              <tranEntry langID="1031" value="In Datei speichern...|Das Logbuch in eine ausgewдhlte Datei speichern"/>
               <tranEntry langID="1046" value="Salvar no arquivo...|Salva ocorrкncias no arquivo selecionado"/>
               <tranEntry langID="1058" value="Зберегти у файл…|Зберегти протокол в обраний файл"/>
             </tranEntries>

@@ -25,7 +25,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Check all groups"/>
               <tranEntry langID="1049" value="&amp;Îòìåòèòü âñå ãðóïïû"/>
-              <tranEntry langID="1031" value="Alle Gruppen &amp;ausw&#228;hlen"/>
+              <tranEntry langID="1031" value="Alle Gruppen &amp;auswählen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -46,7 +46,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Set check to all the groups having pictures"/>
               <tranEntry langID="1049" value="Óñòàíîâèòü îòìåòêó ó âñåõ ãðóïï, èìåþùèõ èçîáðàæåíèÿ"/>
-              <tranEntry langID="1031" value="Alle Gruppen die Bilder enthalten ausw&#228;hlen"/>
+              <tranEntry langID="1031" value="Alle Gruppen die Bilder enthalten auswählen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="SecondaryShortCuts">
@@ -65,7 +65,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Invert group checks"/>
               <tranEntry langID="1049" value="&amp;Èíâåðòèðîâàòü îòìåòêó ó ãðóïï"/>
-              <tranEntry langID="1031" value="Ausgew&#228;hlte Gruppen &amp;invertieren"/>
+              <tranEntry langID="1031" value="Ausgewählte Gruppen &amp;invertieren"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -109,7 +109,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Uncheck all groups"/>
               <tranEntry langID="1049" value="&amp;Ñíÿòü îòìåòêó ó âñåõ ãðóïï"/>
-              <tranEntry langID="1031" value="Alle Gruppen a&amp;bw&#228;hlen"/>
+              <tranEntry langID="1031" value="Alle Gruppen a&amp;bwählen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Category">
@@ -153,7 +153,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="File link validity filter"/>
               <tranEntry langID="1049" value="Ôèëüòð ïî ñóùåñòâîâàíèþ ôàéëà èçîáðàæåíèÿ"/>
-              <tranEntry langID="1031" value="G&#252;ltigkeit der Dateiverkn&#252;pfung pr&#252;fen"/>
+              <tranEntry langID="1031" value="Gültigkeit der Dateiverknüpfung prüfen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -245,7 +245,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Pictures in selected &amp;groups:"/>
               <tranEntry langID="1049" value="Èçîáðàæåíèÿ â âûáðàííûõ &amp;ãðóïïàõ:"/>
-              <tranEntry langID="1031" value="Bilder in ausgew&#228;hlten Gruppen:"/>
+              <tranEntry langID="1031" value="Bilder in ausgewählten Gruppen:"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -271,7 +271,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Selected pictures"/>
               <tranEntry langID="1049" value="Âû&amp;áðàííûå èçîáðàæåíèÿ"/>
-              <tranEntry langID="1031" value="Au&amp;sgew&#228;hlte Bilder"/>
+              <tranEntry langID="1031" value="Au&amp;sgewählte Bilder"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -297,7 +297,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="All selected &amp;pictures"/>
               <tranEntry langID="1049" value="Âñå â&amp;ûáðàííûå èçîáðàæåíèÿ"/>
-              <tranEntry langID="1031" value="Alle ausgew&#228;hlten Bilder"/>
+              <tranEntry langID="1031" value="Alle ausgewählten Bilder"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

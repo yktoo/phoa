@@ -25,7 +25,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Delete original files"/>
               <tranEntry langID="1049" value="&amp;Óäàëÿòü èñõîäíûå ôàéëû"/>
-              <tranEntry langID="1031" value="Originaldateien &amp;l&#246;schen"/>
+              <tranEntry langID="1031" value="Originaldateien &amp;löschen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -51,7 +51,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Delete to the rec&amp;ycle bin"/>
               <tranEntry langID="1049" value="Óäàë&amp;ÿòü â Êîðçèíó"/>
-              <tranEntry langID="1031" value="In den Papierkorb l&amp;&#246;schen"/>
+              <tranEntry langID="1031" value="In den Papierkorb l&amp;öschen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -95,7 +95,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Treat as an error\nUpdate the link only if the target file exists\nUpdate the link anyway\n"/>
               <tranEntry langID="1049" value="Ñ÷èòàòü îøèáêîé\nÎáíîâèòü ññûëêó òîëüêî åñëè ôàéë íàçíà÷åíèÿ ñóùåñòâóåò\nÎáíîâèòü ññûëêó â ëþáîì ñëó÷àå\n"/>
-              <tranEntry langID="1031" value="Als Fehler behandeln\nDie Verkn&#252;pfung nur aktualisieren, wenn die Zieldatei existiert\nDie Verkn&#252;pfung in jedem Fall aktualisieren\n"/>
+              <tranEntry langID="1031" value="Als Fehler behandeln\nDie Verknüpfung nur aktualisieren, wenn die Zieldatei existiert\nDie Verknüpfung in jedem Fall aktualisieren\n"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">
@@ -131,7 +131,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Skip the current picture\nPrompt to overwrite the file\nAlways overwrite the file\n"/>
               <tranEntry langID="1049" value="Ïðîïóñêàòü òåêóùåå èçîáðàæåíèå\nÂûäàòü çàïðîñ íà ïåðåçàïèñü ôàéëà\nÂñåãäà ïåðåçàïèñûâàòü ôàéë\n"/>
-              <tranEntry langID="1031" value="Das aktuelle Bild &#252;berspringen\nVor dem &#220;berschreiben der Datei nachfragen\nDie Datei immer &#252;berschreiben\n"/>
+              <tranEntry langID="1031" value="Das aktuelle Bild überspringen\nVor dem Überschreiben der Datei nachfragen\nDie Datei immer überschreiben\n"/>
             </tranEntries>
           </propEntry>
           <propEntry name="Text">

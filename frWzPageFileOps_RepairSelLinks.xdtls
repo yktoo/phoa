@@ -25,7 +25,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Delete pictures having no matching file (only affects pictures with no valid file linked)"/>
               <tranEntry langID="1049" value="&amp;Удалить изображения, для которых нет подходящего файла (только для изображений без существующего файла)"/>
-              <tranEntry langID="1031" value="Bilder die keine zugeh&#246;rige Datei besitzen &amp;l&#246;schen (betrifft nur Bilder, die mit keiner g&#252;ltigen Datei verlinkt sind)"/>
+              <tranEntry langID="1031" value="Bilder die keine zugehцrige Datei besitzen &amp;lцschen (betrifft nur Bilder, die mit keiner gьltigen Datei verlinkt sind)"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">

@@ -138,7 +138,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Не учитывать\nТолько файлы, отсутствующие в фотоальбоме\nТолько файлы, присутствующие в фотоальбоме\n"/>
               <tranEntry langID="1033" value="Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n"/>
-              <tranEntry langID="1031" value="Nicht ber&#252;cksichtigen\nNur Dateien, die noch nicht im Fotoalbum vorhanden sind\nNur Dateien, die schon im Fotoalbum vorhanden sind\n"/>
+              <tranEntry langID="1031" value="Nicht berьcksichtigen\nNur Dateien, die noch nicht im Fotoalbum vorhanden sind\nNur Dateien, die schon im Fotoalbum vorhanden sind\n"/>
               <tranEntry langID="1046" value="Descartar\nSomente arquivos ausentes no бlbum\nSomente arquivos presentes no бlbum\n"/>
               <tranEntry langID="1058" value="Не враховувати\nТільки файли, відсутні у фотоальбомі\nТільки файли, присутні у фотоальбомі\n"/>
             </tranEntries>

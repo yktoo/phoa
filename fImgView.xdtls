@@ -66,7 +66,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Закрыть"/>
               <tranEntry langID="1033" value="&amp;Close"/>
-              <tranEntry langID="1031" value="&amp;Schlie&#223;en"/>
+              <tranEntry langID="1031" value="&amp;SchlieЯen"/>
               <tranEntry langID="1046" value="&amp;Fechar"/>
               <tranEntry langID="1058" value="&amp;Закрити"/>
             </tranEntries>
@@ -93,7 +93,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Закрыть|Закрыть окно просмотра"/>
               <tranEntry langID="1033" value="Close|Close viewing window"/>
-              <tranEntry langID="1031" value="Schlie&#223;en|Anzeigefenster schlie&#223;en"/>
+              <tranEntry langID="1031" value="SchlieЯen|Anzeigefenster schlieЯen"/>
               <tranEntry langID="1046" value="Fechar|Fechar janela de visualizaзгo"/>
               <tranEntry langID="1058" value="Закрити|Закрити вікно перегляду"/>
             </tranEntries>
@@ -442,7 +442,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Следующее изображение"/>
               <tranEntry langID="1033" value="&amp;Next picture"/>
-              <tranEntry langID="1031" value="&amp;N&#228;chstes Bild"/>
+              <tranEntry langID="1031" value="&amp;Nдchstes Bild"/>
               <tranEntry langID="1046" value="Prу&amp;xima imagem"/>
               <tranEntry langID="1058" value="Н&amp;аступне зображення"/>
             </tranEntries>
@@ -469,7 +469,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Следующее изображение|Перейти к следующему изображению в группе"/>
               <tranEntry langID="1033" value="Next picture|Advance to the next picture in the group"/>
-              <tranEntry langID="1031" value="N&#228;chstes Bild|Weiter zum n&#228;chsten Bild in der Gruppe"/>
+              <tranEntry langID="1031" value="Nдchstes Bild|Weiter zum nдchsten Bild in der Gruppe"/>
               <tranEntry langID="1046" value="Prуxima imagem|Ir para ъltima imagem no grupo"/>
               <tranEntry langID="1058" value="Следующее изображение|Перейти к следующему изображению в группе"/>
             </tranEntries>
@@ -519,7 +519,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Предыдущее изображение|Перейти к предыдущему изображению в группе"/>
               <tranEntry langID="1033" value="Previous picture|Rewind to the previous picture in the group"/>
-              <tranEntry langID="1031" value="Vorheriges Bild|Zur&#252;ck zum vorherigen Bild in der Gruppe"/>
+              <tranEntry langID="1031" value="Vorheriges Bild|Zurьck zum vorherigen Bild in der Gruppe"/>
               <tranEntry langID="1046" value="Imagem anterior|Retroceder para imagem anterior no grupo"/>
               <tranEntry langID="1058" value="Попереднє зображення|Перейти до попереднього зображення в групі"/>
             </tranEntries>
@@ -619,7 +619,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Изменить положение или размер информационного блока"/>
               <tranEntry langID="1033" value="Change position and size of the information bar"/>
-              <tranEntry langID="1031" value="Position und Gr&#246;&#223;e der Informationsleiste &#228;ndern"/>
+              <tranEntry langID="1031" value="Position und GrцЯe der Informationsleiste дndern"/>
               <tranEntry langID="1046" value="Mudar posiзгo e tamanho da barra de informaзгo"/>
               <tranEntry langID="1058" value="Змінити положення або розмір інформаційного блоку"/>
             </tranEntries>
@@ -814,7 +814,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Настройки программы...|Просмотреть/изменить настройки программы"/>
               <tranEntry langID="1033" value="Program settings...|View/change program settings"/>
-              <tranEntry langID="1031" value="Optionen...|Optionen anzeigen/ver&#228;ndern"/>
+              <tranEntry langID="1031" value="Optionen...|Optionen anzeigen/verдndern"/>
               <tranEntry langID="1046" value="Opзхes...|Ver/mudar opзхes"/>
               <tranEntry langID="1058" value="Настроювання програми...|Переглянути/змінити настроювання програми"/>
             </tranEntries>
@@ -900,7 +900,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Slide show|Toggle slide show mode (automatically advance to next picture)"/>
               <tranEntry langID="1049" value="Показ слайдов|Включить/выключить автоматический показ слайдов"/>
-              <tranEntry langID="1031" value="Diashow|In den Diashow Modus wechseln (automatisch zum n&#228;chsten Bild gehen)"/>
+              <tranEntry langID="1031" value="Diashow|In den Diashow Modus wechseln (automatisch zum nдchsten Bild gehen)"/>
               <tranEntry langID="1046" value="Show de slides|Alternar para modo show de slides (avanзo automбtico de imagens)"/>
               <tranEntry langID="1058" value="Показ слайдів|Уключити/виключити автоматичний показ слайдів"/>
             </tranEntries>
@@ -959,7 +959,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="М&amp;асштаб 1:1"/>
               <tranEntry langID="1033" value="Zoom &amp;actual"/>
-              <tranEntry langID="1031" value="&amp;tats&#228;chlicher Zoom"/>
+              <tranEntry langID="1031" value="&amp;tatsдchlicher Zoom"/>
               <tranEntry langID="1046" value="&amp;Tamanho real"/>
               <tranEntry langID="1058" value="Мас&amp;штаб 1:1"/>
             </tranEntries>
@@ -986,7 +986,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Масштаб 1:1|Установить масштаб 1:1"/>
               <tranEntry langID="1033" value="Zoom actual|Set magnification to 1:1"/>
-              <tranEntry langID="1031" value="tats&#228;chlicher Zoom|Zoom auf 1:1 setzen"/>
+              <tranEntry langID="1031" value="tatsдchlicher Zoom|Zoom auf 1:1 setzen"/>
               <tranEntry langID="1046" value="Tamanho real|Ajustar ampliaзгo para 1:1"/>
               <tranEntry langID="1058" value="Масштаб 1:1|Встановити масштаб 1:1"/>
             </tranEntries>
@@ -1036,7 +1036,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Масштаб по размеру окна|Установить масштаб по размеру окна"/>
               <tranEntry langID="1033" value="Zoom best fit|Set magnification for image to fit in the window"/>
-              <tranEntry langID="1031" value="Zoom anpassen|Passt den Zoom der Fenstergr&#246;&#223;e an"/>
+              <tranEntry langID="1031" value="Zoom anpassen|Passt den Zoom der FenstergrцЯe an"/>
               <tranEntry langID="1046" value="Melhor zoom|Ajustar ampliaзгo para imagem caber na janela"/>
               <tranEntry langID="1058" value="Масштаб за розміром вікна|Встановити масштаб за розміром вікна"/>
             </tranEntries>
@@ -1086,7 +1086,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Увеличить|Увеличить изображение"/>
               <tranEntry langID="1033" value="Zoom in|Enlarge the image"/>
-              <tranEntry langID="1031" value="Zoom in|Das Bild vergr&#246;&#223;ern"/>
+              <tranEntry langID="1031" value="Zoom in|Das Bild vergrцЯern"/>
               <tranEntry langID="1046" value="Maior zoom|ampliar imagem"/>
               <tranEntry langID="1058" value="Збільшити|Збільшити зображення"/>
             </tranEntries>

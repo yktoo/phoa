@@ -47,7 +47,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="Çàêðûòü"/>
               <tranEntry langID="1033" value="Close"/>
-              <tranEntry langID="1031" value="Schlie&#223;en"/>
+              <tranEntry langID="1031" value="Schließen"/>
               <tranEntry langID="1046" value="Fechar"/>
               <tranEntry langID="1058" value="Çàêðèòè"/>
             </tranEntries>
@@ -257,7 +257,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="âûøå\náîëüøå ðàçìåð"/>
               <tranEntry langID="1033" value="higher\ngreater size"/>
-              <tranEntry langID="1031" value="h&#246;her\ngr&#246;&#223;ere Datei"/>
+              <tranEntry langID="1031" value="höher\ngrößere Datei"/>
               <tranEntry langID="1046" value="alta\nmaior tamanho"/>
               <tranEntry langID="1058" value="âèùå\ná³ëüøå ðîçì³ð"/>
             </tranEntries>
@@ -289,7 +289,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Êà÷åñòâî ýñêèçà:"/>
               <tranEntry langID="1033" value="&amp;Thumbnail quality:"/>
-              <tranEntry langID="1031" value="&amp;Thumbnail Qualit&#228;t:"/>
+              <tranEntry langID="1031" value="&amp;Thumbnail Qualität:"/>
               <tranEntry langID="1046" value="&amp;Qualidade da miniatura:"/>
               <tranEntry langID="1058" value="&amp;ßê³ñòü åñê³çó:"/>
             </tranEntries>
@@ -321,7 +321,7 @@
             <tranEntries>
               <tranEntry langID="1049" value="&amp;Ðàçìåð ýñêèçà (ØõÂ):"/>
               <tranEntry langID="1033" value="&amp;Thumbnail size (WxH):"/>
-              <tranEntry langID="1031" value="&amp;Thumnail Gr&#246;&#223;e (BxH):"/>
+              <tranEntry langID="1031" value="&amp;Thumnail Größe (BxH):"/>
               <tranEntry langID="1046" value="&amp;Tamanho da miniatura (WxH):"/>
               <tranEntry langID="1058" value="&amp;Ðîçì³ð åñêèçó (ØxÂ):"/>
             </tranEntries>

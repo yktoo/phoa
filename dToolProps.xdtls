@@ -268,7 +268,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Show in Picture Groups popup menu"/>
               <tranEntry langID="1049" value="Отображать в контекстном меню окна групп изображений"/>
-              <tranEntry langID="1031" value="Im Bildgruppen Kontextmen&#252; anzeigen"/>
+              <tranEntry langID="1031" value="Im Bildgruppen Kontextmenь anzeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -294,7 +294,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Show in Thumbnails Window popup menu"/>
               <tranEntry langID="1049" value="Отображать в контекстном меню окна эскизов"/>
-              <tranEntry langID="1031" value="Im Kontextmen&#252; des Thumbnailfensters anzeigen"/>
+              <tranEntry langID="1031" value="Im Kontextmenь des Thumbnailfensters anzeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -320,7 +320,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Show in Tools menu"/>
               <tranEntry langID="1049" value="Отображать в меню «Сервис»"/>
-              <tranEntry langID="1031" value="Im Men&#252; 'Tools' anzeigen"/>
+              <tranEntry langID="1031" value="Im Menь 'Tools' anzeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -346,7 +346,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Show in View mode popup menu"/>
               <tranEntry langID="1049" value="Отображать в контекстном меню режима просмотра"/>
-              <tranEntry langID="1031" value="Im Kontextmen&#252; des Ansichtsmodus anzeigen"/>
+              <tranEntry langID="1031" value="Im Kontextmenь des Ansichtsmodus anzeigen"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -670,7 +670,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Name (caption; use '&amp;&amp;' to indicate the shortcut key):"/>
               <tranEntry langID="1049" value="&amp;Наименование (надпись; &quot;&amp;&amp;&quot; означает гор. клавишу):"/>
-              <tranEntry langID="1031" value="&amp;Name (&#220;berschrift; vernwenden Sie '&amp;&amp;' um den Shortcut anzudeuten):"/>
+              <tranEntry langID="1031" value="&amp;Name (Ьberschrift; vernwenden Sie '&amp;&amp;' um den Shortcut anzudeuten):"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -722,7 +722,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="&amp;Folder (leave empty for defaults):"/>
               <tranEntry langID="1049" value="&amp;Папка (оставьте поле пустым, чтобы использовать установки по умолчанию):"/>
-              <tranEntry langID="1031" value="&amp;Ordner (f&#252;r Standardeinstellungen leer lassen):"/>
+              <tranEntry langID="1031" value="&amp;Ordner (fьr Standardeinstellungen leer lassen):"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -825,7 +825,7 @@
             <tranEntries>
               <tranEntry langID="1033" value="Select an application"/>
               <tranEntry langID="1049" value="Выберите приложение"/>
-              <tranEntry langID="1031" value="W&#228;hlen Sie eine Anwendung aus"/>
+              <tranEntry langID="1031" value="Wдhlen Sie eine Anwendung aus"/>
             </tranEntries>
           </propEntry>
         </propEntries>
