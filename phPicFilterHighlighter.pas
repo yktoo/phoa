@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: phPicFilterHighlighter.pas,v 1.6 2004-12-06 20:19:32 dale Exp $
+//  $Id: phPicFilterHighlighter.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit phPicFilterHighlighter;
 

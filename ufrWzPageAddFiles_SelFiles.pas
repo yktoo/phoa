@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.20 2004-11-24 11:42:17 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.21 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit ufrWzPageAddFiles_SelFiles;
 

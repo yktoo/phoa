@@ -1,9 +1,9 @@
-@echo off
+  @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.18 2004-12-07 13:59:47 dale Exp $
+rem $Id: _make_.bat,v 1.19 2004-12-31 13:38:58 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
-rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+rem Copyright DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 
 rem DK Software Text Preprocessor defines

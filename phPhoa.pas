@@ -1,13 +1,13 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.10 2004-12-22 14:27:32 dale Exp $
+//  $Id: phPhoa.pas,v 1.11 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 //**********************************************************************************************************************
 //
 // PhoA file format description
-// The whole code (c)2002-2004 Dmitry Kann, except where otherwise explicitly
+// The whole code (c)2002-2005 Dmitry Kann, except where otherwise explicitly
 // noted
 // Home site:
 //   http://www.dk-soft.org/

@@ -1,19 +1,19 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.17 2004-12-28 05:52:01 dale Exp $
+;   $Id: phoa.iss,v 1.18 2004-12-31 13:38:58 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
-;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+;   Copyright DK Software, http://www.dk-soft.org/
 ;***********************************************************************************************************************
 [Setup]
   MinVersion             = 4.0,4.0sp6
   AppName                = PhoA
-  AppVersion             = 1.1.8 beta
-  AppVerName             = PhoA v1.1.8 beta
-  AppCopyright           = Copyright ©2002-2004 DK Software
+  AppVersion             = 1.1.9
+  AppVerName             = PhoA v1.1.9
+  AppCopyright           = Copyright ©2002-2005 DK Software
   AppPublisher           = DK Software
   AppPublisherURL        = http://www.dk-soft.org/
   AppSupportURL          = http://www.dk-soft.org/forum/
-  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=118beta
+  AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=119
   AppMutex               = PHOA_RUNNING_MUTEX
   AllowNoIcons           = yes
   ChangesAssociations    = yes
@@ -21,9 +21,9 @@
   DefaultDirName         = {pf}\DK Software\PhoA
   DefaultGroupName       = PhoA (Photo Album)
   OutputDir              = .
-  OutputBaseFilename     = phoa-setup-1.1.8beta
-  VersionInfoVersion     = 1.1.8
-  VersionInfoTextVersion = 1.1.8 beta
+  OutputBaseFilename     = phoa-setup-1.1.9
+  VersionInfoVersion     = 1.1.9
+  VersionInfoTextVersion = 1.1.9
   WizardImageFile        = SetupImage.bmp
   WizardSmallImageFile   = SetupSmallImage.bmp
   ; -- Compression

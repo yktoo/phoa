@@ -1,9 +1,9 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.9 2004-12-06 20:20:21 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit phParsingPicFilter;
 

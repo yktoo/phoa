@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: phoadump.dpr,v 1.3 2004-09-11 17:52:37 dale Exp $
+//  $Id: phoadump.dpr,v 1.4 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 //**********************************************************************************************************************
 //
@@ -36,7 +36,7 @@ uses
 const
   SAppName      = 'phoadump';
   SAppVersion   = '0.01';
-  SAppCopyright = 'Copyright (c)2002-2004 Dmitry Kann, http://phoa.narod.ru';
+  SAppCopyright = 'Copyright (c)2002-2005 Dmitry Kann, http://phoa.narod.ru';
 
    // Terminates the program with error message reported
   procedure Err(const sMessage: String);

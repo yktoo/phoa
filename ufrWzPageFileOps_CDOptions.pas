@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit ufrWzPageFileOps_CDOptions;
 

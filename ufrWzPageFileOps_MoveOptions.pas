@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.12 2004-10-15 13:49:35 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.13 2004-12-31 13:38:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+//  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit ufrWzPageFileOps_MoveOptions;
 
