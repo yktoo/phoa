@@ -1,6 +1,6 @@
 object fMain: TfMain
-  Left = 395
-  Top = 282
+  Left = 401
+  Top = 373
   AutoScroll = False
   Caption = 'PhoA'
   ClientHeight = 385
@@ -344,7 +344,6 @@ object fMain: TfMain
         Header.Options = [hoColumnResize, hoDrag]
         Header.ParentFont = True
         Images = ilActionsSmall
-        ParentBackground = False
         PopupMenu = pmGroups
         TabOrder = 0
         TreeOptions.AnimationOptions = [toAnimatedToggle]
@@ -391,6 +390,7 @@ object fMain: TfMain
     Top = 366
     Width = 615
     Height = 19
+    Images = ilActionsSmall
     Panels = <
       item
         StretchPriority = 1

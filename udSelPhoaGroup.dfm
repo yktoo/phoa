@@ -1,6 +1,6 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
   Left = 509
-  Top = 290
+  Top = 337
   Caption = 'Select picture group'
   ClientHeight = 435
   ClientWidth = 473
@@ -36,7 +36,6 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Header.Options = [hoColumnResize, hoDrag]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 0
     TreeOptions.AnimationOptions = [toAnimatedToggle]
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]

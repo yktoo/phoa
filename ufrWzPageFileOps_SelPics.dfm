@@ -57,7 +57,6 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     Header.Options = [hoColumnResize, hoDrag]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     PopupMenu = pmGroups
     TabOrder = 3
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]

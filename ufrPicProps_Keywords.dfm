@@ -16,7 +16,6 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Header.Options = [hoColumnResize, hoDrag]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     PopupMenu = pmMain
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]

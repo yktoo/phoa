@@ -1,6 +1,6 @@
 inherited dStats: TdStats
-  Left = 401
-  Top = 338
+  Left = 400
+  Top = 363
   Caption = 'Photo album statistics'
   ClientHeight = 435
   ClientWidth = 612
@@ -29,7 +29,6 @@ inherited dStats: TdStats
     Header.ParentFont = True
     HintMode = hmTooltip
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]

@@ -1,6 +1,5 @@
 inherited dViewProps: TdViewProps
-  Left = 586
-  Top = 254
+  Left = 590
   Caption = 'Properties: photo album view'
   ClientHeight = 435
   ClientWidth = 426
@@ -66,7 +65,6 @@ inherited dViewProps: TdViewProps
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     PopupMenu = pmGrouping
     TabOrder = 2
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.65 2004-10-26 16:51:42 dale Exp $
+//  $Id: Main.pas,v 1.66 2004-10-28 13:10:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,7 +29,7 @@ type
     asGroupsPopupToolsValidated, // Инструменты popup-меню групп прошли проверку на доступность текущим выделенным изображениям
     asPicsPopupToolsValidated);  // Инструменты popup-меню вьюера прошли проверку на доступность текущим выделенным изображениям
 
-  TAppStates = set of TAppState; 
+  TAppStates = set of TAppState;
 
   TfMain = class(TForm, IPhotoAlbumApp)
     aAbout: TAction;
@@ -112,6 +112,7 @@ type
     iEditSep2: TTBXSeparatorItem;
     iEditSep3: TTBXSeparatorItem;
     iEditSep4: TTBXSeparatorItem;
+    iEditSep5: TTBXSeparatorItem;
     iExit: TTBXItem;
     iFileOperations: TTBXItem;
     iFileSep1: TTBXSeparatorItem;
@@ -182,6 +183,7 @@ type
     iToolsSep2: TTBXSeparatorItem;
     iUndo: TTBXItem;
     iView: TTBXItem;
+    iViewSlideShow: TTBXItem;
     mruOpen: TTBXMRUList;
     pmGroups: TTBXPopupMenu;
     pmPhoaView: TTBXPopupMenu;
@@ -207,8 +209,6 @@ type
     tbxlToolbarUndo: TTBXLabelItem;
     tvGroups: TVirtualStringTree;
     ulToolbarUndo: TTBXUndoList;
-    iEditSep5: TTBXSeparatorItem;
-    iViewSlideShow: TTBXItem;
     procedure aaAbout(Sender: TObject);
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
@@ -246,6 +246,7 @@ type
     procedure aaStats(Sender: TObject);
     procedure aaUndo(Sender: TObject);
     procedure aaView(Sender: TObject);
+    procedure aaViewSlideShow(Sender: TObject);
     procedure bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
     procedure dklcMainLanguageChanged(Sender: TObject);
     procedure dklcMainLanguageChanging(Sender: TObject);
@@ -272,7 +273,7 @@ type
     procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
     procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -280,7 +281,6 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
-    procedure aaViewSlideShow(Sender: TObject);
   private
      // Активный проект
     FProject: IPhotoAlbumProject;
@@ -1791,15 +1791,16 @@ uses
     PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^ := nil;
   end;
 
-  procedure TfMain.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  procedure TfMain.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
   var s: String;
   begin
+    LineBreakStyle := hlbForceMultiLine;
     case GetNodeKind(Sender, Node) of
       gnkProject:   s := FProject.Description;
       gnkPhoaGroup: s := GetPicGroupPropStrs(GetNodeGroup(Node), FGroupTreeHintProps, ': ', S_CRLF);
       else          s := '';
     end;
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    HintText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

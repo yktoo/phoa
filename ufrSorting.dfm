@@ -27,7 +27,6 @@ object frSorting: TfrSorting
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     PopupMenu = pmMain
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]

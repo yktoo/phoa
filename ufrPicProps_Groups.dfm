@@ -15,7 +15,6 @@ inherited frPicProps_Groups: TfrPicProps_Groups
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]

@@ -1,6 +1,6 @@
 object fImgView: TfImgView
-  Left = 487
-  Top = 218
+  Left = 485
+  Top = 235
   AutoScroll = False
   ClientHeight = 271
   ClientWidth = 532
@@ -566,7 +566,6 @@ object fImgView: TfImgView
     Position = dpBottom
   end
   object alMain: TActionList
-    Images = fMain.ilActionsSmall
     Left = 8
     Top = 48
     object aNextPic: TAction
@@ -789,7 +788,6 @@ object fImgView: TfImgView
     end
   end
   object pmMain: TTBXPopupMenu
-    Images = fMain.ilActionsSmall
     OnPopup = pmMainPopup
     Left = 48
     Top = 48

@@ -15,7 +15,6 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
     Header.ParentFont = True
     HintMode = hmTooltip
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]

@@ -1,6 +1,6 @@
 inherited dSearch: TdSearch
-  Left = 479
-  Top = 271
+  Left = 478
+  Top = 287
   Caption = 'Find pictures'
   ClientHeight = 435
   ClientWidth = 525
@@ -32,7 +32,6 @@ inherited dSearch: TdSearch
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
     Header.ParentFont = True
-    ParentBackground = False
     TabOrder = 1
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]

@@ -1,6 +1,6 @@
 object dAbout: TdAbout
-  Left = 476
-  Top = 274
+  Left = 479
+  Top = 338
   HelpType = htKeyword
   BorderStyle = bsNone
   Caption = 'About'

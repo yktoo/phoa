@@ -15,7 +15,6 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
     Header.ParentFont = True
     HintMode = hmTooltip
-    ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowVertGridLines, toThemeAware, toUseBlendedImages]

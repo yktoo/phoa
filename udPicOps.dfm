@@ -1,6 +1,6 @@
 inherited dPicOps: TdPicOps
-  Left = 489
-  Top = 261
+  Left = 490
+  Top = 313
   ActiveControl = cbOp
   Caption = 'Picture operations'
   ClientHeight = 433
@@ -81,7 +81,6 @@ inherited dPicOps: TdPicOps
     Header.Options = [hoColumnResize, hoDrag]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 2
     TreeOptions.AnimationOptions = [toAnimatedToggle]
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]

@@ -1,6 +1,6 @@
 inherited dSelKeywords: TdSelKeywords
-  Left = 601
-  Top = 227
+  Left = 599
+  Top = 293
   Caption = 'Select keywords'
   ClientHeight = 431
   ClientWidth = 354
@@ -46,7 +46,6 @@ inherited dSelKeywords: TdSelKeywords
     Header.Options = [hoColumnResize, hoDrag]
     Header.ParentFont = True
     Images = fMain.ilActionsSmall
-    ParentBackground = False
     TabOrder = 1
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]

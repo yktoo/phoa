@@ -15,7 +15,6 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Header.ParentFont = True
     HintMode = hmTooltip
     Images = ilFiles
-    ParentBackground = False
     PopupMenu = pmFiles
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
