@@ -182,9 +182,10 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
       Objects[2] := Pointer(SW_SHOWMAXIMIZED);
     end;
      // Инициализируем значения контролов 
-    if FTool=nil then
-      cbKind.ItemIndex           := Byte(ptkOpen)
-    else begin
+    if FTool=nil then begin
+      cbKind.ItemIndex           := Byte(ptkOpen);
+      cbRunShowCommand.ItemIndex := cbRunShowCommand.Items.IndexOfObject(Pointer(SW_SHOWNORMAL));
+    end else begin
       cbKind.ItemIndex           := Byte(FTool.Kind);
       eName.Text                 := ConstValEx(FTool.Name);
       eMasks.Text                := FTool.Masks;
