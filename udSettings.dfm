@@ -38,36 +38,6 @@ inherited dSettings: TdSettings
         TabOrder = 0
       end
     end
-    object tvMain: TVirtualStringTree
-      Left = 27
-      Top = 0
-      Width = 565
-      Height = 398
-      Align = alClient
-      Header.AutoSizeIndex = 1
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'Tahoma'
-      Header.Font.Style = []
-      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
-      HintMode = hmTooltip
-      ParentBackground = False
-      TabOrder = 1
-      TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
-      TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-      TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
-      TreeOptions.SelectionOptions = [toFullRowSelect]
-      Columns = <
-        item
-          Position = 0
-          Width = 300
-        end
-        item
-          Position = 1
-          Width = 261
-        end>
-    end
   end
   inherited pButtonsBottom: TPanel
     Top = 400

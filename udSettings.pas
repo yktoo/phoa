@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.6 2004-04-19 13:25:50 dale Exp $
+//  $Id: udSettings.pas,v 1.7 2004-04-19 18:22:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -10,56 +10,52 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings,
-  phDlg, VirtualTrees, TB2Dock, TB2Toolbar, TBX, DTLangTools, StdCtrls,
-  ExtCtrls;
-
-const
-  WM_EMBEDCONTROL = WM_USER+1;
+  phDlg, TB2Dock, TB2Toolbar, TBX, DTLangTools, StdCtrls, ExtCtrls;
 
 type
   TdSettings = class(TPhoaDialog)
     pMain: TPanel;
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
-    tvMain: TVirtualStringTree;
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
-     // Узел, соответствующего текущей нажатой NavBar-кнопке
-    FCurSetting: TPhoaPageSetting;
-     // Индекс кнопки навигатора, которую следует выбрать по умочанию
-    FDefNavBtnIndex: Integer;
-     // Контрол для редактирования значения текущего узла
-    FEditorControl: TWinControl;
-     // Флаг встраивания контрола-редактора. Используется для предотвращения вызовов EmbeddedControlChange во время его
-     //   начальной настройки, а также для игнорирования потери фокуса деревом
-    FEmbeddingControl: Boolean;
+     // ID страницы-настройки, которую следует выбрать по умочанию
+    FDefPageSettingID: Integer;
+     // Prop storage
+    FCurPageSetting: TPhoaPageSetting;
+     // Текущий редактор настроек
+    FEditor: TWinControl;
      // Создаёт кнопкtи навигации (уровень 0 из ConsVars.aPhoaSettings[])
     procedure CreateNavBar;
      // Событие нажатия NavBar-кнопки
     procedure NavBarButtonClick(Sender: TObject);
-     // Выбирает настройку PageSetting в качестве текущей редактируемой
-    procedure SelectCurSetting(PageSetting: TPhoaPageSetting);
      // Декодирует строку текста сообразно правилам (если требуется, то с использованием констант)
-    function  DecodeSettingText(const sText: String): String;
+    procedure DecodeSettingText(const sText: String; out sDecoded: String);
+     // Prop handlers
+    procedure SetCurPageSetting(Value: TPhoaPageSetting);
   protected
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
     procedure ButtonClick_OK; override;
+  public
+     // Props
+     // -- Текущая выбранная страница-настройка (кнопка на NavBar)
+    property CurPageSetting: TPhoaPageSetting read FCurPageSetting write SetCurPageSetting;
   end;
 
-   // Отображает диалог настроек. iBtnIndex - индекс кнопки навигатора, которую следует выбрать по умочанию
-  function EditSettings(iBtnIndex: Integer): Boolean;
+   // Отображает диалог настроек. DefPageSetting - страница-настройка навигатора, которую следует выбрать по умочанию
+  function EditSettings(DefPageSettingID: Integer): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, TypInfo;
 
-  function EditSettings(iBtnIndex: Integer): Boolean;
+  function EditSettings(DefPageSettingID: Integer): Boolean;
   begin
     with TdSettings.Create(Application) do
       try
-        FDefNavBtnIndex := iBtnIndex;
+        FDefPageSettingID := DefPageSettingID;
         Result := Execute;
       finally
         Free;
@@ -82,11 +78,13 @@ uses phUtils, Main, TypInfo;
     i: Integer;
     tbi: TTBXCustomItem;
     PPS: TPhoaPageSetting;
+    s: String;
   begin
     for i := 0 to FLocalRootSetting.ChildCount-1 do begin
       PPS := FLocalRootSetting.Children[i] as TPhoaPageSetting;
       tbi := TTBXItem.Create(Self);
-      tbi.Caption     := DecodeSettingText(PPS.Name);
+      DecodeSettingText(PPS.Name, s);
+      tbi.Caption     := s;
       tbi.HelpContext := PPS.HelpContext;
       tbi.ImageIndex  := PPS.ImageIndex;
       tbi.Tag         := Integer(PPS);
@@ -96,15 +94,15 @@ uses phUtils, Main, TypInfo;
     end;
   end;
 
-  function TdSettings.DecodeSettingText(const sText: String): String;
+  procedure TdSettings.DecodeSettingText(const sText: String; out sDecoded: String);
   begin
-    Result := sText;
-    if Result<>'' then
-      case Result[1] of
+    sDecoded := sText;
+    if sDecoded<>'' then
+      case sDecoded[1] of
          // Если наименование начинается на '@' - это константа из TdSettings.dtlsMain
-        '@': Result := dtlsMain.Consts[Copy(Result, 2, MaxInt)];
+        '@': sDecoded := dtlsMain.Consts[Copy(sDecoded, 2, MaxInt)];
          // Если наименование начинается на '#' - это константа из fMain.dtlsMain
-        '#': Result := ConstVal(Copy(Result, 2, MaxInt));
+        '#': sDecoded := ConstVal(Copy(sDecoded, 2, MaxInt));
       end;
   end;
 
@@ -123,24 +121,33 @@ uses phUtils, Main, TypInfo;
      // Создаём кнопки навигации
     CreateNavBar;
      // Выбираем стартовую кнопку
-    LoadSettingTree(FLocalRootSetting[FDefNavBtnIndex] as TPhoaPageSetting);
+    CurPageSetting := FLocalRootSetting.Settings[FDefPageSettingID] as TPhoaPageSetting;
   end;
 
   procedure TdSettings.NavBarButtonClick(Sender: TObject);
   begin
-    SelectCurSetting(TPhoaPageSetting(TComponent(Sender).Tag));
+    CurPageSetting := TPhoaPageSetting(TComponent(Sender).Tag);
   end;
 
-  procedure TdSettings.SelectCurSetting(PageSetting: TPhoaPageSetting);
+  procedure TdSettings.SetCurPageSetting(Value: TPhoaPageSetting);
+  var i: Integer;
   begin
-    FCurSetting := PageSetting;
+    FCurPageSetting := Value;
      // Нажимаем соотв. кнопку
     for i := 0 to tbNav.Items.Count-1 do
-      with tbNav.Items[i] do Checked := Tag=Integer(PageSetting);
+      with tbNav.Items[i] do Checked := Tag=Integer(FCurPageSetting);
      // Настраиваем HelpContext
-    HelpContext := PageSetting.HelpContext;
-     // Загружаем редактор
-    //!!!
+    HelpContext := FCurPageSetting.HelpContext;
+     // Загружаем редактор, если класс сменился
+    if (FEditor=nil) or (FEditor.ClassType<>FCurPageSetting.EditorClass) then begin
+      FreeAndNil(FEditor);
+      FEditor := FCurPageSetting.EditorClass.Create(Self);
+      (FEditor as IPhoaSettingEditor).InitAndEmbed(pMain, DlgDataChange, DecodeSettingText);
+    end;
+     // Инициализируем редактор
+    (FEditor as IPhoaSettingEditor).RootSetting := FCurPageSetting;
+     // Устанавливаем фокус на редактор
+//    ActiveControl := FEditor;
   end;
 
 end.

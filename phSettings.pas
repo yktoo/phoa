@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.2 2004-04-19 13:25:50 dale Exp $
+//  $Id: phSettings.pas,v 1.3 2004-04-19 18:22:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -20,7 +20,7 @@ type
     sdtParMsk,   // Переключатель (CheckBox), представляющий собой бит в маске родителя
     sdtMutex,    // Взаимно исключающий выбор (RadioButton), индекс которого представляет собой значение родителя
     sdtMutexInt, // Взаимно исключающий выбор (RadioButton), значение которого представляет собой значение родителя
-    sdtComboIdx, // Список выбора (ComboBox), индекс которого представляет собой значение
+    sdtComboIdx, // Список выбора (ComboBox), ItemIndex которого представляет собой значение
     sdtComboObj, // Список выбора (ComboBox), Objects[ItemIndex] которого представляет собой значение
     sdtColor,    // Цвет
     sdtInt,      // Целое число
@@ -144,21 +144,29 @@ type
      // Prop storage
     FHelpContext: THelpContext;
     FImageIndex: Integer;
+    FEditorClass: TWinControlClass;
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
+    constructor Create(AOwner: TPhoaSetting; AEditorClass: TWinControlClass; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
     procedure Assign(Source: TPhoaSetting); override;
      // -- HelpContext ID пункта
     property HelpContext: THelpContext read FHelpContext;
      // Props
+     // -- Класс компонента-редактора настройки
+    property EditorClass: TWinControlClass read FEditorClass;
      // -- ImageIndex пункта
     property ImageIndex: Integer read FImageIndex;
   end;
 
+   // Событие декодирования текста пункта
+  TPhoaSettingDecodeTextEvent = procedure(const sText: String; out sDecoded: String) of object;
+
    // Интерфейс редактора настроек
   IPhoaSettingEditor = interface(IInterface)
     ['{32018724-F48C-4EC4-B86A-81C5C5A1F75E}']
+     // Инициализирует и встраивает редактор
+    procedure InitAndEmbed(ParentCtl: TWinControl; AOnChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
      // Prop handlers
     function  GetRootSetting: TPhoaPageSetting;
     procedure SetRootSetting(Value: TPhoaPageSetting);
@@ -177,7 +185,7 @@ var
   RootSetting: TPhoaSetting;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses TypInfo, phUtils;
+uses TypInfo, phUtils, phDefSettingEditor;
 
 const
    // Сообщения об ошибках
@@ -252,7 +260,6 @@ const
   begin
     for Prop := Low(Prop) to High(Prop) do TPhoaSetting.Create(Owner, sdtParMsk, 0, '#'+GetEnumName(TypeInfo(TDateTimeAutofillProp), Byte(Prop)));
   end;
-
 
   procedure ApplyTreeSettings(Tree: TVirtualStringTree);
   begin
@@ -625,14 +632,16 @@ const
   begin
     inherited Assign(Source);
     if Source is TPhoaPageSetting then begin
+      FEditorClass := TPhoaPageSetting(Source).FEditorClass;
       FImageIndex  := TPhoaPageSetting(Source).FImageIndex;
       FHelpContext := TPhoaPageSetting(Source).FHelpContext;
     end;
   end;
 
-  constructor TPhoaPageSetting.Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
+  constructor TPhoaPageSetting.Create(AOwner: TPhoaSetting; AEditorClass: TWinControlClass; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
   begin
     inherited Create(AOwner, sdtStatic, iID, sName);
+    FEditorClass := AEditorClass;
     FImageIndex  := iImageIndex;
     FHelpContext := AHelpContext;
   end;
@@ -640,6 +649,7 @@ const
   constructor TPhoaPageSetting.CreateNew(AOwner: TPhoaSetting);
   begin
     inherited CreateNew(AOwner);
+    FEditorClass := TDefSettingEditor;
     FImageIndex := -1;
   end;
 
@@ -650,7 +660,7 @@ const
   var Lvl1, Lvl2, Lvl3, Lvl4: TPhoaSetting;
   begin
      //=================================================================================================================
-    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Gen, iiA_Props, '@ISettingID_Gen', IDH_setup_general);
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, TDefSettingEditor, ISettingID_Gen, iiA_Props, '@ISettingID_Gen', IDH_setup_general);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US});
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,     ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
@@ -691,7 +701,7 @@ const
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //=================================================================================================================
-    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Browse, iiA_NewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, TDefSettingEditor, ISettingID_Browse, iiA_NewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);
@@ -721,7 +731,7 @@ const
       Lvl2.MinValue := 1;
       Lvl2.MaxValue := MaxInt;
      //=================================================================================================================
-    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_View, iiA_ViewMode, '@ISettingID_View', IDH_setup_view_mode);
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, TDefSettingEditor, ISettingID_View, iiA_ViewMode, '@ISettingID_View', IDH_setup_view_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_KeepCursorOverTB, '@ISettingID_View_KeepCursorOverTB', True);
@@ -758,7 +768,7 @@ const
         Lvl3.MaxValue := 600*1000;
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //=================================================================================================================
-    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
+    Lvl1 := TPhoaPageSetting.Create(RootSetting, TDefSettingEditor, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
       Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
         Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);

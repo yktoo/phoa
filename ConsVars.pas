@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.5 2004-04-18 16:13:35 dale Exp $
+//  $Id: ConsVars.pas,v 1.6 2004-04-19 18:22:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -504,15 +504,15 @@ const
 
    // ID пунктов настройки
    //===================================================================================================================
-  ISettingID_Gen                       = 0;    // Общие
+  ISettingID_Gen                       = 0001; // Общие
   ISettingID_Gen_Intf                  = 0;    // Интерфейс
-    ISettingID_Gen_Language            = 0001; // Язык интерфейса
-    ISettingID_Gen_MainFont            = 0002; // Шрифт программы
-    ISettingID_Gen_TooltipDisplTime    = 0010; // Продолжительность отображения всплывающих подсказок, мс
-    ISettingID_Gen_OpenMRUCount        = 0011; // Длина списка последних открытых файлов
-    ISettingID_Gen_LookupPhoaIni       = 0012; // Загружать ли настройки из phoa.ini в каталоге запуска
+    ISettingID_Gen_Language            = 0041; // Язык интерфейса
+    ISettingID_Gen_MainFont            = 0042; // Шрифт программы
+    ISettingID_Gen_TooltipDisplTime    = 0050; // Продолжительность отображения всплывающих подсказок, мс
+    ISettingID_Gen_OpenMRUCount        = 0061; // Длина списка последних открытых файлов
+    ISettingID_Gen_LookupPhoaIni       = 0062; // Загружать ли настройки из phoa.ini в каталоге запуска
   ISettingID_Gen_Clipboard             = 0;    // Буфер обмена
-    ISettingID_Gen_ClipFormats         = 0030; // Форматы, помещаемые в буфер обмена при копировании
+    ISettingID_Gen_ClipFormats         = 0070; // Форматы, помещаемые в буфер обмена при копировании
   ISettingID_Gen_Toolbars              = 0;    // Панели инструментов
     ISettingID_Gen_ToolbarBtnSize      = 0100; // Размер кнопок основной панели
     ISettingID_Gen_ToolbarBSz16        = 0;    // Мелкие (16x16)
@@ -537,55 +537,55 @@ const
     ISettingID_Gen_TreeSelDotted       = 0;    // Пунктир
     ISettingID_Gen_TreeSelBlended      = 0;    // Оттенённый прямоугольник
    //===================================================================================================================
-  ISettingID_Browse                    = 0;    // Режим обзора
+  ISettingID_Browse                    = 1001; // Режим обзора
   ISettingID_Browse_Viewer             = 0;    // Viewer
-    ISettingID_Browse_ViewerBkColor    = 1000; // Viewer: Цвет фона
-    ISettingID_Browse_ViewerThBColor   = 1001; // Viewer: Цвет фона эскиза
-    ISettingID_Browse_ViewerThFColor   = 1002; // Viewer: Цвет шрифта эскиза
-    ISettingID_Browse_ViewerDragDrop   = 1003; // Viewer: Drag'n'Drop
-    ISettingID_Browse_ViewerTooltips   = 1004; // Viewer: Показывать всплывающие описания эскизов
-    ISettingID_Browse_ViewerTipProps   = 1005; // Viewer: Отображать во всплывающих описаниях
-    ISettingID_Browse_ViewerThInfo     = 1010; // Viewer: Данные, отображаемые на эскизах
-    ISettingID_Browse_ViewerThLTProp   = 1011; // Viewer: Left top corner
-    ISettingID_Browse_ViewerThRTProp   = 1012; // Viewer: Right top corner
-    ISettingID_Browse_ViewerThLBProp   = 1013; // Viewer: Left bottom corner
-    ISettingID_Browse_ViewerThRBProp   = 1014; // Viewer: Right bottom corner
-    ISettingID_Browse_ViewerThBorder   = 1020; // Viewer: Чёткие границы эскиза
-    ISettingID_Browse_ViewerCacheThs   = 1030; // Viewer: Кэшировать эскизы при просмотре
-    ISettingID_Browse_ViewerCacheSze   = 1031; // Viewer: Размер кэша эскизов
-    ISettingID_Browse_ViewerStchFilt   = 1040; // Viewer: Метод ресэмплинга эскизов
-    ISettingID_Browse_MaxUndoCount     = 1050; // Макс. количество операций в буфере отмены
+    ISettingID_Browse_ViewerBkColor    = 1010; // Viewer: Цвет фона
+    ISettingID_Browse_ViewerThBColor   = 1011; // Viewer: Цвет фона эскиза
+    ISettingID_Browse_ViewerThFColor   = 1012; // Viewer: Цвет шрифта эскиза
+    ISettingID_Browse_ViewerDragDrop   = 1013; // Viewer: Drag'n'Drop
+    ISettingID_Browse_ViewerTooltips   = 1014; // Viewer: Показывать всплывающие описания эскизов
+    ISettingID_Browse_ViewerTipProps   = 1015; // Viewer: Отображать во всплывающих описаниях
+    ISettingID_Browse_ViewerThInfo     = 1020; // Viewer: Данные, отображаемые на эскизах
+    ISettingID_Browse_ViewerThLTProp   = 1021; // Viewer: Left top corner
+    ISettingID_Browse_ViewerThRTProp   = 1022; // Viewer: Right top corner
+    ISettingID_Browse_ViewerThLBProp   = 1023; // Viewer: Left bottom corner
+    ISettingID_Browse_ViewerThRBProp   = 1024; // Viewer: Right bottom corner
+    ISettingID_Browse_ViewerThBorder   = 1030; // Viewer: Чёткие границы эскиза
+    ISettingID_Browse_ViewerCacheThs   = 1040; // Viewer: Кэшировать эскизы при просмотре
+    ISettingID_Browse_ViewerCacheSze   = 1041; // Viewer: Размер кэша эскизов
+    ISettingID_Browse_ViewerStchFilt   = 1050; // Viewer: Метод ресэмплинга эскизов
+    ISettingID_Browse_MaxUndoCount     = 1060; // Макс. количество операций в буфере отмены
    //===================================================================================================================
-  ISettingID_View                      = 0;    // Режим просмотра
-  ISettingID_View_AlwaysOnTop          = 2000; // Окно просмотра поверх всех окон
-  ISettingID_View_Fullscreen           = 2001; // Полноэкранный режим
-  ISettingID_View_KeepCursorOverTB     = 2002; // Автопозиционировать курсор над панелью инструментов 
-  ISettingID_View_HideCursor           = 2003; // Скрывать указатель мыши в полноэкранном режиме
-  ISettingID_View_BkColor              = 2004; // Цвет фона окна просмотра
-  ISettingID_View_ShowToolbar          = 2005; // Отображать панель инструментов
+  ISettingID_View                      = 2001; // Режим просмотра
+  ISettingID_View_AlwaysOnTop          = 2010; // Окно просмотра поверх всех окон
+  ISettingID_View_Fullscreen           = 2011; // Полноэкранный режим
+  ISettingID_View_KeepCursorOverTB     = 2012; // Автопозиционировать курсор над панелью инструментов
+  ISettingID_View_HideCursor           = 2013; // Скрывать указатель мыши в полноэкранном режиме
+  ISettingID_View_BkColor              = 2014; // Цвет фона окна просмотра
+  ISettingID_View_ShowToolbar          = 2015; // Отображать панель инструментов
   ISettingID_View_PicChange            = 0;    // Смена изображений
-    ISettingID_View_FitWindowToPic     = 2010; // Подгонять размер окна под размер изображения
-    ISettingID_View_CenterWindow       = 2011; // Центрировать окно на рабочем столе
-    ISettingID_View_ShrinkPicToFit     = 2012; // Сжимать изображение до размера окна
-    ISettingID_View_ZoomPicToFit       = 2013; // Растягивать изображение до размера окна
-    ISettingID_View_Cyclic             = 2014; // Циклический просмотр
+    ISettingID_View_FitWindowToPic     = 2020; // Подгонять размер окна под размер изображения
+    ISettingID_View_CenterWindow       = 2021; // Центрировать окно на рабочем столе
+    ISettingID_View_ShrinkPicToFit     = 2022; // Сжимать изображение до размера окна
+    ISettingID_View_ZoomPicToFit       = 2023; // Растягивать изображение до размера окна
+    ISettingID_View_Cyclic             = 2024; // Циклический просмотр
     ISettingID_View_Optimizing         = 0;    // Оптимизация скорости
-      ISettingID_View_Predecode        = 2020; // Предекодировать следующее изображение
-      ISettingID_View_CacheBehind      = 2021; // Кэшировать предыдущее изображение
-  ISettingID_View_ZoomFactor           = 2030; // Шаг изменения масштаба
-  ISettingID_View_CaptionProps         = 2031; // Отображать в заголовке окна
-  ISettingID_View_StchFilt             = 2032; // Метод ресэмплинга изображения
+      ISettingID_View_Predecode        = 2030; // Предекодировать следующее изображение
+      ISettingID_View_CacheBehind      = 2031; // Кэшировать предыдущее изображение
+  ISettingID_View_ZoomFactor           = 2040; // Шаг изменения масштаба
+  ISettingID_View_CaptionProps         = 2041; // Отображать в заголовке окна
+  ISettingID_View_StchFilt             = 2042; // Метод ресэмплинга изображения
   ISettingID_View_Info                 = 0;    // Отображаемая информация
-    ISettingID_View_ShowInfo           = 2040; // Отображать ли информацию
-    ISettingID_View_InfoPicProps       = 2041; // Info: Отображаемая информация
-    ISettingID_View_InfoFont           = 2042; // Info: Шрифт
-    ISettingID_View_InfoBkColor        = 2043; // Info: Цвет фона
-    ISettingID_View_InfoBkOpacity      = 2044; // Info: Непрозрачность фона (0-255)
+    ISettingID_View_ShowInfo           = 2050; // Отображать ли информацию
+    ISettingID_View_InfoPicProps       = 2051; // Info: Отображаемая информация
+    ISettingID_View_InfoFont           = 2052; // Info: Шрифт
+    ISettingID_View_InfoBkColor        = 2053; // Info: Цвет фона
+    ISettingID_View_InfoBkOpacity      = 2054; // Info: Непрозрачность фона (0-255)
   ISettingID_View_Slideshow            = 0;    // Просмотр слайдов
-    ISettingID_View_SlideInterval      = 2050; // Slideshow: Задержка показа, мс
-    ISettingID_View_SlideCyclic        = 2051; // Slideshow: Циклический просмотр
+    ISettingID_View_SlideInterval      = 2060; // Slideshow: Задержка показа, мс
+    ISettingID_View_SlideCyclic        = 2061; // Slideshow: Циклический просмотр
    //===================================================================================================================
-  ISettingID_Dialogs                   = 0;    // Диалоги
+  ISettingID_Dialogs                   = 3001; // Диалоги
   ISettingID_Dlgs_Confms               = 0;    // Подтверждения
     ISettingID_Dlgs_ConfmDelGroup      = 3010; // Подтверждение: Перед удалением группы
     ISettingID_Dlgs_ConfmDelPics       = 3011; // Подтверждение: Перед удалением изображений
@@ -625,6 +625,8 @@ const
 
    // Сообщение о необходимости обновить статус страницы
   WM_PAGEUPDATE                 = WM_USER+$1100;
+   // Сообщение для редактора настроек - о необходимости встроить в дерево редактор текущей настройки
+  WM_EMBEDCONTROL               = WM_USER+$1101;
 
    // PhoA picture clipboard format name
   SClipbrdPicFormatName         = 'PHOA_INT_PICTURE_BUCKET';

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.4 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufImgView.pas,v 1.5 2004-04-19 18:22:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -490,7 +490,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings;
      // Показываем курсор
     AdjustCursorVisibility(True);
      // В диалоге настроек по умолчанию выбираем кнопку "Режим просмотра"
-    bEdited := EditSettings(2);
+    bEdited := EditSettings(ISettingID_View);
      // Возвращаем topmost-положение окну
     TopmostRestore;
      // Применяем настройки
