@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.31 2004-08-29 19:15:28 dale Exp $
+//  $Id: Main.pas,v 1.32 2004-08-30 14:10:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -110,7 +110,6 @@ type
     aSortPics: TAction;
     bEdit: TTBXItem;
     iSortPics: TTBXItem;
-    dtlsMain: TDTLanguageSwitcher;
     tbViewSep1: TTBXSeparatorItem;
     fpMain: TFormPlacement;
     aCut: TAction;
@@ -185,7 +184,6 @@ type
     aRemoveSearchResults: TAction;
     iRemoveSearchResults: TTBXItem;
     dklcMain: TDKLanguageController;
-    cbLng: TComboBox;
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaSave(Sender: TObject);
@@ -219,7 +217,6 @@ type
     procedure fpMainSavePlacement(Sender: TObject);
     procedure fpMainRestorePlacement(Sender: TObject);
     procedure mruOpenClick(Sender: TObject; const Filename: String);
-    procedure dtlsMainLanguageChanged(Sender: TObject);
     procedure SetPhoaViewClick(Sender: TObject);
     procedure SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -251,7 +248,7 @@ type
     procedure aaHelpFAQ(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure aaRemoveSearchResults(Sender: TObject);
-    procedure cbLngChange(Sender: TObject);
+    procedure dklcMainLanguageChanged(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -282,8 +279,6 @@ type
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
-     // Добавляет в настройки пункты выбора языка интерфейса
-    procedure LoadLanguageSettings;
      // Применяет параметры настройки языка
     procedure ApplyLanguage;
      // Применяет параметры настройки инструментов
@@ -331,8 +326,6 @@ type
     procedure OperationsListChange(Sender: TObject);
      // Событие клика на пункте инструмента
     procedure ToolItemClick(Sender: TObject);
-     // Отображает прогресс загрузки
-    procedure ShowProgressInfo(const sConstName: String; const aParams: Array of const);
      // Вводит в режим просмотра, начиная с текущего изображения. InitFlags задаёт опции инициализации
     procedure StartViewMode(InitFlags: TImgViewInitFlags);
      // Отменяет все "неустойчивые" режимы и возвращается в основной режим просмотра
@@ -787,11 +780,7 @@ uses
   procedure TfMain.AppIdle(Sender: TObject; var Done: Boolean);
   begin
      // Уничтожаем окно прогресса, если оно есть
-    if ProgressWnd<>nil then begin
-      ProgressWnd.DisplayStage('');
-      ProgressWnd.AnimateFadeout := SettingValueBool(ISettingID_Dlgs_SplashStartFade);
-      ProgressWnd.HideWindow;
-    end;
+    HideProgressWnd;
   end;
 
   procedure TfMain.ApplyLanguage;
@@ -825,7 +814,7 @@ uses
 
   begin
      // Настраиваем язык интерфейса
-    dtlsMain.Language := SettingValueInt(ISettingID_Gen_Language);
+    LangManager.LanguageID := SettingValueInt(ISettingID_Gen_Language);
      // Настраиваем тему
     with (RootSetting.Settings[ISettingID_Gen_Theme] as TPhoaListSetting) do TBXSetTheme(VariantText); 
      // Настраиваем основной шрифт программы
@@ -955,6 +944,12 @@ uses
     end;
   end;
 
+  procedure TfMain.dklcMainLanguageChanged(Sender: TObject);
+  begin
+    ResetMode;
+    ApplyLanguage;
+  end;
+
   procedure TfMain.DoEnableTools(Item: TTBCustomItem);
   var PicLinks: TPhoaPicLinks;
   begin
@@ -998,12 +993,6 @@ uses
     finally
       tvGroups.EndSynch;
     end;
-  end;
-
-  procedure TfMain.dtlsMainLanguageChanged(Sender: TObject);
-  begin
-    ResetMode;
-    ApplyLanguage;
   end;
 
   procedure TfMain.EnableActions;
@@ -1138,7 +1127,7 @@ uses
   procedure TfMain.FormActivate(Sender: TObject);
   begin
      // Если есть окошко прогресса, держим главное окно позади него  
-    if ProgressWnd<>nil then SetWindowPos(Handle, ProgressWnd.Handle, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+    KeepBehindProgressWnd(Handle);
   end;
 
   procedure TfMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1153,12 +1142,8 @@ uses
   end;
 
   procedure TfMain.FormCreate(Sender: TObject);
-var i: Integer;
   begin
-for i := 0 to LangManager.LanguageCount-1 do
-  fMain.cbLng.AddItem(LangManager.LanguageNames[i], Pointer(LangManager.LanguageIDs[i]));
     try
-      ShowProgressInfo('SMsg_Initializing', []);
       ShortTimeFormat := 'hh:nn';
       LongTimeFormat  := 'hh:nn:ss';
        // Настраиваем fpMain
@@ -1191,8 +1176,6 @@ for i := 0 to LangManager.LanguageCount-1 do
         OnSelectionChange := ViewerSelectionChange;
         OnStartViewMode   := aaView;
       end;
-       // Load language list
-      LoadLanguageSettings;
        // Add self to the clipboard viewer chain
       FHNextClipbrdViewer := SetClipboardViewer(Handle);
        // Применяем настройки
@@ -1322,25 +1305,6 @@ for i := 0 to LangManager.LanguageCount-1 do
       tvGroups.EndUpdate;
     end;
     ViewerRefresh;
-  end;
-
-  procedure TfMain.LoadLanguageSettings;
-  var
-    Langs: TLanguages;
-    LangSetting: TPhoaSetting;
-    i: Integer;
-  begin
-     // Находим пункт списка "Язык интерфейса"
-    LangSetting := RootSetting.Settings[ISettingID_Gen_Language];
-     // Составляем список доступных языков
-    Langs := TLanguages.Create;
-    try
-      dtlsMain.RootComp.BuildLangList(Langs, True, False);
-       // Создаём пункты выбора
-      for i := 0 to Langs.Count-1 do TPhoaMutexIntSetting.Create(LangSetting, 0, Langs.Names[i], Langs[i]);
-    finally
-      Langs.Free;
-    end;
   end;
 
   procedure TfMain.LoadViewList(idxSelect: Integer);
@@ -1521,11 +1485,6 @@ for i := 0 to LangManager.LanguageCount-1 do
     for i := 0 to gipmPhoaViewViews.Count-1 do gipmPhoaViewViews[i].Checked := i=Value;
      // Перегружаем дерево папок
     LoadGroupTree;
-  end;
-
-  procedure TfMain.ShowProgressInfo(const sConstName: String; const aParams: array of const);
-  begin
-    if ProgressWnd<>nil then ProgressWnd.DisplayStage(ConstVal(sConstName, aParams));
   end;
 
   procedure TfMain.StartViewMode(InitFlags: TImgViewInitFlags);
@@ -1903,14 +1862,4 @@ for i := 0 to LangManager.LanguageCount-1 do
     StartViewMode(Msg.InitFlags);
   end;
 
-procedure TfMain.cbLngChange(Sender: TObject);
-begin
-LangManager.LanguageID := Integer(cbLng.Items.Objects[cbLng.ItemIndex]);
-end;
-
-initialization
-  LangManager.RegisterLangFile('phoa-rus.lng');
-  LangManager.RegisterLangFile('phoa-ukr.lng');
-  LangManager.RegisterLangFile('phoa-deu.lng');
-  LangManager.RegisterLangFile('phoa-brp.lng');
 end.

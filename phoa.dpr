@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.17 2004-06-06 13:29:45 dale Exp $
+//  $Id: phoa.dpr,v 1.18 2004-08-30 14:10:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -76,6 +76,9 @@ begin
   LoadAllSettings;
    // Отображаем окно прогресса
   if SettingValueBool(ISettingID_Dlgs_SplashStartShow) then CreateProgressWnd;
+  ShowProgressInfo('SMsg_Initializing', []);
+   // Составляем список доступных языков
+  InitLanguages;
    // Выполняем приложение
   Application.Initialize;
   Application.CreateForm(TfMain, fMain);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.21 2004-08-29 19:15:28 dale Exp $
+//  $Id: ufImgView.pas,v 1.22 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -79,7 +79,6 @@ type
     ipmHelp: TTBXItem;
     aEdit: TAction;
     ipmEdit: TTBXItem;
-    dtlsMain: TDTLanguageSwitcher;
     aSlideShow: TAction;
     ipmSepSMView: TTBXSeparatorItem;
     iSlideShow: TTBXItem;
@@ -886,7 +885,7 @@ uses
       sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
       FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
     end;
-    if sCaption='' then Caption := dtlsMain.Consts['SDefaultCaption'] else Caption := sCaption;
+    if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик
     eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.PicIDs.Count]);
   end;
@@ -923,7 +922,7 @@ uses
       sTitle: String;
       Sz: TSize;
     begin
-      sTitle := dtlsMain.Consts['SError'];
+      sTitle := ConstVal('SImgView_ErrorMsg');
       with iMain.Bitmap do begin
          // Стираем Bitmap
         Width  := 500;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.5 2004-08-29 19:15:28 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -43,7 +43,6 @@ type
     eFrameNumber: TEdit;
     cbAuthor: TComboBox;
     mNotes: TMemo;
-    dtlsMain: TDTLanguageSwitcher;
     eDate: TDateEdit;
     eTime: TMaskEdit;
     lDate: TLabel;

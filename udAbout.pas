@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.5 2004-08-29 19:15:28 dale Exp $
+//  $Id: udAbout.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -16,7 +16,6 @@ type
   TShowDetail = (sdTitle, sdAuthor, sdCredits, sdTranslation);
 
   TdAbout = class(TForm)
-    dtlsMain: TDTLanguageSwitcher;
     iMain: TImage32;
     lWebsite: TLabel;
     lOK: TLabel;
@@ -83,17 +82,23 @@ type
   procedure CreateProgressWnd;
    // ќтображает модальный диалог "ќ программе"
   procedure ShowAbout(bAnimateFadeout: Boolean);
+   // ќтображает прогресс загрузки, если окно прогресса отображаетс€
+  procedure ShowProgressInfo(const sConstName: String; const aParams: array of const);
+   // ”ничтожает окно прогресса, если оно есть
+  procedure HideProgressWnd;
+   // ≈сли есть окошко прогресса, держит окно Wnd позади него
+  procedure KeepBehindProgressWnd(Wnd: HWND);
 
 const
    // ¬ысота области дл€ отрисовки строки прогресса (в нижней части окна)
   IProgressAreaHeight = 16;
 
-var
-  ProgressWnd: TdAbout;  
-
 implementation
 {$R *.dfm}
-uses GraphicEx, phUtils;
+uses GraphicEx, phUtils, phSettings;
+
+var
+  ProgressWnd: TdAbout;
 
   procedure CreateProgressWnd;
   begin
@@ -115,6 +120,25 @@ uses GraphicEx, phUtils;
       finally
         Free;
       end;
+  end;
+
+  procedure ShowProgressInfo(const sConstName: String; const aParams: array of const);
+  begin
+    if ProgressWnd<>nil then ProgressWnd.DisplayStage(ConstVal(sConstName, aParams));
+  end;
+
+  procedure HideProgressWnd;
+  begin
+    if ProgressWnd<>nil then begin
+      ProgressWnd.DisplayStage('');
+      ProgressWnd.AnimateFadeout := SettingValueBool(ISettingID_Dlgs_SplashStartFade);
+      ProgressWnd.HideWindow;
+    end;
+  end;
+
+  procedure KeepBehindProgressWnd(Wnd: HWND);
+  begin
+    if ProgressWnd<>nil then SetWindowPos(Wnd, ProgressWnd.Handle, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
   end;
 
   constructor TdAbout.Create(bDialogMode: Boolean);

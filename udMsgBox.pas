@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.6 2004-08-29 19:15:28 dale Exp $
+//  $Id: udMsgBox.pas,v 1.7 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,7 +14,6 @@ uses
 
 type
   TdMsgBox = class(TForm)
-    dtlsMain: TDTLanguageSwitcher;
     iIcon: TImage;
     lMessage: TLabel;
     cbDontShowAgain: TCheckBox;

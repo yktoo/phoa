@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.5 2004-05-01 04:03:24 dale Exp $
+//  $Id: udStats.pas,v 1.6 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -213,8 +213,8 @@ uses phUtils, Main, phPhoa, phSettings;
   function TdStats.NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData;
   var s: String;
   begin
-     // ≈сли строка начинаетс€ на '@' - это им€ константы из TdStats.dtlsMain
-    if sName[1]='@' then s := dtlsMain.Consts[Copy(sName, 2, MaxInt)] else s := sName;
+     // ≈сли строка начинаетс€ на '@' - это им€ константы 
+    if sName[1]='@' then s := ConstVal(Copy(sName, 2, MaxInt)) else s := sName;
     New(Result);
     Result^.sName   := s;
     Result^.sValue  := sValue;

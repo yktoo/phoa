@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.8 2004-08-29 19:15:28 dale Exp $
+//  $Id: phDlg.pas,v 1.9 2004-08-30 14:10:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,7 +14,6 @@ uses
 
 type
   TPhoaDialog = class(TForm)
-    dtlsMain: TDTLanguageSwitcher;
     pButtonsBottom: TPanel;
     bCancel: TButton;
     bOK: TButton;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.19 2004-06-27 17:44:23 dale Exp $
+//  $Id: phUtils.pas,v 1.20 2004-08-30 14:10:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -154,7 +154,7 @@ uses
   procedure OpenWebsite;
 
 implementation
-uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
+uses Forms, TypInfo, Registry, ShellAPI, DTLangTools, Main, phSettings, udMsgBox;
 
   procedure PhoaException(const sMsg: String; const aParams: Array of const);
 
@@ -503,12 +503,12 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
 
   function ConstVal(const sConstName: String): String;
   begin
-    Result := fMain.dtlsMain.Consts[sConstName];
+    Result := LangManager.ConstantValue[sConstName];
   end;
 
   function ConstVal(const sConstName: String; const aParams: Array of const): String;
   begin
-    Result := Format(ConstVal(sConstName), aParams);
+    Result := Format(LangManager.ConstantValue[sConstName], aParams);
   end;
 
   function ConstValEx(const sText: String): String;

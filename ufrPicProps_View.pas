@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.14 2004-08-29 19:15:28 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.15 2004-08-30 14:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -23,7 +23,6 @@ type
     aZoomActual: TAction;
     aZoomFit: TAction;
     pmMain: TTBXPopupMenu;
-    dtlsMain: TDTLanguageSwitcher;
     dkTop: TTBXDock;
     tbMain: TTBXToolbar;
     cbViewFile: TTBXComboBoxItem;
