@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.4 2004-06-02 08:24:31 dale Exp $
+//  $Id: phPhoa.pas,v 1.5 2004-06-06 13:29:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -31,8 +31,9 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   Jun 06, 2004 - dale - added a chunk for Group Description property
+//   Jun 02, 2004 - dale - added a chunk for Group ID property
 //   May 30, 2004 - dale - added chunks for picture Rotation and Flips properties
-//   Jun 02, 2004 - dale - added a chunk for Group ID
 //**********************************************************************************************************************
 unit phPhoa;
 
@@ -270,6 +271,7 @@ const
   IPhChunk_Group_ID                = $1200; // Int      Group ID
   IPhChunk_Group_Text              = $1201; // StringW  Group text (name)
   IPhChunk_Group_Expanded          = $1202; // Byte     Group-node expanded flag (0/1)
+  IPhChunk_Group_Description       = $1203; // StringW  Group description 
    // Picture linked in group properties
   IPhChunk_GroupPic_ID             = $1220; // Int      Link to picture (the picture's ID)
    // Photo album view properties
@@ -315,7 +317,7 @@ type
 
    // List of chunks known for the moment, and their datatypes and ranges
 const
-  aPhChunks: Array[0..59] of TPhChunkEntry = (
+  aPhChunks: Array[0..60] of TPhChunkEntry = (
     (wCode: IPhChunk_Remark;                 Datatype: pcdStringW),
     (wCode: IPhChunk_PhoaGenerator;          Datatype: pcdStringB),
     (wCode: IPhChunk_PhoaSavedDate;          Datatype: pcdInt;    iRangeMin: 0;  iRangeMax: 3652058 {Dec 31, 9999}),
@@ -348,6 +350,7 @@ const
     (wCode: IPhChunk_Group_ID;               Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_Group_Text;             Datatype: pcdStringW),
     (wCode: IPhChunk_Group_Expanded;         Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
+    (wCode: IPhChunk_Group_Description;      Datatype: pcdStringW),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_View_Name;              Datatype: pcdStringW),
     (wCode: IPhChunk_ViewGrouping_Prop;      Datatype: pcdWord;   iRangeMin: 0;  iRangeMax: 10),

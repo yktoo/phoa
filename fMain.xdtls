@@ -3393,11 +3393,11 @@
       </propEntry>
       <propEntry name="TPhoaMultiOp_PicEdit">
         <tranEntries>
-          <tranEntry langID="1049" value="Изменение изображений"/>
-          <tranEntry langID="1033" value="Edit pictures"/>
+          <tranEntry langID="1049" value="Изменение свойств изображений"/>
+          <tranEntry langID="1033" value="Edit picture properties"/>
           <tranEntry langID="1031" value="Bilder bearbeiten"/>
           <tranEntry langID="1046" value="Editar imagens"/>
-          <tranEntry langID="1058" value="Зміна зображень"/>
+          <tranEntry langID="1058" value="Зміна властивостей зображень"/>
         </tranEntries>
       </propEntry>
       <propEntry name="TPhoaMultiOp_PicOperation">
@@ -3443,6 +3443,15 @@
           <tranEntry langID="1031" value="Gruppe bewegen"/>
           <tranEntry langID="1046" value="Arrastar grupo"/>
           <tranEntry langID="1058" value="Перетаскування групи"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="TPhoaOp_GroupEdit">
+        <tranEntries>
+          <tranEntry langID="1049" value="Изменение свойств группы"/>
+          <tranEntry langID="1033" value="Edit group properties"/>
+          <tranEntry langID="1031" value="Edit group properties"/>
+          <tranEntry langID="1046" value="Edit group properties"/>
+          <tranEntry langID="1058" value="Зміна властивостей групи"/>
         </tranEntries>
       </propEntry>
       <propEntry name="TPhoaOp_GroupNew">

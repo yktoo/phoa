@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.35 2004-06-04 14:18:18 dale Exp $
+//  $Id: ConsVars.pas,v 1.36 2004-06-06 13:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,6 +14,7 @@ uses
 type
   EPhoaException = class(Exception);
 
+   // Свойства изображения
   TPicProperty = (
     ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
     ppFormat, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia,
@@ -23,6 +24,10 @@ const
   PPAllProps = [Low(TPicProperty)..High(TPicProperty)];
 
 type
+   // Свойства группы
+  TGroupProperty = (gpID, gpText, gpDescription);
+  TGroupProperties = set of TGroupProperty;
+
    // Типы данных свойств изображения
   TPicPropertyDatatype = (ppdInteger, ppdString, ppdPixelFormat, ppdDate, ppdTime, ppdStrings);
 
@@ -115,15 +120,15 @@ type
     mbkConfirmWarning, // Предупреждение с подтверждением - OK/Cancel
     mbkError);         // Ошибка                          - OK
 
-   // Кнопка в окне сообщения (порядок следования является обратным порядку их появления в диалоге)
+   // Кнопка в окне сообщения (порядок следования соответствует порядку их появления в диалоге)
   TMessageBoxButton = (
-    mbbHelp,     // Справка
-    mbbCancel,   // Отмена
-    mbbOK,       // ОК
-    mbbNoToAll,  // Нет для всех
-    mbbNo,       // Нет
+    mbbYes,      // Да
     mbbYesToAll, // Да для всех
-    mbbYes);     // Да
+    mbbNo,       // Нет
+    mbbNoToAll,  // Нет для всех
+    mbbOK,       // ОК
+    mbbCancel,   // Отмена
+    mbbHelp);    // Справка
   TMessageBoxButtons = set of TMessageBoxButton;
 
    // Результат показа окна сообщения
@@ -157,7 +162,7 @@ type
      // -- Флаги действий при откате (Undoing)
     uifUReinitAll,           // Переинициализировать все узлы дерева
     uifUReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
-    uifUReinitRecursive,     // При переинициализации (флаги uifUReinitParent и uifUReinitSiblings) действовать рекурсивно
+    uifUReinitRecursive,     // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
     uifUInvalidateNode,      // Сделать Invalidate узлу группы. Должно быть заполнено Op.GroupAbsIdx
     uifUInvalidateTree);     // Сделать Invalidate всему контролу дерева групп
 

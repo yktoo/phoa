@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.17 2004-06-04 14:18:18 dale Exp $
+//  $Id: phObj.pas,v 1.18 2004-06-06 13:29:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -146,6 +146,7 @@ type
     FOwner: TPhoaGroup;
     FPicIDs: TIntegerList;
     FID: Integer;
+    FDescription: String;
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
@@ -176,6 +177,8 @@ type
      // Рекурсивно просматривает группу и все подгруппы, назначая ID группам, его не имеющим
     procedure FixupIDs;
      // Props
+     // -- Описание
+    property Description: String read FDescription write FDescription;
      // -- True, если соответствующий группе узел дерева развёрнут
     property Expanded: Boolean read FExpanded write FExpanded;
      // -- Возвращает следующий свободный ID, больший ID самой группы и ID всх её детей
@@ -711,11 +714,24 @@ type
   TPhoaOp_GroupRename = class(TPhoaOperation)
   private
      // Старое имя группы
-    FOldGroupName: String;
+    FOldText: String;
   protected
     function GetInvalidationFlags: TUndoInvalidationFlags; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText: String);
+    procedure Undo; override;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // Операция редактирования свойств группы
+   //-------------------------------------------------------------------------------------------------------------------
+
+  TPhoaOp_GroupEdit = class(TPhoaOp_GroupRename)
+  private
+     // Старое описание группы
+    FOldDescription: String;
+  public
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText, sNewDescription: String);
     procedure Undo; override;
   end;
 
@@ -4104,7 +4120,7 @@ var
   begin
     inherited Create(List, PhoA);
      // Выполняем операцию и запоминаем данные отката
-    FOldGroupName := Group.Text;
+    FOldText := Group.Text;
     Group.Text := sNewText;
     OpGroup := Group;
   end;
@@ -4117,7 +4133,26 @@ var
   procedure TPhoaOp_GroupRename.Undo;
   begin
      // Получаем группу и восстанавливаем текст
-    OpGroup.Text := FOldGroupName;
+    OpGroup.Text := FOldText;
+    inherited Undo;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // TPhoaOp_GroupEdit
+   //-------------------------------------------------------------------------------------------------------------------
+
+  constructor TPhoaOp_GroupEdit.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sNewText, sNewDescription: String);
+  begin
+    inherited Create(List, PhoA, Group, sNewText);
+     // Выполняем операцию и запоминаем данные отката
+    FOldDescription := Group.Description;
+    Group.Description := sNewDescription;
+  end;
+
+  procedure TPhoaOp_GroupEdit.Undo;
+  begin
+     // Получаем группу и восстанавливаем описание
+    OpGroup.Description := FOldDescription;
     inherited Undo;
   end;
 
@@ -6687,7 +6722,7 @@ var
        // Iterate through known chars
       for Result := Low(Result) to High(Result) do
         if aCmdLineKeys[Result].cChar=c then Exit;
-      Result := clkOpenPhoa; // Satisfy the compiler  
+      Result := clkOpenPhoa; // Satisfy the compiler
       PhoaCommandLineError(SCmdLineErrMsg_UnknownKey, [c]);
     end;
 
@@ -6702,7 +6737,7 @@ var
         else
           PhoaCommandLineError(SCmdLineErrMsg_DuplicateKeyValue, [aCmdLineKeys[Key].cChar]);
        // Нет ещё такого
-      FKeyValues.AddObject(sValue, Pointer(Key)); 
+      FKeyValues.AddObject(sValue, Pointer(Key));
     end;
 
   begin

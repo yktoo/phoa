@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.21 2004-06-02 08:24:31 dale Exp $
+//  $Id: Main.pas,v 1.22 2004-06-06 13:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -373,7 +373,7 @@ uses
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udPhoAProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
-  phToolSetting, udMsgBox;
+  phToolSetting, udMsgBox, udGroupProps;
 
    //===================================================================================================================
    //  TfMain
@@ -419,8 +419,8 @@ uses
       if tvGroups.FocusedNode=FRootNode then
         if ViewIndex>=0 then aPhoaView_Edit.Execute else EditPhoA(FPhoA, FOperations)
        // Редактирование группы
-      else if CurGroup<>nil then
-        tvGroups.EditNode(tvGroups.FocusedNode, -1);
+      else if (CurGroup<>nil) and (tvGroups.FocusedNode<>FSearchedNode) then
+        EditPicGroup(FPhoA, CurGroup, FOperations);
      // Редактирование изображения
     end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) and EditPic(Viewer.GetSelectedPicArray, FPhoA, FOperations) then
       RefreshViewer;
