@@ -2,7 +2,8 @@ LANGID=1031
 TargetApplication=PhoA 1.1.5 beta
 Author=Dominik Mayer <dominik.mayer@web.de>
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-03 20:30:19
+LastModified=2004-09-06 01:24:27
+SourceLANGID=1033
 
 [frWzPageFileOps_SelTask]
 00000007=Kopiert die Dateien der ausgewählten Bilder, in den angegebenen Ordner. Verwenden Sie diese Option, um Fotoalben für das schreiben auf CD oder DVD vorzubereiten.
@@ -18,7 +19,6 @@ LastModified=2004-09-03 20:30:19
 00000037=Thumbnails &erneuern
 
 [frWzPageFileOps_SelPics]
-00000061=<all pics>
 00000064=Au&sgewählte Bilder
 00000067=Bilder in ausgewählten Gruppen:
 00000070=Gültigkeit der Dateiverknüpfung prüfen
@@ -69,8 +69,6 @@ LastModified=2004-09-03 20:30:19
 00000022=Originales Ordnerla&yout beibehalten
 00000025=Dateien in Ordnern unter erhaltung des &Gruppenlayouts anordnen
 00000028=Mehrere &Kopien der Datei erlauben
-00000041=c;;
-00000043=_
 
 [frWzPageFileOps_CDOptions]
 00000007=Das Medium bezeichnen a&ls:
@@ -87,12 +85,7 @@ LastModified=2004-09-03 20:30:19
 00000013=&Dateimaske (getrennt durch ';'):
 00000016=Vorhandensein im &Fotoalbum:
 00000019=&und:
-00000023=*.*
 00000029=Nicht berücksichtigen\nNur Dateien, die noch nicht im Fotoalbum vorhanden sind\nNur Dateien, die schon im Fotoalbum vorhanden sind\n
-00000042=!99:99;1;…
-00000044=:
-00000047=!99:99;1;…
-00000049=:
 00000055=Inklusive &Unterordner
 
 [frWzPageAddFiles_CheckFiles]
@@ -108,7 +101,6 @@ LastModified=2004-09-03 20:30:19
 00000124=Kopieren|Kopiert die aktuelle Aufzeichnung in die Zwischenablage
 00000166=&Suchen...
 00000168=Suche...|Text Suchen Dialog anzeigen
-00000177=...
 00000183=In Datei &speichern...
 00000185=In Datei speichern...|Das Logbuch in eine ausgewählte Datei speichern
 00000187=Nur &Fehler anzeigen
@@ -179,8 +171,6 @@ LastModified=2004-09-03 20:30:19
 00000025=&Datum:
 00000028=&Zeit:
 00000031=&Medienname oder -code:
-00000066=!99:99:99;1;…
-00000068=:  :
 
 [fImgView]
 00000008=Symbolleiste
@@ -191,7 +181,6 @@ LastModified=2004-09-03 20:30:19
 00000150=&Optionen...
 00000152=Optionen...|Optionen anzeigen/verändern
 00000162=Bilder aktuell/gesamt
-00000163=0/0
 00000165=Tools
 00000168=Advance
 00000169=&Nächstes Bild
@@ -271,7 +260,6 @@ LastModified=2004-09-03 20:30:19
 00000020=Weiter >
 00000023=Hilfe
 00000026=< Zurück
-00000032=<heading>
 
 [dViewProps]
 00000003=Eigenschaften: Fotoalbum Ansicht
@@ -319,8 +307,6 @@ LastModified=2004-09-03 20:30:19
 00000012=Abbrechen
 00000015=OK
 00000018=Hilfe
-00000022=\\\
-00000023=\\\
 
 [dSortPics]
 00000003=Bilder sortieren
@@ -342,8 +328,6 @@ LastModified=2004-09-03 20:30:19
 00000012=Schließen
 00000015=OK
 00000018=Hilfe
-00000029=\\\
-00000030=\\\
 
 [dSelPhoaGroup]
 00000003=Bildgruppe auswählen
@@ -383,8 +367,6 @@ LastModified=2004-09-03 20:30:19
 00000032=Daten
 00000034=Schlüsselwörter
 00000036=Gruppen
-00000041=Software\DaleTech\PhoA
-00000042=PicPropsDialog
 
 [dPicOps]
 00000003=Bildoperationen
@@ -402,14 +384,12 @@ LastModified=2004-09-03 20:30:19
 00000018=Hilfe
 00000021=&Beschreibung:
 00000024=&Thumnail Größe (BxH):
-00000027=x
 00000030=&Thumbnail Qualität:
 00000033=niedriger\nkleinere Datei
 00000036=höher\ngrößere Datei
 
 [dMsgBox]
 00000003=<>
-00000009=<>
 00000012=Diese Meldung nicht mehr &anzeigen.
 
 [dGroupProps]
@@ -427,7 +407,6 @@ LastModified=2004-09-03 20:30:19
 00000020=Weiter >
 00000023=Hilfe
 00000026=< Zurück
-00000032=<heading>
 
 [dAbout]
 00000003=Über
@@ -550,7 +529,6 @@ LastModified=2004-09-03 20:30:19
 00000189=Help
 00000190=PhoA &Website
 00000192=PhoA Website|Öffnet die Homepage des Programms im Browser
-00000201=MRU
 00000204=&Bildgruppen
 00000205=Bildgruppen|Zeigt die Gruppen des Fotoalbums in Baumform an
 

@@ -2,7 +2,8 @@ LANGID=1046
 TargetApplication=PhoA 1.1.4 beta
 Author=Cesar Boschetti <cesar@las.inpe.br>
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-03 19:55:09
+LastModified=2004-09-06 01:25:26
+SourceLANGID=1033
 
 [frWzPageAddFiles_SelFiles]
 00000007=Filtro de seleção
@@ -10,12 +11,7 @@ LastModified=2004-09-03 19:55:09
 00000013=&Tipo de arquivo (delimitado com ';'):
 00000016=&Presença no album:
 00000019=at&é:
-00000023=*.*
 00000029=Descartar\nSomente arquivos ausentes no álbum\nSomente arquivos presentes no álbum\n
-00000042=!99:99;1;…
-00000044=:
-00000047=!99:99;1;…
-00000049=:
 00000055=Incluir &subdiretórios
 
 [frWzPageAddFiles_CheckFiles]
@@ -73,8 +69,6 @@ LastModified=2004-09-03 19:55:09
 00000025=&Data:
 00000028=&Hora:
 00000031=Número ou código da &Mídia:
-00000066=!99:99:99;1;…
-00000068=:  :
 
 [fImgView]
 00000130=E&ditar...
@@ -82,7 +76,6 @@ LastModified=2004-09-03 19:55:09
 00000150=&Opções...
 00000152=Opções...|Ver/mudar opções
 00000162=Corrente/total de imagens
-00000163=0/0
 00000169=Pró&xima imagem
 00000171=Próxima imagem|Ir para última imagem no grupo
 00000173=&Imagem anterior
@@ -117,7 +110,6 @@ LastModified=2004-09-03 19:55:09
 00000020=Próxima >
 00000023=Ajuda
 00000026=< Voltar
-00000032=<heading>
 
 [dViewProps]
 00000003=Propriedades: visualização do álbum
@@ -141,8 +133,6 @@ LastModified=2004-09-03 19:55:09
 00000012=Cancelar
 00000015=OK
 00000018=Ajuda
-00000022=\\\
-00000023=\\\
 
 [dSortPics]
 00000003=Classificar imagens
@@ -164,8 +154,6 @@ LastModified=2004-09-03 19:55:09
 00000012=Fechar
 00000015=OK
 00000018=Ajuda
-00000029=\\\
-00000030=\\\
 
 [dSelPhoaGroup]
 00000003=Selecionar grupo
@@ -205,8 +193,6 @@ LastModified=2004-09-03 19:55:09
 00000032=Dados
 00000034=Palavras-\nchave
 00000036=Grupos
-00000041=Software\DaleTech\PhoA
-00000042=PicPropsDialog
 
 [dPicOps]
 00000003=Operações com imagens
@@ -224,7 +210,6 @@ LastModified=2004-09-03 19:55:09
 00000018=Ajuda
 00000021=&Descrição:
 00000024=&Tamanho da miniatura (WxH):
-00000027=x
 00000030=&Qualidade da miniatura:
 00000033=baixa\nmenor tamanho
 00000036=alta\nmaior tamanho
@@ -235,7 +220,6 @@ LastModified=2004-09-03 19:55:09
 00000020=Próxima >
 00000023=Ajuda
 00000026=< Voltar
-00000032=<heading>
 
 [dAbout]
 00000003=Sobre o PhoA
@@ -319,7 +303,6 @@ LastModified=2004-09-03 19:55:09
 00000184=Fazer um grupo...|Transfere a atual hierarquia de uma pasta para um grupo selecionado do álbum
 00000190=PhoA &Website
 00000192=PhoA Website|Ir para home page do programa
-00000201=MRU
 00000204=&Grupos de imagens
 00000205=Grupos de imagens|Mostra a árvore dos grupos de imagens
 
