@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.13 2004-10-23 14:05:08 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.14 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -39,11 +39,14 @@ type
     procedure InitializePage; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+  public
+    procedure FileChanged(iIndex: Integer); override;
   end;
 
 implementation
 {$R *.dfm}
-uses ConsVars, phUtils, phObj, phMetadata, udSettings, phSettings, Main;
+uses ConsVars, phUtils, phObj, phMetadata, udSettings, phSettings, Main,
+  udPicProps;
 
 type
   PPExifTag = ^PExifTag;
@@ -55,6 +58,15 @@ type
       tvMain.RootNodeCount := EditedPics.Count;
       ActivateFirstVTNode(tvMain);
     end;
+  end;
+
+  procedure TfrPicProps_Metadata.FileChanged(iIndex: Integer);
+  var n: PVirtualNode;
+  begin
+    inherited FileChanged(iIndex);
+     // При изменении файла "сбрасываем" (очищаем) узел
+    n := GetVTRootNodeByIndex(tvMain, iIndex); 
+    if n<>nil then tvMain.ResetNode(n);
   end;
 
   function TfrPicProps_Metadata.GetRegistrySection: String;
@@ -94,7 +106,7 @@ type
   procedure TfrPicProps_Metadata.tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
      // Удаляем объект списка метаданных для корневых элементов
-    if Sender.NodeParent[Node]=nil then PImageMetadata(Sender.GetNodeData(Node))^.Free;
+    if Sender.NodeParent[Node]=nil then FreeAndNil(PImageMetadata(Sender.GetNodeData(Node))^);
   end;
 
   procedure TfrPicProps_Metadata.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -112,7 +124,7 @@ type
     if nParent=nil then begin
       case Column of
          // Имя файла
-        0: s := EditedPics[Node.Index].FileName;
+        0: s := Dialog.PictureFiles[Node.Index];
          // Если ошибка - выводим сюда
         2: begin
           case PImageMetadata(Sender.GetNodeData(Node))^.StatusCode of
@@ -150,7 +162,7 @@ type
     if ParentNode=nil then begin
       pim := Sender.GetNodeData(Node);
        // Создаём объект списка метаданных на каждый файл. При создании класса данные сразу считываются
-      pim^ := TImageMetadata.Create(EditedPics[Node.Index].FileName);
+      pim^ := TImageMetadata.Create(Dialog.PictureFiles[Node.Index]);
        // Если не произошло ошибки при считывании
       if pim^.StatusCode=IMS_OK then begin
         Sender.ChildCount[Node] := pim^.EXIFData.Count;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.14 2004-10-23 14:05:08 dale Exp $
+//  $Id: udPicProps.pas,v 1.15 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -38,6 +38,8 @@ type
     FLastUsedPageID: Integer;
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
+     // Список файлов изображений
+    FPictureFiles: TStringList;
      // Список операций для отмены редактирования/добавления
     FUndoOperations: TPhoaOperations;
      // Prop storage
@@ -60,6 +62,8 @@ type
     function  IWizardHostForm.GetStorageForm = WizHost_GetStorageForm;
      // Prop handlers
     function  GetFileImageIndex(Index: Integer): Integer;
+    function  GetPictureFiles(Index: Integer): String;
+    procedure SetPictureFiles(Index: Integer; const Value: String);
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
@@ -77,6 +81,8 @@ type
     property EditedPics: IPhotoAlbumPicList read FEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
+     // -- Имена файлов редактируемых изображений
+    property PictureFiles[Index: Integer]: String read GetPictureFiles write SetPictureFiles;
   end;
 
   function EditPics(AApp: IPhotoAlbumApp; AEditedPics: IPhotoAlbumPicList; AUndoOperations: TPhoaOperations): Boolean;
@@ -143,6 +149,7 @@ uses
   constructor TdPicProps.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
+    FPictureFiles := TStringList.Create;
      // Создаём контроллер страниц
     FController := TWizardController.Create(Self);
     with FController do begin
@@ -160,6 +167,7 @@ uses
   destructor TdPicProps.Destroy;
   begin
     FController.Free;
+    FPictureFiles.Free;
     inherited Destroy;
   end;
 
@@ -176,13 +184,27 @@ type TWinControlCast = class(TWinControl);
   end;
 
   function TdPicProps.GetFileImageIndex(Index: Integer): Integer;
+  var
+    FileInfo: TSHFileInfo;
+    pImgIdx: PInteger;
   begin
-    Result := FFileImageIndices[Index];
+     // Если ImageIndex=-1 - это значит, он ещё не считывался
+    pImgIdx := @FFileImageIndices[Index];
+    if pImgIdx^=-1 then begin
+      SHGetFileInfo(PAnsiChar(FPictureFiles[Index]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+      pImgIdx^ := FileInfo.iIcon;
+    end;
+    Result := pImgIdx^;
   end;
 
   function TdPicProps.GetFormRegistrySection: String;
   begin
     Result := SRegPicProps_Root;
+  end;
+
+  function TdPicProps.GetPictureFiles(Index: Integer): String;
+  begin
+    Result := FPictureFiles[Index];
   end;
 
   function TdPicProps.GetSizeable: Boolean;
@@ -193,19 +215,20 @@ type TWinControlCast = class(TWinControl);
   procedure TdPicProps.InitializeDialog;
   var
     i, iPageID: Integer;
-    HSysIL: THandle;
     FileInfo: TSHFileInfo;
   begin
     inherited InitializeDialog;
     pmNav.LinkSubitems := tbNav.Items;
-     // Считываем ImageIndices файлов изображений
-    SetLength(FFileImageIndices, FEditedPics.Count);
-    HSysIL := 0;
-    for i := 0 to FEditedPics.Count-1 do begin
-      HSysIL := SHGetFileInfo(PAnsiChar(FEditedPics[i].FileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
-      FFileImageIndices[i] := FileInfo.iIcon;
+    if FEditedPics.Count>0 then begin
+       // Инициализируем список индексов изображений файлов в -1 ("ImageIndex не считан") и копируем список файлов
+      SetLength(FFileImageIndices, FEditedPics.Count);
+      for i := 0 to FEditedPics.Count-1 do begin
+        FFileImageIndices[i] := -1;
+        FPictureFiles.Add(FEditedPics[i].FileName);
+      end;
+       // Получаем Handle системного ImageList-а
+      ilFiles.Handle := SHGetFileInfo(PAnsiChar(FPictureFiles[0]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
     end;
-    ilFiles.Handle := HSysIL;
      // Определяем требуемую начальную страницу
     case TPicPropsDlgDefaultPage(SettingValueInt(ISettingID_Dlgs_PP_DefaultPage)) of
       ppddpFileProps:      iPageID := IDlgPicPropsPageID_FileProps;
@@ -225,6 +248,19 @@ type TWinControlCast = class(TWinControl);
   procedure TdPicProps.PageButtonClick(Sender: TObject);
   begin
     FController.SetVisiblePageID(TComponent(Sender).Tag+1, pcmForced);
+  end;
+
+  procedure TdPicProps.SetPictureFiles(Index: Integer; const Value: String);
+  var i: Integer;
+  begin
+    if FPictureFiles[Index]<>Value then begin
+      FPictureFiles[Index] := Value;
+       // Сбрасываем ImageIndex
+      FFileImageIndices[Index] := -1;
+       // Уведомляем все страницы об изменении файла
+      for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).FileChanged(Index);
+      Modified := True;
+    end;
   end;
 
   procedure TdPicProps.SettingsRestore(rif: TRegIniFile);

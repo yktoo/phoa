@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.41 2004-12-06 20:22:45 dale Exp $
+//  $Id: phUtils.pas,v 1.42 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -138,6 +138,8 @@ uses
   function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode; bScrollIntoView: Boolean = True): Boolean;
    // Фокусирует первый узел в дереве (если он есть) и устанавливает положение скроллбаров в левый верхний узел
   procedure ActivateFirstVTNode(Tree: TBaseVirtualTree);
+   // Возвращает узел корневого каталога дерева по заданному индексу. Если нет такого, возвращает nil
+  function  GetVTRootNodeByIndex(Tree: TBaseVirtualTree; iIndex: Integer): PVirtualNode;
    // Сохранение/загрузка настроек столбцов VirtualTree
   procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
   procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
@@ -808,6 +810,16 @@ var
     end;
   end;
 
+  function GetVTRootNodeByIndex(Tree: TBaseVirtualTree; iIndex: Integer): PVirtualNode;
+  begin
+    if iIndex<0 then
+      Result := nil
+    else begin
+      Result := Tree.GetFirst;
+      while (Result<>nil) and (Integer(Result.Index)<iIndex) do Result := Tree.GetNextSibling(Result);
+    end;
+  end;
+  
   procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
   var
     i: Integer;

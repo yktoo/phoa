@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.29 2004-12-04 17:53:11 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.30 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -127,6 +127,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure FileChanged(iIndex: Integer); override;
      // Props
      // -- Масштаб просматриваемого изображения
     property ViewZoomFactor: Single read GetViewZoomFactor write SetViewZoomFactor;
@@ -234,7 +235,7 @@ uses phUtils, Main, phSettings;
        // Считываем имена файлов и проверяем свойства преобразований
       for i := 0 to EditedPics.Count-1 do begin
         Pic := EditedPics[i];
-        cbViewFile.Strings.Add(Pic.FileName);
+        cbViewFile.Strings.Add(Dialog.PictureFiles[i]);
         if i=0 then
           FTransform.InitValues(Pic.Rotation, Pic.Flips)
         else begin
@@ -273,6 +274,13 @@ uses phUtils, Main, phSettings;
     aZoomFit.Enabled    := FImageLoaded and (ViewZoomFactor<>BestFitZoomFactor);
   end;
 
+  procedure TfrPicProps_View.FileChanged(iIndex: Integer);
+  begin
+    inherited FileChanged(iIndex);
+     // При изменении файла обновляем строчку в cbViewFile
+    if FInitialized then cbViewFile.Strings[iIndex] := Dialog.PictureFiles[iIndex];
+  end;
+
   procedure TfrPicProps_View.FinalizePage;
   begin
     FTransform.Free;
@@ -283,7 +291,7 @@ uses phUtils, Main, phSettings;
   begin
      // При нажатом Ctrl вместо стандартного отображаем Shell Context Menu для текущего файла
     if GetKeyState(VK_CONTROL) and $80<>0 then begin
-      ShowFileShellContextMenu(EditedPics[cbViewFile.ItemIndex].FileName);
+      ShowFileShellContextMenu(Dialog.PictureFiles[cbViewFile.ItemIndex]);
       Handled := True;
     end;
   end;
@@ -370,7 +378,7 @@ uses phUtils, Main, phSettings;
       FPic := EditedPics[cbViewFile.ItemIndex];
        // Загружаем изображение
       try
-        LoadGraphicFromFile(FPic.FileName, iMain.Bitmap, Size(0, 0), ImgSize, nil);
+        LoadGraphicFromFile(Dialog.PictureFiles[cbViewFile.ItemIndex], iMain.Bitmap, Size(0, 0), ImgSize, nil);
         FImageLoaded := True;
       except
         FImageLoaded := False;

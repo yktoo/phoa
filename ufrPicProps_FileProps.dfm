@@ -1,9 +1,9 @@
 inherited frPicProps_FileProps: TfrPicProps_FileProps
   object tvMain: TVirtualStringTree
     Left = 0
-    Top = 0
+    Top = 22
     Width = 576
-    Height = 300
+    Height = 278
     Align = alClient
     Header.AutoSizeIndex = 1
     Header.Font.Charset = DEFAULT_CHARSET
@@ -23,6 +23,7 @@ inherited frPicProps_FileProps: TfrPicProps_FileProps
     OnPaintText = tvMainPaintText
     OnGetImageIndex = tvMainGetImageIndex
     OnInitNode = tvMainInitNode
+    OnResetNode = tvMainFreeNode
     OnShortenString = tvMainShortenString
     Columns = <
       item
@@ -36,5 +37,30 @@ inherited frPicProps_FileProps: TfrPicProps_FileProps
         Width = 372
       end>
     WideDefaultText = ''
+  end
+  object tbMain: TTBXToolbar
+    Left = 0
+    Top = 0
+    Width = 576
+    Height = 22
+    Align = alTop
+    Images = fMain.ilActionsSmall
+    TabOrder = 1
+    object bChangeFile: TTBXItem
+      Action = aChangeFile
+      DisplayMode = nbdmImageAndText
+    end
+  end
+  object alMain: TActionList
+    Images = fMain.ilActionsSmall
+    Left = 8
+    Top = 32
+    object aChangeFile: TAction
+      Caption = '&Change file...'
+      Hint = 'Change file...|Change file for selected picture'
+      ImageIndex = 8
+      ShortCut = 113
+      OnExecute = aaChangeFile
+    end
   end
 end

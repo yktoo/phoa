@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.10 2004-11-24 11:42:17 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.11 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,33 +10,58 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phWizard, VirtualTrees, phPicPropsDlgPage;
+  phWizard, VirtualTrees, phPicPropsDlgPage, TB2Dock, TB2Toolbar, TBX,
+  ActnList, TB2Item;
 
 type
   TfrPicProps_FileProps = class(TPicPropsDialogPage)
+    aChangeFile: TAction;
+    alMain: TActionList;
+    bChangeFile: TTBXItem;
+    tbMain: TTBXToolbar;
     tvMain: TVirtualStringTree;
-    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
-    procedure tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure aaChangeFile(Sender: TObject);
     procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+    procedure tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
   private
      // Скэшированное значение настройки ISettingID_Dlgs_PP_ExpFileProps
     FExpandAll: Boolean;
   protected
     procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+  public
+    procedure FileChanged(iIndex: Integer); override;
   end;
 
 implementation
 {$R *.dfm}
-uses TypInfo, VirtualShellUtilities, phUtils, phObj, phSettings;
+uses TypInfo, VirtualShellUtilities, phUtils, phObj, phSettings, GraphicEx, Main;
 
 type
   PNamespace = ^TNamespace;
+
+  procedure TfrPicProps_FileProps.aaChangeFile(Sender: TObject);
+  var n: PVirtualNode;
+  begin
+    n := tvMain.FocusedNode;
+    if n<>nil then
+      with TOpenDialog.Create(Self) do
+        try
+          FileName   := Dialog.PictureFiles[n.Index];
+          Filter     := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
+          Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
+          Title      := {!!!}ConstVal('SDlgTitle_OpenSearchExpr');
+          if Execute then Dialog.PictureFiles[n.Index] := FileName;
+        finally
+          Free;
+        end;
+  end;
 
   procedure TfrPicProps_FileProps.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
@@ -45,6 +70,15 @@ type
       tvMain.RootNodeCount := EditedPics.Count;
       ActivateFirstVTNode(tvMain);
     end;
+  end;
+
+  procedure TfrPicProps_FileProps.FileChanged(iIndex: Integer);
+  var n: PVirtualNode;
+  begin
+    inherited FileChanged(iIndex);
+     // При изменении файла "сбрасываем" (очищаем) узел
+    n := GetVTRootNodeByIndex(tvMain, iIndex); 
+    if n<>nil then tvMain.ResetNode(n);
   end;
 
   procedure TfrPicProps_FileProps.InitializePage;
@@ -73,7 +107,7 @@ type
     if Node<>nil then begin
       nParent := tvMain.NodeParent[Node];
       if nParent<>nil then Node := nParent;
-      ShowFileShellContextMenu(EditedPics[Node.Index].FileName);
+      ShowFileShellContextMenu(Dialog.PictureFiles[Node.Index]);
     end;
     Handled := True;
   end;
@@ -81,7 +115,7 @@ type
   procedure TfrPicProps_FileProps.tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
      // Удаляем объект TNamespace узла для корневого элемента
-    if Sender.NodeParent[Node]=nil then PNamespace(Sender.GetNodeData(Node))^.Free;
+    if Sender.NodeParent[Node]=nil then FreeAndNil(PNamespace(Sender.GetNodeData(Node))^);
   end;
 
   procedure TfrPicProps_FileProps.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -99,7 +133,7 @@ type
     nParent := Sender.NodeParent[Node];
      // Для узлов файлов (корневых)
     if nParent=nil then begin
-      if Column=0 then s := EditedPics[Node.Index].FileName;
+      if Column=0 then s := Dialog.PictureFiles[Node.Index];
      // Для элементов свойств файла (дочерних узлов по отношению к файлам)
     end else begin
       NS := PNamespace(Sender.GetNodeData(nParent))^;
@@ -122,7 +156,7 @@ type
       p := Sender.GetNodeData(Node);
        // При создании объекта данные сразу считываются или возникает exception, если файла нет
       try
-        p^ := TNamespace.CreateFromFileName(EditedPics[Node.Index].FileName);
+        p^ := TNamespace.CreateFromFileName(Dialog.PictureFiles[Node.Index]);
       except
         p^ := nil;
       end;

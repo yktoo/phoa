@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.9 2004-10-19 15:03:31 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.10 2004-12-09 17:35:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -18,7 +18,7 @@ type
    // Базовый класс странички диалога свойств изображений
   TPicPropsDialogPage = class(TWizardPage)
   private
-     // Диалог свойств изображений (владелец страницы)
+     // Prop storage
     FDialog: TdPicProps;
      // Prop handlers 
     function  GetApp: IPhotoAlbumApp;
@@ -35,6 +35,8 @@ type
      // Свойства, получаемые через родительский диалог
      // -- Приложение
     property App: IPhotoAlbumApp read GetApp;
+     // -- Диалог свойств изображений (владелец страницы)
+    property Dialog: TdPicProps read FDialog;
      // -- Ссылки на редактируемые изображения по индексу
     property EditedPics: IPhotoAlbumPicList read GetEditedPics;
      // -- ImageIndices файлов редактируемых изображений
@@ -42,6 +44,9 @@ type
      // -- ImageList со значками файлов
     property FileImages: TImageList read GetFileImages;
   public
+     // Вызывается диалогом для уведомления об изменении файла у изображения с заданным индексом. В базовом классе не
+     //   делает ничего
+    procedure FileChanged(iIndex: Integer); virtual;
      // Вызывается диалогом при нажатии кнопки ОК. Должна вернуть True, чтобы позволить закрытие, иначе должна сама
      //   объяснить пользователю причину отказа. В базовом классе всегда возвращает True
     function  CanApply: Boolean; virtual;
@@ -71,6 +76,11 @@ implementation
   procedure TPicPropsDialogPage.EndUpdate;
   begin
     FDialog.EndUpdate;
+  end;
+
+  procedure TPicPropsDialogPage.FileChanged(iIndex: Integer);
+  begin
+    { does nothing }
   end;
 
   function TPicPropsDialogPage.GetApp: IPhotoAlbumApp;
