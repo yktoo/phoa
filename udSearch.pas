@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.25 2004-11-24 11:42:17 dale Exp $
+//  $Id: udSearch.pas,v 1.26 2004-11-24 13:39:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,6 +15,9 @@ uses
   SynEdit, VirtualTrees, StdCtrls, ComCtrls, ExtCtrls, Menus, ActnList;
 
 type
+   // Вид поиска
+  TPicSearchKind = (pskSimple, pskExpression);
+
    // Условие критерия простого поиска
   TSimpleSearchCondition = (
     sscInvalid, // "Недопустимое условие"
@@ -124,9 +127,28 @@ type
    //===================================================================================================================
 
   TdSearch = class(TPhoaDialog)
+    aExprCopy: TAction;
+    aExprCut: TAction;
+    aExprPaste: TAction;
+    aExprRedo: TAction;
+    aExprSyntaxCheck: TAction;
+    aExprUndo: TAction;
+    alMain: TActionList;
+    aReset: TAction;
+    aSimpleConvertToExpression: TAction;
+    aSimpleCrDelete: TAction;
+    bExprCopy: TTBXItem;
+    bExprCut: TTBXItem;
+    bExprPaste: TTBXItem;
+    bExprRedo: TTBXItem;
+    bExprSyntaxCheck: TTBXItem;
+    bExprUndo: TTBXItem;
     bReset: TButton;
+    bSimpleConvertToExpression: TTBXItem;
+    bSimpleCrDelete: TTBXItem;
     dkExprTop: TTBXDock;
     dklcMain: TDKLanguageController;
+    dkSimpleTop: TTBXDock;
     eExpression: TSynEdit;
     gbSearch: TGroupBox;
     ipmSimpleDelete: TTBXItem;
@@ -140,17 +162,24 @@ type
     smExprInsertOperator: TTBXSubmenuItem;
     smExprInsertProp: TTBXSubmenuItem;
     tbExprMain: TTBXToolbar;
+    tbSepExprSyntaxCheck: TTBXSeparatorItem;
+    tbSepExprUndo: TTBXSeparatorItem;
+    tbSimpleMain: TTBXToolbar;
     tsExpression: TTabSheet;
     tsSimple: TTabSheet;
     tvSimpleCriteria: TVirtualStringTree;
-    dkSimpleTop: TTBXDock;
-    tbSimpleMain: TTBXToolbar;
-    alMain: TActionList;
-    aSimpleCrDelete: TAction;
-    bSimpleCrDelete: TTBXItem;
-    aSimpleConvertToExpression: TAction;
-    bSimpleConvertToExpression: TTBXItem;
-    procedure bResetClick(Sender: TObject);
+    pmExpression: TTBXPopupMenu;
+    tbSepExprCut: TTBXSeparatorItem;
+    procedure aaExprCopy(Sender: TObject);
+    procedure aaExprCut(Sender: TObject);
+    procedure aaExprPaste(Sender: TObject);
+    procedure aaExprRedo(Sender: TObject);
+    procedure aaExprSyntaxCheck(Sender: TObject);
+    procedure aaExprUndo(Sender: TObject);
+    procedure aaReset(Sender: TObject);
+    procedure aaSimpleConvertToExpression(Sender: TObject);
+    procedure aaSimpleCrDelete(Sender: TObject);
+    procedure pcCriteriaChange(Sender: TObject);
     procedure pmSimplePopup(Sender: TObject);
     procedure tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvSimpleCriteriaCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
@@ -158,9 +187,8 @@ type
     procedure tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvSimpleCriteriaPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure aaSimpleCrDelete(Sender: TObject);
-    procedure aaSimpleConvertToExpression(Sender: TObject);
-    procedure pcCriteriaChange(Sender: TObject);
+    procedure eExpressionStatusChange(Sender: TObject;
+      Changes: TSynStatusChanges);
   private
      // Список критериев простого поиска
     FSimpleCriteria: TSimpleSearchCriterionList;
@@ -170,6 +198,7 @@ type
     FApp: IPhotoAlbumApp;
      // Группа, в которую помещать результаты
     FResultsGroup: IPhotoAlbumPicGroup;
+    FSearchKind: TPicSearchKind;
      // Обновляет tvSimpleCriteria (в ответ на изменение FSimpleCriteria)
     procedure SyncSimpleCriteria;
      // Возвращает объект критерия простого поиска по узлу tvSimpleCriteria, или nil, если Node=nil или Node
@@ -177,8 +206,6 @@ type
     function  GetSimpleCriterion(Node: PVirtualNode): TSimpleSearchCriterion;
      // Основная процедура поиска
     procedure PerformSearch;
-     // Сбрасывает критерии в первоначальное состояние
-    procedure ResetCriteria;
      // Событие клика на пункте свойства изображения в pmSimple
     procedure SimpleCrPicPropClick(Sender: TObject);
      // Событие клика на пункте вставки свойства изображения в выражение
@@ -187,6 +214,8 @@ type
     procedure ExprInsertOpClick(Sender: TObject);
      // Настраивает доступность действий
     procedure EnableActions;
+     // Обновляет FSearchKind
+    procedure UpdateSearchKind;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
@@ -198,6 +227,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Props
+    property SearchKind: TPicSearchKind read FSearchKind;
   end;
 
 const
@@ -1054,6 +1085,51 @@ type
    // TfSearch
    //===================================================================================================================
 
+  procedure TdSearch.aaExprCopy(Sender: TObject);
+  begin
+    eExpression.CopyToClipboard;
+  end;
+
+  procedure TdSearch.aaExprCut(Sender: TObject);
+  begin
+    eExpression.CutToClipboard;
+  end;
+
+  procedure TdSearch.aaExprPaste(Sender: TObject);
+  begin
+    eExpression.PasteFromClipboard;
+  end;
+
+  procedure TdSearch.aaExprRedo(Sender: TObject);
+  begin
+    eExpression.Redo;
+  end;
+
+  procedure TdSearch.aaExprSyntaxCheck(Sender: TObject);
+  var PicFilter: IPhoaParsingPicFilter;
+  begin
+    PicFilter := NewPhoaParsingPicFilter;
+    PicFilter.Expression := eExpression.Text;
+    PicFilter.CheckExpression;
+    PhoaInfo(False, 'SMsg_SyntaxOK');
+  end;
+
+  procedure TdSearch.aaExprUndo(Sender: TObject);
+  begin
+    eExpression.Undo;
+  end;
+
+  procedure TdSearch.aaReset(Sender: TObject);
+  begin
+    case SearchKind of
+      pskSimple: begin
+        FSimpleCriteria.Clear;
+        SyncSimpleCriteria;
+      end;
+      pskExpression: eExpression.Clear;
+    end;
+  end;
+
   procedure TdSearch.aaSimpleConvertToExpression(Sender: TObject);
   var
     s: String;
@@ -1071,11 +1147,6 @@ type
     tvSimpleCriteria.EndEditNode;
     FSimpleCriteria.Delete(tvSimpleCriteria.FocusedNode.Index);
     SyncSimpleCriteria;
-  end;
-
-  procedure TdSearch.bResetClick(Sender: TObject);
-  begin
-    ResetCriteria;
   end;
 
   procedure TdSearch.ButtonClick_OK;
@@ -1121,10 +1192,26 @@ type
     inherited Destroy;
   end;
 
-  procedure TdSearch.EnableActions;
+  procedure TdSearch.eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
   begin
-    aSimpleCrDelete.Enabled            := GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil;
-    aSimpleConvertToExpression.Enabled := FSimpleCriteria.Count>0;
+    EnableActions;
+  end;
+
+  procedure TdSearch.EnableActions;
+  var bExprText: Boolean;
+  begin
+    bExprText := eExpression.Lines.Count>0;
+    aReset.Enabled                     := ((SearchKind=pskSimple) and (FSimpleCriteria.Count>0)) or ((SearchKind=pskExpression) and bExprText);
+     // Простой поиск
+    aSimpleCrDelete.Enabled            := (SearchKind=pskSimple) and (GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil);
+    aSimpleConvertToExpression.Enabled := (SearchKind=pskSimple) and (FSimpleCriteria.Count>0);
+     // Поиск по выражению
+    aExprSyntaxCheck.Enabled           := bExprText;
+    aExprCopy.Enabled                  := eExpression.SelAvail;
+    aExprCut.Enabled                   := eExpression.SelAvail;
+    aExprRedo.Enabled                  := eExpression.CanRedo;
+    aExprUndo.Enabled                  := eExpression.CanUndo;
+    UpdateButtons;
   end;
 
   procedure TdSearch.ExprInsertOpClick(Sender: TObject);
@@ -1139,9 +1226,7 @@ type
 
   function TdSearch.GetDataValid: Boolean;
   begin
-    Result :=
-      (pcCriteria.ActivePage=tsSimple) or
-      ((pcCriteria.ActivePage=tsExpression) and (eExpression.Lines.Count>0));
+    Result := (SearchKind=pskSimple) or ((SearchKind=pskExpression) and (eExpression.Lines.Count>0));
   end;
 
   function TdSearch.GetFormRegistrySection: String;
@@ -1229,26 +1314,29 @@ type
      // Инициализируем выражение
     scpMain.Font.Assign(Font);
     scpMain.TitleFont.Assign(Font);
-    eExpression.Highlighter := TSynPicFilterSyn.Create(Self);
-    eExpression.Text        := sSearchExpression;
+    pmExpression.LinkSubitems := tbExprMain.Items;
+    eExpression.Highlighter   := TSynPicFilterSyn.Create(Self);
+    eExpression.Text          := sSearchExpression;
+    UpdateSearchKind;
   end;
 
   procedure TdSearch.pcCriteriaChange(Sender: TObject);
   begin
-    if pcCriteria.ActivePage=tsSimple then tvSimpleCriteria.SetFocus
-    else if pcCriteria.ActivePage=tsExpression then eExpression.SetFocus;
-    UpdateButtons;
+    UpdateSearchKind;
+    case SearchKind of
+      pskSimple:     tvSimpleCriteria.SetFocus;
+      pskExpression: eExpression.SetFocus;
+    end;
+    EnableActions;
   end;
 
   procedure TdSearch.PerformSearch;
   type
     TSearchArea = (saAll, saCurGroup, saResults);
-    TSearchKind = (skSimple, skExpression);
   var
     i, iSrchCount: Integer;
     SearchArea: TSearchArea;
     Pic: IPhotoAlbumPic;
-    SearchKind: TSearchKind;
     PicFilter: IPhoaParsingPicFilter;
 
      // Возвращает True, если изображение подходит под указанные критерии
@@ -1256,9 +1344,9 @@ type
     begin
       case SearchKind of
          // Простой поиск
-        skSimple: Result := FSimpleCriteria.Matches(Pic);
+        pskSimple: Result := FSimpleCriteria.Matches(Pic);
          // Поиск по выражению
-        skExpression:
+        pskExpression:
           try
             Result := PicFilter.Matches(Pic);
           except
@@ -1276,9 +1364,9 @@ type
     begin
       case SearchKind of
          // Простой поиск
-        skSimple: FSimpleCriteria.InitializeSearch;
+        pskSimple: FSimpleCriteria.InitializeSearch;
          // Поиск по выражению
-        skExpression: begin
+        pskExpression: begin
           sSearchExpression := eExpression.Text;
           PicFilter := NewPhoaParsingPicFilter;
           PicFilter.Expression := sSearchExpression;
@@ -1291,17 +1379,15 @@ type
     begin
       case SearchKind of
          // Простой поиск
-        skSimple: FSimpleCriteria.FinalizeSearch;
+        pskSimple: FSimpleCriteria.FinalizeSearch;
          // Поиск по выражению
-        skExpression: PicFilter := nil;
+        pskExpression: PicFilter := nil;
       end;
     end;
 
   begin
     StartWait;
     try
-       // Определяем вид поиска
-      if pcCriteria.ActivePage=tsSimple then SearchKind := skSimple else SearchKind := skExpression;
        // Инициализируем поиск
       try
         InitializeSearch;
@@ -1344,12 +1430,6 @@ type
     if Crit<>nil then
       for i := 0 to ipmsmSimpleProp.Count-1 do
         with ipmsmSimpleProp[i] do Checked := TPicProperty(Tag)=Crit.PicProperty;
-  end;
-
-  procedure TdSearch.ResetCriteria;
-  begin
-    FSimpleCriteria.Clear;
-    SyncSimpleCriteria;
   end;
 
   procedure TdSearch.SettingsRestore(rif: TRegIniFile);
@@ -1443,6 +1523,11 @@ type
   begin
      // Текст виртуальной строки рисуем серым
     if GetSimpleCriterion(Node)=nil then TargetCanvas.Font.Color := clGrayText;
+  end;
+
+  procedure TdSearch.UpdateSearchKind;
+  begin
+    if pcCriteria.ActivePage=tsSimple then FSearchKind := pskSimple else FSearchKind := pskExpression;
   end;
 
 end.

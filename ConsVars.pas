@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.78 2004-11-24 11:42:17 dale Exp $
+//  $Id: ConsVars.pas,v 1.79 2004-11-24 13:39:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -545,6 +545,7 @@ const
   iiSlideShowRandom               = 77;
   iiSlideShowCyclic               = 78;
   iiFolderOpen                    = 79;
+  iiRedo                          = 80;
 
    // Help topics
   IDH_start                       = 00001;
