@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.9 2004-05-11 03:36:47 dale Exp $
+//  $Id: ufImgView.pas,v 1.10 2004-05-13 12:23:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -161,7 +161,7 @@ type
     FRBLayer: TRubberbandLayer;
      // Текущее отображаемое изображение
     FPic: TPhoaPic;
-     // Предыдущее просмотренное скэшированное изображение и имя его файла (используются при bViewCacheBehind=True)
+     // Предыдущее просмотренное скэшированное изображение и имя его файла
     FCachedBitmap: TBitmap32;
     FCachedBitmapFilename: String;
      // True, если курсор принудительно скрыт
@@ -740,13 +740,13 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
   procedure TfImgView.DP_DescribePic;
   var sCaption: String;
   begin
-    FPicDesc := '';
      // Настраиваем Caption / составляем описание
-    if FErroneous then
-      sCaption := ''
-    else begin
+    if FErroneous then begin
+      sCaption := '';
+      FPicDesc := '';
+    end else begin
       sCaption := FPic.GetPropStrs(FCaptionProps, '', ' - ');
-      if FShowInfo then FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
+      FPicDesc := FPic.GetPropStrs(FInfoProps, '', '    ');
     end;
     if sCaption='' then Caption := dtlsMain.Consts['SDefaultCaption'] else Caption := sCaption;
      // Настраиваем счётчик
@@ -999,8 +999,8 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
   procedure TfImgView.PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
   var r: TRect;
   begin
-     // Если есть описание
-    if FPicDesc<>'' then begin
+     // Если надо отображать описание и оно есть
+    if FShowInfo and (FPicDesc<>'') then begin
       r := MakeRect(FDescLayer.GetAdjustedLocation);
       FontFromStr(Buffer.Font, FInfoFont);
       Buffer.FillRectTS(r, (Color32(FInfoBkColor) and $00ffffff) or (Cardinal(FInfoBkOpacity) shl 24));
@@ -1095,7 +1095,7 @@ uses udSettings, Types, phUtils, ChmHlp, udPicProps, Main, phSettings,
       CommitInfoRelocation;
       FShowInfo := Value;
        // Перерисовываем картинку
-      RedisplayPic(False);
+      iMain.Invalidate;
     end;
     aShowInfo.Checked := Value;
   end;
