@@ -1,6 +1,6 @@
 inherited dSortPics: TdSortPics
-  Left = 589
-  Top = 254
+  Left = 556
+  Top = 253
   Caption = 'Sort pictures'
   ClientHeight = 344
   ClientWidth = 398
@@ -38,7 +38,7 @@ inherited dSortPics: TdSortPics
       Left = 318
     end
   end
-  object gbWhereToSort: TGroupBox [3]
+  object gbWhereToSort: TGroupBox
     Left = 12
     Top = 12
     Width = 373
@@ -65,7 +65,7 @@ inherited dSortPics: TdSortPics
       OnClick = DlgDataChange
     end
   end
-  inline frSorting: TfrSorting [4]
+  inline frSorting: TfrSorting
     Left = 13
     Top = 86
     Width = 372
@@ -106,7 +106,6 @@ inherited dSortPics: TdSortPics
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 60
     Top = 126
     LangData = {

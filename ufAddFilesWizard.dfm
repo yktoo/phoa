@@ -1,6 +1,6 @@
 inherited fAddFilesWizard: TfAddFilesWizard
-  Left = 384
-  Top = 192
+  Left = 343
+  Top = 238
   Caption = 'Add pictures wizard'
   ClientWidth = 632
   OnCloseQuery = FormCloseQuery
@@ -40,6 +40,10 @@ inherited fAddFilesWizard: TfAddFilesWizard
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'lHeading.Caption'
+      'Name'
+      'SecondaryShortCuts')
     Left = 92
     Top = 368
     LangData = {
@@ -49,7 +53,7 @@ inherited fAddFilesWizard: TfAddFilesWizard
       010100000011000000070043617074696F6E000500624E657874010100000014
       000000070043617074696F6E0005006248656C70010100000017000000070043
       617074696F6E000500624261636B01010000001A000000070043617074696F6E
-      00070070486561646572000008006C48656164696E6701010000002000000007
-      0043617074696F6E0005006949636F6E0000}
+      00070070486561646572000008006C48656164696E67000005006949636F6E00
+      00}
   end
 end

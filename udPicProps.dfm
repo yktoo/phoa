@@ -1,6 +1,6 @@
 inherited dPicProps: TdPicProps
-  Left = 420
-  Top = 234
+  Left = 278
+  Top = 177
   Caption = 'Properties: picture'
   ClientHeight = 433
   ClientWidth = 590
@@ -112,7 +112,11 @@ inherited dPicProps: TdPicProps
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    IgnoreList.Strings = (
+      'IniFileName'
+      'IniSection'
+      'Name'
+      'SecondaryShortCuts')
     Top = 400
     LangData = {
       09006450696350726F7073010100000003000000070043617074696F6E011200
@@ -126,9 +130,8 @@ inherited dPicProps: TdPicProps
       7074696F6E00070062506744617461010100000020000000070043617074696F
       6E000B006250674B6579776F726473010100000022000000070043617074696F
       6E00090062506747726F757073010100000024000000070043617074696F6E00
-      06007050616765730000060066704D61696E0102000000290000000B00496E69
-      46696C654E616D652A0000000A00496E6953656374696F6E000700696C46696C
-      657300000500706D4E61760000}
+      06007050616765730000060066704D61696E00000700696C46696C6573000005
+      00706D4E61760000}
   end
   object fpMain: TFormPlacement
     IniFileName = 'Software\DaleTech\PhoA'

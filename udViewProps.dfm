@@ -1,5 +1,5 @@
 inherited dViewProps: TdViewProps
-  Left = 574
+  Left = 579
   Caption = 'Properties: photo album view'
   ClientHeight = 435
   ClientWidth = 426
@@ -41,7 +41,7 @@ inherited dViewProps: TdViewProps
       Left = 344
     end
   end
-  object eName: TEdit [4]
+  object eName: TEdit
     Left = 12
     Top = 28
     Width = 403
@@ -50,7 +50,7 @@ inherited dViewProps: TdViewProps
     TabOrder = 1
     OnChange = DlgDataChange
   end
-  object tvGrouping: TVirtualStringTree [5]
+  object tvGrouping: TVirtualStringTree
     Left = 12
     Top = 68
     Width = 402
@@ -95,7 +95,7 @@ inherited dViewProps: TdViewProps
       end>
     WideDefaultText = ''
   end
-  inline frSorting: TfrSorting [6]
+  inline frSorting: TfrSorting
     Left = 12
     Top = 231
     Width = 402
@@ -138,7 +138,6 @@ inherited dViewProps: TdViewProps
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 76
     Top = 104
     LangData = {

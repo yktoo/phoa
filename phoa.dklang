@@ -115,7 +115,6 @@ aHelpFAQ.Hint=00000188,FAQ|View the PhoA FAQ (Frequently Asked Questions) topic
 aHelpWebsite.Caption=00000190,PhoA &Website
 aHelpWebsite.Category=00000189,Help
 aHelpWebsite.Hint=00000192,PhoA Website|Open program home site in the browser
-mruOpen.Prefix=00000201,MRU
 iPhoaView_SetDefault.Caption=00000204,&Picture groups
 iPhoaView_SetDefault.Hint=00000205,Picture groups|Display photo album picture group tree
 
@@ -129,7 +128,6 @@ bCancel.Caption=00000017,Cancel
 bNext.Caption=00000020,Next >
 bHelp.Caption=00000023,Help
 bBack.Caption=00000026,< Back
-lHeading.Caption=00000032,<heading>
 
 [dGroupProps]
 Caption=00000003,Properties: Picture group
@@ -142,7 +140,6 @@ lDesc.Caption=00000027,&Description:
 
 [dMsgBox]
 Caption=00000003,<>
-lMessage.Caption=00000009,<>
 cbDontShowAgain.Caption=00000012,Don't &show this message again
 
 [dPhoAProps]
@@ -152,7 +149,6 @@ bOK.Caption=00000015,OK
 bHelp.Caption=00000018,Help
 lDesc.Caption=00000021,&Description:
 lThumbSize.Caption=00000024,&Thumbnail size (WxH):
-lThumbSizeX.Caption=00000027,x
 lThumbQuality.Caption=00000030,&Thumbnail quality:
 lThQuality1.Caption=00000033,lower\nless size
 lThQuality2.Caption=00000036,higher\ngreater size
@@ -177,8 +173,6 @@ bPgView.Caption=00000030,View && Adjust
 bPgData.Caption=00000032,Data
 bPgKeywords.Caption=00000034,Keywords
 bPgGroups.Caption=00000036,Groups
-fpMain.IniFileName=00000041,Software\DaleTech\PhoA
-fpMain.IniSection=00000042,PicPropsDialog
 
 [dSearch]
 Caption=00000003,Find pictures
@@ -212,8 +206,6 @@ Caption=00000003,Program settings
 bCancel.Caption=00000012,Close
 bOK.Caption=00000015,OK
 bHelp.Caption=00000018,Help
-fpMain.IniFileName=00000029,\\\
-fpMain.IniSection=00000030,\\\
 
 [dSortPics]
 Caption=00000003,Sort pictures
@@ -244,7 +236,6 @@ rbRepairFileLinks.Caption=00000034,Re&pair picture file links
 rbRebuildThumbs.Caption=00000037,&Rebuild thumbnails
 
 [frWzPageFileOps_SelPics]
-rbAllPics.Caption=00000061,<all pics>
 rbSelPics.Caption=00000064,&Selected pictures
 rbSelGroups.Caption=00000067,Pictures in selected &groups:
 gbValidity.Caption=00000070,File link validity filter
@@ -292,8 +283,6 @@ rbPutFlatly.Caption=00000019,&Put all the files into the destination folder
 rbMaintainFolderLayout.Caption=00000022,&Maintain original folder layout
 rbMaintainGroupLayout.Caption=00000025,Arran&ge files into folders maintaining group layout
 cbAllowDuplicating.Caption=00000028,Allo&w multiple copies of the file
-eReplaceChar.EditMask=00000041,c;; 
-eReplaceChar.Text=00000043,_
 
 [frWzPageFileOps_DelOptions]
 cbDeleteToRecycleBin.Caption=00000007,Delete files to the Rec&ycle Bin
@@ -313,12 +302,7 @@ lFileDateFrom.Caption=00000010,&File modified from:
 lFileMasks.Caption=00000013,&File masks (delimited with ';'):
 lPresence.Caption=00000016,&Photo album presence:
 lFileDateTo.Caption=00000019,&to:
-cbFileMasks.Text=00000023,*.*
 cbPresence.Items=00000029,Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n
-eFileTimeFrom.EditMask=00000042,!99:99;1;…
-eFileTimeFrom.Text=00000044,  :  
-eFileTimeTo.EditMask=00000047,!99:99;1;…
-eFileTimeTo.Text=00000049,  :  
 cbRecurseFolders.Caption=00000055,&Recurse subfolders
 
 [frWzPageAddFiles_CheckFiles]
@@ -334,7 +318,6 @@ aCopy.Caption=00000122,&Copy
 aCopy.Hint=00000124,Copy|Copy current record to clipboard
 aFind.Caption=00000166,&Find...
 aFind.Hint=00000168,Find...|Show Find Text dialog
-lInfo.Caption=00000177,...
 aSaveToFile.Caption=00000183,&Save to file...
 aSaveToFile.Hint=00000185,Save to file...|Save the log to a selected file
 aDisplayErrorsOnly.Caption=00000187,&Display errors only
@@ -405,8 +388,6 @@ lNotes.Caption=00000022,&Notes (additional info):
 lDate.Caption=00000025,&Date:
 lTime.Caption=00000028,&Time:
 lMedia.Caption=00000031,&Media name or code:
-eTime.EditMask=00000066,!99:99:99;1;…
-eTime.Text=00000068,  :  :  
 
 [fImgView]
 tbMain.Caption=00000008,Main Toolbar
@@ -417,7 +398,6 @@ aSettings.Caption=00000150,Pro&gram settings...
 aSettings.Category=00000149,Edit
 aSettings.Hint=00000152,Program settings...|View/change program settings
 eCounter.Hint=00000162,Current/total pictures
-eCounter.Text=00000163,0/0
 tbTools.Caption=00000165,Tools
 aNextPic.Caption=00000169,&Next picture
 aNextPic.Category=00000168,Advance
@@ -537,8 +517,6 @@ Caption=00000003,Photo album statistics
 bCancel.Caption=00000012,Cancel
 bOK.Caption=00000015,OK
 bHelp.Caption=00000018,Help
-fpMain.IniFileName=00000022,\\\
-fpMain.IniSection=00000023,\\\
 
 [fAddFilesWizard]
 Caption=00000003,Add pictures wizard
@@ -546,7 +524,6 @@ bCancel.Caption=00000017,Cancel
 bNext.Caption=00000020,Next >
 bHelp.Caption=00000023,Help
 bBack.Caption=00000026,< Back
-lHeading.Caption=00000032,<heading>
 
 [$CONSTANTS]
 dfpArchive=Archive

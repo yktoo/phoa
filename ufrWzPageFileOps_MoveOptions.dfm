@@ -118,6 +118,11 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'eReplaceChar.EditMask'
+      'eReplaceChar.Text'
+      'Name'
+      'SecondaryShortCuts')
     Left = 536
     Top = 12
     LangData = {
@@ -132,7 +137,6 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       6F75704C61796F7574010100000019000000070043617074696F6E0012006362
       416C6C6F774475706C69636174696E6701010000001C00000007004361707469
       6F6E000C00636242617365466F6C64657200000B0063624261736547726F7570
-      00000C00655265706C616365436861720102000000290000000800456469744D
-      61736B2B00000004005465787400}
+      00000C00655265706C616365436861720000}
   end
 end

@@ -1,6 +1,6 @@
 inherited dToolProps: TdToolProps
-  Left = 408
-  Top = 211
+  Left = 340
+  Top = 163
   Caption = 'Properties: Tool'
   ClientHeight = 371
   ClientWidth = 592
@@ -83,7 +83,7 @@ inherited dToolProps: TdToolProps
       Left = 511
     end
   end
-  object cbKind: TComboBox [10]
+  object cbKind: TComboBox
     Left = 296
     Top = 28
     Width = 285
@@ -94,7 +94,7 @@ inherited dToolProps: TdToolProps
     OnChange = cbKindChange
     OnDrawItem = cbKindDrawItem
   end
-  object eName: TEdit [11]
+  object eName: TEdit
     Left = 12
     Top = 68
     Width = 281
@@ -103,7 +103,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 2
     OnChange = DlgDataChange
   end
-  object eHint: TEdit [12]
+  object eHint: TEdit
     Left = 296
     Top = 68
     Width = 285
@@ -112,7 +112,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 3
     OnChange = DlgDataChange
   end
-  object eRunCommand: TEdit [13]
+  object eRunCommand: TEdit
     Left = 12
     Top = 108
     Width = 485
@@ -121,7 +121,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 4
     OnChange = DlgDataChange
   end
-  object bBrowseRunCommand: TButton [14]
+  object bBrowseRunCommand: TButton
     Left = 500
     Top = 108
     Width = 81
@@ -131,7 +131,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 5
     OnClick = bBrowseRunCommandClick
   end
-  object eRunParams: TEdit [15]
+  object eRunParams: TEdit
     Left = 12
     Top = 148
     Width = 365
@@ -140,7 +140,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 6
     OnChange = DlgDataChange
   end
-  object eRunFolder: TEdit [16]
+  object eRunFolder: TEdit
     Left = 12
     Top = 188
     Width = 485
@@ -149,7 +149,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 8
     OnChange = DlgDataChange
   end
-  object bBrowseRunFolder: TButton [17]
+  object bBrowseRunFolder: TButton
     Left = 500
     Top = 188
     Width = 81
@@ -159,7 +159,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 9
     OnClick = bBrowseRunFolderClick
   end
-  object cbRunShowCommand: TComboBox [18]
+  object cbRunShowCommand: TComboBox
     Left = 380
     Top = 148
     Width = 201
@@ -173,7 +173,7 @@ inherited dToolProps: TdToolProps
       'Minimized'
       'Maximized')
   end
-  object gbUsage: TGroupBox [19]
+  object gbUsage: TGroupBox
     Left = 12
     Top = 212
     Width = 569
@@ -228,7 +228,7 @@ inherited dToolProps: TdToolProps
       OnClick = DlgDataChange
     end
   end
-  object eMasks: TEdit [20]
+  object eMasks: TEdit
     Left = 12
     Top = 28
     Width = 281
@@ -237,7 +237,6 @@ inherited dToolProps: TdToolProps
     OnChange = DlgDataChange
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 40
     Top = 336
     LangData = {

@@ -1,6 +1,6 @@
 inherited dPhoAProps: TdPhoAProps
-  Left = 586
-  Top = 248
+  Left = 576
+  Top = 235
   ActiveControl = eThumbSizeX
   Caption = 'Properties: photo album'
   ClientHeight = 296
@@ -78,7 +78,7 @@ inherited dPhoAProps: TdPhoAProps
       Left = 305
     end
   end
-  object mDesc: TMemo [8]
+  object mDesc: TMemo
     Left = 12
     Top = 96
     Width = 359
@@ -88,7 +88,7 @@ inherited dPhoAProps: TdPhoAProps
     TabOrder = 3
     OnChange = DlgDataChange
   end
-  object tbThumbQuality: TTrackBar [9]
+  object tbThumbQuality: TTrackBar
     Left = 128
     Top = 28
     Width = 253
@@ -101,7 +101,7 @@ inherited dPhoAProps: TdPhoAProps
     TabOrder = 2
     OnChange = DlgDataChange
   end
-  object eThumbSizeX: TRxSpinEdit [10]
+  object eThumbSizeX: TRxSpinEdit
     Left = 12
     Top = 28
     Width = 49
@@ -115,7 +115,7 @@ inherited dPhoAProps: TdPhoAProps
     TabOrder = 0
     OnChange = DlgDataChange
   end
-  object eThumbSizeY: TRxSpinEdit [11]
+  object eThumbSizeY: TRxSpinEdit
     Left = 72
     Top = 28
     Width = 49
@@ -130,7 +130,10 @@ inherited dPhoAProps: TdPhoAProps
     OnChange = DlgDataChange
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    IgnoreList.Strings = (
+      'lThumbSizeX.Caption'
+      'Name'
+      'SecondaryShortCuts')
     Left = 12
     Top = 260
     LangData = {
@@ -140,12 +143,11 @@ inherited dPhoAProps: TdPhoAProps
       4F4B01010000000F000000070043617074696F6E0005006248656C7001010000
       0012000000070043617074696F6E0005006C4465736301010000001500000007
       0043617074696F6E000A006C5468756D6253697A650101000000180000000700
-      43617074696F6E000B006C5468756D6253697A655801010000001B0000000700
-      43617074696F6E000D006C5468756D625175616C69747901010000001E000000
-      070043617074696F6E000B006C54685175616C69747931010100000021000000
-      070043617074696F6E000B006C54685175616C69747932010100000024000000
-      070043617074696F6E0005006D4465736300000E0074625468756D625175616C
-      69747900000B00655468756D6253697A655800000B00655468756D6253697A65
-      590000}
+      43617074696F6E000B006C5468756D6253697A655800000D006C5468756D6251
+      75616C69747901010000001E000000070043617074696F6E000B006C54685175
+      616C69747931010100000021000000070043617074696F6E000B006C54685175
+      616C69747932010100000024000000070043617074696F6E0005006D44657363
+      00000E0074625468756D625175616C69747900000B00655468756D6253697A65
+      5800000B00655468756D6253697A65590000}
   end
 end

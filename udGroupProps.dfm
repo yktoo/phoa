@@ -1,6 +1,6 @@
 inherited dGroupProps: TdGroupProps
-  Left = 439
-  Top = 183
+  Left = 495
+  Top = 203
   ActiveControl = eText
   Caption = 'Properties: Picture group'
   ClientHeight = 209
@@ -51,7 +51,7 @@ inherited dGroupProps: TdGroupProps
       Left = 346
     end
   end
-  object eID: TEdit [5]
+  object eID: TEdit
     Left = 12
     Top = 28
     Width = 61
@@ -60,7 +60,7 @@ inherited dGroupProps: TdGroupProps
     ReadOnly = True
     TabOrder = 0
   end
-  object eText: TEdit [6]
+  object eText: TEdit
     Left = 76
     Top = 28
     Width = 337
@@ -69,7 +69,7 @@ inherited dGroupProps: TdGroupProps
     TabOrder = 1
     OnChange = DlgDataChange
   end
-  object mDescription: TMemo [7]
+  object mDescription: TMemo
     Left = 12
     Top = 68
     Width = 401
@@ -80,7 +80,6 @@ inherited dGroupProps: TdGroupProps
     OnChange = DlgDataChange
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 176
     LangData = {
       0B006447726F757050726F7073010100000003000000070043617074696F6E01

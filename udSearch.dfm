@@ -1,6 +1,6 @@
 inherited dSearch: TdSearch
-  Left = 486
-  Top = 244
+  Left = 471
+  Top = 227
   Caption = 'Find pictures'
   ClientHeight = 435
   ClientWidth = 525
@@ -124,7 +124,6 @@ inherited dSearch: TdSearch
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 20
     Top = 76
     LangData = {

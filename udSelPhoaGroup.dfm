@@ -1,6 +1,6 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
-  Left = 508
-  Top = 182
+  Left = 500
+  Top = 196
   Caption = 'Select picture group'
   ClientHeight = 435
   ClientWidth = 473
@@ -67,7 +67,6 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 404
     LangData = {
       0D006453656C50686F6147726F7570010100000003000000070043617074696F

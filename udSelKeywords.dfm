@@ -1,6 +1,6 @@
 inherited dSelKeywords: TdSelKeywords
-  Left = 601
-  Top = 198
+  Left = 600
+  Top = 211
   Caption = 'Select keywords'
   ClientHeight = 431
   ClientWidth = 354
@@ -78,7 +78,6 @@ inherited dSelKeywords: TdSelKeywords
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 400
     LangData = {
       0C006453656C4B6579776F726473010100000003000000070043617074696F6E

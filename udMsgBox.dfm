@@ -1,6 +1,6 @@
 object dMsgBox: TdMsgBox
-  Left = 503
-  Top = 434
+  Left = 505
+  Top = 439
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = '<>'
@@ -44,12 +44,15 @@ object dMsgBox: TdMsgBox
     TabOrder = 0
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'lMessage.Caption'
+      'Name'
+      'SecondaryShortCuts')
     Left = 280
     Top = 4
     LangData = {
       0700644D7367426F78010100000003000000070043617074696F6E0103000000
-      05006949636F6E000008006C4D65737361676501010000000900000007004361
-      7074696F6E000F006362446F6E7453686F77416761696E01010000000C000000
-      070043617074696F6E00}
+      05006949636F6E000008006C4D65737361676500000F006362446F6E7453686F
+      77416761696E01010000000C000000070043617074696F6E00}
   end
 end

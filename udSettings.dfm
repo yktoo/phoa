@@ -1,6 +1,6 @@
 inherited dSettings: TdSettings
-  Left = 376
-  Top = 236
+  Left = 311
+  Top = 184
   Caption = 'Program settings'
   ClientHeight = 435
   ClientWidth = 632
@@ -68,7 +68,11 @@ inherited dSettings: TdSettings
     end
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+    IgnoreList.Strings = (
+      'IniFileName'
+      'IniSection'
+      'Name'
+      'SecondaryShortCuts')
     Top = 400
     LangData = {
       09006453657474696E6773010100000003000000070043617074696F6E010A00
@@ -76,9 +80,7 @@ inherited dSettings: TdSettings
       07006243616E63656C01010000000C000000070043617074696F6E000300624F
       4B01010000000F000000070043617074696F6E0005006248656C700101000000
       12000000070043617074696F6E000500704D61696E00000500646B4E61760000
-      050074624E61760000070070456469746F720000060066704D61696E01020000
-      001D0000000B00496E6946696C654E616D651E0000000A00496E695365637469
-      6F6E00}
+      050074624E61760000070070456469746F720000060066704D61696E0000}
   end
   object fpMain: TFormPlacement
     IniFileName = '\\\'

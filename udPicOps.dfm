@@ -1,6 +1,6 @@
 inherited dPicOps: TdPicOps
   Left = 485
-  Top = 246
+  Top = 232
   ActiveControl = cbOp
   Caption = 'Picture operations'
   ClientHeight = 433
@@ -45,7 +45,7 @@ inherited dPicOps: TdPicOps
       Left = 317
     end
   end
-  object cbOp: TComboBox [4]
+  object cbOp: TComboBox
     Left = 12
     Top = 28
     Width = 375
@@ -64,7 +64,7 @@ inherited dPicOps: TdPicOps
         'Leave only selected pictures to the group specified below (inter' +
         'sect)')
   end
-  object tvGroups: TVirtualStringTree [5]
+  object tvGroups: TVirtualStringTree
     Left = 12
     Top = 68
     Width = 375
@@ -97,7 +97,6 @@ inherited dPicOps: TdPicOps
     WideDefaultText = 'Photo Album'
   end
   object dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 400
     LangData = {
       0700645069634F7073010100000003000000070043617074696F6E0109000000
