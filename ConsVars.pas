@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.56 2004-09-22 15:12:33 dale Exp $
+//  $Id: ConsVars.pas,v 1.57 2004-09-23 04:08:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -394,8 +394,8 @@ const
   IThumbMarginH                   = 2;       //                                MarginV
   IThumbMarginV                   = 2;       //                                   |
    // -- Внутренние                                         +-------------------------------------------+
-  IThumbPaddingL                  = 5;       //             |                     |                     |
-  IThumbPaddingR                  = 5;       //             |                  PaddingT                 |
+  IThumbPaddingL                  = 5;       //             |  Thumbnail          |                     |
+  IThumbPaddingR                  = 5;       //             |  background      PaddingT                 |
   IThumbPaddingT                  = 5;       //             |                     |                     |
   IThumbPaddingB                  = 5;       //             |              +-------------+              |
                                              //             |              |             |              |
@@ -1226,7 +1226,7 @@ type
           Lvl4 := TPhoaIntEntrySetting.Create(Lvl3, ISettingID_Browse_ViewerCacheSze, '@ISettingID_Browse_ViewerCacheSze', 1000, 1, MaxInt);
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest), Byte(Low(TStretchFilter)), Byte(High(TStretchFilter)));
         AddStretchFilterSettings(Lvl3 as TPhoaIntSetting);
-      Lvl2 := TPhoaIntEntrySetting.Create    (Lvl1, ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount',   32, 1, MaxInt);
+      Lvl2 := TPhoaIntEntrySetting.Create    (Lvl1, ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount',   100, 1, MaxInt);
      //== Режим просмотра ==============================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_View, iiViewMode, '@ISettingID_View', IDH_setup_view_mode);
       Lvl2 := TPhoaBoolSetting.Create        (Lvl1, ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop',      False);
