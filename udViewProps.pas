@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: udViewProps.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -27,7 +27,6 @@ type
     tvGrouping: TVirtualStringTree;
     frSorting: TfrSorting;
     procedure tvGroupingAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
-    procedure lbGroupingDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure tvGroupingChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupingChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupingDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
@@ -216,38 +215,6 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
     with tvGrouping do MoveTo(FocusedNode, GetPreviousSibling(FocusedNode), amInsertBefore, False);
     EnableActions;
     Modified := True;
-  end;
-
-  procedure TdViewProps.lbGroupingDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-  {var
-    s: String;
-    ElementDetails: TThemedElementDetails;
-    G: TPhoaGrouping;}
-  begin
-    {G := FGroupings[Index];
-    with lbGrouping.Canvas do begin
-      FillRect(Rect);
-       // Рисуем значок группировки
-      InflateRect(Rect, -2, 0);
-      ImageList_Draw(fMain.ilMain.Handle, iiGrouping, Handle, Rect.Left, Rect.Top, ILD_NORMAL);
-       // Рисуем тип группировки
-      Inc(Rect.Left, 18);
-      s := ConstVal(asGroupByPropConsts[G.Prop]);
-      DrawText(Handle, PChar(s), -1, Rect, DT_LEFT or DT_SINGLELINE or DT_VCENTER or DT_NOPREFIX or DT_END_ELLIPSIS);
-       // Рисуем CheckBox (кроме для gbpFilePath, т.к. изображений без путей не бывает)
-      if G.Prop<>gbpFilePath then begin
-        Inc(Rect.Left, FXCBOffset-18-2);
-        Rect.Right := Rect.Left+16;
-        if ThemeServices.ThemesEnabled then begin
-          if G.bUnclassified then
-            ElementDetails := ThemeServices.GetElementDetails(tbCheckBoxCheckedNormal)
-          else
-            ElementDetails := ThemeServices.GetElementDetails(tbCheckBoxUncheckedNormal);
-          ThemeServices.DrawElement(Handle, ElementDetails, Rect);
-        end else
-          DrawFrameControl(Handle, Rect, DFC_BUTTON, iif(G.bUnclassified, DFCS_BUTTONCHECK or DFCS_CHECKED, DFCS_BUTTONCHECK));
-      end;
-    end;}
   end;
 
   procedure TdViewProps.SyncGroupings;

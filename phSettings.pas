@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.6 2004-04-23 19:26:29 dale Exp $
+//  $Id: phSettings.pas,v 1.7 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -38,6 +38,8 @@ type
     function  GetChildCount: Integer;
     function  GetChildren(Index: Integer): TPhoaSetting;
     function  GetSettings(iID: Integer): TPhoaSetting;
+    function  GetIndex: Integer;
+    procedure SetIndex(Value: Integer);
   protected
      // "ѕростой" конструктор, не инициализирующий свойств, кроме Owner (используетс€ в "нормальных" конструкторах и в
      //   Assign)
@@ -62,6 +64,8 @@ type
     property Children[Index: Integer]: TPhoaSetting read GetChildren; default;
      // -- ID пункта
     property ID: Integer read FID;
+     // -- »ндекс настройки внутри родител€
+    property Index: Integer read GetIndex write SetIndex;
      // -- Ќаименование пункта. ≈сли начинаетс€ с '@', то это им€ константы из диалога Settings, если с '#' - то из fMain
     property Name: String read FName;
      // -- ѕункт-владелец данного пункта
@@ -279,6 +283,11 @@ const
     Result := TPhoaSetting(FChildren[Index]);
   end;
 
+  function TPhoaSetting.GetIndex: Integer;
+  begin
+    if FOwner=nil then Result := 0 else Result := FOwner.FChildren.IndexOf(Self);
+  end;
+
   function TPhoaSetting.GetSettings(iID: Integer): TPhoaSetting;
   begin
     Result := FindID(iID);
@@ -316,6 +325,11 @@ const
   procedure TPhoaSetting.RemoveSetting(Item: TPhoaSetting);
   begin
     FChildren.Remove(Item);
+  end;
+
+  procedure TPhoaSetting.SetIndex(Value: Integer);
+  begin
+    if FOwner<>nil then FOwner.FChildren.Move(GetIndex, Value);
   end;
 
    //===================================================================================================================

@@ -63,7 +63,7 @@ inherited dViewProps: TdViewProps
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmGrouping
     TabOrder = 2
@@ -264,9 +264,9 @@ inherited dViewProps: TdViewProps
       0000220400000000000000000000}
   end
   object pmGrouping: TTBXPopupMenu
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     Left = 32
-    Top = 100
+    Top = 104
     object ipmsmProp: TTBXSubmenuItem
       Caption = '&Picture property'
     end

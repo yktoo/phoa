@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.9 2004-04-23 19:26:29 dale Exp $
+//  $Id: ConsVars.pas,v 1.10 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -316,6 +316,7 @@ const
    // Ключи реестра для сохранения настроек
   SRegRoot                        = 'Software\DaleTech\PhoA';
   SRegPrefs                       = 'Preferences';
+  SRegPrefTools                   = SRegPrefs+'\Tools';
   SRegToolbars                    = SRegRoot+'\Toolbars';
   SRegOpen_Root                   = 'Open';
   SRegOpen_FilesMRU               = SRegOpen_Root+'\FilesMRU';
@@ -386,31 +387,66 @@ const
   ISlideShowTimerID               = $01010101;
   IPicPropsViewTimerID            = $01010101;
 
-   // Image indices
-  iiPhoA                          =  0;
-  iiFolder                        =  1;
-  iiNo                            =  2;
-  iiSearch                        =  3;
-  iiView                          =  4;
-  iiGrouping                      =  5;
-  iiSorting                       =  6;
-  iiSortAsc                       =  7;
-  iiSortDesc                      =  8;
-  iiDelete                        =  9;
-  iiUp                            = 10;
-  iiDown                          = 11;
-  iiOK                            = 12;
-  iiError                         = 13;
-
-   // ImageIndices (from ilActionsSmall)
-  iiA_NewGroup                    =  5;
-  iiA_Edit                        =  8;
-  iiA_Props                       = 12;
-  iiA_ViewMode                    = 15;
-  iiA_View                        = 37;
-  iiA_Keyword                     = 41;
-  iiA_Asterisk                    = 43;
-  iiA_Dialog                      = 46;
+   // Image indices (from ilActionsSmall)
+  iiNew                           =  0;
+  iiOpen                          =  1;
+  iiSave                          =  2;
+  iiSaveAs                        =  3;
+  iiExit                          =  4;
+  iiNewGroup                      =  5;
+  iiNewPic                        =  6;
+  iiDelete                        =  7;
+  iiEdit                          =  8;
+  iiSearch                        =  9;
+  iiAbout                         = 10;
+  iiHelp                          = 11;
+  iiProps                         = 12;
+  iiSeleactAll                    = 13;
+  iiSelectNone                    = 14;
+  iiViewMode                      = 15;
+  iiSort                          = 16;
+  iiFileOps                       = 17;
+  iiPicOps                        = 18;
+  iiStats                         = 19;
+  iiCut                           = 20;
+  iiCopy                          = 21;
+  iiPaste                         = 22;
+  iiUndo                          = 23;
+  iiUndoHistory                   = 24;
+  iiZoomIn                        = 25;
+  iiZoomOut                       = 26;
+  iiZoomFit                       = 27;
+  iiZoomActual                    = 28;
+  iiRefresh                       = 29;
+  iiLeft                          = 30;
+  iiFirst                         = 31;
+  iiLast                          = 32;
+  iiRight                         = 33;
+  iiFullScreen                    = 34;
+  iiSlideShow                     = 35;
+  iiFolder                        = 36;
+  iiView                          = 37;
+  iiNewView                       = 38;
+  iiGroupFromView                 = 39;
+  iiInvertSelection               = 40;
+  iiKeyword                       = 41;
+  iiMetadata                      = 42;
+  iiAsterisk                      = 43;
+  iiInfo                          = 44;
+  iiInfoRelocate                  = 45;
+  iiDialog                        = 46;
+  iiGlobe                         = 47;
+  iiPhoA                          = 48;
+  iiNo                            = 49;
+  iiFolderSearch                  = 50;
+  iiGrouping                      = 51;
+  iiSorting                       = 52;
+  iiSortAsc                       = 53;
+  iiSortDesc                      = 54;
+  iiUp                            = 55;
+  iiDown                          = 56;
+  iiOK                            = 57;
+  iiError                         = 58;
 
    // Help topics
   IDH_start                       = 00001;
@@ -616,6 +652,8 @@ const
     ISettingID_Dlgs_FOW_CfmRebuildTh   = 3123; // Подтверждение для операции перестройки эскизов
     ISettingID_Dlgs_FOW_CfmRepairFLs   = 3124; // Подтверждение для операции восстановления ссылок на файлы
     ISettingID_Dlgs_FOW_LogOnErrOnly   = 3130; // Отображать протокол только при наличии ошибок
+   //===================================================================================================================
+  ISettingID_Tools                     = 4001; // Инструменты
 
    // Соответствие между операциями с файлами изображений и опциями на их подтверждения
   aFileOpConfirmSettingIDs: Array[TFileOperationKind] of Integer = (
@@ -751,7 +789,7 @@ var
   procedure ApplyToolbarSettings(Dock: TTBXDock);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
+uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -903,7 +941,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
   var Lvl1, Lvl2, Lvl3, Lvl4: TPhoaSetting;
   begin
      //=================================================================================================================
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Gen, iiA_Props, '@ISettingID_Gen', IDH_setup_general);
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Gen, iiProps, '@ISettingID_Gen', IDH_setup_general);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US}, MinInt, MaxInt);
         Lvl3 := TPhoaFontSetting.Create(Lvl2, ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
@@ -938,7 +976,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //=================================================================================================================
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiA_NewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiNewGroup, '@ISettingID_Browse', IDH_setup_browse_mode);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);
@@ -963,7 +1001,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
         AddStretchFilterSettings(Lvl3 as TPhoaIntSetting);
       Lvl2 := TPhoaIntEntrySetting.Create(Lvl1, ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount', 32, 1, MaxInt);
      //=================================================================================================================
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_View, iiA_ViewMode, '@ISettingID_View', IDH_setup_view_mode);
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_View, iiViewMode, '@ISettingID_View', IDH_setup_view_mode);
       Lvl2 := TPhoaBoolSetting.Create (Lvl1, ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
       Lvl2 := TPhoaBoolSetting.Create (Lvl1, ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
       Lvl2 := TPhoaBoolSetting.Create (Lvl1, ISettingID_View_KeepCursorOverTB, '@ISettingID_View_KeepCursorOverTB', True);
@@ -996,7 +1034,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_View_SlideInterval,    '@ISettingID_View_SlideInterval', 5000, 0, 600*1000);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //=================================================================================================================
-    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
+    Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);
@@ -1028,11 +1066,11 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
      //=================================================================================================================
-{
-    Lvl1 := TPhoaPageSetting.Create(RootSetting, ISettingID_Dialogs, iiA_Dialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
-    Lvl1.ImageIndex  := iiA_Dialog;
-    Lvl1.HelpContext := IDH_setup_dialogs;
-}  end;
+    Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiAsterisk, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Open',  'Open pictures',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Edit',  'Edit pictures',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, 'Print', 'Print pictures', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
+  end;
   {$HINTS ON}
 
 initialization

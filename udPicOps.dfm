@@ -76,7 +76,7 @@ inherited dPicOps: TdPicOps
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 2
     TreeOptions.AnimationOptions = [toAnimatedToggle]

@@ -27,7 +27,7 @@ object frSorting: TfrSorting
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmMain
     TabOrder = 0
@@ -59,7 +59,7 @@ object frSorting: TfrSorting
     WideDefaultText = ''
   end
   object pmMain: TTBXPopupMenu
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     OnPopup = pmMainPopup
     Left = 8
     Top = 40

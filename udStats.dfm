@@ -27,7 +27,7 @@ inherited dStats: TdStats
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
     HintMode = hmTooltip
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]

@@ -13,7 +13,7 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoHotTrack, hoShowSortGlyphs, hoVisible]
     HintMode = hmTooltip
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]

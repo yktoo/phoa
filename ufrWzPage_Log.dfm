@@ -12,7 +12,7 @@ inherited frWzPage_Log: TfrWzPage_Log
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmMain
     TabOrder = 0

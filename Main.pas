@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.7 2004-04-23 19:26:29 dale Exp $
+//  $Id: Main.pas,v 1.8 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -32,7 +32,6 @@ type
     aEdit: TAction;
     aSettings: TAction;
     aView: TAction;
-    ilMain: TTBImageList;
     dkTop: TTBXDock;
     dkBottom: TTBXDock;
     dkLeft: TTBXDock;
@@ -1026,7 +1025,7 @@ uses
       tbi := TTBXItem.Create(Self);
       with tbi do begin
         Caption    := FPhoA.Views[i].Name;
-        ImageIndex := iiA_View;
+        ImageIndex := iiView;
         Tag        := i+1; // Tag=0 у пункта iPhoaView_SetDefault ("Группы изображений")
         OnClick    := SetPhoaViewClick;
       end;
@@ -1301,7 +1300,7 @@ uses
        // Обычная группа
       if Sender.NodeParent[Node]<>nil then ImageIndex := iiFolder
        // Узел результатов поиска
-      else if Node=FSearchedNode      then ImageIndex := iiSearch
+      else if Node=FSearchedNode      then ImageIndex := iiFolderSearch
        // Узел фотоальбома
       else if ViewIndex<0             then ImageIndex := iiPhoA
        // Узел представления

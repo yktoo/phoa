@@ -1,4 +1,7 @@
 inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
+  DesignSize = (
+    576
+    284)
   object lCountInfo: TLabel
     Left = 0
     Top = 271
@@ -53,7 +56,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmGroups
     TabOrder = 3

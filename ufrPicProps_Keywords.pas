@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -262,9 +262,9 @@ uses phUtils, Main, phSettings;
   procedure TfrPicProps_Keywords.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
     case FKeywords[Node.Index].Change of
-      kcNone:    ImageIndex := iiA_Keyword;
-      kcAdd:     ImageIndex := iiA_Asterisk;
-      kcReplace: ImageIndex := iiA_Edit;
+      kcNone:    ImageIndex := iiKeyword;
+      kcAdd:     ImageIndex := iiAsterisk;
+      kcReplace: ImageIndex := iiEdit;
     end;
   end;
 

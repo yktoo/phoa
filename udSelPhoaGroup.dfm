@@ -32,7 +32,7 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
-    Images = fMain.ilMain
+    Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 0
     TreeOptions.AnimationOptions = [toAnimatedToggle]

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -98,7 +98,7 @@ uses phUtils, ConsVars, Main, phSettings;
 
   procedure TdSelKeywords.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := iiA_Keyword;
+    if Kind in [ikNormal, ikSelected] then ImageIndex := iiKeyword;
   end;
 
   procedure TdSelKeywords.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);

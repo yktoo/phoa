@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.3 2004-04-23 19:26:30 dale Exp $
+//  $Id: phValSetting.pas,v 1.4 2004-04-24 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -196,7 +196,7 @@ type
   end;
 
    //===================================================================================================================
-   // Пункт пункта-страницы дерева настроек со значениями
+   // Класс пункта-страницы дерева настроек со значениями
    //===================================================================================================================
 
   TPhoaValPageSetting = class(TPhoaPageSetting)
@@ -205,7 +205,7 @@ type
   end;
 
 implementation
-uses TypInfo, Forms, Dialogs, phUtils;
+uses TypInfo, Forms, Dialogs, Math, RXSpin, phUtils;
 
 type
    //===================================================================================================================
@@ -225,14 +225,14 @@ type
     FOnSettingChange: TNotifyEvent;
     FOnDecodeText: TPhoaSettingDecodeTextEvent;
     FRootSetting: TPhoaValPageSetting;
-     // Загружает в tvMain дерево настроек, относящихся к детям узла FRootSetting
+     // Загружает дерево настроек, относящихся к детям узла FRootSetting
     procedure LoadTree;
      // Вызывает OnSettingChange
     procedure DoSettingChange;
      // Возвращает настройку TPhoaSetting, связанную с узлом
     function  GetSetting(Node: PVirtualNode): TPhoaSetting; 
-     // Встраивает соответствующий контрол для текущего узла, если он нужен. Если нет (в том числе при
-     //   tvMain.FocusedNode=nil), удаляет текущий контрол
+     // Встраивает соответствующий контрол для текущего узла, если он нужен. Если нет (в том числе при FocusedNode=nil),
+     //   удаляет текущий контрол
     procedure EmbedControl;
      // События встроенного контрола
     procedure EmbeddedControlEnterExit(Sender: TObject);
@@ -453,7 +453,10 @@ type
   procedure TPhoaListSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
-    if Source is TPhoaListSetting then FVariants.Assign(TPhoaListSetting(Source).FVariants);
+    if Source is TPhoaListSetting then begin
+      FVariants.Assign(TPhoaListSetting(Source).FVariants);
+      FRefObject := TPhoaListSetting(Source).FRefObject;
+    end;
   end;
 
   constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; bRefObject: Boolean);
@@ -774,13 +777,17 @@ type
     end;
 
      // Создаёт и возвращает TEdit в качестве редактора значения настройки
-    procedure NewEdit(iMaxLen: Integer);
+    procedure NewSpinEdit;
+    var IES: TPhoaIntEntrySetting;
     begin
-      NewControl(TEdit);
-      with TEdit(FEditorControl) do begin
-        MaxLength := iMaxLen;
-        Text      := (Setting as TPhoaIntEntrySetting).AsString;
-        OnChange  := EmbeddedControlChange;
+      NewControl(TRxSpinEdit);
+      IES := Setting as TPhoaIntEntrySetting;
+      with TRxSpinEdit(FEditorControl) do begin
+        ButtonKind := bkStandard;
+        MinValue   := IES.MinValue;
+        MaxValue   := IES.MaxValue;
+        AsInteger  := IES.Value;
+        OnChange   := EmbeddedControlChange;
       end;
     end;
 
@@ -813,7 +820,7 @@ type
            // Создаём или уничтожаем контрол
           if      Setting is TPhoaListSetting     then NewComboBox
           else if Setting is TPhoaColorSetting    then NewColorBox
-          else if Setting is TPhoaIntEntrySetting then NewEdit(Length(IntToStr(TPhoaIntSetting(Setting).MaxValue)))
+          else if Setting is TPhoaIntEntrySetting then NewSpinEdit
           else if Setting is TPhoaFontSetting     then NewFontButton
           else FreeAndNil(FEditorControl);
         end;
@@ -837,7 +844,7 @@ type
     Setting := GetSetting(Node);
     if      Setting is TPhoaListSetting     then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TComboBox).ItemIndex
     else if Setting is TPhoaColorSetting    then TPhoaColorSetting(Setting).Value := (FEditorControl as TColorBox).Selected
-    else if Setting is TPhoaIntEntrySetting then TPhoaIntEntrySetting(Setting).Value := StrToIntDef((FEditorControl as TEdit).Text, TPhoaIntEntrySetting(Setting).Value);
+    else if Setting is TPhoaIntEntrySetting then TPhoaIntEntrySetting(Setting).Value := (FEditorControl as TRxSpinEdit).AsInteger;
     DoSettingChange;
   end;
 
@@ -895,7 +902,6 @@ type
 
   procedure TPhoaValSettingEditor.LoadTree;
   begin
-     // Загружаем дерево
     BeginUpdate;
     try
        // Удаляем все узлы
@@ -905,8 +911,7 @@ type
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Выделяем первый узел
-      FocusedNode := GetFirst;
-      Selected[FocusedNode] := True;
+      ActivateVTVNode(Self, GetFirst);
     finally
       EndUpdate;
     end;

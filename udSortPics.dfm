@@ -89,6 +89,7 @@ inherited dSortPics: TdSortPics
       WideDefaultText = ''
     end
     inherited pmMain: TTBXPopupMenu
+      Images = fMain.ilActionsSmall
       inherited ipmsmProp: TTBXSubmenuItem
         Caption = '&Picture property'
       end
