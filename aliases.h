@@ -1,4 +1,5 @@
 IDH_start                       = start.html
+IDH_acknowledgements            = acknowledgements.html
 IDH_general_advantages          = general-advantages.html
 IDH_general_license             = general-license.html
 IDH_general_file_formats        = general-file-formats.html

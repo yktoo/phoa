@@ -1,11 +1,12 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.17 2005-03-08 09:49:04 dale Exp $
+//  $Id: maps.h,v 1.18 2005-03-13 10:37:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 
 #define IDH_start                       00001
+#define IDH_acknowledgements            00010
 #define IDH_general_advantages          01010
 #define IDH_general_license             01020
 #define IDH_general_file_formats        01040

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.93 2005-03-08 09:49:04 dale Exp $
+//  $Id: ConsVars.pas,v 1.94 2005-03-13 10:37:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -570,6 +570,7 @@ const
 
    // Help topics
   IDH_start                       = 00001;
+  IDH_acknowledgements            = 00010;
   IDH_general_advantages          = 01010;
   IDH_general_license             = 01020;
   IDH_general_file_formats        = 01040;
