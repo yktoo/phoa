@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.58 2004-10-21 12:42:00 dale Exp $
+//  $Id: Main.pas,v 1.59 2004-10-22 12:50:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1018,6 +1018,7 @@ uses
     finally
       tvGroups.EndSynch;
     end;
+    EnableActions;
   end;
 
   procedure TfMain.DoSave(const sFileName: String; iRevisionNumber: Integer);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.22 2004-10-22 12:43:18 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.23 2004-10-22 12:50:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -438,7 +438,7 @@ uses
     FFileList.Free;
     FLog.Free;
      // Если есть добавленные изображения, выполняем операцию
-    if FPics<>nil then FApp.PerformOperation('PicAdd', ['Group', FApp.CurGroup, 'Pics', FPics]);
+    if (FPics<>nil) and (FPics.Count>0) then FApp.PerformOperation('PicAdd', ['Group', FApp.CurGroup, 'Pics', FPics]);
     inherited FinalizeWizard;
   end;
 
@@ -620,12 +620,19 @@ uses
   end;
 
   procedure TfAddFilesWizard.ThreadFileProcessed;
+  var iPicID: Integer;
   begin
      // Проверяем, чем кончилось добавление. Ошибка - это когда нет картинки
     if FAddFilesThread.AddedPic=nil then
       Inc(FCountFailed)
     else begin
-      FPics.Add(FAddFilesThread.AddedPic, False);
+       // Если новое изображение - распределяем новый ID
+      iPicID := FAddFilesThread.AddedPic.ID;
+      if iPicID=0 then begin
+        iPicID := FFreePicID;
+        Inc(FFreePicID);
+      end;
+      FAddFilesThread.AddedPic.PutToList(FPics, iPicID);
        // Обновляем статус диалога
       HasUpdates := True;
     end;
