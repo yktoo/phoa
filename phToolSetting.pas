@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.9 2004-05-05 13:58:04 dale Exp $
+//  $Id: phToolSetting.pas,v 1.10 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -147,7 +147,7 @@ const
     iiAction);   // ptkCustom
 
 implementation
-uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms;
+uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
 
   function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
   begin
@@ -266,6 +266,7 @@ type
     function  DoDragOver(Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
    //===================================================================================================================
@@ -632,6 +633,13 @@ type
     end;
   end;
 
+  destructor TPhoaToolSettingEditor.Destroy;
+  begin
+     // Сохраняем столбцы
+    RegSaveVTColumns(SRegPrefs_ToolEditor, Self);
+    inherited Destroy;
+  end;
+
   function TPhoaToolSettingEditor.DoBeforeDrag(Node: PVirtualNode; Column: TColumnIndex): Boolean;
   begin
     Result := IsSettingNode(Node);
@@ -640,8 +648,8 @@ type
   procedure TPhoaToolSettingEditor.DoChecked(Node: PVirtualNode);
   var p: TPoint;
   begin
-    ActivateVTVNode(Self, Node);
-    with GetDisplayRect(Node, -1, False) do p := ClientToScreen(Point(Left, Bottom));
+    ActivateVTNode(Self, Node);
+    with GetDisplayRect(Node, 0, False) do p := ClientToScreen(Point(Left, Bottom));
     PopupMenu.Popup(p.x, p.y);
   end;
 
@@ -709,8 +717,14 @@ type
         1: s := PhoaToolKindName(Setting.Kind);
          // Имя
         2: s := ConstValEx(Setting.Name);
+         // Hint
+        3: s := ConstValEx(Setting.Hint);
          // Приложение
-        3: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
+        4: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
+         // Папка
+        5: if Setting.Kind=ptkCustom then s := Setting.RunFolder;
+         // Параметры
+        6: if Setting.Kind=ptkCustom then s := Setting.RunParameters;
       end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
@@ -784,7 +798,7 @@ type
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Если нет выделения, выделяем первый узел
-      if FocusedNode=nil then ActivateVTVNode(Self, GetFirst);
+      if FocusedNode=nil then ActivateVTNode(Self, GetFirst);
     finally
       EndUpdate;
     end;
@@ -815,23 +829,34 @@ type
   end;
 
   procedure TPhoaToolSettingEditor.SetupHeader;
+
+    procedure AddColumn(const sConst: String; iWidth: Integer; bVisible: Boolean);
+    begin
+      with Header.Columns.Add do begin
+        Text    := ConstVal(sConst);
+        Width   := iWidth;
+        Options := Options-[coAllowClick];
+        if not bVisible then Options := Options-[coVisible];
+      end;
+    end;
+
   begin
-    with Header do begin
-      with Columns.Add do begin
-        Width := 80;
-        Text  := ConstVal('SText_Masks');
-      end;
-      with Columns.Add do begin
-        Width := 200;
-        Text  := ConstVal('SText_Kind');
-      end;
-      with Columns.Add do begin
-        Width := 150;
-        Text  := ConstVal('SText_Name');
-      end;
-      Columns.Add.Text := ConstVal('SText_Application');
-      AutoSizeIndex := 3;
-      Options       := Options+[hoAutoResize, hoVisible];
+     // Запрещаем обновления столбцов (чтобы не получить 'Control has no parent window')
+//    Header.Columns.BeginUpdate;
+    try
+      AddColumn('SText_Masks',       80,  True);
+      AddColumn('SText_Kind',        200, True);
+      AddColumn('SText_Name',        150, True);
+      AddColumn('SText_Hint',        200, False);
+      AddColumn('SText_Application', 250, True);
+      AddColumn('SText_Folder',      150, False);
+      AddColumn('SText_Params',      150, False);
+      Header.Options   := Header.Options+[hoVisible];
+      Header.PopupMenu := TVTHeaderPopupMenu.Create(Self);
+       // Восстанавливаем столбцы
+      RegLoadVTColumns(SRegPrefs_ToolEditor, Self);
+    finally
+//      Header.Columns.EndUpdate;
     end;
   end;
 

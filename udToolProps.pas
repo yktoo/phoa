@@ -35,8 +35,7 @@ type
     procedure bBrowseRunCommandClick(Sender: TObject);
     procedure bBrowseRunFolderClick(Sender: TObject);
     procedure cbKindChange(Sender: TObject);
-    procedure cbKindDrawItem(Control: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
+    procedure cbKindDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
   private
      // Редактируемая настройка инструмента (nil, если это "пустая" настройка, т.е. происходит добавление)
     FTool: TPhoaToolSetting;

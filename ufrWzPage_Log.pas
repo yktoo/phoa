@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.3 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.4 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -143,7 +143,7 @@ uses phUtils, Main, Clipbrd, phSettings;
       repeat n := GetProc(n);
       until (n=nil) or Matches(Copy(Log[n.Index], 5, MaxInt));
      // Проверяем: нашли или нет
-    if n=nil then Info(ConstVal('SInfo_SearchStringNotFound')) else ActivateVTVNode(tvMain, n);
+    if n=nil then Info(ConstVal('SInfo_SearchStringNotFound')) else ActivateVTNode(tvMain, n);
   end;
 
   procedure TfrWzPage_Log.fdMainFind(Sender: TObject);

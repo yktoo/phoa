@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.8 2004-05-01 19:32:12 dale Exp $
+//  $Id: phUtils.pas,v 1.9 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -109,9 +109,14 @@ uses
   function  LoadGraphicFromFile(const sFileName: String): TBitmap32; overload;
 
    // Фокусирует и выделяет узел и проматывает дерево так, чтобы он был виден. Возвращает True, если Node<>nil
-  function  ActivateVTVNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
+  function  ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
    // Возвращает узел по его абсолютному индексу (0, если нет такого)
-  function  VTVNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
+  function  VTNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
+   // Сохранение/загрузка настроек столбцов VirtualTree
+  procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
+   // Устанавливает опцию coVisible столбца согласно bVisible
+  procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
 
    // Возвращает True, если iID содержится в массиве aIDs
   function  IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
@@ -601,7 +606,7 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
     end;
   end;
 
-  function ActivateVTVNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
+  function ActivateVTNode(Tree: TBaseVirtualTree; Node: PVirtualNode): Boolean;
   begin
     Result := Node<>nil;
     Tree.FocusedNode := Node;
@@ -611,13 +616,55 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
     end;
   end;
 
-  function VTVNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
+  function VTNodeByAbsoluteIndex(Tree: TBaseVirtualTree; idx: Integer): PVirtualNode;
   begin
     Result := Tree.GetFirst;
     while (idx>0) and (Result<>nil) do begin
       Result := Tree.GetNext(Result);
       Dec(idx);
     end;
+  end;
+
+  procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  var
+    i: Integer;
+    c: TVirtualTreeColumn;
+  begin
+    with TRegIniFile.Create(SRegRoot) do
+      try
+        for i := 0 to Tree.Header.Columns.Count-1 do begin
+          c := Tree.Header.Columns[i];
+          WriteString(sSection, 'Column'+IntToStr(i), Format('%d,%d,%d', [c.Position, c.Width, Byte(coVisible in c.Options)]));
+        end;
+      finally
+        Free;
+      end;
+  end;
+
+  procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  var
+    i: Integer;
+    c: TVirtualTreeColumn;
+    s: String;
+  begin
+    with TRegIniFile.Create(SRegRoot) do
+      try
+        for i := 0 to Tree.Header.Columns.Count-1 do begin
+          c := Tree.Header.Columns[i];
+          s := ReadString(sSection, 'Column'+IntToStr(i), '');
+          c.Position := StrToIntDef(ExtractFirstWord(s, ','), c.Position);
+          c.Width    := StrToIntDef(ExtractFirstWord(s, ','), c.Width);
+          SetVTColumnVisible(c, StrToIntDef(ExtractFirstWord(s, ','), Byte(coVisible in c.Options))<>0);
+        end;
+      finally
+        Free;
+      end;
+  end;
+
+  procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
+  begin
+    with Column do
+      if bVisible then Options := Options+[coVisible] else Options := Options-[coVisible];
   end;
 
   function IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;

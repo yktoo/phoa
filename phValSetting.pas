@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.7 2004-05-03 16:34:03 dale Exp $
+//  $Id: phValSetting.pas,v 1.8 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -947,7 +947,7 @@ type
        // Инициализируем все узлы
       ReinitChildren(nil, True);
        // Выделяем первый узел
-      ActivateVTVNode(Self, GetFirst);
+      ActivateVTNode(Self, GetFirst);
     finally
       EndUpdate;
     end;

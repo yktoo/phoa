@@ -2926,6 +2926,22 @@
           <tranEntry langID="1046" value="Application"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="SText_Folder">
+        <tranEntries>
+          <tranEntry langID="1049" value="Папка"/>
+          <tranEntry langID="1033" value="Folder"/>
+          <tranEntry langID="1031" value="Folder"/>
+          <tranEntry langID="1046" value="Folder"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SText_Hint">
+        <tranEntries>
+          <tranEntry langID="1049" value="Подсказка"/>
+          <tranEntry langID="1033" value="Hint"/>
+          <tranEntry langID="1031" value="Hint"/>
+          <tranEntry langID="1046" value="Hint"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="SText_Kind">
         <tranEntries>
           <tranEntry langID="1049" value="Вид"/>
@@ -2948,6 +2964,14 @@
           <tranEntry langID="1033" value="Name"/>
           <tranEntry langID="1031" value="Name"/>
           <tranEntry langID="1046" value="Name"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="SText_Params">
+        <tranEntries>
+          <tranEntry langID="1049" value="Параметры"/>
+          <tranEntry langID="1033" value="Parameters"/>
+          <tranEntry langID="1031" value="Parameters"/>
+          <tranEntry langID="1046" value="Parameters"/>
         </tranEntries>
       </propEntry>
       <propEntry name="SUnclassified_Author">

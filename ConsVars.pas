@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.17 2004-05-05 13:58:04 dale Exp $
+//  $Id: ConsVars.pas,v 1.18 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -321,6 +321,7 @@ const
 
   SRegPrefs_Root                  = 'Preferences';
     SRegPrefs_Tools               = SRegPrefs_Root+'\Tools';
+    SRegPrefs_ToolEditor          = SRegPrefs_Root+'\ToolEditor';
 
   SRegOpen_Root                   = 'Open';
   SRegOpen_FilesMRU               = SRegOpen_Root+'\FilesMRU';

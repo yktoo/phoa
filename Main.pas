@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.12 2004-05-05 13:58:04 dale Exp $
+//  $Id: Main.pas,v 1.13 2004-05-06 10:13:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1170,14 +1170,14 @@ uses
      // Получает узел в tvGroups, соответствующий группе GroupAbsIdx операции, кэшируя результат
     function GetOpGroupNode: PVirtualNode;
     begin
-      if GetOpGroupNode_Cache=nil then GetOpGroupNode_Cache := VTVNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
+      if GetOpGroupNode_Cache=nil then GetOpGroupNode_Cache := VTNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
       Result := GetOpGroupNode_Cache;
     end;
 
      // Получает узел в tvGroups, соответствующий группе ParentGroupAbsIdx операции, кэшируя результат
     function GetOpParentGroupNode: PVirtualNode;
     begin
-      if GetOpParentGroupNode_Cache=nil then GetOpParentGroupNode_Cache := VTVNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
+      if GetOpParentGroupNode_Cache=nil then GetOpParentGroupNode_Cache := VTNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
       Result := GetOpParentGroupNode_Cache;
     end;
 
@@ -1514,8 +1514,8 @@ uses
     IFlags := Op.InvalidationFlags;
     OpGroupNode       := nil;
     OpParentGroupNode := nil;
-    if uifUReinitParent   in IFlags then OpParentGroupNode := VTVNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
-    if uifUInvalidateNode in IFlags then OpGroupNode       := VTVNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
+    if uifUReinitParent   in IFlags then OpParentGroupNode := VTNodeByAbsoluteIndex(tvGroups, Op.ParentGroupAbsIdx);
+    if uifUInvalidateNode in IFlags then OpGroupNode       := VTNodeByAbsoluteIndex(tvGroups, Op.GroupAbsIdx);
      // Откатываем (и уничтожаем) операцию
     Op.Undo;
      // Проверяем флаги требуемых обновлений
