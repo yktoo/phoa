@@ -1,9 +1,9 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_lang_distribution.bat,v 1.3 2004-05-24 05:30:37 dale Exp $
+rem $Id: _make_lang_distribution.bat,v 1.4 2004-09-11 17:52:35 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
-rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 rem ** Making bundle of language files and the designer application
 

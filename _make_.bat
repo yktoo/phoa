@@ -1,9 +1,9 @@
 @echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.7 2004-06-29 14:11:49 dale Exp $
+rem $Id: _make_.bat,v 1.8 2004-09-11 17:52:35 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
-rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+rem Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
 
 rem DaleTech Text Preprocessor defines

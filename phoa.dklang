@@ -1,3 +1,10 @@
+;***********************************************************************************************************************
+;  $Id: phoa.dklang,v 1.10 2004-09-11 17:52:36 dale Exp $
+;-----------------------------------------------------------------------------------------------------------------------
+;  PhoA image arranging and searching tool
+;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
+;***********************************************************************************************************************
+
 [fMain]
 Caption=00000003,PhoA
 tbMain.Caption=00000008,Toolbar
@@ -126,7 +133,7 @@ aHelpVendorWebsite.Hint=00000211,DK Software Website|Open the vendor home site i
 aHelpCheckUpdates.Caption=00000213,Check for &updates
 aHelpCheckUpdates.Category=00000212,Help
 aHelpCheckUpdates.Hint=00000214,Check for updates|Check for program updates on the web
-TBXSubmenuItem1.Caption=00000215,Internet
+smHelpInternet.Caption=00000215,&Internet
 aHelpSupport.Caption=00000217,Product &support
 aHelpSupport.Category=00000216,Help
 aHelpSupport.Hint=00000218,Product support|Open the product support page in the browser

@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.8 2004-09-10 13:55:12 dale Exp $
+//  $Id: udAbout.pas,v 1.9 2004-09-11 17:52:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit udAbout;
 
@@ -13,7 +13,7 @@ uses
   StdCtrls, GR32_Image, ExtCtrls, DKLang;
 
 type
-  TShowDetail = (sdTitle, sdAuthor, sdCredits, sdTranslation);
+  TShowDetail = (sdTitle, sdAuthor, sdCredits);
 
   TdAbout = class(TForm)
     iMain: TImage32;
@@ -35,7 +35,7 @@ type
      // Слой, на котором рисуется прогресс [при DialogMode=False]
     FProgressLayer: TPositionedLayer;
      // Картинки заголовка
-    FBmpTitle, FBmpAuthor, FBmpCredits, FBmpTranslation: TBitmap32;
+    FBmpTitle, FBmpAuthor, FBmpCredits: TBitmap32;
      // Строка состояния прогресса [при DialogMode=False]
     FCurProgressStage: String;
      // Текущие отображаемые данные
@@ -166,10 +166,9 @@ var
   function TdAbout.CurBitmap: TBitmap32;
   begin
     case FShowDetail of
-      sdTitle:   Result := FBmpTitle;
-      sdAuthor:  Result := FBmpAuthor;
-      sdCredits: Result := FBmpCredits;
-      else       Result := FBmpTranslation;
+      sdTitle:  Result := FBmpTitle;
+      sdAuthor: Result := FBmpAuthor;
+      else      Result := FBmpCredits;
     end;
   end;
 
@@ -200,11 +199,10 @@ var
       FProgressLayer.OnPaint := PaintProgressLayer;
     end;
      // Загружаем изображения заголовков
-    FBmpTitle         := CreatePNGBitmap('PNG_TITLE',       255);
+    FBmpTitle     := CreatePNGBitmap('PNG_TITLE',   255);
     if DialogMode then begin
-      FBmpAuthor      := CreatePNGBitmap('PNG_AUTHOR',      0);
-      FBmpCredits     := CreatePNGBitmap('PNG_CREDITS',     0);
-      FBmpTranslation := CreatePNGBitmap('PNG_TRANSLATION', 0);
+      FBmpAuthor  := CreatePNGBitmap('PNG_AUTHOR',  0);
+      FBmpCredits := CreatePNGBitmap('PNG_CREDITS', 0);
     end;
      // Разрешаем таймер смены заголовков для режима диалога "О программе"
     TheTimer.Enabled := DialogMode;
@@ -237,7 +235,6 @@ var
     FBmpTitle.Free;
     FBmpAuthor.Free;
     FBmpCredits.Free;
-    FBmpTranslation.Free;
     ProgressWnd := nil;
   end;
 

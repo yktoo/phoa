@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelFolder.pas,v 1.5 2004-09-02 14:20:38 dale Exp $
+//  $Id: ufrWzPageFileOps_SelFolder.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit ufrWzPageFileOps_SelFolder;
 

@@ -1,8 +1,8 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.36 2004-09-10 13:55:12 dale Exp $
+//  $Id: Main.pas,v 1.37 2004-09-11 17:52:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
-//  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+//  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 unit Main;
 
@@ -188,80 +188,81 @@ type
     iFlatMode: TTBXItem;
     aHelpVendorWebsite: TAction;
     aHelpCheckUpdates: TAction;
-    TBXSubmenuItem1: TTBXSubmenuItem;
+    smHelpInternet: TTBXSubmenuItem;
     iHelpVendorWebsite: TTBXItem;
     iHelpCheckUpdates: TTBXItem;
     aHelpSupport: TAction;
     iHelpSupport: TTBXItem;
-    procedure aaNew(Sender: TObject);
-    procedure aaOpen(Sender: TObject);
-    procedure aaSave(Sender: TObject);
-    procedure aaSaveAs(Sender: TObject);
-    procedure aaExit(Sender: TObject);
     procedure aaAbout(Sender: TObject);
+    procedure aaCopy(Sender: TObject);
+    procedure aaCut(Sender: TObject);
+    procedure aaDelete(Sender: TObject);
+    procedure aaEdit(Sender: TObject);
+    procedure aaExit(Sender: TObject);
+    procedure aaFileOperations(Sender: TObject);
+    procedure aaFind(Sender: TObject);
+    procedure aaFlatMode(Sender: TObject);
+    procedure aaHelpCheckUpdates(Sender: TObject);
+    procedure aaHelpContents(Sender: TObject);
+    procedure aaHelpFAQ(Sender: TObject);
+    procedure aaHelpProductWebsite(Sender: TObject);
+    procedure aaHelpSupport(Sender: TObject);
+    procedure aaHelpVendorWebsite(Sender: TObject);
+    procedure aaIniLoadSettings(Sender: TObject);
+    procedure aaIniSaveSettings(Sender: TObject);
+    procedure aaNew(Sender: TObject);
     procedure aaNewGroup(Sender: TObject);
     procedure aaNewPic(Sender: TObject);
-    procedure aaDelete(Sender: TObject);
-    procedure aaSettings(Sender: TObject);
-    procedure aaEdit(Sender: TObject);
-    procedure aaView(Sender: TObject);
-    procedure aaHelpContents(Sender: TObject);
-    procedure aaStats(Sender: TObject);
-    procedure aaFind(Sender: TObject);
-    procedure aaSelectAll(Sender: TObject);
-    procedure aaSelectNone(Sender: TObject);
-    procedure aaPicOps(Sender: TObject);
-    procedure aaSortPics(Sender: TObject);
-    procedure aaCut(Sender: TObject);
-    procedure aaCopy(Sender: TObject);
+    procedure aaOpen(Sender: TObject);
     procedure aaPaste(Sender: TObject);
-    procedure aaUndo(Sender: TObject);
-    procedure aaPhoaView_New(Sender: TObject);
     procedure aaPhoaView_Delete(Sender: TObject);
     procedure aaPhoaView_Edit(Sender: TObject);
     procedure aaPhoaView_MakeGroup(Sender: TObject);
+    procedure aaPhoaView_New(Sender: TObject);
+    procedure aaPicOps(Sender: TObject);
+    procedure aaRemoveSearchResults(Sender: TObject);
+    procedure aaSave(Sender: TObject);
+    procedure aaSaveAs(Sender: TObject);
+    procedure aaSelectAll(Sender: TObject);
+    procedure aaSelectNone(Sender: TObject);
+    procedure aaSettings(Sender: TObject);
+    procedure aaSortPics(Sender: TObject);
+    procedure aaStats(Sender: TObject);
+    procedure aaUndo(Sender: TObject);
+    procedure aaView(Sender: TObject);
+    procedure bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
+    procedure dklcMainLanguageChanged(Sender: TObject);
+    procedure dklcMainLanguageChanging(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure fpMainSavePlacement(Sender: TObject);
     procedure fpMainRestorePlacement(Sender: TObject);
+    procedure fpMainSavePlacement(Sender: TObject);
     procedure mruOpenClick(Sender: TObject; const Filename: String);
-    procedure SetPhoaViewClick(Sender: TObject);
+    procedure pmGroupsPopup(Sender: TObject);
+    procedure pmPicsPopup(Sender: TObject);
     procedure SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
-    procedure tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
-    procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure SetPhoaViewClick(Sender: TObject);
+    procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvGroupsEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
+    procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
     procedure tvGroupsCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
-    procedure tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
     procedure tvGroupsDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
     procedure tvGroupsDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
     procedure tvGroupsDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
-    procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-    procedure bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
+    procedure tvGroupsEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
+    procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
+    procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
-    procedure aaHelpProductWebsite(Sender: TObject);
-    procedure aaFileOperations(Sender: TObject);
-    procedure aaIniSaveSettings(Sender: TObject);
-    procedure aaIniLoadSettings(Sender: TObject);
-    procedure pmGroupsPopup(Sender: TObject);
-    procedure pmPicsPopup(Sender: TObject);
-    procedure aaHelpFAQ(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
-    procedure aaRemoveSearchResults(Sender: TObject);
-    procedure dklcMainLanguageChanged(Sender: TObject);
-    procedure aaFlatMode(Sender: TObject);
-    procedure aaHelpCheckUpdates(Sender: TObject);
-    procedure aaHelpVendorWebsite(Sender: TObject);
-    procedure aaHelpSupport(Sender: TObject);
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
@@ -1015,8 +1016,20 @@ uses
 
   procedure TfMain.dklcMainLanguageChanged(Sender: TObject);
   begin
-    ResetMode;
+    dkTop.EndUpdate;
+    dkLeft.EndUpdate;
+    dkRight.EndUpdate;
+    dkBottom.EndUpdate;
     ApplyLanguage;
+  end;
+
+  procedure TfMain.dklcMainLanguageChanging(Sender: TObject);
+  begin
+    ResetMode;
+    dkTop.BeginUpdate;
+    dkLeft.BeginUpdate;
+    dkRight.BeginUpdate;
+    dkBottom.BeginUpdate;
   end;
 
   procedure TfMain.DoEnableTools(Item: TTBCustomItem);

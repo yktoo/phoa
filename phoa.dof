@@ -120,17 +120,17 @@ DLL=0
 Locale=1033
 CodePage=1252
 [Version Info Keys]
-CompanyName=Dmitry Kann
+CompanyName=DK Software
 FileDescription=PhoA image arranging and searching tool
 FileVersion=1.1.6.253
 InternalName=PhoA
-LegalCopyright=©2002-2004 Dmitry Kann
+LegalCopyright=©2002-2004 DK Software
 LegalTrademarks=
 OriginalFilename=phoa.exe
 ProductName=PhoA
 ProductVersion=1.1.6
-Comments=All rights reserved. Refer to http://phoa.narod.ru for detailed info or distribution terms.
-VendorWebsite=http://phoa.narod.ru
+Comments=All rights reserved. Refer to http://www.dk-soft.org/ for detailed info or distribution terms.
+VendorWebsite=http://www.dk-soft.org/
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
