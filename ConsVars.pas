@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.27 2004-05-24 05:31:21 dale Exp $
+//  $Id: ConsVars.pas,v 1.28 2004-05-25 14:05:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -378,14 +378,17 @@ const
   SRegRoot                        = 'Software\DaleTech\PhoA';
 
   SRegMainWindow_Root             = 'MainWindow';
-  SRegMainWindow_Toolbars         = SRegMainWindow_Root+'\Toolbars';
+    SRegMainWindow_Toolbars       = SRegMainWindow_Root+'\Toolbars';
+
+  SRegViewWindow_Root             = 'ViewWindow';
+    SRegViewWindow_Toolbars       = SRegViewWindow_Root+'\Toolbars';
 
   SRegPrefs_Root                  = 'Preferences';
     SRegPrefs_Tools               = SRegPrefs_Root+'\Tools';
     SRegPrefs_ToolEditor          = SRegPrefs_Root+'\ToolEditor';
 
   SRegOpen_Root                   = 'Open';
-  SRegOpen_FilesMRU               = SRegOpen_Root+'\FilesMRU';
+    SRegOpen_FilesMRU             = SRegOpen_Root+'\FilesMRU';
 
   SRegDialogsRoot                 = 'Dialogs';
 
@@ -524,6 +527,11 @@ const
   iiSaveSettings                  = 63;
   iiLoadSettings                  = 64;
   iiRemoveSearchResults           = 65;
+  iiRotate90                      = 66;
+  iiRotate180                     = 67;
+  iiRotate270                     = 68;
+  iiFlipHorz                      = 69;
+  iiFlipVert                      = 70;
 
    // Help topics
   IDH_start                       = 00001;

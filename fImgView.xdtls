@@ -73,11 +73,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="File"/>
+              <tranEntry langID="1033" value="File"/>
+              <tranEntry langID="1031" value="File"/>
+              <tranEntry langID="1046" value="File"/>
+              <tranEntry langID="1058" value="File"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -123,11 +123,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Edit"/>
+              <tranEntry langID="1033" value="Edit"/>
+              <tranEntry langID="1031" value="Edit"/>
+              <tranEntry langID="1046" value="Edit"/>
+              <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -173,11 +173,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Advance"/>
+              <tranEntry langID="1033" value="Advance"/>
+              <tranEntry langID="1031" value="Advance"/>
+              <tranEntry langID="1046" value="Advance"/>
+              <tranEntry langID="1058" value="Advance"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -210,6 +210,74 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="aFlipHorz">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Flip &amp;horizontally"/>
+              <tranEntry langID="1049" value="Отразить &amp;горизонтально"/>
+              <tranEntry langID="1058" value="Отразить &amp;горизонтально"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Flip horizontally|Flip the image horizontally"/>
+              <tranEntry langID="1049" value="Отразить горизонтально|Отразить изображение горизонтально"/>
+              <tranEntry langID="1058" value="Отразить горизонтально|Отразить изображение горизонтально"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aFlipVert">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Flip &amp;vertically"/>
+              <tranEntry langID="1049" value="Отразить &amp;вертикально"/>
+              <tranEntry langID="1058" value="Отразить &amp;вертикально"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Flip vertically|Flip the image vertically"/>
+              <tranEntry langID="1049" value="Отразить вертикально|Отразить изображение вертикально"/>
+              <tranEntry langID="1058" value="Отразить вертикально|Отразить изображение вертикально"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="aFullScreen">
         <propEntries>
           <propEntry name="Caption">
@@ -224,7 +292,7 @@
           <propEntry name="Category">
             <tranEntries>
               <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1033" value="View"/>
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
@@ -273,11 +341,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Help"/>
+              <tranEntry langID="1033" value="Help"/>
+              <tranEntry langID="1031" value="Help"/>
+              <tranEntry langID="1046" value="Help"/>
+              <tranEntry langID="1058" value="Help"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -323,11 +391,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Advance"/>
+              <tranEntry langID="1033" value="Advance"/>
+              <tranEntry langID="1031" value="Advance"/>
+              <tranEntry langID="1046" value="Advance"/>
+              <tranEntry langID="1058" value="Advance"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -377,11 +445,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Advance"/>
+              <tranEntry langID="1033" value="Advance"/>
+              <tranEntry langID="1031" value="Advance"/>
+              <tranEntry langID="1046" value="Advance"/>
+              <tranEntry langID="1058" value="Advance"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -427,11 +495,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Advance"/>
+              <tranEntry langID="1033" value="Advance"/>
+              <tranEntry langID="1031" value="Advance"/>
+              <tranEntry langID="1046" value="Advance"/>
+              <tranEntry langID="1058" value="Advance"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -477,11 +545,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="View"/>
+              <tranEntry langID="1033" value="View"/>
+              <tranEntry langID="1031" value="View"/>
+              <tranEntry langID="1046" value="View"/>
+              <tranEntry langID="1058" value="View"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -527,11 +595,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="View"/>
+              <tranEntry langID="1033" value="View"/>
+              <tranEntry langID="1031" value="View"/>
+              <tranEntry langID="1046" value="View"/>
+              <tranEntry langID="1058" value="View"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -564,6 +632,108 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="aRotate180">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW &amp;180°"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;180°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;180°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW 180°|Rotate the image clockwise by 180°"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на 180°|Повернуть изображение по часовой стрелке на 180°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на 180°|Повернуть изображение по часовой стрелке на 180°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aRotate270">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW &amp;270°"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;270°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;270°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW 270°|Rotate the image clockwise by 270° (or counter-clockwise by 90°)"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на 270°|Повернуть изображение по часовой стрелке на 270°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на 270°|Повернуть изображение по часовой стрелке на 270°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aRotate90">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW &amp;90°"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на &amp;90°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на &amp;90°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Rotate CW 90°|Rotate the image clockwise by 90°"/>
+              <tranEntry langID="1049" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
+              <tranEntry langID="1058" value="Повернуть по часовой стрелке на 90°|Повернуть изображение по часовой стрелке на 90°"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="aSettings">
         <propEntries>
           <propEntry name="Caption">
@@ -577,11 +747,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Edit"/>
+              <tranEntry langID="1033" value="Edit"/>
+              <tranEntry langID="1031" value="Edit"/>
+              <tranEntry langID="1046" value="Edit"/>
+              <tranEntry langID="1058" value="Edit"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -625,7 +795,7 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1033" value="View"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -661,11 +831,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value="View"/>
+              <tranEntry langID="1049" value="View"/>
+              <tranEntry langID="1031" value="View"/>
+              <tranEntry langID="1046" value="View"/>
+              <tranEntry langID="1058" value="View"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -711,11 +881,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
+              <tranEntry langID="1033" value="Zoom"/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -761,11 +931,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
+              <tranEntry langID="1033" value="Zoom"/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -811,11 +981,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
+              <tranEntry langID="1033" value="Zoom"/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -861,11 +1031,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1049" value="Zoom"/>
+              <tranEntry langID="1033" value="Zoom"/>
+              <tranEntry langID="1031" value="Zoom"/>
+              <tranEntry langID="1046" value="Zoom"/>
+              <tranEntry langID="1058" value="Zoom"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -910,6 +1080,14 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="bFlipHorz">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bFlipVert">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="bFullScreen">
         <propEntries/>
         <compEntries/>
@@ -938,7 +1116,23 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="bRotate180">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bRotate270">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bRotate90">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="bSettings">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bShowInfo">
         <propEntries/>
         <compEntries/>
       </compEntry>
@@ -1099,6 +1293,10 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="gipmTools">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="iMain">
         <propEntries>
           <propEntry name="HelpKeyword">
@@ -1134,6 +1332,14 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmFlipHorz">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmFlipVert">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmFullScreen">
         <propEntries/>
         <compEntries/>
@@ -1162,57 +1368,63 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
-      <compEntry name="ipmSep1">
+      <compEntry name="ipmRotate180">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmRotate270">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmRotate90">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSepClose">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
               <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="ipmSep2">
+      <compEntry name="ipmSepGIPMTools">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
               <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="ipmSep3">
+      <compEntry name="ipmSepSlideShow">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
               <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="ipmSep4">
+      <compEntry name="ipmSepSMView">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
               <tranEntry langID="1033" value=""/>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmSepZoomIn">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -1224,6 +1436,74 @@
       </compEntry>
       <compEntry name="ipmShowInfo">
         <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmToggleMainToolbar">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Main Toolbar"/>
+              <tranEntry langID="1049" value="Основная &amp;панель инструментов"/>
+              <tranEntry langID="1058" value="Основная &amp;панель инструментов"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Main Toolbar|Show or hide the Main Toolbar"/>
+              <tranEntry langID="1049" value="Основная панель инструментов|Показать или скрыть основную панель инструментов"/>
+              <tranEntry langID="1058" value="Основная панель инструментов|Показать или скрыть основную панель инструментов"/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmToggleToolsToolbar">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Tools Toolbar"/>
+              <tranEntry langID="1049" value="П&amp;анель инструментов «Сервис»"/>
+              <tranEntry langID="1058" value="П&amp;анель инструментов «Сервис»"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools Toolbar|Show or hide the Tools Toolbar"/>
+              <tranEntry langID="1049" value="Панель инструментов «Сервис»|Показать или скрыть панель инструментов «Сервис»"/>
+              <tranEntry langID="1058" value="Панель инструментов «Сервис»|Показать или скрыть панель инструментов «Сервис»"/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmToolsSep1">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmToolsSep2">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="ipmViewSep1">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
         <compEntries/>
       </compEntry>
       <compEntry name="ipmZoomActual">
@@ -1246,28 +1526,63 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="itbToolsSep1">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="pmMain">
         <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pmsmTools">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;Tools"/>
+              <tranEntry langID="1049" value="&amp;Сервис"/>
+              <tranEntry langID="1058" value="&amp;Сервис"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="pmsmView">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;View"/>
+              <tranEntry langID="1049" value="&amp;Вид"/>
+              <tranEntry langID="1058" value="&amp;Вид"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
         <compEntries/>
       </compEntry>
       <compEntry name="tbMain">
         <propEntries>
           <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value="Панель инструментов"/>
-              <tranEntry langID="1033" value="Toolbar"/>
-              <tranEntry langID="1031" value="Symbolleiste"/>
-              <tranEntry langID="1046" value="Barra de ferramentas"/>
-              <tranEntry langID="1058" value="Панель інструментів"/>
-            </tranEntries>
-          </propEntry>
-          <propEntry name="ChevronHint">
-            <tranEntries>
-              <tranEntry langID="1049" value="Ещё кнопки|"/>
-              <tranEntry langID="1033" value="More buttons|"/>
-              <tranEntry langID="1031" value="Weitere Schaltflдchen|"/>
-              <tranEntry langID="1046" value="Mais botхes|"/>
-              <tranEntry langID="1058" value="Ще кнопки|"/>
+              <tranEntry langID="1049" value="Основная панель инструментов"/>
+              <tranEntry langID="1033" value="Main Toolbar"/>
+              <tranEntry langID="1031" value="Main Toolbar"/>
+              <tranEntry langID="1046" value="Main Toolbar"/>
+              <tranEntry langID="1058" value="Основная панель инструментов"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -1276,6 +1591,26 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbMainSepSlideShow">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="tbMainSepZoomIn">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
               <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
@@ -1324,28 +1659,17 @@
         </propEntries>
         <compEntries/>
       </compEntry>
-      <compEntry name="tbSepSlideShow">
+      <compEntry name="tbTools">
         <propEntries>
-          <propEntry name="Hint">
+          <propEntry name="Caption">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
-              <tranEntry langID="1033" value=""/>
+              <tranEntry langID="1033" value="Tools"/>
+              <tranEntry langID="1049" value="Сервис"/>
+              <tranEntry langID="1058" value="Сервис"/>
             </tranEntries>
           </propEntry>
-        </propEntries>
-        <compEntries/>
-      </compEntry>
-      <compEntry name="tbSepZoomIn">
-        <propEntries>
-          <propEntry name="Hint">
+          <propEntry name="HelpKeyword">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
               <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>

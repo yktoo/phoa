@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.11 2004-05-23 13:23:09 dale Exp $
+//  $Id: ufImgView.pas,v 1.12 2004-05-25 14:05:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -62,15 +62,15 @@ type
     ipmPrevPic: TTBXItem;
     ipmLastPic: TTBXItem;
     ipmFirstPic: TTBXItem;
-    ipmSep1: TTBXSeparatorItem;
+    ipmSepZoomIn: TTBXSeparatorItem;
     ipmZoomIn: TTBXItem;
     ipmZoomOut: TTBXItem;
     ipmZoomActual: TTBXItem;
     ipmZoomFit: TTBXItem;
-    ipmSep2: TTBXSeparatorItem;
+    ipmSepSlideShow: TTBXSeparatorItem;
     ipmRefresh: TTBXItem;
     ipmSettings: TTBXItem;
-    ipmSep4: TTBXSeparatorItem;
+    ipmSepClose: TTBXSeparatorItem;
     ipmClose: TTBXItem;
     aFullScreen: TAction;
     ipmFullScreen: TTBXItem;
@@ -80,7 +80,7 @@ type
     ipmEdit: TTBXItem;
     dtlsMain: TDTLanguageSwitcher;
     aSlideShow: TAction;
-    ipmSep3: TTBXSeparatorItem;
+    ipmSepSMView: TTBXSeparatorItem;
     iSlideShow: TTBXItem;
     iMain: TImage32;
     aRelocateInfo: TAction;
@@ -94,12 +94,12 @@ type
     bPrevPic: TTBXItem;
     bNextPic: TTBXItem;
     bLastPic: TTBXItem;
-    tbSepZoomIn: TTBXSeparatorItem;
+    tbMainSepZoomIn: TTBXSeparatorItem;
     bZoomIn: TTBXItem;
     bZoomOut: TTBXItem;
     bZoomActual: TTBXItem;
     bZoomFit: TTBXItem;
-    tbSepSlideShow: TTBXSeparatorItem;
+    tbMainSepSlideShow: TTBXSeparatorItem;
     bSlideShow: TTBXItem;
     tbSepEdit: TTBXSeparatorItem;
     bEdit: TTBXItem;
@@ -115,8 +115,32 @@ type
     aShowInfo: TAction;
     ipmShowInfo: TTBXItem;
     bShowInfo: TTBXItem;
-    ipmSep5: TTBXSeparatorItem;
+    ipmSepGIPMTools: TTBXSeparatorItem;
     gipmTools: TTBGroupItem;
+    aRotate90: TAction;
+    aRotate180: TAction;
+    aRotate270: TAction;
+    aFlipHorz: TAction;
+    aFlipVert: TAction;
+    pmsmView: TTBXSubmenuItem;
+    pmsmTools: TTBXSubmenuItem;
+    ipmViewSep1: TTBXSeparatorItem;
+    ipmToggleToolsToolbar: TTBXVisibilityToggleItem;
+    ipmToggleMainToolbar: TTBXVisibilityToggleItem;
+    ipmToolsSep1: TTBXSeparatorItem;
+    ipmRotate270: TTBXItem;
+    ipmRotate180: TTBXItem;
+    ipmRotate90: TTBXItem;
+    ipmToolsSep2: TTBXSeparatorItem;
+    ipmFlipVert: TTBXItem;
+    ipmFlipHorz: TTBXItem;
+    tbTools: TTBXToolbar;
+    bRotate90: TTBXItem;
+    bRotate180: TTBXItem;
+    bRotate270: TTBXItem;
+    itbToolsSep1: TTBXSeparatorItem;
+    bFlipHorz: TTBXItem;
+    bFlipVert: TTBXItem;
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);
@@ -148,6 +172,11 @@ type
     procedure tbMainVisibleChanged(Sender: TObject);
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
+    procedure aaRotate90(Sender: TObject);
+    procedure aaRotate180(Sender: TObject);
+    procedure aaRotate270(Sender: TObject);
+    procedure aaFlipHorz(Sender: TObject);
+    procedure aaFlipVert(Sender: TObject);
   private
     FGroup: TPhoaGroup;
     FPhoA: TPhotoAlbum;
@@ -440,6 +469,16 @@ uses
     PicIdx := 0;
   end;
 
+  procedure TfImgView.aaFlipHorz(Sender: TObject);
+  begin
+    iMain.Bitmap.FlipHorz;
+  end;
+
+  procedure TfImgView.aaFlipVert(Sender: TObject);
+  begin
+    iMain.Bitmap.FlipVert;
+  end;
+
   procedure TfImgView.aaFullScreen(Sender: TObject);
   begin
     CommitInfoRelocation;
@@ -497,6 +536,21 @@ uses
       FreeAndNil(FRBLayer);
     end;
     aRelocateInfo.Checked := Assigned(FRBLayer);
+  end;
+
+  procedure TfImgView.aaRotate180(Sender: TObject);
+  begin
+    iMain.Bitmap.Rotate180;
+  end;
+
+  procedure TfImgView.aaRotate270(Sender: TObject);
+  begin
+    iMain.Bitmap.Rotate270;
+  end;
+
+  procedure TfImgView.aaRotate90(Sender: TObject);
+  begin
+    iMain.Bitmap.Rotate90;
   end;
 
   procedure TfImgView.aaSettings(Sender: TObject);
@@ -897,15 +951,24 @@ uses
   procedure TfImgView.FormCreate(Sender: TObject);
   begin
     HelpContext := IDH_intf_view_mode;
+     // Создаём поток декодера
     FDecodeThread := TDecodeThread.Create;
+     // Создаём слой для отрисовки описания
     FDescLayer := TPositionedLayer.Create(iMain.Layers);
     FDescLayer.OnPaint := PaintDescLayer;
+     // Восстанавливаем положение и видимость панелей инструментов
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars); 
   end;
 
   procedure TfImgView.FormDestroy(Sender: TObject);
   begin
+     // Сохраняем положение и видимость панелей инструментов
+    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+     // Уведомляем фоновый поток о необходимости завершиться
     FDecodeThread.Terminate;
+     // Уничтожаем таймер слайдшоу
     if FTimerID<>0 then KillTimer(Handle, FTimerID);
+     // Уничтожаем кэш
     FCachedBitmap.Free;
   end;
 
