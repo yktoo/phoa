@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.15 2004-09-24 14:09:16 dale Exp $
+;  $Id: phoa.dklang,v 1.16 2004-09-27 17:07:22 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -641,6 +641,12 @@ ISettingID_Browse_ViewerThLBProp=At the left bottom corner:
 ISettingID_Browse_ViewerThLTProp=At the left top corner:
 ISettingID_Browse_ViewerThRBProp=At the right bottom corner:
 ISettingID_Browse_ViewerThRTProp=At the right top corner:
+ISettingID_Browse_ViewerThShadow=Show thumbnail shadow
+ISettingID_Browse_ViewerThShColor=Shadow color:
+ISettingID_Browse_ViewerThShOffsX=Horizontal shadow offset, pixels:
+ISettingID_Browse_ViewerThShOffsY=Vertical shadow offset, pixels:
+ISettingID_Browse_ViewerThShOpact=Shadow opacity (0-255):
+ISettingID_Browse_ViewerThShRadius=Shadow blur radius, pixels:
 ISettingID_Browse_ViewerTipProps=Display in tooltips
 ISettingID_Browse_ViewerTooltips=Show thumbnail tooltips
 ISettingID_Dialogs=Dialogs

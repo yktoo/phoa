@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.12 2004-09-24 14:09:17 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.13 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufAddFilesWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phIntf, ConsVars, phObj, phWizard, Registry,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type

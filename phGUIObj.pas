@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.12 2004-09-27 04:14:08 dale Exp $
+//  $Id: phGUIObj.pas,v 1.13 2004-09-27 17:07:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,13 +7,16 @@
 unit phGUIObj;
 
 interface
-uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phObj, phGraphics, ConsVars;
+uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phIntf, phGraphics, ConsVars;
 
 type  
 
    //===================================================================================================================
    // TThumbnailViewer - средство просмотра эскизов изображений
    //===================================================================================================================
+
+  TThumbnailViewerState = (tvsLayoutChangePending);
+  TThumbnailViewerStates = set of TThumbnailViewerState;
 
    // Информация для отрисовки окна 
   TThumbnailViewerPaintInfo = record
@@ -53,6 +56,8 @@ type
 
   TThumbnailViewer = class(TCustomControl)
   private
+     // Интерфейс списка изображений, отображаемых в контроле
+    FPicList: IPhoaPicList;
      // Буферный битмэп для отрисовки содержимого окна контрола
     FBuffer: TBitmap32;
      // Размер пункта-эскиза (вместе с отступами, границами и т.п.)
@@ -69,13 +74,9 @@ type
     FTextLineHeight: Integer;
      // Флаг валидности параметров шрифта
     FFontParamsValid: Boolean;
-     // Битмэп тени эскиза
-    FShadow: TBitmap32;
-     // Флаг валидности FShadow
-    FShadowValid: Boolean;
+     // Битмэп тени эскиза (nil, если нет валидной рассчитанной тени)
+    FThumbShadow: TBitmap32;
 
-     // Список ссылок на изображения группы, наполняется вызовом SetCurrentGroup()
-    FPicLinks: TPhoaPicLinks;
      // Список индексов выделенных эскизов
     FSelIndexes: TIntegerList;
      // Индекс активного эскиза
@@ -105,7 +106,6 @@ type
      //   контекстное меню
     FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
-    FGroupID: Integer;
     FDragInsideEnabled: Boolean;
     FOnSelectionChange: TNotifyEvent;
     FBorderStyle: TBorderStyle;
@@ -120,6 +120,12 @@ type
     FThumbnailSize: TSize;
     FThumbBackBorderStyle: TThumbBackBorderStyle;
     FThumbBackBorderColor: TColor;
+    FThumbShadowOpacity: Byte;
+    FThumbShadowColor: TColor;
+    FThumbShadowOffset: TPoint;
+    FThumbShadowBlurRadius: Integer;
+    FThumbShadowVisible: Boolean;
+    FStates: TThumbnailViewerStates;
 
 
      // Painting stage handlers
@@ -131,8 +137,12 @@ type
     function  GetValidTopOffset(iOffset: Integer): Integer;
      // Рассчитывает параметры шрифта
     procedure CalcFontParams;
+     // Уничтожает FShadowBitmap
+    procedure InvalidateShadow;
      // Готовит FShadowBitmap
     procedure PrepareShadow;
+     // Вызывает пересчёт параметров отображения
+    procedure LayoutChanged;
      // Рассчитывает основные параметры отображения эскизов
     procedure CalcLayout;
      // Возвращает индекс самого верхнего отображаемого эскиза
@@ -182,7 +192,7 @@ type
     procedure SetItemIndex(Value: Integer);
     function  GetSelectedIndexes(Index: Integer): Integer;
     function  GetIDSelected(iID: Integer): Boolean;
-    function  GetSelectedPics(Index: Integer): TPhoaPic;
+    function  GetSelectedPics(Index: Integer): IPhoaPic;
     function  GetDropTargetIndex: Integer;
     function  GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
     procedure SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
@@ -195,6 +205,11 @@ type
     procedure SetThumbnailSize(const Value: TSize);
     procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
     procedure SetThumbBackBorderColor(Value: TColor);
+    procedure SetThumbShadowBlurRadius(Value: Integer);
+    procedure SetThumbShadowColor(Value: TColor);
+    procedure SetThumbShadowOffset(const Value: TPoint);
+    procedure SetThumbShadowOpacity(Value: Byte);
+    procedure SetThumbShadowVisible(Value: Boolean);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -210,6 +225,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+     // Обновляет отображаемый список изображений
+    procedure ReloadPicList(APicList: IPhoaPicList);
      // Сохраняет текущие параметры отображения и возвращает:
      //   в SelectedIDs - список ID выделенных изображений (может быть nil!)
      //   в iFocusedID  - ID изображения, которому соответствует ItemIndex (0, если нет такого)
@@ -221,8 +238,6 @@ type
      //     Если iFocusedID>0, устанавливает ItemIndex на изображение с заданным ID
      //     iTopOffset задаёт желаемый индекс верхнего эскиза
     procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
-     // Устанавливает группу Group для просмотра в качестве текущей
-    procedure ViewGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bRecurse: Boolean);
      // Снимает выделение со всех эскизов
     procedure SelectNone;
      // Выделяет все эскизы
@@ -250,8 +265,6 @@ type
     property DragInsideEnabled: Boolean read FDragInsideEnabled write FDragInsideEnabled;
      // -- Индекс последнего места вставки при Drag'n'Drop. -1, если не было подходящего
     property DropTargetIndex: Integer read GetDropTargetIndex;
-     // -- ID группы, отображаемой в данный момент (0, если нет)
-    property GroupID: Integer read FGroupID;
      // -- True, если изображение с заданным ID выделено
     property IDSelected[iID: Integer]: Boolean read GetIDSelected;
      // -- Индекс сфокусированного изображения
@@ -262,11 +275,32 @@ type
      //    0..SelCount-1)
     property SelectedIndexes[Index: Integer]: Integer read GetSelectedIndexes;
      // -- Выделенные изображения (Index - индекс выделенного изображения, 0..SelCount-1)
-    property SelectedPics[Index: Integer]: TPhoaPic read GetSelectedPics;
+    property SelectedPics[Index: Integer]: IPhoaPic read GetSelectedPics;
      // -- Если True, отображает всплывающие описания эскизов
     property ShowThumbTooltips: Boolean read FShowThumbTooltips write SetShowThumbTooltips;
+     // -- Состояния контрола
+    property States: TThumbnailViewerStates read FStates; 
+     // -- Цвет рамки фона эскиза при ThumbBackBorderStyle=tbbsColor
+    property ThumbBackBorderColor: TColor read FThumbBackBorderColor write SetThumbBackBorderColor;
+     // -- Стиль рамки фона эскиза
+    property ThumbBackBorderStyle: TThumbBackBorderStyle read FThumbBackBorderStyle write SetThumbBackBorderStyle;
+     // -- Цвет фона эскизов
+    property ThumbBackColor: TColor read FThumbBackColor write SetThumbBackColor;
+     // -- Цвет шрифта эскизов
+    property ThumbFontColor: TColor read FThumbFontColor write SetThumbFontColor;
      // -- Данные, отображаемые на эскизах
     property ThumbCornerDetails[Corner: TThumbCorner]: TThumbCornerDetail read GetThumbCornerDetails write SetThumbCornerDetails;
+     // -- Параметры тени эскиза
+     // ---- Радиус размывки
+    property ThumbShadowBlurRadius: Integer read FThumbShadowBlurRadius write SetThumbShadowBlurRadius;
+     // ---- Цвет
+    property ThumbShadowColor: TColor read FThumbShadowColor write SetThumbShadowColor;
+     // ---- Смещение
+    property ThumbShadowOffset: TPoint read FThumbShadowOffset write SetThumbShadowOffset;
+     // ---- Непрозрачность
+    property ThumbShadowOpacity: Byte read FThumbShadowOpacity write SetThumbShadowOpacity;
+     // ---- "Видимость"
+    property ThumbShadowVisible: Boolean read FThumbShadowVisible write SetThumbShadowVisible;
      // -- Данные, отображаемые на всплывающих описаниях эскизов
     property ThumbTooltipProps: TPicProperties read FThumbTooltipProps write SetThumbTooltipProps;
      // -- Размеры эскизов
@@ -284,7 +318,6 @@ type
     property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
     property Color default clBtnFace;
     property Constraints;
-    property Ctl3D;
     property DragCursor;
     property Enabled;
     property Font;
@@ -297,14 +330,6 @@ type
     property ShowHint;
     property TabOrder;
     property TabStop default True;
-     // -- Цвет рамки фона эскиза при ThumbBackBorderStyle=tbbsColor
-    property ThumbBackBorderColor: TColor read FThumbBackBorderColor write SetThumbBackBorderColor default clGray;
-     // -- Стиль рамки фона эскиза
-    property ThumbBackBorderStyle: TThumbBackBorderStyle read FThumbBackBorderStyle write SetThumbBackBorderStyle default tbbsXP;  
-     // -- Цвет фона эскизов
-    property ThumbBackColor: TColor read FThumbBackColor write SetThumbBackColor default clBtnFace;
-     // -- Цвет шрифта эскизов
-    property ThumbFontColor: TColor read FThumbFontColor write SetThumbFontColor default clWindowText;
     property Visible;
     property OnContextPopup;
     property OnDragDrop;
@@ -359,7 +384,7 @@ uses Math, Themes, phUtils;
 
   procedure TThumbnailViewer.AddToSelection(Index: Integer);
   begin
-    if (Index>=0) and (Index<FPicLinks.Count) and FSelIndexes.Add(Index) then InvalidateItem(Index);
+    if (Index>=0) and (Index<FItemCount) and FSelIndexes.Add(Index) then InvalidateItem(Index);
   end;
 
   procedure TThumbnailViewer.AdjustTooltip(ix, iy: Integer);
@@ -372,7 +397,7 @@ uses Math, Themes, phUtils;
        // Скрываем Tooltip, если есть
       Application.CancelHint;
        // Строим описание (добавляем палку, чтобы в StatusBar ничего не попадало)
-      if idx<0 then Hint := '' else Hint := FPicLinks[idx].GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
+//!!!      if idx<0 then Hint := '' else Hint := FPicLinks[idx].GetPropStrs(FThumbTooltipProps, ':'#9, #13)+'|';
       FLastTooltipIdx := idx;
     end;
   end;
@@ -404,19 +429,15 @@ uses Math, Themes, phUtils;
   end;
 
   procedure TThumbnailViewer.CalcLayout;
-  var
-    iPrevItemCount, iPrevColCount, iPrevTopOffset: Integer;
-    PrevDisplayMode: TThumbViewerDisplayMode;
+  var iPrevColCount, iPrevTopOffset: Integer;
   begin
     if (FUpdateLock>0) or not HandleAllocated then Exit;
      // Сбрасываем Tooltip/Hint
     FLastTooltipIdx := -1;
     Hint := '';
      // Сохраняем старые параметры
-    iPrevItemCount  := FItemCount;
-    iPrevColCount   := FColCount;
-    iPrevTopOffset  := FTopOffset;
-    PrevDisplayMode := FDisplayMode;
+    iPrevColCount  := FColCount;
+    iPrevTopOffset := FTopOffset;
      // Если параметры шрифта не валидны, инициализируем их
     if not FFontParamsValid then CalcFontParams;
      // Находим размеры ячейки и количество столбцов
@@ -439,12 +460,13 @@ uses Math, Themes, phUtils;
       end;
     end;
      // Обновляем значения
-    FItemCount    := FPicLinks.Count;
     FVisibleItems := (ClientHeight div FItemSize.cy)*FColCount;
     FVRange       := Ceil(FItemCount/FColCount)*FItemSize.cy;
     FTopOffset    := GetValidTopOffset(FTopOffset);
      // Обновляем отображаемые данные при наличии изменений
-    if (FItemCount<>iPrevItemCount) or (FDisplayMode<>PrevDisplayMode) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
+    if (tvsLayoutChangePending in FStates) or (FColCount<>iPrevColCount) or (FTopOffset<>iPrevTopOffset) then Invalidate;
+     // Обновляем флаги состояния
+    FStates := FStates-[tvsLayoutChangePending];
     UpdateScrollBar;
   end;
 
@@ -484,23 +506,27 @@ uses Math, Themes, phUtils;
   constructor TThumbnailViewer.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
-    ControlStyle          := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
-    Width                 := 100;
-    Height                := 100;
-    TabStop               := True;
-    ParentColor           := False;
-    Color                 := clBtnFace;
-    FBorderStyle          := bsSingle;
-    FColCount             := 1;
-    FNoMoveItemIndex      := -1;
-    FPicLinks             := TPhoaPicLinks.Create(False);
-    FSelIndexes           := TIntegerList.Create(False);
-    FThumbBackBorderColor := clGray;
-    FThumbBackBorderStyle := tbbsXP;
-    FThumbBackColor       := clBtnFace;
-    FThumbFontColor       := clWindowText;
-    FThumbnailSize.cx     := IDefaultThumbWidth;
-    FThumbnailSize.cy     := IDefaultThumbHeight;
+    ControlStyle           := [csCaptureMouse, csClickEvents, csOpaque, csDoubleClicks, csReplicatable];
+    Width                  := 100;
+    Height                 := 100;
+    TabStop                := True;
+    ParentColor            := False;
+    Color                  := clBtnFace;
+    FBorderStyle           := bsSingle;
+    FColCount              := 1;
+    FNoMoveItemIndex       := -1;
+    FSelIndexes            := TIntegerList.Create(False);
+    FThumbBackBorderColor  := clGray;
+    FThumbBackBorderStyle  := tbbsXP;
+    FThumbBackColor        := clBtnFace;
+    FThumbFontColor        := clWindowText;
+    FThumbnailSize.cx      := IDefaultThumbWidth;
+    FThumbnailSize.cy      := IDefaultThumbHeight;
+    FThumbShadowBlurRadius := 40;
+    FThumbShadowColor      := clBlack;
+    FThumbShadowOffset     := Point(7, 7);
+    FThumbShadowOpacity    := 140;
+    FThumbShadowVisible    := True;
   end;
 
   procedure TThumbnailViewer.CreateParams(var Params: TCreateParams);
@@ -509,12 +535,10 @@ uses Math, Themes, phUtils;
     with Params do begin
       WindowClass.style := WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
       Style := Style or WS_VSCROLL;
-      if FBorderStyle=bsSingle then
-        if NewStyleControls and Ctl3D then begin
-          Style := Style and not WS_BORDER;
-          ExStyle := ExStyle or WS_EX_CLIENTEDGE;
-        end else
-          Style := Style or WS_BORDER;
+      if FBorderStyle=bsSingle then begin
+        Style := Style and not WS_BORDER;
+        ExStyle := ExStyle or WS_EX_CLIENTEDGE;
+      end;
     end;
   end;
 
@@ -535,9 +559,9 @@ uses Math, Themes, phUtils;
   destructor TThumbnailViewer.Destroy;
   begin
     FSelIndexes.Free;
-    FPicLinks.Free;
     FBuffer.Free;
-    FShadow.Free;
+    FThumbShadow.Free;
+    FPicList := nil;
     inherited Destroy;
   end;
 
@@ -644,7 +668,7 @@ uses Math, Themes, phUtils;
        //   изображение или место вставки не совпадает с положением этого изображения
       Accept :=
         (FDragTargetCoord.iIndex>=0) and
-        (FSelIndexes.Count<FPicLinks.Count) and
+        (FSelIndexes.Count<FItemCount) and
         ((FSelIndexes.Count>1) or ((FSelIndexes[0]<>FDragTargetCoord.iIndex) and (FSelIndexes[0]<>FDragTargetCoord.iIndex-1)));
     end else
       inherited DragOver(Source, X, Y, State, Accept);
@@ -675,7 +699,7 @@ uses Math, Themes, phUtils;
   var idx: Integer;
   begin
     Result := False;
-    idx := FPicLinks.IndexOfID(iID);
+    idx := FPicList.IndexOfID(iID);
     if (idx>=0) and (FSelIndexes.IndexOf(idx)>=0) then Result := True;
   end;
 
@@ -690,15 +714,16 @@ uses Math, Themes, phUtils;
   end;
 
   function TThumbnailViewer.GetSelectedPicArray: TPicArray;
-  var i: Integer;
+//  var i: Integer;
   begin
-    SetLength(Result, FSelIndexes.Count);
-    for i := 0 to FSelIndexes.Count-1 do Result[i] := GetSelectedPics(i);
+result := nil;  
+//!!!    SetLength(Result, FSelIndexes.Count);
+//!!!    for i := 0 to FSelIndexes.Count-1 do Result[i] := GetSelectedPics(i);
   end;
 
-  function TThumbnailViewer.GetSelectedPics(Index: Integer): TPhoaPic;
+  function TThumbnailViewer.GetSelectedPics(Index: Integer): IPhoaPic;
   begin
-    Result := FPicLinks[FSelIndexes[Index]];
+    Result := FPicList[FSelIndexes[Index]];
   end;
 
   function TThumbnailViewer.GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
@@ -717,6 +742,14 @@ uses Math, Themes, phUtils;
     if (FUpdateLock=0) and HandleAllocated then begin
       r := ItemRect(Index, False);
       if not IsRectEmpty(r) then InvalidateRect(Handle, @r, False);
+    end;
+  end;
+
+  procedure TThumbnailViewer.InvalidateShadow;
+  begin
+    if FThumbShadow<>nil then begin
+      FreeAndNil(FThumbShadow);
+      Invalidate;
     end;
   end;
 
@@ -790,6 +823,12 @@ uses Math, Themes, phUtils;
         end
       end;
     end;
+  end;
+
+  procedure TThumbnailViewer.LayoutChanged;
+  begin
+    Include(FStates, tvsLayoutChangePending);
+    CalcLayout;
   end;
 
   procedure TThumbnailViewer.MarqueingEnd;
@@ -899,7 +938,7 @@ uses Math, Themes, phUtils;
      // Если была нажата правая кнопка вместе с Ctrl - вызываем системное контекстное меню 
     else if FShellCtxMenuOnMouseUp then begin
       FShellCtxMenuOnMouseUp := False;
-      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicLinks[FItemIndex].PicFileName);
+      if (ssCtrl in Shift) and (FItemIndex>=0) and (FItemIndex=ItemAtPos(x, y)) then ShowFileShellContextMenu(FPicList[FItemIndex].FileName);
       Exit;
      // Иначе завершаем Dragging
     end else begin
@@ -957,24 +996,25 @@ uses Math, Themes, phUtils;
   procedure TThumbnailViewer.Paint_Thumbnail(const Info: TThumbnailViewerPaintInfo; iIndex: Integer; ItemRect: TRect; bSelected: Boolean);
   const aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
   var
-    Pic: TPhoaPic;
+    Pic: IPhoaPic;
     r, rInner: TRect;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
     function DrawDetail(Corner: TThumbCorner; rText: TRect): Integer;
-    var sProp: String;
+//!!!    var sProp: String;
     begin
-      Result := 0;
-      if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
-        sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
-        if sProp<>'' then begin
-          Result := Info.Bitmap.TextWidth(sProp)+2;
-          Info.Bitmap.Textout(
-            rText,
-            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
-            sProp);
-        end;
-      end;
+//!!!      Result := 0;
+//      if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
+//        sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
+//        if sProp<>'' then begin
+//          Result := Info.Bitmap.TextWidth(sProp)+2;
+//          Info.Bitmap.Textout(
+//            rText,
+//            iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
+//            sProp);
+//        end;
+//      end;
+result := 30;
     end;
 
      // Отрисовывает на эскизе данные, находящиеся на одной гориз. линии
@@ -988,18 +1028,22 @@ uses Math, Themes, phUtils;
 
      // Отрисовывает эскиз в заданном прямоугольнике 
     procedure DrawThumbnail(const rThumb: TRect);
-    var r: TRect;
+    var
+      r: TRect;
+      sThData: String;
     begin
        // Рисуем эскиз
       r := rThumb;
-      PaintThumbnail(Pic.ThumbnailData, Pic.PicRotation, Pic.PicFlips, Info.Bitmap, r);
+      SetString(sThData, PChar(Pic.ThumbnailData), Pic.ThumbnailDataSize);
+      PaintThumbnail(sThData, Pic.Rotation, Pic.Flips, Info.Bitmap, r);
        // Рисуем тень
-      DropShadow(Info.Bitmap, FShadow, r, rThumb, 5, 5, clBlack{!!!});
+      if FThumbShadowVisible then
+        DropShadow(Info.Bitmap, FThumbShadow, r, rThumb, FThumbShadowOffset.x, FThumbShadowOffset.y, FThumbShadowColor);
     end;
 
   begin
      // Получаем изображение
-    Pic := FPicLinks[iIndex];
+    Pic := FPicList[iIndex];
      // Рисуем рамку
     r := ItemRect;
     Info.Bitmap.Font.Assign(Self.Font);
@@ -1126,10 +1170,31 @@ uses Math, Themes, phUtils;
 
   procedure TThumbnailViewer.PrepareShadow;
   begin
-    if not FShadowValid then begin
-      if FShadow=nil then FShadow := TBitmap32.Create;
-      RenderShadowTemplate(FShadow, 7, 140, clBlack{!!!});
-      FShadowValid := True;
+    if FThumbShadowVisible and (FThumbShadow=nil) then begin
+      FThumbShadow := TBitmap32.Create;
+      RenderShadowTemplate(FThumbShadow, FThumbShadowBlurRadius, FThumbShadowOpacity, FThumbShadowColor);
+    end;
+  end;
+
+  procedure TThumbnailViewer.ReloadPicList(APicList: IPhoaPicList);
+  var iItemIdx: Integer;
+  begin
+    BeginUpdate;
+    try
+       // Присваиваем список и взводим флаг изменённости параметров отображения
+      FPicList   := APicList;
+      FItemCount := FPicList.Count;
+      FTopOffset := 0;
+      LayoutChanged;
+       // Стираем выделение
+      ClearSelection;
+       // Выделяем первое изображение (если оно есть)
+      AddToSelection(0);
+      if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[0] else iItemIdx := -1;
+      MoveItemIndex(iItemIdx, True);
+    finally
+       // Всё пересчитываем и уведомляем об изменениях
+      EndUpdate;
     end;
   end;
 
@@ -1150,17 +1215,17 @@ uses Math, Themes, phUtils;
     ClearSelection;
      // Добавляем в выделение изображения с заданными ID
     if SelectedIDs<>nil then
-      for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicLinks.IndexOfID(SelectedIDs[i]));
+      for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicList.IndexOfID(SelectedIDs[i]));
      // Если нет выделения, выделяем первое изображение (если оно есть)
     if FSelIndexes.Count=0 then AddToSelection(0);
      // Находим сфокусированное изображение
-    if iFocusedID>0 then iItemIdx := FPicLinks.IndexOfID(iFocusedID) else iItemIdx := -1;
+    if iFocusedID>0 then iItemIdx := FPicList.IndexOfID(iFocusedID) else iItemIdx := -1;
      // Если так и не нашлось
     if iItemIdx<0 then
        // Фокусируем последнее из выделенных, если они есть
       if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[FSelIndexes.Count-1]
        // Иначе пытаемся выделить самое первое изображение, если оно есть
-      else if FPicLinks.Count>0 then iItemIdx := 0;
+      else if FItemCount>0 then iItemIdx := 0;
     TopOffset := iTopOffset;
     MoveItemIndex(iItemIdx, True);
     DoSelectionChange;
@@ -1173,7 +1238,7 @@ uses Math, Themes, phUtils;
     if FSelIndexes.Count>0 then begin
       SelectedIDs := TIntegerList.Create(False);
       for i := 0 to FSelIndexes.Count-1 do SelectedIDs.Add(SelectedPics[i].ID);
-      if FItemIndex>=0 then iFocusedID := FPicLinks[FItemIndex].ID;
+      if FItemIndex>=0 then iFocusedID := FPicList[FItemIndex].ID;
     end else
       SelectedIDs := nil;
     iTopOffset := FTopOffset;
@@ -1254,7 +1319,7 @@ uses Math, Themes, phUtils;
   begin
     if FDisplayMode<>Value then begin
       FDisplayMode := Value;
-      CalcLayout;
+      LayoutChanged;
     end;
   end;
 
@@ -1305,7 +1370,7 @@ uses Math, Themes, phUtils;
   procedure TThumbnailViewer.SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
   begin
     FThumbCornerDetails[Corner] := Value;
-    CalcLayout;
+    LayoutChanged;
   end;
 
   procedure TThumbnailViewer.SetThumbFontColor(Value: TColor);
@@ -1320,7 +1385,47 @@ uses Math, Themes, phUtils;
   begin
     if (FThumbnailSize.cx<>Value.cx) or (FThumbnailSize.cy<>Value.cy) then begin
       FThumbnailSize := Value;
-      CalcLayout;
+      LayoutChanged;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbShadowBlurRadius(Value: Integer);
+  begin
+    if FThumbShadowBlurRadius<>Value then begin
+      FThumbShadowBlurRadius := Value;
+      InvalidateShadow;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbShadowColor(Value: TColor);
+  begin
+    if FThumbShadowColor<>Value then begin
+      FThumbShadowColor := Value;
+      InvalidateShadow;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbShadowOffset(const Value: TPoint);
+  begin
+    if Int64(FThumbShadowOffset)<>Int64(Value) then begin
+      FThumbShadowOffset := Value;
+      InvalidateShadow;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbShadowOpacity(Value: Byte);
+  begin
+    if FThumbShadowOpacity<>Value then begin
+      FThumbShadowOpacity := Value;
+      InvalidateShadow;
+    end;
+  end;
+
+  procedure TThumbnailViewer.SetThumbShadowVisible(Value: Boolean);
+  begin
+    if FThumbShadowVisible<>Value then begin
+      FThumbShadowVisible := Value;
+      InvalidateShadow;
     end;
   end;
 
@@ -1365,28 +1470,6 @@ uses Math, Themes, phUtils;
     SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
   end;
 
-  procedure TThumbnailViewer.ViewGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bRecurse: Boolean);
-  var iItemIdx: Integer;
-  begin
-    BeginUpdate;
-    try
-       // Находим новый GroupID
-      if Group=nil then FGroupID := 0 else FGroupID := Group.ID;
-       // Копируем ссылки на изображения по их IDs из группы
-      FPicLinks.AddFromGroup(PhoA, Group, True, bRecurse);
-       // Стираем выделение
-      ClearSelection;
-      FTopOffset := 0;
-       // Выделяем первое изображение (если оно есть)
-      AddToSelection(0);
-      if FSelIndexes.Count>0 then iItemIdx := FSelIndexes[0] else iItemIdx := -1;
-      MoveItemIndex(iItemIdx, True);
-    finally
-       // Пересчитываем layout, validate TopIndex, обновляем, уведомляем об изменении выделения
-      EndUpdate;
-    end;
-  end;
-
   procedure TThumbnailViewer.WMContextMenu(var Msg: TWMContextMenu);
   begin
      // Вызываем context menu только если не был нажат Ctrl
@@ -1416,6 +1499,7 @@ uses Math, Themes, phUtils;
   procedure TThumbnailViewer.WMVScroll(var Msg: TWMVScroll);
   var iOffset: Integer;
 
+     // Получает 32-битную позицию скроллера (в сообщении передаётся только 16-битная)
     function GetRealScrollPos: Integer;
     var SI: TScrollInfo;
     begin
@@ -1443,7 +1527,7 @@ uses Math, Themes, phUtils;
   procedure TThumbnailViewer.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
   begin
     inherited;
-    CalcLayout;
+    LayoutChanged;
   end;
 
   procedure TThumbnailViewer.WndProc(var Msg: TMessage);

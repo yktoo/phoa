@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.25 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufImgView.pas,v 1.26 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufImgView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, ConsVars, phObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
+  phIntf, ConsVars, phObj,
   GR32_Layers, phGraphics,
   TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
   TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;

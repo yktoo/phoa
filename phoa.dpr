@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.22 2004-09-18 19:44:23 dale Exp $
+//  $Id: phoa.dpr,v 1.23 2004-09-27 17:07:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -64,7 +64,8 @@ uses
   phGraphics in 'phGraphics.pas',
   udGroupProps in 'udGroupProps.pas' {dGroupProps},
   phGUIObj in 'phGUIObj.pas',
-  phProfileSetting in 'phProfileSetting.pas';
+  phProfileSetting in 'phProfileSetting.pas',
+  phIntf in 'phIntf.pas';
 
 {$R *.res}
 

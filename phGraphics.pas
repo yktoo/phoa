@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.8 2004-09-27 04:14:08 dale Exp $
+//  $Id: phGraphics.pas,v 1.9 2004-09-27 17:07:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phGraphics;
 
 interface
-uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars;
+uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars, phIntf;
 
 type
 
@@ -105,13 +105,13 @@ const
   BColor_Alpha_Opaque      = $ff;
 
 implementation
-uses JPEG, phUtils;
+uses JPEG, phUtils, Math;
 
   procedure RenderShadowTemplate(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
   var
-    iSize, ix, iy, iR2, iy2: Integer;
+    iSize, ix, iy, iy2: Integer;
     c32: TColor32;
-    sAlpha: Single;
+    sAlpha, sCoeff: Single;
     bAlpha: Byte;
 
      // Отражает "четвертинку" изображения по горизонтали и/или вертикали
@@ -142,18 +142,18 @@ uses JPEG, phUtils;
 
   begin
     iSize := iRadius*2;
-    iR2 := iRadius*iRadius*iRadius;
     c32 := Color32(Color);
      // Устанавливаем параметры битмэпа
     Bitmap.SetSize(iSize, iSize);
     Bitmap.DrawMode    := dmBlend;
     Bitmap.MasterAlpha := bOpacity;
      // Рендерим квадрат (3)
+    sCoeff := 1/Sqr(iRadius)*Ln(0.013);
     for iy := 0 to iRadius-1 do begin
        // Заранее считаем квадрат iy
-      iy2 := iy*iy*iy;
+      iy2 := Sqr(iy);
       for ix := 0 to iRadius-1 do begin
-        sAlpha := 1-(ix*ix*ix+iy2)/iR2; // Находим значение непрозрачности в диапазоне 0..1
+        sAlpha := Exp(sCoeff*(Sqr(ix)+iy2)); // Находим значение непрозрачности в диапазоне 0..1
         if sAlpha<0 then bAlpha := 0 else bAlpha := Trunc(255*sAlpha);
         Bitmap.SetPixelT(iRadius+ix, iRadius+iy, SetAlpha(c32, bAlpha));
       end;
@@ -210,10 +210,10 @@ uses JPEG, phUtils;
       iRadius := ShadowTemplate.Width div 2;
       r := rObject;
       with r do begin
-        Inc(Left,   iOffsetX+iRadius);
-        Inc(Top,    iOffsetY+iRadius);
-        Inc(Right,  iOffsetX-iRadius);
-        Inc(Bottom, iOffsetY-iRadius);
+        Inc(Left,   iOffsetX+iRadius div 3);
+        Inc(Top,    iOffsetY+iRadius div 3);
+        Inc(Right,  iOffsetX-iRadius div 3);
+        Inc(Bottom, iOffsetY-iRadius div 3);
       end;
        // Считаем общие размеры всей тени
       rTotal := r;

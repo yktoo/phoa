@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.17 2004-09-24 14:09:17 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.18 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1134,7 +1134,7 @@ uses
      // Удаляем обработанное изображение
     FSelectedPics.Delete(0);
      // Если операция - удаление изображений, обновляем вьюер
-    if FFileOpKind=fokDeleteFiles then fMain.ViewerRefresh;
+    if FFileOpKind=fokDeleteFiles then fMain.RefreshViewer;
      // Если обработан весь список, прерываем поток
     if (FSelectedPics.Count=0) or FProcessingInterrupted then begin
       FProcessing := False;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.27 2004-09-24 16:44:29 dale Exp $
+//  $Id: phUtils.pas,v 1.28 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phUtils;
 interface
 uses
   SysUtils, Windows, Messages, Classes, Controls, Graphics, StdCtrls, VirtualTrees, VirtualShellUtilities, GraphicEx,
-  GR32, ConsVars, phObj;
+  GR32, phIntf, ConsVars, phObj;
 
    // Exception raising
   procedure PhoaException(const sMsg: String; const aParams: Array of const);

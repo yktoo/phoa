@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.37 2004-09-24 14:09:17 dale Exp $
+//  $Id: phObj.pas,v 1.38 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phObj;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Masks, ConsVars, phPhoa;
+  Windows, Messages, SysUtils, Classes, Graphics, Masks, ConsVars, phPhoa, phIntf;
 
 type
   TPhoaGroup  = class;
@@ -57,10 +57,29 @@ type
    // Список ссылок на изображения
    //-------------------------------------------------------------------------------------------------------------------
 
-  TPhoaPicLinks = class(TList)
+  TPhoaPicLinks = class(TList, IPhoaPicList)
   private
+     // Prop storage
     FSorted: Boolean;
-    function GetItems(Index: Integer): TPhoaPic;
+     // IInterface
+    function  QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function  _AddRef: Integer; stdcall;
+    function  _Release: Integer; stdcall;
+     // IPhoaPicList
+    function  IPhoaPicList.IndexOfID          = IPPL_IndexOfID;
+    function  IPhoaPicList.IndexOfFileName    = IPPL_IndexOfFileName;
+    function  IPhoaPicList.GetCount           = IPPL_GetCount;
+    function  IPhoaPicList.GetItemsByID       = IPPL_GetItemsByID;
+    function  IPhoaPicList.GetItemsByFileName = IPPL_GetItemsByFileName;
+    function  IPhoaPicList.GetItems           = IPPL_GetItems;
+    function  IPPL_IndexOfID(iID: Integer): Integer; stdcall;
+    function  IPPL_IndexOfFileName(pcFileName: PAnsiChar): Integer; stdcall;
+    function  IPPL_GetCount: Integer; stdcall;
+    function  IPPL_GetItemsByID(iID: Integer): IPhoaPic; stdcall;
+    function  IPPL_GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic; stdcall;
+    function  IPPL_GetItems(Index: Integer): IPhoaPic; stdcall;
+     // Prop handlers
+    function  GetItems(Index: Integer): TPhoaPic;
   public
      // При bSorted=True список является сортированным, использует бинарный поиск и игнорирует дубликаты изображений (т.е.
      //   с повторяющимися ID)
@@ -68,11 +87,13 @@ type
      // Копирует ссылки на изображения с Src. Если RestrictLinks=nil, то копирует все изображения, иначе - только те,
      //   ID которых содержатся в RestrictLinks
     procedure Assign(Src: TPhoaPics; RestrictLinks: TPhoaPicLinks);
-     // Добавляет изображения в список. При bSkipDuplicates=True дубликаты игнорируются
-    function Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer;
+     // Добавляет изображения в список. При bSkipDuplicates=True дубликаты игнорируются. Версия с bAdded возвращает в
+     //   bAdded True, если изображение было добавлено; False, если пропущено
+    function  Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer; overload;
+    function  Add(Pic: TPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload;
      // Ищет изображение по ID и возвращает True, если нашла, а в Index - позицию найденного изображения. Если
      //   изображения с таким ID не найдено, возвращает False, а в Index - позицию изображения с ближайшим бОльшим ID
-    function FindID(iID: Integer; var Index: Integer): Boolean;
+    function  FindID(iID: Integer; var Index: Integer): Boolean;
      // Копирует все ссылки на изображения с группы. При bReplace=True предварительно стирает список (если Group=nil,
      //   просто очищает список). При bRecurse также добавляет изображения из вложенных групп
     procedure AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
@@ -83,12 +104,15 @@ type
      // Копирует все ID изображений в группу
     procedure CopyToGroup(Group: TPhoaGroup);
      // Возвращает индекс изображения с заданным ID, или -1, если нет такого
-    function IndexOfID(iID: Integer): Integer;
+    function  IndexOfID(iID: Integer): Integer;
+     // Возвращает индекс изображения по его имени файла; -1, если нет такого
+    function  IndexOfFileName(const sFileName: String): Integer;
      // Возвращает изображение по его ID (nil, если не найдено)
-    function PicByID(iID: Integer): TPhoaPic;
+    function  PicByID(iID: Integer): TPhoaPic;
      // Возвращает изображение по его имени файла (nil, если не найдено)
-    function PicByFileName(const sFileName: String): TPhoaPic;
+    function  PicByFileName(const sFileName: String): TPhoaPic;
      // Props
+     // -- Пункты по индексу
     property Items[Index: Integer]: TPhoaPic read GetItems; default;
   end;
 
@@ -239,7 +263,7 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   PPhoaPic = ^TPhoaPic; 
-  TPhoaPic = class(TObject)
+  TPhoaPic = class(TObject, IPhoaPic)
   private
      // Фотоальбом. Должен использоваться только для получения размеров и качества эскизов
     FPhoA: TPhotoAlbum;
@@ -272,6 +296,51 @@ type
      //      связанные с изображением, т.е. с файлом, сохраняются только при наличии ppFileName in PProps)
     procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
     procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
+     // IInterface
+    function  QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function  _AddRef: Integer; stdcall;
+    function  _Release: Integer; stdcall;
+     // IPhoaPic
+    function  IPhoaPic.GetID                = IPP_GetID;               
+    function  IPhoaPic.GetAuthor            = IPP_GetAuthor;
+    function  IPhoaPic.GetDate              = IPP_GetDate;
+    function  IPhoaPic.GetTime              = IPP_GetTime;
+    function  IPhoaPic.GetDescription       = IPP_GetDescription;
+    function  IPhoaPic.GetFileName          = IPP_GetFileName;
+    function  IPhoaPic.GetFileSize          = IPP_GetFileSize;
+    function  IPhoaPic.GetFilmNumber        = IPP_GetFilmNumber;
+    function  IPhoaPic.GetFlips             = IPP_GetFlips;
+    function  IPhoaPic.GetFrameNumber       = IPP_GetFrameNumber;
+    function  IPhoaPic.GetImageSize         = IPP_GetImageSize;
+    function  IPhoaPic.GetKeywords          = IPP_GetKeywords;
+    function  IPhoaPic.GetMedia             = IPP_GetMedia;
+    function  IPhoaPic.GetNotes             = IPP_GetNotes;
+    function  IPhoaPic.GetPlace             = IPP_GetPlace;
+    function  IPhoaPic.GetPropertyValue     = IPP_GetPropertyValue;
+    function  IPhoaPic.GetRotation          = IPP_GetRotation;
+    function  IPhoaPic.GetThumbnailSize     = IPP_GetThumbnailSize;
+    function  IPhoaPic.GetThumbnailData     = IPP_GetThumbnailData;
+    function  IPhoaPic.GetThumbnailDataSize = IPP_GetThumbnailDataSize;
+    function  IPP_GetID: Integer; stdcall;
+    function  IPP_GetAuthor: PAnsiChar; stdcall;
+    function  IPP_GetDate: Integer; stdcall;
+    function  IPP_GetTime: Integer; stdcall;
+    function  IPP_GetDescription: PAnsiChar; stdcall;
+    function  IPP_GetFileName: PAnsiChar; stdcall;
+    function  IPP_GetFileSize: Integer; stdcall;
+    function  IPP_GetFilmNumber: PAnsiChar; stdcall;
+    function  IPP_GetFlips: TPicFlips; stdcall;
+    function  IPP_GetFrameNumber: PAnsiChar; stdcall;
+    function  IPP_GetImageSize: TSize; stdcall;
+    function  IPP_GetKeywords: PAnsiChar; stdcall;
+    function  IPP_GetMedia: PAnsiChar; stdcall;
+    function  IPP_GetNotes: PAnsiChar; stdcall;
+    function  IPP_GetPlace: PAnsiChar; stdcall;
+    function  IPP_GetPropertyValue(pcPropName: PAnsiChar): PAnsiChar; stdcall;
+    function  IPP_GetRotation: TPicRotation; stdcall;
+    function  IPP_GetThumbnailSize: TSize; stdcall;
+    function  IPP_GetThumbnailData: Pointer; stdcall;
+    function  IPP_GetThumbnailDataSize: Integer; stdcall;
      // Prop handlers
     procedure SetList(Value: TPhoaPics);
     function  GetRawData(PProps: TPicProperties): String;
@@ -1523,11 +1592,20 @@ uses
    //-------------------------------------------------------------------------------------------------------------------
 
   function TPhoaPicLinks.Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer;
+  var bDummy: Boolean;
+  begin
+    Result := Add(Pic, bSkipDuplicates, bDummy);
+  end;
+
+  function TPhoaPicLinks.Add(Pic: TPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer;
   begin
     if FSorted or bSkipDuplicates then begin
-      if not FindID(Pic.ID, Result) then Insert(Result, Pic);
-    end else
+      bAdded := not FindID(Pic.ID, Result);
+      if bAdded then Insert(Result, Pic);
+    end else begin
+      bAdded := True;
       Result := inherited Add(Pic);
+    end;
   end;
 
   procedure TPhoaPicLinks.AddFromGroup(PhoA: TPhotoAlbum; Group: TPhoaGroup; bReplace, bRecurse: Boolean);
@@ -1624,25 +1702,76 @@ uses
     Result := TPhoaPic(inherited Items[Index]);
   end;
 
+  function TPhoaPicLinks.IndexOfFileName(const sFileName: String): Integer;
+  begin
+    for Result := 0 to Count-1 do
+      if ReverseCompare(GetItems(Result).PicFileName, sFileName) then Exit;
+    Result := -1;
+  end;
+
   function TPhoaPicLinks.IndexOfID(iID: Integer): Integer;
   begin
     if not FindID(iID, Result) then Result := -1;
   end;
 
-  function TPhoaPicLinks.PicByFileName(const sFileName: String): TPhoaPic;
-  var i: Integer;
+  function TPhoaPicLinks.IPPL_GetCount: Integer;
   begin
-    for i := 0 to Count-1 do begin
-      Result := GetItems(i);
-      if ReverseCompare(Result.PicFileName, sFileName) then Exit;
-    end;
-    Result := nil;
+    Result := Count;
+  end;
+
+  function TPhoaPicLinks.IPPL_GetItems(Index: Integer): IPhoaPic;
+  begin
+    Result := Items[Index];
+  end;
+
+  function TPhoaPicLinks.IPPL_GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic;
+  begin
+    Result := PicByFileName(pcFileName);
+  end;
+
+  function TPhoaPicLinks.IPPL_GetItemsByID(iID: Integer): IPhoaPic;
+  begin
+    Result := PicByID(iID);
+  end;
+
+  function TPhoaPicLinks.IPPL_IndexOfFileName(pcFileName: PAnsiChar): Integer;
+  begin
+    Result := IndexOfFileName(pcFileName);
+  end;
+
+  function TPhoaPicLinks.IPPL_IndexOfID(iID: Integer): Integer;
+  begin
+    Result := IndexOfID(iID);
+  end;
+
+  function TPhoaPicLinks.PicByFileName(const sFileName: String): TPhoaPic;
+  var idx: Integer;
+  begin
+    idx := IndexOfFileName(sFileName);
+    if idx<0 then Result := nil else Result := GetItems(idx);
   end;
 
   function TPhoaPicLinks.PicByID(iID: Integer): TPhoaPic;
   var idx: Integer;
   begin
     if FindID(iID, idx) then Result := GetItems(idx) else Result := nil;
+  end;
+
+  function TPhoaPicLinks.QueryInterface(const IID: TGUID; out Obj): HResult;
+  begin
+    if GetInterface(IID, Obj) then Result := S_OK else Result := E_NOINTERFACE;
+  end;
+
+  function TPhoaPicLinks._AddRef: Integer;
+  begin
+     // No refcounting applicable
+    Result := -1;
+  end;
+
+  function TPhoaPicLinks._Release: Integer;
+  begin
+     // No refcounting applicable
+    Result := -1;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -2344,6 +2473,115 @@ type
     if FID=0 then FID := List.GetFreePicID;
   end;
 
+  function TPhoaPic.IPP_GetAuthor: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicAuthor);
+  end;
+
+  function TPhoaPic.IPP_GetDate: Integer;
+  begin
+    Result := DateToPhoaDate(FPicDateTime);
+  end;
+
+  function TPhoaPic.IPP_GetDescription: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicDesc);
+  end;
+
+  function TPhoaPic.IPP_GetFileName: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicFileName);
+  end;
+
+  function TPhoaPic.IPP_GetFileSize: Integer;
+  begin
+    Result := FPicFileSize;
+  end;
+
+  function TPhoaPic.IPP_GetFilmNumber: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicFilmNumber);
+  end;
+
+  function TPhoaPic.IPP_GetFlips: TPicFlips;
+  begin
+    Result := FPicFlips;
+  end;
+
+  function TPhoaPic.IPP_GetFrameNumber: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicFrameNumber);
+  end;
+
+  function TPhoaPic.IPP_GetID: Integer;
+  begin
+    Result := FID;
+  end;
+
+  function TPhoaPic.IPP_GetImageSize: TSize;
+  begin
+    Result.cx := FPicWidth;
+    Result.cy := FPicHeight;
+  end;
+
+  function TPhoaPic.IPP_GetKeywords: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicKeywords.CommaText);
+  end;
+
+  function TPhoaPic.IPP_GetMedia: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicMedia);
+  end;
+
+  function TPhoaPic.IPP_GetNotes: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicNotes);
+  end;
+
+  function TPhoaPic.IPP_GetPlace: PAnsiChar;
+  begin
+    Result := PAnsiChar(FPicPlace);
+  end;
+
+  function TPhoaPic.IPP_GetPropertyValue(pcPropName: PAnsiChar): PAnsiChar;
+  var Prop: TPicProperty;
+  begin
+    Prop := PropNameToPicProperty(pcPropName);
+    if Prop in PPAllProps then Result := PAnsiChar(Props[Prop]) else Result := nil;
+  end;
+
+  function TPhoaPic.IPP_GetRotation: TPicRotation;
+  begin
+    Result := FPicRotation;
+  end;
+
+  function TPhoaPic.IPP_GetThumbnailData: Pointer;
+  begin
+    Result := Pointer(FThumbnailData);
+  end;
+
+  function TPhoaPic.IPP_GetThumbnailDataSize: Integer;
+  begin
+    Result := Length(FThumbnailData);
+  end;
+
+  function TPhoaPic.IPP_GetThumbnailSize: TSize;
+  begin
+    Result.cx := FThumbWidth;
+    Result.cy := FThumbHeight;
+  end;
+
+  function TPhoaPic.IPP_GetTime: Integer;
+  begin
+    Result := TimeToPhoaTime(FPicDateTime);
+  end;
+
+  function TPhoaPic.QueryInterface(const IID: TGUID; out Obj): HResult;
+  begin
+    if GetInterface(IID, Obj) then Result := S_OK else Result := E_NOINTERFACE;
+  end;
+
   procedure TPhoaPic.ReloadPicFileData;
   begin
     FThumbnailData := GetThumbnailData(
@@ -2516,6 +2754,18 @@ type
         if (ppRotation    in PProps)                  and (FPicRotation<>pr0)      then WriteChunkByte  (IPhChunk_Pic_Rotation,      Byte(FPicRotation));
         if (ppFlips       in PProps)                  and (FPicFlips<>[])          then WriteChunkByte  (IPhChunk_Pic_Flips,         Byte(FPicFlips));
       end;
+  end;
+
+  function TPhoaPic._AddRef: Integer;
+  begin
+     // No refcounting applicable
+    Result := -1;
+  end;
+
+  function TPhoaPic._Release: Integer;
+  begin
+     // No refcounting applicable
+    Result := -1;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

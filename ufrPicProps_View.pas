@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.17 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.18 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
-  phObj, phGraphics,
+  phIntf, phObj, phGraphics,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
   TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DKLang;
 

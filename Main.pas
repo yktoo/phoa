@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.41 2004-09-24 14:09:16 dale Exp $
+//  $Id: Main.pas,v 1.42 2004-09-27 17:07:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -267,6 +267,8 @@ type
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
+     // Просматриваемые в настоящий момент изображения (с учётом режима Flat)
+    FViewedPics: TPhoaPicLinks;
      // Узел результатов поиска
     FSearchNode: PVirtualNode;
      // Список изображений - результаты поиска
@@ -283,10 +285,10 @@ type
     FPicsPopupToolsValidated: Boolean;
      // Флаг того, что инициализация формы окончена
     FInitialized: Boolean;
-     // Счётчик вызовов BeginOperation/EndOperation 
+     // Счётчик вызовов BeginOperation/EndOperation
     FOpLockCounter: Integer;
      // Сохранённый на время выполнения операции ID последней выделенной группы
-    FSavedGroupID: Integer; 
+    FSavedGroupID: Integer;
      // Сохранённые на время выполнения операции параметры отображения Viewer
     FViewerSavedSelectedIDs: TIntegerList;
     FViewerSavedFocusedID: Integer;
@@ -372,7 +374,7 @@ type
      // Применяет параметры настройки
     procedure ApplySettings;
      // Обновляет Viewer
-    procedure ViewerRefresh;
+    procedure RefreshViewer;
      // Props
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
     property FileName: String read GetFileName write SetFileName;
@@ -533,7 +535,7 @@ uses
   procedure TfMain.aaFlatMode(Sender: TObject);
   begin
     aFlatMode.Checked := not aFlatMode.Checked;
-    ViewerRefresh;
+    RefreshViewer;
   end;
 
   procedure TfMain.aaHelpCheckUpdates(Sender: TObject);
@@ -786,7 +788,7 @@ uses
   procedure TfMain.aaStats(Sender: TObject);
   begin
     ResetMode;
-    ShowPhoaStats(FPhoA, CurGroup, Viewer.GetSelectedPicArray);
+    ShowPhoaStats(FPhoA, CurGroup);
   end;
 
   procedure TfMain.aaUndo(Sender: TObject);
@@ -891,13 +893,18 @@ uses
     with Viewer do begin
       BeginUpdate;
       try
-        ThumbBackBorderStyle := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
-        ThumbBackBorderColor := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
-        Color                := SettingValueInt (ISettingID_Browse_ViewerBkColor);
-        ThumbBackColor       := SettingValueInt (ISettingID_Browse_ViewerThBColor);
-        ThumbFontColor       := SettingValueInt (ISettingID_Browse_ViewerThFColor);
-        ShowThumbTooltips    := SettingValueBool(ISettingID_Browse_ViewerTooltips);
-        ThumbTooltipProps    := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
+        ThumbBackBorderStyle  := TThumbBackBorderStyle(SettingValueInt(ISettingID_Browse_ViewerThBordSt));
+        ThumbBackBorderColor  := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
+        Color                 := SettingValueInt (ISettingID_Browse_ViewerBkColor);
+        ThumbBackColor        := SettingValueInt (ISettingID_Browse_ViewerThBColor);
+        ThumbFontColor        := SettingValueInt (ISettingID_Browse_ViewerThFColor);
+        ThumbShadowVisible    := SettingValueBool(ISettingID_Browse_ViewerThShadow);
+        ThumbShadowBlurRadius := SettingValueInt(ISettingID_Browse_ViewerThShRadius);
+        ThumbShadowOffset     := Point(SettingValueInt(ISettingID_Browse_ViewerThShOffsX), SettingValueInt(ISettingID_Browse_ViewerThShOffsY));
+        ThumbShadowColor      := SettingValueInt(ISettingID_Browse_ViewerThShColor);
+        ThumbShadowOpacity    := SettingValueInt(ISettingID_Browse_ViewerThShOpact);
+        ShowThumbTooltips     := SettingValueBool(ISettingID_Browse_ViewerTooltips);
+        ThumbTooltipProps     := IntToPicProps(SettingValueInt(ISettingID_Browse_ViewerTipProps));
         SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);
         SetupViewerCorner(tcRightTop,    ISettingID_Browse_ViewerThRTProp);
         SetupViewerCorner(tcLeftBottom,  ISettingID_Browse_ViewerThLBProp);
@@ -1177,7 +1184,7 @@ uses
       FViewer.BeginUpdate;
       try
         Group := CurGroup;
-        FViewer.ViewGroup(FPhoA, Group, aFlatMode.Checked);
+        RefreshViewer;
          // Если группа не поменялась, восстанавливаем параметры отображения
         if (Group<>nil) and (Group.ID=FSavedGroupID) then
           FViewer.RestoreDisplay(FViewerSavedSelectedIDs, FViewerSavedFocusedID, FViewerSavedTopIndex);
@@ -1224,6 +1231,7 @@ uses
       fpMain.IniSection  := SRegMainWindow_Root;
        // Создаём фотоальбом
       FPhoA := TPhotoAlbum.Create;
+      FViewedPics := TPhoaPicLinks.Create(False);
       FViewIndex := -1;
        // Настраиваем Application
       Application.OnHint      := AppHint;
@@ -1274,6 +1282,9 @@ uses
   begin
      // Remove self from the clipboard viewer chain
     ChangeClipboardChain(Handle, FHNextClipbrdViewer);
+     // Уничтожаем Viewer до уничтожения FViewedPics
+    FViewer.Free; 
+    FViewedPics.Free;
     FPhoA.Free;
     FSearchResults.Free;
     FViewerSavedSelectedIDs.Free;
@@ -1376,7 +1387,7 @@ uses
     finally
       tvGroups.EndUpdate;
     end;
-    ViewerRefresh;
+    RefreshViewer;
   end;
 
   procedure TfMain.LoadViewList(idxSelect: Integer);
@@ -1511,6 +1522,49 @@ uses
     EnableActions;
   end;
 
+  procedure TfMain.RefreshViewer;
+  var
+    UniquePics: TPhoaPicLinks;
+    bRecurse: Boolean;
+
+    procedure DoAddPics(Group: TPhoaGroup);
+    var
+      i, iID: Integer;
+      bDoAdd: Boolean;
+      Pic: TPhoaPic;
+    begin
+       // Добавляем ссылки на изображения группы
+      for i := 0 to Group.PicIDs.Count-1 do begin
+        iID := Group.PicIDs[i];
+         // Проверяем на дубликаты, если надо
+        Pic := FPhoA.Pics.PicByID(iID);
+        if UniquePics=nil then bDoAdd := True else UniquePics.Add(Pic, True, bDoAdd);
+         // Добавляем
+        if bDoAdd then FViewedPics.Add(Pic, False);
+      end;
+       // Если рекурсивное добавление - повторяем то же для вложенных групп
+      if bRecurse then
+        for i := 0 to Group.Groups.Count-1 do DoAddPics(Group.Groups[i]);
+    end;
+
+  begin
+    FViewedPics.Clear;
+     // Если есть текущая группа
+    if CurGroup<>nil then begin
+       // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды.
+       //   Иначе создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
+      bRecurse := aFlatMode.Checked;
+      if bRecurse then UniquePics := TPhoaPicLinks.Create(True) else UniquePics := nil;
+      try
+        DoAddPics(CurGroup);
+      finally
+        UniquePics.Free;
+      end;
+    end;
+     // Обновляем вьюер
+    FViewer.ReloadPicList(FViewedPics);
+  end;
+
   procedure TfMain.ResetMode;
   begin
      // Завершаем inplace-редактирование текста узла в дереве групп
@@ -1592,7 +1646,7 @@ uses
 
   procedure TfMain.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    ViewerRefresh;
+    RefreshViewer;
   end;
 
   procedure TfMain.tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -1875,7 +1929,7 @@ uses
     finally
       tvGroups.EndUpdate;
     end;
-    ViewerRefresh;
+    RefreshViewer;
   end;
 
   procedure TfMain.ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -1893,11 +1947,6 @@ uses
     finally
       EndOperation(Operation);
     end;
-  end;
-
-  procedure TfMain.ViewerRefresh;
-  begin
-    FViewer.ViewGroup(FPhoA, CurGroup, aFlatMode.Checked);
   end;
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);

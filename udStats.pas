@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.10 2004-09-11 17:52:36 dale Exp $
+//  $Id: udStats.pas,v 1.11 2004-09-27 17:07:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -35,8 +35,6 @@ type
     FPhoA: TPhotoAlbum;
      // Текущая группа
     FGroup: TPhoaGroup;
-     // Выбранные изображения
-    FSelPics: TPicArray;
      // Создаёт в памяти новый объект данных статистики
     function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
     function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
@@ -44,19 +42,18 @@ type
     procedure InitializeDialog; override;
   end;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup; aSelPics: TPicArray);
+  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup);
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phPhoa, phSettings;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup; aSelPics: TPicArray);
+  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup);
   begin
     with TdStats.Create(Application) do
       try
-        FPhoA    := PhoA;
-        FGroup   := Group;
-        FSelPics := aSelPics;
+        FPhoA  := PhoA;
+        FGroup := Group;
         Execute;
       finally
         Free;
