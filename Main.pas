@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.67 2004-11-01 17:19:50 dale Exp $
+//  $Id: Main.pas,v 1.68 2004-11-04 18:54:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -21,13 +21,13 @@ uses
 type
    // Состояние приложения
   TAppState = (
-    asInitialized,               // Инициализация окончена
-    asActionChangePending,       // Ожидается изменение доступности Actions
-    asFileNameChangePending,     // Ожидается изменение имени файла
-    asModifiedChangePending,     // Ожидается изменение состояния изменённости проекта
-    asViewerSelChangePending,    // Ожидается изменение выделения вьюера
-    asGroupsPopupToolsValidated, // Инструменты popup-меню групп прошли проверку на доступность текущим выделенным изображениям
-    asPicsPopupToolsValidated);  // Инструменты popup-меню вьюера прошли проверку на доступность текущим выделенным изображениям
+    asInitialized,                // Инициализация окончена
+    asActionChangePending,        // Ожидается изменение доступности Actions
+    asFileNameChangePending,      // Ожидается изменение имени файла
+    asModifiedChangePending,      // Ожидается изменение состояния изменённости проекта
+    asStatusBarInfoChangePending, // Ожидается изменение выделения вьюера
+    asGroupsPopupToolsValidated,  // Инструменты popup-меню групп прошли проверку на доступность текущим выделенным изображениям
+    asPicsPopupToolsValidated);   // Инструменты popup-меню вьюера прошли проверку на доступность текущим выделенным изображениям
 
   TAppStates = set of TAppState;
 
@@ -1139,7 +1139,9 @@ uses
         tvGroups.EndSynch;
       end;
     finally
-      StateChanged([asInitialized]);
+      StateChanged([
+        asInitialized, asActionChangePending, asFileNameChangePending, asModifiedChangePending,
+        asStatusBarInfoChangePending]);
       EndUpdate;
     end;
   end;
@@ -2007,9 +2009,9 @@ uses
       FAppState := FAppState-[asFileNameChangePending, asModifiedChangePending];
     end;
      // Если есть изменение выделения вьюера
-    if asViewerSelChangePending in FAppState then begin
+    if asStatusBarInfoChangePending in FAppState then begin
       Adjust_SelInfo;
-      Exclude(FAppState, asViewerSelChangePending);
+      Exclude(FAppState, asStatusBarInfoChangePending);
     end;
   end;
 
@@ -2044,7 +2046,7 @@ uses
 
   procedure TfMain.ViewerSelectionChange(Sender: TObject);
   begin
-    StateChanged([asActionChangePending, asViewerSelChangePending]);
+    StateChanged([asActionChangePending, asStatusBarInfoChangePending]);
   end;
 
   procedure TfMain.WMChangeCBChain(var Msg: TWMChangeCBChain);
