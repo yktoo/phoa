@@ -223,7 +223,6 @@ inherited dToolProps: TdToolProps
     Width = 241
     Height = 21
     TabOrder = 2
-    Text = '*.*'
     OnChange = DlgDataChange
   end
   inherited dtlsMain: TDTLanguageSwitcher
