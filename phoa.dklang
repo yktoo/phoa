@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.37 2004-11-25 15:27:53 dale Exp $
+;  $Id: phoa.dklang,v 1.38 2004-12-03 11:30:12 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -332,7 +332,6 @@ aExprOpen.Hint=00000091,Open...|Open a text file containing the search expressio
 aExprSaveAs.Caption=00000093,Save &as...
 aExprSaveAs.Category=00000092,Expression search
 aExprSaveAs.Hint=00000094,Save as...|Save the expression to a file
-mruExprOpen.Prefix=00000095,MRU
 
 [dProjectProps]
 Caption=00000003,Properties: photo album

@@ -1,8 +1,8 @@
 LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
-Generator=DKLang Translation Editor v2.2
-LastModified=2004-11-25 13:05:06
+Generator=DKLang Translation Editor v2.4
+LastModified=2004-12-03 16:16:15
 SourceLANGID=1033
 
 [fMain]
@@ -243,7 +243,7 @@ SourceLANGID=1033
 00000024=Путь
 00000025=Размер
 00000026=Дата
-00000027=Отобра&жать окно просмотра\n
+00000027=Отобра&жать окно просмотра
 
 [frWzPage_Log]
 00000122=&Копировать
@@ -582,6 +582,15 @@ SourceLANGID=1033
 00000083=Поиск по выражению
 00000084=Поиск по выражению
 00000085=Поиск по выражению
+00000086=Поиск по выражению
+00000087=&Новый
+00000088=Новый|Стереть выражение
+00000089=Поиск по выражению
+00000090=&Открыть...
+00000091=Открыть...|Открыть текстовый файл, содержащий выражение поиска
+00000092=Поиск по выражению
+00000093=Сохранить &как...
+00000094=Сохранить как...|Сохранить выражение в файл
 
 [dPicProps]
 00000003=Свойства: изображения
@@ -905,8 +914,10 @@ SDlgTitle_Error=PhoA: Ошибка
 SDlgTitle_Info=PhoA: Информация
 SDlgTitle_OpenIni=Открыть файл настроек
 SDlgTitle_OpenPhoa=Открыть файл фотоальбома
+SDlgTitle_OpenSearchExpr=Открыть поисковое выражение
 SDlgTitle_SaveIni=Сохранить файл настроек
 SDlgTitle_SavePhoa=Сохранить файл фотоальбома как
+SDlgTitle_SaveSearchExprAs=Сохранить поисковое выражение как
 SDlgTitle_SelectFolder=Выберите папку
 SDlgTitle_Warning=PhoA: Внимание
 SErrCannotCreateFolder=Ошибка при создании папки «%s»
@@ -928,6 +939,7 @@ SErrTargetFileExists=Файл назначения «%s» уже существует
 SErrUnknownPicFileExtension=Неизвестное расширение у файла изображения «%s»
 SFileFilter_Ini=Ini-файлы (*.ini)|*.ini
 SFileFilter_OpenPhoa=Файлы фотоальбомов (*.phoa)|*.phoa|Все файлы (*.*)|*.*
+SFileFilter_SearchExpr=Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*
 SHelpFileName=phoa-rus.chm
 SImgView_DefaultCaption=Просмотр изображения
 SImgView_ErrorMsg=ОШИБКА
