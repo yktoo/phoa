@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.27 2004-11-24 11:42:17 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.28 2004-11-24 12:05:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -761,6 +761,7 @@ uses
   end;
 
   procedure TfAddFilesWizard.SettingsRestore(rif: TRegIniFile);
+  var r: TRect;
   begin
     inherited SettingsRestore(rif);
     FDefaultPath             := rif.ReadString ('', 'DefaultFolder',       '');
@@ -775,12 +776,17 @@ uses
                                 rif.ReadString ('', 'FilterTimeFrom',      ''), -1, AppFormatSettings);
     FFilter_TimeTo           := StrToTimeDef(
                                 rif.ReadString ('', 'FilterTimeTo',        ''), -1, AppFormatSettings);
+     // Восстанавливаем параметры просмотра
     FShowPreview             := rif.ReadBool   ('', 'ShowPreview',         False);
-    dpPreview.FloatingPosition := Point(
-                                rif.ReadInteger('', 'PreviewLeft',         Left+100),
-                                rif.ReadInteger('', 'PreviewTop',          Top+100));
-    dpPreview.FloatingWidth  := rif.ReadInteger('', 'PreviewWidth',        150);
-    dpPreview.FloatingHeight := rif.ReadInteger('', 'PreviewHeight',       200);
+    r                        := StrToRect(
+                                rif.ReadString ('', 'PreviewBounds',       ''),
+                                Rect(-1, -1, -1, -1));
+    if (r.Left>=0) and (r.Top>=0) then begin
+      dpPreview.FloatingPosition := r.TopLeft;
+      dpPreview.FloatingWidth    := r.Right-r.Left;
+      dpPreview.FloatingHeight   := r.Bottom-r.Top;
+    end else
+      dpPreview.FloatingPosition := pMain.ClientToScreen(Point(40, 40));
   end;
 
   procedure TfAddFilesWizard.SettingsStore(rif: TRegIniFile);
@@ -806,11 +812,12 @@ uses
     PutDate(FFilter_DateTo,   'FilterDateTo');
     PutTime(FFilter_TimeFrom, 'FilterTimeFrom');
     PutTime(FFilter_TimeTo,   'FilterTimeTo');
-    rif.WriteBool   ('', 'ShowPreview',         FShowPreview);   
-    rif.WriteInteger('', 'PreviewLeft',         dpPreview.FloatingPosition.x);
-    rif.WriteInteger('', 'PreviewTop',          dpPreview.FloatingPosition.y);
-    rif.WriteInteger('', 'PreviewWidth',        dpPreview.FloatingWidth);
-    rif.WriteInteger('', 'PreviewHeight',       dpPreview.FloatingHeight);
+     // Сохраняем параметры просмотра
+    rif.WriteBool  ('', 'ShowPreview', FShowPreview);
+    rif.WriteString(
+      '',
+      'PreviewBounds',
+      RectToStr(Bounds(dpPreview.FloatingPosition.x, dpPreview.FloatingPosition.y, dpPreview.FloatingWidth, dpPreview.FloatingHeight)));
   end;
 
   procedure TfAddFilesWizard.StartFileProcessing;
