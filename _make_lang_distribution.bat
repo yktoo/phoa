@@ -1,6 +1,11 @@
 @echo off
+rem ********************************************************************************************************************
+rem $Id: _make_lang_distribution.bat,v 1.2 2004-04-15 12:54:10 dale Exp $
+rem --------------------------------------------------------------------------------------------------------------------
+rem PhoA image arranging and searching tool
+rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+rem ********************************************************************************************************************
 rem ** Making bundle of language files and the designer application
-rem ** (c)2004 Dmitry Kann
 
 if exist IS-install\phoa-lang-src.zip del IS-install\phoa-lang-src.zip
 

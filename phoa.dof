@@ -94,7 +94,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=GraphicEx
+SearchPath=$(DELPHI)\GraphicEx
 Packages=vcl;rtl;dbrtl;adortl;vcldb;vclx;bdertl;vcldbx;qrpt;teeui;teedb;tee;dss;teeqr;VclSmp;vclshlctrls;vclie;xmlrtl;inet;inetdbbde;inetdbxpress;dsnap;inetdb;dbexpress;dclOffice2k;visualclx;visualdbclx;RxCtl6;RxDB6;RxBDE6
 Conditionals=
 DebugSourceDirs=
@@ -134,7 +134,8 @@ Comments=http://phoa.narod.ru/
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=GraphicEx
-Item1=$(DELPHI)\Lib\Debug;GraphicEx
-Item2=C:\Delphi\Home Projects\PhoA\GraphicEx
+Count=4
+Item0=$(DELPHI)\GraphicEx
+Item1=GraphicEx
+Item2=$(DELPHI)\Lib\Debug;GraphicEx
+Item3=C:\Delphi\Home Projects\PhoA\GraphicEx

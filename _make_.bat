@@ -1,8 +1,10 @@
 @echo off
-rem =======================================================
-rem PhoA [Photo Album] makefile
-rem Copyright ©2002-2004 Dmitry Kann, http://phoa.narod.ru
-rem =======================================================
+rem ********************************************************************************************************************
+rem $Id: _make_.bat,v 1.2 2004-04-15 12:54:10 dale Exp $
+rem --------------------------------------------------------------------------------------------------------------------
+rem PhoA image arranging and searching tool
+rem Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+rem ********************************************************************************************************************
 
 rem -B = Rebuild all
 rem -W = Output warning messages
@@ -27,7 +29,6 @@ del *.dcu
 del *.ddp
 del *.bkf
 del *.bkm
-del GraphicEx\*.dcu
 
 rem == Compile Help CHM project ==
 echo.

@@ -1,3 +1,9 @@
+;***********************************************************************************************************************
+;   $Id: phoa.iss,v 1.2 2004-04-15 12:54:11 dale Exp $
+;-----------------------------------------------------------------------------------------------------------------------
+;   PhoA image arranging and searching tool
+;   Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
+;***********************************************************************************************************************
 [Setup]
   MinVersion=4.0,4.0
   AppName=PhoA
@@ -26,7 +32,7 @@
 [Languages]
   Name: "en"; MessagesFile: compiler:Default.isl;             LicenseFile: eula-eng.rtf
   Name: "ru"; MessagesFile: compiler:Russian.isl;             LicenseFile: eula-rus.rtf
-  Name: "de"; MessagesFile: compiler:German.isl;              LicenseFile: eula-deu.rtf
+  Name: "de"; MessagesFile: compiler:Languages\German.isl;    LicenseFile: eula-deu.rtf
   Name: "br"; MessagesFile: compiler:BrazilianPortuguese.isl; LicenseFile: eula-brp.rtf
   Name: "ua"; MessagesFile: compiler:Ukrainian.isl;           LicenseFile: eula-ukr.rtf
   
