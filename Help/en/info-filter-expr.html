@@ -1,4 +1,4 @@
-<!-- $Id: info-filter-expr.html,v 1.2 2004-12-07 10:27:17 dale Exp $ -->
+<!-- $Id: info-filter-expr.html,v 1.3 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:Picture filter expressions]}
 
 <p align=justify>Picture filter expressions are used for <a href="intf-search-expr.html">Expression search</a>, in
@@ -158,9 +158,9 @@
 <p align=justify>Operators can be of the two types:
 <ul>
   <li><b>Unary operators</b> are operators having single operand placed on the right side of it.<br>
-      Examples: <i>not</i>, <i>isEmpty</i>.</li>
+      Examples: <i>not</i>, <i>isEmpty</i>.
   <li><b>Binary operators</b> are operators having two operands on left and right sides of it.<br>
-      Examples: <i>and</i>, <i>contains</i>, <i>&gt;</i>.</li>
+      Examples: <i>and</i>, <i>contains</i>, <i>&gt;</i>.
 </ul>
 <p align=justify>Operators can be applied only to operands which are of a datatype compatible with the given operator.
 
@@ -306,21 +306,21 @@
 <ul>
   <li><b>Integer constants</b> contain digits <b>0...9</b> and an optional &quot;minus&quot; (<b>-</b>) sign.
       Example:<br>
-      <span class=fp>-123</span></li>
+      <span class=fp>-123</span>
   <li><b>Real constants</b> contain digits <b>0...9</b>, symbol <b>-</b> and a decimal point (<b>.</b>).
       Example:<br>
-      <span class=fp>-123.45</span></li>
+      <span class=fp>-123.45</span>
   <li><b>String constants</b> or <b>literals</b> are enclosed with single quotes (<b>'</b>) and can contain any
       characters. If you need to insert a single quote inside a literal, you should double it.
       Example:<br>
       <span class=fp>'Mary had a little lamb'</span><br>
-      <span class=fp>'Don''t get me wrong'</span><br></li>
+      <span class=fp>'Don''t get me wrong'</span><br>
   <li><b>Date constants</b> are written in the same way as literals but their format must conform to the current
       regional settings of your system. Example:<br>
-      <span class=fp>'Jul 25, 2003'</span></li>
+      <span class=fp>'Jul 25, 2003'</span>
   <li><b>Time constants</b> are written in the same way as literals but using format &quot;Hours:Minutes&quot; or
       &quot;Hours:Minutes:Seconds&quot;. Example:<br>
-      <span class=fp>'12:00:03'</span></li>
+      <span class=fp>'12:00:03'</span>
 </ul>
 
 <a name=comments></a>{[%hh_h2:Comments]}
@@ -331,12 +331,12 @@
       occurence of <b>}</b> are considered to be a comment. Example:<br>
       <span class=fp>$Date&gt;'01.01.1914' { my grandma birth-date } <b>or</b>
       $Author&lt;&gt;'grandma'</span>
-  </li>
+  
   <li>Line comment <b>//comment</b>: all the symbols from <b>//</b> up to line end are considered to be a comment.
       Example:<br>
       <span class=fp>$Date&gt;'01.01.1914' // my grandma birth-date<br>
       <b>or</b> $Time&lt;'08:00'</span>
-  </li>
+  
 </ul>
 
 {[%hh_seealso_en]}

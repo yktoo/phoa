@@ -1,4 +1,4 @@
-<!-- $Id: info-faq.html,v 1.3 2004-12-10 18:41:12 dale Exp $ -->
+<!-- $Id: info-faq.html,v 1.4 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:FAQ (Frequently Asked Questions)]}
 
 {[%hh_h2:Contents]}
@@ -11,10 +11,10 @@
   <li><a href=#writing-to-cd>Is it possible to write my photo album to a CD-ROM along with the program so I can view it
       on any computer?</a>
   <li><a href=#autorun>How do I write <b>autorun.inf</b> file for the photo album on a CD-ROM starts
-      automatically?</a></li>
+      automatically?</a>
   <li><a href=#open-album-on-startup>I want the program to open my photo album automatically when I start it.
-      How?</a></li>
-  <li><a href=#relocating-pics>Is it possible to alter picture file paths?</a></li>
+      How?</a>
+  <li><a href=#relocating-pics>Is it possible to alter picture file paths?</a>
 </ul>
 
 {[%hh_h2:Q&A]}
@@ -25,16 +25,16 @@
   <ul>
     <li>You can create some folders (groups) for pictures. You do it by selecting <b>Edit | Add group</b> menu item or
         by pressing <b>Alt+Ins</b> shortcut keys - then the group is created &quot;inside&quot; the group currently
-        selected. You may skip this step and add pictures directly to the photo album.</li>
-    <li>Highlight a folder to add pictures to (group or the photo album node).</li>
-    <li>Select <b>Edit | Add pictures...</b> menu item, Add pictures Wizard opens.</li>
+        selected. You may skip this step and add pictures directly to the photo album.
+    <li>Highlight a folder to add pictures to (group or the photo album node).
+    <li>Select <b>Edit | Add pictures...</b> menu item, Add pictures Wizard opens.
     <li>At the first page you select a folder with pictures. Check the checkbox <b>Recurse subfolders</b> if it contains
-        nested folders with pictures. Click <b>Next &gt;</b>.</li>
+        nested folders with pictures. Click <b>Next &gt;</b>.
     <li>At the <b>Check files</b> page you can choose exactly which files are to be added to the photo album. All the
-        files are checked by default. Click <b>Next &gt;</b>, and the adding process will start.</li>
+        files are checked by default. Click <b>Next &gt;</b>, and the adding process will start.
     <li>After adding has finished the program closes Wizard window and you see your pictures, or advances to the
-        <b>Log</b> page (click <b>Close</b> if this is the case) - according to the program settings.</li>
-    <li>Save photo album to a file. That's all!</li>
+        <b>Log</b> page (click <b>Close</b> if this is the case) - according to the program settings.
+    <li>Save photo album to a file. That's all!
   </ul>
 <p align=right><a href=#top>Top</a>
 <hr>
@@ -59,10 +59,10 @@
     <li><b><a href="info-resampling.html">Resampling filter</a> used</b>. Nearest Neighbor is the most quick one but
         images downsampled with it appear &quot;fuzzy&quot;. The most soft contours are achieved by using B-spline, then
         Linear filters. You get more plain lines with Lanczos filter. To change resampling filter, select <b>Tools |
-        Program settings...</b> -&gt; <b>Browse mode</b> -&gt; <b>Resampling filter</b>.</li>
+        Program settings...</b> -&gt; <b>Browse mode</b> -&gt; <b>Resampling filter</b>.
     <li><b>Compression level</b>. Thumbnails are stored in JPEG format; this format compresses images with the price of
         some quality loss. You can change &quot;size/quality&quot; ratio for each photo album individually, by selecting
-        photo album node in the group tree, and then <b>Edit | Edit...</b> menu item.</li>
+        photo album node in the group tree, and then <b>Edit | Edit...</b> menu item.
   </ul>
 <p align=right><a href=#top>Top</a>
 <hr>
@@ -78,17 +78,17 @@
         <b>unchanged</b>. E.g.:
         <ul>
           <li>Before writing: photo album file: <b>C:\My documents\Photos.phoa</b>; base picture files folder:
-              <b>C:\My documents\Pics</b></li>
+              <b>C:\My documents\Pics</b>
           <li>After writing (onto a CD-ROM): photo album file: <b>D:\Photos.phoa</b>; base picture files folder:
-              <b>D:\Pics</b></li>
+              <b>D:\Pics</b>
         </ul>
-    </li>
+    
     <li><b>PhoA</b> doesn't require any additional files to run besides the main executable <b>phoa.exe</b>. You can
-        place it in any folder on the CD.</li>
+        place it in any folder on the CD.
     <li>For the program to load a given photo album, specify its path in the command line, eg: <b>phoa.exe
-        Photos.phoa</b></li>
+        Photos.phoa</b>
     <li>The most simple and efficient way to prepare the files and the photo album for writing onto a removable medium
-        is using the <a href="intf-file-ops-task-copy.html">Copy files operation</a>.</li>
+        is using the <a href="intf-file-ops-task-copy.html">Copy files operation</a>.
   </ul>
 <p align=right><a href=#top>Top</a>
 <hr>

@@ -1,4 +1,4 @@
-<!-- $Id: file-formats.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+<!-- $Id: file-formats.html,v 1.2 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_de:Dateiformate]}
 
 <link rel="dummy" type="image/gif" href="../x-minus.gif">
@@ -8,10 +8,10 @@
 
 <p align=justify>Wie bereits erw&auml;hnt arbeitet <b>PhoA</b> mit Fotoalbum-Dateien mit der Erweiterung <b>.phoa</b> - diese Dateien enthalten:
 <ul>
-  <li>Beschreibung und Einstellungen des Fotoalbums;</li>
-  <li>Liste der Bilder mit ihren Beschreibungen;</li>
-  <li>eine Hierachie der Ordner-Gruppen, jeweils mit einer spezifischen Anzahl an Verkn&uuml;pfungen zu den Bilddateien;</li>
-  <li>Ansichtenstruktur (PhoA-Versionen 1.0.1+).</li>
+  <li>Beschreibung und Einstellungen des Fotoalbums;
+  <li>Liste der Bilder mit ihren Beschreibungen;
+  <li>eine Hierachie der Ordner-Gruppen, jeweils mit einer spezifischen Anzahl an Verkn&uuml;pfungen zu den Bilddateien;
+  <li>Ansichtenstruktur (PhoA-Versionen 1.0.1+).
 </ul>
 <p align=justify>Dateien mit der Erweiterung <b>.phoa</b> k&ouml;nnen nur mit <b>PhoA</b> ge&ouml;ffnet werden. Ab <b>PhoA</b> Version <b>1.1.1a</b> k&ouml;nnen jedoch eigene Tools eingesetzt werden, da das <b>PhoA</b>-Dateiformat offengelegt wurde: Siehe dazu die offizielle <a href="http://phoa.narod.ru/en" target=_blank>Programm-Homepage</a>, mit zus&auml;tzlichen Informationen.
 
@@ -19,168 +19,168 @@
 <div style="padding-left: 32px">
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divBMP')"> Standard Windows and OS/2 Bitmap Bilder (<b>*.bmp, *.rle, *.dib</b>)
 <div id=divBMP style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 4, 8 bits per sample</li>
-  <li>color spaces: indexed, RGB(A)</li>
-  <li>compression formats: uncompressed, RLE</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 4, 8 bits per sample
+  <li>color spaces: indexed, RGB(A)
+  <li>compression formats: uncompressed, RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divJPG')"> JPEG Bilder (<b>*.jpg; *.jpeg; *.jpe</b>)
 <div id=divJPG style="display:none"><ul>
-  <li>byte orders: little endian, big endian</li>
-  <li>sample sizes: 8 bits per sample</li>
-  <li>color spaces: grayscale, RGB</li>
+  <li>byte orders: little endian, big endian
+  <li>sample sizes: 8 bits per sample
+  <li>color spaces: grayscale, RGB
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divTIFF')"> TIFF images (<b>*.tif; *.tiff</b>)
 <div id=divTIFF style="display:none"><ul>
-  <li>byte orders: little endian, big endian</li>
-  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
-  <li>color spaces: indexed, grayscale, RGB(A), CMYK, L*a*b*</li>
-  <li>compression formats: uncompressed, packed bits, LZW, CCITT T.4 (raw and modified fax group 3, possibly word aligned), ThunderScan, Deflate, new style JPEG</li>
+  <li>byte orders: little endian, big endian
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample
+  <li>color spaces: indexed, grayscale, RGB(A), CMYK, L*a*b*
+  <li>compression formats: uncompressed, packed bits, LZW, CCITT T.4 (raw and modified fax group 3, possibly word aligned), ThunderScan, Deflate, new style JPEG
 </ul></div>
   
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> GFI Faxbilder</a> (<b>*.fax</b>) 
 <div id=divGFI style="display:none"><ul>
-  <li>sample size: 1 bits per sample</li>
-  <li>color space: indexed</li>
-  <li>compression format: CCITT T.4 (raw and modified fax group 3)</li>
+  <li>sample size: 1 bits per sample
+  <li>color space: indexed
+  <li>compression format: CCITT T.4 (raw and modified fax group 3)
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divSGI')"> SGI Bilder</a> (<b>*.bw, *.rgb, *.rgba, *.sgi</b>)
 <div id=divSGI style="display:none"><ul>
-  <li>byte order: big endian</li>
-  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
-  <li>color spaces: indexed, grayscale, RGB(A)</li>
-  <li>compression formats: uncompressed, RLE</li>
+  <li>byte order: big endian
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample
+  <li>color spaces: indexed, grayscale, RGB(A)
+  <li>compression formats: uncompressed, RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCEL')"> Autodesk Bilddateien</a> (<b>*.cel; *.pic</b>)
 <div id=divCEL style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample size: 8 bits per sample</li>
-  <li>color spaces: indexed</li>
-  <li>compression format: uncompressed</li>
+  <li>byte order: little endian
+  <li>sample size: 8 bits per sample
+  <li>color spaces: indexed
+  <li>compression format: uncompressed
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divTGA')"> Truevision Targa Bilder</a> (<b>*.tga; *.vst; *.icb; *.vda; *.win</b>)
 <div id=divTGA style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 5, 8 bits per sample</li>
-  <li>color spaces: gray scale, indexed, 15 bits RGB (555), 24 bits RGB(A)(888)</li>
-  <li>compression formats: uncompressed, RLE</li>
+  <li>byte order: little endian
+  <li>sample sizes: 5, 8 bits per sample
+  <li>color spaces: gray scale, indexed, 15 bits RGB (555), 24 bits RGB(A)(888)
+  <li>compression formats: uncompressed, RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPCX')"> ZSoft Paintbrush Bilder</a> (<b>*.pcx, *.pcc</b>)
 <div id=divPCX style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 2, 4, 8 bits per sample</li>
-  <li>color spaces: gray scale, indexed, RGB</li>
-  <li>compression formats: uncompressed, RLE</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 2, 4, 8 bits per sample
+  <li>color spaces: gray scale, indexed, RGB
+  <li>compression formats: uncompressed, RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divSCR')"> Word 5.x Bildschirmausdruck</a> (<b>*.scr</b>)
 <div id=divSCR style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 2, 4, 8 bits per sample</li>
-  <li>color spaces: indexed, gray scaleRGB</li>
-  <li>compression formats: uncompressed, RLE</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 2, 4, 8 bits per sample
+  <li>color spaces: indexed, gray scaleRGB
+  <li>compression formats: uncompressed, RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPCD')"> Kodak Photo-CD Bilder</a> (<b>*.pcd</b>)
 <div id=divPCD style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>samples size: 8 bits per sample</li>
-  <li>color space: YCbCr</li>
-  <li>compression: PCD Huffmann</li>
+  <li>byte order: little endian
+  <li>samples size: 8 bits per sample
+  <li>color space: YCbCr
+  <li>compression: PCD Huffmann
   <li>specials:
     <ul>
-      <li>sizes: all resolutions, from 192 x 128 up to 6144 x 4096 (64 Base vaporware)</li>
-      <li>rotated: clockwise and counter-clockwise</li>
+      <li>sizes: all resolutions, from 192 x 128 up to 6144 x 4096 (64 Base vaporware)
+      <li>rotated: clockwise and counter-clockwise
     </ul>
-  </li>
+  
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPPM')"> Portable pixel/gray map Bilder</a> (<b>*.ppm, *.pgm, *.pbm</b>)
 <div id=divPPM style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 8 bits per sample</li>
-  <li>color spaces: gray scale, indexed, RGB</li>
-  <li>compression format: uncompressed</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 8 bits per sample
+  <li>color spaces: gray scale, indexed, RGB
+  <li>compression format: uncompressed
   <li>specials:
     <ul>
-      <li>ASCII and Binary format</li>
+      <li>ASCII and Binary format
     </ul>
-  </li>
+  
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCUT')"> Dr. Halo Bilder</a> (<b>*.cut, *.pal</b>)
 <div id=divCUT style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample size: 8 bits per sample</li>
-  <li>color spaces: indexed</li>
-  <li>compression formats: RLE</li>
+  <li>byte order: little endian
+  <li>sample size: 8 bits per sample
+  <li>color spaces: indexed
+  <li>compression formats: RLE
   <li>specials:
     <ul>
-      <li>external palette file (*.pal) is automatically loaded</li>
+      <li>external palette file (*.pal) is automatically loaded
     </ul>
-  </li>
+  
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGIF')"> CompuServe GIF Bilder</a> (<b>*.gif</b>)
 <div id=divGIF style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 4, 8 bits per sample</li>
-  <li>color spaces: indexed</li>
-  <li>compression format: LZW</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 4, 8 bits per sample
+  <li>color spaces: indexed
+  <li>compression format: LZW
   <li>specials:
     <ul>
-      <li>interlaced, non-interlaced</li>
+      <li>interlaced, non-interlaced
     </ul>
-  </li>
+  
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divRLA')"> SGI Wavefront Bilder</a> (<b>*.rla, *.rpf</b>)
 <div id=divRLA style="display:none"><ul>
-  <li>byte order: big endian</li>
-  <li>sample size: 8 bits per sample</li>
-  <li>color space: RGB(A)</li>
-  <li>compression formats: RLE</li>
+  <li>byte order: big endian
+  <li>sample size: 8 bits per sample
+  <li>color space: RGB(A)
+  <li>compression formats: RLE
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSD')"> Photoshop Bilder</a> (<b>*.psd, *.pdd</b>)
 <div id=divPSD style="display:none"><ul>
-  <li>byte order: big endian</li>
-  <li>sample sizes: 1, 8, 16 bits per sample</li>
-  <li>color spaces: indexed, RGB, CMYK, CIE L*a*b*</li>
-  <li>compression formats: uncompressed, packed bits</li>
+  <li>byte order: big endian
+  <li>sample sizes: 1, 8, 16 bits per sample
+  <li>color spaces: indexed, RGB, CMYK, CIE L*a*b*
+  <li>compression formats: uncompressed, packed bits
   <li>special:
     <ul>
-      <li>duo tone</li>
+      <li>duo tone
     </ul>
-  </li>
+  
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSP')"> Paint Shop Pro Bilder</a> (<b>*.psp</b>)
 <div id=divPSP style="display:none"><ul>
-  <li>byte order: little endian</li>
-  <li>sample sizes: 1, 4, 8 bits per sample</li>
-  <li>color spaces: indexed, gray scale, RGB</li>
-  <li>compression formats: uncompressed, LZ77</li>
+  <li>byte order: little endian
+  <li>sample sizes: 1, 4, 8 bits per sample
+  <li>color spaces: indexed, gray scale, RGB
+  <li>compression formats: uncompressed, LZ77
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPNG')"> Portable Network Graphic Bilder</a> (<b>*.png</b>)
 <div id=divPNG style="display:none"><ul>
-  <li>byte order: big endian</li>
-  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample</li>
-  <li>color spaces: indexed, grayscale (alpha), RGB(A)</li>
-  <li>compression format: LZ77</li>
+  <li>byte order: big endian
+  <li>sample sizes: 1, 2, 4, 8, 16 bits per sample
+  <li>color spaces: indexed, grayscale (alpha), RGB(A)
+  <li>compression format: LZ77
   <li>specials:
     <ul>
-      <li>supported chunks: IHDR, IDAT, IEND, PLTE, gAMA, tRNS, bKGD</li>
-      <li>transparency support partially for RGB, which is stored as 32 bits format</li>
+      <li>supported chunks: IHDR, IDAT, IEND, PLTE, gAMA, tRNS, bKGD
+      <li>transparency support partially for RGB, which is stored as 32 bits format
     </ul>
-  </li>
+  
 </ul></div>
 </div>
 

@@ -1,14 +1,14 @@
-<!-- $Id: theory-resampling.html,v 1.1.1.1 2004-06-29 14:10:45 dale Exp $ -->
+<!-- $Id: theory-resampling.html,v 1.2 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_de:Resampling]}
 
 <p align=justify>Bilder k&ouml;nnen bei einer Verkleinerung oder Vergr&ouml;&szlig;erung oft &quot;unscharf&quot; erscheinen. Diese Unsch&auml;rfe kann durch zwei Vorg&auml;nge gesteuert werden: Resampling und Filtern.
 <p align=justify>Der Filtervorgang versucht die ver&auml;nderten Pixel zu gl&auml;tten (verwischen). Wird ein Bild f&uuml;r eine andere Aufl&ouml;sung resampled, muss die alte Pixelanordnung durch eine neue ersetzt (interpoliert) werden. Dies erfordert eine Art von Bildinterpolierung, von denen es mehrere Methoden gibt. Die einfachste und schnellste Methode ist die Nearest-Neighbour-Methode, auch bekannt als Quick-Filter. Falls die Aufl&ouml;sungsanpassung nicht zu gro&szlig; ist, kann diese Methode durchaus ad&auml;quat sein. Bei h&ouml;heren Vergr&ouml;&szlig;erungen k&ouml;nnen die einzelnen Pixel jedoch als Bl&ouml;cke erscheinen. Bei gr&ouml;&szlig;eren Verkleinerungen hingegen kann das Anti-Aliasing auftreten, wodurch das Bild unscharf erscheint. In solchen F&auml;llen ist die Verwendung einer genaueren Interpolierungsmethode angebracht,  dies erfordert jedoch einern h&ouml;heren Zeitaufwand. Die am h&auml;ufigsten verwendten Filtermethoden sind Nearest-Neighbor, Bilinear and B-spline, in der Reihenfolge ihrer Genauigkeit. Folgende Filter sind in <b>PhoA</b> implementiert:
   <ul>
-    <li>Nearest-Neighbor;</li>
-    <li>Linear (bilinear);</li>
-    <li>B-spline (bicubic);</li>
-    <li>Lanczos;</li>
-    <li>Mitchell.</li>
+    <li>Nearest-Neighbor;
+    <li>Linear (bilinear);
+    <li>B-spline (bicubic);
+    <li>Lanczos;
+    <li>Mitchell.
   </ul>
 
 {[%hh_ftr_de]}

@@ -1,4 +1,4 @@
-<!-- $Id: intf-browse-mode-views.html,v 1.7 2004-12-07 10:27:17 dale Exp $ -->
+<!-- $Id: intf-browse-mode-views.html,v 1.8 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:Working with views]}
 
 {[%hh_h2:Introduction]}
@@ -26,49 +26,49 @@
       <b>PhoA</b> supports the following grouping kinds:
       <ul>
         <li><b>By picture file path</b><br>
-            Pictures are arranged into folders according to their physical locations.</li>
+            Pictures are arranged into folders according to their physical locations.
         <li><b>By date year</b><br>
             Pictures are grouped into folders, each of which contains pictures with the same year. This grouping
-            supports arranging <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            supports arranging <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By date month</b><br>
             Pictures are grouped into folders, each of which contains pictures with the same month. Usually it is worth
             to apply this grouping after the grouping by date year, in this case you'll have year folders containing
             folders for months of that year; but you may apply this grouping alone, this way pictures will be grouped by
             the month, but still with different years. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By date day</b><br>
             Pictures are grouped into folders, each of which contains pictures with the same day of the month. Usually
             it is worth to apply this grouping after the groupings by date year and by date month, in this case you'll
             have year folders containing folders for months of that year, and they in turn will contain folders for days
             of that month; but you may apply this grouping alone, this way pictures will be grouped by day of the month,
             but still with different years and months. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By time hour</b><br>
             Pictures are grouped into folders, each of which contains pictures with the same hour (taken from picture's
             time). This grouping supports arranging <a href="#unclassified">unclassified</a> pictures into a separate
-            folder.</li>
+            folder.
         <li><b>By time minute</b><br>
             Pictures are grouped into folders, each of which contains pictures with the same minute (taken from
             picture's time). Usually it is worth to apply this grouping after the grouping by time hour, in this case
             you'll have year folders containing folders for minutes of that hour; but you may apply this grouping alone,
             this way pictures will be grouped by the minute, but still with different hours. This grouping supports
-            arranging <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            arranging <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By place</b><br>
             Pictures are arranged into folders by their place. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By film number</b><br>
             Pictures are arranged into folders by their film number. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By author</b><br>
             Pictures are arranged into folders by their author. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By media name or code</b><br>
             Pictures are arranged into folders by their media. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
         <li><b>By keywords</b><br>
             Pictures are arranged into folders by their keywords. Accordingly, one picture may participate in some
             folders, and it'll do if it contains some keywords. This grouping supports arranging
-            <a href="#unclassified">unclassified</a> pictures into a separate folder.</li>
+            <a href="#unclassified">unclassified</a> pictures into a separate folder.
       </ul>
     </td>
   </tr>
@@ -89,13 +89,13 @@
 <ul>
   <li>If a grouping has &quot;Unclassified pictures in own folder&quot; checkbox checked, they will be put into the
       appropriate folder (&quot;No date&quot;, &quot;No place&quot; etc.) located at the same tree level as the rest of
-      folders, and just at the top of the level.</li>
+      folders, and just at the top of the level.
   <li>If the checkbox is unchecked, pictures with no data will be leaved in the former folder, and no additional folder
       is created for them. So, given the grouping by date (checkbox is unchecked), the picture remains in the root
       folder (the folder corresponding to the view itself), and if you then apply the grouping by place (checkbox is
       checked), the &quot;No place&quot; folder will reside in the root directory, and the picture will be placed there,
       while the rest of folders (with place specified) will be created under the date folders; thus picture
-      classification by place will reside on different folder tree levels.</li>
+      classification by place will reside on different folder tree levels.
 </ul>
 <p align=justify>This feature (obvious) is not applicable for the grouping by picture file path since there are no
   pictures with no files, and there are no files without paths (at least I've heard nothing of it ;).

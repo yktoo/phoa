@@ -1,26 +1,26 @@
-<!-- $Id: info-tools.html,v 1.2 2004-11-10 21:17:05 dale Exp $ -->
+<!-- $Id: info-tools.html,v 1.3 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:Tools]}
 
 <p align=justify>A <b>tool</b> in <b>PhoA</b> is an user-defined (and user-configurable) command. Tools introduce the
   following features:
 <ul>
-  <li>They may be of various <a href="#tool-kinds">kinds</a>.</li>
-  <li>They are applicable to files matching the <a href="#masks">specified masks</a>.</li>
-  <li>They are displayed in menus; in which exactly depends on <a href="#usages">tool usage flags</a> set.</li>
-  <li>They are available only when there are pictures selected.</li>
+  <li>They may be of various <a href="#tool-kinds">kinds</a>.
+  <li>They are applicable to files matching the <a href="#masks">specified masks</a>.
+  <li>They are displayed in menus; in which exactly depends on <a href="#usages">tool usage flags</a> set.
+  <li>They are available only when there are pictures selected.
   <li>They have a name and a hint (except <a href="#ptkSeparator">separator item</a>). The name is used as a menu item
-      caption while the hint is displayed in the status bar when you select that item.</li>
+      caption while the hint is displayed in the status bar when you select that item.
 </ul>
 
 {[%hh_h2:<a name=tool-kinds>Tool kinds</a>]}
 <p align=justify><b>PhoA</b> currently supports the following tool kinds:
 <ul>
-  <li><a href="#ptkSeparator">Separator item</a></li>
-  <li><a href="#ptkDefault">Default action</a></li>
-  <li><a href="#ptkOpen">Standard Open action</a></li>
-  <li><a href="#ptkEdit">Standard Edit action</a></li>
-  <li><a href="#ptkPrint">Standard Print action</a></li>
-  <li><a href="#ptkCustom">Custom action</a></li>
+  <li><a href="#ptkSeparator">Separator item</a>
+  <li><a href="#ptkDefault">Default action</a>
+  <li><a href="#ptkOpen">Standard Open action</a>
+  <li><a href="#ptkEdit">Standard Edit action</a>
+  <li><a href="#ptkPrint">Standard Print action</a>
+  <li><a href="#ptkCustom">Custom action</a>
 </ul>
 
 <h3><a name=ptkSeparator>Separator item</a></h3>
@@ -57,13 +57,13 @@
 <p align=justify><b>PhoA</b> tools can be displayed in a number of menus. You configure by yourself where exactly tool
   action item appears:
 <ul>
-  <li><i>In Tools menu</i>: the item is displayed in <b>Tools</b> submenu of main menu.</li>
+  <li><i>In Tools menu</i>: the item is displayed in <b>Tools</b> submenu of main menu.
   <li><i>In Picture Groups popup menu</i>: the command appears in group tree context menu, which is accessible with
-      right mouse click.</li>
+      right mouse click.
   <li><i>In Thumbnails Window popup menu</i>: the command appears in thumbnail viewer context menu, which is accessible
-      with right mouse click.</li>
+      with right mouse click.
   <li><i>In View mode popup menu</i>: the tool appears in context menu, which is accessible with right mouse click in
-      <a href="intf-view-mode.html">View mode</a>.</li>
+      <a href="intf-view-mode.html">View mode</a>.
 </ul>
 <p align=justify>If Group Tree pane was active when you invoked a tool, the tool is applied to <b>all pictures in the
   group</b>. If Thumbnail Window was active, the tool is applied to <b>selected pictures only</b>.
