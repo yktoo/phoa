@@ -1,0 +1,68 @@
+<html><!-- $Id: info-cmd-line.html,v 1.1 2004-05-24 04:23:01 dale Exp $ -->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Command line parameters</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Command line parameters</h1>
+
+  <p align=justify><b>PhoA</b> supports a number of command line parameters. The general format of the command line is as following:
+  <p align=center><b>phoa.exe [<i>key1</i> [<i>key_value1</i>] [<i>key2</i> [<i>key_value2</i>]] ... ] [<i>photo_album_file</i>]</b>,
+  <p align=justify>where:
+  <ul>
+    <li><b><i>keyN</i></b> - a character prepended with a dash (<b>-</b>). <a href="#keys">See below</a> for the list of available keys.</li>
+    <li><b><i>key_valueN</i></b> - a character string specifying the key value. Some keys don't allow values while some do. Hence the rest ones
+        allow optional value.</li>
+    <li><b><i>photo_album_file</i></b> - optional photo album file name which will be loaded after program is started.</li>
+  </ul>
+  
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=keys>Available keys</a></h2>
+  
+  <p align=justify><b>-w <i>view_name</i></b> - activate <a href="intf-browse-mode-views.html">view</a> <i>view_name</i>. If the key is omitted
+    the program displays picture groups upon start by default. The view is searched case insensitively.<br>
+    <i>Example:</i> <span class=fp>-w &quot;By date and place&quot;</span>
+  
+  <p align=justify><b>-g <i>group_path</i></b> - select a group specified by the <i>group_path</i> in the tree. The path for a group is a string
+    similar to OS file path with the difference that it is separated with slash character (<b>/</b>). You may do or do not specify the starting
+    slash as this affects none. You are also allowed to specify both ordinary picture group or a view's group (ie. with using the <b>-w</b> key).
+    If you omit this key the program selects the root item of the group tree by default. The groups are searched by the name case insensitively.<br>
+    <i>Example:</i> <span class=fp>-g &quot;Photos by date/2000/January/Morning&quot;</span>
+  
+  <p align=justify><b>-i <i>pic_ID</i></b> - select a picture with specified ID in thumbnail window. If the key is omitted the program selects the
+    first thumbnail in the list by default.<br>
+    <i>Example:</i> <span class=fp>-i 418</span>
+  
+  <p align=justify><b>-v</b> - enter the <a href="intf-view-mode.html">View mode</a> upon start. The view mode is allowed only when a there is a
+    picture selected.
+  
+  <p align=justify><b>-s</b> - only applicable with <b>-v</b> key. When specified the program will start the Slide show mode.
+  
+  <p align=justify><b>-f [1|0]</b> - only applicable with <b>-v</b> key and specifies whether fullscreen or window mode is used. If you omit this key
+    the program will use the default (current) settings for fullscreen mode. If the key is specified with no value or with value of <b>1</b> (one) the
+    fullscreen mode will be forced (for the current session only). If the key is specified with value of <b>0</b> (zero), the window mode will be
+    forced (also for the current session only).<br>
+    <i>Examples:</i><br>
+    <span class=fp>&nbsp;&nbsp;&nbsp;&nbsp;-f</span><br>
+    <span class=fp>&nbsp;&nbsp;&nbsp;&nbsp;-f 0</span>
+
+  <div class=nb><b>NB:</b>
+    <ul>
+      <li>The command line parameters are separated with spaces.</li>
+      <li>If a parameter value or photo album file name contain spaces you need to enclose them in double quotes as in examples above.</li>
+      <li>You can specify the photo album file name anywhere in the command line but make sure the program doesn't consider it a key value.
+          Eg., you may write it at the start of the parameter list or right after the key value (because a key may have only one value).</li>
+      <li>The program displays errors found in command line parameters upon start.</li>
+    </ul>
+  </div>
+
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>
