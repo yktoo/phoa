@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.26 2004-11-24 13:39:24 dale Exp $
+//  $Id: udSearch.pas,v 1.27 2004-11-25 08:45:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -212,8 +212,6 @@ type
     procedure ExprInsertPropClick(Sender: TObject);
      // Событие клика на пункте вставки оператора в выражение
     procedure ExprInsertOpClick(Sender: TObject);
-     // Настраивает доступность действий
-    procedure EnableActions;
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
   protected
@@ -224,6 +222,7 @@ type
     function  GetSizeable: Boolean; override;
     procedure SettingsStore(rif: TRegIniFile); override;
     procedure SettingsRestore(rif: TRegIniFile); override;
+    procedure UpdateState; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1135,18 +1134,29 @@ type
     s: String;
     i: Integer;
   begin
-    s := '';
-    for i := 0 to FSimpleCriteria.Count-1 do
-      AccumulateStr(s, ' and'+S_CRLF, FSimpleCriteria[i].AsExpression);
-    eExpression.Text := s;
-    pcCriteria.ActivePage := tsExpression;
+    BeginUpdate;
+    try
+      s := '';
+      for i := 0 to FSimpleCriteria.Count-1 do
+        AccumulateStr(s, ' and'+S_CRLF, FSimpleCriteria[i].AsExpression);
+      eExpression.Text := s;
+      pcCriteria.ActivePage := tsExpression;
+      UpdateSearchKind;
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TdSearch.aaSimpleCrDelete(Sender: TObject);
   begin
-    tvSimpleCriteria.EndEditNode;
-    FSimpleCriteria.Delete(tvSimpleCriteria.FocusedNode.Index);
-    SyncSimpleCriteria;
+    BeginUpdate;
+    try
+      tvSimpleCriteria.EndEditNode;
+      FSimpleCriteria.Delete(tvSimpleCriteria.FocusedNode.Index);
+      SyncSimpleCriteria;
+    finally
+      EndUpdate;
+    end;
   end;
 
   procedure TdSearch.ButtonClick_OK;
@@ -1194,24 +1204,7 @@ type
 
   procedure TdSearch.eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
   begin
-    EnableActions;
-  end;
-
-  procedure TdSearch.EnableActions;
-  var bExprText: Boolean;
-  begin
-    bExprText := eExpression.Lines.Count>0;
-    aReset.Enabled                     := ((SearchKind=pskSimple) and (FSimpleCriteria.Count>0)) or ((SearchKind=pskExpression) and bExprText);
-     // Простой поиск
-    aSimpleCrDelete.Enabled            := (SearchKind=pskSimple) and (GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil);
-    aSimpleConvertToExpression.Enabled := (SearchKind=pskSimple) and (FSimpleCriteria.Count>0);
-     // Поиск по выражению
-    aExprSyntaxCheck.Enabled           := bExprText;
-    aExprCopy.Enabled                  := eExpression.SelAvail;
-    aExprCut.Enabled                   := eExpression.SelAvail;
-    aExprRedo.Enabled                  := eExpression.CanRedo;
-    aExprUndo.Enabled                  := eExpression.CanUndo;
-    UpdateButtons;
+    StateChanged;
   end;
 
   procedure TdSearch.ExprInsertOpClick(Sender: TObject);
@@ -1327,12 +1320,11 @@ type
       pskSimple:     tvSimpleCriteria.SetFocus;
       pskExpression: eExpression.SetFocus;
     end;
-    EnableActions;
+    StateChanged;
   end;
 
   procedure TdSearch.PerformSearch;
-  type
-    TSearchArea = (saAll, saCurGroup, saResults);
+  type TSearchArea = (saAll, saCurGroup, saResults);
   var
     i, iSrchCount: Integer;
     SearchArea: TSearchArea;
@@ -1469,14 +1461,14 @@ type
   begin
     tvSimpleCriteria.RootNodeCount := FSimpleCriteria.Count+1; // Добавляем виртуальную "пустую" строку
     tvSimpleCriteria.Invalidate;
-    EnableActions;
+    StateChanged;
   end;
 
   procedure TdSearch.tvSimpleCriteriaChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   var p: TPoint;
   begin
     ActivateVTNode(Sender, Node);
-    EnableActions;
+    StateChanged;
     with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
     pmSimple.Popup(p.x, p.y);
   end;
@@ -1488,7 +1480,7 @@ type
 
   procedure TdSearch.tvSimpleCriteriaFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   begin
-    EnableActions;
+    StateChanged;
      // Редактируем ячейку, в которую входим
     if not UpdateLocked and (GetSimpleCriterion(Node)<>nil) then Sender.EditNode(Node, Column);
   end;
@@ -1528,6 +1520,27 @@ type
   procedure TdSearch.UpdateSearchKind;
   begin
     if pcCriteria.ActivePage=tsSimple then FSearchKind := pskSimple else FSearchKind := pskExpression;
+  end;
+
+  procedure TdSearch.UpdateState;
+  var bSSimple, bSExpr, bCrExist, bExprText, bExprSel: Boolean;
+  begin
+    inherited UpdateState;
+    bSSimple  := SearchKind=pskSimple;
+    bSExpr    := SearchKind=pskExpression;
+    bCrExist  := FSimpleCriteria.Count>0;
+    bExprText := eExpression.Lines.Count>0;
+    bExprSel  := bExprText and eExpression.SelAvail;
+    aReset.Enabled                     := (bSSimple and bCrExist) or (bSExpr and bExprText);
+     // Простой поиск
+    aSimpleCrDelete.Enabled            := bSSimple and (GetSimpleCriterion(tvSimpleCriteria.FocusedNode)<>nil);
+    aSimpleConvertToExpression.Enabled := bSSimple and bCrExist;
+     // Поиск по выражению
+    aExprSyntaxCheck.Enabled           := bSExpr and bExprText;
+    aExprCopy.Enabled                  := bSExpr and bExprSel;
+    aExprCut.Enabled                   := bSExpr and bExprSel;
+    aExprRedo.Enabled                  := bSExpr and eExpression.CanRedo;
+    aExprUndo.Enabled                  := bSExpr and eExpression.CanUndo;
   end;
 
 end.

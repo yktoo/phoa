@@ -202,27 +202,15 @@ inherited dSearch: TdSearch
             Caption = 'Insert propert&y'
             DisplayMode = nbdmImageAndText
             Hint = 'Insert a picture property into the expression'
+            ImageIndex = 82
             Options = [tboDropdownArrow]
           end
           object smExprInsertOperator: TTBXSubmenuItem
             Caption = 'Insert &operator'
             DisplayMode = nbdmImageAndText
             Hint = 'Insert an operator into the expression'
+            ImageIndex = 82
             Options = [tboDropdownArrow]
-          end
-          object tbSepExprSyntaxCheck: TTBXSeparatorItem
-          end
-          object bExprSyntaxCheck: TTBXItem
-            Action = aExprSyntaxCheck
-            DisplayMode = nbdmImageAndText
-          end
-          object tbSepExprUndo: TTBXSeparatorItem
-          end
-          object bExprUndo: TTBXItem
-            Action = aExprUndo
-          end
-          object bExprRedo: TTBXItem
-            Action = aExprRedo
           end
           object tbSepExprCut: TTBXSeparatorItem
           end
@@ -234,6 +222,20 @@ inherited dSearch: TdSearch
           end
           object bExprPaste: TTBXItem
             Action = aExprPaste
+          end
+          object tbSepExprUndo: TTBXSeparatorItem
+          end
+          object bExprUndo: TTBXItem
+            Action = aExprUndo
+          end
+          object bExprRedo: TTBXItem
+            Action = aExprRedo
+          end
+          object tbSepExprSyntaxCheck: TTBXSeparatorItem
+          end
+          object bExprSyntaxCheck: TTBXItem
+            Action = aExprSyntaxCheck
+            DisplayMode = nbdmImageAndText
           end
         end
       end
@@ -277,25 +279,29 @@ inherited dSearch: TdSearch
       0F0069706D53696D706C6544656C65746500000B00646B53696D706C65546F70
       00000C00746253696D706C654D61696E01020000003600000007004361707469
       6F6E370000000B0043686576726F6E48696E74000600616C4D61696E00000F00
-      6153696D706C65437244656C657465010200000038000000070043617074696F
-      6E39000000040048696E74000F006253696D706C65437244656C65746500001A
-      006153696D706C65436F6E76657274546F45787072657373696F6E0102000000
-      3A000000070043617074696F6E3B000000040048696E74001A006253696D706C
-      65436F6E76657274546F45787072657373696F6E000006006152657365740102
-      0000003F000000070043617074696F6E40000000040048696E74001000614578
-      707253796E746178436865636B010200000041000000070043617074696F6E42
-      000000040048696E74001000624578707253796E746178436865636B00000800
-      6145787072437574010200000043000000070043617074696F6E440000000400
-      48696E740009006145787072436F707901020000004500000007004361707469
-      6F6E46000000040048696E74000A006145787072506173746501020000004700
-      0000070043617074696F6E4A000000040048696E740009006145787072556E64
-      6F010200000048000000070043617074696F6E4B000000040048696E74000900
-      61457870725265646F010200000049000000070043617074696F6E4C00000004
-      0048696E7400090062457870725265646F000009006245787072556E646F0000
-      0A0062457870725061737465000009006245787072436F707900000800624578
-      707243757400000D00746253657045787072556E646F00001400746253657045
-      78707253796E746178436865636B00000C00706D45787072657373696F6E0000
-      0C007462536570457870724375740000}
+      6153696D706C65437244656C657465010300000038000000070043617074696F
+      6E4E000000080043617465676F727939000000040048696E74000F006253696D
+      706C65437244656C65746500001A006153696D706C65436F6E76657274546F45
+      787072657373696F6E01030000003A000000070043617074696F6E4F00000008
+      0043617465676F72793B000000040048696E74001A006253696D706C65436F6E
+      76657274546F45787072657373696F6E0000060061526573657401030000003F
+      000000070043617074696F6E4D000000080043617465676F7279400000000400
+      48696E74001000614578707253796E746178436865636B010300000041000000
+      070043617074696F6E50000000080043617465676F727942000000040048696E
+      74001000624578707253796E746178436865636B000008006145787072437574
+      010300000043000000070043617074696F6E53000000080043617465676F7279
+      44000000040048696E740009006145787072436F707901030000004500000007
+      0043617074696F6E54000000080043617465676F727946000000040048696E74
+      000A0061457870725061737465010300000047000000070043617074696F6E55
+      000000080043617465676F72794A000000040048696E74000900614578707255
+      6E646F010300000048000000070043617074696F6E5100000008004361746567
+      6F72794B000000040048696E7400090061457870725265646F01030000004900
+      0000070043617074696F6E52000000080043617465676F72794C000000040048
+      696E7400090062457870725265646F000009006245787072556E646F00000A00
+      62457870725061737465000009006245787072436F7079000008006245787072
+      43757400000D00746253657045787072556E646F000014007462536570457870
+      7253796E746178436865636B00000C00706D45787072657373696F6E00000C00
+      7462536570457870724375740000}
   end
   object scpMain: TSynCompletionProposal
     Options = [scoLimitToMatchedText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
@@ -336,57 +342,67 @@ inherited dSearch: TdSearch
     Left = 132
     Top = 124
     object aReset: TAction
+      Category = 'General'
       Caption = '&Reset'
       Hint = 'Reset|Clear entered criteria or expression'
       OnExecute = aaReset
     end
     object aSimpleCrDelete: TAction
+      Category = 'Simple search'
       Caption = '&Delete'
       Hint = 'Delete selected criterion'
       ImageIndex = 7
       OnExecute = aaSimpleCrDelete
     end
     object aSimpleConvertToExpression: TAction
+      Category = 'Simple search'
       Caption = 'Convert to e&xpression'
       Hint = 'Convert selected criteria to search expression'
+      ImageIndex = 81
       OnExecute = aaSimpleConvertToExpression
     end
-    object aExprSyntaxCheck: TAction
-      Caption = 'Syntax check'
-      Hint = 'Syntax check the expression'
-      ImageIndex = 57
-      ShortCut = 16504
-      OnExecute = aaExprSyntaxCheck
-    end
-    object aExprUndo: TAction
-      Caption = '&Undo'
-      Hint = 'Undo|Undo the last change'
-      ImageIndex = 23
-      OnExecute = aaExprUndo
-    end
-    object aExprRedo: TAction
-      Caption = '&Redo'
-      Hint = 'Redo|Redo the last undone change'
-      ImageIndex = 80
-      OnExecute = aaExprRedo
-    end
     object aExprCut: TAction
+      Category = 'Expression search'
       Caption = '&Cut'
       Hint = 'Cut|Cut selected text to the clipboard'
       ImageIndex = 20
       OnExecute = aaExprCut
     end
     object aExprCopy: TAction
+      Category = 'Expression search'
       Caption = 'Co&py'
       Hint = 'Copy|Copy selected text to the clipboard'
       ImageIndex = 21
       OnExecute = aaExprCopy
     end
     object aExprPaste: TAction
+      Category = 'Expression search'
       Caption = '&Paste'
       Hint = 'Paste|Paste text from the clipboard'
       ImageIndex = 22
       OnExecute = aaExprPaste
+    end
+    object aExprUndo: TAction
+      Category = 'Expression search'
+      Caption = '&Undo'
+      Hint = 'Undo|Undo the last change'
+      ImageIndex = 23
+      OnExecute = aaExprUndo
+    end
+    object aExprRedo: TAction
+      Category = 'Expression search'
+      Caption = '&Redo'
+      Hint = 'Redo|Redo the last undone change'
+      ImageIndex = 80
+      OnExecute = aaExprRedo
+    end
+    object aExprSyntaxCheck: TAction
+      Category = 'Expression search'
+      Caption = 'Syntax check'
+      Hint = 'Syntax check the expression'
+      ImageIndex = 57
+      ShortCut = 16504
+      OnExecute = aaExprSyntaxCheck
     end
   end
   object pmExpression: TTBXPopupMenu
