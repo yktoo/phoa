@@ -7,3 +7,5 @@ Add pictures wizard:
 File operations wizard: 
   An option for renaming picture files being copied or moved, with using picture property values. 
   An option for copying the language file currently being used.
+
+New -r command-line option.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.80 2005-03-02 17:13:45 dale Exp $
+//  $Id: Main.pas,v 1.81 2005-03-07 10:37:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1510,6 +1510,11 @@ uses
           sPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
           ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
           DoLoad(sPhoaFile);
+           // -- Если указан режим рекурсивного просмотра
+          if clkFlatMode in CmdLine.Keys then begin
+            SetSettingValueBool(ISettingID_Browse_FlatMode, CmdLine.KeyValues[clkFlatMode]<>'0');
+            UpdateFlatModeAction;
+          end;
            // -- Если указано представление - выбираем его
           if clkSelectView  in CmdLine.Keys then SelectViewByName(CmdLine.KeyValues[clkSelectView]);
            // -- Если указана группа - ищем и выделяем её

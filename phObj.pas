@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.63 2005-02-13 19:16:38 dale Exp $
+//  $Id: phObj.pas,v 1.64 2005-03-07 10:37:36 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -140,6 +140,7 @@ type
 
   TCmdLineKey = (
     clkOpenPhoa,    // Открыть фотоальбом <значение>
+    clkFlatMode,    // Рекурсивный режим (<значение>=1. При <значение>=0 - НЕ рекурсивный режим)
     clkSelectView,  // Перейти в режим отображения представления <значение>
     clkSelectGroup, // Выделить в дереве группу <значение>
     clkSelectPicID, // Отобразить изображение с ID=<значение>
@@ -187,6 +188,7 @@ const
        cChar:     Char;                 // Символ (имя) ключа
      end = (
      (ValueMode: clkvmOptional; cChar: #0),   // clkOpenPhoa
+     (ValueMode: clkvmOptional; cChar: 'r'),  // clkFlatMode
      (ValueMode: clkvmRequired; cChar: 'w'),  // clkSelectView
      (ValueMode: clkvmRequired; cChar: 'g'),  // clkSelectGroup
      (ValueMode: clkvmRequired; cChar: 'i'),  // clkSelectPicID
