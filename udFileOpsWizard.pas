@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.24 2004-10-12 12:38:09 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.25 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -113,7 +113,6 @@ type
     FSelectedPics: IPhotoAlbumPicList;
     FSelPicMode: TFileOpSelPicMode;
     FSelPicValidityFilter: TFileOpSelPicValidityFilter;
-    FViewerCurView: IPhotoAlbumView;
     FViewerSelGroup: IPhotoAlbumPicGroup;
     FViewerSelPics: IPhoaPicList;
      // Отбирает изображения для операции в FSelectedPics - на основании выбранного режима и выбранных групп
@@ -241,8 +240,6 @@ type
     property ViewerSelGroup: IPhotoAlbumPicGroup read FViewerSelGroup;
      // -- Выбранные во вьюере изображения
     property ViewerSelPics: IPhoaPicList read FViewerSelPics;
-     // -- Текущее выбранное во вьюере представление; nil, если отображаются группы изображений
-    property ViewerCurView: IPhotoAlbumView read FViewerCurView;
   end;
 
    // Поток-обработчик файловых операций
@@ -281,11 +278,11 @@ type
   end;
 
    // Показывает мастер операций с файлами изображений. Возвращает True, если что-то в фотоальбоме было изменено
+   //   AProject          - проект
    //   AViewerSelGroup   - текущая выбранная во вьюере группа
-   //   AViewerCurView    - текущее выбранное во вьюере представление; nil, если отображаются группы изображений
    //   AViewerSelPics    - список выделенных во вьюере изображений
    //   bSelPicsByDefault - если True, по умолчанию выбирать "Выбранные изображения"
-  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: IPhotoAlbumView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
+  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
@@ -297,13 +294,12 @@ uses
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
   ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
 
-  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: IPhotoAlbumView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
+  function DoFileOperations(AProject: IPhotoAlbumProject; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bProjectChanged: Boolean): Boolean;
   begin
     with TdFileOpsWizard.Create(Application) do
       try
         FProject          := AProject;
         FViewerSelGroup   := AViewerSelGroup;
-        FViewerCurView    := AViewerCurView;
         FViewerSelPics    := AViewerSelPics;
         FSelPicsByDefault := bSelPicsByDefault;
         Result := Execute;
@@ -485,10 +481,7 @@ uses
           SLRelTargetPaths.Sorted     := True;
           SLRelTargetPaths.Duplicates := dupIgnore;
            // Заполняем SLRelTargetPaths путями назначения
-          if FWizard.ViewerCurView=nil then
-            AddPathIfPicInGroup(FWizard.Project.RootGroupX)
-          else
-            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroupX);
+          AddPathIfPicInGroup(FWizard.Project.ViewRootGroupX);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];

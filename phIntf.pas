@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.11 2004-10-12 12:38:09 dale Exp $
+//  $Id: phIntf.pas,v 1.12 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -402,8 +402,6 @@ type
 
   IPhoaViewList = interface(IInterface)
     ['{5ADA8486-1E50-44BA-A9F7-2AB729234A22}']
-     // Returns index of a view; -1 if no such view
-    function  IndexOf(Item: IPhoaView): Integer; stdcall;
      // Returns index of a view by its name (case-insensitive search); -1 if no such view
     function  IndexOfName(const sName: String): Integer; stdcall;
      // Invalidates all the views
@@ -431,6 +429,7 @@ type
   IPhoaProject = interface(IInterface)
     ['{769DBE0B-D86B-4F89-A557-9A8DA083E506}']
      // Prop handlers
+    function  GetCurrentView: IPhoaView; stdcall;
     function  GetDescription: String; stdcall;
     function  GetFileName: String; stdcall;
     function  GetFileRevision: Integer; stdcall;
@@ -438,8 +437,12 @@ type
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
     function  GetThumbnailQuality: Byte; stdcall;
+    function  GetViewIndex: Integer; stdcall;
+    function  GetViewRootGroup: IPhoaPicGroup; stdcall;
     function  GetViews: IPhoaViewList; stdcall;
      // Props
+     // -- Current view, if ViewIndex>=0; nil otherwise
+    property CurrentView: IPhoaView read GetCurrentView;
      // -- Photo album description
     property Description: String read GetDescription;
      // -- Project file name
@@ -454,6 +457,10 @@ type
     property ThumbnailSize: TSize read GetThumbnailSize;
      // -- JPEG-thumbnail quality (0..100)
     property ThumbnailQuality: Byte read GetThumbnailQuality;
+     // -- Current active view index in range -1..Views.Count-1 (-1 means no view is active but picture groups)
+    property ViewIndex: Integer read GetViewIndex;
+     // -- Current root group considering ViewIndex value (when ViewIndex=-1 this is the same as RootGroup)
+    property ViewRootGroup: IPhoaPicGroup read GetViewRootGroup;
      // -- Photo album views
     property Views: IPhoaViewList read GetViews;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.13 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.14 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -32,6 +32,7 @@ type
     bAdvanced: TButton;
     tvMain: TVirtualExplorerTree;
     dklcMain: TDKLanguageController;
+    pProcess: TPanel;
     procedure tvMainEnumFolder(Sender: TCustomVirtualExplorerTree; Namespace: TNamespace; var AllowAsChild: Boolean);
     procedure bAdvancedClick(Sender: TObject);
     procedure tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -165,6 +166,10 @@ uses
       sr: TSearchRec;
       iRes: Integer;
     begin
+       // Обновляем информацию о процессе
+      pProcess.Caption := ConstVal('SMsg_ProcessingSomething', [sPath]);
+      pProcess.Update;
+       // Сканируем каталог
       iRes := FindFirst(sPath+'*.*', faAnyFile, sr);
       try
         while iRes=0 do begin
@@ -189,28 +194,37 @@ uses
     Project := Wiz.Project;
      // Стираем существующий список файлов
     Files.Clear;
-     // Инициализируем критерии
-    Wiz.Filter_Presence := TAddFilePresenceFilter(cbPresence.ItemIndex);
-    Wiz.Filter_Masks    := cbFileMasks.Text;
-    Wiz.Filter_DateFrom := StrToDateDef(eFileDateFrom.Text, -1);
-    Wiz.Filter_DateTo   := StrToDateDef(eFileDateTo.Text,   -1);
-    Wiz.Filter_TimeFrom := StrToTimeDef(eFileTimeFrom.Text, -1);
-    Wiz.Filter_TimeTo   := StrToTimeDef(eFileTimeTo.Text,   -1);
-    if bAdvanced.Tag=0 then Masks := nil else Masks := TPhoaMasks.Create(Wiz.Filter_Masks);
+     // Отображаем панель процесса
+    StartWait;
+    pProcess.Show;
     try
-       // Обрабатываем список выбранных файлов/папок
-      Node := tvMain.GetFirstSelected;
-      while Assigned(Node) do begin
-        if tvMain.ValidateNamespace(Node, Namespace) then
-          if Namespace.FileSystem then
-            if Namespace.Folder then
-              AddFolder(IncludeTrailingPathDelimiter(Namespace.NameParseAddress), cbRecurseFolders.Checked)
-            else
-              AddFile(Namespace.NameParseAddress);
-        Node := tvMain.GetNextSelected(Node);
+       // Инициализируем критерии
+      Wiz.Filter_Presence := TAddFilePresenceFilter(cbPresence.ItemIndex);
+      Wiz.Filter_Masks    := cbFileMasks.Text;
+      Wiz.Filter_DateFrom := StrToDateDef(eFileDateFrom.Text, -1);
+      Wiz.Filter_DateTo   := StrToDateDef(eFileDateTo.Text,   -1);
+      Wiz.Filter_TimeFrom := StrToTimeDef(eFileTimeFrom.Text, -1);
+      Wiz.Filter_TimeTo   := StrToTimeDef(eFileTimeTo.Text,   -1);
+      if bAdvanced.Tag=0 then Masks := nil else Masks := TPhoaMasks.Create(Wiz.Filter_Masks);
+      try
+         // Обрабатываем список выбранных файлов/папок
+        Node := tvMain.GetFirstSelected;
+        while Assigned(Node) do begin
+          if tvMain.ValidateNamespace(Node, Namespace) then
+            if Namespace.FileSystem then
+              if Namespace.Folder then
+                AddFolder(IncludeTrailingPathDelimiter(Namespace.NameParseAddress), cbRecurseFolders.Checked)
+              else
+                AddFile(Namespace.NameParseAddress);
+          Node := tvMain.GetNextSelected(Node);
+        end;
+      finally
+        Masks.Free;
       end;
+     // Скрываем панель процесса
     finally
-      Masks.Free;
+      pProcess.Hide;
+      StopWait;
     end;
      // Если в списке есть файлы
     Result := Files.Count>0;

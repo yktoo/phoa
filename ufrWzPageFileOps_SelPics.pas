@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.13 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.14 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -99,15 +99,19 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
   end;
 
   procedure TfrWzPageFileOps_SelPics.BeforeDisplay(ChangeMethod: TPageChangeMethod);
-  var Wiz: TdFileOpsWizard;
+  var
+    Wiz: TdFileOpsWizard;
+    View: IPhotoAlbumView;
   begin
     inherited BeforeDisplay(ChangeMethod);
     Wiz := TdFileOpsWizard(StorageForm);
     rbSelPics.Enabled  := Wiz.ViewerSelPics.Count>0;
-    if Wiz.ViewerCurView=nil then
+     // Настраиваем название радиокнопки "Все изображения фотоальбома/представления"
+    View := Wiz.Project.CurrentViewX;
+    if View=nil then
       rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInPhoa')
     else
-      rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInView', [Wiz.ViewerCurView.Name]);
+      rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInView', [View.Name]);
      // Устанавливаем выбранную радиокнопку в зависимости от режима
     rbSelPics.Checked   := Wiz.SelPicMode=fospmSelPics;
     rbAllPics.Checked   := Wiz.SelPicMode=fospmAll;

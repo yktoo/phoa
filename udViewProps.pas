@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.9 2004-10-12 12:38:10 dale Exp $
+//  $Id: udViewProps.pas,v 1.10 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -97,9 +97,9 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
   begin
      // «апоминаем данные отката/выполн€ем операцию
     if FView=nil then
-      TPhoaOp_ViewNew.Create(FUndoOperations, fMain, eName.Text, FGroupings, frSorting.Sortings)
+      TPhoaOp_ViewNew.Create(FUndoOperations, FProject, eName.Text, FGroupings, frSorting.Sortings)
     else
-      TPhoaOp_ViewEdit.Create(FUndoOperations, FView, fMain, eName.Text, FGroupings, frSorting.Sortings);
+      TPhoaOp_ViewEdit.Create(FUndoOperations, FProject, FView, eName.Text, FGroupings, frSorting.Sortings);
     inherited ButtonClick_OK;
   end;
 

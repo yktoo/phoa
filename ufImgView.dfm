@@ -259,9 +259,9 @@ object fImgView: TfImgView
   TextHeight = 13
   object iMain: TImage32
     Left = 9
-    Top = 23
+    Top = 26
     Width = 514
-    Height = 222
+    Height = 236
     Align = alClient
     BitmapAlign = baCustom
     Scale = 1.000000000000000000
@@ -276,12 +276,12 @@ object fImgView: TfImgView
     Left = 0
     Top = 0
     Width = 532
-    Height = 23
+    Height = 26
     object tbMenu: TTBXToolbar
       Left = 0
       Top = 0
       Caption = 'Main Menu'
-      CloseButton = False
+      CloseButtonWhenDocked = True
       Images = fMain.ilActionsSmall
       MenuBar = True
       ProcessShortCuts = True
@@ -314,8 +314,13 @@ object fImgView: TfImgView
       end
       object smView: TTBXSubmenuItem
         Caption = '&View'
+        object iToggleMainMenu: TTBXVisibilityToggleItem
+          Caption = '&Main Menu'
+          Control = tbMenu
+          Hint = 'Main Menu|Show or hide the Main Menu'
+        end
         object iToggleMainToolbar: TTBXVisibilityToggleItem
-          Caption = '&Main Toolbar'
+          Caption = 'M&ain Toolbar'
           Control = tbMain
           Hint = 'Main Toolbar|Show or hide the Main Toolbar'
         end
@@ -382,6 +387,20 @@ object fImgView: TfImgView
           object iSlideShowCyclic: TTBXItem
             Action = aSlideShowCyclic
           end
+          object iSepSlideShowInterval: TTBXSeparatorItem
+            Blank = True
+          end
+          object eSlideShowInterval: TTBXSpinEditItem
+            EditCaption = 'Slide sho&w interval:'
+            EditWidth = 80
+            Hint = 'Slide show interval|Slide show interval in seconds'
+            ValueType = evtFloat
+            Decimal = 1
+            Postfix = 's'
+            SpaceAfterPrefix = False
+            SpaceBeforePostfix = True
+            OnValueChange = eSlideShowIntervalValueChange
+          end
         end
         object smTransforms: TTBXSubmenuItem
           Caption = '&Transformations'
@@ -426,36 +445,14 @@ object fImgView: TfImgView
         end
       end
     end
-  end
-  object dkLeft: TTBXDock
-    Left = 0
-    Top = 23
-    Width = 9
-    Height = 222
-    Position = dpLeft
-  end
-  object dkRight: TTBXDock
-    Left = 523
-    Top = 23
-    Width = 9
-    Height = 222
-    Position = dpRight
-  end
-  object dkBottom: TTBXDock
-    Left = 0
-    Top = 245
-    Width = 532
-    Height = 26
-    Position = dpBottom
     object tbMain: TTBXToolbar
-      Left = 0
+      Left = 195
       Top = 0
       Caption = 'Main Toolbar'
       CloseButtonWhenDocked = True
-      DockPos = -8
-      DockRow = 1
+      DockPos = 188
       Images = fMain.ilActionsSmall
-      TabOrder = 0
+      TabOrder = 1
       OnVisibleChanged = tbMainVisibleChanged
       object bFirstPic: TTBXItem
         Action = aFirstPic
@@ -529,11 +526,10 @@ object fImgView: TfImgView
       Top = 0
       Caption = 'Transformations'
       CloseButtonWhenDocked = True
-      DockPos = 516
-      DockRow = 1
+      DockPos = 500
       Images = fMain.ilActionsSmall
       LinkSubitems = smTransforms
-      TabOrder = 1
+      TabOrder = 2
       Visible = False
     end
     object tbSlideShow: TTBXToolbar
@@ -541,12 +537,32 @@ object fImgView: TfImgView
       Top = 0
       Caption = 'Slide Show'
       CloseButtonWhenDocked = True
-      DockPos = 520
-      DockRow = 1
+      DockPos = 516
       Images = fMain.ilActionsSmall
       LinkSubitems = smSlideShow
-      TabOrder = 2
+      TabOrder = 3
     end
+  end
+  object dkLeft: TTBXDock
+    Left = 0
+    Top = 26
+    Width = 9
+    Height = 236
+    Position = dpLeft
+  end
+  object dkRight: TTBXDock
+    Left = 523
+    Top = 26
+    Width = 9
+    Height = 236
+    Position = dpRight
+  end
+  object dkBottom: TTBXDock
+    Left = 0
+    Top = 262
+    Width = 532
+    Height = 9
+    Position = dpBottom
   end
   object alMain: TActionList
     Images = fMain.ilActionsSmall
@@ -815,7 +831,7 @@ object fImgView: TfImgView
     Left = 92
     Top = 48
     LangData = {
-      080066496D67566965770001770000000500646B546F700000060074624D6169
+      080066496D675669657700017A0000000500646B546F700000060074624D6169
       6E010100000008000000070043617074696F6E00050062456469740000090062
       53657474696E677300000800646B426F74746F6D00000600646B4C6566740000
       0700646B526967687400000600616C4D61696E00000500614564697401030000
@@ -912,6 +928,10 @@ object fImgView: TfImgView
       617074696F6E27010000040048696E740009006953657474696E677300000800
       746267695A6F6F6D0000090074626769546F6F6C730000070074626769566577
       000005006948656C70000009006769706D546F6F6C730000090069546F6F6C73
-      5365700000}
+      53657000000F0069546F67676C654D61696E4D656E7501020000002801000007
+      0043617074696F6E29010000040048696E7400120065536C69646553686F7749
+      6E74657276616C01030000002A0100000B004564697443617074696F6E2B0100
+      00040048696E742C0100000700506F737466697800150069536570536C696465
+      53686F77496E74657276616C0000}
   end
 end

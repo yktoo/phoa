@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.1 2004-10-12 12:38:09 dale Exp $
+//  $Id: phOps.pas,v 1.2 2004-10-13 11:03:33 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -91,11 +91,15 @@ type
    // Флаги требуемого обновления операции отката
   TUndoInvalidationFlag  = (
      // -- Флаги действий при выполнении (eXecution)
+    uifXReloadViews,         // Перегрузить список представлений (и обновить индекс текущего представления)
+    uifXUpdateViewIndex,     // Обновить индекс текущего представления
     uifXReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
     uifXReinitSiblings,      // Переинициализировать соседние с узлом группы операции узлы дерева. Должно быть заполнено Op.ParentGroupAbsIdx
     uifXReinitRecursive,     // При переинициализации (флаги uifXReinitParent и uifXReinitSiblings) действовать рекурсивно
     uifXEditGroup,           // Ввести узел группы Op.GroupAbsIdx в режим редактирования его текста. Должно быть заполнено Op.GroupAbsIdx
      // -- Флаги действий при откате (Undoing)
+    uifUReloadViews,         // Перегрузить список представлений (и обновить индекс текущего представления)
+    uifUUpdateViewIndex,     // Обновить индекс текущего представления
     uifUReinitAll,           // Переинициализировать все узлы дерева
     uifUReinitParent,        // Переинициализировать родителя узла группы операции. Должно быть заполнено Op.ParentGroupAbsIdx
     uifUReinitRecursive);    // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
@@ -280,8 +284,8 @@ type
   private
      // Список удалений зависимых узлов
     FCascadedDeletes: TPhoaOperations;
-     // Список удалений неиспользуемых изображений
-    FUnlinkedPicRemoves: TPhoaOperations;
+     // Операция удаления неиспользуемых изображений
+    FUnlinkedPicsRemove: TPhoaOperation;
      // Список ID изображений группы
     FPicIDs: TIntegerList;
      // Внутренняя (оптимизированная на использование заранее известного Owner-а) процедура отката
@@ -299,14 +303,14 @@ type
   end;
 
    //===================================================================================================================
-   // Внутренняя операция удаления неиспользуемого изображения (используется в TPhotoAlbum.RemoveUnlinkedPics)
+   // Внутренняя операция удаления неиспользуемых изображений из проекта
    //===================================================================================================================
 
-  TPhoaOp_InternalPicRemoving = class(TPhoaOperation)
+  TPhoaOp_InternalUnlinkedPicsRemoving = class(TPhoaOperation)
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Pic: IPhotoAlbumPic);
+    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject);
   end;
 
    //===================================================================================================================
@@ -500,7 +504,7 @@ type
 
   TPhoaOp_GroupDragAndDrop = class(TPhoaOperation)
   protected
-    function GetInvalidationFlags: TUndoInvalidationFlags; override;
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
     constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group, NewParentGroup: IPhotoAlbumPicGroup; iNewIndex: Integer);
@@ -527,35 +531,15 @@ type
   end;
 
    //===================================================================================================================
-   // Вспомогательный интерфейс для работы со списком представлений
-   //===================================================================================================================
-
-  IPhoaViews = interface(IInterface)
-//!!!     // Загружает список представлений и выбирает представление с индексом idxSelect
-//    procedure LoadViewList(idxSelect: Integer);
-//     // Prop handlers
-//    function  GetViewIndex: Integer;
-//    procedure SetViewIndex(Value: Integer);
-//    function  GetViews: TPhoaViews;
-//     // Props
-//     // -- Текущий индекс представления
-//    property ViewIndex: Integer read GetViewIndex write SetViewIndex;
-//     // -- Список представлений
-//    property Views: TPhoaViews read GetViews;
-  end;
-
-   //===================================================================================================================
    // Операция создания представления
    //===================================================================================================================
 
   TPhoaOp_ViewNew = class(TPhoaOperation)
-  private
-     // Интерфейс списка представлений
-//    FViewsIntf: IPhoaViews;
   protected
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; ViewsIntf: IPhoaViews; const sName: String; Groupings: IPhotoAlbumPicGroupingList; Sortings: IPhotoAlbumPicSortingList);
+    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; const sName: String; Groupings: IPhotoAlbumPicGroupingList; Sortings: IPhotoAlbumPicSortingList);
   end;
 
    //===================================================================================================================
@@ -563,14 +547,12 @@ type
    //===================================================================================================================
 
   TPhoaOp_ViewEdit = class(TPhoaOperation)
-  private
-     // Интерфейс списка представлений
-//    FViewsIntf: IPhoaViews;
   protected
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
      // Если NewGroupings=nil и NewSortings=nil, значит, это просто переименование представления
-    constructor Create(List: TPhoaOperations; View: IPhotoAlbumView; ViewsIntf: IPhoaViews; const sNewName: String; NewGroupings: IPhotoAlbumPicGroupingList; NewSortings: IPhotoAlbumPicSortingList);
+    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; View: IPhotoAlbumView; const sNewName: String; NewGroupings: IPhotoAlbumPicGroupingList; NewSortings: IPhotoAlbumPicSortingList);
   end;
 
    //===================================================================================================================
@@ -578,13 +560,11 @@ type
    //===================================================================================================================
 
   TPhoaOp_ViewDelete = class(TPhoaOperation)
-  private
-     // Интерфейс списка представлений
-//    FViewsIntf: IPhoaViews;
   protected
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; ViewsIntf: IPhoaViews);
+    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject);
   end;
 
    //===================================================================================================================
@@ -592,14 +572,12 @@ type
    //===================================================================================================================
 
   TPhoaOp_ViewMakeGroup = class(TPhoaOperation)
-  private
-     // Интерфейс списка представлений
-//    FViewsIntf: IPhoaViews;
   protected
+    function  GetInvalidationFlags: TUndoInvalidationFlags; override;
     procedure RollbackChanges; override;
   public
      // Group - группа, куда помещать папки представления
-    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup; ViewsIntf: IPhoaViews);
+    constructor Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup);
   end;
 
    // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
@@ -1126,15 +1104,14 @@ uses
        // Удаляем группу
       Group.Owner := nil;
        // Удаляем неиспользуемые изображения
-      FUnlinkedPicRemoves := TPhoaOperations.Create(List.UndoFile);
-//!!!      PhoA.RemoveUnlinkedPics(FUnlinkedPicRemoves);
+      FUnlinkedPicsRemove := TPhoaOp_InternalUnlinkedPicsRemoving.Create(List, Project);
     end;
   end;
 
   destructor TPhoaOp_GroupDelete.Destroy;
   begin
     FCascadedDeletes.Free;
-    FUnlinkedPicRemoves.Free;
+    FUnlinkedPicsRemove.Free;
     FPicIDs.Free;
     inherited Destroy;
   end;
@@ -1170,32 +1147,48 @@ uses
      // Восстанавливаем ветку групп/узлов
     InternalRollback(OpParentGroup);
      // Восстанавливаем удалённые (несвязанные) изображения
-    if FUnlinkedPicRemoves<>nil then FUnlinkedPicRemoves.UndoAll;
+    if FUnlinkedPicsRemove<>nil then FUnlinkedPicsRemove.Undo;
   end;
 
    //===================================================================================================================
-   // TPhoaOp_InternalPicRemoving
+   // TPhoaOp_InternalUnlinkedPicsRemoving
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalPicRemoving.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Pic: IPhotoAlbumPic);
+  constructor TPhoaOp_InternalUnlinkedPicsRemoving.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject);
+  var
+    i: Integer;
+    Pic: IPhotoAlbumPic;
   begin
     inherited Create(AList, AProject);
-     // Сохраняем данные изображения
-    UndoFile.WriteStr(Pic.RawData[PPAllProps]);
-     // Выполняем операцию
-    Pic.Release;
+     // Цикл по всем изображениям фотоальбома
+    for i := Project.Pics.Count-1 downto 0 do begin
+      Pic := Project.PicsX[i];
+       // Если изображение не связано ни с одной группой
+      if not Project.RootGroup.IsPicLinked(Pic.ID, True) then begin
+         // Пишем флаг продолжения
+        UndoFile.WriteBool(True);
+         // Сохраняем данные изображения
+        UndoFile.WriteStr(Pic.RawData[PPAllProps]);
+         // Удаляем изображение из списка
+        Pic.Release;
+      end;
+    end;
+     // Пишем стоп-флаг
+    UndoFile.WriteBool(False);
   end;
 
-  procedure TPhoaOp_InternalPicRemoving.RollbackChanges;
+  procedure TPhoaOp_InternalUnlinkedPicsRemoving.RollbackChanges;
   begin
     inherited RollbackChanges;
-     // Создаём изображение
-    with NewPhotoAlbumPic do begin
-       // Загружаем данные
-      RawData[PPAllProps] := UndoFile.ReadStr;
-       // Кладём в список (ID уже загружен)
-      PutToList(Project.PicsX, False);
-    end;
+     // Читаем данные, пока не встретим стоп-флаг
+    while UndoFile.ReadBool do
+       // Создаём изображение
+      with NewPhotoAlbumPic do begin
+         // Загружаем данные
+        RawData[PPAllProps] := UndoFile.ReadStr;
+         // Кладём в список (ID уже загружен)
+        PutToList(Project.PicsX, False);
+      end;
   end;
 
    //===================================================================================================================
@@ -1684,7 +1677,7 @@ uses
      // Удаляем изображения из группы
     TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, Project, Group, Pics);
      // Удаляем несвязанные изображения из фотоальбома
-//!!!    PhoA.RemoveUnlinkedPics(FOperations);
+    TPhoaOp_InternalUnlinkedPicsRemoving.Create(FOperations, Project);
   end;
 
    //===================================================================================================================
@@ -1798,7 +1791,7 @@ uses
       end;
       if IntersectPics.Count>0 then begin
         TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, Project, TargetGroup, IntersectPics);
-//!!!        PhoA.RemoveUnlinkedPics(FOperations);
+        TPhoaOp_InternalUnlinkedPicsRemoving.Create(FOperations, Project);
       end;
     end;
   end;
@@ -1953,156 +1946,174 @@ uses
    // TPhoaOp_ViewNew
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewNew.Create(List: TPhoaOperations; ViewsIntf: IPhoaViews; const sName: String; Groupings: IPhotoAlbumPicGroupingList; Sortings: IPhotoAlbumPicSortingList);
-//  var
-//    View: IPhotoAlbumView;
-//    iNewViewIndex: Integer;
+  constructor TPhoaOp_ViewNew.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; const sName: String; Groupings: IPhotoAlbumPicGroupingList; Sortings: IPhotoAlbumPicSortingList);
+  var
+    View: IPhotoAlbumView;
+    iNewViewIndex: Integer;
   begin
-    inherited Create(List, nil);
-//!!!    FViewsIntf := ViewsIntf;
-//     // Сохраняем предыдущий индекс представления
-//    UndoFile.WriteInt(ViewsIntf.ViewIndex);
-//     // Выполняем операцию
-//    View := NewPhotoAlbumView(ViewsIntf.Views);
-//    View.Name := sName;
-//    View.Groupings.Assign(Groupings);
-//    View.Sortings.Assign(Sortings);
-//     // Сохраняем новый индекс представления
-//    iNewViewIndex := ViewsIntf.Views.IndexOf(View);
-//    UndoFile.WriteInt(iNewViewIndex);
-//     // Перегружаем список
-//    ViewsIntf.LoadViewList(iNewViewIndex);
+    inherited Create(AList, AProject);
+     // Сохраняем предыдущий индекс представления
+    UndoFile.WriteInt(Project.ViewIndex);
+     // Выполняем операцию
+    View := NewPhotoAlbumView(Project.ViewsX);
+    View.Name := sName;
+    View.GroupingsX.Assign(Groupings);
+    View.SortingsX.Assign(Sortings);
+     // Сохраняем новый индекс представления
+    iNewViewIndex := View.Index;
+    UndoFile.WriteInt(iNewViewIndex);
+     // Перегружаем список
+    Project.ViewIndex := iNewViewIndex;
+  end;
+
+  function TPhoaOp_ViewNew.GetInvalidationFlags: TUndoInvalidationFlags;
+  begin
+    Result := [
+      uifXReloadViews, uifXUpdateViewIndex,  // Execution flags
+      uifUReloadViews, uifUUpdateViewIndex]; // Undo flags
   end;
 
   procedure TPhoaOp_ViewNew.RollbackChanges;
-//  var iPrevViewIndex, iNewViewIndex: Integer;
+  var iPrevViewIndex, iNewViewIndex: Integer;
   begin
     inherited RollbackChanges;
-//!!!     // Получаем сохранённые данные
-//    iPrevViewIndex := UndoFile.ReadInt;
-//    iNewViewIndex  := UndoFile.ReadInt;
-//     // Удаляем представление
-//    FViewsIntf.Views.Delete(iNewViewIndex);
-//     // Перегружаем список и восстанавливаем прежнее выбранное представление
-//    FViewsIntf.LoadViewList(iPrevViewIndex);
+     // Получаем сохранённые данные
+    iPrevViewIndex := UndoFile.ReadInt;
+    iNewViewIndex  := UndoFile.ReadInt;
+     // Удаляем представление
+    Project.ViewsX.Delete(iNewViewIndex);
+     // Восстанавливаем прежнее выбранное представление
+    Project.ViewIndex := iPrevViewIndex;
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewEdit
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewEdit.Create(List: TPhoaOperations; View: IPhotoAlbumView; ViewsIntf: IPhoaViews; const sNewName: String; NewGroupings: IPhotoAlbumPicGroupingList; NewSortings: IPhotoAlbumPicSortingList);
-//  var bWriteGroupings, bWriteSortings: Boolean;
+  constructor TPhoaOp_ViewEdit.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; View: IPhotoAlbumView; const sNewName: String; NewGroupings: IPhotoAlbumPicGroupingList; NewSortings: IPhotoAlbumPicSortingList);
+  var bWriteGroupings, bWriteSortings: Boolean;
   begin
-    inherited Create(List, nil);
-//!!!     // Сохраняем данные отката и применяем изменения
-//    FViewsIntf := ViewsIntf;
-//    UndoFile.WriteStr(View.Name);
-//    View.Name := sNewName;
-//     // Пересортировываем список
-//    ViewsIntf.Views.Sort;
-//     // Запоминаем новый индекс представления
-//    UndoFile.WriteInt(View.Index);
-//     // -- Список группировок создаём и сохраняем только в том случае, если это не переименование и он различается
-//    bWriteGroupings := (NewGroupings<>nil) and not View.Groupings.IdenticalWith(NewGroupings);
-//    UndoFile.WriteBool(bWriteGroupings); // Признак наличия группировок
-//    if bWriteGroupings then begin
-//      UndoWriteGroupings(UndoFile, View.Groupings);
-//      View.Groupings.Assign(NewGroupings);
-//       // -- Invalidate view's groups
-//      View.UnprocessGroups;
-//    end;
-//     // -- Список сортировок создаём и сохраняем только в том случае, если это не переименование и он различается
-//    bWriteSortings := (NewSortings<>nil) and not View.Sortings.IdenticalWith(NewSortings);
-//    UndoFile.WriteBool(bWriteSortings); // Признак наличия сортировок
-//    if bWriteSortings then begin
-//      UndoWriteSortings(UndoFile, View.Sortings);
-//      View.Sortings.Assign(NewSortings);
-//       // -- Invalidate view's groups
-//      View.UnprocessGroups;
-//    end;
-//     // Перегружаем список
-//    ViewsIntf.LoadViewList(View.Index);
+    inherited Create(AList, AProject);
+     // Сохраняем данные отката и применяем изменения
+    UndoFile.WriteStr(View.Name);
+    View.Name := sNewName;
+     // Запоминаем новый индекс представления (ПОСЛЕ присвоения имени, т.к. оно изменяет позицию представления в списке)
+    UndoFile.WriteInt(View.Index);
+     // Список группировок создаём и сохраняем только в том случае, если это не переименование и он различается
+    bWriteGroupings := (NewGroupings<>nil) and not View.Groupings.IdenticalWith(NewGroupings);
+     // Пишем признак наличия группировок
+    UndoFile.WriteBool(bWriteGroupings);
+    if bWriteGroupings then begin
+      UndoWriteGroupings(UndoFile, View.GroupingsX);
+      View.GroupingsX.Assign(NewGroupings);
+      View.Invalidate;
+    end;
+     // Список сортировок создаём и сохраняем только в том случае, если это не переименование и он различается
+    bWriteSortings := (NewSortings<>nil) and not View.Sortings.IdenticalWith(NewSortings);
+     // Пишем признак наличия сортировок
+    UndoFile.WriteBool(bWriteSortings);
+    if bWriteSortings then begin
+      UndoWriteSortings(UndoFile, View.SortingsX);
+      View.SortingsX.Assign(NewSortings);
+      View.Invalidate;
+    end;
+     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
+    Project.ViewIndex := View.Index;
+  end;
+
+  function TPhoaOp_ViewEdit.GetInvalidationFlags: TUndoInvalidationFlags;
+  begin
+    Result := [
+      uifXReloadViews, uifXUpdateViewIndex,  // Execution flags
+      uifUReloadViews, uifUUpdateViewIndex]; // Undo flags
   end;
 
   procedure TPhoaOp_ViewEdit.RollbackChanges;
-//  var
-//    sViewName: String;
-//    iViewIndex: Integer;
-//    View: TPhoaView;
+  var
+    sViewName: String;
+    iViewIndex: Integer;
+    View: IPhotoAlbumView;
   begin
     inherited RollbackChanges;
-//!!!     // Восстанавливаем представление
-//    sViewName  := UndoFile.ReadStr;
-//    iViewIndex := UndoFile.ReadInt;
-//    View := FViewsIntf.Views[iViewIndex];
-//    View.Name := sViewName;
-//    if UndoFile.ReadBool then UndoReadGroupings(UndoFile, View.Groupings);
-//    if UndoFile.ReadBool then UndoReadSortings(UndoFile,  View.Sortings);
-//    View.UnprocessGroups;
-//     // Пересортировываем список (смена имени может повлиять на положение представления в списке)
-//    FViewsIntf.Views.Sort;
-//     // Перегружаем список
-//    FViewsIntf.LoadViewList(View.Index);
+     // Восстанавливаем представление
+    sViewName  := UndoFile.ReadStr;
+    iViewIndex := UndoFile.ReadInt;
+    View := Project.ViewsX[iViewIndex];
+    View.Name := sViewName;
+    if UndoFile.ReadBool then UndoReadGroupings(UndoFile, View.GroupingsX);
+    if UndoFile.ReadBool then UndoReadSortings (UndoFile, View.SortingsX);
+    View.Invalidate;
+     // Обновляем текущий индекс представления (мог поменяться после переименования представления)
+    Project.ViewIndex := View.Index;
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewDelete
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewDelete.Create(List: TPhoaOperations; ViewsIntf: IPhoaViews);
+  constructor TPhoaOp_ViewDelete.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject);
+  var View: IPhotoAlbumView;
   begin
-    inherited Create(List, nil);
+    inherited Create(AList, AProject);
      // Сохраняем данные отката
-//!!!    FViewsIntf := ViewsIntf;
-//    with ViewsIntf.Views[ViewsIntf.ViewIndex] do begin
-//      UndoFile.WriteStr(Name);
-//      UndoWriteGroupings(UndoFile, Groupings);
-//      UndoWriteSortings (UndoFile, Sortings);
-//    end;
-//     // Удаляем представление
-//    ViewsIntf.Views.Delete(ViewsIntf.ViewIndex);
-//     // Перегружаем список
-//    ViewsIntf.LoadViewList(-1);
+    View := Project.CurrentViewX;
+    UndoFile.WriteStr(View.Name);
+    UndoWriteGroupings(UndoFile, View.GroupingsX);
+    UndoWriteSortings (UndoFile, View.SortingsX);
+     // Удаляем представление
+    Project.ViewsX.Delete(Project.ViewIndex);
+     // Устанавливаем режим отображения групп
+    Project.ViewIndex := -1;
+  end;
+
+  function TPhoaOp_ViewDelete.GetInvalidationFlags: TUndoInvalidationFlags;
+  begin
+    Result := [
+      uifXReloadViews, uifXUpdateViewIndex,  // Execution flags
+      uifUReloadViews, uifUUpdateViewIndex]; // Undo flags
   end;
 
   procedure TPhoaOp_ViewDelete.RollbackChanges;
-//  var View: TPhoaView;
+  var View: IPhotoAlbumView;
   begin
     inherited RollbackChanges;
-     // Создаём представление
-//!!!    View := TPhoaView.Create(FViewsIntf.Views);
-//    View.Name := UndoFile.ReadStr;
-//    UndoReadGroupings(UndoFile, View.Groupings);
-//    UndoReadSortings (UndoFile, View.Sortings);
-//     // Пересортировываем список
-//    FViewsIntf.Views.Sort;
-//     // Перегружаем список
-//    FViewsIntf.LoadViewList(View.Index);
+      // Создаём представление
+    View := NewPhotoAlbumView(Project.ViewsX);
+    View.Name := UndoFile.ReadStr;
+    UndoReadGroupings(UndoFile, View.GroupingsX);
+    UndoReadSortings (UndoFile, View.SortingsX);
+     // Активизируем представление
+    Project.ViewIndex := View.Index;
   end;
 
    //===================================================================================================================
    // TPhoaOp_ViewMakeGroup
    //===================================================================================================================
 
-  constructor TPhoaOp_ViewMakeGroup.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup; ViewsIntf: IPhoaViews);
-//  var
-//    g: IPhotoAlbumPicGroup;
-//    View: TPhoaView;
+  constructor TPhoaOp_ViewMakeGroup.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Group: IPhotoAlbumPicGroup);
+  var
+    g: IPhotoAlbumPicGroup;
+    View: IPhotoAlbumView;
   begin
     inherited Create(AList, AProject);
-//!!!    FViewsIntf := ViewsIntf;
-//    View := ViewsIntf.Views[ViewsIntf.ViewIndex];
-//     // Создаём группы (изначально с нулевыми ID)
-//    g := NewPhotoAlbumPicGroup(Group, 0);
-//    g.Assign(View.RootGroup, False, True, True);
-//    g.Text := View.Name;
-//     // Распределяем группам настоящие ID
-//    PhoA.RootGroup.FixupIDs;
-//     // Запоминаем главную (корневую) группу из добавленных
-//    OpGroup := g;
-//     // Загружаем дерево папок
-//    ViewsIntf.ViewIndex := -1;
+    View := Project.CurrentViewX;
+     // Создаём группы (изначально с нулевыми ID)
+    g := NewPhotoAlbumPicGroup(Group, 0);
+    g.Assign(View.RootGroup, False, True, True);
+    g.Text := View.Name;
+     // Распределяем группам настоящие ID
+    Project.RootGroupX.FixupIDs;
+     // Запоминаем созданную (корневую) группу 
+    OpGroup := g;
+     // Устанавливаем режим отображения групп
+    Project.ViewIndex := -1;
+  end;
+
+  function TPhoaOp_ViewMakeGroup.GetInvalidationFlags: TUndoInvalidationFlags;
+  begin
+    Result := [
+      uifXUpdateViewIndex,  // Execution flags
+      uifUUpdateViewIndex]; // Undo flags
   end;
 
   procedure TPhoaOp_ViewMakeGroup.RollbackChanges;
@@ -2110,8 +2121,8 @@ uses
     inherited RollbackChanges;
      // Удаляем корневую группу копии представления
     OpGroup.Owner := nil;
-     // Загружаем дерево папок
-//!!!    FViewsIntf.ViewIndex := -1;
+     // Устанавливаем режим отображения групп
+    Project.ViewIndex := -1;
   end;
 
 end.

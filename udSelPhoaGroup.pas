@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.10 2004-10-12 12:38:10 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.11 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,27 +29,24 @@ type
     FProject: IPhotoAlbumProject;
      // Буфер отката
     FUndoOperations: TPhoaOperations;
-      // Интерфейс представлений
-    FViewsIntf: IPhoaViews;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
   end;
 
-  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; AViewsIntf: IPhoaViews): Boolean;
+  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, phSettings;
 
-  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations; AViewsIntf: IPhoaViews): Boolean;
+  function MakeGroupFromView(AProject: IPhotoAlbumProject; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdSelPhoaGroup.Create(Application) do
       try
         FProject        := AProject;
         FUndoOperations := AUndoOperations;
-        FViewsIntf      := AViewsIntf;
         Result := Execute;
       finally
         Free;
@@ -59,7 +56,7 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TdSelPhoaGroup.ButtonClick_OK;
   begin
      // Создаём операцию
-    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FProject, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FViewsIntf);
+    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FProject, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^);
     inherited ButtonClick_OK;
   end;
 

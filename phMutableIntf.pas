@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.7 2004-10-12 12:38:09 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.8 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -365,14 +365,19 @@ type
     procedure LoadFromFile(const sFileName: String); stdcall;
     procedure SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer); stdcall;
      // Prop handlers
+    function  GetCurrentViewM: IPhoaMutableView; stdcall;
     function  GetPicsM: IPhoaMutablePicList; stdcall;
     function  GetRootGroupM: IPhoaMutablePicGroup; stdcall;
+    function  GetViewRootGroupM: IPhoaMutablePicGroup; stdcall;
     function  GetViewsM: IPhoaMutableViewList; stdcall;
     procedure SetDescription(const Value: String); stdcall;
     procedure SetFileName(const Value: String); stdcall;
     procedure SetThumbnailQuality(Value: Byte); stdcall;
     procedure SetThumbnailSize(const Value: TSize); stdcall;
+    procedure SetViewIndex(Value: Integer); stdcall;
      // Props
+     // -- 'Mutable' version of CurrentView
+    property CurrentViewM: IPhoaMutableView read GetCurrentViewM;
      // -- Writable Description
     property Description: String read GetDescription write SetDescription;
      // -- Writable FileName
@@ -385,6 +390,10 @@ type
     property ThumbnailSize: TSize read GetThumbnailSize write SetThumbnailSize;
      // -- Writable ThumbnailQuality
     property ThumbnailQuality: Byte read GetThumbnailQuality write SetThumbnailQuality;
+     // -- 'Mutable' version of ViewIndex
+    property ViewIndex: Integer read GetViewIndex write SetViewIndex;
+     // -- 'Mutable' version of ViewRootGroup
+    property ViewRootGroupM: IPhoaMutablePicGroup read GetViewRootGroupM;
      // -- 'Mutable' version of Views
     property ViewsM: IPhoaMutableViewList read GetViewsM;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.1 2004-10-12 12:38:09 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.2 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -241,14 +241,20 @@ type
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer; const sGenerator, sRemark: String);
      // Prop handlers
+    function  GetCurrentViewX: IPhotoAlbumView;
     function  GetPicsX: IPhotoAlbumPicList;
     function  GetRootGroupX: IPhotoAlbumPicGroup;
+    function  GetViewRootGroupX: IPhotoAlbumPicGroup;
     function  GetViewsX: IPhotoAlbumViewList;
      // Props
+     // -- 'Native' version of CurrentView
+    property CurrentViewX: IPhotoAlbumView read GetCurrentViewX;
      // -- 'Native' version of Pics
     property PicsX: IPhotoAlbumPicList read GetPicsX;
      // -- 'Native' version of RootGroup
     property RootGroupX: IPhotoAlbumPicGroup read GetRootGroupX;
+     // -- 'Native' version of ViewRootGroup
+    property ViewRootGroupX: IPhotoAlbumPicGroup read GetViewRootGroupX;
      // -- 'Native' version of Views
     property ViewsX: IPhotoAlbumViewList read GetViewsX;
   end;

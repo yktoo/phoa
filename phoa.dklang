@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.18 2004-10-11 11:41:24 dale Exp $
+;  $Id: phoa.dklang,v 1.19 2004-10-13 11:03:33 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -513,12 +513,17 @@ smView.Caption=00000285,&View
 smPicture.Caption=00000283,&Picture
 smSlideShow.Caption=00000288,&Slide show
 smTransforms.Caption=00000289,&Transformations
-iToggleMainToolbar.Caption=00000290,&Main Toolbar
+iToggleMainToolbar.Caption=00000290,M&ain Toolbar
 iToggleMainToolbar.Hint=00000291,Main Toolbar|Show or hide the Main Toolbar
 iToggleToolsToolbar.Caption=00000292,&Transformations Toolbar
 iToggleToolsToolbar.Hint=00000293,Transformations Toolbar|Show or hide the Transformations Toolbar
 iToggleSlideShowToolbar.Caption=00000294,Slide S&how Toolbar
 iToggleSlideShowToolbar.Hint=00000295,Slide Show Toolbar|Show or hide the Slide Show Toolbar
+iToggleMainMenu.Caption=00000296,&Main Menu
+iToggleMainMenu.Hint=00000297,Main Menu|Show or hide the Main Menu
+eSlideShowInterval.EditCaption=00000298,Slide sho&w interval:
+eSlideShowInterval.Hint=00000299,Slide show interval|Slide show interval in seconds
+eSlideShowInterval.Postfix=00000300,s
 
 [dViewProps]
 Caption=00000003,Properties: photo album view
@@ -917,6 +922,7 @@ SMsg_ApplyingSettings=Applying settings...
 SMsg_Initializing=Initializing...
 SMsg_LoadingPhoa=Loading photo album %s...
 SMsg_NoMetatagSelected=No metatag selected. Select an item to view its description
+SMsg_ProcessingSomething=Processing %s...
 SMsg_ScanningLanguages=Scanning for language files...
 SMsg_Starting=Starting the application...
 SNoFilesSelected=No files selected in the result list
@@ -940,6 +946,7 @@ SPhotoAlbumNode=Photo Album
 SPicCount=%d pictures
 SPicsNotFound=Such pictures are not found.
 SSearchResultsNode=Search Results
+SSelectedPicCount=%d selected
 SSizeBytes=%d bytes
 SSizeGBytes=%.2f Gbytes
 SSizeKBytes=%.2f Kbytes

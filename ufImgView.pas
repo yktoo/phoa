@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.34 2004-10-12 12:38:10 dale Exp $
+//  $Id: ufImgView.pas,v 1.35 2004-10-13 11:03:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -173,6 +173,9 @@ type
     iHelp: TTBXItem;
     gipmTools: TTBGroupItem;
     iToolsSep: TTBXSeparatorItem;
+    iToggleMainMenu: TTBXVisibilityToggleItem;
+    eSlideShowInterval: TTBXSpinEditItem;
+    iSepSlideShowInterval: TTBXSeparatorItem;
     procedure aaClose(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaFirstPic(Sender: TObject);
@@ -215,6 +218,8 @@ type
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
     procedure tbMainVisibleChanged(Sender: TObject);
+    procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem;
+      const AValue: Extended);
   private
      // Список просматриваемых изображений
     FPics: IPhotoAlbumPicList;
@@ -253,26 +258,26 @@ type
      // Флаг принудительного изменения размеров окна
     FForcedResize: Boolean;
      // Кэшированные настройки просмотра
-    FBackgroundColor: TColor;
-    FZoomFactorChange: Single;
-    FCaptionProps: TPicProperties;
-    FDoShrinkPic: Boolean;
-    FDoZoomPic: Boolean;
     FAlwaysOnTop: Boolean;
-    FKeepCursorOverTB: Boolean;
-    FHideCursorInFS: Boolean;
-    FFitWindowToPic: Boolean;
+    FBackgroundColor: TColor;
+    FCacheBehindPic: Boolean;
+    FCaptionProps: TPicProperties;
     FCenterWindow: Boolean;
     FCyclicViewing: Boolean;
-    FPredecodePic: Boolean;
-    FCacheBehindPic: Boolean;
-    FStretchFilter: TStretchFilter;
-    FSlideInterval: Integer;
-    FInfoProps: TPicProperties;
-    FInfoFont: String;
+    FDoShrinkPic: Boolean;
+    FDoZoomPic: Boolean;
+    FFitWindowToPic: Boolean;
+    FHideCursorInFS: Boolean;
     FInfoBkColor: TColor;
     FInfoBkOpacity: Byte;
+    FInfoFont: String;
+    FInfoProps: TPicProperties;
+    FKeepCursorOverTB: Boolean;
+    FPredecodePic: Boolean;
+    FSlideShowInterval: Integer;
+    FStretchFilter: TStretchFilter;
     FViewInfoPos: TRect;
+    FZoomFactorChange: Single;
      // Коэффициенты увеличения/уменьшения изображения
     FDefaultZoomFactor: Single;
     FBestFitZoomFactor: Single;
@@ -350,7 +355,7 @@ type
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
-    procedure RestartShowTimer;
+    procedure RestartSlideShowTimer;
      // Процедуры временного убирания/восстановления стиля TOPMOST окна просмотра, если он есть
     procedure TopmostCancel;
     procedure TopmostRestore;
@@ -651,7 +656,7 @@ uses
     if bEdited then begin
       fMain.ApplySettings;
       ApplySettings(False);
-      RestartShowTimer;
+      RestartSlideShowTimer;
     end else
       AdjustCursorVisibility(False);
   end;
@@ -746,7 +751,7 @@ uses
     FPredecodePic       := SettingValueBool(ISettingID_View_Predecode);
     FCacheBehindPic     := SettingValueBool(ISettingID_View_CacheBehind);
     FStretchFilter      := TStretchFilter(SettingValueInt(ISettingID_View_StchFilt));
-    FSlideInterval      := SettingValueInt(ISettingID_View_SlideInterval);
+    FSlideShowInterval  := SettingValueInt(ISettingID_View_SlideInterval);
     FSlideShowDirection := TSlideShowDirection(SettingValueInt(ISettingID_View_SlideDirection));
     FSlideShowCyclic    := SettingValueBool(ISettingID_View_SlideCyclic);
     FShowInfo           := SettingValueBool(ISettingID_View_ShowInfo);
@@ -901,7 +906,7 @@ uses
       FDisplayingPic := False;
     end;
      // Перезапускаем таймер
-    RestartShowTimer;
+    RestartSlideShowTimer;
   end;
 
   procedure TfImgView.DP_ApplyTransforms;
@@ -1092,6 +1097,12 @@ uses
     aFlipHorz.Enabled       := bNoErr;
     aFlipVert.Enabled       := bNoErr;
     aStoreTransform.Enabled := bNoErr and ((FPic.Rotation<>FTransform.Rotation) or (FPic.Flips<>FTransform.Flips));
+  end;
+
+  procedure TfImgView.eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
+  begin
+    FSlideShowInterval := Trunc(AValue*1000);
+    RestartSlideShowTimer;
   end;
 
   procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1296,10 +1307,10 @@ uses
     end;
   end;
 
-  procedure TfImgView.RestartShowTimer;
+  procedure TfImgView.RestartSlideShowTimer;
   begin
     if FTimerID<>0 then KillTimer(Handle, FTimerID);
-    if FSlideShow then FTimerID := SetTimer(Handle, ISlideShowTimerID, FSlideInterval, nil) else FTimerID := 0;
+    if FSlideShow then FTimerID := SetTimer(Handle, ISlideShowTimerID, FSlideShowInterval, nil) else FTimerID := 0;
   end;
 
   procedure TfImgView.SetFullScreen(Value: Boolean);
@@ -1344,7 +1355,7 @@ uses
       CommitInfoRelocation;
       FSlideShow := Value;
       if Value then Randomize;
-      RestartShowTimer;
+      RestartSlideShowTimer;
       UpdateSlideShowActions;
     end;
   end;
@@ -1430,6 +1441,7 @@ uses
     aSlideShowBackward.Checked := FSlideShowDirection=ssdBackward;
     aSlideShowRandom.Checked   := FSlideShowDirection=ssdRandom;
     aSlideShowCyclic.Checked   := FSlideShowCyclic;
+    eSlideShowInterval.Value   := FSlideShowInterval/1000;
   end;
 
   procedure TfImgView.UpdateTransformActions;

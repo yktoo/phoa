@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.47 2004-10-12 12:38:09 dale Exp $
+//  $Id: phObj.pas,v 1.48 2004-10-13 11:03:33 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -2730,7 +2730,7 @@ type
   constructor TPhotoAlbumView.Create(AList: IPhotoAlbumViewList);
   begin
     inherited Create;
-    FList := Pointer(AList); 
+    FList := Pointer(AList);
     AList.Add(Self);
     FGroupings := NewPhotoAlbumPicGroupingList;
     FSortings  := NewPhotoAlbumPicSortingList;
@@ -2752,8 +2752,16 @@ type
   end;
 
   function TPhotoAlbumView.GetIndex: Integer;
+  var
+    pSelf: Pointer;
+    VList: IPhoaViewList;
   begin
-    Result := GetList.IndexOf(Self);
+    VList := GetList;
+     // Ищем себя в списке-владельце (по указателю на интерфейс IPhoaView, с которым в этом списке регистрировались)
+    pSelf := Pointer(Self as IPhoaView); 
+    for Result := 0 to VList.Count-1 do
+      if Pointer(VList[Result])=pSelf then Exit;
+    Result := -1;
   end;
 
   function TPhotoAlbumView.GetList: IPhoaViewList;
@@ -3063,16 +3071,18 @@ type
   begin
      // *** Old format
     if not Streamer.Chunked then begin
-       // Read name
-      FName := Streamer.ReadStringI;
+       // Читаем наименование - устанавливаем сеттером, т.к. при изменении имени должна измениться позиция представления
+       //   в списке-владельце
+      SetName(Streamer.ReadStringI);
        // Read groupings
       FGroupings.StreamerLoad(Streamer);
      // *** New format
     end else
       while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
         case Code of
-           // Name
-          IPhChunk_View_Name: FName := vValue;
+           // Name - устанавливаем сеттером, т.к. при изменении имени должна измениться позиция представления в
+           //   списке-владельце
+          IPhChunk_View_Name: SetName(vValue);
            // Groupings
           IPhChunk_ViewGroupings_Open: FGroupings.StreamerLoad(Streamer);
            // Sortings
@@ -3121,7 +3131,6 @@ type
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaView; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
-    function  IndexOf(Item: IPhoaView): Integer; stdcall;
     function  IndexOfName(const sName: String): Integer; stdcall;
     procedure Invalidate; stdcall;
      // IPhoaMutableViewList
@@ -3230,11 +3239,6 @@ type
     Result := FPics as IPhotoAlbumPicList;
   end;
 
-  function TPhotoAlbumViewList.IndexOf(Item: IPhoaView): Integer;
-  begin
-    Result := FList.IndexOf(Item);
-  end;
-
   function TPhotoAlbumViewList.IndexOfName(const sName: String): Integer;
   begin
     if not FindName(sName, Result) then Result := -1; 
@@ -3302,8 +3306,10 @@ type
     FRootGroup: IPhotoAlbumPicGroup;
     FThumbnailQuality: Byte;
     FThumbnailSize: TSize;
+    FViewIndex: Integer;
     FViews: IPhotoAlbumViewList; 
      // IPhoaProject
+    function  GetCurrentView: IPhoaView; stdcall;
     function  GetDescription: String; stdcall;
     function  GetFileName: String; stdcall;
     function  GetFileRevision: Integer; stdcall;
@@ -3311,10 +3317,14 @@ type
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetThumbnailQuality: Byte; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
+    function  GetViewIndex: Integer; stdcall;
+    function  GetViewRootGroup: IPhoaPicGroup; stdcall;
     function  GetViews: IPhoaViewList; stdcall;
      // IPhoaMutableProject
+    function  GetCurrentViewM: IPhoaMutableView; stdcall;
     function  GetPicsM: IPhoaMutablePicList; stdcall;
     function  GetRootGroupM: IPhoaMutablePicGroup; stdcall;
+    function  GetViewRootGroupM: IPhoaMutablePicGroup; stdcall;
     function  GetViewsM: IPhoaMutableViewList; stdcall;
     procedure Assign(Source: IPhoaProject; bCopyRevision: Boolean); stdcall;
     procedure LoadFromFile(const sFileName: String); stdcall;
@@ -3324,9 +3334,12 @@ type
     procedure SetFileName(const Value: String); stdcall;
     procedure SetThumbnailQuality(Value: Byte); stdcall;
     procedure SetThumbnailSize(const Value: TSize); stdcall;
+    procedure SetViewIndex(Value: Integer); stdcall;
      // IPhotoAlbumProject
+    function  GetCurrentViewX: IPhotoAlbumView;
     function  GetPicsX: IPhotoAlbumPicList;
     function  GetRootGroupX: IPhotoAlbumPicGroup;
+    function  GetViewRootGroupX: IPhotoAlbumPicGroup;
     function  GetViewsX: IPhotoAlbumViewList;
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer; const sGenerator, sRemark: String);
@@ -3347,6 +3360,23 @@ type
   begin
     inherited Create;
     New;
+  end;
+
+  function TPhotoAlbumProject.GetCurrentView: IPhoaView;
+  var idx: Integer;
+  begin
+    idx := GetViewIndex;
+    if idx<0 then Result := nil else Result := FViews[idx];
+  end;
+
+  function TPhotoAlbumProject.GetCurrentViewM: IPhoaMutableView;
+  begin
+    Result := GetCurrentView as IPhoaMutableView;
+  end;
+
+  function TPhotoAlbumProject.GetCurrentViewX: IPhotoAlbumView;
+  begin
+    Result := GetCurrentView as IPhotoAlbumView;
   end;
 
   function TPhotoAlbumProject.GetDescription: String;
@@ -3404,6 +3434,30 @@ type
     Result := FThumbnailSize;
   end;
 
+  function TPhotoAlbumProject.GetViewIndex: Integer;
+  begin
+     // Validate index
+    if FViewIndex>=FViews.Count then FViewIndex := FViews.Count-1; 
+    Result := FViewIndex;
+  end;
+
+  function TPhotoAlbumProject.GetViewRootGroup: IPhoaPicGroup;
+  var idx: Integer;
+  begin
+    idx := GetViewIndex;
+    if idx<0 then Result := FRootGroup else Result := FViews[idx].RootGroup;
+  end;
+
+  function TPhotoAlbumProject.GetViewRootGroupM: IPhoaMutablePicGroup;
+  begin
+    Result := GetViewRootGroup as IPhoaMutablePicGroup;
+  end;
+
+  function TPhotoAlbumProject.GetViewRootGroupX: IPhotoAlbumPicGroup;
+  begin
+    Result := GetViewRootGroup as IPhotoAlbumPicGroup;
+  end;
+
   function TPhotoAlbumProject.GetViews: IPhoaViewList;
   begin
     Result := FViews;
@@ -3452,6 +3506,7 @@ type
     FThumbnailQuality := IThumbQuality_Default;
     FThumbnailSize.cx := IThumbWidth_Default;
     FThumbnailSize.cy := IThumbHeight_Default;
+    FViewIndex        := -1;
   end;
 
   procedure TPhotoAlbumProject.SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer);
@@ -3498,6 +3553,11 @@ type
      // Validate height
     if FThumbnailSize.cy<IThumbHeight_Min then FThumbnailSize.cy := IThumbHeight_Min
     else if FThumbnailSize.cy>IThumbHeight_Max then FThumbnailSize.cy := IThumbHeight_Max;
+  end;
+
+  procedure TPhotoAlbumProject.SetViewIndex(Value: Integer);
+  begin
+    FViewIndex := Value;
   end;
 
   procedure TPhotoAlbumProject.StreamerLoad(Streamer: TPhoaStreamer);

@@ -1101,6 +1101,10 @@ object fMain: TfMain
       item
         Size = 130
         Tag = 0
+      end
+      item
+        Size = 130
+        Tag = 0
       end>
     PopupMenu = pmView
     UseSystemFont = False
