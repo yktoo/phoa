@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.11 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.12 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -45,7 +45,8 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
+uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox,
+  phIntf;
 
   procedure TfrWzPageAddFiles_SelFiles.AdjustAdvancedCtls(bShowAdvanced: Boolean);
   begin
@@ -138,7 +139,7 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings, udMsgBox;
         if bMatches then bMatches := Masks.Matches(SRec.Name);
          // Проверяем присутствие в фотоальбоме
         if bMatches and (Wiz.Filter_Presence<>afpfDontCare) then
-          bMatches := (PhoA.Pics.ItemsByFileName[PChar(sPath+SRec.Name)]<>nil) = (Wiz.Filter_Presence=afpfExistingOnly);
+          bMatches := (PhoA.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (Wiz.Filter_Presence=afpfExistingOnly);
       end;
        // Если все критерии удовлетворены
       if bMatches then Files.Add(SRec.Name, sPath, SRec.Size, -2, d);

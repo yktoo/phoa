@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.10 2004-10-08 12:13:46 dale Exp $
+//  $Id: phGraphics.pas,v 1.11 2004-10-10 18:53:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -353,10 +353,8 @@ var
   end;
 
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32; var r: TRect);
-  var sThData: String;
   begin
-    SetString(sThData, PChar(Pic.ThumbnailData), Pic.ThumbnailDataSize);
-    PaintThumbnail(sThData, Pic.Rotation, Pic.Flips, Bitmap32, r);
+    PaintThumbnail(Pic.ThumbnailData, Pic.Rotation, Pic.Flips, Bitmap32, r);
   end;
 
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.13 2004-10-08 12:13:46 dale Exp $
+//  $Id: udSearch.pas,v 1.14 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -33,9 +33,9 @@ type
      // Фотоальбом
     FPhoA: TPhotoAlbum;
      // Группа, в которую помещать результаты
-    FResultsGroup: TPhoaGroup;
+    FResultsGroup: IPhotoAlbumPicGroup;
      // Текущая выбранная группа, nil, если нет
-    FCurGroup: TPhoaGroup;
+    FCurGroup: IPhotoAlbumPicGroup;
      // Основная процедура поиска
     procedure PerformSearch;
      // Сбрасывает критерии в первоначальное состояние
@@ -46,7 +46,7 @@ type
     procedure ButtonClick_OK; override;
   end;
 
-  function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: TPhoaGroup): Boolean;
+  function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: IPhotoAlbumPicGroup): Boolean;
 
 implementation
 {$R *.dfm}
@@ -54,7 +54,7 @@ uses
   TypInfo, StrUtils, Mask, ToolEdit,
   phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox;
 
-  function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: TPhoaGroup): Boolean;
+  function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
     with TdSearch.Create(Application) do
       try
@@ -221,7 +221,7 @@ const
     end;
   end;
 
-  function MatchesCondition(Condition: TLstPropCondition; List, CritList: TStrings): Boolean; overload;
+  function MatchesCondition(Condition: TLstPropCondition; List, CritList: IPhoaKeywordList): Boolean; overload;
   var i: Integer;
   begin
     case Condition of
@@ -594,7 +594,7 @@ type
       PhoaInfo(False, 'SPicsNotFound')
     else begin
        // Fill search results
-      FResultsGroup.Pics.Assign(FLocalResults);
+      (FResultsGroup.Pics as IPhoaMutablePicList).Assign(FLocalResults);
       inherited ButtonClick_OK;
     end;
   end;
@@ -641,7 +641,7 @@ type
   type TSearchArea = (saAll, saCurGroup, saResults);
   var
     iDate1, iDate2, iTime1, iTime2: Integer;
-    SLKeywords: TStringList;
+    Keywords: IPhoaMutableKeywordList;
     FMasks: TPhoaMasks;
     i, iSrchCount, iID, iFSize, iPicWidth, iPicHeight: Integer;
     SearchArea: TSearchArea;
@@ -662,7 +662,7 @@ type
             ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                      iDate2);
             ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime1);
             ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime2);
-            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.KeywordList,               SLKeywords);
+            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.Keywords,                  Keywords);
             else                Result := MatchesCondition(StrCond, Pic.Props[Prop],               sValue);
           end;
          // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
@@ -688,7 +688,6 @@ type
 
   begin
     StartWait;
-    SLKeywords := TStringList.Create;
     try
       FMasks := TPhoaMasks.Create(aSearchCriteria[ICritIdx_FileMasks].sValue);
       try
@@ -712,7 +711,8 @@ type
         iDate2     := GetCritDate(ICritIdx_Date2);
         iTime1     := GetCritTime(ICritIdx_Time1);
         iTime2     := GetCritTime(ICritIdx_Time2);
-        SLKeywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
+        Keywords := NewPhoaMutableKeywordList;
+        Keywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
          // Ищем
         FLocalResults.Clear;
         for i := 0 to iSrchCount-1 do begin
@@ -727,7 +727,6 @@ type
         FMasks.Free;
       end;
     finally
-      SLKeywords.Free;
       StopWait;
     end;
   end;

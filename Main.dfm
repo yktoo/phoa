@@ -1068,6 +1068,7 @@ object fMain: TfMain
         OnEdited = tvGroupsEdited
         OnEditing = tvGroupsEditing
         OnExpanded = SetGroupExpanded
+        OnFreeNode = tvGroupsFreeNode
         OnGetText = tvGroupsGetText
         OnPaintText = tvGroupsPaintText
         OnGetImageIndex = tvGroupsGetImageIndex

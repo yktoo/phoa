@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.9 2004-10-08 12:13:46 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.10 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -23,7 +23,7 @@ type
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   private
      // Возвращает количество выбранных изображений среди изображений группы
-    function  GetSelCount(Group: TPhoaGroup): Integer;
+    function  GetSelCount(Group: IPhotoAlbumPicGroup): Integer;
   protected
     procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
@@ -41,8 +41,8 @@ type
    // Данные, ассоциированные с каждым узлом дерева групп
   PGroupData = ^TGroupData;
   TGroupData = record
-    Group: TPhoaGroup;  // Ссылка на группу
-    iSelCount: Integer; // Количество изображений в группе из числа выбранных
+    Group: IPhotoAlbumPicGroup; // Ссылка на группу
+    iSelCount: Integer;         // Количество изображений в группе из числа выбранных
   end;
 
   procedure TfrPicProps_Groups.AfterDisplay(ChangeMethod: TPageChangeMethod);
@@ -158,7 +158,7 @@ type
     end;
   end;
 
-  function TfrPicProps_Groups.GetSelCount(Group: TPhoaGroup): Integer;
+  function TfrPicProps_Groups.GetSelCount(Group: IPhotoAlbumPicGroup): Integer;
   var i: Integer;
   begin
     Result := 0;
@@ -211,10 +211,10 @@ type
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p.Group := PhoA.RootGroup
+      p.Group := PhoA.RootGroup as IPhotoAlbumPicGroup
     else begin
       pp := Sender.GetNodeData(ParentNode);
-      p.Group := pp.Group.Groups[Node.Index];
+      p.Group := pp.Group.Groups[Node.Index] as IPhotoAlbumPicGroup;
     end;
     Sender.ChildCount[Node] := p.Group.Groups.Count;
      // Считаем количество выбранных изображений среди изображений группы

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.13 2004-10-06 14:41:11 dale Exp $
+//  $Id: udStats.pas,v 1.14 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -34,7 +34,7 @@ type
      // Фотоальбом
     FPhoA: TPhotoAlbum;
      // Текущая группа
-    FGroup: TPhoaGroup;
+    FGroup: IPhotoAlbumPicGroup;
      // Создаёт в памяти новый объект данных статистики
     function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
     function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
@@ -42,13 +42,13 @@ type
     procedure InitializeDialog; override;
   end;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup);
+  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup);
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phPhoa, phSettings;
 
-  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: TPhoaGroup);
+  procedure ShowPhoaStats(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup);
   begin
     with TdStats.Create(Application) do
       try
@@ -79,7 +79,7 @@ uses phUtils, Main, phPhoa, phSettings;
     end;
 
      // Добавляет узлы статистики группы
-    procedure AddGroupStats(Group: TPhoaGroup; nParent: PVirtualNode);
+    procedure AddGroupStats(Group: IPhotoAlbumPicGroup; nParent: PVirtualNode);
     var
       iCntNestedGroups: Integer;  // Количество вложенных подгрупп
       iCntPicsInGroup: Integer;   // Количество изображений в группе
@@ -98,17 +98,17 @@ uses phUtils, Main, phPhoa, phSettings;
       IDs: TIntegerList;
       Pic: IPhoaPic;
 
-      procedure ProcessGroup(Group: TPhoaGroup);
+      procedure ProcessGroup(Group: IPhotoAlbumPicGroup);
       var
         i: Integer;
-        gChild: TPhoaGroup;
+        gChild: IPhotoAlbumPicGroup;
       begin
         Inc(iCntPics, Group.Pics.Count);
          // Добавляем ID изображений в список
         for i := 0 to Group.Pics.Count-1 do IDs.Add(Group.Pics[i].ID);
          // Рекурсивно вызываем для вложенных групп
         for i := 0 to Group.Groups.Count-1 do begin
-          gChild := Group.Groups[i];
+          gChild := Group.Groups[i] as IPhotoAlbumPicGroup;
           Inc(iCntNestedGroups);
           ProcessGroup(gChild);
         end;
@@ -134,7 +134,7 @@ uses phUtils, Main, phPhoa, phSettings;
           Pic := FPhoA.Pics.ItemsByID[IDs[i]];
           i64FSize := Pic.FileSize;
           Inc(i64TotalFileSize,  i64FSize);
-          Inc(i64TotalThumbSize, Pic.ThumbnailDataSize);
+          Inc(i64TotalThumbSize, Length(Pic.ThumbnailData));
            // -- Ищем самый большой файл
           if i64FSize>i64MaxFileSize then begin
             i64MaxFileSize := i64FSize;
@@ -197,7 +197,7 @@ uses phUtils, Main, phPhoa, phSettings;
           AddPhoaFileProps(n1);
           tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FPhoA.FileRevision))].sName));
         tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FPhoA.Pics.Count));
-        AddGroupStats(FPhoA.RootGroup, n0);
+        AddGroupStats(FPhoA.RootGroup as IPhotoAlbumPicGroup, n0);
        // -- Текущая группа
       if (FGroup<>nil) and (FGroup<>FPhoA.RootGroup) then begin
         n0 := tvMain.AddChild(nil, NewStatData('@SStat_Group', '', iiFolder));

@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.16 2004-09-27 17:07:22 dale Exp $
+;  $Id: phoa.dklang,v 1.17 2004-10-10 18:53:31 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -621,6 +621,7 @@ ipcLess=is less than
 ipcLessEqual=is less than or equal to
 ipcNotEqual=isn't equal to
 ISettingID_Browse=Browse\nmode
+ISettingID_Browse_FlatMode=Flat mode
 ISettingID_Browse_GTree=Picture group trees
 ISettingID_Browse_GT_HintInfo=Display with selected properties
 ISettingID_Browse_GT_HintNone=None

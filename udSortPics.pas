@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
+//  $Id: udSortPics.pas,v 1.9 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,7 +25,7 @@ type
      // Фотоальбом
     FPhoA: TPhotoAlbum;
      // Текущая выбранная группа в дереве
-    FGroup: TPhoaGroup;
+    FGroup: IPhotoAlbumPicGroup;
      // Буфер отката
     FUndoOperations: TPhoaOperations;
      // Если True, сортировать напрямую, без сохранения данных отката
@@ -40,13 +40,13 @@ type
 
    // Отображает диалог сортировки изображений. Если bDirectSort=True, то сортирует выбранную группу непосредственно,
    //   без сохранения информации для отката (используется для сортировки результатов поиска)
-  function DoSortPics(PhoA: TPhotoAlbum; Group: TPhoaGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
+  function DoSortPics(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main;
 
-  function DoSortPics(PhoA: TPhotoAlbum; Group: TPhoaGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
+  function DoSortPics(PhoA: TPhotoAlbum; Group: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations; bDirectSort: Boolean): Boolean;
   begin
     with TdSortPics.Create(Application) do
       try
@@ -72,10 +72,10 @@ uses phUtils, ConsVars, Main;
   procedure TdSortPics.ButtonClick_OK;
   var
     Operation: TPhoaOperation;
-    g: TPhoaGroup;
+    g: IPhotoAlbumPicGroup;
   begin
      // Создаём операцию
-    if rbAllGroups.Checked then g := FPhoA.RootGroup else g := FGroup;
+    if rbAllGroups.Checked then g := FPhoA.RootGroup as IPhotoAlbumPicGroup else g := FGroup;
     if rbCurGroup.Checked and FDirectSort then begin
       g.SortPics(frSorting.Sortings);
       fMain.RefreshViewer;

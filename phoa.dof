@@ -107,7 +107,7 @@ UseLauncher=0
 DebugCWD=
 [Version Info]
 IncludeVerInfo=1
-AutoIncBuild=1
+AutoIncBuild=0
 MajorVer=1
 MinorVer=1
 Release=6
@@ -135,8 +135,9 @@ VendorWebsite=http://www.dk-soft.org/
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=4
-Item0=$(DELPHI)\GraphicEx
-Item1=GraphicEx
-Item2=$(DELPHI)\Lib\Debug;GraphicEx
-Item3=C:\Delphi\Home Projects\PhoA\GraphicEx
+Count=5
+Item0=$(DELPHI)\Lib\Debug
+Item1=$(DELPHI)\GraphicEx
+Item2=GraphicEx
+Item3=$(DELPHI)\Lib\Debug;GraphicEx
+Item4=C:\Delphi\Home Projects\PhoA\GraphicEx

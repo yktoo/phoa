@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.9 2004-10-06 14:41:11 dale Exp $
+//  $Id: udPicOps.pas,v 1.10 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -29,7 +29,7 @@ type
   private
     FPhoA: TPhotoAlbum;
     FUndoOperations: TPhoaOperations;
-    FSourceGroup: TPhoaGroup;
+    FSourceGroup: IPhotoAlbumPicGroup;
     FPics: IPhoaPicList;
   protected
     procedure InitializeDialog; override;
@@ -40,13 +40,13 @@ type
    // Отображает диалог операций с изображениями.
    //   ASourceGroup - текущая выбранная группа.
    //   APics        - список выделенных изображений
-  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: TPhoaGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phSettings;
 
-  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: TPhoaGroup; APics: IPhoaPicList): Boolean;
+  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: IPhotoAlbumPicGroup; APics: IPhoaPicList): Boolean;
   begin
     with TdPicOps.Create(Application) do
       try
@@ -70,7 +70,7 @@ uses phUtils, Main, phSettings;
         FUndoOperations,
         FPhoA,
         FSourceGroup,
-        PPhoaGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
+        PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
         FPics,
         TPictureOperation(cbOp.ItemIndex))
     finally
@@ -86,7 +86,7 @@ uses phUtils, Main, phSettings;
     Result :=
       (cbOp.ItemIndex>=0) and
       (n<>nil) and
-      (PPhoaGroup(tvGroups.GetNodeData(n))^<>FSourceGroup);
+      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FSourceGroup);
   end;
 
   procedure TdPicOps.InitializeDialog;
@@ -126,7 +126,7 @@ uses phUtils, Main, phSettings;
   procedure TdPicOps.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
      // Операции группы с самой собой делать бессмысленно
-    if (Kind in [ikNormal, ikSelected]) and (PPhoaGroup(Sender.GetNodeData(Node))^=FSourceGroup) then
+    if (Kind in [ikNormal, ikSelected]) and (PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^=FSourceGroup) then
       ImageIndex := iiNo
     else
       fMain.tvGroupsGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex);

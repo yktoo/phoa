@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.10 2004-10-08 12:13:46 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.11 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -33,17 +33,18 @@ type
     rbValidityValid: TRadioButton;
     rbValidityInvalid: TRadioButton;
     dklcMain: TDKLanguageController;
+    procedure aaCheckAll(Sender: TObject);
+    procedure aaInvertChecks(Sender: TObject);
+    procedure aaUncheckAll(Sender: TObject);
+    procedure RBSelPicturesClick(Sender: TObject);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure RBSelPicturesClick(Sender: TObject);
-    procedure aaCheckAll(Sender: TObject);
-    procedure aaUncheckAll(Sender: TObject);
-    procedure aaInvertChecks(Sender: TObject);
     procedure UpdateCountInfoNotify(Sender: TObject);
   private
      // Количество выбранных групп
@@ -171,7 +172,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
   begin
      // Устанавливаем режим выбора изображений и настраиваем список выбранных групп
     Wiz := TdFileOpsWizard(StorageForm);
-    Wiz.ClearSelectedGroups;
+    Wiz.SelectedGroups.Clear;
      // -- Выбранные во вьюере изображения
     if rbSelPics.Checked then
       Wiz.SelPicMode := fospmSelPics
@@ -183,7 +184,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
       Wiz.SelPicMode := fospmSelGroups;
       n := tvGroups.GetFirst;
       while n<>nil do begin
-        if n.CheckState=csCheckedNormal then Wiz.AddSelectedGroup(PPhoaGroup(tvGroups.GetNodeData(n))^);
+        if n.CheckState=csCheckedNormal then Wiz.SelectedGroups.Add(PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^);
         n := tvGroups.GetNext(n);
       end;
     end;
@@ -216,6 +217,11 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
     if not (tsUpdating in Sender.TreeStates) then UpdateCountInfo;
   end;
 
+  procedure TfrWzPageFileOps_SelPics.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    fMain.tvGroupsFreeNode(Sender, Node);
+  end;
+
   procedure TfrWzPageFileOps_SelPics.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
     fMain.tvGroupsGetHint(Sender, Node, Column, TextType, CellText);
@@ -232,16 +238,16 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var Group: TPhoaGroup;
+  var Group: IPhotoAlbumPicGroup;
   begin
     fMain.tvGroupsInitNode(Sender, ParentNode, Node, InitialStates);
      // Получаем группу, с которой ассоциирован узел
-    Group := PPhoaGroup(Sender.GetNodeData(Node))^;
+    Group := PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^;
      // Запрещаем узел, если у него нет изображений
     if Group.Pics.Count=0 then Include(InitialStates, ivsDisabled);
      // Настраиваем птицу узла
     Node.CheckType := ctCheckBox;
-    Node.CheckState := aCheckStates[not (ivsDisabled in InitialStates) and (TdFileOpsWizard(StorageForm).IndexOfSelectedGroup(Group)>=0)];
+    Node.CheckState := aCheckStates[not (ivsDisabled in InitialStates) and (TdFileOpsWizard(StorageForm).SelectedGroups.IndexOfID(Group.ID)>=0)];
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
@@ -282,7 +288,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
         while n<>nil do begin
           if n.CheckState=csCheckedNormal then begin
             Inc(FSelGroupCount);
-            GroupPics.Add(PPhoaGroup(tvGroups.GetNodeData(n))^.Pics, True);
+            GroupPics.Add(PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^.Pics, True);
           end;
           n := tvGroups.GetNext(n);
         end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.8 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -54,7 +54,7 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TdSelPhoaGroup.ButtonClick_OK;
   begin
      // Создаём операцию
-    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FPhoA, PPhoaGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FViewsIntf);
+    TPhoaOp_ViewMakeGroup.Create(FUndoOperations, FPhoA, PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^, FViewsIntf);
     inherited ButtonClick_OK;
   end;
 
@@ -85,7 +85,7 @@ uses phUtils, ConsVars, Main, phSettings;
 
   procedure TdSelPhoaGroup.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
-    p: PPhoaGroup;
+    p: PPhotoAlbumPicGroup;
     s: String;
   begin
     p := Sender.GetNodeData(Node);
@@ -98,14 +98,14 @@ uses phUtils, ConsVars, Main, phSettings;
   end;
 
   procedure TdSelPhoaGroup.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var p, pp: PPhoaGroup;
+  var p, pp: PPhotoAlbumPicGroup;
   begin
     p := Sender.GetNodeData(Node);
     if ParentNode=nil then
-      p^ := FPhoA.RootGroup
+      p^ := FPhoA.RootGroup as IPhotoAlbumPicGroup
     else begin
       pp := Sender.GetNodeData(ParentNode);
-      p^ := pp^.Groups[Node.Index];
+      p^ := pp^.Groups[Node.Index] as IPhotoAlbumPicGroup;
     end;
     Sender.ChildCount[Node] := p^.Groups.Count;
      // Разворачиваем корневой узел или если группа развёрнута

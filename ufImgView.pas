@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.31 2004-10-08 12:13:46 dale Exp $
+//  $Id: ufImgView.pas,v 1.32 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -190,8 +190,10 @@ type
     procedure aaFlipVert(Sender: TObject);
     procedure aaStoreTransform(Sender: TObject);
   private
-    FGroup: TPhoaGroup;
+    FPics: IPhoaPicList;
     FPhoA: TPhotoAlbum;
+     // Количество изображений в FPics
+    FPicCount: Integer;
      // Инициализационные флаги
     FInitFlags: TImgViewInitFlags;
      // Поток фоновой загрузки картинок
@@ -362,25 +364,27 @@ type
   end;
 
    // Переход в режим просмотра изображений
-   //   Group          - группа, в которой просматривать изображения
-   //   PhoA           - фотоальбом
-   //   iPicIdx        - индекс изображения в группе, с которого начинать просмотр. В него же возвращается индекс
-   //                    последнего просмотренного изображения 
-   //   UndoOperations - буфер отката
-   //   bPhGroups      - True, если отображается дерево папок фотоальбома (не представление)
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+   //   AInitFlags      - флаги инициализации режима просмотра
+   //   APics           - список изображений для просмотра
+   //   APhoA           - фотоальбом
+   //   iPicIdx         - индекс изображения в группе, с которого начинать просмотр. В него же возвращается индекс
+   //                     последнего просмотренного изображения
+   //   AUndoOperations - буфер отката
+   //   bPhGroups       - True, если отображается дерево папок фотоальбома (не представление)
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhoaPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
 
 implementation
 {$R *.dfm}
 uses
   Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
-  procedure ViewImage(AInitFlags: TImgViewInitFlags; AGroup: TPhoaGroup; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
+  procedure ViewImage(AInitFlags: TImgViewInitFlags; APics: IPhoaPicList; APhoA: TPhotoAlbum; var iPicIdx: Integer; AUndoOperations: TPhoaOperations; bPhGroups: Boolean);
   begin
     with TfImgView.Create(Application) do
       try
         FInitFlags      := AInitFlags;
-        FGroup          := AGroup;
+        FPics           := APics;
+        FPicCount       := FPics.Count;
         FPhoA           := APhoA;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
@@ -530,13 +534,13 @@ uses
   procedure TfImgView.aaLastPic(Sender: TObject);
   begin
     FLastPicChangeBackwards := True;
-    PicIdx := FGroup.Pics.Count-1;
+    PicIdx := FPicCount-1;
   end;
 
   procedure TfImgView.aaNextPic(Sender: TObject);
   begin
     FLastPicChangeBackwards := False;
-    if PicIdx<FGroup.Pics.Count-1 then PicIdx := PicIdx+1
+    if PicIdx<FPicCount-1 then PicIdx := PicIdx+1
     else if FCyclicViewing then PicIdx := 0;
   end;
 
@@ -544,7 +548,7 @@ uses
   begin
     FLastPicChangeBackwards := True;
     if PicIdx>0 then PicIdx := PicIdx-1
-    else if FCyclicViewing then PicIdx := FGroup.Pics.Count-1;
+    else if FCyclicViewing then PicIdx := FPicCount-1;
   end;
 
   procedure TfImgView.aaRefresh(Sender: TObject);
@@ -888,7 +892,7 @@ uses
     end;
     if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
      // Настраиваем счётчик
-    eCounter.Text := Format('%d/%d', [FPicIdx+1, FGroup.Pics.Count]);
+    eCounter.Text := Format('%d/%d', [FPicIdx+1, FPicCount]);
   end;
 
   procedure TfImgView.DP_EnqueueNext;
@@ -900,11 +904,11 @@ uses
       idxNextPic := FPicIdx+iif(FLastPicChangeBackwards, -1, 1);
        // Проверяем границы / цикличность просмотра
       if idxNextPic<0 then
-        if FCyclicViewing then idxNextPic := FGroup.Pics.Count-1 else idxNextPic := -1
-      else if idxNextPic>=FGroup.Pics.Count then
+        if FCyclicViewing then idxNextPic := FPicCount-1 else idxNextPic := -1
+      else if idxNextPic>=FPicCount then
         if FCyclicViewing then idxNextPic := 0 else idxNextPic := -1;
        // Ставим файл в очередь 
-      if idxNextPic>=0 then FDecodeThread.QueuedFileName := FGroup.Pics[idxNextPic].FileName;
+      if idxNextPic>=0 then FDecodeThread.QueuedFileName := FPics[idxNextPic].FileName;
     end;
   end;
 
@@ -951,7 +955,7 @@ uses
      // Сохраняем прежнее изображение
     PrevPic := FPic;
      // Находим текущее изображение
-    FPic := FGroup.Pics[FPicIdx] as IPhotoAlbumPic;
+    FPic := FPics[FPicIdx] as IPhotoAlbumPic;
      // Определяем, есть ли изображение в кэше 
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
@@ -1013,16 +1017,13 @@ uses
   end;
 
   procedure TfImgView.EnableActions;
-  var
-    iCnt: Integer;
-    bNoErr: Boolean;
+  var bNoErr: Boolean;
   begin
     bNoErr := not FErroneous;
-    iCnt := FGroup.Pics.Count;
-    aLastPic.Enabled        := FPicIdx<iCnt-1;
+    aLastPic.Enabled        := FPicIdx<FPicCount-1;
     aFirstPic.Enabled       := FPicIdx>0;
-    aNextPic.Enabled        := (iCnt>1) and (FCyclicViewing or aLastPic.Enabled);
-    aPrevPic.Enabled        := (iCnt>1) and (FCyclicViewing or aFirstPic.Enabled);
+    aNextPic.Enabled        := (FPicCount>1) and (FCyclicViewing or aLastPic.Enabled);
+    aPrevPic.Enabled        := (FPicCount>1) and (FCyclicViewing or aFirstPic.Enabled);
     aZoomIn.Enabled         := bNoErr and (ZoomFactor<SMaxPicZoom);
     aZoomOut.Enabled        := bNoErr and (ZoomFactor>SMinPicZoom);
     aZoomFit.Enabled        := bNoErr and (ZoomFactor<>FBestFitZoomFactor);
@@ -1262,7 +1263,7 @@ uses
 
   procedure TfImgView.SetPicIdx(Value: Integer);
   begin
-    if (FPicIdx<>Value) and (Value>=0) and (Value<FGroup.Pics.Count) then begin
+    if (FPicIdx<>Value) and (Value>=0) and (Value<FPicCount) then begin
       FPicIdx := Value;
       DisplayPic(True, True);
     end;
@@ -1360,7 +1361,7 @@ uses
   procedure TfImgView.WMTimer(var Msg: TWMTimer);
   begin
     FLastPicChangeBackwards := False;
-    if PicIdx<FGroup.Pics.Count-1 then PicIdx := PicIdx+1
+    if PicIdx<FPicCount-1 then PicIdx := PicIdx+1
     else if FSlideCyclic then PicIdx := 0
     else SlideShow := False;
   end;

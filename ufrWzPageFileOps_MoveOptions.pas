@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.8 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrWzPageFileOps_MoveOptions;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, phObj, ConsVars,
   phWizard, StdCtrls, Mask, DKLang;
 
 type
@@ -52,7 +52,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, udFileOpsWizard, phObj;
+uses phUtils, udFileOpsWizard;
 
   procedure TfrWzPageFileOps_MoveOptions.AdjustOptionControls;
   var bMFL, bMGL: Boolean;
@@ -150,68 +150,60 @@ uses phUtils, udFileOpsWizard, phObj;
 
   procedure TfrWzPageFileOps_MoveOptions.MakeBaseGroupsLoaded;
   var
-    LPath, LGroupPath: TList;
-    Group: TPhoaGroup;
+    LPath, LGroupPath: IPhotoAlbumPicGroupList;
+    Group: IPhotoAlbumPicGroup;
     i: Integer;
     Wiz: TdFileOpsWizard;
     sRootGroupName: String;
 
      // Заполняет List группами, представляющими собой путь к Group
-    procedure FillPath(Group: TPhoaGroup; List: TList);
+    procedure FillPath(Group: IPhotoAlbumPicGroup; List: IPhotoAlbumPicGroupList);
     begin
       List.Clear;
       repeat
         List.Insert(0, Group);
-        Group := Group.Owner;
+        Group := Group.Owner as IPhotoAlbumPicGroup;
       until Group=nil;
     end;
 
      // Оставляет в CommonList ту часть пути, которая совпадает с началом пути в CurList
-    procedure FindCommonPath(CommonList, CurList: TList);
+    procedure FindCommonPath(CommonList, CurList: IPhotoAlbumPicGroupList);
     var i: Integer;
     begin
       i := 0;
       while (i<CommonList.Count) and (i<CurList.Count) and (CommonList[i]=CurList[i]) do Inc(i);
-      CommonList.Count := i;
+      for i := CommonList.Count-1 downto i do CommonList.Delete(i);
     end;
 
   begin
     if cbBaseGroup.Items.Count=0 then begin
       Wiz := TdFileOpsWizard(StorageForm);
-      LPath := TList.Create;
-      try
-         // Ищем и заносим в LPath самый длинный общий путь
-        case Wiz.SelPicMode of
-           // -- Выбранные во вьюере изображения - заносим путь к текущей выбранной группе
-          fospmSelPics: FillPath(Wiz.ViewerSelGroup, LPath);
-           // -- Все изображения - заносим только сам фотоальбом/представление
-          fospmAll: if Wiz.ViewerCurView=nil then LPath.Add(Wiz.PhoA.RootGroup) else LPath.Add(Wiz.ViewerCurView.RootGroup);
-           // -- Выбранные группы - проходим по всем выбранным группам, выделяя общий путь
-          else {fospmSelGroups} begin
-            LGroupPath := TList.Create;
-            try
-              for i := 0 to Wiz.SelectedGroupCount-1 do begin
-                FillPath(Wiz.SelectedGroups[i], LGroupPath);
-                if i=0 then LPath.Assign(LGroupPath) else FindCommonPath(LPath, LGroupPath);
-                 // Если путь уже пустой (или там единственный узел - узел фотоальбома), выходим
-                if LPath.Count<=1 then Break;
-              end;
-            finally
-              LGroupPath.Free;
-            end;
+      LPath := NewPhotoAlbumPicGroupList(nil);
+       // Ищем и заносим в LPath самый длинный общий путь
+      case Wiz.SelPicMode of
+         // -- Выбранные во вьюере изображения - заносим путь к текущей выбранной группе
+        fospmSelPics: FillPath(Wiz.ViewerSelGroup, LPath);
+         // -- Все изображения - заносим только сам фотоальбом/представление
+        fospmAll: if Wiz.ViewerCurView=nil then LPath.Add(Wiz.PhoA.RootGroup) else LPath.Add(Wiz.ViewerCurView.RootGroup);
+         // -- Выбранные группы - проходим по всем выбранным группам, выделяя общий путь
+        else {fospmSelGroups} begin
+          LGroupPath := NewPhotoAlbumPicGroupList(nil);
+          for i := 0 to Wiz.SelectedGroups.Count-1 do begin
+            FillPath(Wiz.SelectedGroups[i] as IPhotoAlbumPicGroup, LGroupPath);
+            if i=0 then LPath.Assign(LGroupPath) else FindCommonPath(LPath, LGroupPath);
+             // Если путь уже пустой (или там единственный узел - узел фотоальбома), выходим
+            if LPath.Count<=1 then Break;
           end;
         end;
-         // Выделяем части пути, пишем в Items[] - путь группы, в Items.Objects[] - ссылку на группу
-        if Wiz.ViewerCurView=nil then sRootGroupName := ConstVal('SPhotoAlbumNode') else sRootGroupName := Wiz.ViewerCurView.Name;
-        for i := LPath.Count-1 downto 0 do begin
-          Group := TPhoaGroup(LPath[i]);
-          cbBaseGroup.Items.AddObject(Group.Path[sRootGroupName], Group);
-        end;
-      finally
-        LPath.Free;
+      end;
+       // Выделяем части пути, пишем в Items[] - путь группы, в Items.Objects[] - ссылку на группу
+      if Wiz.ViewerCurView=nil then sRootGroupName := ConstVal('SPhotoAlbumNode') else sRootGroupName := Wiz.ViewerCurView.Name;
+      for i := LPath.Count-1 downto 0 do begin
+        Group := LPath[i] as IPhotoAlbumPicGroup;
+        cbBaseGroup.Items.AddObject(Group.Path[sRootGroupName], Pointer(Group));
       end;
        // Выбираем нужный пункт
-      i := cbBaseGroup.Items.IndexOfObject(Wiz.MoveFile_BaseGroup);
+      i := cbBaseGroup.Items.IndexOfObject(Pointer(Wiz.MoveFile_BaseGroup));
       cbBaseGroup.ItemIndex := iif(i<0, 0, i);
     end;
   end;
@@ -232,7 +224,7 @@ uses phUtils, udFileOpsWizard, phObj;
         fomfaMaintainFolderLayout:
           Wiz.MoveFile_BasePath := iif(cbBaseFolder.ItemIndex=cbBaseFolder.Items.Count-1, '', cbBaseFolder.Text);
         fomfaMaintainGroupLayout: begin
-          Wiz.MoveFile_BaseGroup        := TPhoaGroup(cbBaseGroup.Items.Objects[cbBaseGroup.ItemIndex]);
+          Wiz.MoveFile_BaseGroup        := IPhotoAlbumPicGroup(Pointer(cbBaseGroup.Items.Objects[cbBaseGroup.ItemIndex]));
           Wiz.MoveFile_AllowDuplicating := cbAllowDuplicating.Checked;
           Wiz.MoveFile_ReplaceChar      := eReplaceChar.Text[1];
         end;

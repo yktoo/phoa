@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.14 2004-10-08 12:13:46 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.15 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -43,7 +43,7 @@ type
      // Prop storage
     FFileList: TFileList;
     FPhoA: TPhotoAlbum;
-    FGroup: TPhoaGroup;
+    FGroup: IPhotoAlbumPicGroup;
     FRecurseFolders: Boolean;
     FDefaultPath: String;
     FShowAdvancedOptions: Boolean;
@@ -114,7 +114,7 @@ type
      // -- Фильтр: время модификации файла "По" фильтра
     property Filter_TimeTo: TDateTime read FFilter_TimeTo write FFilter_TimeTo;
      // -- Группа, куда добавляются изображения
-    property Group: TPhoaGroup read FGroup;
+    property Group: IPhotoAlbumPicGroup read FGroup;
      // -- Фотоальбом
     property PhoA: TPhotoAlbum read FPhoA;
      // -- True, если включен просмотр вложенных папок
@@ -151,7 +151,7 @@ type
   end;
 
    // Показывает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
-  function AddFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -160,7 +160,7 @@ uses
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
   phPhoa, phSettings;
 
-  function AddFiles(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; AUndoOperations: TPhoaOperations): Boolean;
+  function AddFiles(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TfAddFilesWizard.Create(Application) do
       try

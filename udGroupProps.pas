@@ -17,7 +17,7 @@ type
     mDescription: TMemo;
   private
     FPhoA: TPhotoAlbum; 
-    FGroup: TPhoaGroup;
+    FGroup: IPhotoAlbumPicGroup;
     FUndoOperations: TPhoaOperations;
   protected
     procedure InitializeDialog; override;
@@ -25,13 +25,13 @@ type
     function  GetDataValid: Boolean; override;
   end;
 
-  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; UndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
 uses ConsVars, phUtils, Main;
 
-  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: TPhoaGroup; UndoOperations: TPhoaOperations): Boolean;
+  function EditPicGroup(APhoA: TPhotoAlbum; AGroup: IPhotoAlbumPicGroup; UndoOperations: TPhoaOperations): Boolean;
   begin
     with TdGroupProps.Create(Application) do
       try

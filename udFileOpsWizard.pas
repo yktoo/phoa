@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.21 2004-10-08 12:13:46 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.22 2004-10-10 18:53:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -93,7 +93,7 @@ type
     FFileOpKind: TFileOperationKind;
     FMoveFile_AllowDuplicating: Boolean;
     FMoveFile_Arranging: TFileOpMoveFileArranging;
-    FMoveFile_BaseGroup: TPhoaGroup;
+    FMoveFile_BaseGroup: IPhotoAlbumPicGroup;
     FMoveFile_BasePath: String;
     FMoveFile_DeleteOriginal: Boolean;
     FMoveFile_DeleteToRecycleBin: Boolean;
@@ -108,12 +108,12 @@ type
     FRepair_LookSubfolders: Boolean;
     FRepair_MatchFlags: TFileOpRepairMatchFlags;
     FRepair_RelinkFilesInUse: Boolean;
-    FSelectedGroups: TList;
+    FSelectedGroups: IPhotoAlbumPicGroupList;
     FSelectedPics: IPhoaMutablePicList;
     FSelPicMode: TFileOpSelPicMode;
     FSelPicValidityFilter: TFileOpSelPicValidityFilter;
     FViewerCurView: TPhoaView;
-    FViewerSelGroup: TPhoaGroup;
+    FViewerSelGroup: IPhotoAlbumPicGroup;
     FViewerSelPics: IPhoaPicList;
      // Отбирает изображения для операции в FSelectedPics - на основании выбранного режима и выбранных групп
     procedure DoSelectPictures;
@@ -151,8 +151,6 @@ type
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
      // Prop handlers
-    function  GetSelectedGroupCount: Integer;
-    function  GetSelectedGroups(Index: Integer): TPhoaGroup;
     function  GetSelectedPics: IPhoaPicList;
   protected
     procedure InitializeWizard; override;
@@ -167,12 +165,6 @@ type
     function  PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
   public
-     // Стирает список выбранных групп
-    procedure ClearSelectedGroups;
-     // Добавляет группу в список выбранных
-    procedure AddSelectedGroup(AGroup: TPhoaGroup);
-     // Возвращает индекс группы в списке выбранных, или -1, если нет такой
-    function  IndexOfSelectedGroup(AGroup: TPhoaGroup): Integer;
      // Props
      // -- Создание CD/DVD: True, если нужно создавать фотоальбом из копируемых изображений
     property CDOpt_CreatePhoa: Boolean read FCDOpt_CreatePhoa write FCDOpt_CreatePhoa;
@@ -198,10 +190,6 @@ type
     property ExportedPhoA: TPhotoAlbum read FExportedPhoA;
      // -- Выбранная операция с файлами изображений
     property FileOpKind: TFileOperationKind read FFileOpKind write FFileOpKind;
-     // -- Количество выбранных групп
-    property SelectedGroupCount: Integer read GetSelectedGroupCount;
-     // -- Выбранные группы (список не пустой только для SelPicMode=fospmSelGroups)
-    property SelectedGroups[Index: Integer]: TPhoaGroup read GetSelectedGroups;
      // -- Копирование/перемещение: режим размещения файлов
     property MoveFile_Arranging: TFileOpMoveFileArranging read FMoveFile_Arranging write FMoveFile_Arranging;
      // -- Копирование/перемещение: путь, относительно которого создавать папки с файлами (при
@@ -209,7 +197,7 @@ type
     property MoveFile_BasePath: String read FMoveFile_BasePath write FMoveFile_BasePath;
      // -- Копирование/перемещение: группа, относительно которой создавать папки с файлами (при
      //    MoveFileArranging=fomfaMaintainGroupLayout)
-    property MoveFile_BaseGroup: TPhoaGroup read FMoveFile_BaseGroup write FMoveFile_BaseGroup;
+    property MoveFile_BaseGroup: IPhotoAlbumPicGroup read FMoveFile_BaseGroup write FMoveFile_BaseGroup;
      // -- Копирование/перемещение: если True, делать дубликаты файлов, помещая их в папки, соответствующие группам (при
      //    MoveFileArranging=fomfaMaintainGroupLayout)
     property MoveFile_AllowDuplicating: Boolean read FMoveFile_AllowDuplicating write FMoveFile_AllowDuplicating;
@@ -242,6 +230,8 @@ type
     property Repair_DeleteUnmatchedPics: Boolean read FRepair_DeleteUnmatchedPics write FRepair_DeleteUnmatchedPics;
      // -- Восстановление ссылок: список найденных файлов и ссылок на изображения
     property Repair_FileLinks: TFileLinks read FRepair_FileLinks;
+     // -- Выбранные группы (список не пустой только для SelPicMode=fospmSelGroups)
+    property SelectedGroups: IPhotoAlbumPicGroupList read FSelectedGroups;
      // -- Отобранные для операции изображения (снаружи видны, как immutable)
     property SelectedPics: IPhoaPicList read GetSelectedPics;
      // -- Режим выбора изображений
@@ -249,7 +239,7 @@ type
      // -- Фильтр выбора изображений по наличию соответствующего файла
     property SelPicValidityFilter: TFileOpSelPicValidityFilter read FSelPicValidityFilter write FSelPicValidityFilter;
      // -- Текущая выбранная во вьюере группа
-    property ViewerSelGroup: TPhoaGroup read FViewerSelGroup;
+    property ViewerSelGroup: IPhotoAlbumPicGroup read FViewerSelGroup;
      // -- Выбранные во вьюере изображения
     property ViewerSelPics: IPhoaPicList read FViewerSelPics;
      // -- Текущее выбранное во вьюере представление; nil, если отображаются группы изображений
@@ -296,7 +286,7 @@ type
    //   AViewerCurView    - текущее выбранное во вьюере представление; nil, если отображаются группы изображений
    //   AViewerSelPics    - список выделенных во вьюере изображений
    //   bSelPicsByDefault - если True, по умолчанию выбирать "Выбранные изображения"
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
 
 implementation
 {$R *.dfm}
@@ -308,7 +298,7 @@ uses
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
   ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
 
-  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: TPhoaGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
+  function DoFileOperations(APhoA: TPhotoAlbum; AViewerSelGroup: IPhotoAlbumPicGroup; AViewerCurView: TPhoaView; AViewerSelPics: IPhoaPicList; bSelPicsByDefault: Boolean; out bPhoaChanged: Boolean): Boolean;
   begin
     with TdFileOpsWizard.Create(Application) do
       try
@@ -389,18 +379,18 @@ uses
 
      // Добавляет относительный путь к изображению в SLRelTargetPaths, если группа выбрана и оно присутствует в группе
      //   Group. Рекурсивно вызывает себя для вложенных групп
-    procedure AddPathIfPicInGroup(Group: TPhoaGroup);
+    procedure AddPathIfPicInGroup(Group: IPhotoAlbumPicGroup);
     var
       i: Integer;
-      g: TPhoaGroup;
+      g: IPhotoAlbumPicGroup;
       sRelPath: String;
       bGroupSelected: Boolean;
     begin
        // Проверяем выбранность группы
       case FWizard.SelPicMode of
-        fospmSelPics:         bGroupSelected := Group=FWizard.ViewerSelGroup;
+        fospmSelPics:         bGroupSelected := Group.ID=FWizard.ViewerSelGroup.ID;
         fospmAll:             bGroupSelected := True;
-        else {fospmSelGroups} bGroupSelected := FWizard.IndexOfSelectedGroup(Group)>=0;
+        else {fospmSelGroups} bGroupSelected := FWizard.SelectedGroups.IndexOfID(Group.ID)>=0;
       end;
        // Если группа выбрана, ищем изображение в группе
       if bGroupSelected and (Group.Pics.IndexOfID(Pic.ID)>=0) then begin
@@ -409,7 +399,7 @@ uses
         sRelPath := '';
         while (g<>nil) and (g<>FWizard.MoveFile_BaseGroup) do begin
           sRelPath := ReplaceChars(g.Text, SInvalidPathChars, FWizard.MoveFile_ReplaceChar)+'\'+sRelPath;
-          g := g.Owner;
+          g := g.Owner as IPhotoAlbumPicGroup;
         end;
          // Добавляем путь в список
         SLRelTargetPaths.Add(sRelPath);
@@ -418,7 +408,7 @@ uses
       end;
        // Повторяем то же для вложенных групп
       for i := 0 to Group.Groups.Count-1 do begin
-        AddPathIfPicInGroup(Group.Groups[i]);
+        AddPathIfPicInGroup(Group.Groups[i] as IPhotoAlbumPicGroup);
          // Если дублирование файлов не позволяется, прерываем поиск при наличии [хотя бы одной] записи пути
         if not FWizard.MoveFile_AllowDuplicating and (SLRelTargetPaths.Count>0) then Exit;
       end;
@@ -497,9 +487,9 @@ uses
           SLRelTargetPaths.Duplicates := dupIgnore;
            // Заполняем SLRelTargetPaths путями назначения
           if FWizard.ViewerCurView=nil then
-            AddPathIfPicInGroup(FWizard.PhoA.RootGroup)
+            AddPathIfPicInGroup(FWizard.PhoA.RootGroup as IPhotoAlbumPicGroup)
           else
-            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup);
+            AddPathIfPicInGroup(FWizard.ViewerCurView.RootGroup as IPhotoAlbumPicGroup);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
           sTargetPath := sDestPath+SLRelTargetPaths[0];
@@ -518,7 +508,7 @@ uses
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
     if FWizard.ExportedPhoA<>nil then
-      (FWizard.ExportedPhoA.Pics.ItemsByID[Pic.ID] as IPhoaMutablePic).FileName := PChar(sTargetPath+sFile);
+      (FWizard.ExportedPhoA.Pics.ItemsByID[Pic.ID] as IPhoaMutablePic).FileName := sTargetPath+sFile;
   end;
 
   procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
@@ -551,10 +541,10 @@ uses
   procedure TFileOpThread.DoDeletePic(Pic: IPhoaPic);
 
      // Рекурсивно удаляет изображение из группы Group и её подгрупп
-    procedure DelID(Group: TPhoaGroup; iID: Integer);
+    procedure DelID(Group: IPhoaPicGroup; iID: Integer);
     var i: Integer;
     begin
-      Group.Pics.Remove(iID);
+      (Group.Pics as IPhoaMutablePicList).Remove(iID);
       for i := 0 to Group.Groups.Count-1 do DelID(Group.Groups[i], iID);
     end;
 
@@ -582,14 +572,14 @@ uses
   var iPrevThumbSize, iPrevFileSize: Integer;
   begin
      // Запоминаем прежние размеры эскиза и файла
-    iPrevThumbSize := Pic.ThumbnailDataSize;
+    iPrevThumbSize := Length(Pic.ThumbnailData);
     iPrevFileSize  := Pic.FileSize;
      // Перестраиваем эскиз
     (Pic as IPhoaMutablePic).ReloadPicFileData;
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
-      [Pic.FileName, iPrevThumbSize, Pic.ThumbnailDataSize, iPrevFileSize, Pic.FileSize]);
+      [Pic.FileName, iPrevThumbSize, Length(Pic.ThumbnailData), iPrevFileSize, Pic.FileSize]);
     FChangesMade := True;
   end;
 
@@ -602,12 +592,12 @@ uses
   var sPrevFileName: String;
   begin
      // Проверяем, можно ли исправить путь
-    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.ItemsByFileName[PChar(sNewFileName)]<>nil) then
+    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.IndexOfFileName(sNewFileName)>=0) then
       FileOpError('SLogEntry_PicRelinkingError', [sNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
     sPrevFileName := Pic.FileName;
     if sPrevFileName<>sNewFileName then begin
-      Pic.FileName := PChar(sNewFileName);
+      Pic.FileName := sNewFileName;
       FWizard.LogSuccess('SLogEntry_PicRelinkedOK', [sPrevFileName, sNewFileName]);
       FChangesMade := True;
     end;
@@ -647,25 +637,15 @@ uses
    // TdFileOpsWizard
    //===================================================================================================================
 
-  procedure TdFileOpsWizard.AddSelectedGroup(AGroup: TPhoaGroup);
-  begin
-    FSelectedGroups.Add(AGroup);
-  end;
-
-  procedure TdFileOpsWizard.ClearSelectedGroups;
-  begin
-    FSelectedGroups.Clear;
-  end;
-
   procedure TdFileOpsWizard.CreateExportedPhoa;
    // Признак выбранности группы (не выбрана; выбрана; не выбрана, но выбрана одна из её подгрупп)
   type TGroupSelection = (gsNotSelected, gsSelected, gsChildSelected);
 
      // Возвращает выбранность группы в Мастере (только для режима SelPicMode=fospmSelGroups)
-    function GetGroupSelection(Group: TPhoaGroup): TGroupSelection;
+    function GetGroupSelection(Group: IPhoaPicGroup): TGroupSelection;
     var i: Integer;
     begin
-      if IndexOfSelectedGroup(Group)>=0 then
+      if FSelectedGroups.IndexOfID(Group.ID)>=0 then
         Result := gsSelected
       else begin
         Result := gsNotSelected;
@@ -678,7 +658,7 @@ uses
     end;
 
      // Рекурсивно добавляет выбранные группы и изображения (только для режима SelPicMode=fospmSelGroups)
-    procedure AddGroup(TgtGroup, OwnerGroup, SrcGroup: TPhoaGroup; bUseTgtGroup: Boolean);
+    procedure AddGroup(TgtGroup, OwnerGroup, SrcGroup: IPhotoAlbumPicGroup; bUseTgtGroup: Boolean);
     var
       GS: TGroupSelection;
       i: Integer;
@@ -687,23 +667,23 @@ uses
        // Если группа или подгруппа выбраны - добавляем группу в иерархию
       if GS<>gsNotSelected then begin
          // Если это не корневая группа, создаём соотв. target-группу
-        if not bUseTgtGroup then TgtGroup := TPhoaGroup.Create(OwnerGroup, 0);
+        if not bUseTgtGroup then TgtGroup := NewPhotoAlbumPicGroup(OwnerGroup, 0);
          // Копируем свойства исходной группы. Если выбрана сама группа, добавляем в неё и изображения исходной группы
         TgtGroup.Assign(SrcGroup, True, GS=gsSelected, False);
          // Повторяем то же для всех подгрупп
-        for i := 0 to SrcGroup.Groups.Count-1 do AddGroup(nil, TgtGroup, SrcGroup.Groups[i], False);
+        for i := 0 to SrcGroup.Groups.Count-1 do AddGroup(nil, TgtGroup, SrcGroup.Groups[i] as IPhotoAlbumPicGroup, False);
       end;
     end;
 
      // Добавляет одиночную группу в фотоальбом
-    procedure AddSingleGroup(TgtGroup, SrcGroup: TPhoaGroup; bUseTgtAsOwnerGroup: Boolean);
+    procedure AddSingleGroup(TgtGroup, SrcGroup: IPhotoAlbumPicGroup; bUseTgtAsOwnerGroup: Boolean);
     begin
        // Если это не корневая группа, создаём соотв. target-группу
-      if bUseTgtAsOwnerGroup then TgtGroup := TPhoaGroup.Create(TgtGroup, 0);
+      if bUseTgtAsOwnerGroup then TgtGroup := NewPhotoAlbumPicGroup(TgtGroup, 0);
        // Копируем свойства исходной группы
       TgtGroup.Assign(SrcGroup, True, False, False);
        // Добавляем выбранные изображения
-      TgtGroup.Pics.Add(FSelectedPics, True);
+      (TgtGroup.Pics as IPhoaMutablePicList).Add(FSelectedPics, True);
     end;
 
   begin
@@ -716,11 +696,11 @@ uses
     FExportedPhoA.FileName    := IncludeTrailingPathDelimiter(FDestinationFolder)+FCDOpt_PhoaFileName;
      // Копируем изображения
     FExportedPhoA.Pics.DuplicatePics(FSelectedPics);
-     // Копируем группы и ID изображений в них
+     // Копируем группы и изображения в них
     case SelPicMode of
-      fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
-      fospmAll:       FExportedPhoA.RootGroup.Assign(FPhoA.RootGroup, True, True, True);
-      fospmSelGroups: AddGroup(FExportedPhoA.RootGroup, nil, FPhoA.RootGroup, True);
+      fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup as IPhotoAlbumPicGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
+      fospmAll:       (FExportedPhoA.RootGroup as IPhotoAlbumPicGroup).Assign(FPhoA.RootGroup, True, True, True);
+      fospmSelGroups: AddGroup(FExportedPhoA.RootGroup as IPhotoAlbumPicGroup, nil, FPhoA.RootGroup as IPhotoAlbumPicGroup, True);
     end;
      // Копируем представления
     if FCDOpt_IncludeViews then FExportedPhoA.Views.Assign(FPhoA.Views);
@@ -734,7 +714,7 @@ uses
     case SelPicMode of
       fospmSelPics:   FSelectedPics.Assign(FViewerSelPics);
       fospmAll:       FSelectedPics.Assign(FPhoA.Pics);
-      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.Add(TPhoaGroup(FSelectedGroups[i]).Pics, True);
+      fospmSelGroups: for i := 0 to FSelectedGroups.Count-1 do FSelectedPics.Add(FSelectedGroups[i].Pics, True);
       else            FSelectedPics := nil;
     end;
      // Удаляем [не]существующие
@@ -810,7 +790,7 @@ uses
     FRepair_FileLinks.Free;
     FExportedPhoA.Free;
     FSelectedPics := nil;
-    FSelectedGroups.Free;
+    FSelectedGroups := nil;
     FLog.Free;
     inherited FinalizeWizard;
   end;
@@ -849,31 +829,16 @@ uses
     end;
   end;
 
-  function TdFileOpsWizard.GetSelectedGroupCount: Integer;
-  begin
-    Result := FSelectedGroups.Count;
-  end;
-
-  function TdFileOpsWizard.GetSelectedGroups(Index: Integer): TPhoaGroup;
-  begin
-    Result := TPhoaGroup(FSelectedGroups[Index]);
-  end;
-
   function TdFileOpsWizard.GetSelectedPics: IPhoaPicList;
   begin
     Result := FSelectedPics;
-  end;
-
-  function TdFileOpsWizard.IndexOfSelectedGroup(AGroup: TPhoaGroup): Integer;
-  begin
-    Result := FSelectedGroups.IndexOf(AGroup);
   end;
 
   procedure TdFileOpsWizard.InitializeWizard;
   var sOptPageTitle: String;
   begin
     inherited InitializeWizard;
-    FSelectedGroups := TList.Create;
+    FSelectedGroups := NewPhotoAlbumPicGroupList(nil);
      // Если во вьюере выбрана группа, заносим её в список
     if FViewerSelGroup<>nil then FSelectedGroups.Add(FViewerSelGroup);
      // Настраиваем режим выбора изображений по умолчанию
@@ -1041,7 +1006,7 @@ uses
         if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.FileSize;
         if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.FileName));
          // Проверяем доступность по "занятости" другим изображением
-        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.ItemsByFileName[PChar(sPath+SRec.Name)]=nil;
+        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.IndexOfFileName(sPath+SRec.Name)<0;
          // Если подходит
         if bMatches then begin
            // Создаём файл, если он ещё не создан

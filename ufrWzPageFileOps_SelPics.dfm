@@ -66,6 +66,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
     OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChecked = tvGroupsChecked
+    OnFreeNode = tvGroupsFreeNode
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText
     OnGetImageIndex = tvGroupsGetImageIndex

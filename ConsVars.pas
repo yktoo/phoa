@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.62 2004-10-08 12:13:45 dale Exp $
+//  $Id: ConsVars.pas,v 1.63 2004-10-10 18:53:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -728,6 +728,7 @@ const
     ISettingID_Gen_TreeSelBlended      = 0;    // Оттенённый прямоугольник
    //===================================================================================================================
   ISettingID_Browse                    = 1001; // Режим обзора
+  ISettingID_Browse_FlatMode           = 1005; // Рекурсивный просмотр
   ISettingID_Browse_GTree              = 1010; // Деревья групп
     ISettingID_Browse_GT_Hints         = 1011; // Деревья групп: Всплывающие подсказки
     ISettingID_Browse_GT_HintNone      = 1012; // Деревья групп: Всплывающие подсказки: не отображать
@@ -1234,6 +1235,7 @@ type
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Gen_TreeSelBlended,      '@ISettingID_Gen_TreeSelBlended');
      //== Режим обзора =================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiFolder, '@ISettingID_Browse', IDH_setup_browse_mode);
+      Lvl2 := TPhoaBoolSetting.Create        (Lvl1, ISettingID_Browse_FlatMode,         '@ISettingID_Browse_FlatMode',         False);
       Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Browse_GTree,            '@ISettingID_Browse_GTree');
         Lvl3 := TPhoaIntSetting.Create       (Lvl2, ISettingID_Browse_GT_Hints,         '@ISettingID_Browse_GT_Hints',         1 {gthmTips}, 0, 2);
           Lvl4 := TPhoaMutexSetting.Create   (Lvl3, ISettingID_Browse_GT_HintNone,      '@ISettingID_Browse_GT_HintNone');     

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.19 2004-10-08 12:13:46 dale Exp $
+//  $Id: phGUIObj.pas,v 1.20 2004-10-10 18:53:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -177,8 +177,8 @@ type
     function  AddToSelection(Index: Integer): Boolean;
     procedure RemoveFromSelection(Index: Integer);
      // Перемещает ItemIndex на новое место, не трогая выделения. При bUpdateStreamSelStart=True также обновляет
-     //   FStreamSelStart
-    procedure MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
+     //   FStreamSelStart. При bScrollIntoView=True также прокручивает эскиз в зону видимости
+    procedure MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart, bScrollIntoView: Boolean);
      // Вызывает OnStartViewMode
     procedure DoStartViewMode;
      // Настраивает ScrollBar
@@ -832,18 +832,14 @@ type
        // Стрелки - обрабатываем движения
       VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_HOME, VK_END, VK_PRIOR, VK_NEXT: begin
          // Без модификаторов или с Shift, но нет поточного выделения
-        if (Shift=[]) or ((Shift=[ssShift]) and (FStreamSelStart<0)) then begin
-          ItemIndex := GetItemIndexForKey(True);
-          ScrollIntoView;
+        if (Shift=[]) or ((Shift=[ssShift]) and (FStreamSelStart<0)) then 
+          ItemIndex := GetItemIndexForKey(True)
          // Нажат Shift - создаём поточное выделение, Shift+Alt - прямоугольное выделение
-        end else if (Shift=[ssShift]) or (Shift=[ssShift, ssAlt]) then begin
-          SelectRange(FStreamSelStart, GetItemIndexForKey(not (ssAlt in Shift)), ssAlt in Shift);
-          ScrollIntoView;
+        else if (Shift=[ssShift]) or (Shift=[ssShift, ssAlt]) then
+          SelectRange(FStreamSelStart, GetItemIndexForKey(not (ssAlt in Shift)), ssAlt in Shift)
          // Нажат Ctrl - двигаем только ItemIndex, не меняя выделения
-        end else if Shift=[ssCtrl] then begin
-          MoveItemIndex(GetItemIndexForKey(True), True);
-          ScrollIntoView;
-        end
+        else if Shift=[ssCtrl] then
+          MoveItemIndex(GetItemIndexForKey(True), True, True);
       end;
     end;
   end;
@@ -941,7 +937,7 @@ type
        // Если левая кнопка - переключаем выделение эскиза, на котором кликнули
       if Button=mbLeft then begin
         ToggleSelection(idx);
-        MoveItemIndex(idx, True);
+        MoveItemIndex(idx, True, True);
        // Если правая кнопка - готовим вызов Shell Context Menu
       end else if Button=mbRight then begin
         BeginUpdate;
@@ -1013,14 +1009,14 @@ type
     end else begin
       FDragPending := False;
       if FNoMoveItemIndex>=0 then begin
-        if not Dragging then SetItemIndex(FNoMoveItemIndex);
+        if not Dragging then ItemIndex := FNoMoveItemIndex;
         FNoMoveItemIndex := -1;
       end;
     end;
     inherited MouseUp(Button, Shift, x, y);
   end;
 
-  procedure TThumbnailViewer.MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart: Boolean);
+  procedure TThumbnailViewer.MoveItemIndex(iNewIndex: Integer; bUpdateStreamSelStart, bScrollIntoView: Boolean);
   begin
     if iNewIndex<>FItemIndex then begin
       InvalidateItem(FItemIndex);
@@ -1028,6 +1024,7 @@ type
       InvalidateItem(FItemIndex);
     end;
     if bUpdateStreamSelStart then FStreamSelStart := iNewIndex;
+    if bScrollIntoView then ScrollIntoView;
   end;
 
   procedure TThumbnailViewer.Paint;
@@ -1096,14 +1093,11 @@ type
 
      // Отрисовывает эскиз в заданном прямоугольнике
     procedure DrawThumbnail(const rThumb: TRect);
-    var
-      r: TRect;
-      sThData: String;
+    var r: TRect;
     begin
        // Рисуем эскиз
       r := rThumb;
-      SetString(sThData, PChar(Pic.ThumbnailData), Pic.ThumbnailDataSize);
-      PaintThumbnail(sThData, Pic.Rotation, Pic.Flips, Info.Bitmap, r);
+      PaintThumbnail(Pic, Info.Bitmap, r);
        // Рисуем тень
       if FThumbShadowVisible then
         DropShadow(Info.Bitmap, FThumbShadow, r, rThumb, FThumbShadowOffset.x, FThumbShadowOffset.y, FThumbShadowColor);
@@ -1259,7 +1253,7 @@ type
        // Выделяем первое изображение (если оно есть)
       AddToSelection(0);
       if FSelectedPics.Count>0 then iItemIdx := 0 else iItemIdx := -1;
-      MoveItemIndex(iItemIdx, True);
+      MoveItemIndex(iItemIdx, True, False);
     finally
        // Всё пересчитываем и уведомляем об изменениях
       EndUpdate;
@@ -1307,7 +1301,7 @@ type
          // Иначе пытаемся выделить самое первое изображение, если оно есть
         else if FItemCount>0 then iItemIdx := 0;
       TopOffset := Data.TopOffset;
-      MoveItemIndex(iItemIdx, True);
+      MoveItemIndex(iItemIdx, True, False);
     finally
       EndUpdate;
     end;
@@ -1372,7 +1366,7 @@ type
       if iMin>iMax then begin
         i    := iMax;
         iMax := iMin;
-        iMin := i;      
+        iMin := i;
       end;
     end;
 
@@ -1380,7 +1374,7 @@ type
     BeginUpdate;
     try
       ClearSelection;
-      MoveItemIndex(idxEnd, False);
+      MoveItemIndex(idxEnd, False, True);
        // Прямоугольное выделение
       if bRectangular then begin
         pStart := Point(idxStart mod FColCount, idxStart div FColCount);
@@ -1423,7 +1417,7 @@ type
       try
         ClearSelection;
         AddToSelection(Value);
-        MoveItemIndex(Value, True);
+        MoveItemIndex(Value, True, True);
       finally
         EndUpdate;
       end;
