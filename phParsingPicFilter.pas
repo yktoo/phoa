@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.8 2004-12-03 13:50:24 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.9 2004-12-06 20:20:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -1133,9 +1133,11 @@ type
     while (i<FParseErrorPos) and (i<=iLen) do begin
       c := FExpression[i];
        // ≈сли встретили перевод строки
-      if (c in [#10, #13]) and (not (cLast in [#10, #13]) or (c=cLast)) then begin
-        Result.x := 1;
-        Inc(Result.y);
+      if c in [#10, #13] then begin
+        if not (cLast in [#10, #13]) or (c=cLast) then begin
+          Result.x := 1;
+          Inc(Result.y);
+        end;
        // »наче приращиваем горизонтальную координату
       end else
         Inc(Result.x);
