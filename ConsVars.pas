@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.41 2004-06-11 14:19:41 dale Exp $
+//  $Id: ConsVars.pas,v 1.42 2004-06-14 06:18:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -511,7 +511,7 @@ const
   iiAbout                         = 10;
   iiHelp                          = 11;
   iiProps                         = 12;
-  iiSeleactAll                    = 13;
+  iiSelectAll                     = 13;
   iiSelectNone                    = 14;
   iiViewMode                      = 15;
   iiSort                          = 16;
@@ -1119,7 +1119,7 @@ type
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
         Lvl3 := TPhoaIntSetting.Create (Lvl2, ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US}, MinInt, MaxInt);
         Lvl3 := TPhoaFontSetting.Create(Lvl2, ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
-        Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_Theme,             '@ISettingID_Gen_Theme', 0 {Default?}, False);
+        Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_Theme,             '@ISettingID_Gen_Theme', 0 {Default?}, lsvtIndexString);
         AdjustThemeSetting(Lvl3 as TPhoaListSetting);
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_Gen_TooltipDisplTime,  '@ISettingID_Gen_TooltipDisplTime', 5000, 100, MaxInt);
         Lvl3 := TPhoaIntEntrySetting.Create (Lvl2, ISettingID_Gen_OpenMRUCount,      '@ISettingID_Gen_OpenMRUCount', 10, 0, 15);
@@ -1146,7 +1146,7 @@ type
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Gen_TreeButtonStyle,   '@ISettingID_Gen_TreeButtonStyle',   0, 0, 1);
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeBS_Rectangle,  '@ISettingID_Gen_TreeBS_Rectangle');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeBS_Triangle,   '@ISettingID_Gen_TreeBS_Triangle');
-        Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP}, False);
+        Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP}, lsvtIndex);
         AdjustTreeCheckStyleSetting(Lvl3 as TPhoaListSetting);
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1, 0, 1);
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
@@ -1169,13 +1169,13 @@ type
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Browse_ViewerTipProps, '@ISettingID_Browse_ViewerTipProps', PicPropsToInt([ppFileName, ppFileSize, ppPicDims, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppMedia]), MinInt, MaxInt);
         AddPicPropSettings(Lvl3 as TPhoaIntSetting);
         Lvl3 := TPhoaSetting.Create(Lvl2, ISettingID_Browse_ViewerThInfo,   '@ISettingID_Browse_ViewerThInfo');
-          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThLTProp, '@ISettingID_Browse_ViewerThLTProp', MaxInt, True);
+          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThLTProp, '@ISettingID_Browse_ViewerThLTProp', MaxInt, lsvtObject);
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
-          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThRTProp, '@ISettingID_Browse_ViewerThRTProp', MaxInt, True);
+          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThRTProp, '@ISettingID_Browse_ViewerThRTProp', MaxInt, lsvtObject);
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
-          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThLBProp, '@ISettingID_Browse_ViewerThLBProp', Byte(ppPlace), True);
+          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThLBProp, '@ISettingID_Browse_ViewerThLBProp', Byte(ppPlace), lsvtObject);
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
-          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThRBProp, '@ISettingID_Browse_ViewerThRBProp', Byte(ppDate), True);
+          Lvl4 := TPhoaListSetting.Create(Lvl3, ISettingID_Browse_ViewerThRBProp, '@ISettingID_Browse_ViewerThRBProp', Byte(ppDate), lsvtObject);
           AdjustPicPropListSettings(Lvl4 as TPhoaListSetting);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Browse_ViewerThBorder, '@ISettingID_Browse_ViewerThBorder', True);
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Browse_ViewerCacheThs, '@ISettingID_Browse_ViewerCacheThs', True);
@@ -1200,7 +1200,7 @@ type
         Lvl3 := TPhoaSetting.Create(Lvl2, ISettingID_View_Optimizing,       '@ISettingID_View_Optimizing');
           Lvl4 := TPhoaBoolSetting.Create(Lvl3, ISettingID_View_Predecode,        '@ISettingID_View_Predecode', True);
           Lvl4 := TPhoaBoolSetting.Create(Lvl3, ISettingID_View_CacheBehind,      '@ISettingID_View_CacheBehind', True);
-      Lvl2 := TPhoaListSetting.Create(Lvl1, ISettingID_View_ZoomFactor,       '@ISettingID_View_ZoomFactor', 3 {=50%}, False);
+      Lvl2 := TPhoaListSetting.Create(Lvl1, ISettingID_View_ZoomFactor,       '@ISettingID_View_ZoomFactor', 3 {=50%}, lsvtIndex);
       AdjustMagnificationSetting(Lvl2 as TPhoaListSetting);
       Lvl2 := TPhoaIntSetting.Create(Lvl1, ISettingID_View_CaptionProps,     '@ISettingID_View_CaptionProps', PicPropsToInt([ppFileName]), MinInt, MaxInt);
       AddPicPropSettings(Lvl2 as TPhoaIntSetting);

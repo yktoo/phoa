@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.10 2004-05-23 13:23:09 dale Exp $
+//  $Id: phValSetting.pas,v 1.11 2004-06-14 06:18:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -121,13 +121,17 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaListSetting - настройка, имеюща€ значение типа Integer и список допустимых значений-вариантов
+   // TPhoaListSetting - настройка, имеюща€ значение типа Integer (но которое может хранитьс€ в виде строки, при
+   //   ValueType=lsvtIndexString) и список допустимых значений-вариантов
    //===================================================================================================================
+
+   // “ип значени€ настройки класса TPhoaListSetting
+  TListSettingValueType = (lsvtIndex, lsvtObject, lsvtIndexString);
 
   TPhoaListSetting = class(TPhoaIntSetting)
   private
      // Prop storage
-    FRefObject: Boolean;
+    FValueType: TListSettingValueType;
     FVariants: TStrings;
      // Prop handlers
     function  GetVariantIndex: Integer;
@@ -135,14 +139,16 @@ type
     procedure SetVariantIndex(iValue: Integer);
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
+    function  GetAsString: String; override;
+    procedure SetAsString(const sValue: String); override;
     function  GetDisplayString: String; override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; bRefObject: Boolean);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; AValueType: TListSettingValueType);
     destructor Destroy; override;
     procedure Assign(Source: TPhoaSetting); override;
      // Props
-     // -- ≈сли False, значение представл€ет собой индекс из списка; если True, то значение - это Variants.Objects[VariantIndex]
-    property RefObject: Boolean read FRefObject;
+     // -- “ип значени€
+    property ValueType: TListSettingValueType read FValueType;
      // -- »ндекс в Variants, соответствующий текущему Value; -1, если нет такого соответстви€
     property VariantIndex: Integer read GetVariantIndex write SetVariantIndex;
      // -- ƒочерние пункты (варианты) пункта. “екст закодирован по правилам ConstValEx()
@@ -513,14 +519,14 @@ type
     inherited Assign(Source);
     if Source is TPhoaListSetting then begin
       FVariants.Assign(TPhoaListSetting(Source).FVariants);
-      FRefObject := TPhoaListSetting(Source).FRefObject;
+      FValueType := TPhoaListSetting(Source).FValueType;
     end;
   end;
 
-  constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; bRefObject: Boolean);
+  constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; AValueType: TListSettingValueType);
   begin
     inherited Create(AOwner, iID, sName, iValue, -1, MaxInt);
-    FRefObject := bRefObject;
+    FValueType := AValueType;
   end;
 
   constructor TPhoaListSetting.CreateNew(AOwner: TPhoaSetting);
@@ -536,6 +542,14 @@ type
     inherited Destroy;
   end;
 
+  function TPhoaListSetting.GetAsString: String;
+  begin
+    case FValueType of
+      lsvtIndexString: Result := GetVariantText;
+      else Result := inherited GetAsString;
+    end;
+  end;
+
   function TPhoaListSetting.GetDisplayString: String;
   begin
     Result := GetVariantText;
@@ -543,7 +557,10 @@ type
 
   function TPhoaListSetting.GetVariantIndex: Integer;
   begin
-    if FRefObject then Result := FVariants.IndexOfObject(Pointer(FData)) else Result := FData;
+    case FValueType of
+      lsvtObject: Result := FVariants.IndexOfObject(Pointer(FData));
+      else Result := FData;
+    end;
   end;
 
   function TPhoaListSetting.GetVariantText: String;
@@ -553,12 +570,20 @@ type
     if idx<0 then Result := '' else Result := FVariants[idx];
   end;
 
+  procedure TPhoaListSetting.SetAsString(const sValue: String);
+  begin
+    case FValueType of
+      lsvtIndexString: SetVariantIndex(FVariants.IndexOf(sValue));
+      else inherited SetAsString(sValue);
+    end;
+  end;
+
   procedure TPhoaListSetting.SetVariantIndex(iValue: Integer);
   begin
-    if FRefObject then
-      if iValue<0 then Value := -1 else Value := Integer(FVariants.Objects[iValue])
-    else
-      Value := iValue;
+    case FValueType of
+      lsvtObject: if iValue<0 then Value := -1 else Value := Integer(FVariants.Objects[iValue]);
+      else Value := iValue;
+    end;
   end;
 
    //===================================================================================================================
