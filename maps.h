@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: maps.h,v 1.11 2004-11-10 10:35:24 dale Exp $
+//  $Id: maps.h,v 1.12 2004-11-25 20:42:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -71,6 +71,9 @@
 #define IDH_intf_pic_props_metadata     03450
 #define IDH_intf_pic_props_view         03460
 #define IDH_intf_search                 03470
+#define IDH_intf_search_datatypes       03472
+#define IDH_intf_search_expr            03474
+#define IDH_intf_search_simple          03475
 #define IDH_intf_select_keywords        03480
 #define IDH_intf_sel_phoa_group         03490
 #define IDH_intf_sort_pics              03500

@@ -220,6 +220,20 @@
 				<param name="Name" value="Find pictures dialog">
 				<param name="Local" value="intf-search.html">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Simple search">
+					<param name="Local" value="intf-search-simple.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Expression search">
+					<param name="Local" value="intf-search-expr.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Data types">
+					<param name="Local" value="intf-search-datatypes.html">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Select keywords dialog">
 				<param name="Local" value="intf-select-keywords.html">

@@ -220,6 +220,20 @@
 				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &iuml;&icirc;&egrave;&ntilde;&ecirc;&agrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 				<param name="Local" value="intf-search.html">
 				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Iuml;&eth;&icirc;&ntilde;&ograve;&icirc;&eacute; &iuml;&icirc;&egrave;&ntilde;&ecirc;">
+					<param name="Local" value="intf-search-simple.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Iuml;&icirc;&egrave;&ntilde;&ecirc; &iuml;&icirc; &acirc;&ucirc;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&thorn;">
+					<param name="Local" value="intf-search-expr.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="&Ograve;&egrave;&iuml;&ucirc; &auml;&agrave;&iacute;&iacute;&ucirc;&otilde;">
+					<param name="Local" value="intf-search-datatypes.html">
+					</OBJECT>
+			</UL>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &acirc;&ucirc;&aacute;&icirc;&eth;&agrave; &ecirc;&euml;&thorn;&divide;&aring;&acirc;&ucirc;&otilde; &ntilde;&euml;&icirc;&acirc;">
 				<param name="Local" value="intf-select-keywords.html">
