@@ -1,87 +1,84 @@
-<!-- $Id: tasks-media-preparing.html,v 1.1 2005-03-08 09:49:04 dale Exp $ -->
+<!-- $Id: tasks-media-preparing.html,v 1.2 2005-03-13 19:21:06 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Preparing for CD or DVD burning]}
 
 {[%hh_h2:Why burn?]}
 
-<p align=justify><b>PhoA</b> позволяет достаточно просто подготовить набор файлов для записи на сменный носитель: CD,
-  DVD, Flash Disk или любой другой.
+<p align=justify><b>PhoA</b> simplifies preparing files to have them burned on a removable media, like CD, DVD, Flash
+  Disk or whatever else.
 
-<div class=nb><b>NB:</b> Программа не содержит <i>средств записи</i> на CD или DVD. Она позволяет лишь подготовить
-  структуру файлов и папок, которую будет удобно записать на сменный носитель. Для последней операции вам придётся
-  воспользоваться специальным программным обеспечением.
+<div class=nb><b>NB:</b> The program has no CD or DVD <i>writing facility</i>. It only allows to make a file and folder
+  layout which will be handy to write onto a removable media. To make the latter you will need an appropriate software.
 </div>
 
-<p align=justify>Можно выделить два основных предназначения для копирования файлов на сменный носитель: (<b>1</b>)
-  создание резервной копии архива изображений или просто диска с набором изображений и (<b>2</b>) создание полноценного
-  диска-фотоальбома.
+<p align=justify>One can distinguish the two major file copying goals: (<b>1</b>) creating a backup copy of the image
+  archive or simply an image disk and (<b>2</b>) creating a full-fledged photo album disk.
 
-<p align=justify>В первом случае диск будет содержать только папки и файлы изображений, организованные выбранным вами
-  способом.
+<p align=justify>The former case assumes the disk contains only folders and image files organized in a desired way.
 
-<p align=justify>Во втором случае на диск также помещаются некоторые дополнительные файлы: специально составленный из
-  скопированных файлов изображений фотоальбом, исполняемый файл самой программы <b>PhoA</b>, файл текущих настроек
-  программы и др.
+<p align=justify>The latter case means the disk also contains a number of additional files: a photo album containing
+  the copied image files, the main <b>PhoA</b> executable, a file with current program settings and so forth.
 
-<p align=justify>Поскольку первый вариант является частью второго, с него и начнём.
+<p align=justify>Let's start with the former case as it's a part of the latter one.
 
 {[%hh_h2:Preparing image files to recording on a removable media]}
 
 <ol>
-  <li>Для начала вам необходимо определиться, какие изображения будут помещены на носитель:
+  <li>For a start you should decide which pictures will be placed to the media:
       <ul>
-        <li>Если вы хотите записать только выбранные изображения, отметьте их в окне просмотра эскизов.
-        <li>Если требуется записать все изображения какой-либо группы, отметьте эту группу в дереве.
-        <li>Если нужно записать несколько групп, то ничего особенного делать не надо, вы выберете их позднее.
+        <li>If you wish to write only selected pictures, then select them in the thumbnail window.
+        <li>If you wish to write all of the pictures belonging to a group, then select that group in the tree.
+        <li>If you wish to write a number of groups, you don't need to do something special as you will select them
+            later.
       </ul>
 
-  <li>Запустите <b>Мастер операций с файлами изображений</b>. Делается это выбором пункта меню <b>Сервис | Операции с
-      файлами изображений</b>.
+  <li>Start the <b>File operations wizard</b>. You do it by selecting the <b>Tools | File operations...</b> menu item.
 
-  <li>На первой странице Мастера выберите <b>Копировать файлы изображений в папку</b> и нажмите <b>Далее</b>.
+  <li>On the first page of the wizard check <b>Copy picture files to a folder</b> and click <b>Next</b>.
 
-  <li>Вот теперь вам и предстоит указать, файлы каких именно изображений должны быть скопированы. Для первых двух
-      вариантов, перечисленных в <b>п.&nbsp;1</b>, всё должно уже быть выбрано подходящим образом. Для третьего
-      варианта, т.&nbsp;е.&nbsp; выбора нескольких групп одновременно, поставьте отметки у требуемых групп.
-      <p align=justify><b>Обратите внимание</b> на указанный в нижней части страницы <i>суммарный размер файлов
-      изображений</i>: он не должен превышать размер используемого носителя. Кроме того, если вы хотите также поместить
-      на него программу, оставьте около 10 Мбайт запаса + примерный размер файла фотоальбома.
+  <li>It's just the time now to specify which picture files are to be copied. For first and second choices of
+      <b>item&nbsp;1</b> an appropriate selection should already be made. For the third choice, i.&nbsp;e. selecting a
+      number of groups at once, check the required groups.
+      <p align=justify><b>Please note</b> the <i>total picture file size</i> denoted at the bottom of the page: it
+      shouldn't be greater than available media size. Moreover, if you plan to have the program file also be included,
+      leave about 10 MByte + estimated photo album file size of free space.
 
-  <li>На следующей странице вам предлагается указать <b>папку назначения</b>, куда будут скопированы файлы. Укажите
-      имя пустой папки (можно указать также имя несуществующей папки, в таком случае она будет создана автоматически).
+  <li>On the next page you will have to specify the <b>destination folder</b> for copied files. Select an empty folder
+      (you can type in a nonexistent folder name, in that case it will be created automatically).
 
-  <li>Дальше начинается самое ответственное ;)
-      <p align=justify>Требуется указать режим размещения файлов. Подробное описание каждого режима приведено в
-      <a href="intf-file-ops-moveopts.html">руководстве</a>. Можно добавить лишь, что, во-первых, физическое
-      расположение файлов не имеет большого значения для программы, а во-вторых, самым простым вариантом будет режим с
-      размещением всех файлов в единственной папке. В последнем случае вам, однако, необходимо обеспечить уникальность
-      имён файлов. Проще всего это сделать с помощью переименования файлов, включив в формат имени файла свойство ID.
-      Любой формат имени файла, в который входит {ID} (например, <b>Image_{ID}</b> ), обеспечит уникальное имя для всех
-      изображений.
+  <li>Configure the file arranging mode. Refer to the <a href="intf-file-ops-moveopts.html">manual</a> for a detailed
+      explanation of each of the choices. Have in mind though that, firstly, physical file layout does not mean much to
+      the program, and, secondly, the most simple option will be putting all of the files into a single folder. In the
+      latter case you will have to ensure that file names are unique, and the simplest way to achieve this is enabling 
+      file renaming provided picture ID included in the file name format. By the way, any format containing {ID} (for
+      instance, <b>Image_{ID}</b> ), provides uniqueness across all of the images.
    
-   <li>На последней странице опций вам нужно задать, как вести себя программе в случае возникновения &laquo;нештатных
-       ситуаций&raquo;. Если вам не требуется создания дополнительных файлов на диске, отключите переключатель
-       <b>Настроить также опции записи на CD/DVD</b>. После нажатия <b>Далее</b> программа начнёт копирование файлов.
+  <li>On the last page you should denote which behavior the program will use when a problem occurs. If you don't need
+      creating additional files, uncheck the <b>Set up CD/DVD creation options as well</b> check box. After you click
+      <b>Next</b> the program will start copying of the files.
 </ol>
 
 
 {[%hh_h2:Preparing additional files to recording on a removable media]}
 
-<p align=justify>Теперь о втором варианте: о полноценном фотоальбоме на диске. В этом случае вам как раз <i>не надо</i>
-  отключать <b>Настроить также опции записи на CD/DVD</b>. Тогда после нажатия <b>Далее</b> вам будет предложено
-  выбрать, какие специальные файлы вы хотите поместить на сменный носитель. Подробное описание опций приведено в
-  <a href="intf-file-ops-cdopts.html">руководстве</a>.
+<p align=justify>Now the second case: a full-fledged photo album disk. This time you <i>don't need</i> to uncheck the
+  <b>Set up CD/DVD creation options as well</b> check box. Then after clicking <b>Next</b> you will be offered a number
+  of options to configure which special files are to be included in the removable media. Detailed description of each
+  option is in the <a href="intf-file-ops-cdopts.html">manual</a>.
 
 {[%hh_h2:Done?]}
 
-<p align=justify>Чтобы правильно записать файлы на сменный носитель (особенно это касается второго варианта), вам
-  необходимо сделать следующее:
+<p align=justify>To place files to a removable media correctly (it is especially important for the second case), you
+  should do the following:
 
 <ol>
-  <li>Запустить вашу программу записи на CD/DVD.
-  <li>Выбрать режим записи <b>Диск с данными</b> (или как он у вас называется).
-  <li>Поместить всё <i>содержимое</i> папки назначения, выбранной вами ранее (но не саму папку!) в корневой каталог
-      будущего диска.
-  <li>Произвести запись. Пожалуй, всё.
+  <li>Launch your CD/DVD burning software.
+  <li>Select a <b>Data CD/DVD</b> mode (or similar, consult your burning software manual for details).
+  <li>Place the whole <i>content</i> of the destionation folder selected before (but not the folder itself!) to the root
+      directory of the disk.
+  <li>Burn the media. That's all.
 </ol>
+
+{[%hh_seealso_en]}
+  <a href="intf-file-ops-task-copy.html">Copy picture files operation</a><br>
 
 {[%hh_ftr_en]}
