@@ -291,11 +291,11 @@
           </propEntry>
           <propEntry name="Category">
             <tranEntries>
-              <tranEntry langID="1049" value=""/>
+              <tranEntry langID="1049" value="View"/>
               <tranEntry langID="1033" value="View"/>
-              <tranEntry langID="1031" value=""/>
-              <tranEntry langID="1046" value=""/>
-              <tranEntry langID="1058" value=""/>
+              <tranEntry langID="1031" value="View"/>
+              <tranEntry langID="1046" value="View"/>
+              <tranEntry langID="1058" value="View"/>
             </tranEntries>
           </propEntry>
           <propEntry name="HelpKeyword">
@@ -632,6 +632,40 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="aRotate0">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="&amp;No rotation"/>
+              <tranEntry langID="1049" value="&amp;Без поворота"/>
+              <tranEntry langID="1058" value="&amp;Без поворота"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="No rotation|Don't apply rotation to the image"/>
+              <tranEntry langID="1049" value="Без поворота|Не применять поворот к изображению"/>
+              <tranEntry langID="1058" value="Без поворота|Не применять поворот к изображению"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="aRotate180">
         <propEntries>
           <propEntry name="Caption">
@@ -863,6 +897,40 @@
               <tranEntry langID="1031" value=""/>
               <tranEntry langID="1046" value=""/>
               <tranEntry langID="1058" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="aStoreTransform">
+        <propEntries>
+          <propEntry name="Caption">
+            <tranEntries>
+              <tranEntry langID="1033" value="Store &amp;transformations"/>
+              <tranEntry langID="1049" value="&amp;Записать преобразования"/>
+              <tranEntry langID="1058" value="&amp;Записать преобразования"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Category">
+            <tranEntries>
+              <tranEntry langID="1033" value="Tools"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="HelpKeyword">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value="Store transformations|Store current transformations applied, to the picture"/>
+              <tranEntry langID="1049" value="Записать преобразования|Записать текущие применённые преобразования в свойства изображения"/>
+              <tranEntry langID="1058" value="Записать преобразования|Записать текущие применённые преобразования в свойства изображения"/>
+            </tranEntries>
+          </propEntry>
+          <propEntry name="SecondaryShortCuts">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
             </tranEntries>
           </propEntry>
         </propEntries>
@@ -1116,6 +1184,10 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="bRotate0">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="bRotate180">
         <propEntries/>
         <compEntries/>
@@ -1137,6 +1209,10 @@
         <compEntries/>
       </compEntry>
       <compEntry name="bSlideShow">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="bStoreTransform">
         <propEntries/>
         <compEntries/>
       </compEntry>
@@ -1368,6 +1444,10 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmRotate0">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmRotate180">
         <propEntries/>
         <compEntries/>
@@ -1438,6 +1518,10 @@
         <propEntries/>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmStoreTransform">
+        <propEntries/>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmToggleMainToolbar">
         <propEntries>
           <propEntry name="Caption">
@@ -1496,6 +1580,16 @@
         </propEntries>
         <compEntries/>
       </compEntry>
+      <compEntry name="ipmToolsSep3">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
       <compEntry name="ipmViewSep1">
         <propEntries>
           <propEntry name="Hint">
@@ -1527,6 +1621,16 @@
         <compEntries/>
       </compEntry>
       <compEntry name="itbToolsSep1">
+        <propEntries>
+          <propEntry name="Hint">
+            <tranEntries>
+              <tranEntry langID="1033" value=""/>
+            </tranEntries>
+          </propEntry>
+        </propEntries>
+        <compEntries/>
+      </compEntry>
+      <compEntry name="itbToolsSep2">
         <propEntries>
           <propEntry name="Hint">
             <tranEntries>
