@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.15 2004-05-30 18:41:18 dale Exp $
+//  $Id: ufImgView.pas,v 1.16 2004-06-03 04:37:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -118,11 +118,6 @@ type
     bShowInfo: TTBXItem;
     ipmSepGIPMTools: TTBXSeparatorItem;
     gipmTools: TTBGroupItem;
-    aRotate90: TAction;
-    aRotate180: TAction;
-    aRotate270: TAction;
-    aFlipHorz: TAction;
-    aFlipVert: TAction;
     pmsmView: TTBXSubmenuItem;
     pmsmTools: TTBXSubmenuItem;
     ipmViewSep1: TTBXSeparatorItem;
@@ -147,6 +142,14 @@ type
     ipmStoreTransform: TTBXItem;
     itbToolsSep2: TTBXSeparatorItem;
     bStoreTransform: TTBXItem;
+    aRotate0: TAction;
+    aRotate90: TAction;
+    aRotate180: TAction;
+    aRotate270: TAction;
+    aFlipHorz: TAction;
+    aFlipVert: TAction;
+    bRotate0: TTBXItem;
+    ipmRotate0: TTBXItem;
     procedure aaNextPic(Sender: TObject);
     procedure aaPrevPic(Sender: TObject);
     procedure aaRefresh(Sender: TObject);
@@ -178,6 +181,7 @@ type
     procedure tbMainVisibleChanged(Sender: TObject);
     procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
+    procedure aaRotate0(Sender: TObject);
     procedure aaRotate90(Sender: TObject);
     procedure aaRotate180(Sender: TObject);
     procedure aaRotate270(Sender: TObject);
@@ -305,6 +309,8 @@ type
     procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
      // Применяет заданные преобразования к отображаемому битмэпу, обновляя переменные текущих преобразований
     procedure ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
+     // Настраивает свойство Checked для Actions преобразований
+    procedure UpdateTransformActions;
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
@@ -491,13 +497,19 @@ uses
   end;
 
   procedure TfImgView.aaFlipHorz(Sender: TObject);
+  var fl: TPicFlips;
   begin
-    ApplyTransform(pr0, [pflHorz]);
+    fl := FCurFlips;
+    if pflHorz in fl then Exclude(fl, pflHorz) else Include(fl, pflHorz);
+    ApplyTransform(FCurRotation, fl);
   end;
 
   procedure TfImgView.aaFlipVert(Sender: TObject);
+  var fl: TPicFlips;
   begin
-    ApplyTransform(pr0, [pflVert]);
+    fl := FCurFlips;
+    if pflVert in fl then Exclude(fl, pflVert) else Include(fl, pflVert);
+    ApplyTransform(FCurRotation, fl);
   end;
 
   procedure TfImgView.aaFullScreen(Sender: TObject);
@@ -559,19 +571,24 @@ uses
     aRelocateInfo.Checked := Assigned(FRBLayer);
   end;
 
+  procedure TfImgView.aaRotate0(Sender: TObject);
+  begin
+    ApplyTransform(pr0, FCurFlips);
+  end;
+
   procedure TfImgView.aaRotate180(Sender: TObject);
   begin
-    ApplyTransform(pr180, []);
+    ApplyTransform(pr180, FCurFlips);
   end;
 
   procedure TfImgView.aaRotate270(Sender: TObject);
   begin
-    ApplyTransform(pr270, []);
+    ApplyTransform(pr270, FCurFlips);
   end;
 
   procedure TfImgView.aaRotate90(Sender: TObject);
   begin
-    ApplyTransform(pr90, []);
+    ApplyTransform(pr90, FCurFlips);
   end;
 
   procedure TfImgView.aaSettings(Sender: TObject);
@@ -711,9 +728,11 @@ uses
 
   procedure TfImgView.ApplyTransform(Rotation: TPicRotation; Flips: TPicFlips);
   begin
-    ApplyBitmapTransform(iMain.Bitmap, Rotation, Flips);
-    IncTransformValues(FCurRotation, Rotation, FCurFlips, Flips);
+    ApplyBitmapTransform(iMain.Bitmap, FCurRotation, Rotation, FCurFlips, Flips);
+    FCurRotation := Rotation;
+    FCurFlips    := Flips;
     DisplayPic(False, False);
+    UpdateTransformActions;
   end;
 
   procedure TfImgView.ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
@@ -824,6 +843,7 @@ uses
       ApplyBitmapTransform(iMain.Bitmap, FCurRotation, FPic.PicRotation, FCurFlips, FPic.PicFlips);
       FCurRotation := FPic.PicRotation;
       FCurFlips    := FPic.PicFlips;
+      UpdateTransformActions;
     end;
   end;
 
@@ -1303,6 +1323,16 @@ uses
   procedure TfImgView.TopmostRestore;
   begin
     if FAlwaysOnTop then SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+  end;
+
+  procedure TfImgView.UpdateTransformActions;
+  begin
+    aRotate0.Checked   := FCurRotation=pr0;
+    aRotate90.Checked  := FCurRotation=pr90;
+    aRotate180.Checked := FCurRotation=pr180;
+    aRotate270.Checked := FCurRotation=pr270;
+    aFlipHorz.Checked  := pflHorz in FCurFlips;
+    aFlipVert.Checked  := pflVert in FCurFlips;
   end;
 
   procedure TfImgView.WMHelp(var Msg: TWMHelp);

@@ -388,6 +388,9 @@ object fImgView: TfImgView
       Images = fMain.ilActionsSmall
       TabOrder = 1
       Visible = False
+      object bRotate0: TTBXItem
+        Action = aRotate0
+      end
       object bRotate90: TTBXItem
         Action = aRotate90
       end
@@ -416,43 +419,6 @@ object fImgView: TfImgView
     Images = fMain.ilActionsSmall
     Left = 8
     Top = 48
-    object aRotate90: TAction
-      Category = 'Tools'
-      Caption = 'Rotate CW by &90'#176
-      Hint = 'Rotate CW by 90'#176'|Rotate the image clockwise by 90'#176
-      ImageIndex = 67
-      OnExecute = aaRotate90
-    end
-    object aRotate180: TAction
-      Category = 'Tools'
-      Caption = 'Rotate by &180'#176
-      Hint = 'Rotate by 180'#176'|Rotate the image by 180'#176
-      ImageIndex = 68
-      OnExecute = aaRotate180
-    end
-    object aRotate270: TAction
-      Category = 'Tools'
-      Caption = 'Rotate CCW by 9&0'#176
-      Hint = 
-        'Rotate CCW by 90'#176'|Rotate the image counter-clockwise by 90'#176' (or ' +
-        'clockwise by 270'#176')'
-      ImageIndex = 69
-      OnExecute = aaRotate270
-    end
-    object aFlipHorz: TAction
-      Category = 'Tools'
-      Caption = 'Flip &horizontally'
-      Hint = 'Flip horizontally|Flip the image horizontally'
-      ImageIndex = 70
-      OnExecute = aaFlipHorz
-    end
-    object aFlipVert: TAction
-      Category = 'Tools'
-      Caption = 'Flip &vertically'
-      Hint = 'Flip vertically|Flip the image vertically'
-      ImageIndex = 71
-      OnExecute = aaFlipVert
-    end
     object aNextPic: TAction
       Category = 'Advance'
       Caption = '&Next picture'
@@ -584,6 +550,54 @@ object fImgView: TfImgView
       ShortCut = 27
       OnExecute = aaClose
     end
+    object aRotate0: TAction
+      Category = 'Tools'
+      Caption = '&No rotation'
+      GroupIndex = 1
+      Hint = 'No rotation|Don'#39't apply rotation to the image'
+      ImageIndex = 66
+      OnExecute = aaRotate0
+    end
+    object aRotate90: TAction
+      Category = 'Tools'
+      Caption = 'Rotate CW by &90'#176
+      GroupIndex = 1
+      Hint = 'Rotate CW by 90'#176'|Rotate the image clockwise by 90'#176
+      ImageIndex = 67
+      OnExecute = aaRotate90
+    end
+    object aRotate180: TAction
+      Category = 'Tools'
+      Caption = 'Rotate by &180'#176
+      GroupIndex = 1
+      Hint = 'Rotate by 180'#176'|Rotate the image by 180'#176
+      ImageIndex = 68
+      OnExecute = aaRotate180
+    end
+    object aRotate270: TAction
+      Category = 'Tools'
+      Caption = 'Rotate CCW by 9&0'#176
+      GroupIndex = 1
+      Hint = 
+        'Rotate CCW by 90'#176'|Rotate the image counter-clockwise by 90'#176' (or ' +
+        'clockwise by 270'#176')'
+      ImageIndex = 69
+      OnExecute = aaRotate270
+    end
+    object aFlipHorz: TAction
+      Category = 'Tools'
+      Caption = 'Flip &horizontally'
+      Hint = 'Flip horizontally|Flip the image horizontally'
+      ImageIndex = 70
+      OnExecute = aaFlipHorz
+    end
+    object aFlipVert: TAction
+      Category = 'Tools'
+      Caption = 'Flip &vertically'
+      Hint = 'Flip vertically|Flip the image vertically'
+      ImageIndex = 71
+      OnExecute = aaFlipVert
+    end
     object aStoreTransform: TAction
       Category = 'Tools'
       Caption = 'Store &transformations'
@@ -669,6 +683,9 @@ object fImgView: TfImgView
         Action = aEdit
       end
       object ipmToolsSep1: TTBXSeparatorItem
+      end
+      object ipmRotate0: TTBXItem
+        Action = aRotate0
       end
       object ipmRotate90: TTBXItem
         Action = aRotate90
