@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.21 2004-06-09 13:55:25 dale Exp $
+//  $Id: phObj.pas,v 1.22 2004-06-09 14:50:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1198,6 +1198,7 @@ type
     FPhoA: TPhotoAlbum;
     FGroupID: Integer;
     FCacheThumbnails: Boolean;
+    FDragInsideEnabled: Boolean;
     FThickThumbBorder: Boolean;
     FOnSelectionChange: TNotifyEvent;
     FBorderStyle: TBorderStyle;
@@ -1307,6 +1308,9 @@ type
      // Props
      // -- Флаг, разрешающий перетаскивание эскизов
     property DragEnabled: Boolean read FDragEnabled write FDragEnabled;
+     // -- Флаг, разрешающий перестановку эскизов внутри окна с помощью Drag'n'Drop. Если перестановка запрещена, а
+     //    DragEnabled=True, то можно только "вытаскивать" эскизы наружу
+    property DragInsideEnabled: Boolean read FDragInsideEnabled write FDragInsideEnabled; 
      // -- Индекс последнего места вставки при Drag'n'Drop. -1, если не было подходящего
     property DropTargetIndex: Integer read GetDropTargetIndex;
      // -- ID группы, отображаемой в данный момент (0, если нет)
@@ -2264,12 +2268,20 @@ type
   end;
 
   function TPhoaGroup.GetProps(GroupProp: TGroupProperty): String;
+
+    function IntToStrPositive(i: Integer): String;
+    begin
+      if i>0 then Result := IntToStr(i) else Result := '';
+    end;
+
   begin
     Result := '';
     case GroupProp of
       gpID:          Result := IntToStr(FID);
       gpText:        Result := FText;
       gpDescription: Result := FDescription;
+      gpPicCount:    Result := IntToStrPositive(FPicIDs.Count);
+      gpGroupCount:  Result := IntToStrPositive(NestedGroupCount);
     end;
   end;
 
@@ -5435,7 +5447,7 @@ var
     end;
 
   begin
-    if Source=Self then begin
+    if (Source=Self) and FDragInsideEnabled then begin
       FDragTargetCoord.iIndex := -1;
       FDragTargetCoord.bLower := False;
        // Если входим/находимся в контроле

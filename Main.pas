@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.24 2004-06-09 12:18:15 dale Exp $
+//  $Id: Main.pas,v 1.25 2004-06-09 14:50:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -973,7 +973,8 @@ uses
     aPhoaView_Edit.Enabled      := bView;
     aPhoaView_MakeGroup.Enabled := bView;
      // Drag-and-drop
-    Viewer.DragEnabled := (gnk in [gnkPhoA, gnkPhoaGroup]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+    Viewer.DragEnabled       := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+    Viewer.DragInsideEnabled := gnk in [gnkPhoA, gnkPhoaGroup];
      // Инструменты
     EnableTools;
      // Настраиваем Captions
