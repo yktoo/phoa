@@ -373,6 +373,16 @@
 			<param name="Name" value="Tools">
 			<param name="Local" value="info-tools.html">
 			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Common tasks">
+		<param name="Local" value="tasks.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Getting started">
+			<param name="Local" value="tasks-getting-started.html">
+			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="FAQ (Frequently Asked Questions)">
 			<param name="Local" value="info-faq.html">

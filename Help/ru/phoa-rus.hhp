@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-rus.hhp,v 1.16 2004-12-31 13:38:58 dale Exp $
+;   $Id: phoa-rus.hhp,v 1.17 2005-03-07 19:04:33 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright DK Software, http://www.dk-soft.org/
@@ -110,6 +110,8 @@ setup-storing.html
 setup-tools.html
 setup-view-mode.html
 start.html
+tasks.html
+tasks-getting-started.html
 
 [ALIAS]
 #include ..\..\aliases.h

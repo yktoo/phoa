@@ -90,4 +90,5 @@ IDH_setup_general               = setup-general.html
 IDH_setup_storing               = setup-storing.html
 IDH_setup_tools                 = setup-tools.html
 IDH_setup_view_mode             = setup-view-mode.html
-
+IDH_tasks                       = tasks.html
+IDH_tasks_getting_started       = tasks-getting-started.html
