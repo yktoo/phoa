@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.5 2004-04-18 16:13:35 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.6 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -793,7 +793,7 @@ uses
         end;
     end;
      // Закрываем форму Мастера/показываем протокол
-    if (FCountErrors=0) and RootSetting.ValueBoolByID[ISettingID_Dlgs_FOW_LogOnErrOnly] then
+    if (FCountErrors=0) and SettingValueBool(ISettingID_Dlgs_FOW_LogOnErrOnly) then
       ModalResult := mrOK
     else
       Controller.SetVisiblePageID(IWzFileOpsPageID_Log, pcmNextBtn);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.2 2004-04-23 03:57:01 dale Exp $
+//  $Id: phValSetting.pas,v 1.3 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -8,7 +8,8 @@ unit phValSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, StdCtrls, ExtCtrls, VirtualTrees, ConsVars, phSettings;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, StdCtrls, ExtCtrls, VirtualTrees,
+  ConsVars, phSettings;
 
 type
    //===================================================================================================================
@@ -21,17 +22,16 @@ type
     FData: Integer;
      // Prop handlers
     function  GetAsString: String; virtual; abstract;
+    procedure SetAsString(const sValue: String); virtual; abstract;
     function  GetDisplayString: String; virtual;
   public
-     // Загрузка/сохранение в реестре значений с ID<>0
-{!!!    procedure RegLoad(RegIniFile: TRegIniFile);
-    procedure RegSave(RegIniFile: TRegIniFile);
-     // Загрузка/сохранение в Ini-файле значений с ID<>0
-    procedure IniLoad(IniFile: TIniFile);
-    procedure IniSave(IniFile: TIniFile);}
+    procedure RegLoad(RegIniFile: TRegIniFile); override;
+    procedure RegSave(RegIniFile: TRegIniFile); override;
+    procedure IniLoad(IniFile: TIniFile); override;
+    procedure IniSave(IniFile: TIniFile); override;
      // Props
      // -- Значение (данные) в виде строки
-    property AsString: String read GetAsString;
+    property AsString: String read GetAsString write SetAsString;
      // -- Отображаемое значение в виде строки. В базовом классе совпадает с AsString
     property DisplayString: String read GetDisplayString;
   end;
@@ -50,6 +50,8 @@ type
     procedure SetValue(Value: Integer);
   protected
     function  GetAsString: String; override;
+    procedure SetAsString(const sValue: String); override;
+    function  GetDisplayString: String; override;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue, iMinValue, iMaxValue: Integer);
     procedure Assign(Source: TPhoaSetting); override;
@@ -59,6 +61,15 @@ type
     property MinValue: Integer read FMinValue;
      // -- Значение пункта
     property Value: Integer read GetValue write SetValue;
+  end;
+
+   //===================================================================================================================
+   // TPhoaIntEntrySetting - настройка, типа Integer, позволяющая редактирование значения
+   //===================================================================================================================
+
+  TPhoaIntEntrySetting = class(TPhoaIntSetting)
+  protected
+    function  GetDisplayString: String; override;
   end;
 
    //===================================================================================================================
@@ -72,6 +83,8 @@ type
     procedure SetValue(Value: Boolean);
   protected
     function  GetAsString: String; override;
+    procedure SetAsString(const sValue: String); override;
+    function  GetDisplayString: String; override;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; bValue: Boolean);
     procedure Assign(Source: TPhoaSetting); override;
@@ -91,6 +104,7 @@ type
     procedure SetValue(const Value: String);
   protected
     function  GetAsString: String; override;
+    procedure SetAsString(const sValue: String); override;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
     destructor Destroy; override;
@@ -114,6 +128,7 @@ type
     function  GetVariantText: String;
     procedure SetVariantIndex(Value: Integer);
   protected
+    constructor CreateNew(AOwner: TPhoaSetting); override;
     function  GetDisplayString: String; override;
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; bRefObject: Boolean);
@@ -149,6 +164,10 @@ type
    //===================================================================================================================
 
   TPhoaColorSetting = class(TPhoaIntSetting)
+  protected
+    function  GetDisplayString: String; override;
+  public
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
   end;
 
    //===================================================================================================================
@@ -159,8 +178,8 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaMutexSetting - настройка, не имеющая значения, представляющая собой вариант выбора, индекс
-   //   которого является значением родителя
+   // TPhoaMutexSetting - настройка, не имеющая значения, представляющая собой вариант выбора, индекс которого является
+   //   значением родителя
    //===================================================================================================================
 
   TPhoaMutexSetting = class(TPhoaSetting)
@@ -172,6 +191,8 @@ type
    //===================================================================================================================
 
   TPhoaMutexIntSetting = class(TPhoaIntSetting)
+  public
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
   end;
 
    //===================================================================================================================
@@ -227,7 +248,6 @@ type
   protected
     procedure DoEnter; override;
     procedure DoExit; override;
-    function  ColumnIsEmpty(Node: PVirtualNode; Column: TColumnIndex): Boolean; override;
     procedure DoAfterCellPaint(TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect); override;
     procedure DoChecked(Node: PVirtualNode); override;
     procedure DoFocusChange(Node: PVirtualNode; Column: TColumnIndex); override;
@@ -263,6 +283,30 @@ type
     Result := GetAsString;
   end;
 
+  procedure TPhoaValSetting.IniLoad(IniFile: TIniFile);
+  begin
+    if ID<>0 then AsString := IniFile.ReadString(SRegPrefs, Name, AsString);
+    inherited IniLoad(IniFile);
+  end;
+
+  procedure TPhoaValSetting.IniSave(IniFile: TIniFile);
+  begin
+    if ID<>0 then IniFile.WriteString(SRegPrefs, Name, AsString);
+    inherited IniSave(IniFile);
+  end;
+
+  procedure TPhoaValSetting.RegLoad(RegIniFile: TRegIniFile);
+  begin
+    if ID<>0 then AsString := RegIniFile.ReadString(SRegPrefs, Name, AsString);
+    inherited RegLoad(RegIniFile);
+  end;
+
+  procedure TPhoaValSetting.RegSave(RegIniFile: TRegIniFile);
+  begin
+    if ID<>0 then RegIniFile.WriteString(SRegPrefs, Name, AsString);
+    inherited RegSave(RegIniFile);
+  end;
+
    //===================================================================================================================
    // TPhoaIntSetting
    //===================================================================================================================
@@ -290,14 +334,33 @@ type
     Result := IntToStr(FData);
   end;
 
+  function TPhoaIntSetting.GetDisplayString: String;
+  begin
+    Result := ''; // IntSetting не отображает значения
+  end;
+
   function TPhoaIntSetting.GetValue: Integer;
   begin
     Result := FData;
   end;
 
+  procedure TPhoaIntSetting.SetAsString(const sValue: String);
+  begin
+    Value := StrToIntDef(sValue, FData);
+  end;
+
   procedure TPhoaIntSetting.SetValue(Value: Integer);
   begin
     FData := Min(Max(Value, FMinValue), FMaxValue);
+  end;
+
+   //===================================================================================================================
+   // TPhoaIntEntrySetting
+   //===================================================================================================================
+
+  function TPhoaIntEntrySetting.GetDisplayString: String;
+  begin
+    Result := AsString; // Перекрываем унаследованное поведение (пустую строку)
   end;
 
    //===================================================================================================================
@@ -321,9 +384,19 @@ type
     Result := IntToStr(FData);
   end;
 
+  function TPhoaBoolSetting.GetDisplayString: String;
+  begin
+    Result := '';
+  end;
+
   function TPhoaBoolSetting.GetValue: Boolean;
   begin
     Result := FData<>0;
+  end;
+
+  procedure TPhoaBoolSetting.SetAsString(const sValue: String);
+  begin
+    Value := StrToIntDef(sValue, FData)<>0;
   end;
 
   procedure TPhoaBoolSetting.SetValue(Value: Boolean);
@@ -363,6 +436,11 @@ type
     Result := String(FData);
   end;
 
+  procedure TPhoaStrSetting.SetAsString(const sValue: String);
+  begin
+    Value := sValue;
+  end;
+
   procedure TPhoaStrSetting.SetValue(const Value: String);
   begin
     String(FData) := Value;
@@ -382,6 +460,12 @@ type
   begin
     inherited Create(AOwner, iID, sName, iValue, -1, MaxInt);
     FRefObject := bRefObject;
+  end;
+
+  constructor TPhoaListSetting.CreateNew(AOwner: TPhoaSetting);
+  begin
+    inherited CreateNew(AOwner);
+     // FVariants создаём здесь, т. к. при Assign Create() не вызывается
     FVariants  := TStringList.Create;
   end;
 
@@ -436,6 +520,29 @@ type
   end;
 
    //===================================================================================================================
+   // TPhoaColorSetting
+   //===================================================================================================================
+
+  constructor TPhoaColorSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+  begin
+    inherited Create(AOwner, iID, sName, iValue, MinInt, MaxInt);
+  end;
+
+  function TPhoaColorSetting.GetDisplayString: String;
+  begin
+    Result := ' '; // Возвращаем непустую строку, чтобы не работал column spanning
+  end;
+
+   //===================================================================================================================
+   // TPhoaMutexIntSetting
+   //===================================================================================================================
+
+  constructor TPhoaMutexIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+  begin
+    inherited Create(AOwner, iID, sName, iValue, MinInt, MaxInt);
+  end;
+
+   //===================================================================================================================
    // TPhoaValPageSetting
    //===================================================================================================================
 
@@ -447,15 +554,6 @@ type
    //===================================================================================================================
    // TPhoaValSettingEditor
    //===================================================================================================================
-
-  function TPhoaValSettingEditor.ColumnIsEmpty(Node: PVirtualNode; Column: TColumnIndex): Boolean;
-  begin
-    case Column of
-       // Ячейка значения не пустая, если настройка редактируется редактором
-      1: Result := not (GetSetting(Node) is TPhoaValSetting)
-      else Result := inherited ColumnIsEmpty(Node, Column);
-    end;
-  end;
 
   constructor TPhoaValSettingEditor.Create(AOwner: TComponent);
   begin
@@ -539,17 +637,17 @@ type
 
   procedure TPhoaValSettingEditor.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
-    s: String;
+    s, sVal: String;
     Setting: TPhoaSetting;
   begin
     s := '';
     Setting := GetSetting(Node);
     case Column of
       0: FOnDecodeText(Setting.Name, s);
-      1:
+      1: 
         if Setting is TPhoaValSetting then begin
-          s := TPhoaValSetting(Setting).DisplayString;
-          if Setting is TPhoaListSetting then FOnDecodeText(s, s)
+          sVal := TPhoaListSetting(Setting).DisplayString;
+          if Setting is TPhoaListSetting then FOnDecodeText(sVal, s) else s := sVal;
         end;
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
@@ -681,7 +779,7 @@ type
       NewControl(TEdit);
       with TEdit(FEditorControl) do begin
         MaxLength := iMaxLen;
-        Text      := (Setting as TPhoaIntSetting).AsString;
+        Text      := (Setting as TPhoaIntEntrySetting).AsString;
         OnChange  := EmbeddedControlChange;
       end;
     end;
@@ -713,10 +811,10 @@ type
            // Получаем пункт настроек из данных узла
           Setting := GetSetting(CurNode);
            // Создаём или уничтожаем контрол
-          if      Setting is TPhoaListSetting  then NewComboBox
-          else if Setting is TPhoaColorSetting then NewColorBox
-          else if Setting is TPhoaIntSetting   then NewEdit(Length(IntToStr(TPhoaIntSetting(Setting).MaxValue)))
-          else if Setting is TPhoaFontSetting  then NewFontButton
+          if      Setting is TPhoaListSetting     then NewComboBox
+          else if Setting is TPhoaColorSetting    then NewColorBox
+          else if Setting is TPhoaIntEntrySetting then NewEdit(Length(IntToStr(TPhoaIntSetting(Setting).MaxValue)))
+          else if Setting is TPhoaFontSetting     then NewFontButton
           else FreeAndNil(FEditorControl);
         end;
       finally
@@ -737,9 +835,9 @@ type
     Node := PVirtualNode(FEditorControl.Tag);
      // Получаем пункт настроек из данных узла
     Setting := GetSetting(Node);
-    if      Setting is TPhoaListSetting       then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TComboBox).ItemIndex
-    else if Setting is TPhoaColorSetting      then TPhoaColorSetting(Setting).Value := (FEditorControl as TColorBox).Selected
-    else if Setting.ClassType=TPhoaIntSetting then TPhoaIntSetting(Setting).Value := StrToIntDef((FEditorControl as TEdit).Text, TPhoaIntSetting(Setting).Value);
+    if      Setting is TPhoaListSetting     then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TComboBox).ItemIndex
+    else if Setting is TPhoaColorSetting    then TPhoaColorSetting(Setting).Value := (FEditorControl as TColorBox).Selected
+    else if Setting is TPhoaIntEntrySetting then TPhoaIntEntrySetting(Setting).Value := StrToIntDef((FEditorControl as TEdit).Text, TPhoaIntEntrySetting(Setting).Value);
     DoSettingChange;
   end;
 

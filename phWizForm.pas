@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.4 2004-04-18 16:13:35 dale Exp $
+//  $Id: phWizForm.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -179,7 +179,7 @@ uses phUtils, ChmHlp, phSettings;
   procedure TPhoaWizardForm.InitializeWizard;
   var rif: TRegIniFile;
   begin
-    FontFromStr(Font, RootSetting.ValueStrByID[ISettingID_Gen_MainFont]);
+    FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
      // Загружаем значок
     iIcon.Picture.Icon.Handle := LoadIcon(HInstance, 'MAINICON');
      // Создаём и настраиваем контроллер

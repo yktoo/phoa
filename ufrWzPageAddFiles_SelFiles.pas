@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.4 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -67,7 +67,7 @@ uses phUtils, phObj, ufAddFilesWizard, ConsVars, phSettings;
       Wiz := TfAddFilesWizard(StorageForm);
        // Настраиваем браузер
        // -- Скрытые файлы/папки
-      if RootSetting.ValueBoolByID[ISettingID_Dlgs_APW_ShowHidden] then
+      if SettingValueBool(ISettingID_Dlgs_APW_ShowHidden) then
         tvMain.FileObjects := [foFolders, foNonFolders, foHidden]
       else
         tvMain.FileObjects := [foFolders, foNonFolders];

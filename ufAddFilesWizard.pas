@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.4 2004-04-18 16:13:36 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.5 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -346,10 +346,10 @@ uses
     FWizard := Wizard;
     FreeOnTerminate := True;
      // Кэшируем значения Autofill-свойств
-    FDateAutofillProps := TDateTimeAutofillProps(Byte(RootSetting.ValueIntByID[ISettingID_Dlgs_APW_AutofillDate]));
-    FReplaceDate       := RootSetting.ValueBoolByID[ISettingID_Dlgs_APW_ReplaceDate];
-    FTimeAutofillProps := TDateTimeAutofillProps(Byte(RootSetting.ValueIntByID[ISettingID_Dlgs_APW_AutofillTime]));
-    FReplaceTime       := RootSetting.ValueBoolByID[ISettingID_Dlgs_APW_ReplaceTime];
+    FDateAutofillProps := TDateTimeAutofillProps(Byte(SettingValueInt(ISettingID_Dlgs_APW_AutofillDate)));
+    FReplaceDate       := SettingValueBool(ISettingID_Dlgs_APW_ReplaceDate);
+    FTimeAutofillProps := TDateTimeAutofillProps(Byte(SettingValueInt(ISettingID_Dlgs_APW_AutofillTime)));
+    FReplaceTime       := SettingValueBool(ISettingID_Dlgs_APW_ReplaceTime);
     Resume;
   end;
 
@@ -415,7 +415,7 @@ uses
   begin
     case CurPageID of
        // Если надо пропустить страницу отметки файлов - переходим к странице отметки файлов
-      IWzAddFilesPageID_SelFiles:   Result := iif(RootSetting.ValueBoolByID[ISettingID_Dlgs_APW_SkipChkPage], IWzAddFilesPageID_Processing, IWzAddFilesPageID_CheckFiles);
+      IWzAddFilesPageID_SelFiles:   Result := iif(SettingValueBool(ISettingID_Dlgs_APW_SkipChkPage), IWzAddFilesPageID_Processing, IWzAddFilesPageID_CheckFiles);
       IWzAddFilesPageID_CheckFiles: Result := IWzAddFilesPageID_Processing;
       IWzAddFilesPageID_Processing: Result := IWzAddFilesPageID_Log;
       else                          Result := 0;
@@ -597,7 +597,7 @@ uses
       FAddFilesThread := nil;
        // Если список пуст, закрываем форму Мастера/показываем протокол
       if FFileList.Count=0 then
-        if (FCountFailed=0) and RootSetting.ValueBoolByID[ISettingID_Dlgs_APW_LogOnErrOnly] then
+        if (FCountFailed=0) and SettingValueBool(ISettingID_Dlgs_APW_LogOnErrOnly) then
           ModalResult := mrOK
         else
           Controller.SetVisiblePageID(IWzAddFilesPageID_Log, pcmNextBtn);

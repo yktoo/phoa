@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.7 2004-04-19 18:22:34 dale Exp $
+//  $Id: udSettings.pas,v 1.8 2004-04-23 19:26:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -116,7 +116,7 @@ uses phUtils, Main, TypInfo;
   begin
     inherited InitializeDialog;
      // Копируем настройки
-    FLocalRootSetting := TPhoaSetting.Create(nil, sdtStatic, 0, '');
+    FLocalRootSetting := TPhoaSetting.Create(nil, 0, '');
     FLocalRootSetting.Assign(RootSetting);
      // Создаём кнопки навигации
     CreateNavBar;

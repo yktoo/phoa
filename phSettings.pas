@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.5 2004-04-23 03:57:01 dale Exp $
+//  $Id: phSettings.pas,v 1.6 2004-04-23 19:26:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -45,12 +45,14 @@ type
   public
     constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String);
     destructor Destroy; override;
-     // Загрузка/сохранение в реестре значений с ID<>0
-    procedure RegLoad(RegIniFile: TRegIniFile);
-    procedure RegSave(RegIniFile: TRegIniFile);
-     // Загрузка/сохранение в Ini-файле значений с ID<>0
-    procedure IniLoad(IniFile: TIniFile);
-    procedure IniSave(IniFile: TIniFile);
+     // Загрузка/сохранение в реестре значений с ID<>0. В базовом классе не делают ничего, кроме каскадных вызовов
+     //   методов дочерних настроек
+    procedure RegLoad(RegIniFile: TRegIniFile); virtual;
+    procedure RegSave(RegIniFile: TRegIniFile); virtual;
+     // Загрузка/сохранение в Ini-файле значений с ID<>0. В базовом классе не делают ничего, кроме каскадных вызовов
+     //   методов дочерних настроек
+    procedure IniLoad(IniFile: TIniFile); virtual;
+    procedure IniSave(IniFile: TIniFile); virtual;
      // Копирует все установки (включая структуру дочерних узлов) с узла Source
     procedure Assign(Source: TPhoaSetting); virtual;
      // Props
@@ -114,10 +116,13 @@ var
    // Корневой пункт установки
   RootSetting: TPhoaSetting;
 
-   // Функции для доступа к значениям настроек
-  function SettingValueInt(iID: Integer): Integer;
-  function SettingValueBool(iID: Integer): Boolean;
-  function SettingValueStr(iID: Integer): String;
+   // Функции/процедуры для доступа к значениям настроек
+  function  SettingValueInt (iID: Integer): Integer;
+  function  SettingValueBool(iID: Integer): Boolean;
+  function  SettingValueStr (iID: Integer): String;
+  procedure SetSettingValueInt (iID, iValue: Integer);
+  procedure SetSettingValueBool(iID: Integer; bValue: Boolean);
+  procedure SetSettingValueStr (iID: Integer; const sValue: String);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses TypInfo, phUtils, phValSetting;
@@ -161,6 +166,30 @@ const
     Setting := RootSetting.Settings[iID];
     if not (Setting is TPhoaStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['String']);
     Result := TPhoaStrSetting(Setting).Value;
+  end;
+
+  procedure SetSettingValueInt(iID, iValue: Integer);
+  var Setting: TPhoaSetting;
+  begin
+    Setting := RootSetting.Settings[iID];
+    if not (Setting is TPhoaIntSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['Integer']);
+    TPhoaIntSetting(Setting).Value := iValue;
+  end;
+
+  procedure SetSettingValueBool(iID: Integer; bValue: Boolean);
+  var Setting: TPhoaSetting;
+  begin
+    Setting := RootSetting.Settings[iID];
+    if not (Setting is TPhoaBoolSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['Bool']);
+    TPhoaBoolSetting(Setting).Value := bValue;
+  end;
+
+  procedure SetSettingValueStr(iID: Integer; const sValue: String);
+  var Setting: TPhoaSetting;
+  begin
+    Setting := RootSetting.Settings[iID];
+    if not (Setting is TPhoaStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['String']);
+    TPhoaStrSetting(Setting).Value := sValue;
   end;
 
    //===================================================================================================================
@@ -257,54 +286,32 @@ const
   end;
 
   procedure TPhoaSetting.IniLoad(IniFile: TIniFile);
-{  var
-    s: String;
-    i: Integer;
-}  begin
-{     // Получаем своё значение
-    if FID<>0 then begin
-      s := IniFile.ReadString(SRegPrefs, FName, AsString);
-      if FDatatype=sdtFont then SetValueStr(s) else FData := StrToIntDef(s, FData);
-    end;
-     // Повторяем то же для детей
+  var i: Integer;
+  begin
     if FChildren<>nil then
       for i := 0 to FChildren.Count-1 do GetChildren(i).IniLoad(IniFile);
-}  end;
+  end;
 
   procedure TPhoaSetting.IniSave(IniFile: TIniFile);
-//  var i: Integer;
+  var i: Integer;
   begin
-{     // Сохраняем своё значение
-    if FID<>0 then IniFile.WriteString(SRegPrefs, FName, GetValStr);
-     // Повторяем то же для детей
     if FChildren<>nil then
       for i := 0 to FChildren.Count-1 do GetChildren(i).IniSave(IniFile);
-}  end;
+  end;
 
   procedure TPhoaSetting.RegLoad(RegIniFile: TRegIniFile);
-{  var
-    s: String;
-    i: Integer;
-}  begin
-{     // Получаем своё значение
-    if FID<>0 then begin
-      s := RegIniFile.ReadString(SRegPrefs, FName, GetValStr);
-      if FDatatype=sdtFont then SetValueStr(s) else FData := StrToIntDef(s, FData);
-    end;
-     // Повторяем то же для детей
+  var i: Integer;
+  begin
     if FChildren<>nil then
       for i := 0 to FChildren.Count-1 do GetChildren(i).RegLoad(RegIniFile);
-}  end;
+  end;
 
   procedure TPhoaSetting.RegSave(RegIniFile: TRegIniFile);
-//  var i: Integer;
+  var i: Integer;
   begin
-{     // Сохраняем своё значение
-    if FID<>0 then RegIniFile.WriteString(SRegPrefs, FName, GetValStr);
-     // Повторяем то же для детей
     if FChildren<>nil then
       for i := 0 to FChildren.Count-1 do GetChildren(i).RegSave(RegIniFile);
-}  end;
+  end;
 
   procedure TPhoaSetting.RemoveSetting(Item: TPhoaSetting);
   begin

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.6 2004-04-23 03:57:01 dale Exp $
+//  $Id: phObj.pas,v 1.7 2004-04-23 19:26:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -4395,7 +4395,7 @@ var
     StartWait;
     try
       if High(aPics)>=0 then begin
-        pcfs := TPicClipboardFormats(Byte(RootSetting.ValueIntByID[ISettingID_Gen_ClipFormats]));
+        pcfs := TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats)));
         Clipboard.Open;
         try
            // Помещаем PhoA-данные
