@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.28 2004-06-25 03:13:42 dale Exp $
+//  $Id: phObj.pas,v 1.29 2004-06-25 13:01:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -911,8 +911,6 @@ type
 
   TPhoaOp_InternalPicAdd = class(TPhoaOperation)
   private
-     // ID изображения
-    FPicID: Integer;
      // True, если файл изображения уже был зарегистрирован в фотоальбоме до добавления изображения
     FExisting: Boolean;
      // Prop storage
@@ -934,14 +932,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_InternalPicFromGroupRemoving = class(TPhoaOperation)
-  private
-     // Список ID и индексов изображений в группе (в виде ID1, индекс1, ID2, индекс2, ...)
-    FIDsAndIndexes: TIntegerList;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -949,14 +943,10 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_InternalPicToGroupAdding = class(TPhoaOperation)
-  private
-     // Список ID изображений, реально добавленных в группу 
-    FAddedIDs: TIntegerList;
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
-    destructor Destroy; override;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -990,13 +980,6 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
   TPhoaOp_PhoAEdit = class(TPhoaOperation)
-  private
-     // Старые размеры эскиза
-    FOldThumbnailWidth, FOldThumbnailHeight: Integer;
-     // Старое качество эскиза
-    FOldThumbnailQuality: Byte;
-     // Старое описание фотоальбома
-    FOldDescription: String;
   protected
     procedure RollbackChanges; override;
   public
@@ -4770,20 +4753,23 @@ var
      // Добавляем изображение в группу, если его не было
     if Group.PicIDs.Add(Pic.ID) then begin
        // Сохраняем данные для отката
-      FPicID  := Pic.ID;
       OpGroup := Group;
-    end;
+      UndoFile.WriteInt(Pic.ID);
+    end else
+      UndoFile.WriteInt(0);
   end;
 
   procedure TPhoaOp_InternalPicAdd.RollbackChanges;
+  var iPicID: Integer;
   begin
     inherited RollbackChanges;
      // Если реально операция была сделана
-    if FPicID>0 then begin
+    iPicID := UndoFile.ReadInt;
+    if iPicID>0 then begin
        // Удаляем из группы
-      OpGroup.PicIDs.Remove(FPicID);
-       // Если быдо добавлено новое изображение, удаляем и из фотоальбома
-      if not FExisting then FPhoA.Pics.PicByID(FPicID).Free;
+      OpGroup.PicIDs.Remove(iPicID);
+       // Если было добавлено новое изображение, удаляем и из фотоальбома
+      if not FExisting then FPhoA.Pics.PicByID(iPicID).Free;
     end;
   end;
 
@@ -4795,39 +4781,50 @@ var
   var i, idx: Integer;
   begin
     inherited Create(List, PhoA);
+     // Запоминаем группу
+    OpGroup := Group;
      // Запоминаем ID и индексы
-    FIDsAndIndexes := TIntegerList.Create(True);
     for i := 0 to High(aPicIDs) do begin
        // Если есть такой ID в группе, записываем и удаляем
       idx := Group.PicIDs.IndexOf(aPicIDs[i]);
       if idx>=0 then begin
-        FIDsAndIndexes.Add(aPicIDs[i]);
-        FIDsAndIndexes.Add(idx);
+         // Пишем флаг продолжения
+        UndoFile.WriteBool(True);
+         // Пишем ID
+        UndoFile.WriteInt(aPicIDs[i]);
+         // Пишем индекс
+        UndoFile.WriteInt(idx);
+         // Удаляем изображение
         Group.PicIDs.Delete(idx);
       end;
     end;
-     // Запоминаем группу
-    OpGroup := Group;
-  end;
-
-  destructor TPhoaOp_InternalPicFromGroupRemoving.Destroy;
-  begin
-    FIDsAndIndexes.Free;
-    inherited Destroy;
+     // Пишем стоп-флаг
+    UndoFile.WriteBool(False); 
   end;
 
   procedure TPhoaOp_InternalPicFromGroupRemoving.RollbackChanges;
   var
     i: Integer;
     g: TPhoaGroup;
+    IIs: TIntegerList;
   begin
     inherited RollbackChanges;
     g := OpGroup;
-     // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
-    i := FIDsAndIndexes.Count-2; // i указывает на ID, i+1 - на индекс
-    while i>=0 do begin
-      g.PicIDs.Insert(FIDsAndIndexes[i+1], FIDsAndIndexes[i]);
-      Dec(i, 2);
+     // Загружаем ID и индексы во временный список
+    IIs := TIntegerList.Create(True);
+    try
+      while UndoFile.ReadBool do begin
+        IIs.Add(UndoFile.ReadInt);
+        IIs.Add(UndoFile.ReadInt);
+      end;
+       // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
+      i := IIs.Count-2; // i указывает на ID, i+1 - на индекс
+      while i>=0 do begin
+        g.PicIDs.Insert(IIs[i+1], IIs[i]);
+        Dec(i, 2);
+      end;
+    finally
+      IIs.Free;
     end;
   end;
 
@@ -4840,27 +4837,23 @@ var
   begin
     inherited Create(List, PhoA);
     OpGroup := Group;
-    FAddedIDs := TIntegerList.Create(False);
-     // Добавляем изображения в группу и в список
+     // Добавляем изображения в группу и в undo-файл
     for i := 0 to High(aPicIDs) do
-      if Group.PicIDs.Add(aPicIDs[i]) then FAddedIDs.Add(aPicIDs[i]);
-  end;
-
-  destructor TPhoaOp_InternalPicToGroupAdding.Destroy;
-  begin
-    FAddedIDs.Free;
-    inherited Destroy;
+      if Group.PicIDs.Add(aPicIDs[i]) then begin
+        UndoFile.WriteBool(True); // Флаг продолжения
+        UndoFile.WriteInt (aPicIDs[i]);
+      end;
+     // Пишем стоп-флаг
+    UndoFile.WriteBool(False); 
   end;
 
   procedure TPhoaOp_InternalPicToGroupAdding.RollbackChanges;
-  var
-    i: Integer;
-    g: TPhoaGroup;
+  var g: TPhoaGroup;
   begin
     inherited RollbackChanges;
-     // Удаляем добавленные изображения
+     // Удаляем добавленные изображения (считываем ID добавленных изображений из файла, пока не встретим стоп-флаг)
     g := OpGroup;
-    for i := FAddedIDs.Count-1 downto 0 do g.PicIDs.Remove(FAddedIDs[i]);
+    while UndoFile.ReadBool do g.PicIDs.Remove(UndoFile.ReadInt);
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -5079,10 +5072,10 @@ var
     inherited Create(List, PhoA);
     with PhoA do begin
        // Сохраняем старые свойства
-      FOldThumbnailWidth   := ThumbnailWidth;
-      FOldThumbnailHeight  := ThumbnailHeight;
-      FOldThumbnailQuality := ThumbnailQuality;
-      FOldDescription      := Description;
+      UndoFile.WriteInt (ThumbnailWidth);
+      UndoFile.WriteInt (ThumbnailHeight);
+      UndoFile.WriteByte(ThumbnailQuality);
+      UndoFile.WriteStr (Description);
        // Выполняем операцию
       ThumbnailWidth   := iNewThWidth;
       ThumbnailHeight  := iNewThHeight;
@@ -5094,12 +5087,11 @@ var
   procedure TPhoaOp_PhoAEdit.RollbackChanges;
   begin
     inherited RollbackChanges;
-    with FPhoA do begin
-      ThumbnailWidth   := FOldThumbnailWidth;
-      ThumbnailHeight  := FOldThumbnailHeight;
-      ThumbnailQuality := FOldThumbnailQuality;
-      Description      := FOldDescription;
-    end;
+     // Восстанавливаем свойства фотоальбома 
+    FPhoA.ThumbnailWidth   := UndoFile.ReadInt;
+    FPhoA.ThumbnailHeight  := UndoFile.ReadInt;
+    FPhoA.ThumbnailQuality := UndoFile.ReadByte;
+    FPhoA.Description      := UndoFile.ReadStr;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
