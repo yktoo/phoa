@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.29 2004-10-05 13:16:34 dale Exp $
+//  $Id: phUtils.pas,v 1.30 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -136,8 +136,6 @@ uses
    // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
   function  GTreeHintModeToVTHintMode(GTHM: TGroupTreeHintMode): TVTHintMode;
 
-   // Возвращает True, если iID содержится в массиве aIDs
-  function  IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
    // Запись/чтение содержимого TPhoaGroupings в/из Undo-файла
   procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
   procedure UndoReadGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);
@@ -768,17 +766,6 @@ type
       hmHint);   // gthmInfo
   begin
     Result := aHM[GTHM];
-  end;
-
-  function IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
-  var i: Integer;
-  begin
-    for i := 0 to High(aIDs) do
-      if aIDs[i]=iID then begin
-        Result := True;
-        Exit;
-      end;
-    Result:= False;
   end;
 
   procedure UndoWriteGroupings(UndoFile: TPhoaUndoFile; Groupings: TPhoaGroupings);

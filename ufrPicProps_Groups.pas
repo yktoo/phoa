@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.7 2004-10-05 13:16:35 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrPicProps_Groups;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phMutableIntf, phObj, ConsVars,
   phWizard, VirtualTrees, phPicPropsDlgPage;
 
 type
@@ -56,8 +56,9 @@ type
     n: PVirtualNode;
     pgd: PGroupData;
     bChanges, bLinked: Boolean;
-    aIDs: TIDArray;
-    i, iPicID: Integer;
+    Pics: IPhoaMutablePicList;
+    Pic: IPhoaPic;
+    i: Integer;
   begin
      // Если страница инициализировалась, создаём операции добавления/удаления изображений
     if tvMain.RootNodeCount>0 then begin
@@ -68,28 +69,25 @@ type
         pgd := tvMain.GetNodeData(n);
         case n.CheckState of
            // -- Надо включить все
-          csCheckedNormal:   bChanges := pgd.iSelCount<EditedPicCount;
+          csCheckedNormal:   bChanges := pgd.iSelCount<EditedPics.Count;
            // -- Надо выключить все
           csUncheckedNormal: bChanges := pgd.iSelCount>0;
            // -- Не менялось
           else               bChanges := False;
         end;
-         // Если есть - составляем список ID изображений
+         // Если есть - составляем список изображений
         if bChanges then begin
-          aIDs := nil;
-          for i := 0 to EditedPicCount-1 do begin
-            iPicID := EditedPics[i].ID;
-            bLinked := pgd.Group.IsPicLinked(iPicID, False);
-            if (n.CheckState=csCheckedNormal) <> bLinked then begin
-              SetLength(aIDs, Length(aIDs)+1);
-              aIDs[High(aIDs)] := iPicID;
-            end;
+          Pics := TPhoaMutablePicList.Create(False);
+          for i := 0 to EditedPics.Count-1 do begin
+            Pic := EditedPics[i];
+            bLinked := pgd.Group.IsPicLinked(Pic.ID, False);
+            if (n.CheckState=csCheckedNormal) <> bLinked then Pics.Add(Pic, False);
           end;
            // Выполняем (создаём) операцию
           if n.CheckState=csCheckedNormal then
-            TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, pgd.Group, aIDs)
+            TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, pgd.Group, Pics)
           else
-            TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, pgd.Group, aIDs);
+            TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, pgd.Group, Pics);
         end;
          // Переходим к следующей группе
         n := tvMain.GetNext(n);
@@ -120,7 +118,7 @@ type
     bAllInGroups: Boolean;
 
      // Возвращает True, если изображение содержится в какой-нибудь группе
-    function PicLinked(Pic: TPhoaPic): Boolean;
+    function PicLinked(iPicID: Integer): Boolean;
     var Node: PVirtualNode;
     begin
       Result := False;
@@ -135,7 +133,7 @@ type
             bAllInGroups := True;
           end;
            // Если неполная птица - проверяем наличие в этой группе конкретно этого изображения
-          csMixedNormal: Result := PGroupData(tvMain.GetNodeData(Node)).Group.IsPicLinked(Pic.ID, False);
+          csMixedNormal: Result := PGroupData(tvMain.GetNodeData(Node)).Group.IsPicLinked(iPicID, False);
         end;
         Node := tvMain.GetNext(Node);
       end;
@@ -150,13 +148,13 @@ type
       bAllInGroups := False;
       iUnlinkedCount := 0;
        // Цикл по выбранным изображениям
-      for i := 0 to EditedPicCount-1 do begin
-        if not PicLinked(EditedPics[i]) then Inc(iUnlinkedCount);
+      for i := 0 to EditedPics.Count-1 do begin
+        if not PicLinked(EditedPics[i].ID) then Inc(iUnlinkedCount);
         if bAllInGroups then Break;
       end;
        // Проверяем количество несвязанных
       Result := iUnlinkedCount=0;
-      if not Result then PhoaError('SErrNotAllPicsLinked', [iUnlinkedCount, EditedPicCount]);
+      if not Result then PhoaError('SErrNotAllPicsLinked', [iUnlinkedCount, EditedPics.Count]);
     end;
   end;
 
@@ -164,7 +162,7 @@ type
   var i: Integer;
   begin
     Result := 0;
-    for i := 0 to EditedPicCount-1 do
+    for i := 0 to EditedPics.Count-1 do
       if Group.IsPicLinked(EditedPics[i].ID, False) then Inc(Result);
   end;
 
@@ -185,7 +183,7 @@ type
      // Выставляем тип птицы: если изначально было Grayed - после Unchecked идёт Grayed
     if (Node.CheckState=csUncheckedNormal) and (NewState=csCheckedNormal) then
       with PGroupData(Sender.GetNodeData(Node))^ do
-        if (iSelCount>0) and (iSelCount<EditedPicCount) then NewState := csMixedNormal;
+        if (iSelCount>0) and (iSelCount<EditedPics.Count) then NewState := csMixedNormal;
   end;
 
   procedure TfrPicProps_Groups.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -223,13 +221,10 @@ type
     p.iSelCount := GetSelCount(p.Group);
      // Настраиваем CheckBox
     Node.CheckType  := ctCheckBox;
-    if      p.iSelCount=0              then Node.CheckState := csUncheckedNormal
-    else if p.iSelCount<EditedPicCount then Node.CheckState := csMixedNormal
-    else                                    Node.CheckState := csCheckedNormal;
-
+    if      p.iSelCount=0                then Node.CheckState := csUncheckedNormal
+    else if p.iSelCount<EditedPics.Count then Node.CheckState := csMixedNormal
+    else                                      Node.CheckState := csCheckedNormal;
     if p.iSelCount>0 then Sender.FullyVisible[Node] := True;
-     // Разворачиваем все узлы
-//    Include(InitialStates, ivsExpanded);
   end;
 
   procedure TfrPicProps_Groups.tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);

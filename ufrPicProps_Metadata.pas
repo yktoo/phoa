@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.10 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.11 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -58,7 +58,7 @@ type
   procedure TfrPicProps_Metadata.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPicCount;
+    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPics.Count;
   end;
 
   function TfrPicProps_Metadata.GetRegistrySection: String;
@@ -116,7 +116,7 @@ type
     if nParent=nil then begin
       case Column of
          // Имя файла
-        0: s := EditedPics[Node.Index].PicFileName;
+        0: s := EditedPics[Node.Index].FileName;
          // Если ошибка - выводим сюда
         2: begin
           case PImageMetadata(Sender.GetNodeData(Node))^.StatusCode of
@@ -154,7 +154,7 @@ type
     if ParentNode=nil then begin
       pim := Sender.GetNodeData(Node);
        // Создаём объект списка метаданных на каждый файл. При создании класса данные сразу считываются
-      pim^ := TImageMetadata.Create(EditedPics[Node.Index].PicFileName);
+      pim^ := TImageMetadata.Create(EditedPics[Node.Index].FileName);
        // Если не произошло ошибки при считывании
       if pim^.StatusCode=IMS_OK then begin
         Sender.ChildCount[Node] := pim^.EXIFData.Count;

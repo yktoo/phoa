@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.19 2004-10-05 13:16:34 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.20 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -277,7 +277,7 @@ type
      // Удаляет изображение из фотоальбома (также ссылки на него из групп)
     procedure DoDeletePic(Pic: IPhoaPic);
      // Обновляет ссылку на файл (предварительно проверяя допустимость этого)
-    procedure DoUpdateFileLink(Pic: IPhoaPic; const sNewFileName: String);
+    procedure DoUpdateFileLink(Pic: IPhoaMutablePic; const sNewFileName: String);
      // Спрашивает возможность перезаписи файла (вызывается в Synchronize())
     procedure AskOverwrite;
   protected
@@ -512,12 +512,13 @@ uses
      // Если режим - перемещение
     if FWizard.FileOpKind=fokMoveFiles then begin
        // Исправляем ссылку
-      DoUpdateFileLink(Pic, sTargetPath+sFile);
+      DoUpdateFileLink(Pic as IPhoaMutablePic, sTargetPath+sFile);
        // Удаляем исходный файл
       if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcPath+sFile, FWizard.MoveFile_DeleteToRecycleBin);
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
-    if FWizard.ExportedPhoA<>nil then FWizard.ExportedPhoA.Pics.PicByID(Pic.ID).PicFileName := sTargetPath+sFile;
+    if FWizard.ExportedPhoA<>nil then
+      (FWizard.ExportedPhoA.Pics.ItemsByID[Pic.ID] as IPhoaMutablePic).FileName := PChar(sTargetPath+sFile);
   end;
 
   procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
@@ -587,7 +588,7 @@ uses
     iPrevThumbSize := Pic.ThumbnailDataSize;
     iPrevFileSize  := Pic.FileSize;
      // Перестраиваем эскиз
-    TPhoaPic(Pic.Handle).ReloadPicFileData;
+    (Pic as IPhoaMutablePic).ReloadPicFileData;
      // Протоколируем успех
     FWizard.LogSuccess(
       'SLogEntry_ThumbRebuiltOK',
@@ -600,16 +601,16 @@ uses
     //!!! Написать repair routine
   end;
 
-  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhoaPic; const sNewFileName: String);
+  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhoaMutablePic; const sNewFileName: String);
   var sPrevFileName: String;
   begin
      // Проверяем, можно ли исправить путь
-    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.PicByFileName(sNewFileName)<>nil) then
+    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.PhoA.Pics.ItemsByFileName[PChar(sNewFileName)]<>nil) then
       FileOpError('SLogEntry_PicRelinkingError', [sNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
     sPrevFileName := Pic.FileName;
     if sPrevFileName<>sNewFileName then begin
-      TPhoaPic(Pic.Handle).PicFileName := sNewFileName;
+      Pic.FileName := PChar(sNewFileName);
       FWizard.LogSuccess('SLogEntry_PicRelinkedOK', [sPrevFileName, sNewFileName]);
       FChangesMade := True;
     end;
@@ -717,7 +718,7 @@ uses
     FExportedPhoA.Description := FCDOpt_PhoaDesc;
     FExportedPhoA.FileName    := IncludeTrailingPathDelimiter(FDestinationFolder)+FCDOpt_PhoaFileName;
      // Копируем изображения
-    FExportedPhoA.Pics.Assign(FPhoA.Pics, False, FSelectedPics);
+    FExportedPhoA.Pics.DuplicatePics(FSelectedPics);
      // Копируем группы и ID изображений в них
     case SelPicMode of
       fospmSelPics:   AddSingleGroup(FExportedPhoA.RootGroup, FViewerSelGroup, FViewerSelGroup<>FPhoA.RootGroup);
@@ -1043,7 +1044,7 @@ uses
         if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.FileSize;
         if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.FileName));
          // Проверяем доступность по "занятости" другим изображением
-        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.PicByFileName(sPath+SRec.Name)=nil;
+        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FPhoA.Pics.ItemsByFileName[PChar(sPath+SRec.Name)]=nil;
          // Если подходит
         if bMatches then begin
            // Создаём файл, если он ещё не создан

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.2 2004-10-05 13:16:34 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.3 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -16,9 +16,21 @@ type
    // An alterable PhoA picture interface
    //-------------------------------------------------------------------------------------------------------------------
 
-  IPhoaMutablePic = interface(IInterface)
+  IPhoaMutablePic = interface(IPhoaPic)
     ['{7AC3D444-5A48-4396-95C9-82AACDCF68F0}']
-
+     // Rebuilds thumbnail and updates thumbnail, image and file parameters
+    procedure ReloadPicFileData; stdcall;
+     // Prop handlers
+    procedure SetFileName(Value: PAnsiChar); stdcall;
+    procedure SetFlips(Value: TPicFlips); stdcall;
+    procedure SetRotation(Value: TPicRotation); stdcall;
+     // Props
+     // -- Picture file name
+    property FileName: PAnsiChar read GetFileName write SetFileName;
+     // -- Picture flip flags
+    property Flips: TPicFlips read GetFlips write SetFlips;
+     // -- Picture rotation
+    property Rotation: TPicRotation read GetRotation write SetRotation;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

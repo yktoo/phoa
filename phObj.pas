@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.41 2004-10-05 13:16:34 dale Exp $
+//  $Id: phObj.pas,v 1.42 2004-10-06 14:41:10 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -11,41 +11,73 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Masks, ConsVars, phPhoa, phIntf, phMutableIntf;
 
 type
-  TPhoaGroup  = class;
-  TPhoaGroups = class;
-  TPhotoAlbum = class;
-  TPhoaPic    = class;
-  TPhoaPics   = class;
-  TPhoaViews  = class;
+   //===================================================================================================================
+   // IPhotoAlbumPic - изображение фотоальбома
+   //===================================================================================================================
 
-  TPicArray = Array of TPhoaPic;
+  IPhotoAlbumPics = interface;
+   
+  IPhotoAlbumPic = interface(IPhoaMutablePic)
+    ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB631}']
+     // Устанавливает список NewList в качестве владельца. При bAllocateNewID=True также распределяет изображению новый
+     //    ID, уникальный в списке
+    procedure PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
+     // Удаляет изображение из списка (после этого оно должно уничтожаться, если на него больше нет ссылок)
+    procedure Release;
+     // Загрузка/сохранение с помощью Streamer
+     //   -- Параметр bEx...Relative контролирует, осуществлять ли преобразование относительного <-> абсолютного пути
+     //      к файлу изображения
+     //   -- Параметр PProps указывает, какие свойства сохранять и восстанавливать (при этом все внутренние данные,
+     //      связанные с изображением, т.е. с файлом, сохраняются только при наличии ppFileName in PProps)
+    procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
+    procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
+     // Prop handlers
+    function  GetList: IPhotoAlbumPics;
+     // Props
+     // -- Список-владелец изображения
+    property List: IPhotoAlbumPics read GetList;
+  end;
+
+   //===================================================================================================================
+   // IPhotoAlbumPics - сортированный по ID список изображений фотоальбома
+   //===================================================================================================================
+
+  TPhotoAlbum = class;
+
+  IPhotoAlbumPics = interface(IPhoaMutablePicList)
+    ['{AE945E5F-9BF1-4FD0-92C9-92716D7BB632}']
+     // Загрузка/сохранение с помощью Streamer
+    procedure StreamerLoad(Streamer: TPhoaStreamer);
+    procedure StreamerSave(Streamer: TPhoaStreamer);
+     // Создаёт полные копии изображений с Src (объекты, которыми владеет только сам список)
+    procedure DuplicatePics(PicList: IPhoaPicList);
+     // Prop handlers
+    function  GetPhoA: TPhotoAlbum;
+     // Props
+     // -- Фотоальбом-владелец
+    property PhoA: TPhotoAlbum read GetPhoA;
+  end;
 
    //===================================================================================================================
    // Список Integer'ов
    //===================================================================================================================
 
-  TIntegerListSortSompareFunc = function(i1, i2: Integer; pData: Pointer): Integer;
-
   TIntegerList = class(TList)
   private
+     // Prop storage
     FAllowDuplicates: Boolean;
+     // Prop handlers
     function  GetItems(Index: Integer): Integer;
   public
     constructor Create(bAllowDuplicates: Boolean);
      // Если числа не было в списке или позволены дубликаты, добавляет его и возвращает True, иначе возвращает False
     function  Add(i: Integer): Boolean;
-     // Добавляет все числа из списка SourceList (с учётом AllowDuplicates). Возвращает количество реально добавленных
-     //   чисел
-    function  AddAll(SourceList: TIntegerList): Integer;
      // Если числа не было в списке или позволены дубликаты, вставляет его и возвращает True, иначе возвращает False
     function  Insert(Index, i: Integer): Boolean;
      // Если число есть в списке, удаляет его и возвращает его прежний индекс, иначе возвращает -1
     function  Remove(i: Integer): Integer;
      // Возвращает индекс числа или -1, если такого нет
     function  IndexOf(i: Integer): Integer;
-     // Сортирует список, используя функцию сравнения типа TIntegerListSortSompareFunc. Параметр pData - произвольный
-     //   указатель, передающийся в функцию сравнения
-    procedure Sort(CompareFunc: TIntegerListSortSompareFunc; pData: Pointer);
      // Props
      // -- Если False, перед добавлением проверяет на наличие такого числа, и, если есть, не добавляет
     property AllowDuplicates: Boolean read FAllowDuplicates;
@@ -63,6 +95,7 @@ type
     FList: TInterfaceList;
      // Prop storage
     FSorted: Boolean;
+    FMaxPicID: Integer;
      // IPhoaPicList
     function  IndexOfID(iID: Integer): Integer; stdcall;
     function  IndexOfFileName(pcFileName: PAnsiChar): Integer; stdcall;
@@ -70,6 +103,7 @@ type
     function  GetItemsByID(iID: Integer): IPhoaPic; stdcall;
     function  GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic; stdcall;
     function  GetItems(Index: Integer): IPhoaPic; stdcall;
+    function  GetMaxPicID: Integer; stdcall;
      // IPhoaMutablePicList
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean): Integer; overload; stdcall;
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload; stdcall;
@@ -87,69 +121,13 @@ type
      // Конструктор. При bSorted список является сортированным по ID изображения
     constructor Create(bSorted: Boolean);
     destructor Destroy; override;
-  end;
-
-   //===================================================================================================================
-   // Список ссылок на изображения
-   //===================================================================================================================
-
-  TPhoaPicLinks = class(TList, IPhoaPicList)
-  private
-     // Prop storage
-    FSorted: Boolean;
-     // IInterface
-    function  QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
-    function  _AddRef: Integer; stdcall;
-    function  _Release: Integer; stdcall;
-     // IPhoaPicList
-    function  IPhoaPicList.IndexOfID          = IPPL_IndexOfID;
-    function  IPhoaPicList.IndexOfFileName    = IPPL_IndexOfFileName;
-    function  IPhoaPicList.GetCount           = IPPL_GetCount;
-    function  IPhoaPicList.GetItemsByID       = IPPL_GetItemsByID;
-    function  IPhoaPicList.GetItemsByFileName = IPPL_GetItemsByFileName;
-    function  IPhoaPicList.GetItems           = IPPL_GetItems;
-    function  IPPL_IndexOfID(iID: Integer): Integer; stdcall;
-    function  IPPL_IndexOfFileName(pcFileName: PAnsiChar): Integer; stdcall;
-    function  IPPL_GetCount: Integer; stdcall;
-    function  IPPL_GetItemsByID(iID: Integer): IPhoaPic; stdcall;
-    function  IPPL_GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic; stdcall;
-    function  IPPL_GetItems(Index: Integer): IPhoaPic; stdcall;
-     // Prop handlers
-    function  GetItems(Index: Integer): TPhoaPic;
-  public
-     // При bSorted=True список является сортированным, использует бинарный поиск и игнорирует дубликаты изображений (т.е.
-     //   с повторяющимися ID)
-    constructor Create(bSorted: Boolean);
-     // Копирует ссылки на изображения с Src. Если RestrictPics=nil, то копирует все изображения, иначе - только те,
-     //   ID которых содержатся в RestrictPics
-    procedure Assign(Src: TPhoaPics; RestrictPics: IPhoaPicList);
-     // Добавляет изображения в список. При bSkipDuplicates=True дубликаты игнорируются. Версия с bAdded возвращает в
-     //   bAdded True, если изображение было добавлено; False, если пропущено
-    function  Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer; overload;
-    function  Add(Pic: TPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload;
-     // Ищет изображение по ID и возвращает True, если нашла, а в Index - позицию найденного изображения. Если
-     //   изображения с таким ID не найдено, возвращает False, а в Index - позицию изображения с ближайшим бОльшим ID
-    function  FindID(iID: Integer; var Index: Integer): Boolean;
-     // Копирует все ссылки на изображения с группы. При bReplace=True предварительно стирает список (если Group=nil,
-     //   просто очищает список). При bRecurse также добавляет изображения из вложенных групп
-    procedure AddFromGroup(Group: TPhoaGroup; bReplace, bRecurse: Boolean);
-     // Копирует все ссылки на изображения с массива ID изображений. При bReplace=True предварительно стирает список
-    procedure AddFromPicIDs(PhoA: TPhotoAlbum; const aPicIDs: TIDArray; bReplace: Boolean);
-     // Копирует все ссылки на изображения с фотоальбома
-    procedure CopyFromPhoa(PhoA: TPhotoAlbum);
-     // Копирует все ID изображений в группу
-    procedure CopyToGroup(Group: TPhoaGroup);
-     // Возвращает индекс изображения с заданным ID, или -1, если нет такого
-    function  IndexOfID(iID: Integer): Integer;
-     // Возвращает индекс изображения по его имени файла; -1, если нет такого
-    function  IndexOfFileName(const sFileName: String): Integer;
-     // Возвращает изображение по его ID (nil, если не найдено)
-    function  PicByID(iID: Integer): TPhoaPic;
-     // Возвращает изображение по его имени файла (nil, если не найдено)
-    function  PicByFileName(const sFileName: String): TPhoaPic;
-     // Props
-     // -- Пункты по индексу
-    property Items[Index: Integer]: TPhoaPic read GetItems; default;
+     // Props (для использования в потомках)
+    property Count: Integer read GetCount;
+    property ItemsByID[iID: Integer]: IPhoaPic read GetItemsByID;
+    property ItemsByFileName[pcFileName: PAnsiChar]: IPhoaPic read GetItemsByFileName;
+    property Items[Index: Integer]: IPhoaPic read GetItems; default;
+    property MaxPicID: Integer read FMaxPicID;
+    property Sorted: Boolean read FSorted;
   end;
 
    //===================================================================================================================
@@ -195,10 +173,12 @@ type
    // Группа (категория) изображений
    //===================================================================================================================
 
+  TPhoaGroups = class;
+   
   PPhoaGroup = ^TPhoaGroup;
   TPhoaGroup = class(TObject)
   private
-     // ID изображений в группе для загрузки из Streamer-a (существует только между StreamerLoad и Loaded)
+     // ID изображений в группе для загрузки из Streamer-a (существует только между вызовами StreamerLoad и Loaded)
     FStreamerPicIDs: TIntegerList;
      // Prop storage
     FExpanded: Boolean;
@@ -237,7 +217,7 @@ type
      //   при bCopySubgroups=True - рекурсивно повторяет всё для вложенных групп
     procedure Assign(Src: TPhoaGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean);
      // Сортирует изображения по заданным сортировкам
-    procedure SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
+    procedure SortPics(Sortings: TPhoaSortings);
      // Рекурсивно просматривает группу и все подгруппы, назначая ID группам, его не имеющим
     procedure FixupIDs;
      // Составляет описание группы из свойств Props, выбирая только указанные данные.
@@ -302,13 +282,11 @@ type
    // Изображение
    //===================================================================================================================
 
-  PPhoaPic = ^TPhoaPic; 
-  TPhoaPic = class(TObject, IPhoaPic)
+  PPhoaPic = ^TPhoaPic;
+  TPhoaPic = class(TInterfacedObject, IPhoaPic, IPhoaMutablePic, IPhotoAlbumPic)
   private
-     // Фотоальбом. Должен использоваться только для получения размеров и качества эскизов
-    FPhoA: TPhotoAlbum;
      // Prop storage
-    FList: TPhoaPics;
+    FList: Pointer;
     FID: Integer;
     FPicAuthor: String;
     FPicDateTime: TDateTime;
@@ -329,19 +307,8 @@ type
     FThumbHeight: Integer;
     FThumbnailData: String;
     FThumbWidth: Integer;
-     // Загрузка/сохранение с помощью Streamer
-     //   -- Параметр bEx...Relative контролирует, осуществлять ли преобразование относительного <-> абсолютного пути
-     //      к файлу изображения
-     //   -- Параметр PProps указывает, какие свойства сохранять и восстанавливать (при этом все внутренние данные,
-     //      связанные с изображением, т.е. с файлом, сохраняются только при наличии ppFileName in PProps)
-    procedure StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
-    procedure StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
-     // IInterface
-    function  QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
-    function  _AddRef: Integer; stdcall;
-    function  _Release: Integer; stdcall;
      // IPhoaPic
-    function  IPhoaPic.GetID                = IPP_GetID;               
+    function  IPhoaPic.GetID                = IPP_GetID;
     function  IPhoaPic.GetAuthor            = IPP_GetAuthor;
     function  IPhoaPic.GetDate              = IPP_GetDate;
     function  IPhoaPic.GetTime              = IPP_GetTime;
@@ -383,21 +350,82 @@ type
     function  IPP_GetThumbnailSize: TSize; stdcall;
     function  IPP_GetThumbnailData: Pointer; stdcall;
     function  IPP_GetThumbnailDataSize: Integer; stdcall;
+     // IPhoaMutablePic
+    function  IPhoaMutablePic.GetID                = IPP_GetID;               
+    function  IPhoaMutablePic.GetAuthor            = IPP_GetAuthor;
+    function  IPhoaMutablePic.GetDate              = IPP_GetDate;
+    function  IPhoaMutablePic.GetTime              = IPP_GetTime;
+    function  IPhoaMutablePic.GetDescription       = IPP_GetDescription;
+    function  IPhoaMutablePic.GetFileName          = IPP_GetFileName;
+    function  IPhoaMutablePic.GetFileSize          = IPP_GetFileSize;
+    function  IPhoaMutablePic.GetFilmNumber        = IPP_GetFilmNumber;
+    function  IPhoaMutablePic.GetFlips             = IPP_GetFlips;
+    function  IPhoaMutablePic.GetFrameNumber       = IPP_GetFrameNumber;
+    function  IPhoaMutablePic.GetHandle            = IPP_GetHandle;
+    function  IPhoaMutablePic.GetImageSize         = IPP_GetImageSize;
+    function  IPhoaMutablePic.GetKeywords          = IPP_GetKeywords;
+    function  IPhoaMutablePic.GetMedia             = IPP_GetMedia;
+    function  IPhoaMutablePic.GetNotes             = IPP_GetNotes;
+    function  IPhoaMutablePic.GetPlace             = IPP_GetPlace;
+    function  IPhoaMutablePic.GetPropertyValue     = IPP_GetPropertyValue;
+    function  IPhoaMutablePic.GetRotation          = IPP_GetRotation;
+    function  IPhoaMutablePic.GetThumbnailSize     = IPP_GetThumbnailSize;
+    function  IPhoaMutablePic.GetThumbnailData     = IPP_GetThumbnailData;
+    function  IPhoaMutablePic.GetThumbnailDataSize = IPP_GetThumbnailDataSize;
+    procedure IPhoaMutablePic.ReloadPicFileData    = IPMP_ReloadPicFileData;
+    procedure IPhoaMutablePic.SetFileName          = IPMP_SetFileName;
+    procedure IPhoaMutablePic.SetFlips             = IPMP_SetFlips;
+    procedure IPhoaMutablePic.SetRotation          = IPMP_SetRotation;
+    procedure IPMP_ReloadPicFileData; stdcall;
+    procedure IPMP_SetFileName(Value: PAnsiChar); stdcall;
+    procedure IPMP_SetFlips(Value: TPicFlips); stdcall;
+    procedure IPMP_SetRotation(Value: TPicRotation); stdcall;
+     // IPhotoAlbumPic
+    procedure IPhotoAlbumPic.ReloadPicFileData    = IPMP_ReloadPicFileData;
+    procedure IPhotoAlbumPic.SetFileName          = IPMP_SetFileName;
+    procedure IPhotoAlbumPic.SetFlips             = IPMP_SetFlips;
+    procedure IPhotoAlbumPic.SetRotation          = IPMP_SetRotation;
+    function  IPhotoAlbumPic.GetID                = IPP_GetID;
+    function  IPhotoAlbumPic.GetAuthor            = IPP_GetAuthor;
+    function  IPhotoAlbumPic.GetDate              = IPP_GetDate;
+    function  IPhotoAlbumPic.GetTime              = IPP_GetTime;
+    function  IPhotoAlbumPic.GetDescription       = IPP_GetDescription;
+    function  IPhotoAlbumPic.GetFileName          = IPP_GetFileName;
+    function  IPhotoAlbumPic.GetFileSize          = IPP_GetFileSize;
+    function  IPhotoAlbumPic.GetFilmNumber        = IPP_GetFilmNumber;
+    function  IPhotoAlbumPic.GetFlips             = IPP_GetFlips;
+    function  IPhotoAlbumPic.GetFrameNumber       = IPP_GetFrameNumber;
+    function  IPhotoAlbumPic.GetHandle            = IPP_GetHandle;
+    function  IPhotoAlbumPic.GetImageSize         = IPP_GetImageSize;
+    function  IPhotoAlbumPic.GetKeywords          = IPP_GetKeywords;
+    function  IPhotoAlbumPic.GetMedia             = IPP_GetMedia;
+    function  IPhotoAlbumPic.GetNotes             = IPP_GetNotes;
+    function  IPhotoAlbumPic.GetPlace             = IPP_GetPlace;
+    function  IPhotoAlbumPic.GetPropertyValue     = IPP_GetPropertyValue;
+    function  IPhotoAlbumPic.GetRotation          = IPP_GetRotation;
+    function  IPhotoAlbumPic.GetThumbnailSize     = IPP_GetThumbnailSize;
+    function  IPhotoAlbumPic.GetThumbnailData     = IPP_GetThumbnailData;
+    function  IPhotoAlbumPic.GetThumbnailDataSize = IPP_GetThumbnailDataSize;
+    function  IPhotoAlbumPic.GetList              = IPAP_GetList;
+    procedure IPhotoAlbumPic.PutToList            = IPAP_PutToList;
+    procedure IPhotoAlbumPic.Release              = IPAP_Release;
+    procedure IPhotoAlbumPic.StreamerLoad         = IPAP_StreamerLoad;
+    procedure IPhotoAlbumPic.StreamerSave         = IPAP_StreamerSave;
+    function  IPAP_GetList: IPhotoAlbumPics;
+    procedure IPAP_PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
+    procedure IPAP_Release;
+    procedure IPAP_StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
+    procedure IPAP_StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
      // Prop handlers
-    procedure SetList(Value: TPhoaPics);
     function  GetRawData(PProps: TPicProperties): String;
     procedure SetRawData(PProps: TPicProperties; const Value: String);
     function  GetProps(PicProp: TPicProperty): String;
     procedure SetProps(PicProp: TPicProperty; const Value: String);
   public
-    constructor Create(PhoA: TPhotoAlbum);
+    constructor Create;
     destructor Destroy; override;
      // Копирует все данные изображения
     procedure Assign(Src: TPhoaPic);
-     // Распределяет новый ID, уникальный в списке
-    procedure IDNeeded(List: TPhoaPics);
-     // Перестраивает эскиз и обновляет параметры эскиза, изображения и файла изображения
-    procedure ReloadPicFileData;
      // Составляет описание изображения из свойств Props, выбирая только указанные данные.
      //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
      //   sPropSep - разделительная строка между отдельными свойствами
@@ -407,8 +435,6 @@ type
      // Props
      // -- Уникальный идентификатор
     property ID: Integer read FID;
-     // -- Список - владелец изображения (может быть nil)
-    property List: TPhoaPics read FList write SetList;
      // -- Автор изображения
     property PicAuthor: String read FPicAuthor write FPicAuthor;
      // -- Дата и время изображения
@@ -454,38 +480,27 @@ type
   end;
 
    //===================================================================================================================
-   // Список изображений, в котором изображения регистрируются и которому принадлежат (и уничтожаются при удалении)
+   // TPhotoAlbumPics - реализация IPhotoAlbumPics
    //===================================================================================================================
 
-  TPhoaPics = class(TPhoaPicLinks)
+  TPhotoAlbumPics = class(TPhoAMutablePicList, IPhotoAlbumPics)
   private
+     // Prop storage
     FPhoA: TPhotoAlbum;
-     // Загрузка/сохранение с помощью Streamer
+     // IPhotoAlbumPics
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
+    procedure DuplicatePics(PicList: IPhoaPicList);
+    function  GetPhoA: TPhotoAlbum;
   public
-    constructor Create(_PhoA: TPhotoAlbum);
-    procedure Delete(Index: Integer);
-    procedure Clear; override;
-     // Копирует изображения с Src. Если bCopyLinksOnly=True, копирует только ссылки, иначе создаёт копии изображений.
-     //   Если RestrictPics=nil, то копирует все изображения, иначе - только те, ID которых содержатся в RestrictPics
-    procedure Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictPics: IPhoaPicList);
-     // Возвращает следующий свободный ID изображения
-    function GetFreePicID: Integer;
+    constructor Create(APhoA: TPhotoAlbum);
   end;
 
    //===================================================================================================================
    // Представление
    //===================================================================================================================
 
-  TPhoaView = class;
-
-   // Вспомогательный список, хранящий ссылки на изображения фотоальбома
-  TPhoaViewHelperPics = class(TPhoaPicLinks)
-  public
-     // Сортирует изображения для представления (для последующей группировки)
-    procedure Sort(View: TPhoaView);
-  end;
+  TPhoaViews = class;
 
    // Группировка изображений (помещается в 4 байта)
   TPhoaGrouping = packed record
@@ -510,7 +525,7 @@ type
      // Возвращает True, если содержимое списка идентично списку Groupings
     function  IdenticalWith(Groupings: TPhoaGroupings): Boolean;
      // Сравнивает два изображения (для сортировки)
-    function  SortComparePics(Pic1, Pic2: TPhoaPic): Integer;
+    function  SortComparePics(Pic1, Pic2: IPhoaPic): Integer;
      // Переключает bUnclassified группировки с индексом Index
     procedure ToggleUnclassified(Index: Integer);
      // Устанавливает свойство для группировки у пункта с индексом Index
@@ -599,7 +614,7 @@ type
   private
      // Prop storage
     FRootGroup: TPhoaGroup;
-    FPics: TPhoaPics;
+    FPics: IPhotoAlbumPics;
     FViews: TPhoaViews;
     FFileName: String;
     FFileRevision: Integer;
@@ -637,7 +652,7 @@ type
      // -- Текущая ревизия файла фотоальбома
     property FileRevision: Integer read FFileRevision;
      // -- Список изображений фотоальбома
-    property Pics: TPhoaPics read FPics;
+    property Pics: IPhotoAlbumPics read FPics;
      // -- Корневая (фиктивная) группа, владеющая всеми группами фотоальбома
     property RootGroup: TPhoaGroup read FRootGroup;
      // -- Высота эскиза в пикселах
@@ -953,7 +968,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaPic);
   end;
 
    //===================================================================================================================
@@ -975,7 +990,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; ChangeList: TPicPropertyChanges);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: IPhoaPicList; ChangeList: TPicPropertyChanges);
   end;
 
    //===================================================================================================================
@@ -988,7 +1003,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; Keywords: TKeywordList);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: IPhoaPicList; Keywords: TKeywordList);
   end;
 
    //===================================================================================================================
@@ -999,7 +1014,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic; NewRotation: TPicRotation; NewFlips: TPicFlips);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaMutablePic; NewRotation: TPicRotation; NewFlips: TPicFlips);
   end;
 
    //===================================================================================================================
@@ -1020,12 +1035,12 @@ type
      // Prop storage
     FAddedPic: TPhoaPic;
      // Регистрирует изображение в группе, если его там не было, и запоминает данные отката
-    procedure RegisterPic(Group: TPhoaGroup; Pic: TPhoaPic);
+    procedure RegisterPic(Group: TPhoaGroup; Pic: IPhoaPic);
   protected
     procedure RollbackChanges; override;
   public
     constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sFilename: String); overload;
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pic: TPhoaPic); overload;
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pic: IPhoaPic); overload;
      // Props
      // -- Созданное изображение при создании из файла
     property AddedPic: TPhoaPic read FAddedPic;
@@ -1039,7 +1054,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   end;
 
    //===================================================================================================================
@@ -1050,7 +1065,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   end;
 
    //===================================================================================================================
@@ -1058,7 +1073,7 @@ type
    //===================================================================================================================
 
   TPhoaBaseOp_PicCopy = class(TBaseOperation)
-    constructor Create(const aPics: TPicArray);
+    constructor Create(Pics: IPhoaPicList);
   end;
 
    //===================================================================================================================
@@ -1067,7 +1082,7 @@ type
 
   TPhoaMultiOp_PicDelete = class(TPhoaMultiOp)
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   end;
 
    //===================================================================================================================
@@ -1096,7 +1111,7 @@ type
 
   TPhoaMultiOp_PicOperation = class(TPhoaMultiOp)
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; const aSelPicIDs: TIDArray; PicOperation: TPictureOperation);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; Pics: IPhoaPicList; PicOperation: TPictureOperation);
   end;
 
    //===================================================================================================================
@@ -1140,7 +1155,7 @@ type
 
   TPhoaMultiOp_PicDragAndDropToGroup = class(TPhoaMultiOp)
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; aSelPicIDs: TIDArray; bCopy: Boolean);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; Pics: IPhoaPicList; bCopy: Boolean);
   end;
 
    //===================================================================================================================
@@ -1151,7 +1166,7 @@ type
   protected
     procedure RollbackChanges; override;
   public
-    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray; idxNew: Integer);
+    constructor Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList; idxNew: Integer);
   end;
 
    //===================================================================================================================
@@ -1303,7 +1318,7 @@ type
   end;
 
    // Callback-процедура, вызываемая из TKeywordList.PopulateFromPhoA() для определения, выбрано изображение, или нет
-  TKeywordIsPicSelectedProc = procedure(Pic: TPhoaPic; out bSelected: Boolean) of object;
+  TKeywordIsPicSelectedProc = procedure(Pic: IPhoaPic; out bSelected: Boolean) of object;
 
   TKeywordList = class(TList)
   private
@@ -1431,6 +1446,7 @@ const
 
 resourcestring
   SPhObjErrMsg_InvalidSortedPicListMethodCall = 'Cannot invoke %s on sorted TPhoaMutablePicList';
+  SPhObjErrMsg_InvalidAddPicID                = 'Invalid picture to add ID (%d)';
 
   SCmdLineErrMsg_UnknownKey                   = 'Unknown command line key: "%s"';
   SCmdLineErrMsg_DuplicateKey                 = 'Duplicate key "%s" in the command line';
@@ -1443,9 +1459,6 @@ resourcestring
 
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
   procedure StringsLoadPFAM(PhoA: TPhotoAlbum; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
-
-   // Переписывает ID из TPicArray в TIDArray
-  function PicArrayToIDArray(const Pics: TPicArray): TIDArray;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
@@ -1539,10 +1552,10 @@ uses
        // Крутим цикл по всем изображениям
       for i := 0 to PhoA.Pics.Count-1 do
         with PhoA.Pics[i] do begin
-          AddStr(SLPlaces,      PicPlace);
-          AddStr(SLFilmNumbers, PicFilmNumber);
-          AddStr(SLAuthors,     PicAuthor);
-          AddStr(SLMedia,       PicMedia);
+          AddStr(SLPlaces,      Place);
+          AddStr(SLFilmNumbers, FilmNumber);
+          AddStr(SLAuthors,     Author);
+          AddStr(SLMedia,       Media);
         end;
     finally
       SLPlaces.EndUpdate;
@@ -1550,13 +1563,6 @@ uses
       SLAuthors.EndUpdate;
       SLMedia.EndUpdate;
     end;
-  end;
-
-  function PicArrayToIDArray(const Pics: TPicArray): TIDArray;
-  var i: Integer;
-  begin
-    SetLength(Result, Length(Pics));
-    for i := 0 to High(Pics) do Result[i] := Pics[i].ID;
   end;
 
    //===================================================================================================================
@@ -1567,14 +1573,6 @@ uses
   begin
     Result := FAllowDuplicates or (IndexOf(i)<0);
     if Result then inherited Add(Pointer(i));
-  end;
-
-  function TIntegerList.AddAll(SourceList: TIntegerList): Integer;
-  var i: Integer;
-  begin
-    Result := 0;
-    for i := 0 to SourceList.Count-1 do
-      if Add(SourceList[i]) then Inc(Result);
   end;
 
   constructor TIntegerList.Create(bAllowDuplicates: Boolean);
@@ -1604,33 +1602,6 @@ uses
     Result := inherited Remove(Pointer(i));
   end;
 
-  procedure TIntegerList.Sort(CompareFunc: TIntegerListSortSompareFunc; pData: Pointer);
-
-    procedure DoSort(iL, iR: Integer);
-    var i1, i2, iv: Integer;
-    begin
-      repeat
-        i1 := iL;
-        i2 := iR;
-        iv := GetItems((iL+iR) shr 1);
-        repeat
-          while CompareFunc(GetItems(i1), iv, pData)<0 do Inc(i1);
-          while CompareFunc(GetItems(i2), iv, pData)>0 do Dec(i2);
-          if i1<=i2 then begin
-            Exchange(i1, i2);
-            Inc(i1);
-            Dec(i2);
-          end;
-        until i1>i2;
-        if iL<i2 then DoSort(iL, i2);
-        iL := i1;
-      until i1>=iR;
-    end;
-
-  begin
-    if Count>0 then DoSort(0, Count-1);
-  end;
-
    //===================================================================================================================
    // TPhoaMutablePicList
    //===================================================================================================================
@@ -1642,14 +1613,18 @@ uses
   end;
 
   function TPhoaMutablePicList.Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer;
+  var iID: Integer;
   begin
+    iID := Pic.ID;
+    if iID<=0 then PhoaException(SPhObjErrMsg_InvalidAddPicID, [iID]);
     if FSorted or bSkipDuplicates then begin
-      bAdded := not FindID(Pic.ID, Result);
+      bAdded := not FindID(iID, Result);
       if bAdded then FList.Insert(Result, Pic);
     end else begin
       bAdded := True;
       Result := FList.Add(Pic);
     end;
+    if bAdded and (iID>FMaxPicID) then FMaxPicID := iID;
   end;
 
   function TPhoaMutablePicList.Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer;
@@ -1667,13 +1642,15 @@ uses
   procedure TPhoaMutablePicList.Assign(Source: IPhoaPicList);
   var i: Integer;
   begin
-    FList.Clear;
+    Clear;
     for i := 0 to Source.Count-1 do FList.Add(Source[i]);
+    FMaxPicID := Source.MaxPicID;
   end;
 
   procedure TPhoaMutablePicList.Clear;
   begin
     FList.Clear;
+    FMaxPicID := 0;
   end;
 
   constructor TPhoaMutablePicList.Create(bSorted: Boolean);
@@ -1782,6 +1759,11 @@ uses
     if idx<0 then Result := nil else Result := GetItems(idx);
   end;
 
+  function TPhoaMutablePicList.GetMaxPicID: Integer;
+  begin
+    Result := FMaxPicID;
+  end;
+
   function TPhoaMutablePicList.GetSorted: Boolean;
   begin
     Result := FSorted;
@@ -1820,189 +1802,6 @@ uses
   function TPhoaMutablePicList.Remove(iID: Integer): Integer;
   begin
     if FindID(iID, Result) then FList.Delete(Result) else Result := -1;
-  end;
-
-   //===================================================================================================================
-   // TPhoaPicLinks
-   //===================================================================================================================
-
-  function TPhoaPicLinks.Add(Pic: TPhoaPic; bSkipDuplicates: Boolean): Integer;
-  var bDummy: Boolean;
-  begin
-    Result := Add(Pic, bSkipDuplicates, bDummy);
-  end;
-
-  function TPhoaPicLinks.Add(Pic: TPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer;
-  begin
-    if FSorted or bSkipDuplicates then begin
-      bAdded := not FindID(Pic.ID, Result);
-      if bAdded then Insert(Result, Pic);
-    end else begin
-      bAdded := True;
-      Result := inherited Add(Pic);
-    end;
-  end;
-
-  procedure TPhoaPicLinks.AddFromGroup(Group: TPhoaGroup; bReplace, bRecurse: Boolean);
-  var i: Integer;
-  begin
-    if bReplace then Clear;
-     // Копируем ссылки на изображения, принадлежащие группе
-    if Group<>nil then begin
-       // Если не рекурсивное добавление, не проверяем на дубликаты, т.к. группа не может содержать изображение дважды
-      for i := 0 to Group.Pics.Count-1 do Add(TPhoaPic(Group.Pics[i].Handle), bRecurse);
-       // Если рекурсивное добавление - повторяем то же для вложенных групп
-      if bRecurse then
-        for i := 0 to Group.Groups.Count-1 do AddFromGroup(Group.Groups[i], False, True);
-    end;
-  end;
-
-  procedure TPhoaPicLinks.AddFromPicIDs(PhoA: TPhotoAlbum; const aPicIDs: TIDArray; bReplace: Boolean);
-  var i: Integer;
-  begin
-    if bReplace then Clear;
-    for i := 0 to High(aPicIDs) do Add(PhoA.Pics.PicByID(aPicIDs[i]), True);
-  end;
-
-  procedure TPhoaPicLinks.Assign(Src: TPhoaPics; RestrictPics: IPhoaPicList);
-  var
-    i: Integer;
-    Pic: TPhoaPic;
-  begin
-    Clear;
-    for i := 0 to Src.Count-1 do begin
-      Pic := Src[i];
-      if (RestrictPics=nil) or (RestrictPics.IndexOfID(Pic.ID)>=0) then Add(Pic, False);
-    end;
-  end;
-
-  procedure TPhoaPicLinks.CopyFromPhoa(PhoA: TPhotoAlbum);
-  begin
-    Assign(PhoA.Pics, nil);
-  end;
-
-  procedure TPhoaPicLinks.CopyToGroup(Group: TPhoaGroup);
-  var i: Integer;
-  begin
-    Group.Pics.Clear;
-    for i := 0 to Count-1 do Group.Pics.Add(GetItems(i), False);
-  end;
-
-  constructor TPhoaPicLinks.Create(bSorted: Boolean);
-  begin
-    inherited Create;
-    FSorted := bSorted;
-  end;
-
-  function TPhoaPicLinks.FindID(iID: Integer; var Index: Integer): Boolean;
-  var i1, i2, i, iCompare: Integer;
-  begin
-    Result := False;
-     // Если список сортированный - ищем с помощью бинарного поиска
-    if FSorted then begin
-      i1 := 0;
-      i2 := Count-1;
-      while i1<=i2 do begin
-        i := (i1+i2) shr 1;
-        iCompare := GetItems(i).ID-iID;
-        if iCompare<0 then
-          i1 := i+1
-        else begin
-          i2 := i-1;
-          if iCompare=0 then begin
-            Result := True;
-            i1 := i;
-          end;
-        end;
-      end;
-      Index := i1;
-     // Иначе - ищем простым перебором
-    end else begin
-      for i := 0 to Count-1 do
-        if GetItems(i).ID=iID then begin
-          Result := True;
-          Index := i;
-          Exit;
-        end;
-      Index := Count;
-    end;
-  end;
-
-  function TPhoaPicLinks.GetItems(Index: Integer): TPhoaPic;
-  begin
-    Result := TPhoaPic(inherited Items[Index]);
-  end;
-
-  function TPhoaPicLinks.IndexOfFileName(const sFileName: String): Integer;
-  begin
-    for Result := 0 to Count-1 do
-      if ReverseCompare(GetItems(Result).PicFileName, sFileName) then Exit;
-    Result := -1;
-  end;
-
-  function TPhoaPicLinks.IndexOfID(iID: Integer): Integer;
-  begin
-    if not FindID(iID, Result) then Result := -1;
-  end;
-
-  function TPhoaPicLinks.IPPL_GetCount: Integer;
-  begin
-    Result := Count;
-  end;
-
-  function TPhoaPicLinks.IPPL_GetItems(Index: Integer): IPhoaPic;
-  begin
-    Result := Items[Index];
-  end;
-
-  function TPhoaPicLinks.IPPL_GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic;
-  begin
-    Result := PicByFileName(pcFileName);
-  end;
-
-  function TPhoaPicLinks.IPPL_GetItemsByID(iID: Integer): IPhoaPic;
-  begin
-    Result := PicByID(iID);
-  end;
-
-  function TPhoaPicLinks.IPPL_IndexOfFileName(pcFileName: PAnsiChar): Integer;
-  begin
-    Result := IndexOfFileName(pcFileName);
-  end;
-
-  function TPhoaPicLinks.IPPL_IndexOfID(iID: Integer): Integer;
-  begin
-    Result := IndexOfID(iID);
-  end;
-
-  function TPhoaPicLinks.PicByFileName(const sFileName: String): TPhoaPic;
-  var idx: Integer;
-  begin
-    idx := IndexOfFileName(sFileName);
-    if idx<0 then Result := nil else Result := GetItems(idx);
-  end;
-
-  function TPhoaPicLinks.PicByID(iID: Integer): TPhoaPic;
-  var idx: Integer;
-  begin
-    if FindID(iID, idx) then Result := GetItems(idx) else Result := nil;
-  end;
-
-  function TPhoaPicLinks.QueryInterface(const IID: TGUID; out Obj): HResult;
-  begin
-    if GetInterface(IID, Obj) then Result := S_OK else Result := E_NOINTERFACE;
-  end;
-
-  function TPhoaPicLinks._AddRef: Integer;
-  begin
-     // No refcounting applicable
-    Result := -1;
-  end;
-
-  function TPhoaPicLinks._Release: Integer;
-  begin
-     // No refcounting applicable
-    Result := -1;
   end;
 
    //===================================================================================================================
@@ -2115,7 +1914,7 @@ uses
         ppPicWidth:        Result := Pic1.ImageSize.cx-Pic2.ImageSize.cx;
         ppPicHeight:       Result := Pic1.ImageSize.cy-Pic2.ImageSize.cy;
         ppPicDims:         Result := (Pic1.ImageSize.cx*Pic1.ImageSize.cy)-(Pic2.ImageSize.cx*Pic2.ImageSize.cy);
-//!!!!        ppFormat:          Result := Byte(Pic1.PicFormat)-Byte(Pic2.PicFormat);
+        ppFormat:          Result := Byte(TPhoaPic(Pic1.Handle).PicFormat)-Byte(TPhoaPic(Pic2.Handle).PicFormat);
         ppDate:            Result := Pic1.Date-Pic2.Date;
         ppTime:            Result := Pic1.Time-Pic2.Time;
         ppPlace:           Result := AnsiCompareText(Pic1.Place,       Pic2.Place);
@@ -2200,6 +1999,11 @@ uses
    //===================================================================================================================
    // TPhoaGroup
    //===================================================================================================================
+
+  function PhoaGroupPicSortCompare(Pic1, Pic2: IPhoaPic; dwData: Cardinal): Integer; stdcall;
+  begin
+    Result := TPhoaSortings(dwData).SortComparePics(Pic1, Pic2);
+  end;
 
   procedure TPhoaGroup.Assign(Src: TPhoaGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean);
   var i: Integer;
@@ -2390,7 +2194,7 @@ uses
      // Превращаем ID изображений в ссылки на изображения
     if FStreamerPicIDs<>nil then begin
       for i := 0 to FStreamerPicIDs.Count-1 do begin
-        Pic := PhoA.Pics.PicByID(FStreamerPicIDs[i]);
+        Pic := PhoA.Pics.ItemsByID[FStreamerPicIDs[i]];
         if Pic<>nil then FPics.Add(Pic, False);
       end;
        // Убиваем список ID изображений для загрузки
@@ -2418,14 +2222,9 @@ uses
     end;
   end;
 
-  function __GroupPicSortCompare(Pic1, Pic2: IPhoaPic; dwData: Cardinal): Integer; stdcall;
+  procedure TPhoaGroup.SortPics(Sortings: TPhoaSortings);
   begin
-    Result := TPhoaSortings(dwData).SortComparePics(Pic1, Pic2);
-  end;
-
-  procedure TPhoaGroup.SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
-  begin
-    FPics.CustomSort(__GroupPicSortCompare, Cardinal(Sortings));
+    FPics.CustomSort(PhoaGroupPicSortCompare, Cardinal(Sortings));
   end;
 
   procedure TPhoaGroup.StreamerLoad(Streamer: TPhoaStreamer);
@@ -2633,10 +2432,9 @@ uses
     if ppFlips       in Props                  then FPicFlips           := [];
   end;
 
-  constructor TPhoaPic.Create(PhoA: TPhotoAlbum);
+  constructor TPhoaPic.Create;
   begin
     inherited Create;
-    FPhoA := PhoA;
     FPicKeywords := TStringList.Create;
     TStringList(FPicKeywords).Sorted     := True;
     TStringList(FPicKeywords).Duplicates := dupIgnore;
@@ -2646,7 +2444,6 @@ uses
   destructor TPhoaPic.Destroy;
   begin
     FPicKeywords.Free;
-    if FList<>nil then FList.Remove(Self);
     inherited Destroy;
   end;
 
@@ -2705,7 +2502,7 @@ uses
     try
       Streamer := TPhoaStreamer.Create(Stream, psmWrite, '');
       try
-        StreamerSave(Streamer, False, PProps);
+        IPAP_StreamerSave(Streamer, False, PProps);
       finally
         Streamer.Free;
       end;
@@ -2716,9 +2513,175 @@ uses
     end;
   end;
 
-  procedure TPhoaPic.IDNeeded(List: TPhoaPics);
+  function TPhoaPic.IPAP_GetList: IPhotoAlbumPics;
   begin
-    if FID=0 then FID := List.GetFreePicID;
+    Result := IPhotoAlbumPics(FList);
+  end;
+
+  procedure TPhoaPic.IPAP_PutToList(NewList: IPhotoAlbumPics; bAllocateNewID: Boolean);
+  begin
+    if FList<>Pointer(NewList) then begin
+      if FList<>nil then IPhotoAlbumPics(FList).Remove(Self.ID);
+      FList := Pointer(NewList);
+      if NewList<>nil then begin
+        if bAllocateNewID then FID := NewList.MaxPicID+1;
+        NewList.Add(Self, False);
+      end;
+    end;
+  end;
+
+  procedure TPhoaPic.IPAP_Release;
+  begin
+    IPAP_PutToList(nil, False);
+  end;
+
+  procedure TPhoaPic.IPAP_StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
+  var
+    Code: TPhChunkCode;
+    Datatype: TPhChunkDatatype;
+    vValue: Variant;
+
+    function XFilename(const s: String): String;
+    begin
+      if bExpandRelative then Result := ExpandRelativePath(Streamer.BasePath, s) else Result := s;
+    end;
+
+  begin
+     // *** Old format
+    if not Streamer.Chunked then begin
+      if ppID          in PProps                  then FID                    := Streamer.ReadInt;
+      if ppFileName    in PProps                  then FThumbnailData         := Streamer.ReadStringI;
+      if ppFilmNumber  in PProps                  then FPicFilmNumber         := Streamer.ReadStringI;
+      if ppDate        in PProps                  then FPicDateTime           := Streamer.ReadInt;
+      if ppDescription in PProps                  then FPicDesc               := Streamer.ReadStringI;
+      if ppFileName    in PProps                  then FPicFileName           := XFilename(Streamer.ReadStringI);
+      if [ppFileSize, ppFileSizeBytes]*PProps<>[] then FPicFileSize           := Streamer.ReadInt;
+      if ppFormat      in PProps                  then FPicFormat             := TPixelFormat(Streamer.ReadByte);
+      if ppKeywords    in PProps                  then FPicKeywords.CommaText := Streamer.ReadStringI;
+      if ppFrameNumber in PProps                  then FPicFrameNumber        := Streamer.ReadStringI;
+      if ppPlace       in PProps                  then FPicPlace              := Streamer.ReadStringI;
+      if ppFileName    in PProps                  then FThumbWidth            := Streamer.ReadInt;
+      if ppFileName    in PProps                  then FThumbHeight           := Streamer.ReadInt;
+     // *** New format
+    end else begin
+       // Revert props to their defaults because they might be not saved due to their emptiness
+      CleanupProps(PProps);
+       // Read chunked data
+      while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
+        case Code of
+           // Picture props
+          IPhChunk_Pic_ID:            if ppID          in PProps                  then FID                    := vValue;
+          IPhChunk_Pic_ThumbnailData: if ppFileName    in PProps                  then FThumbnailData         := vValue;
+          IPhChunk_Pic_ThumbWidth:    if ppFileName    in PProps                  then FThumbWidth            := vValue;
+          IPhChunk_Pic_ThumbHeight:   if ppFileName    in PProps                  then FThumbHeight           := vValue;
+          IPhChunk_Pic_PicFileName:   if ppFileName    in PProps                  then FPicFileName           := XFilename(vValue);
+          IPhChunk_Pic_PicFileSize:   if [ppFileSize, ppFileSizeBytes]*PProps<>[] then FPicFileSize           := vValue;
+          IPhChunk_Pic_PicWidth:      if [ppPicWidth, ppPicDims]*PProps<>[]       then FPicWidth              := vValue;
+          IPhChunk_Pic_PicHeight:     if [ppPicHeight, ppPicDims]*PProps<>[]      then FPicHeight             := vValue;
+          IPhChunk_Pic_PicFormat:     if ppFormat      in PProps                  then Byte(FPicFormat)       := vValue;
+          IPhChunk_Pic_Date:          if ppDate        in PProps                  then FPicDateTime           := PhoaDateToDate(vValue)+Frac(FPicDateTime);
+          IPhChunk_Pic_Time:          if ppTime        in PProps                  then FPicDateTime           := PhoaTimeToTime(vValue)+Int(FPicDateTime);
+          IPhChunk_Pic_Place:         if ppPlace       in PProps                  then FPicPlace              := vValue;
+          IPhChunk_Pic_FilmNumber:    if ppFilmNumber  in PProps                  then FPicFilmNumber         := vValue;
+          IPhChunk_Pic_FrameNumber:   if ppFrameNumber in PProps                  then FPicFrameNumber        := vValue;
+          IPhChunk_Pic_Author:        if ppAuthor      in PProps                  then FPicAuthor             := vValue;
+          IPhChunk_Pic_Media:         if ppMedia       in PProps                  then FPicMedia              := vValue;
+          IPhChunk_Pic_Desc:          if ppDescription in PProps                  then FPicDesc               := vValue;
+          IPhChunk_Pic_Notes:         if ppNotes       in PProps                  then FPicNotes              := vValue;
+          IPhChunk_Pic_Keywords:      if ppKeywords    in PProps                  then FPicKeywords.CommaText := vValue;
+          IPhChunk_Pic_Rotation:      if ppRotation    in PProps                  then Byte(FPicRotation)     := vValue;
+          IPhChunk_Pic_Flips:         if ppFlips       in PProps                  then Byte(FPicFlips)        := vValue;
+           // Close-chunk
+          IPhChunk_Pic_Close: Break;
+           // Ensure unknown nested structures are skipped whole
+          else Streamer.SkipNestedChunks(Code);
+        end;
+    end;
+  end;
+
+  procedure TPhoaPic.IPAP_StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
+
+    function XFilename: String;
+    begin
+      if bExtractRelative then Result := ExtractRelativePath(Streamer.BasePath, FPicFileName) else Result := FPicFileName;
+    end;
+
+  begin
+     // *** Old format
+    if not Streamer.Chunked then begin
+      if ppID          in PProps                  then Streamer.WriteInt    (FID);
+      if ppFileName    in PProps                  then Streamer.WriteStringI(FThumbnailData);
+      if ppFilmNumber  in PProps                  then Streamer.WriteStringI(FPicFilmNumber);
+      if ppDate        in PProps                  then Streamer.WriteInt    (Trunc(FPicDateTime));
+      if ppDescription in PProps                  then Streamer.WriteStringI(FPicDesc);
+      if ppFileName    in PProps                  then Streamer.WriteStringI(XFilename);
+      if [ppFileSize, ppFileSizeBytes]*PProps<>[] then Streamer.WriteInt    (FPicFileSize);
+      if ppFormat      in PProps                  then Streamer.WriteByte   (Byte(FPicFormat));
+      if ppKeywords    in PProps                  then Streamer.WriteStringI(FPicKeywords.CommaText);
+      if ppFrameNumber in PProps                  then Streamer.WriteStringI(FPicFrameNumber);
+      if ppPlace       in PProps                  then Streamer.WriteStringI(FPicPlace);
+      if ppFileName    in PProps                  then Streamer.WriteInt    (FThumbWidth);
+      if ppFileName    in PProps                  then Streamer.WriteInt    (FThumbHeight);
+     // *** New format
+    end else begin
+      if ppID          in PProps                                                 then Streamer.WriteChunkInt   (IPhChunk_Pic_ID,            FID);
+      if ppFileName    in PProps                                                 then Streamer.WriteChunkString(IPhChunk_Pic_ThumbnailData, FThumbnailData);
+      if ppFileName    in PProps                                                 then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbWidth,    FThumbWidth);
+      if ppFileName    in PProps                                                 then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbHeight,   FThumbHeight);
+      if ppFileName    in PProps                                                 then Streamer.WriteChunkString(IPhChunk_Pic_PicFileName,   XFilename);
+      if ([ppFileSize, ppFileSizeBytes]*PProps<>[]) and (FPicFileSize>0)         then Streamer.WriteChunkInt   (IPhChunk_Pic_PicFileSize,   FPicFileSize);
+      if ([ppPicWidth, ppPicDims]*PProps<>[])       and (FPicWidth>0)            then Streamer.WriteChunkInt   (IPhChunk_Pic_PicWidth,      FPicWidth);
+      if ([ppPicHeight, ppPicDims]*PProps<>[])      and (FPicHeight>0)           then Streamer.WriteChunkInt   (IPhChunk_Pic_PicHeight,     FPicHeight);
+      if (ppFormat      in PProps)                  and (FPicFormat<>pfCustom)   then Streamer.WriteChunkByte  (IPhChunk_Pic_PicFormat,     Byte(FPicFormat));
+      if (ppDate        in PProps)                  and (Trunc(FPicDateTime)<>0) then Streamer.WriteChunkInt   (IPhChunk_Pic_Date,          DateToPhoaDate(FPicDateTime));
+      if (ppTime        in PProps)                  and (Frac(FPicDateTime)<>0)  then Streamer.WriteChunkInt   (IPhChunk_Pic_Time,          TimeToPhoaTime(FPicDateTime));
+      if (ppPlace       in PProps)                  and (FPicPlace<>'')          then Streamer.WriteChunkString(IPhChunk_Pic_Place,         FPicPlace);
+      if (ppFilmNumber  in PProps)                  and (FPicFilmNumber<>'')     then Streamer.WriteChunkString(IPhChunk_Pic_FilmNumber,    FPicFilmNumber);
+      if (ppFrameNumber in PProps)                  and (FPicFrameNumber<>'')    then Streamer.WriteChunkString(IPhChunk_Pic_FrameNumber,   FPicFrameNumber);
+      if (ppAuthor      in PProps)                  and (FPicAuthor<>'')         then Streamer.WriteChunkString(IPhChunk_Pic_Author,        FPicAuthor);
+      if (ppMedia       in PProps)                  and (FPicMedia<>'')          then Streamer.WriteChunkString(IPhChunk_Pic_Media,         FPicMedia);
+      if (ppDescription in PProps)                  and (FPicDesc<>'')           then Streamer.WriteChunkString(IPhChunk_Pic_Desc,          FPicDesc);
+      if (ppNotes       in PProps)                  and (FPicNotes<>'')          then Streamer.WriteChunkString(IPhChunk_Pic_Notes,         FPicNotes);
+      if (ppKeywords    in PProps)                  and (FPicKeywords.Count>0)   then Streamer.WriteChunkString(IPhChunk_Pic_Keywords,      FPicKeywords.CommaText);
+      if (ppRotation    in PProps)                  and (FPicRotation<>pr0)      then Streamer.WriteChunkByte  (IPhChunk_Pic_Rotation,      Byte(FPicRotation));
+      if (ppFlips       in PProps)                  and (FPicFlips<>[])          then Streamer.WriteChunkByte  (IPhChunk_Pic_Flips,         Byte(FPicFlips));
+    end;
+  end;
+
+  procedure TPhoaPic.IPMP_ReloadPicFileData;
+  var PhoA: TPhotoAlbum;
+  begin
+    Assert(FList<>nil, 'Cannot reload picture file data when a picture isn''t in list');
+     // Получаем фотоальбом - через список-владелец
+    PhoA := IPhotoAlbumPics(FList).PhoA;
+     // Загружаем эскиз и получаем его данные
+    FThumbnailData := GetThumbnailData(
+      FPicFileName,
+      PhoA.ThumbnailWidth,
+      PhoA.ThumbnailHeight,
+      TStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
+      PhoA.ThumbnailQuality,
+      FPicWidth,
+      FPicHeight,
+      FThumbWidth,
+      FThumbHeight);
+     // Получаем размер файла изображения
+    FPicFileSize := GetFileSize(FPicFileName, 0); 
+  end;
+
+  procedure TPhoaPic.IPMP_SetFileName(Value: PAnsiChar);
+  begin
+    FPicFileName := Value;
+  end;
+
+  procedure TPhoaPic.IPMP_SetFlips(Value: TPicFlips);
+  begin
+    FPicFlips := Value;
+  end;
+
+  procedure TPhoaPic.IPMP_SetRotation(Value: TPicRotation);
+  begin
+    FPicRotation := Value;
   end;
 
   function TPhoaPic.IPP_GetAuthor: PAnsiChar;
@@ -2830,34 +2793,6 @@ uses
     Result := TimeToPhoaTime(FPicDateTime);
   end;
 
-  function TPhoaPic.QueryInterface(const IID: TGUID; out Obj): HResult;
-  begin
-    if GetInterface(IID, Obj) then Result := S_OK else Result := E_NOINTERFACE;
-  end;
-
-  procedure TPhoaPic.ReloadPicFileData;
-  begin
-    FThumbnailData := GetThumbnailData(
-      FPicFileName,
-      FPhoA.FThumbnailWidth,
-      FPhoA.FThumbnailHeight,
-      TStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
-      FPhoA.FThumbnailQuality,
-      FPicWidth,
-      FPicHeight,
-      FThumbWidth,
-      FThumbHeight);
-  end;
-
-  procedure TPhoaPic.SetList(Value: TPhoaPics);
-  begin
-    if FList<>Value then begin
-      if FList<>nil then FList.Remove(Self);
-      FList := Value;
-      if FList<>nil then FList.Add(Self, False);
-    end;
-  end;
-
   procedure TPhoaPic.SetProps(PicProp: TPicProperty; const Value: String);
   begin
     case PicProp of
@@ -2885,7 +2820,7 @@ uses
     try
       Streamer := TPhoaStreamer.Create(Stream, psmRead, '');
       try
-        StreamerLoad(Streamer, False, PProps);
+        IPAP_StreamerLoad(Streamer, False, PProps);
       finally
         Streamer.Free;
       end;
@@ -2894,228 +2829,63 @@ uses
     end;
   end;
 
-  procedure TPhoaPic.StreamerLoad(Streamer: TPhoaStreamer; bExpandRelative: Boolean; PProps: TPicProperties);
-  var
-    Code: TPhChunkCode;
-    Datatype: TPhChunkDatatype;
-    vValue: Variant;
-
-    function XFilename(const s: String): String;
-    begin
-      if bExpandRelative then Result := ExpandRelativePath(Streamer.BasePath, s) else Result := s;
-    end;
-
-  begin
-    with Streamer do
-       // *** Old format
-      if not Chunked then begin
-        if ppID          in PProps                  then FID                    := ReadInt;
-        if ppFileName    in PProps                  then FThumbnailData         := ReadStringI;
-        if ppFilmNumber  in PProps                  then FPicFilmNumber         := ReadStringI;
-        if ppDate        in PProps                  then FPicDateTime           := ReadInt;
-        if ppDescription in PProps                  then FPicDesc               := ReadStringI;
-        if ppFileName    in PProps                  then FPicFileName           := XFilename(ReadStringI);
-        if [ppFileSize, ppFileSizeBytes]*PProps<>[] then FPicFileSize           := ReadInt;
-        if ppFormat      in PProps                  then FPicFormat             := TPixelFormat(ReadByte);
-        if ppKeywords    in PProps                  then FPicKeywords.CommaText := ReadStringI;
-        if ppFrameNumber in PProps                  then FPicFrameNumber        := ReadStringI;
-        if ppPlace       in PProps                  then FPicPlace              := ReadStringI;
-        if ppFileName    in PProps                  then FThumbWidth            := ReadInt;
-        if ppFileName    in PProps                  then FThumbHeight           := ReadInt;
-       // *** New format
-      end else begin
-         // Revert props to their defaults because they might be not saved due to their emptiness
-        CleanupProps(PProps);
-         // Read chunked data
-        while ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
-          case Code of
-             // Picture props
-            IPhChunk_Pic_ID:            if ppID          in PProps                  then FID                    := vValue;
-            IPhChunk_Pic_ThumbnailData: if ppFileName    in PProps                  then FThumbnailData         := vValue;
-            IPhChunk_Pic_ThumbWidth:    if ppFileName    in PProps                  then FThumbWidth            := vValue;
-            IPhChunk_Pic_ThumbHeight:   if ppFileName    in PProps                  then FThumbHeight           := vValue;
-            IPhChunk_Pic_PicFileName:   if ppFileName    in PProps                  then FPicFileName           := XFilename(vValue);
-            IPhChunk_Pic_PicFileSize:   if [ppFileSize, ppFileSizeBytes]*PProps<>[] then FPicFileSize           := vValue;
-            IPhChunk_Pic_PicWidth:      if [ppPicWidth, ppPicDims]*PProps<>[]       then FPicWidth              := vValue;
-            IPhChunk_Pic_PicHeight:     if [ppPicHeight, ppPicDims]*PProps<>[]      then FPicHeight             := vValue;
-            IPhChunk_Pic_PicFormat:     if ppFormat      in PProps                  then Byte(FPicFormat)       := vValue;
-            IPhChunk_Pic_Date:          if ppDate        in PProps                  then FPicDateTime           := PhoaDateToDate(vValue)+Frac(FPicDateTime);
-            IPhChunk_Pic_Time:          if ppTime        in PProps                  then FPicDateTime           := PhoaTimeToTime(vValue)+Int(FPicDateTime);
-            IPhChunk_Pic_Place:         if ppPlace       in PProps                  then FPicPlace              := vValue;
-            IPhChunk_Pic_FilmNumber:    if ppFilmNumber  in PProps                  then FPicFilmNumber         := vValue;
-            IPhChunk_Pic_FrameNumber:   if ppFrameNumber in PProps                  then FPicFrameNumber        := vValue;
-            IPhChunk_Pic_Author:        if ppAuthor      in PProps                  then FPicAuthor             := vValue;
-            IPhChunk_Pic_Media:         if ppMedia       in PProps                  then FPicMedia              := vValue;
-            IPhChunk_Pic_Desc:          if ppDescription in PProps                  then FPicDesc               := vValue;
-            IPhChunk_Pic_Notes:         if ppNotes       in PProps                  then FPicNotes              := vValue;
-            IPhChunk_Pic_Keywords:      if ppKeywords    in PProps                  then FPicKeywords.CommaText := vValue;
-            IPhChunk_Pic_Rotation:      if ppRotation    in PProps                  then Byte(FPicRotation)     := vValue;
-            IPhChunk_Pic_Flips:         if ppFlips       in PProps                  then Byte(FPicFlips)        := vValue;
-             // Close-chunk
-            IPhChunk_Pic_Close: Break;
-             // Ensure unknown nested structures are skipped whole
-            else SkipNestedChunks(Code);
-          end;
-      end;
-  end;
-
-  procedure TPhoaPic.StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
-
-    function XFilename: String;
-    begin
-      if bExtractRelative then Result := ExtractRelativePath(Streamer.BasePath, FPicFileName) else Result := FPicFileName;
-    end;
-
-  begin
-    with Streamer do
-       // *** Old format
-      if not Chunked then begin
-        if ppID          in PProps                  then WriteInt    (FID);
-        if ppFileName    in PProps                  then WriteStringI(FThumbnailData);
-        if ppFilmNumber  in PProps                  then WriteStringI(FPicFilmNumber);
-        if ppDate        in PProps                  then WriteInt    (Trunc(FPicDateTime));
-        if ppDescription in PProps                  then WriteStringI(FPicDesc);
-        if ppFileName    in PProps                  then WriteStringI(XFilename);
-        if [ppFileSize, ppFileSizeBytes]*PProps<>[] then WriteInt    (FPicFileSize);
-        if ppFormat      in PProps                  then WriteByte   (Byte(FPicFormat));
-        if ppKeywords    in PProps                  then WriteStringI(FPicKeywords.CommaText);
-        if ppFrameNumber in PProps                  then WriteStringI(FPicFrameNumber);
-        if ppPlace       in PProps                  then WriteStringI(FPicPlace);
-        if ppFileName    in PProps                  then WriteInt    (FThumbWidth);
-        if ppFileName    in PProps                  then WriteInt    (FThumbHeight);
-       // *** New format
-      end else begin
-        if ppID          in PProps                                                 then WriteChunkInt   (IPhChunk_Pic_ID,            FID);
-        if ppFileName    in PProps                                                 then WriteChunkString(IPhChunk_Pic_ThumbnailData, FThumbnailData);
-        if ppFileName    in PProps                                                 then WriteChunkWord  (IPhChunk_Pic_ThumbWidth,    FThumbWidth);
-        if ppFileName    in PProps                                                 then WriteChunkWord  (IPhChunk_Pic_ThumbHeight,   FThumbHeight);
-        if ppFileName    in PProps                                                 then WriteChunkString(IPhChunk_Pic_PicFileName,   XFilename);
-        if ([ppFileSize, ppFileSizeBytes]*PProps<>[]) and (FPicFileSize>0)         then WriteChunkInt   (IPhChunk_Pic_PicFileSize,   FPicFileSize);
-        if ([ppPicWidth, ppPicDims]*PProps<>[])       and (FPicWidth>0)            then WriteChunkInt   (IPhChunk_Pic_PicWidth,      FPicWidth);
-        if ([ppPicHeight, ppPicDims]*PProps<>[])      and (FPicHeight>0)           then WriteChunkInt   (IPhChunk_Pic_PicHeight,     FPicHeight);
-        if (ppFormat      in PProps)                  and (FPicFormat<>pfCustom)   then WriteChunkByte  (IPhChunk_Pic_PicFormat,     Byte(FPicFormat));
-        if (ppDate        in PProps)                  and (Trunc(FPicDateTime)<>0) then WriteChunkInt   (IPhChunk_Pic_Date,          DateToPhoaDate(FPicDateTime));
-        if (ppTime        in PProps)                  and (Frac(FPicDateTime)<>0)  then WriteChunkInt   (IPhChunk_Pic_Time,          TimeToPhoaTime(FPicDateTime));
-        if (ppPlace       in PProps)                  and (FPicPlace<>'')          then WriteChunkString(IPhChunk_Pic_Place,         FPicPlace);
-        if (ppFilmNumber  in PProps)                  and (FPicFilmNumber<>'')     then WriteChunkString(IPhChunk_Pic_FilmNumber,    FPicFilmNumber);
-        if (ppFrameNumber in PProps)                  and (FPicFrameNumber<>'')    then WriteChunkString(IPhChunk_Pic_FrameNumber,   FPicFrameNumber);
-        if (ppAuthor      in PProps)                  and (FPicAuthor<>'')         then WriteChunkString(IPhChunk_Pic_Author,        FPicAuthor);
-        if (ppMedia       in PProps)                  and (FPicMedia<>'')          then WriteChunkString(IPhChunk_Pic_Media,         FPicMedia);
-        if (ppDescription in PProps)                  and (FPicDesc<>'')           then WriteChunkString(IPhChunk_Pic_Desc,          FPicDesc);
-        if (ppNotes       in PProps)                  and (FPicNotes<>'')          then WriteChunkString(IPhChunk_Pic_Notes,         FPicNotes);
-        if (ppKeywords    in PProps)                  and (FPicKeywords.Count>0)   then WriteChunkString(IPhChunk_Pic_Keywords,      FPicKeywords.CommaText);
-        if (ppRotation    in PProps)                  and (FPicRotation<>pr0)      then WriteChunkByte  (IPhChunk_Pic_Rotation,      Byte(FPicRotation));
-        if (ppFlips       in PProps)                  and (FPicFlips<>[])          then WriteChunkByte  (IPhChunk_Pic_Flips,         Byte(FPicFlips));
-      end;
-  end;
-
-  function TPhoaPic._AddRef: Integer;
-  begin
-     // No refcounting applicable
-    Result := -1;
-  end;
-
-  function TPhoaPic._Release: Integer;
-  begin
-     // No refcounting applicable
-    Result := -1;
-  end;
-
    //===================================================================================================================
-   // TPhoaPics
+   // TPhotoAlbumPics
    //===================================================================================================================
 
-  procedure TPhoaPics.Assign(Src: TPhoaPics; bCopyLinksOnly: Boolean; RestrictPics: IPhoaPicList);
-  var
-    i: Integer;
-    Pic, SrcPic: TPhoaPic;
-  begin
-     // Копирование ссылок реализуется методом предка
-    if bCopyLinksOnly then
-      inherited Assign(Src, RestrictPics)
-     // Копирование с созданием новых экземпляров изображений 
-    else begin
-      Clear;
-      for i := 0 to Src.Count-1 do begin
-        SrcPic := Src[i];
-        if (RestrictPics=nil) or (RestrictPics.IndexOfID(SrcPic.ID)>=0) then begin
-          Pic := TPhoaPic.Create(FPhoA);
-          try
-            Pic.Assign(SrcPic);
-            Pic.List := Self;
-          except
-            Pic.Free;
-            raise;
-          end;
-        end;
-      end;
-    end;
-  end;
-
-  procedure TPhoaPics.Clear;
-  var i: Integer;
-  begin
-    for i := Count-1 downto 0 do Delete(i);
-    inherited Clear;
-  end;
-
-  constructor TPhoaPics.Create(_PhoA: TPhotoAlbum);
+  constructor TPhotoAlbumPics.Create(APhoA: TPhotoAlbum);
   begin
     inherited Create(True);
-    FPhoA := _PhoA;
+    FPhoA := APhoA;
   end;
 
-  procedure TPhoaPics.Delete(Index: Integer);
+  procedure TPhotoAlbumPics.DuplicatePics(PicList: IPhoaPicList);
+  var
+    i: Integer;
+    Pic: IPhotoAlbumPic;
   begin
-    GetItems(Index).Free;
+    Clear;
+    for i := 0 to PicList.Count-1 do begin
+       // Создаём экземпляр изображения
+      Pic := TPhoaPic.Create;
+       // Копируем в него данные исходного изображения
+      TPhoaPic(Pic.Handle).Assign(TPhoaPic(PicList[i].Handle));
+       // После этого (ID присвоен) - заносим в список
+      Pic.PutToList(Self, False);
+    end;
   end;
 
-  function TPhoaPics.GetFreePicID: Integer;
-  var i: Integer;
+  function TPhotoAlbumPics.GetPhoA: TPhotoAlbum;
   begin
-    Result := 0;
-    for i := 0 to Count-1 do
-      with GetItems(i) do
-        if ID>Result then Result := ID;
-    Inc(Result);
+    Result := FPhoA;
   end;
 
-  procedure TPhoaPics.StreamerLoad(Streamer: TPhoaStreamer);
+  procedure TPhotoAlbumPics.StreamerLoad(Streamer: TPhoaStreamer);
   var
     i: Integer;
     Code: TPhChunkCode;
     Datatype: TPhChunkDatatype;
     vValue: Variant;
-    Pic: TPhoaPic;
+
+    procedure LoadPic;
+    var Pic: IPhotoAlbumPic;
+    begin
+      Pic := TPhoaPic.Create;
+      Pic.StreamerLoad(Streamer, True, PPAllProps);
+      Pic.PutToList(Self, False);
+    end;
+
   begin
     Clear;
      // *** Old format
     if not Streamer.Chunked then
-      for i := 0 to Streamer.ReadInt-1 do begin
-        Pic := TPhoaPic.Create(FPhoA);
-        try
-          Pic.StreamerLoad(Streamer, True, PPAllProps);
-          Pic.List := Self;
-        except
-          Pic.Free;
-          raise;
-        end;
-      end
+      for i := 0 to Streamer.ReadInt-1 do LoadPic
      // *** New format
     else
       while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
         case Code of
            // Picture
-          IPhChunk_Pic_Open: begin
-            Pic := TPhoaPic.Create(FPhoA);
-            try
-              Pic.StreamerLoad(Streamer, True, PPAllProps);
-              Pic.List := Self;
-            except
-              Pic.Free;
-              raise;
-            end;
-          end;
+          IPhChunk_Pic_Open: LoadPic;
            // Close-chunk
           IPhChunk_Pics_Close: Break;
            // Ensure unknown nested structures are skipped whole
@@ -3123,43 +2893,23 @@ uses
         end;
   end;
 
-  procedure TPhoaPics.StreamerSave(Streamer: TPhoaStreamer);
+  procedure TPhotoAlbumPics.StreamerSave(Streamer: TPhoaStreamer);
   var i: Integer;
   begin
      // *** Old format
     if not Streamer.Chunked then begin
       Streamer.WriteInt(Count);
-      for i := 0 to Count-1 do GetItems(i).StreamerSave(Streamer, True, PPAllProps);
+      for i := 0 to Count-1 do (Items[i] as IPhotoAlbumPic).StreamerSave(Streamer, True, PPAllProps);
      // *** New format
     end else begin
       Streamer.WriteChunk(IPhChunk_Pics_Open);
       for i := 0 to Count-1 do begin
         Streamer.WriteChunk(IPhChunk_Pic_Open);
-        GetItems(i).StreamerSave(Streamer, True, PPAllProps);
+        (Items[i] as IPhotoAlbumPic).StreamerSave(Streamer, True, PPAllProps);
         Streamer.WriteChunk(IPhChunk_Pic_Close);
       end;
       Streamer.WriteChunk(IPhChunk_Pics_Close);
     end;
-  end;
-
-   //===================================================================================================================
-   // TPhoaViewHelperPics
-   //===================================================================================================================
-var
-  ViewToSortFor: TPhoaView;
-
-  function PVHelperSortCompare(Item1, Item2: Pointer): Integer;
-  begin
-     // Сначала сортируем по группировкам
-    Result := ViewToSortFor.Groupings.SortComparePics(TPhoaPic(Item1), TPhoaPic(Item2));
-     // Потом по сортировкам
-    if Result=0 then Result := ViewToSortFor.Sortings.SortComparePics(TPhoaPic(Item1), TPhoaPic(Item2));
-  end;
-
-  procedure TPhoaViewHelperPics.Sort(View: TPhoaView);
-  begin
-    ViewToSortFor := View;
-    inherited Sort(PVHelperSortCompare);
   end;
 
    //===================================================================================================================
@@ -3201,22 +2951,22 @@ var
     inherited Items[Index] := Pointer(gs);
   end;
 
-  function TPhoaGroupings.SortComparePics(Pic1, Pic2: TPhoaPic): Integer;
+  function TPhoaGroupings.SortComparePics(Pic1, Pic2: IPhoaPic): Integer;
   var i: Integer;
   begin
     Result := 0;
     for i := 0 to Count-1 do begin
       case GetItems(i).Prop of
-        gbpFilePath:    Result := AnsiCompareText(ExtractFilePath(Pic1.PicFileName), ExtractFilePath(Pic2.PicFileName));
-        gbpDateByYear:  Result := YearOf(Pic1.PicDateTime)-YearOf(Pic2.PicDateTime);
-        gbpDateByMonth: Result := MonthOf(Pic1.PicDateTime)-MonthOf(Pic2.PicDateTime);
-        gbpDateByDay:   Result := DayOf(Pic1.PicDateTime)-DayOf(Pic2.PicDateTime);
-        gbpTimeHour:    Result := HourOf(Pic1.PicDateTime)-HourOf(Pic2.PicDateTime);
-        gbpTimeMinute:  Result := MinuteOf(Pic1.PicDateTime)-MinuteOf(Pic2.PicDateTime);
-        gbpPlace:       Result := AnsiCompareText(Pic1.PicPlace,      Pic2.PicPlace);
-        gbpFilmNumber:  Result := AnsiCompareText(Pic1.PicFilmNumber, Pic2.PicFilmNumber);
-        gbpAuthor:      Result := AnsiCompareText(Pic1.PicAuthor,     Pic2.PicAuthor);
-        gbpMedia:       Result := AnsiCompareText(Pic1.PicMedia,      Pic2.PicMedia);
+        gbpFilePath:    Result := AnsiCompareText(ExtractFilePath(Pic1.FileName), ExtractFilePath(Pic2.FileName));
+        gbpDateByYear:  Result := YearOf(PhoaDateToDate(Pic1.Date))-YearOf(PhoaDateToDate(Pic2.Date));
+        gbpDateByMonth: Result := MonthOf(PhoaDateToDate(Pic1.Date))-MonthOf(PhoaDateToDate(Pic2.Date));
+        gbpDateByDay:   Result := DayOf(PhoaDateToDate(Pic1.Date))-DayOf(PhoaDateToDate(Pic2.Date));
+        gbpTimeHour:    Result := HourOf(PhoaTimeToTime(Pic1.Time))-HourOf(PhoaTimeToTime(Pic2.Time));
+        gbpTimeMinute:  Result := MinuteOf(PhoaTimeToTime(Pic1.Time))-MinuteOf(PhoaTimeToTime(Pic2.Time));
+        gbpPlace:       Result := AnsiCompareText(Pic1.Place,      Pic2.Place);
+        gbpFilmNumber:  Result := AnsiCompareText(Pic1.FilmNumber, Pic2.FilmNumber);
+        gbpAuthor:      Result := AnsiCompareText(Pic1.Author,     Pic2.Author);
+        gbpMedia:       Result := AnsiCompareText(Pic1.Media,      Pic2.Media);
         gbpKeywords:    Result := 0; // По ключевым словам сортировка неприменима
       end;
       if Result<>0 then Break;
@@ -3236,7 +2986,7 @@ var
     with Streamer do
        // *** Old format
       if not Chunked then begin
-         // Read groupings translatin GroupByProperty from old revision 2
+         // Read groupings translating GroupByProperty from old revision 2
         for i := 0 to ReadInt-1 do begin
           Integer(RG) := ReadInt;
           RG.bProp := aXlat_GBProp2ToGBProp[RG.bProp];
@@ -3314,6 +3064,14 @@ var
    // TPhoaView
    //===================================================================================================================
 
+  function PhoaViewSortCompareFunc(Pic1, Pic2: IPhoaPic; dwData: Cardinal): Integer; stdcall;
+  begin
+     // Сначала сортируем по группировкам
+    Result := TPhoaView(dwData).Groupings.SortComparePics(Pic1, Pic2);
+     // Потом по сортировкам
+    if Result=0 then Result := TPhoaView(dwData).Sortings.SortComparePics(Pic1, Pic2);
+  end;
+
   procedure TPhoaView.Assign(Src: TPhoaView);
   begin
     UnprocessGroups;
@@ -3360,6 +3118,16 @@ var
     Pic: IPhoaPic;
     GroupWithPics: TList;
     bClassified: Boolean;
+
+     // Создаёт вспомогательный список, сортирует его и помещает изображения в корневую группу
+    procedure FillRootGroup;
+    var Pics: IPhoaMutablePicList;
+    begin
+      Pics := TPhoaMutablePicList.Create(False);
+      Pics.Add(FList.FPhoA.Pics, False);
+      Pics.CustomSort(PhoaViewSortCompareFunc, Cardinal(Self));
+      FRootGroup.Pics.Assign(Pics);
+    end;
 
      // Создаёт дерево по пути к изображению
     procedure ProcessFilePathTree(ParentGroup: TPhoaGroup; Pic: IPhoaPic);
@@ -3517,15 +3285,8 @@ var
     try
        // Создаём корневую или стираем подчинённые группы по необходимости
       if FRootGroup=nil then FRootGroup := TPhoaGroup.Create(nil, 1) else FRootGroup.Groups.Clear;
-       // Создаём вспомогательный список, сортируем его и помещаем ID изображений в корневую группу
-      with TPhoaViewHelperPics.Create(False) do
-        try
-          CopyFromPhoa(FList.FPhoA);
-          Sort(Self);
-          CopyToGroup(FRootGroup);
-        finally
-          Free;
-        end;
+       // Помещает сортированный по группировкам представления список всех изображений фотоальбома в корневую группу
+      FillRootGroup;
        // Создаём иерархию групп - применяем последовательно все группировки
       GroupWithPics := TList.Create;
       try
@@ -3777,7 +3538,7 @@ var
   begin
     inherited Create;
     FRootGroup        := TPhoaGroup.Create(nil, 1);
-    FPics             := TPhoaPics.Create(Self);
+    FPics             := TPhotoAlbumPics.Create(Self);
     FViews            := TPhoaViews.Create(Self);
     FFileRevision     := IPhFileRevisionNumber;
     FThumbnailQuality := IDefaultThumbQuality;
@@ -3788,7 +3549,7 @@ var
   destructor TPhotoAlbum.Destroy;
   begin
     FreeAndNil(FRootGroup);
-    FPics.Free;
+    FPics := nil;
     FViews.Free;
     inherited Destroy;
   end;
@@ -3836,12 +3597,12 @@ var
   procedure TPhotoAlbum.RemoveUnlinkedPics(UndoOperations: TPhoaOperations);
   var
     i: Integer;
-    pic: TPhoaPic;
+    Pic: IPhoaPic;
   begin
     i := 0;
     while i<FPics.Count do begin
-      pic := FPics[i];
-      if not FRootGroup.IsPicLinked(pic.ID, True) then TPhoaOp_InternalPicRemoving.Create(UndoOperations, Self, pic) else Inc(i);
+      Pic := FPics[i];
+      if not FRootGroup.IsPicLinked(Pic.ID, True) then TPhoaOp_InternalPicRemoving.Create(UndoOperations, Self, Pic) else Inc(i);
     end;
   end;
 
@@ -4499,7 +4260,7 @@ var
     g.Index       := UndoFile.ReadInt;
     g.Expanded    := UndoFile.ReadBool;
     if FPicIDs<>nil then
-      for i := 0 to FPicIDs.Count-1 do g.Pics.Add(PhoA.Pics.PicByID(FPicIDs[i]), False);
+      for i := 0 to FPicIDs.Count-1 do g.Pics.Add(PhoA.Pics.ItemsByID[FPicIDs[i]], False);
      // Восстанавливаем каскадно удалённые группы
     if FCascadedDeletes<>nil then
       for i := 0 to FCascadedDeletes.Count-1 do TPhoaOp_GroupDelete(FCascadedDeletes[i]).InternalRollback(g);
@@ -4518,38 +4279,35 @@ var
    // TPhoaOp_InternalPicRemoving
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalPicRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic);
+  constructor TPhoaOp_InternalPicRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaPic);
   begin
     inherited Create(List, PhoA);
      // Сохраняем данные изображения
-    UndoFile.WriteStr(Pic.RawData[PPAllProps]);
+    UndoFile.WriteStr(TPhoaPic(Pic.Handle).RawData[PPAllProps]);
      // Выполняем операцию
-    Pic.Free;
+    (Pic as IPhotoAlbumPic).Release;
   end;
 
   procedure TPhoaOp_InternalPicRemoving.RollbackChanges;
-  var Pic: TPhoaPic;
+  var Pic: IPhotoAlbumPic;
   begin
     inherited RollbackChanges;
-     // Создаём изображение и загружаем данные
-    Pic := TPhoaPic.Create(FPhoA);
-    try
-      Pic.RawData[PPAllProps] := UndoFile.ReadStr;
-      Pic.List := FPhoA.Pics; // Assign the List AFTER props have been read because List sorts pics by IDs
-    except
-      Pic.Free;
-      raise;
-    end;
+     // Создаём изображение
+    Pic := TPhoaPic.Create;
+     // Загружаем данные
+    TPhoaPic(Pic.Handle).RawData[PPAllProps] := UndoFile.ReadStr;
+     // Кладём в список (ID уже загружен)
+    Pic.PutToList(FPhoA.Pics, False);
   end;
 
    //===================================================================================================================
    // TPhoaOp_InternalEditPicProps
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalEditPicProps.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; ChangeList: TPicPropertyChanges);
+  constructor TPhoaOp_InternalEditPicProps.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: IPhoaPicList; ChangeList: TPicPropertyChanges);
   var
     iPic, iChg: Integer;
-    Pic: TPhoaPic;
+    Pic: IPhoaPic;
     ChangedProps: TPicProperties;
   begin
     inherited Create(List, PhoA);
@@ -4557,16 +4315,16 @@ var
     ChangedProps := ChangeList.ChangedProps;
     UndoFile.WriteInt(PicPropsToInt(ChangedProps));
      // Сохраняем количество изображений
-    UndoFile.WriteInt(Length(Pics));
+    UndoFile.WriteInt(Pics.Count);
      // Цикл по изображениям
-    for iPic := 0 to High(Pics) do begin
+    for iPic := 0 to Pics.Count-1 do begin
        // Запоминаем старые данные
       Pic := Pics[iPic];
       UndoFile.WriteInt(Pic.ID);
-      UndoFile.WriteStr(Pic.RawData[ChangedProps]);
+      UndoFile.WriteStr(TPhoaPic(Pic.Handle).RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
-        with ChangeList[iChg]^ do Pic.Props[Prop] := sNewValue;
+        with ChangeList[iChg]^ do TPhoaPic(Pic.Handle).Props[Prop] := sNewValue;
     end;
   end;
 
@@ -4583,7 +4341,7 @@ var
     for i := 0 to UndoFile.ReadInt-1 do begin
       iPicID   := UndoFile.ReadInt;
       sPicData := UndoFile.ReadStr;
-      FPhoA.Pics.PicByID(iPicID).RawData[ChangedProps] := sPicData;
+      TPhoaPic(FPhoA.Pics.ItemsByID[iPicID].Handle).RawData[ChangedProps] := sPicData;
     end;
   end;
 
@@ -4591,7 +4349,7 @@ var
    // TPhoaOp_InternalEditPicKeywords
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalEditPicKeywords.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: TPicArray; Keywords: TKeywordList);
+  constructor TPhoaOp_InternalEditPicKeywords.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pics: IPhoaPicList; Keywords: TKeywordList);
   var
     iPic, iCnt, iKwd, idxKeyword: Integer;
     Pic: TPhoaPic;
@@ -4611,10 +4369,10 @@ var
 
   begin
     inherited Create(List, PhoA);
-    iCnt := Length(Pics);
      // Цикл по изображениям
+    iCnt := Pics.Count;
     for iPic := 0 to iCnt-1 do begin
-      Pic := Pics[iPic];
+      Pic := TPhoaPic(Pics[iPic].Handle);
       bKWSaved := False;
        // Цикл по ключевым словам
       for iKwd := 0 to Keywords.Count-1 do begin
@@ -4680,7 +4438,7 @@ var
     while UndoFile.ReadBool do begin
       iPicID    := UndoFile.ReadInt;
       sKeywords := UndoFile.ReadStr;
-      FPhoA.Pics.PicByID(iPicID).PicKeywords.CommaText := sKeywords;
+      TPhoaPic(FPhoA.Pics.ItemsByID[iPicID].Handle).PicKeywords.CommaText := sKeywords;
     end;
   end;
 
@@ -4688,25 +4446,25 @@ var
    // TPhoaOp_StoreTransform
    //===================================================================================================================
 
-  constructor TPhoaOp_StoreTransform.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: TPhoaPic; NewRotation: TPicRotation; NewFlips: TPicFlips);
+  constructor TPhoaOp_StoreTransform.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Pic: IPhoaMutablePic; NewRotation: TPicRotation; NewFlips: TPicFlips);
   begin
     inherited Create(List, PhoA);
      // Сохраняем прежние свойства
     UndoFile.WriteInt(Pic.ID);
-    UndoFile.WriteByte(Byte(Pic.PicRotation));
-    UndoFile.WriteByte(Byte(Pic.PicFlips));
+    UndoFile.WriteByte(Byte(Pic.Rotation));
+    UndoFile.WriteByte(Byte(Pic.Flips));
      // Применяем новые свойства
-    Pic.PicRotation := NewRotation;
-    Pic.PicFlips    := NewFlips; 
+    Pic.Rotation := NewRotation;
+    Pic.Flips    := NewFlips;
   end;
 
   procedure TPhoaOp_StoreTransform.RollbackChanges;
-  var Pic: TPhoaPic;
+  var Pic: IPhoaMutablePic;
   begin
     inherited RollbackChanges;
-    Pic             := PhoA.Pics.PicByID(UndoFile.ReadInt);
-    Pic.PicRotation := TPicRotation     (UndoFile.ReadByte);
-    Pic.PicFlips    := TPicFlips   (Byte(UndoFile.ReadByte)); // Странный typecast, но иначе не компилируется
+    Pic          := PhoA.Pics.ItemsByID[UndoFile.ReadInt] as IPhoaMutablePic;
+    Pic.Rotation := TPicRotation(UndoFile.ReadByte);
+    Pic.Flips    := TPicFlips(Byte(UndoFile.ReadByte)); // Странный typecast, но иначе не компилируется
   end;
 
    //===================================================================================================================
@@ -4714,56 +4472,40 @@ var
    //===================================================================================================================
 
   constructor TPhoaOp_InternalPicAdd.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const sFilename: String);
-  var Pic: TPhoaPic;
+  var Pic: IPhotoAlbumPic;
   begin
     inherited Create(List, PhoA);
      // Ищем уже существующее изображение с тем же файлом
-    Pic := PhoA.Pics.PicByFileName(sFilename);
+    Pic := PhoA.Pics.ItemsByFileName[PChar(sFilename)] as IPhotoAlbumPic;
     FExisting := Pic<>nil;
      // Если файл ещё не использовался, создаём экземпляр TPhoaPic
     if not FExisting then begin
-      Pic := TPhoaPic.Create(PhoA);
-       // Получаем ID, добавляем в список и строим эскиз
-      with Pic do
-        try
-          IDNeeded(PhoA.Pics);
-          Pic.List := PhoA.Pics;
-          PicFileName := sFilename;
-          ReloadPicFileData;
-        except
-          Free;
-          raise;
-        end;
+      Pic := TPhoaPic.Create;
+       // Добавляем в список, получая ID
+      Pic.PutToList(PhoA.Pics, True);
+       // Присваиваем имя файла и строим эскиз
+      Pic.FileName := PChar(sFilename);
+      Pic.ReloadPicFileData;
     end;
      // Добавляем в группу
     RegisterPic(Group, Pic);
-    FAddedPic := Pic;
+    FAddedPic := TPhoaPic(Pic.Handle);
   end;
 
-  constructor TPhoaOp_InternalPicAdd.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pic: TPhoaPic);
-  var PicEx: TPhoaPic;
+  constructor TPhoaOp_InternalPicAdd.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pic: IPhoaPic);
+  var PicEx: IPhoaPic;
   begin
     inherited Create(List, PhoA);
      // Ищем уже существующее изображение с тем же файлом
-    PicEx := PhoA.Pics.PicByFileName(Pic.PicFileName);
+    PicEx := PhoA.Pics.ItemsByFileName[PChar(Pic.FileName)];
     FExisting := PicEx<>nil;
-     // Если нет (новое изображение) - добавляем
-    if not FExisting then begin
-       // Распределяем новый ID
-      Pic.FID := 0;
-      Pic.IDNeeded(PhoA.Pics);
-       // Заносим в список
-      Pic.List := PhoA.Pics;
-     // Иначе уничтожаем копию
-    end else begin
-      Pic.Free;
-      Pic := PicEx;
-    end;
+     // Если новое изображение - заносим в список, распределяя новый ID. Иначе игнорируем Pic
+    if not FExisting then (Pic as IPhotoAlbumPic).PutToList(PhoA.Pics, True) else Pic := PicEx;
      // Добавляем в группу
     RegisterPic(Group, Pic);
   end;
 
-  procedure TPhoaOp_InternalPicAdd.RegisterPic(Group: TPhoaGroup; Pic: TPhoaPic);
+  procedure TPhoaOp_InternalPicAdd.RegisterPic(Group: TPhoaGroup; Pic: IPhoaPic);
   var bAdded: Boolean;
   begin
      // Добавляем изображение в группу, если его не было
@@ -4786,7 +4528,7 @@ var
        // Удаляем из группы
       OpGroup.Pics.Remove(iPicID);
        // Если было добавлено новое изображение, удаляем и из фотоальбома
-      if not FExisting then FPhoA.Pics.PicByID(iPicID).Free;
+      if not FExisting then (FPhoA.Pics.ItemsByID[iPicID] as IPhotoAlbumPic).Release;
     end;
   end;
 
@@ -4794,21 +4536,21 @@ var
    // TPhoaOp_PicFromGroupRemove
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalPicFromGroupRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+  constructor TPhoaOp_InternalPicFromGroupRemoving.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   var i, idx: Integer;
   begin
     inherited Create(List, PhoA);
      // Запоминаем группу
     OpGroup := Group;
      // Запоминаем ID и индексы
-    for i := 0 to High(aPicIDs) do begin
+    for i := 0 to Pics.Count-1 do begin
        // Если есть такой ID в группе, записываем и удаляем
-      idx := Group.Pics.IndexOfID(aPicIDs[i]);
+      idx := Group.Pics.IndexOfID(Pics[i].ID);
       if idx>=0 then begin
          // Пишем флаг продолжения
         UndoFile.WriteBool(True);
          // Пишем ID
-        UndoFile.WriteInt(aPicIDs[i]);
+        UndoFile.WriteInt(Pics[i].ID);
          // Пишем индекс
         UndoFile.WriteInt(idx);
          // Удаляем изображение
@@ -4837,7 +4579,7 @@ var
        // Восстанавливаем изображения в обратном порядке, чтобы они встали на свои места
       i := IIs.Count-2; // i указывает на ID, i+1 - на индекс
       while i>=0 do begin
-        g.Pics.Insert(IIs[i+1], PhoA.Pics.PicByID(IIs[i]), False);
+        g.Pics.Insert(IIs[i+1], PhoA.Pics.ItemsByID[IIs[i]], False);
         Dec(i, 2);
       end;
     finally
@@ -4849,19 +4591,21 @@ var
    // TPhoaOp_InternalPicToGroupAdding
    //===================================================================================================================
 
-  constructor TPhoaOp_InternalPicToGroupAdding.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+  constructor TPhoaOp_InternalPicToGroupAdding.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   var
     i: Integer;
     bAdded: Boolean;
+    Pic: IPhoaPic;
   begin
     inherited Create(List, PhoA);
     OpGroup := Group;
      // Добавляем изображения в группу и в undo-файл
-    for i := 0 to High(aPicIDs) do begin
-      Group.Pics.Add(PhoA.Pics.PicByID(aPicIDs[i]), True, bAdded);
+    for i := 0 to Pics.Count-1 do begin
+      Pic := Pics[i];
+      Group.Pics.Add(Pic, True, bAdded);
       if bAdded then begin
         UndoFile.WriteBool(True); // Флаг продолжения
-        UndoFile.WriteInt (aPicIDs[i]);
+        UndoFile.WriteInt (Pic.ID);
       end;
     end;
      // Пишем стоп-флаг
@@ -4881,7 +4625,7 @@ var
    // TPhoaBaseOp_PicCopy
    //===================================================================================================================
 
-  constructor TPhoaBaseOp_PicCopy.Create(const aPics: TPicArray);
+  constructor TPhoaBaseOp_PicCopy.Create(Pics: IPhoaPicList);
   var pcfs: TPicClipboardFormats;
 
      // Копирует в буфер обмена данные TPhoaPic
@@ -4899,9 +4643,9 @@ var
         Streamer := TPhoaStreamer.Create(ms, psmWrite, '');
         try
            // Добавляем данные изображений
-          for i := 0 to High(aPics) do begin
+          for i := 0 to Pics.Count-1 do begin
             Streamer.WriteChunk(IPhChunk_Pic_Open);
-            aPics[i].StreamerSave(Streamer, False, PPAllProps);
+            (Pics[i] as IPhotoAlbumPic).StreamerSave(Streamer, False, PPAllProps);
             Streamer.WriteChunk(IPhChunk_Pic_Close);
           end;
         finally
@@ -4936,7 +4680,7 @@ var
         SL.Sorted := True;
         SL.Duplicates := dupIgnore;
          // Составляем список полных путей файлов в StringList
-        for i := 0 to High(aPics) do SL.Add(aPics[i].PicFileName);
+        for i := 0 to Pics.Count-1 do SL.Add(Pics[i].FileName);
          // Создаём объект THDrop
         HD := THDrop.Create;
         try
@@ -4961,13 +4705,13 @@ var
     begin
        // Составляем список полных путей файлов
       s := '';
-      for i := 0 to High(aPics) do s := s+aPics[i].PicFileName+S_CRLF;
+      for i := 0 to Pics.Count-1 do s := s+Pics[i].FileName+S_CRLF;
        // Помещаем текст в clipboard
       Clipboard.AsText := s;
     end;
 
      // Копирует в буфер обмена bitmap-эскиз изображения Pic
-    procedure CopyThumbBitmap(Pic: TPhoaPic);
+    procedure CopyThumbBitmap(Pic: IPhoaPic);
 //!!!!!    var
 //      bmp: TBitmap;
 //      wFmt: Word;
@@ -4989,7 +4733,7 @@ var
   begin
     StartWait;
     try
-      if High(aPics)>=0 then begin
+      if Pics.Count>0 then begin
         pcfs := TPicClipboardFormats(Byte(SettingValueInt(ISettingID_Gen_ClipFormats)));
         Clipboard.Open;
         try
@@ -5000,7 +4744,7 @@ var
            // Помещаем список путей файлов
           if pcfPlainList in pcfs then CopyFileList;
            // Помещаем изображение эскиза (в случае единственного изображения)
-          if (pcfSingleBitmap in pcfs) and (High(aPics)=0) then CopyThumbBitmap(aPics[0]);
+          if (pcfSingleBitmap in pcfs) and (Pics.Count=1) then CopyThumbBitmap(Pics[0]);
         finally
           Clipboard.Close;
         end;
@@ -5014,14 +4758,14 @@ var
    // TPhoaMultiOp_PicDelete
    //===================================================================================================================
 
-  constructor TPhoaMultiOp_PicDelete.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray);
+  constructor TPhoaMultiOp_PicDelete.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList);
   begin
     inherited Create(List, PhoA);
     OpGroup := Group;
      // Удаляем ID изображений из группы
-    TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, Group, aPicIDs);
+    TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, Group, Pics);
      // Удаляем несвязанные изображения из фотоальбома
-    FPhoA.RemoveUnlinkedPics(FOperations);
+    PhoA.RemoveUnlinkedPics(FOperations);
   end;
 
    //===================================================================================================================
@@ -5033,7 +4777,7 @@ var
     hRec: THandle;
     ms: TMemoryStream;
     Streamer: TPhoaStreamer;
-    Pic: TPhoaPic;
+    Pic: IPhotoAlbumPic;
     Code: TPhChunkCode;
     Datatype: TPhChunkDatatype;
     vValue: Variant;
@@ -5059,15 +4803,10 @@ var
               case Code of
                  // Picture
                 IPhChunk_Pic_Open: begin
-                  Pic := TPhoaPic.Create(FPhoA);
-                  try
-                    Pic.StreamerLoad(Streamer, False, PPAllProps);
-                     // Создаём дочернюю операцию добавления изображения
-                    TPhoaOp_InternalPicAdd.Create(FOperations, PhoA, Group, Pic);
-                  except
-                    Pic.Free;
-                    raise;
-                  end;
+                  Pic := TPhoaPic.Create;
+                  Pic.StreamerLoad(Streamer, False, PPAllProps);
+                   // Создаём дочернюю операцию добавления изображения
+                  TPhoaOp_InternalPicAdd.Create(FOperations, PhoA, Group, Pic);
                 end;
                  // Ensure unknown nested structures are skipped whole
                 else Streamer.SkipNestedChunks(Code);
@@ -5119,30 +4858,28 @@ var
    // TPhoaMultiOp_PicOperation
    //===================================================================================================================
 
-  constructor TPhoaMultiOp_PicOperation.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; const aSelPicIDs: TIDArray; PicOperation: TPictureOperation);
+  constructor TPhoaMultiOp_PicOperation.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; Pics: IPhoaPicList; PicOperation: TPictureOperation);
   var
-    i, iID: Integer;
-    aIDs: TIDArray;
+    i: Integer;
+    IntersectPics: IPhoaMutablePicList;
+    Pic: IPhoaPic;
   begin
     inherited Create(List, PhoA);
      // Копирование/перемещение: копируем выделенные изображения
-    if PicOperation in [popMoveToTarget, popCopyToTarget] then TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, TargetGroup, aSelPicIDs);
+    if PicOperation in [popMoveToTarget, popCopyToTarget] then TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, TargetGroup, Pics);
      // Если перемещение - удаляем выделенные изображения из исходной группы
-    if PicOperation=popMoveToTarget then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, SourceGroup, aSelPicIDs);
+    if PicOperation=popMoveToTarget then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, SourceGroup, Pics);
      // Удаление выделенных изображений из указанной группы
-    if PicOperation=popRemoveFromTarget then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, TargetGroup, aSelPicIDs);
+    if PicOperation=popRemoveFromTarget then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, TargetGroup, Pics);
      // Оставить только выделенные изображения в указанной группе
     if PicOperation=popIntersectTarget then begin
-      aIDs := nil;
+      IntersectPics := TPhoaMutablePicList.Create(False);
       for i := 0 to TargetGroup.Pics.Count-1 do begin
-        iID := TargetGroup.Pics[i].ID;
-        if not IDInArray(iID, aSelPicIDs) then begin
-          SetLength(aIDs, High(aIDs)+2);
-          aIDs[High(aIDs)] := iID;
-        end;
+        Pic := TargetGroup.Pics[i];
+        if Pics.IndexOfID(Pic.ID)<0 then IntersectPics.Add(Pic, False);
       end;
-      if High(aIDs)>=0 then begin
-        TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, TargetGroup, aIDs);
+      if IntersectPics.Count>0 then begin
+        TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, TargetGroup, IntersectPics);
         PhoA.RemoveUnlinkedPics(FOperations);
       end;
     end;
@@ -5162,7 +4899,7 @@ var
     UndoFile.WriteInt(Group.Pics.Count);
     for i := 0 to Group.Pics.Count-1 do UndoFile.WriteInt(Group.Pics[i].ID);
      // Сортируем изображения в группе
-    Group.SortPics(Sortings, PhoA.Pics);
+    Group.SortPics(Sortings);
   end;
 
   procedure TPhoaOp_InternalGroupPicSort.RollbackChanges;
@@ -5171,7 +4908,7 @@ var
     inherited RollbackChanges;
      // Восстанавливаем старый порядок следования ID изображений в группе
     OpGroup.Pics.Clear;
-    for i := 0 to UndoFile.ReadInt-1 do OpGroup.Pics.Add(PhoA.Pics.PicByID(UndoFile.ReadInt), False);
+    for i := 0 to UndoFile.ReadInt-1 do OpGroup.Pics.Add(PhoA.Pics.ItemsByID[UndoFile.ReadInt], False);
   end;
 
    //===================================================================================================================
@@ -5233,30 +4970,30 @@ var
    // TPhoaMultiOp_PicDragAndDropToGroup
    //===================================================================================================================
 
-  constructor TPhoaMultiOp_PicDragAndDropToGroup.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; aSelPicIDs: TIDArray; bCopy: Boolean);
+  constructor TPhoaMultiOp_PicDragAndDropToGroup.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; SourceGroup, TargetGroup: TPhoaGroup; Pics: IPhoaPicList; bCopy: Boolean);
   begin
     inherited Create(List, PhoA);
      // Выполняем операцию
-    TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, TargetGroup, aSelPicIDs);
-    if not bCopy then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, SourceGroup, aSelPicIDs);
+    TPhoaOp_InternalPicToGroupAdding.Create(FOperations, PhoA, TargetGroup, Pics);
+    if not bCopy then TPhoaOp_InternalPicFromGroupRemoving.Create(FOperations, PhoA, SourceGroup, Pics);
   end;
 
    //===================================================================================================================
    // TPhoaOp_PicDragAndDropInsideGroup
    //===================================================================================================================
 
-  constructor TPhoaOp_PicDragAndDropInsideGroup.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; const aPicIDs: TIDArray; idxNew: Integer);
+  constructor TPhoaOp_PicDragAndDropInsideGroup.Create(List: TPhoaOperations; PhoA: TPhotoAlbum; Group: TPhoaGroup; Pics: IPhoaPicList; idxNew: Integer);
   var i, idxOld: Integer;
   begin
     inherited Create(List, PhoA);
      // Запоминаем группу
     OpGroup := Group;
      // Выполняем операцию
-    for i := 0 to High(aPicIDs) do begin
+    for i := 0 to Pics.Count-1 do begin
        // -- Пишем признак продолжения
       UndoFile.WriteBool(True);
        // -- Запоминаем индексы
-      idxOld := Group.Pics.IndexOfID(aPicIDs[i]);
+      idxOld := Group.Pics.IndexOfID(Pics[i].ID);
       if idxOld<idxNew then Dec(idxNew);
       UndoFile.WriteInt(idxOld);
       UndoFile.WriteInt(idxNew);
@@ -5677,9 +5414,9 @@ var
      // Стираем список
     Clear;
      // Цикл по всем изображениям фотоальбома
-    bSelected := False; 
+    bSelected := False;
     for ip := 0 to PhoA.Pics.Count-1 do begin
-      Pic := PhoA.Pics[ip];
+      Pic := TPhoaPic(PhoA.Pics[ip].Handle);
        // Если передана callback-процедура, вызываем её для определения: выбрано изображение или нет
       if Assigned(IsPicSelCallback) then IsPicSelCallback(Pic, bSelected);
       for ikw := 0 to Pic.PicKeywords.Count-1 do Add(Pic.PicKeywords[ikw], bSelected);

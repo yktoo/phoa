@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.8 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.9 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrPicProps_Keywords;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, phObj,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
   phWizard, Menus, TB2Item, TBX, ActnList, TB2Dock,
   TB2Toolbar, VirtualTrees, phPicPropsDlgPage, DKLang;
 
@@ -57,7 +57,7 @@ type
      // Индекс узла, который надо сфокусировать после окончания редактирования
     FNodeToFocusIndex: Integer;
      // Callback-процедура для определения выбранности изображения
-    procedure IsPicSelectedCallback(Pic: TPhoaPic; out bSelected: Boolean);
+    procedure IsPicSelectedCallback(Pic: IPhoaPic; out bSelected: Boolean);
      // Настраивает доступность Actions
     procedure EnableActions;
      // Ставит, снимает или инвертирует отметку у всех слов
@@ -142,7 +142,7 @@ uses phUtils, Main, phSettings;
   begin
     inherited Apply(FOperations);
      // Если страница инициализирована, создаём операцию изменения списка ключевых слов
-    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(FOperations, PhoA, EditedPicArray, FKeywords);
+    if FInitialized then TPhoaOp_InternalEditPicKeywords.Create(FOperations, PhoA, EditedPics, FKeywords);
   end;
 
   procedure TfrPicProps_Keywords.BeforeDisplay(ChangeMethod: TPageChangeMethod);
@@ -150,7 +150,7 @@ uses phUtils, Main, phSettings;
     inherited BeforeDisplay(ChangeMethod);
     if not FInitialized then begin
        // Составляем список ключевых слов
-      FKeywords.PopulateFromPhoA(PhoA, IsPicSelectedCallback, EditedPicCount);
+      FKeywords.PopulateFromPhoA(PhoA, IsPicSelectedCallback, EditedPics.Count);
        // Настраиваем дерево
       tvMain.RootNodeCount := FKeywords.Count;
       FInitialized := True;
@@ -209,16 +209,9 @@ uses phUtils, Main, phSettings;
     FKeywords := TKeywordList.Create;
   end;
 
-  procedure TfrPicProps_Keywords.IsPicSelectedCallback(Pic: TPhoaPic; out bSelected: Boolean);
-  var i: Integer;
+  procedure TfrPicProps_Keywords.IsPicSelectedCallback(Pic: IPhoaPic; out bSelected: Boolean);
   begin
-    bSelected := False;
-     // Ищем, есть ли такое изображение среди выбранных
-    for i := 0 to EditedPicCount-1 do
-      if Pic=EditedPics[i] then begin
-        bSelected := True;
-        Break;
-      end;
+    bSelected := EditedPics.IndexOfID(Pic.ID)>=0;
   end;
 
   procedure TfrPicProps_Keywords.tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -246,7 +239,7 @@ uses phUtils, Main, phSettings;
      // Выставляем тип птицы: если изначально было Grayed - после Unchecked идёт Grayed
     if (Node.CheckState=csUncheckedNormal) and (NewState=csCheckedNormal) then
       with FKeywords[Node.Index]^ do
-        if (iSelCount>0) and (iSelCount<EditedPicCount) then NewState := csMixedNormal;
+        if (iSelCount>0) and (iSelCount<EditedPics.Count) then NewState := csMixedNormal;
   end;
 
   procedure TfrPicProps_Keywords.tvMainEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);

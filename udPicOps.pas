@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.8 2004-09-11 17:52:36 dale Exp $
+//  $Id: udPicOps.pas,v 1.9 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit udPicOps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, ConsVars,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
   phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
 
 type
@@ -30,7 +30,7 @@ type
     FPhoA: TPhotoAlbum;
     FUndoOperations: TPhoaOperations;
     FSourceGroup: TPhoaGroup;
-    FSelIDs: TIDArray;
+    FPics: IPhoaPicList;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
@@ -38,22 +38,22 @@ type
   end;
 
    // Отображает диалог операций с изображениями.
-   //   SourceGroup - текущая выбранная группа.
-   //   aSelIDs - массив ID выделенных изображений
-  function DoPicOps(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations; SourceGroup: TPhoaGroup; const aSelIDs: TIDArray): Boolean;
+   //   ASourceGroup - текущая выбранная группа.
+   //   APics        - список выделенных изображений
+  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: TPhoaGroup; APics: IPhoaPicList): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, Main, phSettings;
 
-  function DoPicOps(PhoA: TPhotoAlbum; UndoOperations: TPhoaOperations; SourceGroup: TPhoaGroup; const aSelIDs: TIDArray): Boolean;
+  function DoPicOps(APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations; ASourceGroup: TPhoaGroup; APics: IPhoaPicList): Boolean;
   begin
     with TdPicOps.Create(Application) do
       try
-        FPhoA           := PhoA;
-        FUndoOperations := UndoOperations;
-        FSourceGroup    := SourceGroup;
-        FSelIDs         := aSelIDs;
+        FPhoA           := APhoA;
+        FUndoOperations := AUndoOperations;
+        FSourceGroup    := ASourceGroup;
+        FPics           := APics;
         Result := Execute;
       finally
         Free;
@@ -71,7 +71,7 @@ uses phUtils, Main, phSettings;
         FPhoA,
         FSourceGroup,
         PPhoaGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
-        FSelIDs,
+        FPics,
         TPictureOperation(cbOp.ItemIndex))
     finally
       fMain.EndOperation(Operation);

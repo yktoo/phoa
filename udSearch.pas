@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.10 2004-10-05 13:16:34 dale Exp $
+//  $Id: udSearch.pas,v 1.11 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -50,8 +50,9 @@ type
 
 implementation
 {$R *.dfm}
-uses TypInfo, StrUtils, Mask, ToolEdit, phUtils, ConsVars, udSelKeywords,
-  phSettings, udMsgBox;
+uses
+  TypInfo, StrUtils, Mask, ToolEdit,
+  phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox;
 
   function DoSearch(PhoA: TPhotoAlbum; CurGroup, ResultsGroup: TPhoaGroup): Boolean;
   begin
@@ -200,21 +201,21 @@ const
     end;
   end;
 
-  function MatchesCondition(Condition: TDatPropCondition; const dValue, dCritValue: TDateTime): Boolean; overload;
+  function MatchesCondition(Condition: TDatPropCondition; const iValue, iCritValue: Integer): Boolean; overload;
   begin
     case Condition of
-      dpcSpecified:    Result := dValue>=0;
-      dpcNotSpecified: Result := dValue<0;
+      dpcSpecified:    Result := iValue>=0;
+      dpcNotSpecified: Result := iValue<0;
       else begin
-        Result := dCritValue<0;
+        Result := iCritValue<0;
         if not Result then
           case Condition of
-            dpcLess:         Result := dValue<dCritValue;
-            dpcLessEqual:    Result := dValue<=dCritValue;
-            dpcEqual:        Result := dValue=dCritValue;
-            dpcNotEqual:     Result := dValue<>dCritValue;
-            dpcGreaterEqual: Result := dValue>=dCritValue;
-            dpcGreater:      Result := dValue>dCritValue;
+            dpcLess:         Result := iValue<iCritValue;
+            dpcLessEqual:    Result := iValue<=iCritValue;
+            dpcEqual:        Result := iValue=iCritValue;
+            dpcNotEqual:     Result := iValue<>iCritValue;
+            dpcGreaterEqual: Result := iValue>=iCritValue;
+            dpcGreater:      Result := iValue>iCritValue;
           end;
       end;
     end;
@@ -609,16 +610,24 @@ type
   end;
 
   procedure TdSearch.InitializeDialog;
+
+    function NewSL: TStringList;
+    begin
+      Result := TStringList.Create;
+      Result.Sorted     := True;
+      Result.Duplicates := dupIgnore;
+    end;
+
   begin
     inherited InitializeDialog;
     HelpContext := IDH_intf_search;
     OKIgnoresModified := True;
     FLocalResults     := TPhoaMutablePicList.Create(False);
      // Загружаем списки мест, номеров плёнок, авторов
-    SLPhoaPlaces      := TStringList.Create;
-    SLPhoaFilmNumbers := TStringList.Create;
-    SLPhoaAuthors     := TStringList.Create;
-    SLPhoaMedia       := TStringList.Create;
+    SLPhoaPlaces      := NewSL;
+    SLPhoaFilmNumbers := NewSL;
+    SLPhoaAuthors     := NewSL;
+    SLPhoaMedia       := NewSL;
     StringsLoadPFAM(FPhoA, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
      // Настраиваем контролы
     rbCurGroup.Enabled      := (FCurGroup<>nil) and (FCurGroup.Pics.Count>0);
@@ -631,35 +640,51 @@ type
   procedure TdSearch.PerformSearch;
   type TSearchArea = (saAll, saCurGroup, saResults);
   var
-    dtDate1, dtDate2, dtTime1, dtTime2: TDateTime;
+    iDate1, iDate2, iTime1, iTime2: Integer;
     SLKeywords: TStringList;
     FMasks: TPhoaMasks;
     i, iSrchCount, iID, iFSize, iPicWidth, iPicHeight: Integer;
     SearchArea: TSearchArea;
-    Pic: TPhoaPic;
+    Pic: IPhoaPic;
 
-    function Matches(Pic: TPhoaPic): Boolean;
+    function Matches(Pic: IPhoaPic): Boolean;
     var i: Integer;
     begin
     
       for i := 0 to High(aSearchCriteria) do begin
         with aSearchCriteria[i] do
           case i of
-            ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                iID);
-            ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.PicFileSize,       iFSize);
-            ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.PicWidth,          iPicWidth);
-            ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.PicHeight,         iPicHeight);
-            ICritIdx_FileMasks: Result := MatchesCondition(MskCond, Pic.Props[Prop],       FMasks);
-            ICritIdx_Date1:     Result := MatchesCondition(DatCond, Int(Pic.PicDateTime),  dtDate1);
-            ICritIdx_Date2:     Result := MatchesCondition(DatCond, Int(Pic.PicDateTime),  dtDate2);
-            ICritIdx_Time1:     Result := MatchesCondition(DatCond, Frac(Pic.PicDateTime), dtTime1);
-            ICritIdx_Time2:     Result := MatchesCondition(DatCond, Frac(Pic.PicDateTime), dtTime2);
-            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.PicKeywords,       SLKeywords);
-            else                Result := MatchesCondition(StrCond, Pic.Props[Prop],       sValue);
+            ICritIdx_ID:        Result := MatchesCondition(IntCond, Pic.ID,                           iID);
+            ICritIdx_FileSize:  Result := MatchesCondition(IntCond, Pic.FileSize,                     iFSize);
+            ICritIdx_PicWidth:  Result := MatchesCondition(IntCond, Pic.ImageSize.cx,                 iPicWidth);
+            ICritIdx_PicHeight: Result := MatchesCondition(IntCond, Pic.ImageSize.cy,                 iPicHeight);
+            ICritIdx_FileMasks: Result := MatchesCondition(MskCond, ExtractFileName(Pic.FileName),    FMasks);
+            ICritIdx_Date1:     Result := MatchesCondition(DatCond, Pic.Date,                         iDate1);
+            ICritIdx_Date2:     Result := MatchesCondition(DatCond, Pic.Date,                         iDate2);
+            ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                         iTime1);
+            ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                         iTime2);
+            ICritIdx_Keywords:  Result := MatchesCondition(LstCond, TPhoaPic(Pic.Handle).PicKeywords, SLKeywords);
+            else                Result := MatchesCondition(StrCond, TPhoaPic(Pic.Handle).Props[Prop], sValue);
           end;
          // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
         if not Result then Break;
       end;
+    end;
+
+     // Преобразует строковое значение критерия в Дату PhoA; если не удалось, возвращает -1
+    function GetCritDate(iCritIndex: Integer): Integer;
+    var dt: TDateTime;
+    begin
+      dt := StrToDateDef(aSearchCriteria[iCritIndex].sValue, -1);
+      if dt>=0 then Result := DateToPhoaDate(dt) else Result := -1;
+    end;
+
+     // Преобразует строковое значение критерия во Время PhoA; если не удалось, возвращает -1
+    function GetCritTime(iCritIndex: Integer): Integer;
+    var dt: TDateTime;
+    begin
+      dt := StrToTimeDef(aSearchCriteria[iCritIndex].sValue, -1);
+      if dt>=0 then Result := TimeToPhoaTime(dt) else Result := -1;
     end;
 
   begin
@@ -680,22 +705,22 @@ type
           iSrchCount := FResultsGroup.Pics.Count;
         end;
          // Инициализируем критерии
-        iID        := StrToIntDef (aSearchCriteria[ICritIdx_ID].sValue,        -1);
-        iFSize     := StrToIntDef (aSearchCriteria[ICritIdx_FileSize].sValue,  -1);
-        iPicWidth  := StrToIntDef (aSearchCriteria[ICritIdx_PicWidth].sValue,  -1);
-        iPicHeight := StrToIntDef (aSearchCriteria[ICritIdx_PicHeight].sValue, -1);
-        dtDate1    := StrToDateDef(aSearchCriteria[ICritIdx_Date1].sValue,     -1);
-        dtDate2    := StrToDateDef(aSearchCriteria[ICritIdx_Date2].sValue,     -1);
-        dtTime1    := StrToTimeDef(aSearchCriteria[ICritIdx_Time1].sValue,     -1);
-        dtTime2    := StrToTimeDef(aSearchCriteria[ICritIdx_Time2].sValue,     -1);
+        iID        := StrToIntDef(aSearchCriteria[ICritIdx_ID].sValue,        -1);
+        iFSize     := StrToIntDef(aSearchCriteria[ICritIdx_FileSize].sValue,  -1);
+        iPicWidth  := StrToIntDef(aSearchCriteria[ICritIdx_PicWidth].sValue,  -1);
+        iPicHeight := StrToIntDef(aSearchCriteria[ICritIdx_PicHeight].sValue, -1);
+        iDate1     := GetCritDate(ICritIdx_Date1);
+        iDate2     := GetCritDate(ICritIdx_Date2);
+        iTime1     := GetCritTime(ICritIdx_Time1);
+        iTime2     := GetCritTime(ICritIdx_Time2);
         SLKeywords.CommaText := aSearchCriteria[ICritIdx_Keywords].sValue;
          // Ищем
         FLocalResults.Clear;
         for i := 0 to iSrchCount-1 do begin
           case SearchArea of
             saAll:      Pic := FPhoA.Pics[i];
-            saCurGroup: Pic := TPhoaPic(FCurGroup.Pics[i].Handle);
-            else        Pic := TPhoaPic(FResultsGroup.Pics[i].Handle);
+            saCurGroup: Pic := FCurGroup.Pics[i];
+            else        Pic := FResultsGroup.Pics[i];
           end;
           if Matches(Pic) then FLocalResults.Add(Pic, True);
         end;

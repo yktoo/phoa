@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.12 2004-10-05 13:16:35 dale Exp $
+//  $Id: udStats.pas,v 1.13 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,9 +9,9 @@ unit udStats;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, PhObj, ConsVars, VirtualShellUtilities,
-  Dialogs, phDlg, StdCtrls, VirtualTrees, ExtCtrls, Placemnt,
-  DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  phIntf, phObj, ConsVars, VirtualShellUtilities, phDlg, Placemnt, DKLang,
+  VirtualTrees, StdCtrls, ExtCtrls;
 
 type
   PPStatsData = ^PStatsData;
@@ -96,7 +96,7 @@ uses phUtils, Main, phPhoa, phSettings;
       i: Integer;
       i64FSize: Int64;
       IDs: TIntegerList;
-      Pic: TPhoaPic;
+      Pic: IPhoaPic;
 
       procedure ProcessGroup(Group: TPhoaGroup);
       var
@@ -131,19 +131,19 @@ uses phUtils, Main, phPhoa, phSettings;
         sMaxFileName   := '';
         sMinFileName   := '';
         for i := 0 to IDs.Count-1 do begin
-          Pic := FPhoA.Pics.PicByID(IDs[i]);
-          i64FSize := Pic.PicFileSize;
+          Pic := FPhoA.Pics.ItemsByID[IDs[i]];
+          i64FSize := Pic.FileSize;
           Inc(i64TotalFileSize,  i64FSize);
-          Inc(i64TotalThumbSize, Length(Pic.ThumbnailData));
+          Inc(i64TotalThumbSize, Pic.ThumbnailDataSize);
            // -- Ищем самый большой файл
           if i64FSize>i64MaxFileSize then begin
             i64MaxFileSize := i64FSize;
-            sMaxFileName   := Pic.PicFileName;
+            sMaxFileName   := Pic.FileName;
           end;
            // -- Ищем самый маленький файл
           if i64FSize<i64MinFileSize then begin
             i64MinFileSize := i64FSize;
-            sMinFileName   := Pic.PicFileName;
+            sMinFileName   := Pic.FileName;
           end;
         end;
          // -- Находим средние значения

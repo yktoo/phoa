@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.28 2004-10-05 13:16:35 dale Exp $
+//  $Id: ufImgView.pas,v 1.29 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -478,25 +478,25 @@ uses
   end;
 
   procedure TfImgView.aaEdit(Sender: TObject);
-//  var
-//    Arr: TPicArray;
-//    bEdited: Boolean;
+  var
+    Pics: IPhoaMutablePicList;
+    bEdited: Boolean;
   begin
-//    CommitInfoRelocation;
-//     // "Снимаем" окно с topmost-положения
-//    TopmostCancel;
-//     // Показываем курсор
-//    AdjustCursorVisibility(True);
-//     // Редактируем изображение
-//    SetLength(Arr, 1);
-//    Arr[0] := FPic;
-//    bEdited := EditPic(Arr, FPhoA, FUndoOperations);
-//     // Возвращаем topmost-положение окну
-//    TopmostRestore;
-//     // Скрываем курсор
-//    AdjustCursorVisibility(False);
-//     // Обновляем свойства изображения
-//    if bEdited then RedisplayPic(False, True);
+    CommitInfoRelocation;
+     // "Снимаем" окно с topmost-положения
+    TopmostCancel;
+     // Показываем курсор
+    AdjustCursorVisibility(True);
+     // Редактируем изображение
+    Pics := TPhoaMutablePicList.Create(False);
+    Pics.Add(FPic, False);
+    bEdited := EditPics(Pics, FPhoA, FUndoOperations);
+     // Возвращаем topmost-положение окну
+    TopmostRestore;
+     // Скрываем курсор
+    AdjustCursorVisibility(False);
+     // Обновляем свойства изображения
+    if bEdited then RedisplayPic(False, True);
   end;
 
   procedure TfImgView.aaFirstPic(Sender: TObject);

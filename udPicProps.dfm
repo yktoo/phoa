@@ -114,9 +114,9 @@ inherited dPicProps: TdPicProps
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       '*.Font.Name'
+      '*.SecondaryShortCuts'
       'fpMain.IniFileName'
-      'fpMain.IniSection'
-      '*.SecondaryShortCuts')
+      'fpMain.IniSection')
     Top = 400
     LangData = {
       09006450696350726F7073010100000003000000070043617074696F6E011200

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.7 2004-09-11 17:52:36 dale Exp $
+//  $Id: udPicProps.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit udPicProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phObj, phMetadata, GR32_Layers,
-  phWizard,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, phMetadata,
+  GR32_Layers, phWizard,
   phDlg, Menus, TB2Item, TBX, ImgList, Placemnt, TB2Dock, TB2Toolbar,
   ExtCtrls, StdCtrls, DKLang;
 
@@ -35,7 +35,7 @@ type
      // Контроллер страниц
     FController: TWizardController;
      // Список редактируемых изображений
-    FEditedPics: TPicArray;
+    FEditedPics: IPhoaPicList;
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
      // Список операций для отмены редактирования/добавления
@@ -63,14 +63,14 @@ type
     procedure ButtonClick_OK; override;
   public
      // -- Ссылки на редактируемые изображения
-    property EditedPics: TPicArray read FEditedPics;
+    property EditedPics: IPhoaPicList read FEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
      // -- Фотоальбом
     property PhoA: TPhotoAlbum read FPhoA;
   end;
 
-  function EditPic(const AEditedPics: TPicArray; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(APics: IPhoaPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
 
 implementation
 {$R *.dfm}
@@ -80,11 +80,11 @@ uses
   phPicPropsDlgPage, ufrPicProps_FileProps, ufrPicProps_Metadata, ufrPicProps_View, ufrPicProps_Data,
   ufrPicProps_Keywords, ufrPicProps_Groups;
 
-  function EditPic(const AEditedPics: TPicArray; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
+  function EditPics(APics: IPhoaPicList; APhoA: TPhotoAlbum; AUndoOperations: TPhoaOperations): Boolean;
   begin
     with TdPicProps.Create(Application) do
       try
-        FEditedPics     := AEditedPics;
+        FEditedPics     := APics;
         FPhoA           := APhoA;
         FUndoOperations := AUndoOperations;
         Result := Execute;
@@ -145,10 +145,10 @@ uses
     fpMain.IniSection  := SRegPicProps_Root;
     pmNav.LinkSubitems := tbNav.Items;
      // Считываем ImageIndices файлов изображений
-    SetLength(FFileImageIndices, High(FEditedPics)+1);
+    SetLength(FFileImageIndices, FEditedPics.Count);
     HSysIL := 0;
-    for i := 0 to High(FEditedPics) do begin
-      HSysIL := SHGetFileInfo(PAnsiChar(FEditedPics[i].PicFileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+    for i := 0 to FEditedPics.Count-1 do begin
+      HSysIL := SHGetFileInfo(PAnsiChar(FEditedPics[i].FileName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
       FFileImageIndices[i] := FileInfo.iIcon;
     end;
     ilFiles.Handle := HSysIL;

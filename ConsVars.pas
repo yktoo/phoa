@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.59 2004-09-27 17:07:22 dale Exp $
+//  $Id: ConsVars.pas,v 1.60 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -174,8 +174,6 @@ type
     uifUReinitRecursive);    // При переинициализации (флаг uifUReinitParent) действовать рекурсивно
 
   TUndoInvalidationFlags = set of TUndoInvalidationFlag;
-
-  TIDArray = Array of Integer;
 
    // Флаги форматов буфера обмена для данных изображений
   TPicClipboardFormat = (

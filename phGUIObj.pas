@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.16 2004-10-04 12:44:36 dale Exp $
+//  $Id: phGUIObj.pas,v 1.17 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phGUIObj;
 interface
 uses Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, Forms, GR32, phIntf, phMutableIntf, phObj, phGraphics, ConsVars;
 
-type  
+type
 
    //===================================================================================================================
    // TThumbnailViewer - средство просмотра эскизов изображений
@@ -21,7 +21,26 @@ type
 
   TThumbnailViewerStates = set of TThumbnailViewerState;
 
-   // Информация для отрисовки окна 
+   // Информация о состоянии TThumbnailViewer, используемая его методами SaveDisplay() и RestoreDisplay()
+  IThumbnailViewerDisplayData = interface(IInterface)
+    ['{436126B8-5E50-4BAB-83D1-CA83FE19B976}']
+     // Prop handlers
+    function  GetFocusedID: Integer;
+    function  GetSelectedIDCount: Integer;
+    function  GetSelectedIDs(Index: Integer): Integer;
+    function  GetTopOffset: Integer;
+     // Props
+     // -- ID сфокусированного изображения
+    property FocusedID: Integer read GetFocusedID;
+     // -- Количество ID выделенных изображений
+    property SelectedIDCount: Integer read GetSelectedIDCount;
+     // -- ID выделенных изображений по индексу
+    property SelectedIDs[Index: Integer]: Integer read GetSelectedIDs;
+     // -- Смещение верхнего края окна просмотра
+    property TopOffset: Integer read GetTopOffset;
+  end;
+
+   // Информация для отрисовки окна
   TThumbnailViewerPaintInfo = record
     RClip:     TRect;     // ClipRect
     RClient:   TRect;     // ClientRect
@@ -227,23 +246,15 @@ type
     destructor Destroy; override;
      // Обновляет отображаемый список изображений
     procedure ReloadPicList(APicList: IPhoaPicList);
-     // Сохраняет текущие параметры отображения и возвращает:
-     //   в SelectedIDs - список ID выделенных изображений (может быть nil!)
-     //   в iFocusedID  - ID изображения, которому соответствует ItemIndex (0, если нет такого)
-     //   в iTopOffset  - текущий TopOffset
-    procedure SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopOffset: Integer);
-     // Восстанавливает параметры отображения; подразумевается возможность использования данных,
-     //   полученных в результате предыдущего вызова SaveDisplay():
-     //     Если SelectedIDs<>nil, то сразу выделяет изображения с заданными ID
-     //     Если iFocusedID>0, устанавливает ItemIndex на изображение с заданным ID
-     //     iTopOffset задаёт желаемый индекс верхнего эскиза
-    procedure RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
+     // Создаёт объект IThumbnailViewerDisplayData, сохраняет в него текущие параметры отображения и возвращает его
+    function  SaveDisplay: IThumbnailViewerDisplayData;
+     // Восстанавливает параметры отображения из Data; подразумевается возможность использования данных, полученных в
+     //   результате предыдущего вызова SaveDisplay()
+    procedure RestoreDisplay(Data: IThumbnailViewerDisplayData);
      // Убирает выделение со всех эскизов и возвращает True, если оно было
     function  ClearSelection: Boolean;
      // Выделяет все эскизы
     procedure SelectAll;
-     // Возвращает массив выделенных изображений
-    function  GetSelectedPicArray: TPicArray;
      // Возвращает ItemIndex в точке, или -1, если там нет эскиза
     function  ItemAtPos(ix, iy: Integer): Integer;
      // Возвращает координаты эскиза с индексом Index. Если bAllowInvisible=False, то возвращает пустой прямоугольник,
@@ -280,7 +291,7 @@ type
      // -- Если True, отображает всплывающие описания эскизов
     property ShowThumbTooltips: Boolean read FShowThumbTooltips write SetShowThumbTooltips;
      // -- Состояния контрола
-    property States: TThumbnailViewerStates read FStates; 
+    property States: TThumbnailViewerStates read FStates;
      // -- Цвет рамки фона эскиза при ThumbBackBorderStyle=tbbsColor
     property ThumbBackBorderColor: TColor read FThumbBackBorderColor write SetThumbBackBorderColor;
      // -- Стиль рамки фона эскиза
@@ -378,6 +389,68 @@ type
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses Math, Themes, phUtils;
+
+type
+
+   //===================================================================================================================
+   // TThumbnailViewerDisplayData - реализация IThumbnailViewerDisplayData
+   //===================================================================================================================
+
+  TThumbnailViewerDisplayData = class(TInterfacedObject, IThumbnailViewerDisplayData)
+  private
+     // Список выделенных ID
+    FSelIDs: TList;
+     // Prop storage
+    FFocusedID: Integer;
+    FTopOffset: Integer; 
+     // IThumbnailViewerDisplayData
+    function  GetFocusedID: Integer;
+    function  GetSelectedIDCount: Integer;
+    function  GetSelectedIDs(Index: Integer): Integer;
+    function  GetTopOffset: Integer;
+  public
+    constructor Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer);
+    destructor Destroy; override;
+  end;
+
+  constructor TThumbnailViewerDisplayData.Create(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer);
+  var i: Integer;
+  begin
+    inherited Create;
+     // Переписываем ID выделенных изображений, если они есть
+    if (SelectedPics<>nil) and (SelectedPics.Count>0) then begin
+      FSelIDs := TList.Create;
+      for i := 0 to SelectedPics.Count-1 do FSelIDs.Add(Pointer(SelectedPics[i].ID));
+    end;
+    FFocusedID := iFocusedID;
+    FTopOffset := iTopOffset;
+  end;
+
+  destructor TThumbnailViewerDisplayData.Destroy;
+  begin
+    FSelIDs.Free;
+    inherited Destroy;
+  end;
+
+  function TThumbnailViewerDisplayData.GetFocusedID: Integer;
+  begin
+    Result := FFocusedID;
+  end;
+
+  function TThumbnailViewerDisplayData.GetSelectedIDCount: Integer;
+  begin
+    if FSelIDs=nil then Result := 0 else Result := FSelIDs.Count;
+  end;
+
+  function TThumbnailViewerDisplayData.GetSelectedIDs(Index: Integer): Integer;
+  begin
+    Result := Integer(FSelIDs[Index]);
+  end;
+
+  function TThumbnailViewerDisplayData.GetTopOffset: Integer;
+  begin
+    Result := FTopOffset;
+  end;
 
    //===================================================================================================================
    // TThumbnailViewer
@@ -664,14 +737,6 @@ uses Math, Themes, phUtils;
   function TThumbnailViewer.GetSelectedIndexes(Index: Integer): Integer;
   begin
     Result := FPicList.IndexOfID(FSelectedPics[Index].ID);
-  end;
-
-  function TThumbnailViewer.GetSelectedPicArray: TPicArray;
-//  var i: Integer;
-  begin
-result := nil;  
-//!!!    SetLength(Result, FSelIndexes.Count);
-//!!!    for i := 0 to FSelIndexes.Count-1 do Result[i] := GetSelectedPics(i);
   end;
 
   function TThumbnailViewer.GetSelectedPics: IPhoaPicList;
@@ -1224,43 +1289,36 @@ result := 30;
     if FDisplayMode=tvdmDetail then InvalidateRect(Handle, nil, False);
   end;
 
-  procedure TThumbnailViewer.RestoreDisplay(SelectedIDs: TIntegerList; iFocusedID, iTopOffset: Integer);
+  procedure TThumbnailViewer.RestoreDisplay(Data: IThumbnailViewerDisplayData);
   var i, iItemIdx: Integer;
   begin
     BeginUpdate;
     try
       ClearSelection;
        // Добавляем в выделение изображения с заданными ID
-      if SelectedIDs<>nil then
-        for i := 0 to SelectedIDs.Count-1 do AddToSelection(FPicList.IndexOfID(SelectedIDs[i]));
+      for i := 0 to Data.SelectedIDCount-1 do AddToSelection(FPicList.IndexOfID(Data.SelectedIDs[i]));
        // Если нет выделения, выделяем первое изображение (если оно есть)
       if FSelectedPics.Count=0 then AddToSelection(0);
        // Находим сфокусированное изображение
-      if iFocusedID>0 then iItemIdx := FPicList.IndexOfID(iFocusedID) else iItemIdx := -1;
+      if Data.FocusedID>0 then iItemIdx := FPicList.IndexOfID(Data.FocusedID) else iItemIdx := -1;
        // Если так и не нашлось
       if iItemIdx<0 then
-         // Фокусируем последнее из выделенных, если они есть
-        if FSelectedPics.Count>0 then iItemIdx := SelectedIndexes[FSelectedPics.Count-1]
+         // Фокусируем первое из выделенных, если они есть
+        if FSelectedPics.Count>0 then iItemIdx := SelectedIndexes[0]
          // Иначе пытаемся выделить самое первое изображение, если оно есть
         else if FItemCount>0 then iItemIdx := 0;
-      TopOffset := iTopOffset;
+      TopOffset := Data.TopOffset;
       MoveItemIndex(iItemIdx, True);
     finally
       EndUpdate;
     end;
   end;
 
-  procedure TThumbnailViewer.SaveDisplay(out SelectedIDs: TIntegerList; out iFocusedID, iTopOffset: Integer);
-  var i: Integer;
+  function TThumbnailViewer.SaveDisplay: IThumbnailViewerDisplayData;
+  var iFocusedID: Integer;
   begin
-    iFocusedID := 0;
-    if FSelectedPics.Count>0 then begin
-      SelectedIDs := TIntegerList.Create(False);
-      for i := 0 to FSelectedPics.Count-1 do SelectedIDs.Add(FSelectedPics[i].ID);
-      if FItemIndex>=0 then iFocusedID := FPicList[FItemIndex].ID;
-    end else
-      SelectedIDs := nil;
-    iTopOffset := FTopOffset;
+    if FItemIndex>=0 then iFocusedID := FPicList[FItemIndex].ID else iFocusedID := 0;
+    Result := TThumbnailViewerDisplayData.Create(FSelectedPics, iFocusedID, FTopOffset);
   end;
 
   procedure TThumbnailViewer.ScrollIntoView;

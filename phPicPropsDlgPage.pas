@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.4 2004-09-11 17:52:36 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.5 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,20 +9,21 @@ unit phPicPropsDlgPage;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, phObj, udPicProps, ImgList,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phIntf, phObj, ConsVars,
+  udPicProps, ImgList,
   phWizard;
 
 type
    // Ѕазовый класс странички диалога свойств изображений
   TPicPropsDialogPage = class(TWizardPage)
   private
+     // ƒиалог свойств изображений (владелец страницы)
     FDialog: TdPicProps;
-    function GetEditedPicCount: Integer;
-    function GetEditedPics(Index: Integer): TPhoaPic;
-    function GetFileImageIndex(Index: Integer): Integer;
-    function GetPhoA: TPhotoAlbum;
-    function GetFileImages: TImageList;
-    function GetEditedPicArray: TPicArray;
+     // Prop handlers 
+    function  GetEditedPics: IPhoaPicList;
+    function  GetFileImageIndex(Index: Integer): Integer;
+    function  GetPhoA: TPhotoAlbum;
+    function  GetFileImages: TImageList;
   protected
     procedure InitializePage; override;
      // ”ведомл€ет форму диалога об изменении
@@ -31,12 +32,8 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
      // —войства, получаемые через родительский диалог
-     // --  оличество редактируемых изображений
-    property EditedPicCount: Integer read GetEditedPicCount;
-     // -- ћассив ссылок на редактируемые изображени€
-    property EditedPicArray: TPicArray read GetEditedPicArray;
      // -- —сылки на редактируемые изображени€ по индексу
-    property EditedPics[Index: Integer]: TPhoaPic read GetEditedPics;
+    property EditedPics: IPhoaPicList read GetEditedPics;
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
      // -- ImageList со значками файлов
@@ -75,19 +72,9 @@ implementation
     FDialog.EndUpdate;
   end;
 
-  function TPicPropsDialogPage.GetEditedPicArray: TPicArray;
+  function TPicPropsDialogPage.GetEditedPics: IPhoaPicList;
   begin
     Result := FDialog.EditedPics;
-  end;
-
-  function TPicPropsDialogPage.GetEditedPicCount: Integer;
-  begin
-    Result := High(FDialog.EditedPics)+1;
-  end;
-
-  function TPicPropsDialogPage.GetEditedPics(Index: Integer): TPhoaPic;
-  begin
-    Result := FDialog.EditedPics[Index];
   end;
 
   function TPicPropsDialogPage.GetFileImageIndex(Index: Integer): Integer;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.6 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.7 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -48,7 +48,7 @@ type
   procedure TfrPicProps_FileProps.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
-    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPicCount;
+    if tvMain.RootNodeCount=0 then tvMain.RootNodeCount := EditedPics.Count;
   end;
 
   procedure TfrPicProps_FileProps.InitializePage;
@@ -106,7 +106,7 @@ type
     nParent := Sender.NodeParent[Node];
      // Для узлов файлов (корневых)
     if nParent=nil then begin
-      if Column=0 then s := EditedPics[Node.Index].PicFileName;
+      if Column=0 then s := EditedPics[Node.Index].FileName;
      // Для элементов свойств файла (дочерних узлов по отношению к файлам)
     end else begin
       NS := PNamespace(Sender.GetNodeData(nParent))^;
@@ -129,7 +129,7 @@ type
       p := Sender.GetNodeData(Node);
        // При создании объекта данные сразу считываются или возникает exception, если файла нет
       try
-        p^ := TNamespace.CreateFromFileName(EditedPics[Node.Index].PicFileName);
+        p^ := TNamespace.CreateFromFileName(EditedPics[Node.Index].FileName);
       except
         p^ := nil;
       end;

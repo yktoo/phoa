@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.7 2004-09-27 17:07:23 dale Exp $
+//  $Id: udSortPics.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -77,7 +77,7 @@ uses phUtils, ConsVars, Main;
      // Создаём операцию
     if rbAllGroups.Checked then g := FPhoA.RootGroup else g := FGroup;
     if rbCurGroup.Checked and FDirectSort then begin
-      g.SortPics(frSorting.Sortings, FPhoA.Pics);
+      g.SortPics(frSorting.Sortings);
       fMain.RefreshViewer;
     end else begin
       Operation := nil;

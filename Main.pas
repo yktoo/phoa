@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.45 2004-10-05 13:16:34 dale Exp $
+//  $Id: Main.pas,v 1.46 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -290,9 +290,7 @@ type
      // Сохранённый на время выполнения операции ID последней выделенной группы
     FSavedGroupID: Integer;
      // Сохранённые на время выполнения операции параметры отображения Viewer
-    FViewerSavedSelectedIDs: TIntegerList;
-    FViewerSavedFocusedID: Integer;
-    FViewerSavedTopIndex: Integer;
+    FViewerDisplayData: IThumbnailViewerDisplayData;
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
@@ -319,7 +317,7 @@ type
      //   если активно дерево групп - то всех изображений группы
      //   если активен вьюер - то выделенных во вьюере изображений
      //   иначе возвращает nil
-    function GetSelectedPics: IPhoaPicList;
+    function  GetSelectedPics: IPhoaPicList;
      // Отображает результаты поиска. Если bForceRemove=True, удаляет узел результатов, иначе, при bDoSelectNode=True,
      //   выделяет узел
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
@@ -441,17 +439,17 @@ uses
   procedure TfMain.aaCopy(Sender: TObject);
   begin
     ResetMode;
-    TPhoaBaseOp_PicCopy.Create(Viewer.GetSelectedPicArray);
+    TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics);
   end;
 
   procedure TfMain.aaCut(Sender: TObject);
   var Operation: TPhoaOperation;
   begin
-    TPhoaBaseOp_PicCopy.Create(Viewer.GetSelectedPicArray);
+    TPhoaBaseOp_PicCopy.Create(Viewer.SelectedPics);
     Operation := nil;
     BeginOperation;
     try
-      Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FPhoA, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
+      Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FPhoA, CurGroup, Viewer.SelectedPics);
     finally
       EndOperation(Operation);
     end;
@@ -477,7 +475,7 @@ uses
       end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then begin
         BeginOperation;
         try
-          Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FPhoA, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
+          Operation := TPhoaMultiOp_PicDelete.Create(FUndo, FPhoA, CurGroup, Viewer.SelectedPics);
         finally
           EndOperation(Operation);
         end;
@@ -496,7 +494,7 @@ uses
       end;
      // Редактирование изображения
     end else if (ActiveControl=Viewer) and (Viewer.SelectedPics.Count>0) then
-      EditPic(Viewer.GetSelectedPicArray, FPhoA, FUndo);
+      EditPics(Viewer.SelectedPics, FPhoA, FUndo);
   end;
 
   procedure TfMain.aaExit(Sender: TObject);
@@ -723,7 +721,7 @@ uses
   procedure TfMain.aaPicOps(Sender: TObject);
   begin
     ResetMode;
-    DoPicOps(FPhoA, FUndo, CurGroup, PicArrayToIDArray(Viewer.GetSelectedPicArray));
+    DoPicOps(FPhoA, FUndo, CurGroup, Viewer.SelectedPics);
   end;
 
   procedure TfMain.aaRemoveSearchResults(Sender: TObject);
@@ -947,7 +945,7 @@ uses
       Group := CurGroup;
       if Group=nil then FSavedGroupID := 0 else FSavedGroupID := Group.ID;
        // Сохраняем параметры отображения Viewer
-      FViewer.SaveDisplay(FViewerSavedSelectedIDs, FViewerSavedFocusedID, FViewerSavedTopIndex);
+      FViewerDisplayData := FViewer.SaveDisplay;
     end;
     Inc(FOpLockCounter);
   end;
@@ -1178,11 +1176,10 @@ uses
         Group := CurGroup;
         RefreshViewer;
          // Если группа не поменялась, восстанавливаем параметры отображения
-        if (Group<>nil) and (Group.ID=FSavedGroupID) then
-          FViewer.RestoreDisplay(FViewerSavedSelectedIDs, FViewerSavedFocusedID, FViewerSavedTopIndex);
+        if (Group<>nil) and (Group.ID=FSavedGroupID) then FViewer.RestoreDisplay(FViewerDisplayData);
       finally
         FViewer.EndUpdate;
-        FreeAndNil(FViewerSavedSelectedIDs);
+        FViewerDisplayData := nil;
       end;
     end;
   end;
@@ -1273,11 +1270,11 @@ uses
   begin
      // Remove self from the clipboard viewer chain
     ChangeClipboardChain(Handle, FHNextClipbrdViewer);
-    FViewer.Free; 
+    FViewerDisplayData := nil;
+    FViewer.Free;
     FViewedPics := nil;
-    FPhoA.Free;
     FSearchResults.Free;
-    FViewerSavedSelectedIDs.Free;
+    FPhoA.Free;
     FUndo.Free;
   end;
 
@@ -1337,14 +1334,9 @@ uses
 
   function TfMain.GetSelectedPics: IPhoaPicList;
   begin
-     // Если активен вьюер - составляем список ссылок на выделенные изображения вьюера
-    if Viewer.Focused then
-      Result := Viewer.SelectedPics
-     // Если активны группы - составляем список ссылок на изображения текущей группы
-    else if tvGroups.Focused and (CurGroup<>nil) then begin
-      Result := TPhoaMutablePicList.Create(True);
-      //!!!Result.AddFromGroup(FPhoA, CurGroup, False, False);
-    end;
+    if Viewer.Focused then        Result := Viewer.SelectedPics
+    else if tvGroups.Focused then Result := FViewedPics
+    else                          Result := nil;
   end;
 
   function TfMain.GetViewIndex: Integer;
@@ -1712,7 +1704,7 @@ uses
       iCntBefore := gTgt.Pics.Count;
       BeginOperation;
       try
-        Operation := TPhoaMultiOp_PicDragAndDropToGroup.Create(FUndo, FPhoA, CurGroup, gTgt, PicArrayToIDArray(Viewer.GetSelectedPicArray), bCopy);
+        Operation := TPhoaMultiOp_PicDragAndDropToGroup.Create(FUndo, FPhoA, CurGroup, gTgt, Viewer.SelectedPics, bCopy);
       finally
         EndOperation(Operation);
       end;
@@ -1917,12 +1909,7 @@ uses
     Operation := nil;
     BeginOperation;
     try
-      Operation := TPhoaOp_PicDragAndDropInsideGroup.Create(
-        FUndo,
-        FPhoA,
-        CurGroup,
-        PicArrayToIDArray(Viewer.GetSelectedPicArray),
-        Viewer.DropTargetIndex);
+      Operation := TPhoaOp_PicDragAndDropInsideGroup.Create(FUndo, FPhoA, CurGroup, Viewer.SelectedPics, Viewer.DropTargetIndex);
     finally
       EndOperation(Operation);
     end;

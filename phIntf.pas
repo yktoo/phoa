@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.7 2004-10-05 13:16:34 dale Exp $
+//  $Id: phIntf.pas,v 1.8 2004-10-06 14:41:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -109,6 +109,7 @@ type
     function  GetItemsByID(iID: Integer): IPhoaPic; stdcall;
     function  GetItemsByFileName(pcFileName: PAnsiChar): IPhoaPic; stdcall;
     function  GetItems(Index: Integer): IPhoaPic; stdcall;
+    function  GetMaxPicID: Integer; stdcall;
      // Props
      // -- Count of pictures in the list
     property Count: Integer read GetCount;
@@ -118,6 +119,8 @@ type
     property ItemsByFileName[pcFileName: PAnsiChar]: IPhoaPic read GetItemsByFileName;
      // -- Pictures by index; Index in range 0..Count-1
     property Items[Index: Integer]: IPhoaPic read GetItems; default;
+     // -- Maximum picture ID of the list
+    property MaxPicID: Integer read GetMaxPicID;
   end;
 
 const
