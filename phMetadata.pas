@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.7 2004-09-11 17:52:36 dale Exp $
+//  $Id: phMetadata.pas,v 1.8 2004-10-14 08:11:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -251,12 +251,10 @@ const
       sDesc: 'For each color component, the maximum value assigned to that component'),
     (iTag: $011a; VType: xtvtRegular;     sName: 'X-Resolution';                         sVList: '';
       sDesc:
-        'Display/Print resolution of image in the image width (x) direction. Default value is 1/72 inch, but it has '+
-        'no meaning because personal computer doesn''t use this value to display/print out'),
+        'Display/Print resolution of image in the image width (x) direction. The default value is 72 dpi'),
     (iTag: $011b; VType: xtvtRegular;     sName: 'Y-Resolution';                         sVList: '';
       sDesc:
-        'Display/Print resolution of image in the image height (y) direction. Default value is 1/72 inch, but it has '+
-        'no meaning because personal computer doesn''t use this value to display/print out'),
+        'Display/Print resolution of image in the image height (y) direction. The default value is 72 dpi'),
     (iTag: $011c; VType: xtvtRegular;     sName: 'Planar Configuration';                 sVList: '';
       sDesc:
         'When image format is no compression YCbCr, this value shows byte aligns of YCbCr data. If value is 1, '+
