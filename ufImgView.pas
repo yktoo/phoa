@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.36 2004-10-13 14:29:09 dale Exp $
+//  $Id: ufImgView.pas,v 1.37 2004-10-13 16:34:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -15,6 +15,10 @@ uses
   TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
   TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;
 
+const  
+   // Событие окончания декодирования
+  WM_DECODE_FINISHED = WM_USER + 201;
+
 type
    // Поток, декодирующий следующее изображение в фоновом режиме
   TDecodeThread = class(TThread)
@@ -27,6 +31,8 @@ type
     FLoadAborted: Boolean;
      // Блокировка доступа к FLoadAborted
     FLoadAbortLock: TRTLCriticalSection;
+     // Форма-владелец
+    FOwner: TForm;
      // Prop storage
     FQueuedFileName: String;
     FHDecodedEvent: THandle;
@@ -35,11 +41,11 @@ type
     procedure LoadProgress(Sender: TObject; Stage: TProgressStage; PercentDone: Byte; RedrawNow: Boolean; const R: TRect; const Msg: string);
      // Prop handlers
     procedure SetQueuedFileName(const Value: String);
-    function GetDecoding: Boolean;
+    function  GetDecoding: Boolean;
   protected
     procedure Execute; override;
   public
-    constructor Create;
+    constructor Create(AOwner: TForm);
     destructor Destroy; override;
      // Возвращает и забывает декодированный Bitmap
     function  GetAndReleasePicture: TBitmap32;
@@ -240,6 +246,8 @@ type
     FInitFlags: TImgViewInitFlags;
      // Поток фоновой загрузки картинок
     FDecodeThread: TDecodeThread;
+     // Флаг блокирующей загрузки изображения
+    FForegroundLoading: Boolean;
      // Направление предекодирования изображений
     FPredecodeDirection: TPredecodeDirection;
      // Слой, на котором рисуется описание
@@ -255,8 +263,6 @@ type
     FCachedFlips: TPicFlips;
      // True, если курсор принудительно скрыт
     FCursorHidden: Boolean;
-     // Курсор для iMain (crHand или crDefault)
-    FImageCursor: TCursor;
      // Флаг и положение перетаскивания изображения
     FTrackDrag: Boolean;
     FTrackX: Integer;
@@ -361,8 +367,8 @@ type
     procedure UpdateTransformActions;
      // Настраивает состояние Actions показа слайдов
     procedure UpdateSlideShowActions;
-     // Обновляет Cursor изображения
-    procedure UpdateImageCursor;
+     // Обновляет Cursor изображения и экрана
+    procedure UpdateCursor;
      // Разрешает/запрещает Actions
     procedure EnableActions;
      // Пересоздаёт или удаляет таймер показа слайдов
@@ -381,6 +387,7 @@ type
      // Message handlers
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
+    procedure WMDecodeFinished(var Msg: TMessage); message WM_DECODE_FINISHED;
      // Prop handlers
     function  GetViewOffset: TPoint;
     function  GetZoomFactor: Single;
@@ -455,14 +462,15 @@ uses
    // TDecodeThread
    //===================================================================================================================
 
-  constructor TDecodeThread.Create;
+  constructor TDecodeThread.Create(AOwner: TForm);
   begin
     inherited Create(True);
     FreeOnTerminate := True;
-    Priority := tpLowest;
-    FHQueuedEvent  := CreateEvent(nil, False, False, nil);
+    Priority        := tpIdle;
+    FOwner          := AOwner;
+    FHQueuedEvent   := CreateEvent(nil, False, False, nil);
      // Событие декодирования создаём в сигнальном состоянии - это означает, что поток изначально свободен
-    FHDecodedEvent := CreateEvent(nil, True,  True,  nil);
+    FHDecodedEvent  := CreateEvent(nil, True,  True,  nil);
     InitializeCriticalSection(FLoadAbortLock);
     Resume;
   end;
@@ -508,6 +516,7 @@ uses
        // Рапортуем о готовности
       finally
         SetEvent(FHDecodedEvent);
+        PostMessage(FOwner.Handle, WM_DECODE_FINISHED, 0, 0);
       end;
     end;
   end;
@@ -906,8 +915,7 @@ uses
     FWClient := iwWindow-FXGap;
     FHClient := ihWindow-FYGap;
      // Настраиваем курсор
-    FImageCursor :=
-    iMain.Cursor := FImageCursor;
+    UpdateCursor;
      // Находим начальное положение изображения
     ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
      // Настраиваем положение информации
@@ -1018,7 +1026,10 @@ uses
       else if idxNextPic>=FPicCount then
         if FCyclicViewing then idxNextPic := 0 else idxNextPic := -1;
        // Ставим файл в очередь 
-      if idxNextPic>=0 then FDecodeThread.QueuedFileName := FPics[idxNextPic].FileName;
+      if idxNextPic>=0 then begin
+        FDecodeThread.QueuedFileName := FPics[idxNextPic].FileName;
+        UpdateCursor;
+      end;
     end;
   end;
 
@@ -1066,7 +1077,7 @@ uses
     PrevPic := FPic;
      // Находим текущее изображение
     FPic := FPics[FPicIdx];
-     // Определяем, есть ли изображение в кэше 
+     // Определяем, есть ли изображение в кэше
     bPicInCache := FCachedBitmapFilename=FPic.FileName;
      // Если нет, начинаем [полу]фоновую загрузку изображения
     if not bPicInCache then FDecodeThread.QueuedFileName := FPic.FileName;
@@ -1093,7 +1104,7 @@ uses
      // Иначе сбрасываем текущие параметры преобразования
     end else
       FTransform.InitValues(pr0, []);
-     // Освобождаем кэш и сохраняем в кэше старое изображение и преобразования 
+     // Освобождаем кэш и сохраняем в кэше старое изображение и преобразования
     FCachedBitmap.Free;
     FCachedBitmap   := bmpPrevTemp;
     FCachedRotation := PrevRotation;
@@ -1101,7 +1112,8 @@ uses
     if bmpPrevTemp=nil then FCachedBitmapFilename := '' else FCachedBitmapFilename := PrevPic.FileName;
      // Если не взяли из кэша, дожидаемся окончания загрузки изображения фоновым потоком
     if not bPicInCache then begin
-      StartWait;
+      FForegroundLoading := True;
+      UpdateCursor;
       try
         WaitForSingleObject(FDecodeThread.HDecodedEvent, INFINITE);
         bmpDecoded := FDecodeThread.GetAndReleasePicture;
@@ -1116,7 +1128,8 @@ uses
             bmpDecoded.Free;
           end;
       finally
-        StopWait;
+        FForegroundLoading := False;
+        UpdateCursor;
       end;
     end;
      // Настраиваем фильтр ресэмплинга
@@ -1166,7 +1179,7 @@ uses
   begin
     HelpContext := IDH_intf_view_mode;
      // Создаём поток декодера
-    FDecodeThread := TDecodeThread.Create;
+    FDecodeThread := TDecodeThread.Create(Self);
      // Создаём слой для отрисовки описания
     FDescLayer := TPositionedLayer.Create(iMain.Layers);
     FDescLayer.OnPaint := PaintDescLayer;
@@ -1262,9 +1275,9 @@ uses
       mbLeft:
         if (FWScaled>FWClient) or (FHScaled>FHClient) then begin
           FTrackDrag := True;
-          iMain.Cursor := crHandDrag;
           FTrackX := ViewOffset.x-x;
           FTrackY := ViewOffset.y-y;
+          UpdateCursor;
         end;
       mbRight: if not FErroneous and (ssCtrl in Shift) then FShellCtxMenuOnMouseUp := True;
       mbMiddle: aFullScreen.Execute;
@@ -1281,8 +1294,8 @@ uses
     if FTrackDrag then begin
       FTrackDrag := False;
        // Возвращаем прежний курсор
-      iMain.Cursor := FImageCursor;
-    end else if FShellCtxMenuOnMouseUp then begin  
+      UpdateCursor;
+    end else if FShellCtxMenuOnMouseUp then begin
       if not FErroneous and (Button=mbRight) and (ssCtrl in Shift) then ShowFileShellContextMenu(FPic.FileName);
       FShellCtxMenuOnMouseUp := False;
     end;
@@ -1476,9 +1489,17 @@ uses
     UpdateTransformActions;
   end;
 
-  procedure TfImgView.UpdateImageCursor;
+  procedure TfImgView.UpdateCursor;
+  var iCur: TCursor;
   begin
-aImgViewCursors[(FWScaled>FWClient) or (FHScaled>FHClient)];
+     // Настраиваем курсор iMain
+    if FTrackDrag then iCur := crHandDrag else iCur := aImgViewCursors[(FWScaled>FWClient) or (FHScaled>FHClient)];
+    iMain.Cursor := iCur;
+     // Настраиваем курсор Screen
+    if FForegroundLoading          then iCur := crHourGlass
+    else if FDecodeThread.Decoding then iCur := crAppStart
+    else                                iCur := crDefault;
+    Screen.Cursor := iCur;
   end;
 
   procedure TfImgView.UpdateShowInfoActions;
@@ -1504,6 +1525,11 @@ aImgViewCursors[(FWScaled>FWClient) or (FHScaled>FHClient)];
     aRotate270.Checked := FTransform.Rotation=pr270;
     aFlipHorz.Checked  := pflHorz in FTransform.Flips;
     aFlipVert.Checked  := pflVert in FTransform.Flips;
+  end;
+
+  procedure TfImgView.WMDecodeFinished(var Msg: TMessage);
+  begin
+    UpdateCursor;
   end;
 
   procedure TfImgView.WMHelp(var Msg: TWMHelp);
