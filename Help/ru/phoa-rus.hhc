@@ -46,14 +46,6 @@
 			<param name="Local" value="pic-data.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="&Dstrok;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">
-			<param name="Local" value="theory-resampling.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
-			<param name="Local" value="theory-metadata.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Egrave;&ntilde;&ograve;&icirc;&eth;&egrave;&yuml; &acirc;&aring;&eth;&ntilde;&egrave;&eacute;">
 			<param name="Local" value="rev-history.html">
 			<param name="New" value="1">
@@ -189,6 +181,10 @@
 				<param name="Local" value="intf-sel-phoa-group.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &ntilde;&acirc;&icirc;&eacute;&ntilde;&ograve;&acirc; &egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&agrave;">
+				<param name="Local" value="intf-tool-props.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="&Igrave;&agrave;&ntilde;&ograve;&aring;&eth; &icirc;&iuml;&aring;&eth;&agrave;&ouml;&egrave;&eacute; &ntilde; &ocirc;&agrave;&eacute;&euml;&agrave;&igrave;&egrave; &egrave;&ccedil;&icirc;&aacute;&eth;&agrave;&aelig;&aring;&iacute;&egrave;&eacute;">
 				<param name="Local" value="intf-file-ops.html">
 				</OBJECT>
@@ -288,8 +284,33 @@
 			<param name="Local" value="setup-dialogs.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
+			<param name="Local" value="setup-tools.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="&Otilde;&eth;&agrave;&iacute;&aring;&iacute;&egrave;&aring; &iacute;&agrave;&ntilde;&ograve;&eth;&icirc;&aring;&ecirc; &acirc; &ocirc;&agrave;&eacute;&euml;&aring;">
 			<param name="Local" value="setup-storing.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&Iuml;&eth;&icirc;&divide;&aring;&aring;">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
+			<param name="Local" value="theory-metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Dstrok;&aring;&ntilde;&yacute;&igrave;&iuml;&euml;&egrave;&iacute;&atilde;">
+			<param name="Local" value="theory-resampling.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Igrave;&agrave;&ntilde;&ecirc;&egrave; &ocirc;&agrave;&eacute;&euml;&icirc;&acirc;">
+			<param name="Local" value="theory-file-masks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Egrave;&iacute;&ntilde;&ograve;&eth;&oacute;&igrave;&aring;&iacute;&ograve;&ucirc;">
+			<param name="Local" value="theory-tools.html">
 			</OBJECT>
 	</UL>
 </UL>
