@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
-    $Id: main.css,v 1.6 2004-09-11 17:52:36 dale Exp $
+    $Id: main.css,v 1.7 2004-10-30 16:45:38 dale Exp $
 ------------------------------------------------------------------------------------------------------------------------
     PhoA image arranging and searching tool
     Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -59,6 +59,7 @@ h3                  { font-family: Verdana,Arial,serif;
                       font-weight: bold; 
                       text-align: left;
                       color: #000060; }                   
+
 a                   { text-decoration: none; }
 a:link              { color: #0000c0; 
                       border-bottom: 1 #6868c5 solid; }
@@ -68,12 +69,16 @@ a:active            { color: #f0a050;
                       border-bottom: 1 #6868c5 solid; }
 a:hover             { color: #f0a050;  
                       border-bottom: 1 #6868c5 solid; }
+
 a.copyright:link    { color: #6868c5;
                       border: none; }
 a.copyright:visited { color: #6868c5;
                       border: none; }
 a.copyright:active  { color: #f0a050; }
 a.copyright:hover   { color: #f0a050; }
+
+/** Tables **/
+
 table.main          { margin: 0 0 0 0; }
 table.plain         { padding: 3px 5px 3px 5 px; }
 td                  { font-family: Verdana,Arial,serif;
