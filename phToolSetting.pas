@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.13 2004-09-11 17:52:36 dale Exp $
+//  $Id: phToolSetting.pas,v 1.14 2004-09-18 19:44:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -701,7 +701,7 @@ type
 
   procedure TPhoaToolSettingEditor.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer);
   begin
-    if (Kind in [ikNormal, ikSelected]) and (Node.Index<RootNodeCount-1) then
+    if (Kind in [ikNormal, ikSelected]) and IsSettingNode(Node) then
       case Column of
         1: Index := aToolImageIndexes[GetSetting(Node).Kind];
       end;
@@ -743,7 +743,7 @@ type
   procedure TPhoaToolSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
      // Если это не последний "пустой" пункт, сохраняем пункт TPhoaToolSetting в Node.Data
-    if Node.Index<RootNodeCount-1 then PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
+    if IsSettingNode(Node) then PPhoaSetting(PChar(Node)+FDataOffset)^ := FRootSetting[Node.Index];
      // Настраиваем CheckType и CheckState - кнопку
     Node.CheckType := ctButton;
   end;

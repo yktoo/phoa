@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.12 2004-09-15 18:53:12 dale Exp $
+;  $Id: phoa.dklang,v 1.13 2004-09-18 19:44:23 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -710,6 +710,7 @@ ISettingID_Gen_TreeSelBlended=Blended rectangle
 ISettingID_Gen_TreeSelDotted=Dotted contour
 ISettingID_Gen_TreeSelStyle=Multiple selection rectangle style
 ISettingID_Gen_TreeWhPanning=Panning using mouse wheel click
+ISettingID_Profiles=Profiles
 ISettingID_Tools=Tools
 ISettingID_View=View\nmode
 ISettingID_View_AlwaysOnTop=View window always on top

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.52 2004-09-17 14:07:32 dale Exp $
+//  $Id: ConsVars.pas,v 1.53 2004-09-18 19:44:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -419,6 +419,8 @@ const
   SRegPrefs_Root                  = 'Preferences';
     SRegPrefs_Tools               = SRegPrefs_Root+'\Tools';
     SRegPrefs_ToolEditor          = SRegPrefs_Root+'\ToolEditor';
+    SRegPrefs_Profiles            = SRegPrefs_Root+'\Profiles';
+    SRegPrefs_ProfileEditor       = SRegPrefs_Root+'\ProfileEditor';
 
   SRegOpen_Root                   = 'Open';
     SRegOpen_FilesMRU             = SRegOpen_Root+'\FilesMRU';
@@ -575,6 +577,9 @@ const
   iiFlipHorz                      = 70;
   iiFlipVert                      = 71;
   iiStoreTransform                = 72;
+  iiDKSoftware                    = 73;
+  iiProfile                       = 74;
+
 
    // Help topics
   IDH_start                       = 00001;
@@ -802,7 +807,9 @@ const
     ISettingID_Dlgs_FOW_CfmRepairFLs   = 3124; // Подтверждение для операции восстановления ссылок на файлы
     ISettingID_Dlgs_FOW_LogOnErrOnly   = 3130; // Отображать протокол только при наличии ошибок
    //===================================================================================================================
-  ISettingID_Tools                     = 4001; // Инструменты
+  ISettingID_Profiles                  = 4001; // Профили
+   //===================================================================================================================
+  ISettingID_Tools                     = 5001; // Инструменты
 
    //===================================================================================================================
   ISettingID_Hidden                    = 9001; // Невидимые настройки
@@ -960,8 +967,7 @@ uses
   TypInfo, Forms,
   TBXThemes, TBXDefaultTheme, TBXOfficeXPTheme, TBXStripesTheme, TBXAluminumTheme,
   DKLang,
-  phPhoa, phUtils, phSettings, phValSetting, phToolSetting, udAbout,
-  phGUIObj;
+  phPhoa, phGUIObj, phUtils, phSettings, phValSetting, phProfileSetting, phToolSetting, udAbout;
 
   function GetPhoaSaveFilter: String;
   var i: Integer;
@@ -1264,6 +1270,9 @@ type
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_CfmRebuildTh, '@ISettingID_Dlgs_FOW_CfmRebuildTh', True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
+     //== Профили ======================================================================================================
+    Lvl1 := TPhoaProfilePageSetting.Create(RootSetting, ISettingID_Profiles, iiProfile, '@ISettingID_Profiles', IDH_setup_tools{!!!});
+//!!!      Lvl2 := TPhoaProfileSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
      //== Инструменты ==================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_tools);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
