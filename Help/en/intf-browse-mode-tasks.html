@@ -1,0 +1,83 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Working in the browse mode</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Working in the browse mode</h1>
+  <p align=justify>The most common tasks are discussed in <a href="intf-browse-mode-menu.html">Browse mode menu commands chapter</a>. Here I want
+    to highlight more specific <b>PhoA</b> topics.
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=picdata>Picture data</a></h2>
+  <p align=justify>As was mentioned in <a href="how-it-works.html">the lyrical part</a>, the program stores picture list independently (to be precise,
+    this is the list which elements are links to picture files along with their description, thumbnails etc). The group tree is also stored
+    independently. Every single group holds a set of links to pictures so when you <a href="intf-pic-add.html">add a file to the group</a>
+    (you work with pictures only by using files), and the file is already used and described somewhere in the photo alubm, then the program
+    automatically finds and fills all the appropriate data; similarly, when you <a href="intf-pic-props.html">edit</a> any picture data (eg, place
+    or date), these data change in all occurences of the picture file.
+  <p align=justify>It works slightly different when you remove a picture from a group. If the picture being removed is linked by any other photo album
+    group (or groups), only the link to the picture is removed, and the picture itselves remains in the photo album (having other group(s) linked to
+    it); if you once later decide to add the picture file back to a group, <b>PhoA</b> will fill all the data form the picture being found.
+    When you delete a picture that was linked only in the current group, the picture is wiped away completely so if you later add the picture back,
+    you'll have to fill picture data with your own.
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=dnd>Drag'n'Drop</a></h2>
+  <p align=justify>Obviously, a picture cannot be contained twice in a group. The most simple way to copy picture across the groups is to drag
+    them with the mouse from the right pane (thumbnails area) to a group in the tree (in the left pane) when holding <b>Ctrl</b> key.
+    Dragging and then dropping pictures with no <b>Ctrl</b> pressed results in thet pictures move (they are removed from source group and placed
+    into target group). You can drag-and-drop more than one picture at once: you select appropriate pictures before starting the drag operation
+    (using <a href="intf-key-mouse-controls.html">keys</a> <b>Ctrl</b>, <b>Shift</b> and left mouse button) and start dragging with any of
+    selected pictures. After pictures are moved or copied, <b>PhoA</b> informs you of changes made, if it's specified in the
+    <a href="setup-dialogs.html">program settings</a> (<b>Notifications</b> section).
+  <p align=justify>Additionally, you can drag-ang-drop group folder as well thus rearranging group tree. When you drag a group above free area to
+    the right of the nodes, tree window displays group <i>insertion place</i> being drawn as line, in this case the group is inserted as a sibling
+    of the target node, just above or below it, depending on mouse cursor location (also influences the insertion line shape). When dragging
+    a group <i>upon</i> a node the node becomes highlighted, and the group becomes a child of the target highlighted node. Note: the root directory
+    may contain only photo album node, and ordinary groups cannot be inserted beside it.
+  <p align=justify>Similarly you can copy (but not move) pictures from Search Results tree node into any picture group. It is convenient to
+    arrange pictures by date (eg. by year or by month) after you have arranged it by event in another folder (simply search pictures by
+    date range and copy results to an appropriate group).
+  <p align=justify>Besides this, you can reorder pictures in a group also using drag'n'drop: when you drag selected thumbnails inside the thumbnals
+    window, also insertion line is displayed. When you release mouse button all the selected pictures move to the indicated location right in
+    the sequence they were before. And an alternative method for reordering pictures is <a href="intf-sort-pics.html">sorting them</a>.
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=clipboard>Clipboard</a></h2>
+  <p align=justify><b>PhoA</b> supports clipboard operations. For the moment you can cut, copy and paste only the program's pictures. Data placed
+    to the clipboard contain all the picture data <i>except</i> their group belongings. This allows moving (or copying) pictures to another group
+    or even another photo album.
+  <p align=justify>There is a limitation regarding inserting pistures to another photo album: the data of <i>existing pictures</i> (being already
+    registered in the photo album with the same picture file name) do not become overwritten with the new ones; ie, let's say, when you paste a
+    picture linked to file C:\Photos\winter-vacation-1812.jpg to the photo album already containing this file, then the picture will only be added
+    to the current group (if it's not there yet). In the case the picture being pasted is already contained in the target group, this picture is
+    simply being skipped. On paste operation completed the program notifies you about the number of pictures <i>actually</i> pasted from the
+    clipboard (is controlled with <a href="setup-dialogs.html">program settings</a> - <b>Notifications</b> section). 
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=undo>Undo system</a></h2>
+  <p align=justify>By contrast with many similar products, <b>PhoA</b> implements fully-function <i>undo system</i>, allowing you to roll back
+    any operations that has modified the photo album (the only exception is <a href="intf-rebuild-thumbs.html">Rebuild thumbnails</a> operation),
+    and also the series of operations - by selecting <b>Edit | Undo</b> or <b>Edit | Undo history</b> <a href="intf-browse-mode-menu.html">menu
+    items</a> respectively. When you select an item from the undo history list all the prior (ie located above in the list) operations are also
+    being undone.
+  <p align=justify>Number of operations you may roll back is specified in the <a href="setup-browse-mode.html">Browse mode program settings</a>.
+    The default value is <b>32</b>.
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=view>Views</a></h2>
+  <p align=justify>Views are an unique technology of automated picture grouping. Refer to <a href="intf-browse-mode-views.html">Working with views</a>
+    section for details.
+
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso>
+    <a href="intf-key-mouse-controls.html">Keyboard and mouse controls</a><br>
+    <a href="intf-view-mode.html">View mode</a><br>
+    <a href="intf-view-mode-tasks.html">Working in the view mode</a><br>
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

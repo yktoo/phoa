@@ -1,0 +1,87 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=phoa-rus.chm
+Contents file=phoa-rus.hhc
+Default topic=start.html
+Display compile notes=No
+Display compile progress=No
+Full-text search=Yes
+Index file=phoa-rus.hhk
+Language=0x419 Русский
+Title=Справочная система PhoA
+
+
+[FILES]
+advantages.html
+eula-eng.html
+eula-rus.html
+file-formats.html
+how-it-works.html
+intf-album-props.html
+intf-browse-mode-menu.html
+intf-browse-mode-tasks.html
+intf-browse-mode-views.html
+intf-browse-mode.html
+intf-key-mouse-controls.html
+intf-major-modes.html
+intf-pic-add.html
+intf-pic-add-checkfiles.html
+intf-pic-add-log.html
+intf-pic-add-process.html
+intf-pic-add-selfiles.html
+intf-pic-operations.html
+intf-pic-props-data.html
+intf-pic-props-fprops.html
+intf-pic-props-groups.html
+intf-pic-props-keywords.html
+intf-pic-props-metadata.html
+intf-pic-props-view.html
+intf-pic-props.html
+intf-search.html
+intf-sel-phoa-group.html
+intf-select-keywords.html
+intf-sort-pics.html
+intf-stats.html
+intf-view-mode-tasks.html
+intf-view-mode.html
+intf-view-props.html
+intro.html
+major-modes.html
+pic-data.html
+pic-prop-autofill.html
+requirements.html
+rev-history.html
+setup.html
+setup-browse-mode.html
+setup-dialogs.html
+setup-general.html
+setup-view-mode.html
+setup-storing.html
+start.html
+theory-metadata.html
+theory-resampling.html
+thumbnails.html
+intf-file-ops.html
+intf-file-ops-cdopts.html
+intf-file-ops-delopts.html
+intf-file-ops-log.html
+intf-file-ops-moveopts.html
+intf-file-ops-process.html
+intf-file-ops-repropts.html
+intf-file-ops-selfolder.html
+intf-file-ops-selpics.html
+intf-file-ops-seltask.html
+intf-file-ops-task-copy.html
+intf-file-ops-task-del.html
+intf-file-ops-task-move.html
+intf-file-ops-task-repfl.html
+intf-file-ops-task-rthumb.html
+
+[ALIAS]
+#include ..\..\aliases.h
+
+[MAP]
+#include ..\..\maps.h
+
+[INFOTYPES]
+

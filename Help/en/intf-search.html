@@ -1,0 +1,91 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Find pictures dialog</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Find pictures dialog</h1>
+  <p align=justify><b>PhoA</b> has a powerful tool for searching pictures. To display Find pictures dialog you select <b>Tools | Find...</b> menu
+    item or press <b>F3</b> key in the <a href="intf-browse-mode.html">Browse mode</a>.
+
+  <h3>Search criteria list</h3>
+  <p align=justify>You enter search criteria in the table with the following data:
+  <ul>
+    <li><b>Picture property</b> - one of the <i>searchable</i> item from <a href="pic-data.html">picture data</a>, for which the criterion is
+        intended.</li>
+    <li><b>Criterion condition</b> - one of comparison conditions, list of possible values depends on property <a href="#datatypes">data type</a>.</li>
+    <li><b>Criterion value</b> - a value to compare picture property with.</li>
+  </ul>
+  <p align=justify>Use arrow keys no navigate through the table. To expand the dropdown list use <b>Alt+Down</b> keys.
+  <p align=justify>Criterion values may be selected from the dropdown history list.
+  
+  <h3>Find</h3>
+  <p align=justify>Starts picture searching.
+  <p align=justify>Pictures found in search operation (if there are any) fill the <b>Search Results</b> folder that is displayed in the root of
+    the group tree. The Search Results folder implements the same functionality as regular picture group folders except that you cannot add
+    or remove its pictures.
+
+  <h3>Reset</h3>
+  <p align=justify>Clears all input fields and reverts all values to their defaults.
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> <a name=datatypes>Picture properties data types</a></h2>
+  <p align=justify>According to the <a href="pic-data.html">picture data table</a>, <b>PhoA</b> uses the following data types for property values:
+
+  <table class=plain border=0>
+    <tr class=tblhdr>
+      <td nowrap>Data type</td>
+      <td nowrap>Description &amp; criteria</td>
+    </tr>
+    <tr>
+      <td><b>Integer</b> or <b>Ordinal</b></td>
+      <td>An integer value can be compared for equality, inequality etc.</td>
+    </tr>
+    <tr>
+      <td><b>Filename string</b></td>
+      <td>Data may be tested for <i>mask</i> matching. The mask is written by ordinary OS rules: <b>?</b> - any character, <b>*</b> - arbitrary number
+          of any characters; moreover, you can specify symbol ranges in square brackets, eg, <b>[A-Z]</b>.</td>
+    </tr>
+    <tr>
+      <td><b>String</b></td>
+      <td>Any literal. Searching string or substring is implemented, case insensitive.</td>
+    </tr>
+    <tr>
+      <td><b>Pixel format</b></td>
+      <td>Not a searchable type.</td>
+    </tr>
+    <tr>
+      <td><b>Date</b></td>
+      <td>Criteria are similar to number ones.</td>
+    </tr>
+    <tr>
+      <td><b>Time</b></td>
+      <td>Criteria are similar to number ones.</td>
+    </tr>
+    <tr>
+      <td><b>String list</b></td>
+      <td>It is a list of keywords. Keywords may be entered manually or by clicking &quot;<b>...</b>&quot; button in the entry field from the
+        <a href="intf-select-keywords.html">list</a>.</td>
+    </tr>
+  </table>
+
+  <p align=justify>The program select those pictures that conform to all search conditions at once (ie, the <b>AND</b> operator is in effect here).
+  <p align=justify>To disable a criterion simply delete its value.
+
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso>
+    <a href="pic-data.html">Picture data</a><br>
+    <a href="intf-browse-mode-tasks.html">Working in the browse mode</a><br>
+    <a href="intf-key-mouse-controls.html">Keyboard and mouse controls</a><br>
+    <a href="intf-pic-add.html">Add pictures wizard</a><br>
+    <a href="intf-pic-props.html">Edit pictures dialog</a><br>
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

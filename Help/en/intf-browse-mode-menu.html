@@ -1,0 +1,109 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Browse mode menu commands</title>
+  <link rel="stylesheet" type="text/css" href="../main.css">
+</head>
+<body bgcolor=white>
+<table width=100% cellpadding=0 cellspacing=0 border=0 class=main>
+  <tr><td class=header><img src="../phoa-icon.gif" width=32 height=32 align=absmiddle> PhoA Help System</td></tr>
+  <tr><td class=hdrshadow></td></tr>
+  <tr><td class=content>
+  <h1><img src="../h1-bullet.gif" align=absmiddle width=22 height=22> Browse mode menu commands</h1>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> File menu</h2>
+  <p align=justify>This menu contains commands for photo album file operations:
+  <ul>
+    <li>New photo album is created automatically on the program startup or when you select the <b>File | New</b> menu item. It erases all groups
+        and pictures while photo album properties are being reset to their defaults.</li>
+    <li>To open a photo album file you created before, you select the <b>File | Open...</b> menu item. This command brings up standard dialog that
+        allows you to select a file (wearing the <b>.phoa</b> extension).</li>
+    <li>To save photo album in the currently open file you select <b>File | Save</b> menu item.</li>
+    <li>To save it into another file - the <b>File | Save as...</b> menu item.</li>
+    <li>The <b>File | Exit</b> menu item confirms whether you wish to save changes (if there were any) and exits the program.</li>
+    <li>Below there are <i>MRU</i> (most recently used) files menu items (number of stored entries is adjusted with <a href="setup-general.html">Program
+        settings dialog</a>)</li>
+  </ul>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Edit menu</h2>
+  <p align=justify>This menu gathers photo album editing commands:
+  <ul>
+    <li><b>Edit | Undo <i>operation</i></b> menu item rolls back changes done to the photo album by signed (most recent) operation.</li>
+    <li><b>Edit | Undo history</b> submenu item contains the changes made list, allowing you to roll back a number of sequential changes at once.</li>
+    <li><b>Edit | Cut</b> menu item removes pictures highlighted and places it into the clipboard (you can add them later to another picture group).</li>
+    <li>Similarly, <b>Edit | Copy</b> menu item copies highlighted pictures to the clipboard.</li>
+    <li><b>Edit | Paste</b> item adds pictures (if any) from the clipboard to the current group. Obviously, you can only add new pictures to a group,
+        all duplicates are skipped. If this specified in <a href="setup-dialogs.html">the program settings</a>, <b>PhoA</b> notifies you of number
+        of pictures actually pasted.</li>
+    <li>The Photo Album is the ultimate parent for all the picture groups, and therefore it is the root node of the group tree. The photo album can
+        hold a text description and it also defines thumbnail parameters - you can change them in <a href="intf-album-props.html">Photo album
+        properties dialog</a>, which appears when you select the <b>Edit | Edit...</b> menu item while photo album node is highlighted.</li>
+    <li>A picture group can be renamed also by selecting the <b>Edit | Edit...</b> menu item, but the group node must be highlighted in the tree;
+        alternatively, you can click once on a highlighted group name, or press <b>F2</b> key. To cancel edit you press <b>Esc</b> key, to confirm
+        new group name - <b>Enter</b> key.</li>
+    <li>To add new group you select the <b>Edit | Add group</b> menu item. The group is created as a child to group currently highlighted. When the
+        photo album node is highlighted the group is created in the photo album's root directory. The default group name is &quot;New group&quot;, 
+        you change it by editing it and pressing <b>Enter</b>.</li>
+    <li>A group can be deleted by selecting <b>Edit | Delete</b> menu item while folder tree is active.</li>
+    <li>To add pictures to a group you select <b>Edit | Add picture...</b> menu item which invokes <a href="intf-pic-add.html">Add pictures wizard</a>
+        window.</li>
+    <li>To arrange (sort) pictures the <b>Edit | Sort pictures...</b> menu item brings up <a href="intf-sort-pics.html">Sort pictures dialog</a>.</li>
+    <li>The <b>Edit | Select all</b> highlights all the pictures in the current group.</li>
+    <li>The <b>Edit | Select none</b> removes highlight from all the pictures.</li>
+    <li>To swith to <a href="intf-view-mode.html">view mode</a> you select the <b>Edit | View</b> menu item or double-click a picture.</li>
+  </ul>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> View menu</h2>
+  <p align=justify>This menu controls program appearance:
+  <ul>
+    <li>Whether toolbar is visible (<b>View | Toolbar</b> menu item) and</li>
+    <li>If status bar is visible (<b>View | Status bar</b>). The program saves visibility of these items and restores it next time you run it.</li>
+    <li><a name="viewsmenu"></a>After them <a href="intf-browse-mode-views.html">photo album views</a> menu items follow:
+      <ul>
+        <li><b>Picture groups</b> item swithes group tree to the main display mode, when the left program window shows photo album groups (default
+            selection).</li>
+        <li><b>New view...</b> menu item brings up <a href="intf-view-props.html">Photo album view properties dialog</a> for creating new view.</li>
+        <li><b>Delete view</b> item removes the currently active view (in the case just view is active, not picture groups).</li>
+        <li><b>Edit view...</b> item displays <a href="intf-view-props.html">Property dialog</a> for editing the currently active view (in the case
+            just view is active, not picture groups).</li>
+        <li><b>Make a group...</b> item opens <a href="intf-sel-phoa-group.html">Select picture group dialog</a>, allowing you to copy view's exact
+            folder hierarchy to a selected photo album picture group.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Tools menu</h2>
+  <p align=justify>Optional tool commands are collected here:
+  <ul>
+    <li>The <b>Tools | Program settings...</b> menu item invokes <a href="setup-browse-mode.html"><b>PhoA</b> browse mode settings dialog</a>.</li>
+    <li>The <b>Tools | Statistics...</b> menu item counts and displays various <a href="intf-stats.html">photo album summaries</a>.</li>
+    <li>The <b>Tools | Rebuild thumbnails...</b> menu item brings up <a href="intf-rebuild-thumbs.html">Rebuild thumbnails dialog</a> allowing you to
+        recreate thumbnails for selected pictures, for all pictures in the current group or for the whole photo album. This operation is necessary
+        every time you alter thumbanil parameters in the  <a href="intf-album-props.html">Photo album properties dialog</a>.</li>
+    <li>The <b>Tools | Picture operations...</b> menu item allows you to move, copy, crop and intersect pictures to another group with the 
+        <a href="intf-pic-operations.html">Picture operations dialog</a>.
+    <li>One of the most important <b>PhoA</b> features is picture search you invoke selecting <b>Tools | Find...</b>. Refer to
+        <a href="intf-search.html">this chapter</a> for further information.</li>
+  </ul>
+
+  <h2><img src="../h2-bullet.gif" align=absmiddle width=10 height=10> Help menu</h2>
+  <p align=justify>The menu contains three items:
+  <ul>
+    <li>The <b>Help | About...</b> item displays version, copyright, update and contact information.</li>
+    <li>The <b>Help | Help contents</b> item brings up <b>PhoA Help System</b> you are currently watching.</li>
+    <li>The <b>Help | PhoA Website</b> item starts up the default Internet browser and opens the program home site in it.</li>
+  </ul>
+    
+  <p align=justify>To the left of the photo album node in the folder tree dropdown-menu button is placed, which brings up <a href="#viewsmenu">view
+    menu</a>.
+  
+  <p class=seealsotitle><img src="../ico-notes.gif" width=10 height=10>See also:
+  <p class=seealso><a href="intf-key-mouse-controls.html">Keyboard and mouse controls</a><br>
+    <a href="intf-view-mode.html">View mode</a><br>
+    <a href="intf-album-props.html">Photo album properties dialog</a>
+<hr width=40%>
+<p class=copyright>Copyright &copy;2002-2004 <a href="http://phoa.narod.ru/en" target=_blank>Dmitry Kann</a>. All rights reserved.
+</td></tr>
+</table>
+</body>
+</html>

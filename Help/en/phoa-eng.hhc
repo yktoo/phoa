@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="Window Styles" value="0x800627">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="General information">
+		<param name="Local" value="start.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="The purpose of the program">
+			<param name="Local" value="intro.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="How it works">
+			<param name="Local" value="how-it-works.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="File formats">
+			<param name="Local" value="file-formats.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Thumbnails">
+			<param name="Local" value="thumbnails.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Major program modes">
+			<param name="Local" value="major-modes.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PhoA features and advantages">
+			<param name="Local" value="advantages.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="System requirements">
+			<param name="Local" value="requirements.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Picture data">
+			<param name="Local" value="pic-data.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Resampling">
+			<param name="Local" value="theory-resampling.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Metadata">
+			<param name="Local" value="theory-metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Revision History">
+			<param name="Local" value="rev-history.html">
+			<param name="New" value="1">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License Agreement">
+			<param name="Local" value="eula-eng.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Working with PhoA">
+		<param name="Local" value="intf-major-modes.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Browse mode">
+			<param name="Local" value="intf-browse-mode.html">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Menu command description">
+				<param name="Local" value="intf-browse-mode-menu.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Working in the browse mode">
+				<param name="Local" value="intf-browse-mode-tasks.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Working with views">
+				<param name="Local" value="intf-browse-mode-views.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Autofilling the picture properties">
+				<param name="Local" value="pic-prop-autofill.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="View mode">
+			<param name="Local" value="intf-view-mode.html">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Working in the view mode">
+				<param name="Local" value="intf-view-mode-tasks.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PhoA dialogs">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Photo album properties dialog">
+				<param name="Local" value="intf-album-props.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Add pictures wizard">
+				<param name="Local" value="intf-pic-add.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture properties dialog">
+				<param name="Local" value="intf-pic-props.html">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="File properties">
+					<param name="Local" value="intf-pic-props-fprops.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Metadata">
+					<param name="Local" value="intf-pic-props-metadata.html">
+					<param name="New" value="1">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="View">
+					<param name="Local" value="intf-pic-props-view.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Data">
+					<param name="Local" value="intf-pic-props-data.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Keywords">
+					<param name="Local" value="intf-pic-props-keywords.html">
+					<param name="New" value="1">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Groups">
+					<param name="Local" value="intf-pic-props-groups.html">
+					</OBJECT>
+			</UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Sort pictures dialog">
+				<param name="Local" value="intf-sort-pics.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Rebuild thumbnails dialog">
+				<param name="Local" value="intf-rebuild-thumbs.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Picture operations dialog">
+				<param name="Local" value="intf-pic-operations.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Photo album statistics">
+				<param name="Local" value="intf-stats.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Find pictures dialog">
+				<param name="Local" value="intf-search.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Select keywords dialog">
+				<param name="Local" value="intf-select-keywords.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="View properties dialog">
+				<param name="Local" value="intf-view-props.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Select photo album group dialog">
+				<param name="Local" value="intf-sel-phoa-group.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Keyboard and mouse controls">
+			<param name="Local" value="intf-key-mouse-controls.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Program settings">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="General">
+			<param name="Local" value="setup-general.html">
+			<param name="New" value="1">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Browse mode">
+			<param name="Local" value="setup-browse-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="View mode">
+			<param name="Local" value="setup-view-mode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Dialogs">
+			<param name="Local" value="setup-dialogs.html">
+			</OBJECT>
+	</UL>
+</UL>
+</BODY></HTML>
