@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.28 2004-11-24 12:05:37 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.29 2004-12-04 17:53:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -879,6 +879,7 @@ uses
     bLoaded: Boolean;
     sFile: String;
     PreviewInfoIntf: IPhoaWizardPage_PreviewInfo;
+    ImgSize: TSize;
   begin
     bLoaded := False;
      // Если окно просмотра отображается, получаем предметный интерфейс информации для просмотра и имя текущего файла
@@ -887,7 +888,7 @@ uses
        // Если файл задан, загружаем изображение
       if sFile<>'' then
         try
-          LoadGraphicFromFile(sFile, iPreview.Bitmap, iPreview.Width, iPreview.Height, nil);
+          LoadGraphicFromFile(sFile, iPreview.Bitmap, Size(iPreview.Width, iPreview.Height), ImgSize, nil);
           bLoaded := True;
         except
         end;

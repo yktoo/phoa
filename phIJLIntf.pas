@@ -1054,7 +1054,7 @@ var
    // Загружает JPEG-файл в Bitmap32. Если iDesiredWidth=0 или iDesiredHeight=0, загружает файл целиком; иначе загружает
    //   наименьший кратный размер (1/2, 1/4 или 1/8), чтобы ширина была больше iDesiredWidth, а высота - больше
    //   iDesiredHeight
-  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; iDesiredWidth, iDesiredHeight: Integer);
+  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; const DesiredSize: TSize; out FullSize: TSize);
 
   procedure Save24bitJPEGToStream(Bitmap32: TBitmap32; MemStream: TMemoryStream; Quality: TIJL_Quality = 75; const Progressive_Passes: Boolean = False);
   procedure LoadJPEGFromStream(Bitmap32: TBitmap32; MemStream: TMemoryStream);
@@ -1135,7 +1135,7 @@ implementation /////////////////////////////////////////////////////////////////
     end;
   end;
 
-  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; iDesiredWidth, iDesiredHeight: Integer);
+  procedure LoadJPEGFromFile(Bitmap32: TBitmap32; const Filename: String; const DesiredSize: TSize; out FullSize: TSize);
   var
     Bitmap: TBitmap;
     DIB: TDIBSection;
@@ -1149,10 +1149,10 @@ implementation /////////////////////////////////////////////////////////////////
     var iRealWidth, iRealHeight: Integer;
     begin
        // Считаем, какие размеры будут у изображения
-      iRealWidth  := (iWidth+iDivisor-1)  div iDivisor;
+      iRealWidth  := (iWidth +iDivisor-1) div iDivisor;
       iRealHeight := (iHeight+iDivisor-1) div iDivisor;
        // Если эти размеры превышают требуемые как минимум вдвое (для качественного ресэмплинга) - принимаем
-      Result := (iRealWidth>iDesiredWidth*2) and (iRealHeight>iDesiredHeight*2);
+      Result := (iRealWidth>DesiredSize.cx*2) and (iRealHeight>DesiredSize.cy*2);
       if Result then begin
         iWidth   := iRealWidth;
         iHeight  := iRealHeight;
@@ -1205,9 +1205,10 @@ implementation /////////////////////////////////////////////////////////////////
        // Определяем требуемые размеры битмэпа
       iWidth  := jcprops.JPGWidth;
       iHeight := jcprops.JPGHeight;
+      FullSize.cx := iWidth;
+      FullSize.cy := iHeight;
        // Если желаемые размеры заданы, пробуем размер 1/8, потом 1/4, потом 1/2
-      if (iDesiredWidth<=0) or
-         (iDesiredHeight<=0) or
+      if (DesiredSize.cx<=0) or (DesiredSize.cy<=0) or
          (not TryUsePartialLoad(8, IJL_JFILE_READONEEIGHTH) and
           not TryUsePartialLoad(4, IJL_JFILE_READONEQUARTER) and
           not TryUsePartialLoad(2, IJL_JFILE_READONEHALF)) then ReadType := IJL_JFILE_READWHOLEIMAGE;

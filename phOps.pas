@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.15 2004-11-24 12:29:38 dale Exp $
+//  $Id: phOps.pas,v 1.16 2004-12-04 17:53:11 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -254,8 +254,8 @@ type
     procedure Clear; override;
      // Устанавливает, что текущее состояние фотоальбома является сохранённым
     procedure SetSavepoint;
-     // Устанавливает, что текущее состояние является модифицированным, но откат невомозжен
-    procedure SetNonUndoable;
+     // Очищает содержимое буфера отката и устанавливает состояние модифицированности проекта в bModified
+    procedure SetNonUndoable(bModified: Boolean);
      // Props
      // -- Возвращает True, если текущее состояние буфера отката соответствует сохранённому состоянию фотоальбома
     property IsUnmodified: Boolean read GetIsUnmodified;
@@ -1203,10 +1203,10 @@ type
     end;
   end;
 
-  procedure TPhoaUndo.SetNonUndoable;
+  procedure TPhoaUndo.SetNonUndoable(bModified: Boolean);
   begin
     Clear;
-    FSavepointOnEmpty := False;
+    FSavepointOnEmpty := not bModified;
   end;
 
   procedure TPhoaUndo.SetSavepoint;

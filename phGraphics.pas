@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.15 2004-11-23 17:22:39 dale Exp $
+//  $Id: phGraphics.pas,v 1.16 2004-12-04 17:53:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -105,7 +105,7 @@ type
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32); overload;
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; iDesiredWidth, iDesiredHeight: Integer; const OnProgress: TProgressEvent);
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
 
 const
   BColor_Alpha_Transparent = $00;
@@ -173,7 +173,7 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
 
   procedure DropShadow(Target, ShadowTemplate: TBitmap32; const rObject, rClipOuter: TRect; iOffsetX, iOffsetY: Integer; Color: TColor);
   var
-    r, rTotal, rQuarter: TRect;
+    r, rTotal, rQuarter, rQuarterMargins: TRect;
     iRadius: Integer;
     BMPObject: TBitmap32;
 
@@ -207,13 +207,24 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
       end;
     end;
 
+     // Обновляет границы "четвертинок" тени, если соотв. размер "сплошного" региона меньше 0
+    procedure CalcQuarterBounds(iSolidSize: Integer; var iLowBound, iHighBound: Integer);
+    var iDelta: Integer;
+    begin
+      if iSolidSize<0 then begin
+        iDelta := iSolidSize div 2; // iDelta<=0 !
+        Inc(iLowBound,  iDelta);
+        Dec(iHighBound, iSolidSize-iDelta); // Это гарантирует, что в сумме границы дадут iSolidSize
+      end;
+    end;
+
   begin
      // Сохраняем объект во временный битмэп
     BMPObject := TBitmap32.Create;
     try
       BMPObject.SetSize(rObject.Right-rObject.Left, rObject.Bottom-rObject.Top);
-      BMPObject.Draw(0, 0, rObject, Target); 
-       // Уменьшаем сплошной регион тени на 1/2 радиуса с каждого края (весьма эмпирическое правило)
+      BMPObject.Draw(0, 0, rObject, Target);
+       // Уменьшаем сплошной регион тени на 1/3 радиуса с каждого края (весьма эмпирическое правило)
       iRadius := ShadowTemplate.Width div 2;
       r := rObject;
       with r do begin
@@ -222,29 +233,49 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
         Inc(Right,  iOffsetX-iRadius div 3);
         Inc(Bottom, iOffsetY-iRadius div 3);
       end;
+       // Рисуем сплошную тень объекта
+      Target.FillRectTS(r, SetAlpha(Color32(Color), ShadowTemplate.MasterAlpha));
+       // Определяем границы "четвертинок" (они >0, если ширина/высота "сплошного" региона меньше 0)
+      FillChar(rQuarterMargins, SizeOf(rQuarterMargins), 0);
+      CalcQuarterBounds(r.Right-r.Left, rQuarterMargins.Left, rQuarterMargins.Right);
+      CalcQuarterBounds(r.Bottom-r.Top, rQuarterMargins.Top,  rQuarterMargins.Bottom);
        // Считаем общие размеры всей тени
       rTotal := r;
       InflateRect(rTotal, iRadius, iRadius);
-       // Рисуем сплошную тень объекта
-      Target.FillRectTS(r, SetAlpha(Color32(Color), ShadowTemplate.MasterAlpha));
        // Рисуем углы тени
        // -- Top left
       rQuarter := Rect(0, 0, iRadius, iRadius);
+      Dec(rQuarter.Bottom, rQuarterMargins.Bottom);
+      Dec(rQuarter.Right,  rQuarterMargins.Right);
       Target.Draw(rTotal.Left, rTotal.Top, rQuarter, ShadowTemplate);
+      Inc(rQuarter.Right,  rQuarterMargins.Right);
        // -- Top right
       OffsetRect(rQuarter, iRadius, 0);
-      Target.Draw(rTotal.Right-iRadius, rTotal.Top, rQuarter, ShadowTemplate);
+      Dec(rQuarter.Left,   rQuarterMargins.Left);
+      Target.Draw(rTotal.Right-(rQuarter.Right-rQuarter.Left), rTotal.Top, rQuarter, ShadowTemplate);
+      Inc(rQuarter.Left,   rQuarterMargins.Left);
+      Inc(rQuarter.Bottom, rQuarterMargins.Bottom);
        // -- Bottom right
       OffsetRect(rQuarter, 0, iRadius);
-      Target.Draw(rTotal.Right-iRadius, rTotal.Bottom-iRadius, rQuarter, ShadowTemplate);
+      Dec(rQuarter.Top,  rQuarterMargins.Top);
+      Dec(rQuarter.Left, rQuarterMargins.Left);
+      Target.Draw(rTotal.Right-(rQuarter.Right-rQuarter.Left), rTotal.Bottom-(rQuarter.Bottom-rQuarter.Top), rQuarter, ShadowTemplate);
+      Inc(rQuarter.Left, rQuarterMargins.Left);
        // -- Bottom left
       OffsetRect(rQuarter, -iRadius, 0);
-      Target.Draw(rTotal.Left, rTotal.Bottom-iRadius, rQuarter, ShadowTemplate);
+      Dec(rQuarter.Right, rQuarterMargins.Right);
+      Target.Draw(rTotal.Left, rTotal.Bottom-(rQuarter.Bottom-rQuarter.Top), rQuarter, ShadowTemplate);
+      Inc(rQuarter.Right, rQuarterMargins.Right);
+      Inc(rQuarter.Top,   rQuarterMargins.Top);
        // Рисуем полоски тени между углами
-      DrawHShadow(rTotal.Top,  0);
-      DrawHShadow(r.Bottom,    iRadius);
-      DrawVShadow(rTotal.Left, 0);
-      DrawVShadow(r.Right,     iRadius);
+      if r.Right>r.Left then begin
+        DrawHShadow(rTotal.Top,  0);
+        DrawHShadow(r.Bottom,    iRadius);
+      end;
+      if r.Bottom>r.Top then begin
+        DrawVShadow(rTotal.Left, 0);
+        DrawVShadow(r.Right,     iRadius);
+      end;
        // Переносим изображение объекта обратно
       Target.Draw(rObject.Left, rObject.Top, BMPObject);
     finally
@@ -259,7 +290,7 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
       GR32.sfNearest, GR32.sfDraft, GR32.sfLinear, GR32.sfCosine, GR32.sfSpline, GR32.sfLanczos, GR32.sfMitchell);
   var
     sScale: Single;
-    ThumbBitmap, FullSizeBitmap: TBitmap32;
+    ThumbBitmap, LargeBitmap: TBitmap32;
     Stream: TStringStream;
     bmp: TBitmap;
   begin
@@ -267,21 +298,19 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
     ThumbBitmap := TBitmap32.Create;
     try
        // Создаём, загружаем картинку и превращаем её в Bitmap32
-      FullSizeBitmap := TBitmap32.Create;
+      LargeBitmap := TBitmap32.Create;
       try
-        LoadGraphicFromFile(sFileName, FullSizeBitmap, ThumbSize.cx, ThumbSize.cy, nil);
-        FullSizeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
-        ImageSize.cx := FullSizeBitmap.Width;
-        ImageSize.cy := FullSizeBitmap.Height;
+        LoadGraphicFromFile(sFileName, LargeBitmap, MaxSize, ImageSize, nil);
+        LargeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
          // Определяем коэффициент масштабирования
         if (ImageSize.cx>0) and (ImageSize.cy>0) then sScale := MinS(MinS(MaxSize.cx/ImageSize.cx, MaxSize.cy/ImageSize.cy), 1) else sScale := 1;
          // Масштабируем изображение
         ThumbSize.cx := Max(Trunc(ImageSize.cx*sScale), 1);
         ThumbSize.cy := Max(Trunc(ImageSize.cy*sScale), 1);
         ThumbBitmap.SetSize(ThumbSize.cx, ThumbSize.cy);
-        FullSizeBitmap.DrawTo(ThumbBitmap, ThumbBitmap.BoundsRect);
+        LargeBitmap.DrawTo(ThumbBitmap, ThumbBitmap.BoundsRect);
       finally
-        FullSizeBitmap.Free;
+        LargeBitmap.Free;
       end;
        // Преобразуем TBitmap32 в TBitmap
       bmp := TBitmap.Create;
@@ -374,7 +403,7 @@ var
     PaintThumbnail(Pic, Bitmap32, r);
   end;
 
-  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; iDesiredWidth, iDesiredHeight: Integer; const OnProgress: TProgressEvent);
+  procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
   var
     sExt: String;
     GClass: TGraphicClass;
@@ -384,7 +413,7 @@ var
      // Если IJL доступна, JPEG грузим с её помощью (якобы 300% faster) 
     if bIJL_Available and (SameText(sExt, '.JPG') or SameText(sExt, '.JPEG')) then begin
       try
-        LoadJPEGFromFile(Bitmap32, sFileName, iDesiredWidth, iDesiredHeight);
+        phIJLIntf.LoadJPEGFromFile(Bitmap32, sFileName, DesiredSize, FullSize);
       except
         on e: Exception do PhoaException(ConstVal('SErrCannotLoadPicture', [sFileName, e.Message]));
       end;

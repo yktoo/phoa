@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.71 2004-11-24 11:42:17 dale Exp $
+//  $Id: Main.pas,v 1.72 2004-12-04 17:53:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -516,19 +516,16 @@ uses
   begin
     BeginUpdate;
     try
-      if DoFileOperations(Self, bProjectChanged) then
-         // Если изменилось содержимое фотоальбома
+      if DoFileOperations(Self, bProjectChanged) then begin
+         // Очищаем буфер отката (делаем откат невозможным), учитывая текущее состояние модифицированности проекта
+        FUndo.SetNonUndoable(not FUndo.IsUnmodified or bProjectChanged);
+         // Если изменилось содержимое фотоальбома, то также перестраиваем представления и перегружаем дерево папок
         if bProjectChanged then begin
-           // Помечаем текущее состояние как изменённое без возможности отката
-          FUndo.SetNonUndoable;
-           // Перестраиваем представления
           FProject.Views.Invalidate;
-           // Перегружаем дерево папок
           LoadGroupTree;
-         // Иначе просто были внесены необратимые изменения (в файловую систему, но не в фотоальбом) - запрещаем откат
-        end else
-          FUndo.Clear;
+        end;
         StateChanged([asActionChangePending, asModifiedChangePending]);
+      end;
     finally
       EndUpdate;
     end;
