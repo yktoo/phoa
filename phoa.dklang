@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.33 2004-11-24 11:42:17 dale Exp $
+;  $Id: phoa.dklang,v 1.34 2004-11-24 12:43:34 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -277,6 +277,9 @@ Caption=00000003,Find pictures
 bCancel.Caption=00000012,Cancel
 bOK.Caption=00000015,Find
 bHelp.Caption=00000018,Help
+tvSimpleCriteria.Header.Columns[0].Text=00000060,Picture property
+tvSimpleCriteria.Header.Columns[1].Text=00000061,Condition
+tvSimpleCriteria.Header.Columns[2].Text=00000062,Value
 gbSearch.Caption=00000027,Perform search
 rbAll.Caption=00000030,In the &photo album
 rbCurGroup.Caption=00000033,In the &current group
@@ -290,10 +293,7 @@ smExprInsertProp.Caption=00000044,Insert propert&y
 smExprInsertProp.Hint=00000046,Insert a picture property into the expression
 smExprInsertOperator.Caption=00000045,Insert &operator
 smExprInsertOperator.Hint=00000047,Insert an operator into the expression
-scpMain.EndOfTokenChr=00000048,()[]. 
 scpMain.Title=00000051,Properties
-scpMain.TitleFont.Name=00000050,MS Sans Serif
-scpMain.TriggerChars=00000049,$
 ipmsmSimpleProp.Caption=00000052,&Picture property
 tbSimpleMain.Caption=00000054,Toolbar
 tbSimpleMain.ChevronHint=00000055,More Buttons|
