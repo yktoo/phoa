@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPlugin.pas,v 1.5 2005-02-26 12:35:51 dale Exp $
+//  $Id: phPlugin.pas,v 1.6 2005-02-26 20:18:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -20,6 +20,11 @@ type
    // A plugin module interface obtaining function prototype. Should be exported from a plugin DLL named
    //   'PhoaGetPluginModule'. Must create and return a module instance.
   TPhoaGetPluginModuleProc = function: IPhoaPluginModule; stdcall;
+
+   // Plugin kind
+  TPhoaPluginKind = (
+    ppkBrowseMode          // Browse mode plugin. The plugin is instantiated automatically once the application finished initialization
+  );
 
    //===================================================================================================================
    // IPhoaPluginModule - A module implementing a number of plugin classes
@@ -76,10 +81,13 @@ type
     function  CreatePlugin: IPhoaPlugin; stdcall;
      // Prop handlers
     function  GetDescription: WideString; stdcall;
+    function  GetKind: TPhoaPluginKind; stdcall;
     function  GetName: WideString; stdcall;
      // Props
      // -- Plugin class description
     property Description: WideString read GetDescription;
+     // -- Kind of plugins of the class
+    property Kind: TPhoaPluginKind read GetKind;
      // -- Plugin class name. Example: 'SuperPlugin '
     property Name: WideString read GetName;
   end;
