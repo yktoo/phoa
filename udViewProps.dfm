@@ -272,7 +272,7 @@ inherited dViewProps: TdViewProps
     end
     object ipmDelete: TTBXItem
       Caption = '&Delete'
-      ImageIndex = 9
+      ImageIndex = 7
       ShortCut = 46
       OnClick = ipmDeleteClick
     end
@@ -280,13 +280,13 @@ inherited dViewProps: TdViewProps
     end
     object ipmMoveUp: TTBXItem
       Caption = 'Move &up'
-      ImageIndex = 10
+      ImageIndex = 55
       ShortCut = 16422
       OnClick = ipmMoveUpClick
     end
     object ipmMoveDown: TTBXItem
       Caption = 'Move do&wn'
-      ImageIndex = 11
+      ImageIndex = 56
       ShortCut = 16424
       OnClick = ipmMoveDownClick
     end

@@ -68,7 +68,7 @@ object frSorting: TfrSorting
     end
     object ipmDelete: TTBXItem
       Caption = '&'#1059#1076#1072#1083#1080#1090#1100
-      ImageIndex = 9
+      ImageIndex = 7
       ShortCut = 46
       OnClick = ipmDeleteClick
     end
@@ -76,13 +76,13 @@ object frSorting: TfrSorting
     end
     object ipmMoveUp: TTBXItem
       Caption = #1057#1076#1074#1080#1085#1091#1090#1100' &'#1074#1074#1077#1088#1093
-      ImageIndex = 10
+      ImageIndex = 55
       ShortCut = 16422
       OnClick = ipmMoveUpClick
     end
     object ipmMoveDown: TTBXItem
       Caption = #1057#1076#1074#1080#1085#1091#1090#1100' '#1074'&'#1085#1080#1079
-      ImageIndex = 11
+      ImageIndex = 56
       ShortCut = 16424
       OnClick = ipmMoveDownClick
     end
