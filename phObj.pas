@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.53 2004-10-19 15:03:31 dale Exp $
+//  $Id: phObj.pas,v 1.54 2004-10-21 18:39:36 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -929,8 +929,10 @@ type
   var iID: Integer;
   begin
     iID := Pic.ID;
-    if iID<=0 then PhoaException(SPhObjErrMsg_InvalidAddPicID, [iID]);
+     // Если нужно проверять дубликаты
     if FSorted or bSkipDuplicates then begin
+       // Проверяем наличие допустимого ID
+      if iID<=0 then PhoaException(SPhObjErrMsg_InvalidAddPicID, [iID]);
       bAdded := not FindID(iID, Result);
       if bAdded then FList.Insert(Result, Pic);
     end else begin
