@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.34 2004-09-15 18:53:12 dale Exp $
+//  $Id: phObj.pas,v 1.35 2004-09-16 16:17:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1265,7 +1265,9 @@ type
     procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
     procedure WMVScroll(var Msg: TWMVScroll);                   message WM_VSCROLL;
     procedure WMNCPaint(var Msg: TWMNCPaint);                   message WM_NCPAINT;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd);             message WM_ERASEBKGND;
     procedure CMDrag(var Msg: TCMDrag);                         message CM_DRAG;
+    procedure CMInvalidate(var Msg: TMessage);                  message CM_INVALIDATE;
      // Prop handlers
     procedure SetBorderStyle(Value: TBorderStyle);
     function  GetSelCount: Integer;
@@ -5526,6 +5528,11 @@ var
     inherited;
   end;
 
+  procedure TThumbnailViewer.CMInvalidate(var Msg: TMessage);
+  begin
+    if HandleAllocated then InvalidateRect(Handle, nil, True);
+  end;
+
   constructor TThumbnailViewer.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
@@ -6023,13 +6030,12 @@ var
             PaintThumb(idx, bmp);
             BitBlt(Canvas.Handle, r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top, bmp.Canvas.Handle, r.Left-rThumb.Left, r.Top-rThumb.Top, SRCCOPY);
            // Иначе - стираем фон
-          end else
-            with Canvas do begin
+          end ;//else
+//            with Canvas do begin
 //              Brush.Style := bsSolid;
 //              Brush.Color := Color;
 //              FillRect(r);
-CurrentTheme.PaintBackgnd(canvas, r, r, r, Color, False, VT_UNKNOWN);
-            end;
+//            end;
         end;
         Inc(idx);
       until False;
@@ -6037,13 +6043,13 @@ CurrentTheme.PaintBackgnd(canvas, r, r, r, Color, False, VT_UNKNOWN);
       bmp.Free;
     end;
      // Стираем неотрисовываемую область справа от эскизов
-    IntersectRect(r, Rect(FColCount*FWCell, 0, ClientWidth, ClientHeight), rClip);
-    if not IsRectEmpty(r) then
-      with Canvas do begin
-        Brush.Style := bsSolid;
-        Brush.Color := Color;
-        FillRect(r);
-      end;
+//    IntersectRect(r, Rect(FColCount*FWCell, 0, ClientWidth, ClientHeight), rClip);
+//    if not IsRectEmpty(r) then
+//      with Canvas do begin
+//        Brush.Style := bsSolid;
+//        Brush.Color := Color;
+//        FillRect(r);
+//      end;
   end;
 
   procedure TThumbnailViewer.PaintMarquee;
@@ -6434,6 +6440,20 @@ CurrentTheme.PaintBackgnd(canvas, r, r, r, Color, False, VT_UNKNOWN);
   begin
      // Вызываем context menu только если не был нажат Ctrl
     if not FShellCtxMenuOnMouseUp then inherited; 
+  end;
+
+  procedure TThumbnailViewer.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
+  var
+    Canvas: TCanvas;
+    r: TRect;
+  begin
+    Canvas := TCanvas.Create;
+    Canvas.Handle := Msg.DC;
+    r := ClientRect;
+    CurrentTheme.PaintBackgnd(Canvas, r, r, r, Color, False, VT_UNKNOWN);
+    Canvas.Handle := 0;
+    Canvas.Free;
+    Msg.Result := 1;
   end;
 
   procedure TThumbnailViewer.WMGetDlgCode(var Msg: TWMGetDlgCode);
