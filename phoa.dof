@@ -105,17 +105,13 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
-[Language]
-ActiveLang=
-ProjectLang=
-RootDir=
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=1
 MinorVer=1
 Release=5
-Build=235
+Build=238
 Debug=0
 PreRelease=1
 Special=0
@@ -126,7 +122,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=Dmitry Kann
 FileDescription=PhoA image arranging and searching tool
-FileVersion=1.1.5.235
+FileVersion=1.1.5.238
 InternalName=PhoA
 LegalCopyright=©2002-2004 Dmitry Kann
 LegalTrademarks=

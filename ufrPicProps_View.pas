@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.7 2004-05-30 18:41:18 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.8 2004-05-31 14:36:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -174,6 +174,7 @@ uses phUtils, phObj, ConsVars, Main, phSettings;
   begin
     inherited AfterDisplay(ChangeMethod);
     StorageForm.ActiveControl := iMain;
+
   end;
 
   procedure TfrPicProps_View.BeforeDisplay(ChangeMethod: TPageChangeMethod);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phWizard.pas,v 1.3 2004-05-31 14:36:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -57,7 +57,7 @@ type
      // Вызывает Controller.OnStatusChange
     procedure StatusChanged;
      // Должна возвращать True, если страница содержит допустимые данные. В базовом классе всегда возвращает True
-    function GetDataValid: Boolean; virtual;
+    function  GetDataValid: Boolean; virtual;
      // Инициализация/финализация страницы. В базовом классе не делают ничего
     procedure InitializePage; virtual;
     procedure FinalizePage; virtual;
@@ -65,6 +65,8 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); virtual;
      // Вызывается после отображения страницы
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); virtual;
+     // Вызывается перед скрытием страницы
+    procedure BeforeHide(ChangeMethod: TPageChangeMethod); virtual;
      // Вызывается при нажатии пользователем кнопки Далее. Должна вернуть True, чтобы позволить смену страницы, иначе
      //   должна сама объяснить пользователю причину отказа
     function  NextPage: Boolean; virtual;
@@ -144,7 +146,7 @@ type
 
 implementation
 {$R *.dfm}
-uses VCLUtils;
+uses VCLUtils, TB2Dock;
 
   procedure PhoaWizardError(const sMsg: String);
   begin
@@ -161,13 +163,34 @@ uses VCLUtils;
    //===================================================================================================================
 
   procedure TWizardPage.AfterDisplay(ChangeMethod: TPageChangeMethod);
+  var
+    i: Integer;
+    c: TComponent;
   begin
-    { does nothing }
+     // !!! PRERELEASE
+    for i := 0 to ComponentCount-1 do begin
+      c := Components[i];
+      if (c is TTBCustomDockableWindow) and TTBCustomDockableWindow(c).Floating then
+        TTBCustomDockableWindow(c).Visible := True;
+    end;
   end;
 
   procedure TWizardPage.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     { does nothing }
+  end;
+
+  procedure TWizardPage.BeforeHide(ChangeMethod: TPageChangeMethod);
+  var
+    i: Integer;
+    c: TComponent;
+  begin
+     // !!! PRERELEASE
+    for i := 0 to ComponentCount-1 do begin
+      c := Components[i];
+      if (c is TTBCustomDockableWindow) and TTBCustomDockableWindow(c).Floating then
+        TTBCustomDockableWindow(c).Visible := False;
+    end;
   end;
 
   constructor TWizardPage.Create(Controller: TWizardController; iID, iHelpContext: Integer; const sPageTitle: String);
@@ -373,6 +396,8 @@ uses VCLUtils;
       try
          // Если текущая страница и обработчик OnPageChanging разрешают смену
         if FHostFormIntf.PageChanging(ChangeMethod, iNewID) then begin
+           // Уведомляем текущую страницу
+          if VisiblePage<>nil then VisiblePage.BeforeHide(ChangeMethod);
            // Уведомляем новую страницу
           NewPage.BeforeDisplay(ChangeMethod);
            // Устанавливаем новую страницу

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.18 2004-05-23 13:23:09 dale Exp $
+//  $Id: Main.pas,v 1.19 2004-05-31 14:36:32 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1702,10 +1702,4 @@ uses
     StartViewMode(Msg.InitFlags);
   end;
 
-initialization
-  with FileFormatList do begin
-    RegisterFileFormat('msk', '', 'Paint Shop Pro mask',          [ftRaster],           False, True, TBitmap);
-    RegisterFileFormat('pfr', '', 'Paint Shop Pro picture frame', [ftRaster, ftVector], False, True, TPSPGraphic);
-    RegisterFileFormat('tub', '', 'Paint Shop Pro picture tube',  [ftRaster, ftVector], False, True, TPSPGraphic);
-  end;
 end.
