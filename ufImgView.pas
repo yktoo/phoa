@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.12 2004-05-25 14:05:08 dale Exp $
+//  $Id: ufImgView.pas,v 1.13 2004-05-26 15:44:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -472,11 +472,13 @@ uses
   procedure TfImgView.aaFlipHorz(Sender: TObject);
   begin
     iMain.Bitmap.FlipHorz;
+    DisplayPic(False);
   end;
 
   procedure TfImgView.aaFlipVert(Sender: TObject);
   begin
     iMain.Bitmap.FlipVert;
+    DisplayPic(False);
   end;
 
   procedure TfImgView.aaFullScreen(Sender: TObject);
@@ -541,16 +543,19 @@ uses
   procedure TfImgView.aaRotate180(Sender: TObject);
   begin
     iMain.Bitmap.Rotate180;
+    DisplayPic(False);
   end;
 
   procedure TfImgView.aaRotate270(Sender: TObject);
   begin
     iMain.Bitmap.Rotate270;
+    DisplayPic(False);
   end;
 
   procedure TfImgView.aaRotate90(Sender: TObject);
   begin
     iMain.Bitmap.Rotate90;
+    DisplayPic(False);
   end;
 
   procedure TfImgView.aaSettings(Sender: TObject);
