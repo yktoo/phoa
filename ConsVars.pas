@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.67 2004-10-15 13:49:34 dale Exp $
+//  $Id: ConsVars.pas,v 1.68 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -837,7 +837,7 @@ uses
     Result := '';
     for Prop := Low(Prop) to High(Prop) do
       if Prop in Props then begin
-        sVal := Pic.Props[Prop];
+        sVal := Pic.PropStrValues[Prop];
         if sVal<>'' then begin
           if sNameValSep<>'' then sVal := PicPropName(Prop)+sNameValSep+sVal;
           AccumulateStr(Result, sPropSep, sVal);

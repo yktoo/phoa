@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.9 2004-10-18 12:25:49 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.10 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -30,8 +30,7 @@ type
     procedure SetDate(Value: Integer); stdcall;
     procedure SetFileName(const Value: String); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
-    procedure SetPropertyValue(const sPropName, Value: String); stdcall;
-    procedure SetProps(PicProp: TPicProperty; const Value: String); stdcall;
+    procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
     procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
@@ -44,10 +43,8 @@ type
     property Flips: TPicFlips read GetFlips write SetFlips;
      // -- 'Mutable' version of Keywords
     property KeywordsM: IPhoaMutableKeywordList read GetKeywordsM;
-     // -- Writable PropertyValue[]. Invalid values of sPropName are ignored
-    property PropertyValue[const sPropName: String]: String read GetPropertyValue write SetPropertyValue;
-     // -- Writable Props
-    property Props[PicProp: TPicProperty]: String read GetProps write SetProps;
+     // -- Writable PropValues
+    property PropValues[PicProp: TPicProperty]: Variant read GetPropValues write SetPropValues;
      // -- Writable RawData[]
     property RawData[PProps: TPicProperties]: String read GetRawData write SetRawData;
      // -- Writable Rotation

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.5 2004-10-19 07:31:32 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.6 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -318,6 +318,8 @@ type
 
   IPhotoAlbumApp = interface(IInterface)
     ['{328D859C-8CDA-494B-B5E8-6AF9AB5E51FD}']
+     // Выполняет заданную операцию с заданными параметрами
+    procedure PerformOperation(const sOpName: String; const aParams: Array of Variant);
      // Prop handlers
     function  GetCurGroup: IPhotoAlbumPicGroup;
     function  GetFocusedControl: TPhoaAppFocusedControl;

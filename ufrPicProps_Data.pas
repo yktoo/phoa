@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.15 2004-10-18 19:27:03 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.16 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,7 +25,7 @@ type
   PPicEditorPropValue = ^TPicEditorPropValue;
   TPicEditorPropValue = record
     State:   TPicEditorPropValueState; // Состояние значения свойства
-    sValue:  String;                   // Значение свойства при State=[pvsUniform, pvsModified]
+    vValue:  Variant;                  // Значение свойства при State=[pvsUniform, pvsModified]
     Control: TWinControl;              // [Основной] контрол, отвечающий за редактирование свойства
   end;
 
@@ -71,12 +71,12 @@ type
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
-    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
 {$R *.dfm}
-uses phUtils, TypInfo;
+uses phUtils, TypInfo, phPhoa;
 
 const
    // Редактируемые свойства
@@ -89,25 +89,22 @@ const
     StorageForm.ActiveControl := eDate;
   end;
 
-  procedure TfrPicProps_Data.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
+  procedure TfrPicProps_Data.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   var
     ChgList: IPhoaPicPropertyChangeList;
     Prop: TPicProperty;
   begin
-    inherited Apply(AOperations, Changes);
      // Если страница посещалась
     if FInitialized then begin
        // Составляем список изменений
       ChgList := NewPhoaPicPropertyChangeList;
       for Prop := Low(Prop) to High(Prop) do
-        if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].sValue, Prop);
-       // Если есть изменения - создаём операцию изменения
-      if ChgList.Count>0 then
-        TPhoaOp_InternalEditPicProps.Create(
-          AOperations,
-          App.Project,
-          NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]),
-          Changes);
+        if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].vValue, Prop);
+       // Если есть изменения - возвращаем параметры подоперации
+      if ChgList.Count>0 then begin
+        sOpParamName := 'EditDataOpParams';
+        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
+      end;
     end;
   end;
 
@@ -150,10 +147,10 @@ const
                  // Значение ещё не присваивалось, это будет первым значением
                 pvsUnassigned: begin
                   State  := pvsUniform;
-                  sValue := Pic.Props[Prop];
+                  vValue := Pic.PropValues[Prop];
                 end;
                  // Значение уже было, сверяем текущее. Если не совпало - статус устанавливаем pvsVarious
-                pvsUniform: if sValue<>Pic.Props[Prop] then State  := pvsVarious;
+                pvsUniform: if not VarSameValue(vValue, Pic.PropValues[Prop]) then State  := pvsVarious;
               end;
       end;
     end;
@@ -201,15 +198,15 @@ const
   begin
     pv := @FPropVals[Prop];
     case Prop of
-      ppDate:     pv.sValue := DateToStr(StrToDateDef(eDate.Text, 0));
-      ppTime:     pv.sValue := TimeToStrX(StrToTimeDef(eTime.Text, 0));
+      ppDate:     pv.vValue := DateToPhoaDate(StrToDateDef(eDate.Text, 0));
+      ppTime:     pv.vValue := TimeToPhoaTime(StrToTimeDef(eTime.Text, 0));
       ppPlace,
         ppFilmNumber,
         ppFrameNumber,
         ppAuthor,
-        ppMedia:  pv.sValue := GetStrProp(pv.Control, 'Text');
+        ppMedia:  pv.vValue := GetStrProp(pv.Control, 'Text');
       ppDescription,
-        ppNotes:  pv.sValue := (pv.Control as TMemo).Text;
+        ppNotes:  pv.vValue := (pv.Control as TMemo).Text;
     end;
     pv.State := pvsModified;
     SetPropEditor(Prop, True);
@@ -225,15 +222,15 @@ const
        // Настраиваем значение
       if not bStateOnly then
         case Prop of
-          ppDate: if pv.sValue='' then eDate.Clear else eDate.Date := StrToDate(pv.sValue);
-          ppTime: if pv.sValue='' then eTime.Clear else eTime.Text := pv.sValue;
+          ppDate: if VarIsEmpty(pv.vValue) then eDate.Clear else eDate.Date := PhoaDateToDate(pv.vValue);
+          ppTime: if VarIsEmpty(pv.vValue) then eTime.Clear else eTime.Text := TimeToStr(PhoaTimeToTime(pv.vValue));
           ppPlace,
             ppFilmNumber,
             ppFrameNumber,
             ppAuthor,
-            ppMedia: SetStrProp(pv.Control, 'Text', pv.sValue);
+            ppMedia: SetStrProp(pv.Control, 'Text', VarToStr(pv.vValue));
           ppDescription,
-            ppNotes: (pv.Control as TMemo).Text := pv.sValue;
+            ppNotes: (pv.Control as TMemo).Text := VarToStr(pv.vValue);
         end;
        // Настраиваем цвет
       SetOrdProp(pv.Control, 'Color', iif(pv.State=pvsVarious, clBtnFace, clWindow));

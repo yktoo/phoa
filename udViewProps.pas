@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.12 2004-10-19 07:31:32 dale Exp $
+//  $Id: udViewProps.pas,v 1.13 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -108,27 +108,15 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings;
    //===================================================================================================================
 
   procedure TdViewProps.ButtonClick_OK;
-  var
-    Changes: TPhoaOperationChanges;
-    Params: IPhoaOperationParams;
   begin
-     // «апоминаем данные отката/выполн€ем операцию
-    Changes := [];
-    fMain.BeginOperation;
-    try
-      Params := NewPhoaOperationParams([
-        'Name',      eName.Text,
-        'Groupings', FGroupings,
-        'Sortings',  frSorting.Sortings]);
-      if FIsAdding then
-        TPhoaOp_ViewNew.Create(FUndoOperations, FApp.Project, Params, Changes)
-      else begin
-        Params['View'] := FApp.Project.CurrentViewX;
-        TPhoaOp_ViewEdit.Create(FUndoOperations, FApp.Project, Params, Changes);
-      end;
-    finally
-      fMain.EndOperation(Changes);
-    end;
+    if FIsAdding then
+      FApp.PerformOperation(
+        'ViewNew',
+        ['Name', eName.Text, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings])
+    else
+      FApp.PerformOperation(
+        'ViewEdit',
+        ['View', FApp.Project.CurrentViewX, 'Name', eName.Text, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings]);
     inherited ButtonClick_OK;
   end;
 

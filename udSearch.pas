@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.18 2004-10-18 19:27:03 dale Exp $
+//  $Id: udSearch.pas,v 1.19 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -661,7 +661,7 @@ type
             ICritIdx_Time1:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime1);
             ICritIdx_Time2:     Result := MatchesCondition(DatCond, Pic.Time,                      iTime2);
             ICritIdx_Keywords:  Result := MatchesCondition(LstCond, Pic.Keywords,                  Keywords);
-            else                Result := MatchesCondition(StrCond, Pic.Props[Prop],               sValue);
+            else                Result := MatchesCondition(StrCond, Pic.PropStrValues[Prop],       sValue);
           end;
          // Если какой-то из критериев не выполнился, выходим (т.к. условие "И")
         if not Result then Break;

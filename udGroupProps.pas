@@ -50,19 +50,10 @@ uses ConsVars, phUtils, Main;
    //===================================================================================================================
 
   procedure TdGroupProps.ButtonClick_OK;
-  var Changes: TPhoaOperationChanges;
   begin
-    Changes := [];
-    fMain.BeginOperation;
-    try
-      TPhoaOp_GroupEdit.Create(
-        FUndoOperations,
-        FApp.Project,
-        NewPhoaOperationParams(['Group', FApp.CurGroup, 'NewText', eText.Text, 'NewDescription', mDescription.Lines.Text]),
-        Changes);
-    finally
-      fMain.EndOperation(Changes);
-    end;
+    FApp.PerformOperation(
+      'GroupEdit',
+      ['Group', FApp.CurGroup, 'NewText', eText.Text, 'NewDescription', mDescription.Lines.Text]);
     inherited ButtonClick_OK;
   end;
 

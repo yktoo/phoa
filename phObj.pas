@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.52 2004-10-19 07:31:32 dale Exp $
+//  $Id: phObj.pas,v 1.53 2004-10-19 15:03:31 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -196,6 +196,7 @@ const
 
 resourcestring
   SPhObjErrMsg_InvalidSortedPicListMethodCall = 'Cannot invoke %s on sorted IPhoaMutablePicList';
+  SPhObjErrMsg_PicPropIsReadOnly              = 'Picture property %s cannot be written';
   SPhObjErrMsg_InvalidAddPicID                = 'Invalid picture to add ID (%d)';
   SPhObjErrMsg_InvalidGroupID                 = 'Invalid group ID (%d)';
 
@@ -217,10 +218,6 @@ resourcestring
   function  StreamReadInt(Stream: TStream): Integer;
   function  StreamReadDbl(Stream: TStream): Double;
   function  StreamReadStr(Stream: TStream): String;
-
-   // Преобразование PropName (из phIntf) <-> TPicProperty. При недопустимых параметрах, возвращают TPicProperty(-1) / ''
-  function PropNameToPicProperty(const sName: String): TPicProperty;
-  function PicPropertyToPropName(PProp: TPicProperty): String;
 
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
   procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
@@ -315,19 +312,6 @@ uses
    // Misc routines
    //===================================================================================================================
 
-  function PropNameToPicProperty(const sName: String): TPicProperty;
-  begin
-    if sName<>'' then
-      for Result := Low(Result) to High(Result) do
-        if SameText(sName, asPicPropertyNames[Result]) then Exit;
-    Result := TPicProperty(-1);
-  end;
-
-  function PicPropertyToPropName(PProp: TPicProperty): String;
-  begin
-    if PProp in PPAllProps then Result := asPicPropertyNames[PProp] else Result := '';
-  end;
-
   procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
   var i: Integer;
 
@@ -406,8 +390,8 @@ type
     function  GetMedia: String; stdcall;
     function  GetNotes: String; stdcall;
     function  GetPlace: String; stdcall;
-    function  GetPropertyValue(const sPropName: String): String; stdcall;
-    function  GetProps(PicProp: TPicProperty): String; stdcall;
+    function  GetPropStrValues(PicProp: TPicProperty): String; stdcall;
+    function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
     function  GetRawData(PProps: TPicProperties): String; stdcall;
     function  GetRotation: TPicRotation; stdcall;
     function  GetThumbnailData: String; stdcall;
@@ -421,8 +405,7 @@ type
     procedure SetDate(Value: Integer); stdcall;
     procedure SetFileName(const Value: String); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
-    procedure SetPropertyValue(const sPropName, Value: String); stdcall;
-    procedure SetProps(PicProp: TPicProperty; const Value: String); stdcall;
+    procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
     procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
@@ -577,14 +560,7 @@ type
     Result := FPlace;
   end;
 
-  function TPhotoAlbumPic.GetPropertyValue(const sPropName: String): String;
-  var Prop: TPicProperty;
-  begin
-    Prop := PropNameToPicProperty(sPropName);
-    if Prop in PPAllProps then Result := GetProps(Prop) else Result := '';
-  end;
-
-  function TPhotoAlbumPic.GetProps(PicProp: TPicProperty): String;
+  function TPhotoAlbumPic.GetPropStrValues(PicProp: TPicProperty): String;
   begin
     Result := '';
     case PicProp of
@@ -610,6 +586,29 @@ type
       ppKeywords:      Result := FKeywords.CommaText;
       ppRotation:      Result := asPicRotationText[FRotation];
       ppFlips:         Result := iif(pflHorz in FFlips, asPicFlipText[pflHorz], '')+iif(pflVert in FFlips, asPicFlipText[pflVert], '');
+    end;
+  end;
+
+  function TPhotoAlbumPic.GetPropValues(PicProp: TPicProperty): Variant;
+  var sVal: String;
+  begin
+    Result := Null;
+    case PicProp of
+      ppID:            Result := FID;
+      ppFileSizeBytes: Result := FFileSize;
+      ppPicWidth:      if FImageSize.cx>0 then Result := FImageSize.cx;
+      ppPicHeight:     if FImageSize.cy>0 then Result := FImageSize.cy;
+      ppFormat:        Result := Byte(FImageFormat);
+      ppDate:          if FDate>0 then Result := FDate;
+      ppTime:          if FTime>0 then Result := FTime;
+      ppKeywords:      Result := FKeywords;
+      ppRotation:      Result := Byte(FRotation);
+      ppFlips:         Result := Byte(FFlips);
+       // Все прочие свойства берём как строки, только вместо пустой строки возвращаем Null
+      else begin
+        sVal := GetPropStrValues(PicProp);
+        if sVal<>'' then Result := sVal;
+      end;
     end;
   end;
 
@@ -673,7 +672,6 @@ type
 
   procedure TPhotoAlbumPic.ReloadPicFileData(const AThumbnailSize: TSize; StretchFilter: TPhoaStretchFilter; AThumbnailQuality: Byte);
   begin
-    Assert(FList<>nil, 'Cannot reload picture file data when a picture isn''t in list');
      // Загружаем эскиз и получаем его данные
     FThumbnailData := phGraphics.GetThumbnailData(FFileName, AThumbnailSize, StretchFilter, AThumbnailQuality, FImageSize, FThumbnailSize);
      // Получаем размер файла изображения
@@ -695,28 +693,30 @@ type
     FFlips := Value;
   end;
 
-  procedure TPhotoAlbumPic.SetPropertyValue(const sPropName, Value: String);
-  var Prop: TPicProperty;
-  begin
-    Prop := PropNameToPicProperty(sPropName);
-    if Prop in PPAllProps then SetProps(Prop, Value);
-  end;
-
-  procedure TPhotoAlbumPic.SetProps(PicProp: TPicProperty; const Value: String);
+  procedure TPhotoAlbumPic.SetPropValues(PicProp: TPicProperty; const Value: Variant);
+  var SrcKeywords: IPhoaKeywordList;
   begin
     case PicProp of
-      ppFullFileName: FFileName              := Value;
-      ppDate:         if Value='' then FDate := 0 else FDate := DateToPhoaDate(StrToDate(Value));
-      ppTime:         if Value='' then FTime := 0 else FTime := TimeToPhoaTime(StrToTime(Value));
-      ppPlace:        FPlace                 := Value;
-      ppFilmNumber:   FFilmNumber            := Value;
-      ppFrameNumber:  FFrameNumber           := Value;
-      ppAuthor:       FAuthor                := Value;
-      ppDescription:  FDescription           := Value;
-      ppNotes:        FNotes                 := Value;
-      ppMedia:        FMedia                 := Value;
-      ppKeywords:     FKeywords.CommaText    := Value;
-      else            PhoaException('Picture property %s cannot be written', [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
+      ppFileName:      FFileName     := ExtractFilePath(FFileName)+Value;
+      ppFullFileName:  FFileName     := Value;
+      ppFilePath:      FFileName     := IncludeTrailingPathDelimiter(Value)+ExtractFileName(FFileName);
+      ppFileSizeBytes: FFileSize     := VarToInt(Value);
+      ppPicWidth:      FImageSize.cx := VarToInt(Value);
+      ppPicHeight:     FImageSize.cy := VarToInt(Value);
+      ppFormat:        FImageFormat  := TPhoaPixelFormat(Byte(Value));
+      ppDate:          FDate         := VarToInt(Value);
+      ppTime:          FTime         := VarToInt(Value);
+      ppPlace:         FPlace        := VarToStr(Value);
+      ppFilmNumber:    FFilmNumber   := VarToStr(Value);
+      ppFrameNumber:   FFrameNumber  := VarToStr(Value);
+      ppAuthor:        FAuthor       := VarToStr(Value);
+      ppDescription:   FDescription  := VarToStr(Value);
+      ppNotes:         FNotes        := VarToStr(Value);
+      ppMedia:         FMedia        := VarToStr(Value);
+      ppKeywords:      if VarSupports(Value, IPhoaKeywordList, SrcKeywords) then FKeywords.Assign(SrcKeywords);
+      ppRotation:      FRotation     := TPicRotation(Byte(Value));
+      ppFlips:         FFlips        := TPicFlips(Byte(Value));
+      else             PhoaException(SPhObjErrMsg_PicPropIsReadOnly, [GetEnumName(TypeInfo(TPicProperty), Byte(PicProp))]);
     end;
   end;
 
@@ -3044,7 +3044,7 @@ type
        // Получаем последнего ребёнка группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      sPropVal := Pic.Props[PicProp];
+      sPropVal := Pic.PropStrValues[PicProp];
       if (Group=nil) or not AnsiSameText(Group.Text, sPropVal) then begin
         Group := NewPhotoAlbumPicGroup(ParentGroup, 0);
         Group.Text := sPropVal;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.35 2004-10-15 13:49:35 dale Exp $
+//  $Id: phUtils.pas,v 1.36 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -20,6 +20,9 @@ uses
   function  Min(i1, i2: Integer): Integer;
   function  MinS(s1, s2: Single): Single;
   function  MaxS(s1, s2: Single): Single;
+
+   // Преобразует Variant в Integer (при этом Null конвертируется в 0)
+  function  VarToInt(const v: Variant): Integer;
 
   procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
@@ -142,7 +145,8 @@ uses
   procedure StopWait;
 
 implementation
-uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang;
+uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang,
+  Variants;
 
   procedure PhoaException(const sMsg: String);
 
@@ -184,6 +188,11 @@ uses Forms, TypInfo, Registry, ShellAPI, phSettings, udMsgBox, DKLang;
   function MaxS(s1, s2: Single): Single;
   begin
     if s1>s2 then Result := s1 else Result := s2;
+  end;
+
+  function VarToInt(const v: Variant): Integer;
+  begin
+    if VarIsNull(v) then Result := 0 else Result := v;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

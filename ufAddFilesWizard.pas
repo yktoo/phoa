@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.20 2004-10-18 19:27:03 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.21 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -432,24 +432,11 @@ uses
    //===================================================================================================================
 
   procedure TfAddFilesWizard.FinalizeWizard;
-  var Changes: TPhoaOperationChanges;
   begin
     FFileList.Free;
     FLog.Free;
      // Если есть добавленные изображения, выполняем операцию
-    if FPics<>nil then begin
-      Changes := [];
-      fMain.BeginOperation;
-      try
-        TPhoaOp_PicAdd.Create(
-          FUndoOperations,
-          FApp.Project,
-          NewPhoaOperationParams(['Group', FApp.CurGroup, 'Pics', FPics]),
-          Changes);
-      finally
-        fMain.EndOperation(Changes);
-      end;
-    end;
+    if FPics<>nil then FApp.PerformOperation('PicAdd', ['Group', FApp.CurGroup, 'Pics', FPics]);
     inherited FinalizeWizard;
   end;
 

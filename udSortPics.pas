@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.13 2004-10-19 07:31:32 dale Exp $
+//  $Id: udSortPics.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -68,31 +68,15 @@ uses phUtils, ConsVars, Main;
   end;
 
   procedure TdSortPics.ButtonClick_OK;
-  var
-    Group: IPhotoAlbumPicGroup;
-    Changes: TPhoaOperationChanges;
+  var Group: IPhotoAlbumPicGroup;
   begin
      // Создаём операцию
     if rbAllGroups.Checked then Group := FApp.Project.RootGroupX else Group := FApp.CurGroup;
     if rbCurGroup.Checked and FDirectSort then begin
       Group.PicsX.SortingsSort(frSorting.Sortings);
       fMain.RefreshViewer;
-    end else begin
-      Changes := [];
-      fMain.BeginOperation;
-      try
-        TPhoaOp_PicSort.Create(
-          FUndoOperations,
-          FApp.Project,
-          NewPhoaOperationParams([
-            'Group',     Group,
-            'Sortings',  frSorting.Sortings,
-            'Recursive', rbAllGroups.Checked]),
-          Changes);
-      finally
-        fMain.EndOperation(Changes);
-      end;
-    end;
+    end else 
+      FApp.PerformOperation('PicSort', ['Group', Group, 'Sortings', frSorting.Sortings, 'Recursive', rbAllGroups.Checked]);
      // Сохраняем использованные сортировки
     frSorting.Sortings.RegSave(SRegRoot, SRegSort_LastSortings);
     inherited ButtonClick_OK;

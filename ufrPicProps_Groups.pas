@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.14 2004-10-18 19:27:03 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.15 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -32,7 +32,7 @@ type
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
-    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -53,48 +53,35 @@ type
     StorageForm.ActiveControl := tvMain;
   end;
 
-  procedure TfrPicProps_Groups.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
+  procedure TfrPicProps_Groups.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   var
     n: PVirtualNode;
     pgd: PGroupData;
-    bChanges, bLinked: Boolean;
-    Pics: IPhoaMutablePicList;
-    Pic: IPhoaPic;
-    OpParams: IPhoaOperationParams;
-    i: Integer;
+    AddToGroups, RemoveFromGroups: IPhotoAlbumPicGroupList;
   begin
-     // Если страница инициализировалась, создаём операции добавления/удаления изображений
+     // Если страница инициализировалась
     if tvMain.RootNodeCount>0 then begin
-       // Крутим цикл по узлам дерева (по группам)
+      AddToGroups      := NewPhotoAlbumPicGroupList(nil);
+      RemoveFromGroups := NewPhotoAlbumPicGroupList(nil);
+       // Крутим цикл по узлам дерева (по группам), заполняя списки групп, в которые надо добавить (AddToGroups) и из
+       //   которых надо удалить (RemoveFromGroups) изображения 
       n := tvMain.GetFirst;
       while n<>nil do begin
          // Определяем, есть ли изменения
         pgd := tvMain.GetNodeData(n);
         case n.CheckState of
            // -- Надо включить все
-          csCheckedNormal:   bChanges := pgd.iSelCount<EditedPics.Count;
+          csCheckedNormal:   if pgd.iSelCount<EditedPics.Count then AddToGroups.Add(pgd.Group);
            // -- Надо выключить все
-          csUncheckedNormal: bChanges := pgd.iSelCount>0;
-           // -- Не менялось
-          else               bChanges := False;
-        end;
-         // Если есть - составляем список изображений
-        if bChanges then begin
-          Pics := NewPhotoAlbumPicList(False);
-          for i := 0 to EditedPics.Count-1 do begin
-            Pic := EditedPics[i];
-            bLinked := pgd.Group.IsPicLinked(Pic.ID, False);
-            if (n.CheckState=csCheckedNormal) <> bLinked then Pics.Add(Pic, False);
-          end;
-           // Выполняем (создаём) операцию
-          OpParams := NewPhoaOperationParams(['Group', pgd.Group, 'Pics', Pics]);
-          if n.CheckState=csCheckedNormal then
-            TPhoaOp_InternalPicToGroupAdding.Create(AOperations, App.Project, OpParams, Changes)
-          else
-            TPhoaOp_InternalPicFromGroupRemoving.Create(AOperations, App.Project, OpParams, Changes);
+          csUncheckedNormal: if pgd.iSelCount>0 then RemoveFromGroups.Add(pgd.Group);
         end;
          // Переходим к следующей группе
         n := tvMain.GetNext(n);
+      end;
+       // Если есть изменения в принадлежности группам, возвращаем параметры соответствующей подоперации
+      if (AddToGroups.Count>0) or (RemoveFromGroups.Count>0) then begin
+        sOpParamName := 'EditGroupOpParams';
+        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'AddToGroups', AddToGroups, 'RemoveFromGroups', RemoveFromGroups]);
       end;
     end;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.13 2004-10-18 19:27:03 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -70,7 +70,7 @@ type
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure InitializePage; override;
   public
-    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -138,16 +138,13 @@ uses phUtils, Main, phSettings;
     StorageForm.ActiveControl := tvMain;
   end;
 
-  procedure TfrPicProps_Keywords.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
+  procedure TfrPicProps_Keywords.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   begin
-    inherited Apply(AOperations, Changes);
-     // ≈сли страница инициализирована, создаЄм операцию изменени€ списка ключевых слов
-    if FInitialized then
-      TPhoaOp_InternalEditPicKeywords.Create(
-        AOperations,
-        App.Project,
-        NewPhoaOperationParams(['Pics', EditedPics, 'KeywordList', FKeywords]),
-        Changes);
+     // ≈сли страница инициализирована, возвращаем параметры дл€ операции изменени€ списка ключевых слов
+    if FInitialized then begin
+      sOpParamName := 'EditKeywordsOpParams';
+      OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'KeywordList', FKeywords]);
+    end;
   end;
 
   procedure TfrPicProps_Keywords.BeforeDisplay(ChangeMethod: TPageChangeMethod);

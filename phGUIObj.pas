@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.25 2004-10-15 13:49:35 dale Exp $
+//  $Id: phGUIObj.pas,v 1.26 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -25,6 +25,7 @@ type
   TThumbnailViewerStates = set of TThumbnailViewerState;
 
    // Информация о состоянии TThumbnailViewer, используемая его методами SaveDisplay() и RestoreDisplay()
+   //??? Надо ли?
   IThumbnailViewerDisplayData = interface(IInterface)
     ['{436126B8-5E50-4BAB-83D1-CA83FE19B976}']
      // Prop handlers
@@ -1101,7 +1102,7 @@ type
     begin
       Result := 0;
       if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
-        sProp := Pic.Props[FThumbCornerDetails[Corner].Prop];
+        sProp := Pic.PropStrValues[FThumbCornerDetails[Corner].Prop];
         if sProp<>'' then begin
           Result := Info.Bitmap.TextWidth(sProp)+2;
           Info.Bitmap.Textout(

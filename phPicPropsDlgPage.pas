@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.8 2004-10-15 13:49:35 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.9 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -45,15 +45,15 @@ type
      // Вызывается диалогом при нажатии кнопки ОК. Должна вернуть True, чтобы позволить закрытие, иначе должна сама
      //   объяснить пользователю причину отказа. В базовом классе всегда возвращает True
     function  CanApply: Boolean; virtual;
-     // Вызывается диалогом при нажатии кнопки ОК. Должна добавить операции для применения изменений в предоставляемый
-     // список. В базовом классе не делает ничего 
-    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); virtual;
+     // Вызывается диалогом при нажатии кнопки ОК. Должна вернуть имя параметра - дочерней операции, а также набор её
+     //   параметров для применения изменений. В базовом классе не делает ничего
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); virtual;
   end;
 
 implementation
 {$R *.dfm}
 
-  procedure TPicPropsDialogPage.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
+  procedure TPicPropsDialogPage.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
   begin
     { does nothing }
   end;

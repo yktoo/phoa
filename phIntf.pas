@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.13 2004-10-19 07:31:32 dale Exp $
+//  $Id: phIntf.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -79,8 +79,8 @@ type
     function  GetMedia: String; stdcall;
     function  GetNotes: String; stdcall;
     function  GetPlace: String; stdcall;
-    function  GetPropertyValue(const sPropName: String): String; stdcall;
-    function  GetProps(PicProp: TPicProperty): String; stdcall;
+    function  GetPropStrValues(PicProp: TPicProperty): String; stdcall;
+    function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
     function  GetRawData(PProps: TPicProperties): String; stdcall;
     function  GetRotation: TPicRotation; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
@@ -118,11 +118,10 @@ type
     property Notes: String read GetNotes;
      // -- Place
     property Place: String read GetPlace;
-     // -- Picture property value by name (name is on of the SPhoaPicProp_XXX constants), represented as string. Invalid
-     //    values of sPropName cause nil to be returned
-    property PropertyValue[const sPropName: String]: String read GetPropertyValue;
-     // -- Properties by index
-    property Props[PicProp: TPicProperty]: String read GetProps;
+     // -- Property values of type String, by index
+    property PropStrValues[PicProp: TPicProperty]: String read GetPropStrValues;
+     // -- Property values of type Variant, by index
+    property PropValues[PicProp: TPicProperty]: Variant read GetPropValues;
      // -- Picture raw binary data (for PProps properties)
     property RawData[PProps: TPicProperties]: String read GetRawData;
      // -- Picture rotation
@@ -460,31 +459,6 @@ type
      // -- Photo album views
     property Views: IPhoaViewList read GetViews;
   end;
-
-const
-   // Picture property names, case-insensitive. DO NOT LOCALIZE!
-  SPhoaPicProp_ID            = 'ID';
-  SPhoaPicProp_FileName      = 'FileName';
-  SPhoaPicProp_FullFileName  = 'FullFileName';
-  SPhoaPicProp_FilePath      = 'FilePath';
-  SPhoaPicProp_FileSize      = 'FileSize';
-  SPhoaPicProp_FileSizeBytes = 'FileSizeBytes';
-  SPhoaPicProp_PicWidth      = 'PicWidth';
-  SPhoaPicProp_PicHeight     = 'PicHeight';
-  SPhoaPicProp_PicDims       = 'PicDims';
-  SPhoaPicProp_Format        = 'Format';
-  SPhoaPicProp_Date          = 'Date';
-  SPhoaPicProp_Time          = 'Time';
-  SPhoaPicProp_Place         = 'Place';
-  SPhoaPicProp_FilmNumber    = 'FilmNumber';
-  SPhoaPicProp_FrameNumber   = 'FrameNumber';
-  SPhoaPicProp_Author        = 'Author';
-  SPhoaPicProp_Description   = 'Description';
-  SPhoaPicProp_Notes         = 'Notes';
-  SPhoaPicProp_Media         = 'Media';
-  SPhoaPicProp_Keywords      = 'Keywords';
-  SPhoaPicProp_Rotation      = 'Rotation';
-  SPhoaPicProp_Flips         = 'Flips';
 
 implementation
 

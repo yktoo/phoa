@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.8 2004-10-19 07:31:32 dale Exp $
+//  $Id: phOps.pas,v 1.9 2004-10-19 15:03:31 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -124,14 +124,14 @@ type
 
   PPicPropertyChange = ^TPicPropertyChange;
   TPicPropertyChange = record
-    sNewValue: String;
+    vNewValue: Variant;
     Prop: TPicProperty;
   end;
 
   IPhoaPicPropertyChangeList = interface(IInterface)
     ['{13EEEA04-FF5A-42B3-861E-C0C7F5A8A334}']
      // Добавляет новую запись
-    function  Add(const sNewValue: String; Prop: TPicProperty): Integer;
+    function  Add(const vNewValue: Variant; Prop: TPicProperty): Integer;
      // Prop handlers
     function  GetChangedProps: TPicProperties;
     function  GetCount: Integer;
@@ -172,6 +172,8 @@ type
    //     Project: IPhotoAlbumProject - проект
    //===================================================================================================================
 
+  TPhoaOperationClass = class of TPhoaOperation;
+
   TPhoaOperation = class(TBaseOperation)
   private
      // Позиция данных отката операции в Undo-файле данных отката (UndoFile)
@@ -196,6 +198,8 @@ type
     procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); virtual;
      // Основная процедура отката изменений, внесённых операцией. В базовом классе откатывает подчинённые операции
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); virtual;
+     // Создаёт новый экземпляр операции класса OpClass и добавляет в список дочерних операций
+    procedure AddChild(OpClass: TPhoaOperationClass; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
      // Props
      // -- Возвращает группу, соответствующую GroupID
     property OpGroup: IPhotoAlbumPicGroup read GetOpGroup write SetOpGroup;
@@ -226,6 +230,23 @@ type
     property Savepoint: Boolean read FSavepoint;
      // -- Файл данных отката (получается через FList)
     property UndoFile: TPhoaUndoFile read GetUndoFile;
+  end;
+
+   //===================================================================================================================
+   // Фабрика операций (изготавливает новые экземпляры операций по имени операции)
+   //===================================================================================================================
+
+  IPhoaOperationFactory = interface(IInterface)
+    ['{BE27C06A-6F28-4A8E-9F41-20350D45D8AC}']
+     // Регистрирует новый класс операций в списке
+    procedure RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
+     // Инстанцирует и возвращает новую операцию
+    function  NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+     // Prop handlers
+    function  GetClassByName(const sOpName: String): TPhoaOperationClass; 
+     // Props
+     // -- Возвращает класс по имени операции. Если нет такого, вызывает Exception
+    property ClassByName[const sOpName: String]: TPhoaOperationClass read GetClassByName;
   end;
 
    //===================================================================================================================
@@ -387,13 +408,21 @@ type
    // Комплексная операция редактирования изображений, служит контейнером для операций:
    //  - TPhoaOp_InternalEditPicProps
    //  - TPhoaOp_InternalEditPicKeywords
-   //  - TPhoaOp_InternalPicFromGroupRemoving
-   //  - TPhoaOp_InternalPicToGroupAdding
+   //  - TPhoaOp_InternalEditPicToGroupBelonging
    //   Params:
-   //     <none>
+   //     EditViewOpParams:     IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
+   //                                                  просмотра
+   //     EditDataOpParams:     IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
+   //                                                  данных
+   //     EditKeywordsOpParams: IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
+   //                                                  ключевых слов
+   //     EditGroupOpParams:    IPhoaOperationParams - параметры для дочерней операции изменения свойств на странице
+   //                                                  принадлежности изображений группам
    //===================================================================================================================
 
   TPhoaOp_PicEdit = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -420,6 +449,19 @@ type
   protected
     procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
+  end;
+
+   //===================================================================================================================
+   // Внутренняя операция изменения принадлежности изображений группам
+   //   Params:
+   //     Pics:             IPhotoAlbumPicList      - список изображений, чья принадлежность группам изменяется
+   //     AddToGroups:      IPhotoAlbumPicGroupList - список групп, в которые необходимо добавить изображения Pics
+   //     RemoveFromGroups: IPhotoAlbumPicGroupList - список групп, из которых необходимо удалить изображения Pics
+   //===================================================================================================================
+
+  TPhoaOp_InternalEditPicToGroupBelonging = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges); override;
   end;
 
    //===================================================================================================================
@@ -661,10 +703,15 @@ type
     procedure RollbackChanges(var Changes: TPhoaOperationChanges); override;
   end;
 
+var
+   // Глобальный экземпляр фабрики операций
+  OperationFactory: IPhoaOperationFactory;
+
 resourcestring
   SPhoaOpErrMsg_ParamNotFound         = 'Operation parameter named "%s" not found';
   SPhoaOpErrMsg_ParamTypeMismatch     = 'Operation parameter "%s" type mismatch. Expected: "%s", actual: "%s"';
   SPhoaOpErrMsg_CannotObtainParamIntf = 'Operation parameter "%s" doesn''t implement required interface';
+  SPhoaOpErrMsg_OperationNotFound     = 'Operation "%s" not found';
 
    // Создаёт экземпляр IPhoaOperationParams и заполняет его параметрами (описания параметров должны идти в Params
    //   парами: [имя1, значение1, имя2, значение2, ...])
@@ -908,6 +955,7 @@ type
   begin
      // Стираем список
     for i := FList.Count-1 downto 0 do Delete(i);
+    FList.Free;
     inherited Destroy;
   end;
 
@@ -1010,7 +1058,7 @@ type
      // Удаляет элемент из списка
     procedure Delete(Index: Integer);
      // IPhoaPicPropertyChangeList
-    function  Add(const sNewValue: String; Prop: TPicProperty): Integer;
+    function  Add(const vNewValue: Variant; Prop: TPicProperty): Integer;
     function  GetChangedProps: TPicProperties;
     function  GetCount: Integer;
     function  GetItems(Index: Integer): PPicPropertyChange;
@@ -1019,12 +1067,12 @@ type
     destructor Destroy; override;
   end;
 
-  function TPhoaPicPropertyChangeList.Add(const sNewValue: String; Prop: TPicProperty): Integer;
+  function TPhoaPicPropertyChangeList.Add(const vNewValue: Variant; Prop: TPicProperty): Integer;
   var p: PPicPropertyChange;
   begin
     New(p);
     Result := FList.Add(p);
-    p^.sNewValue := sNewValue;
+    p^.vNewValue := vNewValue;
     p^.Prop      := Prop;
   end;
 
@@ -1068,6 +1116,11 @@ type
    //===================================================================================================================
    // TPhoaOperation
    //===================================================================================================================
+
+  procedure TPhoaOperation.AddChild(OpClass: TPhoaOperationClass; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  begin
+    OpClass.Create(Operations, Project, Params, Changes);
+  end;
 
   constructor TPhoaOperation.Create(AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   begin
@@ -1152,6 +1205,55 @@ type
        // Уничтожаем объект
       Destroy;
     end;
+  end;
+
+   //===================================================================================================================
+   // TPhoaOperationFactory - реализация IPhoaOperationFactory
+   //===================================================================================================================
+type
+  TPhoaOperationFactory = class(TInterfacedObject, IPhoaOperationFactory)
+  private
+     // Список зарегистрированных классов
+    FClasses: TStringList;
+     // IPhoaOperationFactory
+    procedure RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
+    function  NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+    function  GetClassByName(const sOpName: String): TPhoaOperationClass; 
+  public
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+  constructor TPhoaOperationFactory.Create;
+  begin
+    inherited Create;
+    FClasses := TStringList.Create;
+    FClasses.Sorted     := True;
+    FClasses.Duplicates := dupError;
+  end;
+
+  destructor TPhoaOperationFactory.Destroy;
+  begin
+    FClasses.Free;
+    inherited Destroy;
+  end;
+
+  function TPhoaOperationFactory.GetClassByName(const sOpName: String): TPhoaOperationClass;
+  var idx: Integer;
+  begin
+    Result := nil; // Satisfy the compiler
+    idx := FClasses.IndexOf(sOpName);
+    if idx<0 then PhoaException(SPhoaOpErrMsg_OperationNotFound, [sOpName]) else Result := TPhoaOperationClass(FClasses.Objects[idx]);
+  end;
+
+  function TPhoaOperationFactory.NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+  begin
+    Result := GetClassByName(sOpName).Create(AList, AProject, Params, Changes);
+  end;
+
+  procedure TPhoaOperationFactory.RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
+  begin
+    FClasses.AddObject(sOpName, Pointer(OpClass));
   end;
 
    //===================================================================================================================
@@ -1376,9 +1478,9 @@ type
   begin
     inherited Perform(Params, Changes);
      // Удаляем группу (и подгруппы)
-    TPhoaOp_InternalGroupDelete.Create(Operations, Project, Params, Changes);
+    AddChild(TPhoaOp_InternalGroupDelete, Params, Changes);
      // Удаляем неиспользуемые изображения
-    TPhoaOp_InternalUnlinkedPicsRemoving.Create(Operations, Project, Params, Changes);
+    AddChild(TPhoaOp_InternalUnlinkedPicsRemoving, Params, Changes);
   end;
 
    //===================================================================================================================
@@ -1405,11 +1507,7 @@ type
     Group.PicsX.Clear;
      // Каскадно удаляем группы
     for i := Group.Groups.Count-1 downto 0 do
-      TPhoaOp_InternalGroupDelete.Create(
-        Operations,
-        Project, 
-        NewPhoaOperationParams(['Group', Group.GroupsX[i]]),
-        Changes);
+      AddChild(TPhoaOp_InternalGroupDelete, NewPhoaOperationParams(['Group', Group.GroupsX[i]]), Changes);
      // Удаляем группу
     Group.Owner := nil;
      // Добавляем флаги изменений
@@ -1481,6 +1579,30 @@ type
   end;
 
    //===================================================================================================================
+   // TPhoaOp_PicEdit
+   //===================================================================================================================
+
+  procedure TPhoaOp_PicEdit.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+
+     // Выполняет операцию класса OpClass с параметрами, получаемыми из собственного параметра с именем sOpParamName,
+     //   если он указан
+    procedure PerformIfSpecified(const sOpParamName: String; OpClass: TPhoaOperationClass);
+    var OpParams: IPhoaOperationParams;
+    begin
+      Params.ObtainValIntf(sOpParamName, IPhoaOperationParams, OpParams, False);
+      if OpParams<>nil then AddChild(OpClass, OpParams, Changes);
+    end;
+
+  begin
+    inherited Perform(Params, Changes);
+     // Выполняем требуемые дочерние операции
+    PerformIfSpecified('EditViewOpParams',     TPhoaOp_InternalEditPicProps);
+    PerformIfSpecified('EditDataOpParams',     TPhoaOp_InternalEditPicProps);
+    PerformIfSpecified('EditKeywordsOpParams', TPhoaOp_InternalEditPicKeywords);
+    PerformIfSpecified('EditGroupOpParams',    TPhoaOp_InternalEditPicToGroupBelonging);
+  end;
+
+   //===================================================================================================================
    // TPhoaOp_InternalEditPicProps
    //===================================================================================================================
 
@@ -1509,7 +1631,7 @@ type
       UndoFile.WriteStr(Pic.RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
-        with ChangeList[iChg]^ do Pic.Props[Prop] := sNewValue;
+        with ChangeList[iChg]^ do Pic.PropValues[Prop] := vNewValue;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
@@ -1642,6 +1764,35 @@ type
   end;
 
    //===================================================================================================================
+   // TPhoaOp_InternalEditPicToGroupBelonging
+   //===================================================================================================================
+
+  procedure TPhoaOp_InternalEditPicToGroupBelonging.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
+  var
+    Pics: IPhotoAlbumPicList;
+    AddToGroups, RemoveFromGroups: IPhotoAlbumPicGroupList;
+    i: Integer;
+  begin
+    inherited Perform(Params, Changes);
+     // Получаем параметры
+    Params.ObtainValIntf('Pics',             IPhotoAlbumPicList,      Pics);
+    Params.ObtainValIntf('AddToGroups',      IPhotoAlbumPicGroupList, AddToGroups);
+    Params.ObtainValIntf('RemoveFromGroups', IPhotoAlbumPicGroupList, RemoveFromGroups);
+     // Отрабатываем добавления
+    for i := 0 to AddToGroups.Count-1 do
+      AddChild(
+        TPhoaOp_InternalPicToGroupAdding,
+        NewPhoaOperationParams(['Group', AddToGroups[i], 'Pics', Pics]),
+        Changes);
+     // Отрабатываем удаления
+    for i := 0 to RemoveFromGroups.Count-1 do
+      AddChild(
+        TPhoaOp_InternalPicFromGroupRemoving,
+        NewPhoaOperationParams(['Group', RemoveFromGroups[i], 'Pics', Pics]),
+        Changes);
+  end;
+
+   //===================================================================================================================
    // TPhoaOp_StoreTransform
    //===================================================================================================================
 
@@ -1680,21 +1831,21 @@ type
   procedure TPhoaOp_PicAdd.Perform(Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges);
   var
     i: Integer;
-    NewPics: IPhotoAlbumPicList;
+    Pics: IPhotoAlbumPicList;
     Group: IPhotoAlbumPicGroup;
     Pic, PicEx: IPhotoAlbumPic;
     bExisting, bAddedToGroup: Boolean;
   begin
     inherited Perform(Params, Changes);
      // Получаем параметры
-    Params.ObtainValIntf('NewPics', IPhotoAlbumPicList,  NewPics);
-    Params.ObtainValIntf('Group',   IPhotoAlbumPicGroup, Group);
+    Params.ObtainValIntf('Pics',  IPhotoAlbumPicList,  Pics);
+    Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
      // Сохраняем данные для отката
     OpGroup := Group;
      // Перебираем все новые изображения
-    UndoFile.WriteInt(NewPics.Count);
-    for i := 0 to NewPics.Count-1 do begin
-      Pic := NewPics[i];
+    UndoFile.WriteInt(Pics.Count);
+    for i := 0 to Pics.Count-1 do begin
+      Pic := Pics[i];
        // Ищем уже существующее изображение с тем же файлом
       PicEx := Project.PicsX.ItemsByFileNameX[Pic.FileName];
       bExisting := PicEx<>nil;
@@ -1986,9 +2137,9 @@ type
   begin
     inherited Perform(Params, Changes);
      // Удаляем изображения из группы
-    TPhoaOp_InternalPicFromGroupRemoving.Create(Operations, Project, Params, Changes);
+    AddChild(TPhoaOp_InternalPicFromGroupRemoving, Params, Changes);
      // Удаляем несвязанные изображения из фотоальбома
-    TPhoaOp_InternalUnlinkedPicsRemoving.Create(Operations, Project, Params, Changes);
+    AddChild(TPhoaOp_InternalUnlinkedPicsRemoving, nil, Changes);
   end;
 
    //===================================================================================================================
@@ -2029,7 +2180,7 @@ type
         ms.Free;
       end;
        // Создаём дочернюю операцию добавления изображений
-      TPhoaOp_PicAdd.Create(Operations, Project, NewPhoaOperationParams(['Group', Group, 'Pics', PastedPics]), Changes);
+      AddChild(TPhoaOp_PicAdd, NewPhoaOperationParams(['Group', Group, 'Pics', PastedPics]), Changes);
     end;
   end;
 
@@ -2088,23 +2239,20 @@ type
     PicOperation := TPictureOperation(Params.ValByte['PicOperation']);
      // Копирование/перемещение: копируем выделенные изображения
     if PicOperation in [popMoveToTarget, popCopyToTarget] then
-      TPhoaOp_InternalPicToGroupAdding.Create(
-        Operations,
-        Project,
+      AddChild(
+        TPhoaOp_InternalPicToGroupAdding,
         NewPhoaOperationParams(['Group', TargetGroup, 'Pics', Pics]),
         Changes);
      // Если перемещение - удаляем выделенные изображения из исходной группы
     if PicOperation=popMoveToTarget then
-      TPhoaOp_InternalPicFromGroupRemoving.Create(
-        Operations,
-        Project,
+      AddChild(
+        TPhoaOp_InternalPicFromGroupRemoving,
         NewPhoaOperationParams(['Group', SourceGroup,'Pics', Pics]),
         Changes);
      // Удаление выделенных изображений из указанной группы
     if PicOperation=popRemoveFromTarget then
-      TPhoaOp_InternalPicFromGroupRemoving.Create(
-        Operations,
-        Project,
+      AddChild(
+        TPhoaOp_InternalPicFromGroupRemoving,
         NewPhoaOperationParams(['Group', TargetGroup, 'Pics', Pics]),
         Changes);
      // Оставить только выделенные изображения в указанной группе
@@ -2115,12 +2263,11 @@ type
         if Pics.IndexOfID(Pic.ID)<0 then IntersectPics.Add(Pic, False);
       end;
       if IntersectPics.Count>0 then begin
-        TPhoaOp_InternalPicFromGroupRemoving.Create(
-          Operations,
-          Project,
+        AddChild(
+          TPhoaOp_InternalPicFromGroupRemoving,
           NewPhoaOperationParams(['Group', TargetGroup, 'Pics', IntersectPics]),
           Changes);
-        TPhoaOp_InternalUnlinkedPicsRemoving.Create(Operations, Project, nil, Changes);
+        AddChild(TPhoaOp_InternalUnlinkedPicsRemoving, nil, Changes);
       end;
     end;
   end;
@@ -2169,7 +2316,7 @@ type
   var i: Integer;
   begin
      // Сортируем изображения в группе
-    TPhoaOp_InternalGroupPicSort.Create(Operations, Project, NewPhoaOperationParams(['Group', Group, 'Sortings', Sortings]), Changes);
+    AddChild(TPhoaOp_InternalGroupPicSort, NewPhoaOperationParams(['Group', Group, 'Sortings', Sortings]), Changes);
      // При необходимости сортируем и в подгруппах
     if bRecursive then
       for i := 0 to Group.Groups.Count-1 do AddGroupSortOp(Group.GroupsX[i], Sortings, True, Changes);
@@ -2242,17 +2389,9 @@ type
     Params.ObtainValIntf('TargetGroup', IPhotoAlbumPicGroup, TargetGroup);
     Params.ObtainValIntf('Pics',        IPhotoAlbumPicList,  Pics);
      // Выполняем операцию
-    TPhoaOp_InternalPicToGroupAdding.Create(
-      Operations,
-      Project,
-      NewPhoaOperationParams(['Group', TargetGroup, 'Pics', Pics]),
-      Changes);
+    AddChild(TPhoaOp_InternalPicToGroupAdding, NewPhoaOperationParams(['Group', TargetGroup, 'Pics', Pics]), Changes);
     if not Params.ValBool['Copy'] then
-      TPhoaOp_InternalPicFromGroupRemoving.Create(
-        Operations,
-        Project,
-        NewPhoaOperationParams(['Group', SourceGroup, 'Pics', Pics]),
-        Changes);
+      AddChild(TPhoaOp_InternalPicFromGroupRemoving, NewPhoaOperationParams(['Group', SourceGroup, 'Pics', Pics]), Changes);
   end;
 
    //===================================================================================================================
@@ -2522,4 +2661,37 @@ type
     Result := TPhoaPicPropertyChangeList.Create;
   end;
 
+initialization
+  OperationFactory := TPhoaOperationFactory.Create;
+  with OperationFactory do begin
+    RegisterOpClass('GroupDelete',                     TPhoaOp_GroupDelete);
+    RegisterOpClass('GroupDragAndDrop',                TPhoaOp_GroupDragAndDrop);
+    RegisterOpClass('GroupEdit',                       TPhoaOp_GroupEdit);
+    RegisterOpClass('GroupNew',                        TPhoaOp_GroupNew);
+    RegisterOpClass('GroupRename',                     TPhoaOp_GroupRename);
+    RegisterOpClass('InternalEditPicKeywords',         TPhoaOp_InternalEditPicKeywords);
+    RegisterOpClass('InternalEditPicProps',            TPhoaOp_InternalEditPicProps);
+    RegisterOpClass('InternalEditPicToGroupBelonging', TPhoaOp_InternalEditPicToGroupBelonging);
+    RegisterOpClass('InternalGroupDelete',             TPhoaOp_InternalGroupDelete);
+    RegisterOpClass('InternalGroupPicSort',            TPhoaOp_InternalGroupPicSort);
+    RegisterOpClass('InternalPicFromGroupRemoving',    TPhoaOp_InternalPicFromGroupRemoving);
+    RegisterOpClass('InternalPicToGroupAdding',        TPhoaOp_InternalPicToGroupAdding);
+    RegisterOpClass('InternalUnlinkedPicsRemoving',    TPhoaOp_InternalUnlinkedPicsRemoving);
+    RegisterOpClass('PicAdd',                          TPhoaOp_PicAdd);
+    RegisterOpClass('PicDelete',                       TPhoaOp_PicDelete);
+    RegisterOpClass('PicDragAndDropInsideGroup',       TPhoaOp_PicDragAndDropInsideGroup);
+    RegisterOpClass('PicDragAndDropToGroup',           TPhoaOp_PicDragAndDropToGroup);
+    RegisterOpClass('PicEdit',                         TPhoaOp_PicEdit);
+    RegisterOpClass('PicOperation',                    TPhoaOp_PicOperation);
+    RegisterOpClass('PicPaste',                        TPhoaOp_PicPaste);
+    RegisterOpClass('PicSort',                         TPhoaOp_PicSort);
+    RegisterOpClass('ProjectEdit',                     TPhoaOp_ProjectEdit);
+    RegisterOpClass('StoreTransform',                  TPhoaOp_StoreTransform);
+    RegisterOpClass('ViewDelete',                      TPhoaOp_ViewDelete);
+    RegisterOpClass('ViewEdit',                        TPhoaOp_ViewEdit);
+    RegisterOpClass('ViewMakeGroup',                   TPhoaOp_ViewMakeGroup);
+    RegisterOpClass('ViewNew',                         TPhoaOp_ViewNew);
+  end;
+finalization
+  OperationFactory := nil;
 end.

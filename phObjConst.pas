@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObjConst.pas,v 1.2 2004-10-14 12:21:03 dale Exp $
+//  $Id: phObjConst.pas,v 1.3 2004-10-19 15:03:31 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -22,31 +22,6 @@ const
 
   IThumbQuality_Default            = 40;
   IThumbQuality_Max                = 100;
-
-   // Соответствие между именами свойств изображений из phIntf и элементами TPicProperty
-  asPicPropertyNames: Array[TPicProperty] of String = (
-    SPhoaPicProp_ID,            // ppID
-    SPhoaPicProp_FileName,      // ppFileName
-    SPhoaPicProp_FullFileName,  // ppFullFileName
-    SPhoaPicProp_FilePath,      // ppFilePath
-    SPhoaPicProp_FileSize,      // ppFileSize
-    SPhoaPicProp_FileSizeBytes, // ppFileSizeBytes
-    SPhoaPicProp_PicWidth,      // ppPicWidth
-    SPhoaPicProp_PicHeight,     // ppPicHeight
-    SPhoaPicProp_PicDims,       // ppPicDims
-    SPhoaPicProp_Format,        // ppFormat
-    SPhoaPicProp_Date,          // ppDate
-    SPhoaPicProp_Time,          // ppTime
-    SPhoaPicProp_Place,         // ppPlace
-    SPhoaPicProp_FilmNumber,    // ppFilmNumber
-    SPhoaPicProp_FrameNumber,   // ppFrameNumber
-    SPhoaPicProp_Author,        // ppAuthor
-    SPhoaPicProp_Description,   // ppDescription
-    SPhoaPicProp_Notes,         // ppNotes
-    SPhoaPicProp_Media,         // ppMedia
-    SPhoaPicProp_Keywords,      // ppKeywords
-    SPhoaPicProp_Rotation,      // ppRotation
-    SPhoaPicProp_Flips);        // ppFlips
 
   asPicRotationText: Array[TPicRotation] of String = (
     '0°',    // pr0

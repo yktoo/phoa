@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.24 2004-10-18 19:27:03 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.25 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -126,7 +126,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure AfterDisplay(ChangeMethod: TPageChangeMethod); override;
   public
-    procedure Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges); override;
+    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
      // Props
      // -- Масштаб просматриваемого изображения
     property ViewZoomFactor: Single read GetViewZoomFactor write SetViewZoomFactor;
@@ -210,28 +210,21 @@ uses phUtils, Main, phSettings;
     StorageForm.ActiveControl := iMain;
   end;
 
-  procedure TfrPicProps_View.Apply(AOperations: TPhoaOperations; var Changes: TPhoaOperationChanges);
-  var
-    i: Integer;
-    Pic: IPhotoAlbumPic;
-    Rotation: TPicRotation;
-    Flips: TPicFlips;
+  procedure TfrPicProps_View.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  var ChgList: IPhoaPicPropertyChangeList;
   begin
-    inherited Apply(AOperations, Changes);
      // Если страница инициализирована, создаём операции применения преобразований
-    if FInitialized and not (FNoRotation and FNoFlipHorz and FNoFlipVert) then
-      for i := 0 to EditedPics.Count-1 do begin
-        Pic := EditedPics[i];
-         // Определяем требуемое преобразование
-        GetRequiredTransform(Pic, Rotation, Flips);
-         // Если оно не совпадает - создаём операцию
-        if (Rotation<>Pic.Rotation) or (Flips<>Pic.Flips) then
-          TPhoaOp_StoreTransform.Create(
-            AOperations,
-            App.Project,
-            NewPhoaOperationParams(['Pic', Pic, 'Rotation', Byte(Rotation), 'Flips', Byte(Flips)]),
-            Changes);
+    if FInitialized and not (FNoRotation and FNoFlipHorz and FNoFlipVert) then begin
+       // Составляем список изменений
+      ChgList := NewPhoaPicPropertyChangeList;
+      if not FNoRotation                  then ChgList.Add(Byte(FTransform.Rotation), ppRotation);
+      if not (FNoFlipHorz or FNoFlipVert) then ChgList.Add(Byte(FTransform.Flips),    ppFlips);
+       // Если есть изменения - возвращаем параметры подоперации
+      if ChgList.Count>0 then begin
+        sOpParamName := 'EditViewOpParams';
+        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
       end;
+    end;
   end;
 
   procedure TfrPicProps_View.BeforeDisplay(ChangeMethod: TPageChangeMethod);

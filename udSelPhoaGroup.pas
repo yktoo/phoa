@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.13 2004-10-19 07:31:32 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.14 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -54,19 +54,8 @@ uses phUtils, ConsVars, Main, phSettings;
   end;
 
   procedure TdSelPhoaGroup.ButtonClick_OK;
-  var Changes: TPhoaOperationChanges;
   begin
-    Changes := [];
-    fMain.BeginOperation;
-    try
-      TPhoaOp_ViewMakeGroup.Create(
-        FUndoOperations,
-        FApp.Project,
-        NewPhoaOperationParams(['Group', PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^]),
-        Changes);
-    finally
-      fMain.EndOperation(Changes);
-    end;
+    FApp.PerformOperation('ViewMakeGroup', ['Group', PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^]);
     inherited ButtonClick_OK;
   end;
 

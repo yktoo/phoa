@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.9 2004-10-19 07:31:32 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.10 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -59,23 +59,13 @@ uses ConsVars, phUtils, Main;
    //===================================================================================================================
 
   procedure TdPhoAProps.ButtonClick_OK;
-  var Changes: TPhoaOperationChanges;
   begin
-    Changes := [];
-    fMain.BeginOperation;
-    try
-      TPhoaOp_ProjectEdit.Create(
-        FUndoOperations,
-        FApp.Project,
-        NewPhoaOperationParams([
-          'NewThWidth',     eThumbSizeX.AsInteger,
-          'NewThHeight',    eThumbSizeY.AsInteger,
-          'NewThQuality',   tbThumbQuality.Position,
-          'NewDescription', mDesc.Text]),
-        Changes);
-    finally
-      fMain.EndOperation(Changes);
-    end;
+    FApp.PerformOperation(
+      'ProjectEdit',
+      ['NewThWidth',     eThumbSizeX.AsInteger,
+       'NewThHeight',    eThumbSizeY.AsInteger,
+       'NewThQuality',   tbThumbQuality.Position,
+       'NewDescription', mDesc.Text]);
     inherited ButtonClick_OK;
   end;
 

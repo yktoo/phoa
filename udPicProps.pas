@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.12 2004-10-18 19:27:03 dale Exp $
+//  $Id: udPicProps.pas,v 1.13 2004-10-19 15:03:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -100,26 +100,35 @@ uses
 
   procedure TdPicProps.ButtonClick_OK;
   var
-    i: Integer;
-    Operation: TPhoaOp_PicEdit;
-    Changes: TPhoaOperationChanges;
+    i, idxMainParam: Integer;
+    sOpParam: String;
+    OpParams: IPhoaOperationParams;
+    aMainOpParams: Array of Variant;
   begin
-    Changes := [];
-    fMain.BeginOperation;
-    try
-       // Проверяем последовательно все страницы
-      for i := 0 to FController.Count-1 do
-        if not (FController[i] as TPicPropsDialogPage).CanApply then begin
-          FController.SetVisiblePageID(FController[i].ID, pcmForced);
-          Exit;
-        end;
-       // Создаём операцию отката
-      Operation := TPhoaOp_PicEdit.Create(FUndoOperations, FApp.Project, NewPhoaOperationParams([]), Changes);
-       // Применяем последовательно все страницы
-      for i := 0 to FController.Count-1 do TPicPropsDialogPage(FController[i]).Apply(Operation.Operations, Changes);
-    finally
-      fMain.EndOperation(Changes);
+     // Проверяем последовательно все страницы
+    for i := 0 to FController.Count-1 do
+      if not (FController[i] as TPicPropsDialogPage).CanApply then begin
+        FController.SetVisiblePageID(FController[i].ID, pcmForced);
+        Exit;
+      end;
+     // Применяем последовательно все страницы, формируя массив параметров главной операции (PicEdit)
+    aMainOpParams := nil;
+    idxMainParam  := -1;
+    for i := 0 to FController.Count-1 do begin
+      sOpParam := '';
+      OpParams := nil;
+      TPicPropsDialogPage(FController[i]).Apply(sOpParam, OpParams);
+      if sOpParam<>'' then begin
+        SetLength(aMainOpParams, idxMainParam+3);
+        Inc(idxMainParam);
+        aMainOpParams[idxMainParam] := sOpParam;
+        Inc(idxMainParam);
+        aMainOpParams[idxMainParam] := OpParams;
+      end;
     end;
+     // Выполняем операцию
+    FApp.PerformOperation('PicEdit', aMainOpParams);
+     // Закрываем окошко
     inherited ButtonClick_OK;
   end;
 
