@@ -113,7 +113,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=1
 Release=10
-Build=282
+Build=283
 Debug=0
 PreRelease=0
 Special=0
@@ -124,7 +124,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=PhoA image arranging and searching tool
-FileVersion=1.1.10.282
+FileVersion=1.1.10.283
 InternalName=PhoA
 LegalCopyright=©2002-2005 DK Software
 LegalTrademarks=

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.1 2005-02-14 19:34:09 dale Exp $
+//  $Id: Main.pas,v 1.2 2005-02-15 14:15:35 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,6 +11,25 @@ interface
 uses Windows, phPlugin;
 
 type
+
+   //===================================================================================================================
+   // Demo plugin module
+   //===================================================================================================================
+
+  TPhoaDemoPluginModule = class(TInterfacedObject, IPhoaPluginModule)
+  private
+     // IPhoaPluginModule
+    function  GetInfoAuthor: WideString; stdcall;
+    function  GetInfoCopyright: WideString; stdcall;
+    function  GetInfoDescription: WideString; stdcall;
+    function  GetInfoName: WideString; stdcall;
+    function  GetInfoWebsiteURL: WideString; stdcall;
+    function  GetPluginClassCount: Integer; stdcall;
+    function  GetPluginClasses(Index: Integer): IPhoaPluginClass; stdcall;
+  public
+    constructor Create;
+  end;
+
   TPhoaDemoPluginClass = class(TInterfacedObject, IPhoaPluginClass)
   private
      // IPhoaPluginClass
@@ -21,23 +40,59 @@ type
     constructor Create;
   end;
 
-   // Exported procs
-  procedure PhoaPluginGetClassCount(var iCount: Integer); stdcall;
-  procedure PhoaPluginGetClass(iIndex: Integer; var PluginClass: IPhoaPluginClass); stdcall;
+   // Exported function
+  function PhoaGetPluginModule: IPhoaPluginModule; stdcall;
 
 implementation
 
-  procedure PhoaPluginGetClassCount(var iCount: Integer);
+  function PhoaGetPluginModule: IPhoaPluginModule;
   begin
-    iCount := 1;
+    Result := TPhoaDemoPluginModule.Create;
   end;
 
-  procedure PhoaPluginGetClass(iIndex: Integer; var PluginClass: IPhoaPluginClass); stdcall;
+   //===================================================================================================================
+   // TPhoaDemoPluginModule
+   //===================================================================================================================
+
+  constructor TPhoaDemoPluginModule.Create;
   begin
-    case iIndex of
-      0:   PluginClass := TPhoaDemoPluginClass.Create;
-      else PluginClass := nil;
-    end;
+    inherited Create;
+    MessageBox(0, 'Module interface created.', 'Demo plugin', 0);
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoAuthor: WideString;
+  begin
+    Result := 'Dmitry Kann';
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoCopyright: WideString;
+  begin
+    Result := 'Copyright ©2005 DK Software';
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoDescription: WideString;
+  begin
+    Result := 'This is a sample plugin doing nothing';
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoName: WideString;
+  begin
+    Result := 'PhoA demo plugin';
+  end;
+
+  function TPhoaDemoPluginModule.GetInfoWebsiteURL: WideString;
+  begin
+    Result := 'http://www.dk-soft.org/';
+  end;
+
+  function TPhoaDemoPluginModule.GetPluginClassCount: Integer;
+  begin
+    Result := 1;
+  end;
+
+  function TPhoaDemoPluginModule.GetPluginClasses(Index: Integer): IPhoaPluginClass;
+  begin
+    Result := TPhoaDemoPluginClass.Create;
   end;
 
    //===================================================================================================================
@@ -47,7 +102,7 @@ implementation
   constructor TPhoaDemoPluginClass.Create;
   begin
     inherited Create;
-    MessageBox(0, 'Plugin class created.', 'Info', 0);
+    MessageBox(0, 'Plugin class created.', 'Demo plugin', 0);
   end;
 
   function TPhoaDemoPluginClass.CreatePlugin: IPhoaPlugin;

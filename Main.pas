@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.76 2005-02-14 19:34:08 dale Exp $
+//  $Id: Main.pas,v 1.77 2005-02-15 14:15:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1160,7 +1160,7 @@ uses
       ApplyLanguage;
        // Загружаем плагины
       ShowProgressInfo('SMsg_LoadingPlugins', []);
-      ScanForPlugins;
+      PluginsInitialize;
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
@@ -1188,6 +1188,8 @@ uses
     FSearchResults := nil;
     FProject       := nil;
     FUndo.Free;
+     // Выгружаем плагины
+    PluginsFinalize;
   end;
 
   procedure TfMain.fpMainRestorePlacement(Sender: TObject);
