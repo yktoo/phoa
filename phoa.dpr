@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.6 2004-04-19 18:22:34 dale Exp $
+//  $Id: phoa.dpr,v 1.7 2004-04-22 17:54:00 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -55,7 +55,7 @@ uses
   ufrWzPageFileOps_RepairSelLinks in 'ufrWzPageFileOps_RepairSelLinks.pas' {frWzPageFileOps_RepairSelLinks: TFrame},
   ufrWzPageFileOps_MoveOptions2 in 'ufrWzPageFileOps_MoveOptions2.pas' {frWzPageFileOps_MoveOptions2: TFrame},
   phSettings in 'phSettings.pas',
-  phDefSettingEditor in 'phDefSettingEditor.pas';
+  phValSetting in 'phValSetting.pas';
 
 {$R *.res}
 
