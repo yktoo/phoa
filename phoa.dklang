@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.31 2004-11-21 13:18:24 dale Exp $
+;  $Id: phoa.dklang,v 1.32 2004-11-22 18:47:40 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -277,7 +277,6 @@ Caption=00000003,Find pictures
 bCancel.Caption=00000012,Cancel
 bOK.Caption=00000015,Find
 bHelp.Caption=00000018,Help
-lCriteria.Caption=00000021,&Search criteria:
 gbSearch.Caption=00000027,Perform search
 rbAll.Caption=00000030,In the &photo album
 rbCurGroup.Caption=00000033,In the &current group
@@ -296,7 +295,12 @@ scpMain.Title=00000051,Properties
 scpMain.TitleFont.Name=00000050,MS Sans Serif
 scpMain.TriggerChars=00000049,$
 ipmsmSimpleProp.Caption=00000052,&Picture property
-ipmSimpleDelete.Caption=00000053,&Delete
+tbSimpleMain.Caption=00000054,Toolbar
+tbSimpleMain.ChevronHint=00000055,More Buttons|
+aSimpleCrDelete.Caption=00000056,&Delete
+aSimpleCrDelete.Hint=00000057,Delete selected criterion
+aSimpleConvertToExpression.Caption=00000058,Convert to e&xpression
+aSimpleConvertToExpression.Hint=00000059,Convert selected criteria to search expression
 
 [dProjectProps]
 Caption=00000003,Properties: photo album

@@ -5,6 +5,7 @@ inherited dSearch: TdSearch
   ClientHeight = 464
   ClientWidth = 640
   OldCreateOrder = True
+  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
@@ -86,25 +87,15 @@ inherited dSearch: TdSearch
     ActivePage = tsSimple
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
-    OnChange = DlgDataChange
+    OnChange = pcCriteriaChange
     object tsSimple: TTabSheet
       Caption = 'Simple search'
-      DesignSize = (
-        608
-        334)
-      object lCriteria: TLabel
-        Left = 4
-        Top = 4
-        Width = 73
-        Height = 13
-        Caption = '&Search criteria:'
-      end
       object tvSimpleCriteria: TVirtualStringTree
-        Left = 3
-        Top = 20
-        Width = 594
-        Height = 309
-        Anchors = [akLeft, akTop, akRight, akBottom]
+        Left = 0
+        Top = 26
+        Width = 608
+        Height = 308
+        Align = alClient
         Header.AutoSizeIndex = 2
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
@@ -118,7 +109,7 @@ inherited dSearch: TdSearch
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
         TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
-        TreeOptions.SelectionOptions = [toExtendedFocus]
+        TreeOptions.SelectionOptions = [toExtendedFocus, toRightClickSelect]
         OnChecked = tvSimpleCriteriaChecked
         OnCreateEditor = tvSimpleCriteriaCreateEditor
         OnFocusChanged = tvSimpleCriteriaFocusChanged
@@ -141,10 +132,32 @@ inherited dSearch: TdSearch
           item
             Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
-            Width = 280
+            Width = 294
             WideText = 'Value'
           end>
         WideDefaultText = ''
+      end
+      object dkSimpleTop: TTBXDock
+        Left = 0
+        Top = 0
+        Width = 608
+        Height = 26
+        AllowDrag = False
+        object tbSimpleMain: TTBXToolbar
+          Left = 0
+          Top = 0
+          Caption = 'Toolbar'
+          Images = fMain.ilActionsSmall
+          TabOrder = 0
+          object bSimpleCrDelete: TTBXItem
+            Action = aSimpleCrDelete
+            DisplayMode = nbdmImageAndText
+          end
+          object bSimpleConvertToExpression: TTBXItem
+            Action = aSimpleConvertToExpression
+            DisplayMode = nbdmImageAndText
+          end
+        end
       end
     end
     object tsExpression: TTabSheet
@@ -211,30 +224,36 @@ inherited dSearch: TdSearch
     Left = 116
     Top = 432
     LangData = {
-      070064536561726368010100000003000000070043617074696F6E0118000000
+      070064536561726368010100000003000000070043617074696F6E011E000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
       6243616E63656C01010000000C000000070043617074696F6E000300624F4B01
       010000000F000000070043617074696F6E0005006248656C7001010000001200
-      0000070043617074696F6E0009006C4372697465726961010100000015000000
-      070043617074696F6E001000747653696D706C65437269746572696100000800
-      676253656172636801010000001B000000070043617074696F6E000500726241
-      6C6C01010000001E000000070043617074696F6E000A00726243757247726F75
-      70010100000021000000070043617074696F6E000F0072625365617263685265
-      73756C7473010100000024000000070043617074696F6E000600625265736574
-      010100000027000000070043617074696F6E000A007063437269746572696100
-      000800747353696D706C65010100000028000000070043617074696F6E000C00
-      747345787072657373696F6E010100000029000000070043617074696F6E000B
-      006545787072657373696F6E00000900646B45787072546F7000000A00746245
-      7870724D61696E01020000002A000000070043617074696F6E2B0000000B0043
-      686576726F6E48696E74001000736D45787072496E7365727450726F70010200
-      00002C000000070043617074696F6E2E000000040048696E74001400736D4578
-      7072496E736572744F70657261746F7201020000002D00000007004361707469
-      6F6E2F000000040048696E740007007363704D61696E0104000000300000000D
-      00456E644F66546F6B656E4368723300000005005469746C65320000000E0054
-      69746C65466F6E742E4E616D65310000000C0054726967676572436861727300
-      0800706D53696D706C6500000F0069706D736D53696D706C6550726F70010100
-      000034000000070043617074696F6E000F0069706D53696D706C6544656C6574
-      65010100000035000000070043617074696F6E00}
+      0000070043617074696F6E001000747653696D706C6543726974657269610000
+      0800676253656172636801010000001B000000070043617074696F6E00050072
+      62416C6C01010000001E000000070043617074696F6E000A0072624375724772
+      6F7570010100000021000000070043617074696F6E000F007262536561726368
+      526573756C7473010100000024000000070043617074696F6E00060062526573
+      6574010100000027000000070043617074696F6E000A00706343726974657269
+      6100000800747353696D706C65010100000028000000070043617074696F6E00
+      0C00747345787072657373696F6E010100000029000000070043617074696F6E
+      000B006545787072657373696F6E00000900646B45787072546F7000000A0074
+      62457870724D61696E01020000002A000000070043617074696F6E2B0000000B
+      0043686576726F6E48696E74001000736D45787072496E7365727450726F7001
+      020000002C000000070043617074696F6E2E000000040048696E74001400736D
+      45787072496E736572744F70657261746F7201020000002D0000000700436170
+      74696F6E2F000000040048696E740007007363704D61696E0104000000300000
+      000D00456E644F66546F6B656E4368723300000005005469746C65320000000E
+      005469746C65466F6E742E4E616D65310000000C005472696767657243686172
+      73000800706D53696D706C6500000F0069706D736D53696D706C6550726F7001
+      0100000034000000070043617074696F6E000F0069706D53696D706C6544656C
+      65746500000B00646B53696D706C65546F7000000C00746253696D706C654D61
+      696E010200000036000000070043617074696F6E370000000B0043686576726F
+      6E48696E74000600616C4D61696E00000F006153696D706C65437244656C6574
+      65010200000038000000070043617074696F6E39000000040048696E74000F00
+      6253696D706C65437244656C65746500001A006153696D706C65436F6E766572
+      74546F45787072657373696F6E01020000003A000000070043617074696F6E3B
+      000000040048696E74001A006253696D706C65436F6E76657274546F45787072
+      657373696F6E0000}
   end
   object scpMain: TSynCompletionProposal
     Options = [scoLimitToMatchedText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
@@ -267,10 +286,23 @@ inherited dSearch: TdSearch
       Caption = '&Picture property'
     end
     object ipmSimpleDelete: TTBXItem
+      Action = aSimpleCrDelete
+    end
+  end
+  object alMain: TActionList
+    Images = fMain.ilActionsSmall
+    Left = 132
+    Top = 124
+    object aSimpleCrDelete: TAction
       Caption = '&Delete'
+      Hint = 'Delete selected criterion'
       ImageIndex = 7
-      ShortCut = 16430
-      OnClick = ipmSimpleDeleteClick
+      OnExecute = aaSimpleCrDelete
+    end
+    object aSimpleConvertToExpression: TAction
+      Caption = 'Convert to e&xpression'
+      Hint = 'Convert selected criteria to search expression'
+      OnExecute = aaSimpleConvertToExpression
     end
   end
 end

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.15 2004-10-23 14:05:08 dale Exp $
+//  $Id: phDlg.pas,v 1.16 2004-11-22 18:47:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -68,6 +68,8 @@ type
     procedure EndUpdate;
      // Настраивает разрешённость и вид кнопок
     procedure UpdateButtons; virtual;
+     // True, если FLockCounter>0
+    function  UpdateLocked: Boolean;
      // Props
      // -- Если True, данные в диалоге допустимы. В базовом классе всегда возвращает True
     property DataValid: Boolean read GetDataValid;
@@ -285,6 +287,11 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     if FLockCounter>0 then Exit;
     bOK.Enabled := (OKIgnoresModified or Modified) and (OKIgnoresDataValidity or DataValid);
     bCancel.Caption := ConstVal(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
+  end;
+
+  function TPhoaDialog.UpdateLocked: Boolean;
+  begin
+    Result := FLockCounter>0;
   end;
 
   procedure TPhoaDialog.WMHelp(var Msg: TWMHelp);
