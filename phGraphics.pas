@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.9 2004-09-27 17:07:22 dale Exp $
+//  $Id: phGraphics.pas,v 1.10 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -98,7 +98,9 @@ type
   function  GetThumbnailData(const sFileName: String; iMaxWidth, iMaxHeight: Integer; StretchFilter: TStretchFilter; bJPEGQuality: Byte; out iWidth, iHeight, iThWidth, iThHeight: Integer): String;
    // Отрисовывает эскиз на битмэпе в заданном прямоугольнике. В r возвращает фактически использованный для отрисовки
    //   прямоугольник
-  procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect);
+  procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect); overload;
+  procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32; var r: TRect); overload;
+  procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32); overload;
 
 const
   BColor_Alpha_Transparent = $00;
@@ -348,6 +350,20 @@ var
        // Отрисовываем изображение на битмэпе
       Bitmap32.Draw(r.Left, r.Top, rSrc, BMPThumbBuffer);
     end;
+  end;
+
+  procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32; var r: TRect);
+  var sThData: String;
+  begin
+    SetString(sThData, PChar(Pic.ThumbnailData), Pic.ThumbnailDataSize);
+    PaintThumbnail(sThData, Pic.Rotation, Pic.Flips, Bitmap32, r);
+  end;
+
+  procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32);
+  var r: TRect;
+  begin
+    r := Bitmap32.BoundsRect;
+    PaintThumbnail(Pic, Bitmap32, r);
   end;
 
    //===================================================================================================================

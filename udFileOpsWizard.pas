@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.20 2004-10-06 14:41:10 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.21 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit udFileOpsWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phIntf, phMutableIntf, phObj,
-  phWizard, Registry, GraphicEx,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  GraphicEx, GR32, phWizard, phIntf, phMutableIntf, phObj, ConsVars, phGraphics,  
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
@@ -138,7 +138,7 @@ type
     function  LogPage_GetLog(iPageID: Integer): TStrings;
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
      // IPhoaWizardPageHost_Process
-    procedure ProcPage_PaintThumbnail(Bitmap: TBitmap);
+    procedure ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
     function  ProcPage_GetCurrentStatus: String;
     function  ProcPage_GetProcessingActive: Boolean;
     function  ProcPage_GetProgressCur: Integer;
@@ -341,7 +341,7 @@ uses
     FFilePath := sFilePath;
     FFileSize := iFileSize;
     FFileTime := dFileTime;
-    FPics     := TPhoaMutablePicList.Create(True);
+    FPics     := NewPhoaMutablePicList(True);
   end;
 
    //===================================================================================================================
@@ -549,7 +549,6 @@ uses
   end;
 
   procedure TFileOpThread.DoDeletePic(Pic: IPhoaPic);
-  var pTPic: TPhoaPic;
 
      // Рекурсивно удаляет изображение из группы Group и её подгрупп
     procedure DelID(Group: TPhoaGroup; iID: Integer);
@@ -560,13 +559,11 @@ uses
     end;
 
   begin
+    FChangesMade := True;
      // Удаляем все ссылки на изображения
     DelID(FWizard.PhoA.RootGroup, Pic.ID);
      // Удаляем изображение
-    pTPic := TPhoaPic(Pic.Handle);
-    Pic := nil;
-    pTPic.Free;
-    FChangesMade := True;
+    (Pic as IPhotoAlbumPic).Release;
   end;
 
   procedure TFileOpThread.DoDelPicAndFile(Pic: IPhoaPic);
@@ -598,7 +595,7 @@ uses
 
   procedure TFileOpThread.DoRepairFileLink(Pic: IPhoaPic);
   begin
-    //!!! Написать repair routine
+    //#ToDo3: Написать repair routine
   end;
 
   procedure TFileOpThread.DoUpdateFileLink(Pic: IPhoaMutablePic; const sNewFileName: String);
@@ -733,7 +730,7 @@ uses
   var i: Integer;
   begin
      // Добавляем изображения
-    FSelectedPics := TPhoaMutablePicList.Create(True);
+    FSelectedPics := NewPhoaMutablePicList(True);
     case SelPicMode of
       fospmSelPics:   FSelectedPics.Assign(FViewerSelPics);
       fospmAll:       FSelectedPics.Assign(FPhoA.Pics);
@@ -909,7 +906,7 @@ uses
     Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    sOptPageTitle);
     Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   sOptPageTitle);
     Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{!!!},                      ConstVal('SWzPageFileOps_RepairSelLinks'));                        
+    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{#ToDo3: Завести HelpTopic}, ConstVal('SWzPageFileOps_RepairSelLinks'));                        
     Controller.CreatePage(TfrWzPage_Processing,            IWzFileOpsPageID_Processing,     IDH_intf_file_ops_process,   ConstVal('SWzPageFileOps_Processing'));
     Controller.CreatePage(TfrWzPage_Log,                   IWzFileOpsPageID_Log,            IDH_intf_file_ops_log,       ConstVal('SWzPageFileOps_Log'));
     Controller.SetVisiblePageID(IWzFileOpsPageID_SelTask, pcmForced);
@@ -1019,9 +1016,9 @@ uses
     Result := FInitialPicCount;
   end;
 
-  procedure TdFileOpsWizard.ProcPage_PaintThumbnail(Bitmap: TBitmap);
+  procedure TdFileOpsWizard.ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
   begin
-//!!!    if FSelectedPics.Count>0 then FSelectedPics[0].PaintThumbnail(Bitmap);
+    if FSelectedPics.Count>0 then PaintThumbnail(FSelectedPics[0], Bitmap32);
   end;
 
   procedure TdFileOpsWizard.Repair_SelectFiles;

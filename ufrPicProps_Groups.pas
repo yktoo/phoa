@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.8 2004-10-06 14:41:11 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.9 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -77,7 +77,7 @@ type
         end;
          // ≈сли есть - составл€ем список изображений
         if bChanges then begin
-          Pics := TPhoaMutablePicList.Create(False);
+          Pics := NewPhoaMutablePicList(False);
           for i := 0 to EditedPics.Count-1 do begin
             Pic := EditedPics[i];
             bLinked := pgd.Group.IsPicLinked(Pic.ID, False);

@@ -5,6 +5,7 @@ inherited frWzPage_Processing: TfrWzPage_Processing
     Width = 576
     Height = 284
     Anchors = []
+    ParentBackground = False
     TabOrder = 0
     DesignSize = (
       576
@@ -19,13 +20,16 @@ inherited frWzPage_Processing: TfrWzPage_Processing
       AutoSize = False
       Layout = tlBottom
     end
-    object iThumb: TImage
+    object iThumb: TImage32
       Left = 28
       Top = 20
       Width = 524
       Height = 145
       Anchors = [akLeft, akTop, akRight, akBottom]
-      Center = True
+      BitmapAlign = baCenter
+      Scale = 1.000000000000000000
+      ScaleMode = smNormal
+      TabOrder = 2
     end
     object pbMain: TProgressBar
       Left = 24

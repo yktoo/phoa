@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Processing.pas,v 1.3 2004-09-11 17:52:36 dale Exp $
+//  $Id: ufrWzPage_Processing.pas,v 1.4 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phWizard, StdCtrls, ComCtrls, ExtCtrls;
+  phWizard, StdCtrls, ComCtrls, ExtCtrls, GR32, GR32_Image;
 
 type
   TfrWzPage_Processing = class(TWizardPage)
@@ -18,7 +18,7 @@ type
     lInfo: TLabel;
     pbMain: TProgressBar;
     bInterrupt: TButton;
-    iThumb: TImage;
+    iThumb: TImage32;
     procedure bInterruptClick(Sender: TObject);
   private
     procedure WMPageUpdate(var Msg: TMessage); message WM_PAGEUPDATE;
@@ -35,6 +35,7 @@ uses phUtils;
   procedure TfrWzPage_Processing.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin
     inherited BeforeDisplay(ChangeMethod);
+    iThumb.Bitmap.SetSize(iThumb.Width, iThumb.Height);
     pbMain.Position := 0;
   end;
 
@@ -53,7 +54,7 @@ uses phUtils;
     bActive: Boolean;
   begin
     bInterrupt.Enabled := True;
-    iThumb.Picture := nil;
+    iThumb.Bitmap.Clear(Color32(gbMain.Color));
     IProcess := StorageForm as IPhoaWizardPageHost_Process;
     bActive := IProcess.ProcessingActive;
      // Обновляем статус
@@ -62,7 +63,7 @@ uses phUtils;
     if bActive then begin
       pbMain.Max      := IProcess.ProgressMax;
       pbMain.Position := IProcess.ProgressCur;
-      IProcess.PaintThumbnail(iThumb.Picture.Bitmap);
+      IProcess.PaintThumbnail(iThumb.Bitmap);
     end;
     bInterrupt.Caption := ConstVal(iif(bActive, 'SBtn_Interrupt', 'SBtn_Continue'));
     bInterrupt.Cancel  := bActive;

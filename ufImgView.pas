@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.30 2004-10-06 15:28:52 dale Exp $
+//  $Id: ufImgView.pas,v 1.31 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -488,7 +488,7 @@ uses
      // Показываем курсор
     AdjustCursorVisibility(True);
      // Редактируем изображение
-    Pics := TPhoaMutablePicList.Create(False);
+    Pics := NewPhoaMutablePicList(False);
     Pics.Add(FPic, False);
     bEdited := EditPics(Pics, FPhoA, FUndoOperations);
      // Возвращаем topmost-положение окну
@@ -1007,7 +1007,7 @@ uses
     end;
      // Настраиваем фильтр ресэмплинга
     iMain.Bitmap.StretchFilter := FStretchFilter;
-     // !!!
+     //#TODO: Применить здесь карту для histogram adjustment
     iMain.Bitmap.DrawMode := dmCustom;
     iMain.Bitmap.OnPixelCombine := BitmapPixelCombine;
   end;
@@ -1197,7 +1197,7 @@ uses
      // Настраиваем доступность инструментов в pmMain
     if gipmTools.Count>0 then begin
        // Добавляем просматриваемое изображение
-      Pics := TPhoaMutablePicList.Create(False);
+      Pics := NewPhoaMutablePicList(False);
       if not FErroneous then Pics.Add(FPic, False);
       AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, gipmTools, Pics);
     end;
@@ -1318,7 +1318,7 @@ uses
   begin
     if not FErroneous then begin
        // Создаём массив ссылок на изображения
-      Pics := TPhoaMutablePicList.Create(True);
+      Pics := NewPhoaMutablePicList(True);
        // Добавляем просматриваемое изображение
       Pics.Add(FPic, True);
        // Выполняем инструмент

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.46 2004-10-06 14:41:10 dale Exp $
+//  $Id: Main.pas,v 1.47 2004-10-08 12:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -1237,7 +1237,7 @@ uses
       with FViewer do begin
         Parent            := Self;
         Align             := alClient;
-//!!!DisplayMode       := tvdmDetail;
+        //#TODO: Выставлять DisplayMode := tvdmDetail или tvdmTile;
         DragCursor        := crDragMove;
         PopupMenu         := pmPics;
         OnDragDrop        := ViewerDragDrop;
@@ -1531,9 +1531,9 @@ uses
        // Рекурсивный режим
       else begin
          // Создаём временный [сортированный] список изображений, чтобы быстро отсеивать уже добавленные изображения
-        UniquePics := TPhoaMutablePicList.Create(True);
+        UniquePics := NewPhoaMutablePicList(True);
          // Создаём список изображений для просмотра
-        ViewPics := TPhoaMutablePicList.Create(False);
+        ViewPics := NewPhoaMutablePicList(False);
          // Рекурсивно наполняем список
         RecursivelyAddPics(CurGroup);
          // Сохраняем список 

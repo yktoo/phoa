@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.9 2004-10-05 13:16:35 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.10 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -277,7 +277,7 @@ uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
        //   отмеченных в дереве групп
       end else begin
         FSelGroupCount := 0;
-        GroupPics := TPhoaMutablePicList.Create(True);
+        GroupPics := NewPhoaMutablePicList(True);
         n := tvGroups.GetFirst;
         while n<>nil do begin
           if n.CheckState=csCheckedNormal then begin

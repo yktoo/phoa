@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.12 2004-10-06 15:28:52 dale Exp $
+//  $Id: udSearch.pas,v 1.13 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -622,7 +622,7 @@ type
     inherited InitializeDialog;
     HelpContext := IDH_intf_search;
     OKIgnoresModified := True;
-    FLocalResults     := TPhoaMutablePicList.Create(False);
+    FLocalResults     := NewPhoaMutablePicList(False);
      // Загружаем списки мест, номеров плёнок, авторов
     SLPhoaPlaces      := NewSL;
     SLPhoaFilmNumbers := NewSL;

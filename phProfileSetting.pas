@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phProfileSetting.pas,v 1.2 2004-09-22 15:12:33 dale Exp $
+//  $Id: phProfileSetting.pas,v 1.3 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -135,20 +135,20 @@ type
   begin
     inherited Assign(Source);
     if Source is TPhoaProfileSetting then begin
-      //!!!
+    //#ToDo: Код для профиля
     end;
   end;
 
   constructor TPhoaProfileSetting.Create(AOwner: TPhoaSetting; const sName: String);
   begin
     inherited Create(AOwner, 0, sName);
-    //!!!
+    //#ToDo: Код для профиля
   end;
 
   constructor TPhoaProfileSetting.CreateNew(AOwner: TPhoaSetting);
   begin
     inherited CreateNew(AOwner);
-    //!!!
+    //#ToDo: Код для профиля
   end;
 
   function TPhoaProfileSetting.GetModified: Boolean;

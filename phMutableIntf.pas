@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.3 2004-10-06 14:41:10 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.4 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -21,16 +21,22 @@ type
      // Rebuilds thumbnail and updates thumbnail, image and file parameters
     procedure ReloadPicFileData; stdcall;
      // Prop handlers
+    procedure SetDate(Value: Integer); stdcall; 
     procedure SetFileName(Value: PAnsiChar); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
+    procedure SetTime(Value: Integer); stdcall; 
      // Props
+     // -- Date
+    property Date: Integer read GetDate write SetDate;
      // -- Picture file name
     property FileName: PAnsiChar read GetFileName write SetFileName;
      // -- Picture flip flags
     property Flips: TPicFlips read GetFlips write SetFlips;
      // -- Picture rotation
     property Rotation: TPicRotation read GetRotation write SetRotation;
+     // -- Time
+    property Time: Integer read GetTime write SetTime;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------

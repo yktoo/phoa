@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.13 2004-09-27 17:07:23 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.14 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufAddFilesWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phIntf, ConsVars, phObj, phWizard, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  GR32, phIntf, phMutableIntf, ConsVars, phObj, phWizard, phGraphics,
   Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
 
 type
@@ -34,7 +35,7 @@ type
      // Исходное количество добавляемых файлов
     FInitialFileCount: Integer;
      // Последнее добавленное изображение (nil, если нет)
-    FLastProcessedPic: TPhoaPic;
+    FLastProcessedPic: IPhoaPic;
      // Счётчик успешно добавленных изображений
     FCountSucceeded: Integer;
      // Счётчик сбойных изображений
@@ -63,7 +64,7 @@ type
     function  LogPage_GetLog(iPageID: Integer): TStrings;
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
      // IPhoaWizardPageHost_Process
-    procedure ProcPage_PaintThumbnail(Bitmap: TBitmap);
+    procedure ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
     function  ProcPage_GetCurrentStatus: String;
     function  ProcPage_GetProcessingActive: Boolean;
     function  ProcPage_GetProgressCur: Integer;
@@ -137,16 +138,16 @@ type
     FTimeFillResult: TDateTimeFillResult;
     FXFormFilled: Boolean;
      // Prop storage
-    FAddedPic: TPhoaPic;
+    FAddedPic: IPhoaPic;
      // Производит автозаполнение свойств изображения
-    procedure AutofillPicProps(Pic: TPhoaPic);
+    procedure AutofillPicProps(Pic: IPhoaMutablePic);
   protected
     procedure Execute; override;
   public
     constructor Create(Wizard: TfAddFilesWizard);
      // Props
      // -- Последнее добавленное изображение (nil, если нет или была ошибка)
-    property AddedPic: TPhoaPic read FAddedPic;
+    property AddedPic: IPhoaPic read FAddedPic;
   end;
 
    // Показывает мастер добавления файлов изображений. Возвращает True, если что-то в фотоальбоме было изменено
@@ -176,7 +177,7 @@ uses
    // TAddFilesThread
    //===================================================================================================================
 
-  procedure TAddFilesThread.AutofillPicProps(Pic: TPhoaPic);
+  procedure TAddFilesThread.AutofillPicProps(Pic: IPhoaMutablePic);
   type
      // Запись о требуемых преобразованиях
     TTransformRec = record
@@ -212,9 +213,7 @@ uses
         s := Metadata.EXIFData[idx];
          // Пытаемся преобразовать в дату
         try
-          Pic.PicDateTime :=
-            Frac(Pic.PicDateTime)+
-            EncodeDate(StrToInt(Copy(s, 1, 4)), StrToInt(Copy(s, 6, 2)), StrToInt(Copy(s, 9, 2)));
+          Pic.Date := DateToPhoaDate(EncodeDate(StrToInt(Copy(s, 1, 4)), StrToInt(Copy(s, 6, 2)), StrToInt(Copy(s, 9, 2))));
           Result := True;
         except
            // Не вышло
@@ -237,9 +236,7 @@ uses
         s := Metadata.EXIFData[idx];
          // Пытаемся преобразовать в дату
         try
-          Pic.PicDateTime :=
-            Int(Pic.PicDateTime)+
-            EncodeTime(StrToInt(Copy(s, 12, 2)), StrToInt(Copy(s, 15, 2)), StrToInt(Copy(s, 18, 2)), 0);
+          Pic.Time := TimeToPhoaTime(EncodeTime(StrToInt(Copy(s, 12, 2)), StrToInt(Copy(s, 15, 2)), StrToInt(Copy(s, 18, 2)), 0));
           Result := True;
         except
            // Не вышло
@@ -255,12 +252,12 @@ uses
       wy, wm, wd: Word;
     begin
       Result := False;
-      s := ExtractFileName(Pic.PicFileName);
+      s := ExtractFileName(Pic.FileName);
       wy := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
       wm := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
       wd := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
       try
-        Pic.PicDateTime := Frac(Pic.PicDateTime)+EncodeDate(wy, wm, wd);
+        Pic.Date := DateToPhoaDate(EncodeDate(wy, wm, wd));
         Result := True;
       except
         on EConvertError do { nothing };
@@ -275,7 +272,7 @@ uses
       t: TDateTime;
     begin
       Result := False;
-      s := ExtractFileName(Pic.PicFileName);
+      s := ExtractFileName(Pic.FileName);
        // Удаляем часть, отвечающую за дату
       ExtractFirstWord(s, ' ');
        // Извлекаем компоненты времени
@@ -285,7 +282,7 @@ uses
       try
         t := EncodeTime(bh, bm, bs, 0);
         if t>0 then begin
-          Pic.PicDateTime := Int(Pic.PicDateTime)+t;
+          Pic.Time := TimeToPhoaTime(t);
           Result := True;
         end;
       except
@@ -297,14 +294,14 @@ uses
     function FillDate(const Date: TDateTime): Boolean;
     begin
       Result := Date<>0;
-      if Result then Pic.PicDateTime := Frac(Pic.PicDateTime)+Date;
+      if Result then Pic.Date := DateToPhoaDate(Date);
     end;
 
      // Пытается заполнить время изображения из TDateTime. Возвращает True, если удалось
     function FillTime(const Time: TDateTime): Boolean;
     begin
       Result := Time<>0;
-      if Result then Pic.PicDateTime := Int(Pic.PicDateTime)+Time;
+      if Result then Pic.Time := TimeToPhoaTime(Time);
     end;
 
      // Возвращает True, если необходимо заполнить свойство с учётом его наличия и флага перезаписи значения
@@ -326,22 +323,22 @@ uses
          // Преобразуем (подпорка: первый символ в ORIENTATION - это цифра [1..8]) 
         bOrient := StrToIntDef(Copy(Metadata.EXIFData[idx], 1, 1), 0);
         if bOrient in [Low(aExifOrientXforms)..High(aExifOrientXforms)] then begin
-          Pic.PicRotation := aExifOrientXforms[bOrient].Rotation;
-          Pic.PicFlips    := aExifOrientXforms[bOrient].Flips;
+          Pic.Rotation := aExifOrientXforms[bOrient].Rotation;
+          Pic.Flips    := aExifOrientXforms[bOrient].Flips;
           FXformFilled := True;
         end;
       end;
     end;
 
   begin
-    if Int (Pic.PicDateTime)=0 then FDateFillResult := dtfrEmpty else FDateFillResult := dtfrSpecified;
-    if Frac(Pic.PicDateTime)=0 then FTimeFillResult := dtfrEmpty else FTimeFillResult := dtfrSpecified;
+    if Pic.Date=0 then FDateFillResult := dtfrEmpty else FDateFillResult := dtfrSpecified;
+    if Pic.Time=0 then FTimeFillResult := dtfrEmpty else FTimeFillResult := dtfrSpecified;
     FXFormFilled := False;
      // Если нужно, создаём объект метаданных
     if (NeedFill(FDateFillResult, FReplaceDate) and ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FDateAutofillProps<>[])) or
        (NeedFill(FTimeFillResult, FReplaceTime) and ([dtapExifDTOriginal, dtapExifDTDigitized, dtapExifDateTime]*FTimeAutofillProps<>[])) or
        FAutofillXForm then begin
-      Metadata := TImageMetadata.Create(Pic.PicFileName);
+      Metadata := TImageMetadata.Create(Pic.FileName);
       try
         if Metadata.StatusCode=IMS_OK then begin
            // Дата
@@ -366,7 +363,7 @@ uses
     if (NeedFill(FDateFillResult, FReplaceDate) and ([dtapDTFileCreated, dtapDTFileModified]*FDateAutofillProps<>[])) or
        (NeedFill(FTimeFillResult, FReplaceTime) and ([dtapDTFileCreated, dtapDTFileModified]*FTimeAutofillProps<>[])) then begin
       try
-        Namespace := TNamespace.CreateFromFileName(Pic.PicFileName);
+        Namespace := TNamespace.CreateFromFileName(Pic.FileName);
         try
            // Дата
           if NeedFill(FDateFillResult, FReplaceDate) and (dtapDTFileCreated  in FDateAutofillProps) and FillDate(Int(Namespace.CreationDateTime))   then FDateFillResult := dtfrCreation;
@@ -398,32 +395,35 @@ uses
   end;
 
   procedure TAddFilesThread.Execute;
-  var AddOp: TPhoaOp_InternalPicAdd;
   begin
-    while not Terminated do
-      with FWizard do begin
-         // Добавляем изображение
-        try
-          AddOp := TPhoaOp_InternalPicAdd.Create(AddOperations, PhoA, Group, FileList.Files[0]);
-          FAddedPic := AddOp.AddedPic;
-           // Производим автозаполнение свойств изображения
-          AutofillPicProps(FAddedPic);
-           // Пишем в протокол
-          LogSuccess(
-            'SLogEntry_AddingOK',
-            [FileList.Files[0],
-             DateTimeFillResultName(FDateFillResult),
-             DateTimeFillResultName(FTimeFillResult),
-             ConstVal(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
-        except
-          on e: Exception do begin
+    try
+      while not Terminated do
+        with FWizard do begin
+           // Добавляем изображение
+          try
             FAddedPic := nil;
-            LogFailure('SLogEntry_AddingError', [FileList.Files[0], e.Message]);
+            TPhoaOp_InternalPicAdd.Create(AddOperations, PhoA, Group, FileList.Files[0], FAddedPic);
+             // Производим автозаполнение свойств изображения
+            AutofillPicProps(FAddedPic as IPhoaMutablePic);
+             // Пишем в протокол
+            LogSuccess(
+              'SLogEntry_AddingOK',
+              [FileList.Files[0],
+               DateTimeFillResultName(FDateFillResult),
+               DateTimeFillResultName(FTimeFillResult),
+               ConstVal(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
+          except
+            on e: Exception do begin
+              FAddedPic := nil;
+              LogFailure('SLogEntry_AddingError', [FileList.Files[0], e.Message]);
+            end;
           end;
+           // Регистрируем результат
+          Synchronize(ThreadFileProcessed);
         end;
-         // Регистрируем результат
-        Synchronize(ThreadFileProcessed);
-      end;
+    finally
+      FAddedPic := nil;
+    end;
   end;
 
    //===================================================================================================================
@@ -556,9 +556,9 @@ uses
     Result := FInitialFileCount;
   end;
 
-  procedure TfAddFilesWizard.ProcPage_PaintThumbnail(Bitmap: TBitmap);
+  procedure TfAddFilesWizard.ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
   begin
-//!!!    if FLastProcessedPic<>nil then FLastProcessedPic.PaintThumbnail(Bitmap);
+    if FLastProcessedPic<>nil then PaintThumbnail(FLastProcessedPic, Bitmap32);
   end;
 
   procedure TfAddFilesWizard.SettingsRestore(rif: TRegIniFile);
@@ -643,6 +643,7 @@ uses
       FProcessingFiles := False;
       FAddFilesThread.Terminate;
       FAddFilesThread := nil;
+      FLastProcessedPic := nil;
        // Если список пуст, закрываем форму Мастера/показываем протокол
       if FFileList.Count=0 then
         if (FCountFailed=0) and SettingValueBool(ISettingID_Dlgs_APW_LogOnErrOnly) then

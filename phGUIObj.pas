@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.18 2004-10-06 15:28:52 dale Exp $
+//  $Id: phGUIObj.pas,v 1.19 2004-10-08 12:13:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -548,7 +548,7 @@ type
     FBorderStyle           := bsSingle;
     FColCount              := 1;
     FNoMoveItemIndex       := -1;
-    FSelectedPics          := TPhoaMutablePicList.Create(True);
+    FSelectedPics          := NewPhoaMutablePicList(True);
     FThumbBackBorderColor  := clGray;
     FThumbBackBorderStyle  := tbbsXP;
     FThumbBackColor        := clBtnFace;
@@ -1138,7 +1138,7 @@ type
         r.Top := r.Bottom-FTextLineHeight;
         DrawDetailsLR(tcLeftBottom, tcRightBottom, r);
       end;
-      tvdmDetail: {!!!};
+      tvdmDetail: ; //#TODO: Сделать отрисовку сведений в режиме Detail
     end;
   end;
 

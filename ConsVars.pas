@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.61 2004-10-06 15:28:52 dale Exp $
+//  $Id: ConsVars.pas,v 1.62 2004-10-08 12:13:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -262,7 +262,7 @@ type
      // Должна прерывать обработку 
     procedure StopProcessing;
      // Должна рисовать изображение обрабатываемого эскиза
-    procedure PaintThumbnail(Bitmap: TBitmap); 
+    procedure PaintThumbnail(Bitmap32: TBitmap32); 
      // Prop handlers
     function GetCurrentStatus: String;
     function GetProcessingActive: Boolean;
@@ -1340,8 +1340,9 @@ type
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_CfmRepairFLs,   '@ISettingID_Dlgs_FOW_CfmRepairFLs',   True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly,   '@ISettingID_Dlgs_FOW_LogOnErrOnly',   True);
      //== Профили ======================================================================================================
-    Lvl1 := TPhoaProfilePageSetting.Create(RootSetting, ISettingID_Profiles, iiProfile, '@ISettingID_Profiles', IDH_setup_tools{!!!});
-//!!!      Lvl2 := TPhoaProfileSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
+    Lvl1 := TPhoaProfilePageSetting.Create(RootSetting, ISettingID_Profiles, iiProfile, '@ISettingID_Profiles', IDH_setup_tools{#ToDo3: Завести HelpTopic});
+    //#TODO: Регистрация стандартных профилей
+    // Lvl2 := TPhoaProfileSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
      //== Инструменты ==================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_tools);
       Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
