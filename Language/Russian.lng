@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.1
-LastModified=2004-09-11 00:25:36
+LastModified=2004-09-15 20:12:59
 SourceLANGID=1033
 
 [fMain]
@@ -224,6 +224,9 @@ SourceLANGID=1033
 00000019=&по:
 00000029=Не учитывать\nТолько файлы, отсутствующие в фотоальбоме\nТолько файлы, присутствующие в фотоальбоме\n
 00000055=&Загружать папки вместе с подпапками
+00000056=Наименование
+00000057=Размер
+00000058=Изменён
 
 [frWzPageAddFiles_CheckFiles]
 00000012=&Отметить все файлы

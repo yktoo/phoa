@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.10 2004-09-11 17:52:36 dale Exp $
+;  $Id: phoa.dklang,v 1.11 2004-09-15 14:25:05 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -323,6 +323,9 @@ lPresence.Caption=00000016,&Photo album presence:
 lFileDateTo.Caption=00000019,&to:
 cbPresence.Items=00000029,Disregard\nOnly files which are absent at the photo album\nOnly files which are present at the photo album\n
 cbRecurseFolders.Caption=00000055,&Recurse subfolders
+tvMain.Header.Columns[0].Text=00000056,Name
+tvMain.Header.Columns[1].Text=00000057,Size
+tvMain.Header.Columns[2].Text=00000058,Modified
 
 [frWzPageAddFiles_CheckFiles]
 aFilesCheckAll.Caption=00000012,Check &all files
