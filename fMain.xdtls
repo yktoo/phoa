@@ -982,6 +982,14 @@
           <tranEntry langID="1046" value="Animate startup splash fadeout (Windows 2000+)"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="ISettingID_Dlgs_SplashStartShow">
+        <tranEntries>
+          <tranEntry langID="1049" value="Отображать заставку при запуске"/>
+          <tranEntry langID="1033" value="Show splash screen at startup"/>
+          <tranEntry langID="1031" value="Show splash screen at startup"/>
+          <tranEntry langID="1046" value="Show splash screen at startup"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="ISettingID_Gen">
         <tranEntries>
           <tranEntry langID="1049" value="Общие"/>

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.26 2004-05-23 13:23:09 dale Exp $
+//  $Id: ConsVars.pas,v 1.27 2004-05-24 05:31:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -709,7 +709,8 @@ const
     ISettingID_View_SlideCyclic        = 2061; // Slideshow: Циклический просмотр
    //===================================================================================================================
   ISettingID_Dialogs                   = 3001; // Диалоги
-  ISettingID_Dlgs_SplashStartFade      = 3006; // Анимированное скрытие заставки
+  ISettingID_Dlgs_SplashStartShow      = 3005; // Отображать заставку при запуске
+    ISettingID_Dlgs_SplashStartFade    = 3006; // Анимированное скрытие заставки
   ISettingID_Dlgs_SplashAboutFade      = 3008; // Анимированное скрытие окна "О программе"
   ISettingID_Dlgs_Confms               = 0;    // Подтверждения
     ISettingID_Dlgs_ConfmDelGroup      = 3010; // Подтверждение: Перед удалением группы
@@ -1134,7 +1135,8 @@ type
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //== Диалоги ======================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Dialogs, iiDialog, '@ISettingID_Dialogs', IDH_setup_dialogs);
-      Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashStartFade,  '@ISettingID_Dlgs_SplashStartFade', True);
+      Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashStartShow,  '@ISettingID_Dlgs_SplashStartShow', True);
+        Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_SplashStartFade,  '@ISettingID_Dlgs_SplashStartFade', True);
       Lvl2 := TPhoaBoolSetting.Create(Lvl1, ISettingID_Dlgs_SplashAboutFade,  '@ISettingID_Dlgs_SplashAboutFade', True);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
