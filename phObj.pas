@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.19 2004-06-06 18:10:55 dale Exp $
+//  $Id: phObj.pas,v 1.20 2004-06-08 13:43:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -162,6 +162,7 @@ type
     function  GetFreeID: Integer;
     function  GetRoot: TPhoaGroup;
     function  GetGroupByID(iID: Integer): TPhoaGroup;
+    function GetProps(GroupProp: TGroupProperty): String;
   public
     constructor Create(_Owner: TPhoaGroup; iID: Integer);
     destructor Destroy; override;
@@ -176,6 +177,10 @@ type
     procedure SortPics(Sortings: TPhoaSortings; Pics: TPhoaPics);
      // Рекурсивно просматривает группу и все подгруппы, назначая ID группам, его не имеющим
     procedure FixupIDs;
+     // Составляет описание группы из свойств Props, выбирая только указанные данные.
+     //   Если задано sNameValSep, то выводит также наименование свойств, разделяя имя от значения этой строкой.
+     //   sPropSep - разделительная строка между отдельными свойствами
+    function  GetPropStrs(Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
      // Props
      // -- Описание
     property Description: String read FDescription write FDescription;
@@ -202,6 +207,8 @@ type
     property Path[const sRootName: String]: String read GetPath;
      // -- Список ID изображений, входящих в группу
     property PicIDs: TIntegerList read FPicIDs;
+     // -- Свойства по индексу
+    property Props[GroupProp: TGroupProperty]: String read GetProps;
      // -- Возвращает окончательного владельца всех групп иерархии
     property Root: TPhoaGroup read GetRoot;
      // -- Текст (наименование) группы
@@ -2253,6 +2260,32 @@ type
   function TPhoaGroup.GetPath(const sRootName: String): String;
   begin
     if FOwner=nil then Result := sRootName else Result := FOwner.Path[sRootName]+'/'+FText;
+  end;
+
+  function TPhoaGroup.GetProps(GroupProp: TGroupProperty): String;
+  begin
+    Result := '';
+    case GroupProp of
+      gpID:          Result := IntToStr(FID);
+      gpText:        Result := FText;
+      gpDescription: Result := FDescription;
+    end;
+  end;
+
+  function TPhoaGroup.GetPropStrs(Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
+  var
+    Prop: TGroupProperty;
+    sVal: String;
+  begin
+    Result := '';
+    for Prop := Low(Prop) to High(Prop) do
+      if Prop in Props then begin
+        sVal := GetProps(Prop);
+        if sVal<>'' then begin
+          if sNameValSep<>'' then sVal := GroupPropName(Prop)+sNameValSep+sVal;
+          AccumulateStr(Result, sPropSep, sVal);
+        end;
+      end;
   end;
 
   function TPhoaGroup.GetRoot: TPhoaGroup;

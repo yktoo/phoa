@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.22 2004-06-06 13:29:45 dale Exp $
+//  $Id: Main.pas,v 1.23 2004-06-08 13:43:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -226,6 +226,7 @@ type
     procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvGroupsEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
@@ -261,12 +262,14 @@ type
     FHNextClipbrdViewer: HWND;
      // Стек операций для отмены
     FOperations: TPhoaOperations;
+     // Набор свойств, которые требуется отображать в подсказках дерева групп
+    FGroupTreeHintProps: TGroupProperties;
      // Флаги, указывающие на то, что инструменты popup-меню групп и вьюера прошли проверку на доступность текущим
      //   выделенным изображениям
     FGroupsPopupToolsValidated: Boolean;
     FPicsPopupToolsValidated: Boolean;
      // Флаг того, что инициализация формы окончена
-    FInitialized: Boolean; 
+    FInitialized: Boolean;
      // Prop storage
     FViewer: TThumbnailViewer;
     FViewIndex: Integer;
@@ -794,6 +797,8 @@ uses
     end;
      // Настраиваем дерево групп
     ApplyTreeSettings(tvGroups);
+    tvGroups.HintMode := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+    FGroupTreeHintProps := IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps));
      // Настраиваем Viewer
     with Viewer do begin
       BeginUpdate;
@@ -1598,6 +1603,13 @@ uses
                                                  //   корневой. Иначе, когда активно представление, можно редактировать
                                                  //   только корневой узел (само представление)
       (Node<>FSearchedNode);                     // Узел результатов поиска редактировать нельзя вообще
+  end;
+
+  procedure TfMain.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  begin
+    CellText := AnsiToUnicodeCP(
+      PPhoaGroup(Sender.GetNodeData(Node))^.GetPropStrs(FGroupTreeHintProps, ': ', S_CRLF),
+      cMainCodePage);
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

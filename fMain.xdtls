@@ -436,6 +436,28 @@
           <tranEntry langID="1058" value="По хвилині часу"/>
         </tranEntries>
       </propEntry>
+      <propEntry name="gpDescription">
+        <tranEntries>
+          <tranEntry langID="1049" value="Описание"/>
+          <tranEntry langID="1033" value="Description"/>
+          <tranEntry langID="1031" value="Beschreibung"/>
+          <tranEntry langID="1046" value="Descriзгo"/>
+          <tranEntry langID="1058" value="Опис"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="gpID">
+        <tranEntries>
+          <tranEntry langID="1049" value="ID"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="gpText">
+        <tranEntries>
+          <tranEntry langID="1049" value="Текст"/>
+          <tranEntry langID="1033" value="Text"/>
+          <tranEntry langID="1031" value="Text"/>
+          <tranEntry langID="1046" value="Text"/>
+        </tranEntries>
+      </propEntry>
       <propEntry name="IMS_CannotOpenFile">
         <tranEntries>
           <tranEntry langID="1049" value="Невозможно открыть файл"/>
@@ -560,6 +582,55 @@
           <tranEntry langID="1031" value="Browser\nModus"/>
           <tranEntry langID="1046" value="Modo de\nListagem"/>
           <tranEntry langID="1058" value="Режим\nогляду"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GT_HintInfo">
+        <tranEntries>
+          <tranEntry langID="1049" value="Отображать с выбранными свойствами"/>
+          <tranEntry langID="1033" value="Display with selected properties"/>
+          <tranEntry langID="1031" value="Display with selected properties"/>
+          <tranEntry langID="1046" value="Display with selected properties"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GT_HintNone">
+        <tranEntries>
+          <tranEntry langID="1049" value="Не отображать"/>
+          <tranEntry langID="1033" value="None"/>
+          <tranEntry langID="1031" value="None"/>
+          <tranEntry langID="1046" value="None"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GT_HintProps">
+        <tranEntries>
+          <tranEntry langID="1049" value="Отображать во всплывающих описаниях"/>
+          <tranEntry langID="1033" value="Display in tooltips"/>
+          <tranEntry langID="1031" value="In Tooltips anzeigen"/>
+          <tranEntry langID="1046" value="Mostrar informaзгo de"/>
+          <tranEntry langID="1058" value="Відображувати в спливаючих описах"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GT_Hints">
+        <tranEntries>
+          <tranEntry langID="1049" value="Всплывающие подсказки"/>
+          <tranEntry langID="1033" value="Tooltips"/>
+          <tranEntry langID="1031" value="Tooltips"/>
+          <tranEntry langID="1046" value="Tooltips"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GT_HintTips">
+        <tranEntries>
+          <tranEntry langID="1049" value="Отображать, если строка не помещается в окне"/>
+          <tranEntry langID="1033" value="Display if item is truncated at window edge"/>
+          <tranEntry langID="1031" value="Display if item is truncated at window edge"/>
+          <tranEntry langID="1046" value="Display if item is truncated at window edge"/>
+        </tranEntries>
+      </propEntry>
+      <propEntry name="ISettingID_Browse_GTree">
+        <tranEntries>
+          <tranEntry langID="1049" value="Деревья групп изображений"/>
+          <tranEntry langID="1033" value="Picture group trees"/>
+          <tranEntry langID="1031" value="Picture group trees"/>
+          <tranEntry langID="1046" value="Picture group trees"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ISettingID_Browse_MaxUndoCount">

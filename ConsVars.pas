@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.37 2004-06-06 18:12:27 dale Exp $
+//  $Id: ConsVars.pas,v 1.38 2004-06-08 13:43:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -27,6 +27,12 @@ type
    // Свойства группы
   TGroupProperty = (gpID, gpText, gpDescription);
   TGroupProperties = set of TGroupProperty;
+
+   // Режим отображения всплывающих подсказок для деревьев с группами
+  TGroupTreeHintMode = (
+    gthmNone,  // Не отображать подсказок
+    gthmTips,  // Отображать tooltips (т.е. показывать надписи, не вмещающиеся в окно)
+    gthmInfo); // Отображать подсказки с заданными данными
 
    // Типы данных свойств изображения
   TPicPropertyDatatype = (ppdInteger, ppdString, ppdPixelFormat, ppdDate, ppdTime, ppdStrings);
@@ -695,23 +701,29 @@ const
     ISettingID_Gen_TreeSelBlended      = 0;    // Оттенённый прямоугольник
    //===================================================================================================================
   ISettingID_Browse                    = 1001; // Режим обзора
+  ISettingID_Browse_GTree              = 1010; // Деревья групп
+    ISettingID_Browse_GT_Hints         = 1011; // Деревья групп: Всплывающие подсказки
+    ISettingID_Browse_GT_HintNone      = 1012; // Деревья групп: Всплывающие подсказки: не отображать
+    ISettingID_Browse_GT_HintTips      = 1013; // Деревья групп: Всплывающие подсказки: отображать tooltips
+    ISettingID_Browse_GT_HintInfo      = 1014; // Деревья групп: Всплывающие подсказки: отображать выбранные свойства
+    ISettingID_Browse_GT_HintProps     = 1015; // Деревья групп: Свойства для отображения
   ISettingID_Browse_Viewer             = 0;    // Viewer
-    ISettingID_Browse_ViewerBkColor    = 1010; // Viewer: Цвет фона
-    ISettingID_Browse_ViewerThBColor   = 1011; // Viewer: Цвет фона эскиза
-    ISettingID_Browse_ViewerThFColor   = 1012; // Viewer: Цвет шрифта эскиза
-    ISettingID_Browse_ViewerDragDrop   = 1013; // Viewer: Drag'n'Drop
-    ISettingID_Browse_ViewerTooltips   = 1014; // Viewer: Показывать всплывающие описания эскизов
-    ISettingID_Browse_ViewerTipProps   = 1015; // Viewer: Отображать во всплывающих описаниях
-    ISettingID_Browse_ViewerThInfo     = 1020; // Viewer: Данные, отображаемые на эскизах
-    ISettingID_Browse_ViewerThLTProp   = 1021; // Viewer: Left top corner
-    ISettingID_Browse_ViewerThRTProp   = 1022; // Viewer: Right top corner
-    ISettingID_Browse_ViewerThLBProp   = 1023; // Viewer: Left bottom corner
-    ISettingID_Browse_ViewerThRBProp   = 1024; // Viewer: Right bottom corner
-    ISettingID_Browse_ViewerThBorder   = 1030; // Viewer: Чёткие границы эскиза
-    ISettingID_Browse_ViewerCacheThs   = 1040; // Viewer: Кэшировать эскизы при просмотре
-    ISettingID_Browse_ViewerCacheSze   = 1041; // Viewer: Размер кэша эскизов
-    ISettingID_Browse_ViewerStchFilt   = 1050; // Viewer: Метод ресэмплинга эскизов
-    ISettingID_Browse_MaxUndoCount     = 1060; // Макс. количество операций в буфере отмены
+    ISettingID_Browse_ViewerBkColor    = 1110; // Viewer: Цвет фона
+    ISettingID_Browse_ViewerThBColor   = 1111; // Viewer: Цвет фона эскиза
+    ISettingID_Browse_ViewerThFColor   = 1112; // Viewer: Цвет шрифта эскиза
+    ISettingID_Browse_ViewerDragDrop   = 1113; // Viewer: Drag'n'Drop
+    ISettingID_Browse_ViewerTooltips   = 1114; // Viewer: Показывать всплывающие описания эскизов
+    ISettingID_Browse_ViewerTipProps   = 1115; // Viewer: Отображать во всплывающих описаниях
+    ISettingID_Browse_ViewerThInfo     = 1120; // Viewer: Данные, отображаемые на эскизах
+    ISettingID_Browse_ViewerThLTProp   = 1121; // Viewer: Left top corner
+    ISettingID_Browse_ViewerThRTProp   = 1122; // Viewer: Right top corner
+    ISettingID_Browse_ViewerThLBProp   = 1123; // Viewer: Left bottom corner
+    ISettingID_Browse_ViewerThRBProp   = 1124; // Viewer: Right bottom corner
+    ISettingID_Browse_ViewerThBorder   = 1130; // Viewer: Чёткие границы эскиза
+    ISettingID_Browse_ViewerCacheThs   = 1140; // Viewer: Кэшировать эскизы при просмотре
+    ISettingID_Browse_ViewerCacheSze   = 1141; // Viewer: Размер кэша эскизов
+    ISettingID_Browse_ViewerStchFilt   = 1150; // Viewer: Метод ресэмплинга эскизов
+  ISettingID_Browse_MaxUndoCount       = 1260; // Макс. количество операций в буфере отмены
    //===================================================================================================================
   ISettingID_View                      = 2001; // Режим просмотра
   ISettingID_View_AlwaysOnTop          = 2010; // Окно просмотра поверх всех окон
@@ -963,6 +975,12 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting, u
       Setting.Variants.AddObject('@'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Pointer(Prop));
   end;
 
+  procedure AddGroupPropSettings(Owner: TPhoaIntSetting);
+  var Prop: TGroupProperty;
+  begin
+    for Prop := Low(Prop) to High(Prop) do TPhoaMaskBitSetting.Create(Owner, 0, '@'+GetEnumName(TypeInfo(TGroupProperty), Byte(Prop)));
+  end;
+
   procedure AddPicClipboardFormatSettings(Owner: TPhoaIntSetting);
   var pcf: TPicClipboardFormat;
   begin
@@ -1115,6 +1133,13 @@ type
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //== Режим обзора =================================================================================================
     Lvl1 := TPhoaValPageSetting.Create(RootSetting, ISettingID_Browse, iiFolder, '@ISettingID_Browse', IDH_setup_browse_mode);
+      Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_GTree,         '@ISettingID_Browse_GTree');
+        Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Browse_GT_Hints,  '@ISettingID_Browse_GT_Hints', 1 {gthmTips}, 0, 2);
+          Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintNone,  '@ISettingID_Browse_GT_HintNone');
+          Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintTips,  '@ISettingID_Browse_GT_HintTips');
+          Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintInfo,  '@ISettingID_Browse_GT_HintInfo');
+          Lvl4 := TPhoaIntSetting.Create  (Lvl3, ISettingID_Browse_GT_HintProps,  '@ISettingID_Browse_GT_HintProps', GroupPropsToInt([gpID, gpDescription]), MinInt, MaxInt);
+          AddGroupPropSettings(Lvl4 as TPhoaIntSetting);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);

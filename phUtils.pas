@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.15 2004-06-03 20:33:39 dale Exp $
+//  $Id: phUtils.pas,v 1.16 2004-06-08 13:43:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -85,6 +85,11 @@ uses
   function  PicFlipText(PicFlip: TPicFlip): String;
    // Возвращает текст отражений изображения
   function  PicFlipsText(PicFlips: TPicFlips): String;
+   // Преобразование TGroupProperties <-> Integer
+  function  GroupPropsToInt(GroupProps: TGroupProperties): Integer;
+  function  IntToGroupProps(i: Integer): TGroupProperties;
+   // Возвращает наименование свойства группы
+  function  GroupPropName(GroupProp: TGroupProperty): String;
    // Возвращает наименование свойства изображения для группировки
   function  GroupByPropName(GBProp: TGroupByProperty): String;
    // Возвращает наименование пиксельного формата изображения
@@ -114,6 +119,8 @@ uses
   procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
    // Устанавливает опцию coVisible столбца согласно bVisible
   procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
+   // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
+  function  GTreeHintModeToVTHintMode(GTHM: TGroupTreeHintMode): TVTHintMode;
 
    // Возвращает True, если iID содержится в массиве aIDs
   function  IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
@@ -511,6 +518,22 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings, udMsgBox;
     Result := '['+Result+']';
   end;
 
+  function GroupPropsToInt(GroupProps: TGroupProperties): Integer;
+  begin
+    Result := 0;
+    Move(GroupProps, Result, SizeOf(GroupProps));
+  end;
+
+  function IntToGroupProps(i: Integer): TGroupProperties;
+  begin
+    Move(i, Result, SizeOf(Result));
+  end;
+
+  function GroupPropName(GroupProp: TGroupProperty): String;
+  begin
+    Result := ConstVal(GetEnumName(TypeInfo(TGroupProperty), Byte(GroupProp)));
+  end;
+
   function GroupByPropName(GBProp: TGroupByProperty): String;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TGroupByProperty), Byte(GBProp)));
@@ -663,6 +686,16 @@ type
   begin
     with Column do
       if bVisible then Options := Options+[coVisible] else Options := Options-[coVisible];
+  end;
+
+  function GTreeHintModeToVTHintMode(GTHM: TGroupTreeHintMode): TVTHintMode;
+  const
+    aHM: Array[TGroupTreeHintMode] of TVTHintMode = (
+      hmDefault, // gthmNone
+      hmTooltip, // gthmTips
+      hmHint);   // gthmInfo
+  begin
+    Result := aHM[GTHM];
   end;
 
   function IDInArray(iID: Integer; const aIDs: TIDArray): Boolean;
