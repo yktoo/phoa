@@ -51,39 +51,3 @@ de.HelpRu=PhoA Hilfe (Russich)
 de.HelpEn=PhoA Hilfe (Englisch)
 de.PhoaFmtName=PhoA Fotoalbum
 de.LangID=1031
-
-;== Brazilian Portuguese ==============================================================================================
-br.CompMain=Arquivos principais
-br.CompPlugins=Plugins
-br.CompIJL=Intel JPEG Library (fast JPEG decoder)
-br.CompHelp=Arquivos de ajuda
-br.CompHelpEn=Inglкs
-br.CompHelpRu=Russo
-br.CompSampleAlbum=Бlbum exemplo
-br.CompPhoaAPI=PhoA API (for developers)
-br.IconsAllUsers=Para todos os usuбrios
-br.IconsCurUser=Somente para usuбrio atual
-br.PhoaDesc=Programa para organizaзгo de imagens
-br.SampleAlbum=Бlbum exemplo
-br.HelpRu=Ajuda PhoA (Russo)
-br.HelpEn=Ajuda PhoA (English)
-br.PhoaFmtName=PhoA Бlbum
-br.LangID=1046
-
-;== Ukrainian =========================================================================================================
-ua.CompMain=Основні файли
-ua.CompPlugins=Plugins
-ua.CompIJL=Intel JPEG Library (fast JPEG decoder)
-ua.CompHelp=Файли  ДовідковоЇ системи
-ua.CompHelpEn=Англійска мова
-ua.CompHelpRu=Російска мова
-ua.CompSampleAlbum=Приклад фотоальбому
-ua.CompPhoaAPI=PhoA API (для розробників)
-ua.IconsAllUsers=Для усіх користувачів
-ua.IconsCurUser=Тільки для поточного користувача
-ua.PhoaDesc=Програма для каталогізаціі зображень і складання фотоальбомів
-ua.SampleAlbum=Приклад фотоальбому
-ua.HelpRu=Довідка по PhoA (Російска)
-ua.HelpEn=Довідка по PhoA (English)
-ua.PhoaFmtName=Фотоальбом PhoA
-ua.LangID=1058
