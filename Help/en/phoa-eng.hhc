@@ -110,6 +110,32 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Menu command description">
+				<param name="Local" value="intf-view-mode-menu.html">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Picture menu">
+					<param name="Local" value="intf-view-mode-menu-picture.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="View menu">
+					<param name="Local" value="intf-view-mode-menu-view.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Zoom menu">
+					<param name="Local" value="intf-view-mode-menu-zoom.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Tools menu">
+					<param name="Local" value="intf-view-mode-menu-tools.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Help menu">
+					<param name="Local" value="intf-view-mode-menu-help.html">
+					</OBJECT>
+			</UL>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Working in the view mode">
 				<param name="Local" value="intf-view-mode-tasks.html">
 				</OBJECT>

@@ -217,6 +217,11 @@
 			<param name="Name" value="Browse mode menu commands">
 			<param name="Local" value="intf-browse-mode-menu.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="view mode">
+			<param name="Name" value="View mode menu commands">
+			<param name="Local" value="intf-view-mode-menu.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="metadata">

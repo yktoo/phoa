@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa-eng.hhp,v 1.9 2004-11-07 17:31:17 dale Exp $
+;   $Id: phoa-eng.hhp,v 1.10 2004-11-08 19:23:36 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright 2002-2004 DK Software, http://www.dk-soft.org/
@@ -78,6 +78,12 @@ intf-sort-pics.html
 intf-stats.html
 intf-tool-props.html
 intf-view-mode.html
+intf-view-mode-menu.html
+intf-view-mode-menu-help.html
+intf-view-mode-menu-picture.html
+intf-view-mode-menu-tools.html
+intf-view-mode-menu-view.html
+intf-view-mode-menu-zoom.html
 intf-view-mode-tasks.html
 intf-view-props.html
 intro.html

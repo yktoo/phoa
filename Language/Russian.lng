@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.5 beta
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.2
-LastModified=2004-11-08 11:58:06
+LastModified=2004-11-08 22:00:45
 SourceLANGID=1033
 
 [fMain]
@@ -411,8 +411,8 @@ SourceLANGID=1033
 00000283=&Изображение
 00000284=&Масштаб
 00000285=&Вид
-00000286=И&нструменты
-00000287=&Справка
+00000286=&Сервис
+00000287=Сп&равка
 00000288=Показ сла&йдов
 00000289=Преобра&зования
 00000290=&Основная панель инструментов

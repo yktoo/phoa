@@ -255,6 +255,11 @@
 			<param name="Name" value="Описание команд меню в режиме обзора">
 			<param name="Local" value="intf-browse-mode-menu.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&eth;&aring;&aelig;&egrave;&igrave; &iuml;&eth;&icirc;&ntilde;&igrave;&icirc;&ograve;&eth;&agrave;">
+			<param name="Name" value="Описание команд меню в режиме просмотра">
+			<param name="Local" value="intf-view-mode-menu.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="&igrave;&aring;&ograve;&agrave;&auml;&agrave;&iacute;&iacute;&ucirc;&aring;">
