@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.8 2004-09-02 14:20:38 dale Exp $
+//  $Id: phWizForm.pas,v 1.9 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -25,7 +25,6 @@ type
     lHeading: TLabel;
     bvTopPanel: TBevel;
     iIcon: TImage;
-    dklcMain: TDKLanguageController;
     procedure bHelpClick(Sender: TObject);
     procedure bBackClick(Sender: TObject);
     procedure bNextClick(Sender: TObject);

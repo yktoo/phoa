@@ -124,7 +124,7 @@ Caption=00000003,About
 lOK.Caption=00000012,OK
 
 [dFileOpsWizard]
-Caption=00000003,<wizard caption>
+Caption=00000003,File operations wizard
 bCancel.Caption=00000017,Cancel
 bNext.Caption=00000020,Next >
 bHelp.Caption=00000023,Help
@@ -541,7 +541,7 @@ fpMain.IniFileName=00000022,\\\
 fpMain.IniSection=00000023,\\\
 
 [fAddFilesWizard]
-Caption=00000003,<wizard caption>
+Caption=00000003,Add pictures wizard
 bCancel.Caption=00000017,Cancel
 bNext.Caption=00000020,Next >
 bHelp.Caption=00000023,Help

@@ -66,7 +66,7 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
       Left = 391
     end
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 404
     LangData = {

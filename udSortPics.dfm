@@ -105,7 +105,7 @@ inherited dSortPics: TdSortPics
       end
     end
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 60
     Top = 126

@@ -137,7 +137,7 @@ inherited dViewProps: TdViewProps
       end
     end
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 76
     Top = 104

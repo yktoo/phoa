@@ -1,10 +1,12 @@
 inherited dFileOpsWizard: TdFileOpsWizard
   Left = 404
   Top = 209
+  Caption = 'File operations wizard'
   PixelsPerInch = 96
   TextHeight = 13
-  inherited dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+  object dklcMain: TDKLanguageController
+    Left = 92
+    Top = 368
     LangData = {
       0E006446696C654F707357697A61726401010000000300000007004361707469
       6F6E010B00000008006276426F74746F6D00000A006276546F7050616E656C00

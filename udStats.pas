@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.8 2004-09-02 14:20:38 dale Exp $
+//  $Id: udStats.pas,v 1.9 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -23,6 +23,7 @@ type
   end;
 
   TdStats = class(TPhoaDialog)
+    dklcMain: TDKLanguageController;
     tvMain: TVirtualStringTree;
     fpMain: TFormPlacement;
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);

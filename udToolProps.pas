@@ -8,6 +8,7 @@ uses
 
 type
   TdToolProps = class(TPhoaDialog)
+    dklcMain: TDKLanguageController;
     lKind: TLabel;
     cbKind: TComboBox;
     lName: TLabel;

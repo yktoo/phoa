@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.5 2004-09-02 14:20:38 dale Exp $
+//  $Id: udPicProps.pas,v 1.6 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -16,6 +16,7 @@ uses
 
 type
   TdPicProps = class(TPhoaDialog, IWizardHostForm)
+    dklcMain: TDKLanguageController;
     fpMain: TFormPlacement;
     pMain: TPanel;
     dkNav: TTBXDock;

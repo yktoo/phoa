@@ -129,7 +129,7 @@ inherited dPhoAProps: TdPhoAProps
     TabOrder = 1
     OnChange = DlgDataChange
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 12
     Top = 260

@@ -8,6 +8,7 @@ uses
 
 type
   TdGroupProps = class(TPhoaDialog)
+    dklcMain: TDKLanguageController;
     lID: TLabel;
     eID: TEdit;
     lText: TLabel;

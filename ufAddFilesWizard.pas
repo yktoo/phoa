@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.9 2004-09-02 14:20:38 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.10 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -16,6 +16,7 @@ type
   TAddFilesThread = class;
 
   TfAddFilesWizard = class(TPhoaWizardForm, IPhoaWizardPageHost_Log, IPhoaWizardPageHost_Process)
+    dklcMain: TDKLanguageController;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
      // Поток, добавляющий файлы

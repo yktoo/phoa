@@ -123,7 +123,7 @@ inherited dSearch: TdSearch
       OnClick = bResetClick
     end
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 20
     Top = 76

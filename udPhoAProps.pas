@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPhoAProps.pas,v 1.4 2004-09-02 14:20:38 dale Exp $
+//  $Id: udPhoAProps.pas,v 1.5 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -14,6 +14,7 @@ uses
 
 type
   TdPhoAProps = class(TPhoaDialog)
+    dklcMain: TDKLanguageController;
     lDesc: TLabel;
     lThumbSize: TLabel;
     lThumbSizeX: TLabel;

@@ -236,7 +236,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 0
     OnChange = DlgDataChange
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Left = 40
     Top = 336

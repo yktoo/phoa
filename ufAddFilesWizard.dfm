@@ -1,6 +1,7 @@
 inherited fAddFilesWizard: TfAddFilesWizard
   Left = 384
   Top = 192
+  Caption = 'Add pictures wizard'
   ClientWidth = 632
   OnCloseQuery = FormCloseQuery
   PixelsPerInch = 96
@@ -38,8 +39,9 @@ inherited fAddFilesWizard: TfAddFilesWizard
       Left = 579
     end
   end
-  inherited dklcMain: TDKLanguageController
-    Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
+  object dklcMain: TDKLanguageController
+    Left = 92
+    Top = 368
     LangData = {
       0F006641646446696C657357697A617264010100000003000000070043617074
       696F6E010B00000008006276426F74746F6D00000A006276546F7050616E656C

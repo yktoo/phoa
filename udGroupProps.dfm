@@ -79,7 +79,7 @@ inherited dGroupProps: TdGroupProps
     TabOrder = 2
     OnChange = DlgDataChange
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 176
     LangData = {

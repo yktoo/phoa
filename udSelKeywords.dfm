@@ -77,7 +77,7 @@ inherited dSelKeywords: TdSelKeywords
       Left = 273
     end
   end
-  inherited dklcMain: TDKLanguageController
+  object dklcMain: TDKLanguageController
     Options = [dklcoAutoSaveLangSource, dklcoIgnoreEmptyProps]
     Top = 400
     LangData = {

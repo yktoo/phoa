@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.47 2004-09-02 14:20:37 dale Exp $
+//  $Id: ConsVars.pas,v 1.48 2004-09-05 11:32:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -1272,26 +1272,6 @@ type
   procedure InitLanguages;
   var LangSetting: TPhoaSetting;
 
-     // Сканирует каталог и регистрирует найденные языковые файлы
-    procedure ScanLangFiles;
-    var
-      sLangFilePath: String;
-      SRec: TSearchRec;
-    begin
-       // Определяем путь к каталогу языковых файлов
-      sLangFilePath := ExtractFilePath(ParamStr(0))+SRelativeLangFilesPath;
-       // Сканируем каталог
-      if FindFirst(sLangFilePath+'*.'+SLangFileExt, faAnyFile, SRec)=0 then
-        try
-          repeat
-             // Если не каталог - пытаемся зарегистрировать в LangManager
-            if SRec.Attr and faDirectory=0 then LangManager.RegisterLangFile(sLangFilePath+SRec.Name);
-          until FindNext(SRec)<>0;
-        finally
-          FindClose(SRec);
-        end;
-    end;
-
      // Добавляет в настройки пункты выбора языка интерфейса
     procedure LoadLanguageSettings;
     var i: Integer;
@@ -1304,7 +1284,7 @@ type
   begin
      // Сканируем языковые файлы
     ShowProgressInfo('SMsg_ScanningLanguages', []);
-    ScanLangFiles;
+    LangManager.ScanForLangFiles(ExtractFilePath(ParamStr(0))+SRelativeLangFilesPath, '*.'+SLangFileExt, False);
      // Находим пункт списка "Язык интерфейса"
     LangSetting := RootSetting.Settings[ISettingID_Gen_Language];
      // Добавляем настройки выбора языка
