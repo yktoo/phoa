@@ -1,6 +1,6 @@
 object fImgView: TfImgView
-  Left = 436
-  Top = 174
+  Left = 447
+  Top = 258
   AutoScroll = False
   ClientHeight = 271
   ClientWidth = 532
@@ -726,7 +726,7 @@ object fImgView: TfImgView
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
       'eCounter.Text'
-      'Name'
+      'Font.Name'
       'SecondaryShortCuts')
     Left = 92
     Top = 48

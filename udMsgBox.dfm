@@ -10,7 +10,7 @@ object dMsgBox: TdMsgBox
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Shell Dlg 2'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poMainFormCenter
@@ -45,8 +45,8 @@ object dMsgBox: TdMsgBox
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'lMessage.Caption'
-      'Name'
       'SecondaryShortCuts')
     Left = 280
     Top = 4

@@ -12,6 +12,7 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoHotTrack, hoShowSortGlyphs, hoVisible]
+    Header.ParentFont = True
     HintMode = hmTooltip
     Images = fMain.ilActionsSmall
     ParentBackground = False
@@ -74,6 +75,10 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Left = 12
     Top = 28
     LangData = {

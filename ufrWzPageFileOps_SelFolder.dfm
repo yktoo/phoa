@@ -22,10 +22,11 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
+    Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+    Header.ParentFont = True
     HintMode = hmHint
     ParentColor = False
     RootFolder = rfDesktop
@@ -76,6 +77,10 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvFolder.Header.Font.Name')
     Left = 8
     Top = 12
     LangData = {

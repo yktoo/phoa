@@ -1,6 +1,6 @@
 object fMain: TfMain
-  Left = 369
-  Top = 217
+  Left = 480
+  Top = 305
   AutoScroll = False
   Caption = 'PhoA'
   ClientHeight = 385
@@ -7048,9 +7048,10 @@ object fMain: TfMain
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'MRUOpen.Prefix'
-      'Name'
-      'SecondaryShortCuts')
+      'SecondaryShortCuts'
+      'tvGroups.Header.Font.Name')
     OnLanguageChanged = dklcMainLanguageChanged
     Left = 292
     Top = 168

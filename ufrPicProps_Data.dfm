@@ -176,7 +176,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     IgnoreList.Strings = (
       'eTime.EditMask'
       'eTime.Text'
-      'Name'
+      'Font.Name'
       'SecondaryShortCuts')
     Left = 476
     Top = 212

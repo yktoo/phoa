@@ -1,6 +1,6 @@
 inherited fAddFilesWizard: TfAddFilesWizard
-  Left = 343
-  Top = 238
+  Left = 353
+  Top = 270
   Caption = 'Add pictures wizard'
   ClientWidth = 632
   OnCloseQuery = FormCloseQuery
@@ -41,8 +41,8 @@ inherited fAddFilesWizard: TfAddFilesWizard
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'lHeading.Caption'
-      'Name'
       'SecondaryShortCuts')
     Left = 92
     Top = 368

@@ -1,6 +1,6 @@
 inherited dSelKeywords: TdSelKeywords
-  Left = 600
-  Top = 211
+  Left = 601
+  Top = 227
   Caption = 'Select keywords'
   ClientHeight = 431
   ClientWidth = 354
@@ -40,10 +40,11 @@ inherited dSelKeywords: TdSelKeywords
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 1
@@ -78,6 +79,10 @@ inherited dSelKeywords: TdSelKeywords
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Top = 400
     LangData = {
       0C006453656C4B6579776F726473010100000003000000070043617074696F6E

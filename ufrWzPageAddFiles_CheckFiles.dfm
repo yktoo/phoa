@@ -12,6 +12,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoHotTrack, hoShowSortGlyphs, hoVisible]
+    Header.ParentFont = True
     HintMode = hmTooltip
     Images = ilFiles
     ParentBackground = False
@@ -109,6 +110,10 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Top = 28
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvFiles.Header.Font.Name')
     Left = 124
     Top = 28
     LangData = {

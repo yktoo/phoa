@@ -1,6 +1,6 @@
 inherited dPicOps: TdPicOps
-  Left = 485
-  Top = 232
+  Left = 489
+  Top = 261
   ActiveControl = cbOp
   Caption = 'Picture operations'
   ClientHeight = 433
@@ -75,10 +75,11 @@ inherited dPicOps: TdPicOps
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 2
@@ -97,6 +98,10 @@ inherited dPicOps: TdPicOps
     WideDefaultText = 'Photo Album'
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvGroups.Header.Font.Name')
     Top = 400
     LangData = {
       0700645069634F7073010100000003000000070043617074696F6E0109000000

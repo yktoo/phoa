@@ -121,7 +121,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
     IgnoreList.Strings = (
       'eReplaceChar.EditMask'
       'eReplaceChar.Text'
-      'Name'
+      'Font.Name'
       'SecondaryShortCuts')
     Left = 536
     Top = 12

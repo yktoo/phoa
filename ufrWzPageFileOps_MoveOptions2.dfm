@@ -77,6 +77,9 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
       'Update the link anyway')
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Left = 540
     Top = 140
     LangData = {

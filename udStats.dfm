@@ -1,6 +1,6 @@
 inherited dStats: TdStats
-  Left = 330
-  Top = 180
+  Left = 401
+  Top = 338
   Caption = 'Photo album statistics'
   ClientHeight = 435
   ClientWidth = 612
@@ -23,9 +23,10 @@ inherited dStats: TdStats
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
+    Header.ParentFont = True
     HintMode = hmTooltip
     Images = fMain.ilActionsSmall
     ParentBackground = False
@@ -67,10 +68,11 @@ inherited dStats: TdStats
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'IniFileName'
       'IniSection'
-      'Name'
-      'SecondaryShortCuts')
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Top = 400
     LangData = {
       0600645374617473010100000003000000070043617074696F6E010700000008

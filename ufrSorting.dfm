@@ -11,7 +11,6 @@ object frSorting: TfrSorting
     Height = 15
     Align = alTop
     AutoSize = False
-    Caption = '&'#1055#1086#1088#1103#1076#1086#1082' '#1089#1086#1088#1090#1080#1088#1086#1074#1082#1080' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1081':'
   end
   object tvMain: TVirtualStringTree
     Left = 0
@@ -26,6 +25,7 @@ object frSorting: TfrSorting
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmMain
@@ -49,11 +49,13 @@ object frSorting: TfrSorting
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         Width = 166
+        WideText = 'Picture property'
       end
       item
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 1
         Width = 150
+        WideText = 'Sort direction'
       end>
     WideDefaultText = ''
   end

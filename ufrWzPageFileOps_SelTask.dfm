@@ -130,6 +130,9 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     OnClick = PageDataChange
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Left = 536
     Top = 264
     LangData = {

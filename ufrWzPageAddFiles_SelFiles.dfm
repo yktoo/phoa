@@ -168,9 +168,10 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
+    Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+    Header.ParentFont = True
     Header.SortColumn = 0
     HintMode = hmHint
     ParentColor = False
@@ -222,9 +223,10 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       'eFileTimeFrom.Text'
       'eFileTimeTo.EditMask'
       'eFileTimeTo.Text'
-      'Name'
-      'SecondaryShortCuts')
-    Left = 36
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
+    Left = 8
     Top = 24
     LangData = {
       19006672577A5061676541646446696C65735F53656C46696C657300010F0000

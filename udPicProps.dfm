@@ -1,6 +1,6 @@
 inherited dPicProps: TdPicProps
-  Left = 278
-  Top = 177
+  Left = 376
+  Top = 334
   Caption = 'Properties: picture'
   ClientHeight = 433
   ClientWidth = 590
@@ -113,9 +113,9 @@ inherited dPicProps: TdPicProps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'IniFileName'
       'IniSection'
-      'Name'
       'SecondaryShortCuts')
     Top = 400
     LangData = {

@@ -1,5 +1,6 @@
 inherited dViewProps: TdViewProps
-  Left = 579
+  Left = 586
+  Top = 254
   Caption = 'Properties: photo album view'
   ClientHeight = 435
   ClientWidth = 426
@@ -60,9 +61,10 @@ inherited dViewProps: TdViewProps
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmGrouping
@@ -87,11 +89,14 @@ inherited dViewProps: TdViewProps
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         Width = 248
+        WideText = 'Grouping property'
       end
       item
+        Alignment = taCenter
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 1
         Width = 150
+        WideText = 'Unclassified in own folder'
       end>
     WideDefaultText = ''
   end
@@ -109,16 +114,19 @@ inherited dViewProps: TdViewProps
     inherited tvMain: TVirtualStringTree
       Width = 402
       Height = 139
+      Header.Font.Name = 'Tahoma'
       Columns = <
         item
           Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
           Position = 0
           Width = 248
+          WideText = 'Picture property'
         end
         item
           Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
           Position = 1
           Width = 150
+          WideText = 'Sort direction'
         end>
       WideDefaultText = ''
     end
@@ -138,6 +146,11 @@ inherited dViewProps: TdViewProps
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'frSorting.tvMain.Header.Font.Name'
+      'SecondaryShortCuts'
+      'tvGrouping.Header.Font.Name')
     Left = 76
     Top = 104
     LangData = {

@@ -13,6 +13,7 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
+    Header.ParentFont = True
     HintMode = hmTooltip
     ParentBackground = False
     TabOrder = 0
@@ -85,6 +86,10 @@ inherited frPicProps_Metadata: TfrPicProps_Metadata
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Left = 68
     Top = 164
     LangData = {

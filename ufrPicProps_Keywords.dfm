@@ -14,6 +14,7 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmMain
@@ -123,6 +124,10 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
     Top = 252
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Left = 12
     Top = 252
     LangData = {

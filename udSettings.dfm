@@ -1,6 +1,6 @@
 inherited dSettings: TdSettings
-  Left = 311
-  Top = 184
+  Left = 377
+  Top = 264
   Caption = 'Program settings'
   ClientHeight = 435
   ClientWidth = 632
@@ -69,9 +69,9 @@ inherited dSettings: TdSettings
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'IniFileName'
       'IniSection'
-      'Name'
       'SecondaryShortCuts')
     Top = 400
     LangData = {

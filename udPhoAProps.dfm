@@ -1,6 +1,6 @@
 inherited dPhoAProps: TdPhoAProps
-  Left = 576
-  Top = 235
+  Left = 574
+  Top = 287
   ActiveControl = eThumbSizeX
   Caption = 'Properties: photo album'
   ClientHeight = 296
@@ -131,8 +131,8 @@ inherited dPhoAProps: TdPhoAProps
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'lThumbSizeX.Caption'
-      'Name'
       'SecondaryShortCuts')
     Left = 12
     Top = 260

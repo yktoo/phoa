@@ -1,6 +1,6 @@
 inherited dGroupProps: TdGroupProps
-  Left = 495
-  Top = 203
+  Left = 534
+  Top = 306
   ActiveControl = eText
   Caption = 'Properties: Picture group'
   ClientHeight = 209
@@ -80,6 +80,9 @@ inherited dGroupProps: TdGroupProps
     OnChange = DlgDataChange
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Top = 176
     LangData = {
       0B006447726F757050726F7073010100000003000000070043617074696F6E01

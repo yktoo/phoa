@@ -85,6 +85,9 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Left = 540
     Top = 184
     LangData = {

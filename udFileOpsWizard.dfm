@@ -1,13 +1,13 @@
 inherited dFileOpsWizard: TdFileOpsWizard
-  Left = 335
-  Top = 158
+  Left = 427
+  Top = 305
   Caption = 'File operations wizard'
   PixelsPerInch = 96
   TextHeight = 13
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'lHeading.Caption'
-      'Name'
       'SecondaryShortCuts')
     Left = 92
     Top = 368

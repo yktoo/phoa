@@ -12,6 +12,7 @@ inherited frWzPage_Log: TfrWzPage_Log
     Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmMain
@@ -135,9 +136,10 @@ inherited frWzPage_Log: TfrWzPage_Log
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
+      'Font.Name'
       'lInfo.Caption'
-      'Name'
-      'SecondaryShortCuts')
+      'SecondaryShortCuts'
+      'tvMain.Header.Font.Name')
     Left = 128
     Top = 8
     LangData = {

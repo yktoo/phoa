@@ -1,6 +1,6 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
-  Left = 500
-  Top = 196
+  Left = 509
+  Top = 290
   Caption = 'Select picture group'
   ClientHeight = 435
   ClientWidth = 473
@@ -30,10 +30,11 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     TabOrder = 0
@@ -67,6 +68,10 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvGroups.Header.Font.Name')
     Top = 404
     LangData = {
       0D006453656C50686F6147726F7570010100000003000000070043617074696F

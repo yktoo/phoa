@@ -51,10 +51,11 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
+    Header.ParentFont = True
     Images = fMain.ilActionsSmall
     ParentBackground = False
     PopupMenu = pmGroups
@@ -158,9 +159,10 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (
-      'Name'
+      'Font.Name'
       'rbAllPics.Caption'
-      'SecondaryShortCuts')
+      'SecondaryShortCuts'
+      'tvGroups.Header.Font.Name')
     Left = 136
     Top = 72
     LangData = {

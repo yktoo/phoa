@@ -1,6 +1,6 @@
 inherited dToolProps: TdToolProps
-  Left = 340
-  Top = 163
+  Left = 443
+  Top = 313
   Caption = 'Properties: Tool'
   ClientHeight = 371
   ClientWidth = 592
@@ -237,6 +237,9 @@ inherited dToolProps: TdToolProps
     OnChange = DlgDataChange
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Left = 40
     Top = 336
     LangData = {

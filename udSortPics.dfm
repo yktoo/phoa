@@ -1,6 +1,6 @@
 inherited dSortPics: TdSortPics
-  Left = 556
-  Top = 253
+  Left = 566
+  Top = 327
   Caption = 'Sort pictures'
   ClientHeight = 344
   ClientWidth = 398
@@ -79,14 +79,17 @@ inherited dSortPics: TdSortPics
     inherited tvMain: TVirtualStringTree
       Width = 372
       Height = 192
+      Header.Font.Name = 'Tahoma'
       Columns = <
         item
           Position = 0
           Width = 218
+          WideText = 'Picture property'
         end
         item
           Position = 1
           Width = 150
+          WideText = 'Sort direction'
         end>
       WideDefaultText = ''
     end
@@ -106,6 +109,10 @@ inherited dSortPics: TdSortPics
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'frSorting.tvMain.Header.Font.Name'
+      'SecondaryShortCuts')
     Left = 60
     Top = 126
     LangData = {

@@ -1,6 +1,6 @@
 object dAbout: TdAbout
   Left = 476
-  Top = 262
+  Top = 274
   HelpType = htKeyword
   BorderStyle = bsNone
   Caption = 'About'
@@ -72,6 +72,9 @@ object dAbout: TdAbout
     Top = 160
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts')
     Left = 60
     Top = 160
     LangData = {

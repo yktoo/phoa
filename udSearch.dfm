@@ -1,6 +1,6 @@
 inherited dSearch: TdSearch
-  Left = 471
-  Top = 227
+  Left = 479
+  Top = 271
   Caption = 'Find pictures'
   ClientHeight = 435
   ClientWidth = 525
@@ -28,9 +28,10 @@ inherited dSearch: TdSearch
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
+    Header.ParentFont = True
     ParentBackground = False
     TabOrder = 1
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -124,6 +125,10 @@ inherited dSearch: TdSearch
     end
   end
   object dklcMain: TDKLanguageController
+    IgnoreList.Strings = (
+      'Font.Name'
+      'SecondaryShortCuts'
+      'tvCriteria.Header.Font.Name')
     Left = 20
     Top = 76
     LangData = {
