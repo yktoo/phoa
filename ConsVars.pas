@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.14 2004-05-01 04:03:24 dale Exp $
+//  $Id: ConsVars.pas,v 1.15 2004-05-01 19:32:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -826,7 +826,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
   procedure AddPicPropSettings(Owner: TPhoaIntSetting);
   var Prop: TPicProperty;
   begin
-    for Prop := Low(Prop) to High(Prop) do TPhoaMaskBitSetting.Create(Owner, 0, '#'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)));
+    for Prop := Low(Prop) to High(Prop) do TPhoaMaskBitSetting.Create(Owner, 0, '@'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)));
   end;
 
   procedure AdjustPicPropListSettings(Setting: TPhoaListSetting);
@@ -834,13 +834,13 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
   begin
     Setting.Variants.AddObject('', Pointer(MaxInt));
     for Prop := Low(Prop) to High(Prop) do
-      Setting.Variants.AddObject('#'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Pointer(Prop));
+      Setting.Variants.AddObject('@'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Pointer(Prop));
   end;
 
   procedure AddPicClipboardFormatSettings(Owner: TPhoaIntSetting);
   var pcf: TPicClipboardFormat;
   begin
-    for pcf := Low(pcf) to High(pcf) do TPhoaMaskBitSetting.Create(Owner, 0, '#'+GetEnumName(TypeInfo(TPicClipboardFormat), Byte(pcf)));
+    for pcf := Low(pcf) to High(pcf) do TPhoaMaskBitSetting.Create(Owner, 0, '@'+GetEnumName(TypeInfo(TPicClipboardFormat), Byte(pcf)));
   end;
 
   procedure AdjustTreeCheckStyleSetting(Setting: TPhoaListSetting);
@@ -875,7 +875,7 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
   procedure AddDateTimeAutofillPropSettings(Owner: TPhoaIntSetting);
   var Prop: TDateTimeAutofillProp;
   begin
-    for Prop := Low(Prop) to High(Prop) do TPhoaMaskBitSetting.Create(Owner, 0, '#'+GetEnumName(TypeInfo(TDateTimeAutofillProp), Byte(Prop)));
+    for Prop := Low(Prop) to High(Prop) do TPhoaMaskBitSetting.Create(Owner, 0, '@'+GetEnumName(TypeInfo(TDateTimeAutofillProp), Byte(Prop)));
   end;
 
   procedure ApplyTreeSettings(Tree: TVirtualStringTree);
@@ -1076,9 +1076,9 @@ uses TypInfo, Forms, phPhoa, phUtils, phSettings, phValSetting, phToolSetting;
         Lvl3 := TPhoaBoolSetting.Create(Lvl2, ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
      //=================================================================================================================
     Lvl1 := TPhoaToolPageSetting.Create(RootSetting, ISettingID_Tools, iiTool, '@ISettingID_Tools', IDH_setup_dialogs{!!!});
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Open',  '#SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Edit',  '#SActionHint_EditPics',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
-      Lvl2 := TPhoaToolSetting.Create(Lvl1, '#SAction_Print', '#SActionHint_PrintPics', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Open',  '@SActionHint_OpenPics',  '', '', '', '', ptkOpen,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Edit',  '@SActionHint_EditPics',  '', '', '', '', ptkEdit,  SW_SHOWNORMAL, [ptuToolsMenu]);
+      Lvl2 := TPhoaToolSetting.Create(Lvl1, '@SAction_Print', '@SActionHint_PrintPics', '', '', '', '', ptkPrint, SW_SHOWNORMAL, [ptuToolsMenu]);
   end;
   {$HINTS ON}
 

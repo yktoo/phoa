@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.7 2004-04-28 04:33:19 dale Exp $
+//  $Id: phUtils.pas,v 1.8 2004-05-01 19:32:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -77,6 +77,9 @@ uses
    // Возвращает значение константы по её наименованию из fMain.dtlsMain
   function  ConstVal(const sConstName: String): String; overload;
   function  ConstVal(const sConstName: String; const aParams: Array of const): String; overload;
+   // Возвращает sText, если он начинается на символ, отличный от '@'. Иначе - трактует текст после '@' как имя
+   //   константы и возвращает её значение
+  function  ConstValEx(const sText: String): String;
 
    // Преобразование TPicProperties <-> Integer
   function  PicPropsToInt(PicProps: TPicProperties): Integer;
@@ -474,6 +477,13 @@ uses Forms, Main, TypInfo, Registry, ShellAPI, phSettings;
   function ConstVal(const sConstName: String; const aParams: Array of const): String;
   begin
     Result := Format(ConstVal(sConstName), aParams);
+  end;
+
+  function ConstValEx(const sText: String): String;
+  begin
+    Result := sText;
+     // Если наименование начинается на '@' - это константа
+    if (Result<>'') and (Result[1]='@') then Result := ConstVal(Copy(Result, 2, MaxInt));
   end;
 
   function PicPropsToInt(PicProps: TPicProperties): Integer;

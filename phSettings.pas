@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.8 2004-04-25 16:28:31 dale Exp $
+//  $Id: phSettings.pas,v 1.9 2004-05-01 19:32:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -67,7 +67,7 @@ type
     property ID: Integer read FID;
      // -- Индекс настройки внутри родителя
     property Index: Integer read GetIndex write SetIndex;
-     // -- Наименование пункта. Если начинается с '@', то это имя константы из диалога Settings, если с '#' - то из fMain
+     // -- Наименование пункта, закодированное по правилам ConstValEx()
     property Name: String read FName;
      // -- Пункт-владелец данного пункта
     property Owner: TPhoaSetting read FOwner;
@@ -101,14 +101,11 @@ type
     property ImageIndex: Integer read FImageIndex;
   end;
 
-   // Событие декодирования текста пункта
-  TPhoaSettingDecodeTextEvent = procedure(const sText: String; out sDecoded: String) of object;
-
    // Интерфейс редактора настроек
   IPhoaSettingEditor = interface(IInterface)
     ['{32018724-F48C-4EC4-B86A-81C5C5A1F75E}']
      // Инициализирует и встраивает редактор
-    procedure InitAndEmbed(ParentCtl: TWinControl; AOnChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
+    procedure InitAndEmbed(ParentCtl: TWinControl; AOnChange: TNotifyEvent);
      // Prop handlers
     function  GetRootSetting: TPhoaPageSetting;
     procedure SetRootSetting(Value: TPhoaPageSetting);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.5 2004-05-01 04:03:24 dale Exp $
+//  $Id: phValSetting.pas,v 1.6 2004-05-01 19:32:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -139,7 +139,7 @@ type
     property RefObject: Boolean read FRefObject;
      // -- Индекс в Variants, соответствующий текущему Value; -1, если нет такого соответствия
     property VariantIndex: Integer read GetVariantIndex write SetVariantIndex;
-     // -- Дочерние пункты (варианты) пункта. Текст закодирован по тем же правилам, что и Name
+     // -- Дочерние пункты (варианты) пункта. Текст закодирован по правилам ConstValEx()
     property Variants: TStrings read FVariants;
      // -- Текст из Variants, соответствующий текущему ValueInt; пустая строка, если нет такого соответствия
     property VariantText: String read GetVariantText;
@@ -223,14 +223,13 @@ type
     FEmbeddingControl: Boolean;
      // Prop storage
     FOnSettingChange: TNotifyEvent;
-    FOnDecodeText: TPhoaSettingDecodeTextEvent;
     FRootSetting: TPhoaValPageSetting;
      // Загружает дерево настроек, относящихся к детям узла FRootSetting
     procedure LoadTree;
      // Вызывает OnSettingChange
     procedure DoSettingChange;
      // Возвращает настройку TPhoaSetting, связанную с узлом
-    function  GetSetting(Node: PVirtualNode): TPhoaSetting; 
+    function  GetSetting(Node: PVirtualNode): TPhoaSetting;
      // Встраивает соответствующий контрол для текущего узла, если он нужен. Если нет (в том числе при FocusedNode=nil),
      //   удаляет текущий контрол
     procedure EmbedControl;
@@ -240,7 +239,7 @@ type
     procedure EmbeddedControlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EmbeddedFontButtonClick(Sender: TObject);
      // IPhoaSettingEditor
-    procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
+    procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
     function  GetRootSetting: TPhoaPageSetting;
     procedure SetRootSetting(Value: TPhoaPageSetting);
      // Message handlers
@@ -646,11 +645,11 @@ type
     s := '';
     Setting := GetSetting(Node);
     case Column of
-      0: FOnDecodeText(Setting.Name, s);
+      0: s := ConstValEx(Setting.Name);
       1: 
         if Setting is TPhoaValSetting then begin
           sVal := TPhoaListSetting(Setting).DisplayString;
-          if Setting is TPhoaListSetting then FOnDecodeText(sVal, s) else s := sVal;
+          if Setting is TPhoaListSetting then s := ConstValEx(sVal) else s := sVal;
         end;
     end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
@@ -744,7 +743,6 @@ type
     procedure NewComboBox;
     var
       i: Integer;
-      s: String;
       ListSetting: TPhoaListSetting;
     begin
       ListSetting := Setting as TPhoaListSetting;
@@ -752,10 +750,7 @@ type
       with TComboBox(FEditorControl) do begin
          // Копируем список вариантов
         Items.Clear;
-        for i := 0 to ListSetting.Variants.Count-1 do begin
-          FOnDecodeText(ListSetting.Variants[i], s);
-          Items.AddObject(s, ListSetting.Variants.Objects[i]);
-        end;
+        for i := 0 to ListSetting.Variants.Count-1 do Items.AddObject(ConstValEx(ListSetting.Variants[i]), ListSetting.Variants.Objects[i]);
          // Прочие опции
         DropDownCount := 16;
         Style         := csDropDownList;
@@ -893,11 +888,10 @@ type
     if Node=nil then Result := nil else Result := PPhoaSetting(PChar(Node)+FDataOffset)^;
   end;
 
-  procedure TPhoaValSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
+  procedure TPhoaValSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
   begin
     Parent           := ParentCtl;
     FOnSettingChange := AOnSettingChange;
-    FOnDecodeText    := AOnDecodeText;
   end;
 
   procedure TPhoaValSettingEditor.LoadTree;

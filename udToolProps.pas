@@ -38,26 +38,23 @@ type
     FTool: TPhoaToolSetting;
      // Страничная настройка - владелец инструментов
     FPage: TPhoaToolPageSetting;
-     // Событие дял декодирования текста пункта
-    FOnDecodeText: TPhoaSettingDecodeTextEvent;
   protected
     procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
   end;
 
-  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting; const AOnDecodeText: TPhoaSettingDecodeTextEvent): Boolean;
+  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
 
 implementation
 {$R *.dfm}
 uses FileCtrl, phUtils;
 
-  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting; const AOnDecodeText: TPhoaSettingDecodeTextEvent): Boolean;
+  function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
   begin
     with TdToolProps.Create(Application) do
       try
-        FTool         := ATool;
-        FPage         := APage;
-        FOnDecodeText := AOnDecodeText;
+        FTool := ATool;
+        FPage := APage;
         Result := Execute;
       finally
         Free;
@@ -107,12 +104,6 @@ uses FileCtrl, phUtils;
 
   procedure TdToolProps.InitializeDialog;
   var k: TPhoaToolKind;
-
-    function DoDecode(const s: String): String;
-    begin
-      FOnDecodeText(s, Result);
-    end;
-
   begin
     inherited InitializeDialog;
      // Заполняем cbKind
@@ -127,9 +118,9 @@ uses FileCtrl, phUtils;
       cbKind.ItemIndex           := Byte(ptkOpen)
     else begin
       cbKind.ItemIndex           := Byte(FTool.Kind);
-      eName.Text                 := DoDecode(FTool.Name);
+      eName.Text                 := ConstValEx(FTool.Name);
       eMasks.Text                := FTool.Masks;
-      eHint.Text                 := DoDecode(FTool.Hint);
+      eHint.Text                 := ConstValEx(FTool.Hint);
       eRunCommand.Text           := FTool.RunCommand;
       eRunParams.Text            := FTool.RunParameters;
       eRunFolder.Text            := FTool.RunFolder;

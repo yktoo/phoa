@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.6 2004-05-01 04:03:24 dale Exp $
+//  $Id: phToolSetting.pas,v 1.7 2004-05-01 19:32:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -60,11 +60,11 @@ type
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
      // Props
-     // -- Подсказка. Закодирована по правилам TPhoaSetting.Name
+     // -- Подсказка. Закодирована по правилам ConstValEx()
     property Hint: String read FHint write FHint;
      // -- Вид инструмента
     property Kind: TPhoaToolKind read FKind write FKind;
-     // -- Наименование, доступное для записи. Закодировано по правилам TPhoaSetting.Name
+     // -- Наименование, доступное для записи. Закодировано по правилам ConstValEx()
     property Name: String read FName write FName;
      // -- Команда запуска (для Kind=ptkCustom)
     property RunCommand: String read FRunCommand write FRunCommand;
@@ -155,7 +155,6 @@ type
     FItemMoveDown: TTBXItem;
      // Prop storage
     FOnSettingChange: TNotifyEvent;
-    FOnDecodeText: TPhoaSettingDecodeTextEvent;
     FRootSetting: TPhoaToolPageSetting;
      // Загружает список настроек, относящихся к детям узла FRootSetting
     procedure LoadTree;
@@ -177,7 +176,7 @@ type
     procedure MoveToolUpClick(Sender: TObject);
     procedure MoveToolDownClick(Sender: TObject);
      // IPhoaSettingEditor
-    procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
+    procedure InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
     function  GetRootSetting: TPhoaPageSetting;
     procedure SetRootSetting(Value: TPhoaPageSetting);
   protected
@@ -471,7 +470,7 @@ type
     if Setting<>nil then
       case Column of
          // Текст
-        0: FOnDecodeText(Setting.Name, s);
+        0: s := ConstValEx(Setting.Name);
          // Вид
         1: s := PhoaToolKindName(Setting.Kind);
          // Маски
@@ -499,7 +498,7 @@ type
   var n: PVirtualNode;
   begin
     n := FocusedNode;
-    if (n<>nil) and EditTool(GetSetting(n), FRootSetting, FOnDecodeText) then begin
+    if (n<>nil) and EditTool(GetSetting(n), FRootSetting) then begin
       DoSettingChange;
       LoadTree;
     end;
@@ -529,11 +528,10 @@ type
     if Node=nil then Result := nil else Result := PPhoaToolSetting(PChar(Node)+FDataOffset)^;
   end;
 
-  procedure TPhoaToolSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent; AOnDecodeText: TPhoaSettingDecodeTextEvent);
+  procedure TPhoaToolSettingEditor.InitAndEmbed(ParentCtl: TWinControl; AOnSettingChange: TNotifyEvent);
   begin
     Parent           := ParentCtl;
     FOnSettingChange := AOnSettingChange;
-    FOnDecodeText    := AOnDecodeText;
   end;
 
   function TPhoaToolSettingEditor.IsSettingNode(Node: PVirtualNode): Boolean;
