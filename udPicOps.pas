@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.3 2004-04-18 16:13:35 dale Exp $
+//  $Id: udPicOps.pas,v 1.4 2004-06-09 12:18:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -23,6 +23,8 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   private
     FPhoA: TPhotoAlbum;
     FUndoOperations: TPhoaOperations;
@@ -87,6 +89,7 @@ uses phUtils, Main, phSettings;
     HelpContext := IDH_intf_pic_operations;
     OKIgnoresModified := True;
     ApplyTreeSettings(tvGroups);
+    tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
     tvGroups.NodeDataSize  := fMain.tvGroups.NodeDataSize;
     tvGroups.RootNodeCount := 1; // "Результаты поиска" тут опускаем
      // Инициализируем все узлы, чтобы они раскрылись быстро
@@ -99,9 +102,19 @@ uses phUtils, Main, phSettings;
     cbOp.ItemIndex := 0;
   end;
 
+  procedure TdPicOps.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+  begin
+    fMain.tvGroupsBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction);
+  end;
+
   procedure TdPicOps.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
     Modified := True;
+  end;
+
+  procedure TdPicOps.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  begin
+    fMain.tvGroupsGetHint(Sender, Node, Column, TextType, CellText);
   end;
 
   procedure TdPicOps.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

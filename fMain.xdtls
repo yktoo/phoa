@@ -611,7 +611,7 @@
       </propEntry>
       <propEntry name="ISettingID_Browse_GT_Hints">
         <tranEntries>
-          <tranEntry langID="1049" value="Всплывающие подсказки"/>
+          <tranEntry langID="1049" value="Всплывающие описания"/>
           <tranEntry langID="1033" value="Tooltips"/>
           <tranEntry langID="1031" value="Tooltips"/>
           <tranEntry langID="1046" value="Tooltips"/>
@@ -777,11 +777,11 @@
       </propEntry>
       <propEntry name="ISettingID_Browse_ViewerTooltips">
         <tranEntries>
-          <tranEntry langID="1049" value="Показывать всплывающие описания эскизов"/>
+          <tranEntry langID="1049" value="Отображать всплывающие описания эскизов"/>
           <tranEntry langID="1033" value="Show thumbnail tooltips"/>
           <tranEntry langID="1031" value="Thumbnail-Tooltips anzeigen"/>
           <tranEntry langID="1046" value="Mostrar Informaзгo da miniatura sob ponteiro do mouse"/>
-          <tranEntry langID="1058" value="Показувати спливаючи описи ескізів"/>
+          <tranEntry langID="1058" value="Відображувати спливаючи описи ескізів"/>
         </tranEntries>
       </propEntry>
       <propEntry name="ISettingID_Dialogs">

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.38 2004-06-08 13:43:07 dale Exp $
+//  $Id: ConsVars.pas,v 1.39 2004-06-09 12:18:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -33,6 +33,15 @@ type
     gthmNone,  // Не отображать подсказок
     gthmTips,  // Отображать tooltips (т.е. показывать надписи, не вмещающиеся в окно)
     gthmInfo); // Отображать подсказки с заданными данными
+
+   // Вид узла в дереве групп
+  TGroupNodeKind = (
+    gnkNone,       // Нет узла
+    gnkPhoA,       // Корневой узел - узел фотоальбома
+    gnkView,       // Корневой узел - узел представления
+    gnkSearch,     // Узел результатов поиска
+    gnkPhoaGroup,  // Узел группы фотоальбома
+    gnkViewGroup); // Узел группы представления
 
    // Типы данных свойств изображения
   TPicPropertyDatatype = (ppdInteger, ppdString, ppdPixelFormat, ppdDate, ppdTime, ppdStrings);
@@ -1127,7 +1136,7 @@ type
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeBS_Rectangle,  '@ISettingID_Gen_TreeBS_Rectangle');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeBS_Triangle,   '@ISettingID_Gen_TreeBS_Triangle');
         Lvl3 := TPhoaListSetting.Create(Lvl2, ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP}, False);
-        AdjustTreeCheckStyleSetting(lvl3 as TPhoaListSetting);
+        AdjustTreeCheckStyleSetting(Lvl3 as TPhoaListSetting);
         Lvl3 := TPhoaIntSetting.Create(Lvl2, ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1, 0, 1);
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
@@ -1138,7 +1147,7 @@ type
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintNone,  '@ISettingID_Browse_GT_HintNone');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintTips,  '@ISettingID_Browse_GT_HintTips');
           Lvl4 := TPhoaMutexSetting.Create(Lvl3, ISettingID_Browse_GT_HintInfo,  '@ISettingID_Browse_GT_HintInfo');
-          Lvl4 := TPhoaIntSetting.Create  (Lvl3, ISettingID_Browse_GT_HintProps,  '@ISettingID_Browse_GT_HintProps', GroupPropsToInt([gpID, gpDescription]), MinInt, MaxInt);
+          Lvl4 := TPhoaIntSetting.Create  (Lvl3, ISettingID_Browse_GT_HintProps,  '@ISettingID_Browse_GT_HintProps', GroupPropsToInt([gpDescription]), MinInt, MaxInt);
           AddGroupPropSettings(Lvl4 as TPhoaIntSetting);
       Lvl2 := TPhoaSetting.Create(Lvl1, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
         Lvl3 := TPhoaColorSetting.Create(Lvl2, ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);

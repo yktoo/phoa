@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.23 2004-06-08 13:43:07 dale Exp $
+//  $Id: Main.pas,v 1.24 2004-06-09 12:18:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -252,10 +252,8 @@ type
   private
      // Рабочий альбом
     FPhoA: TPhotoAlbum;
-     // Корневой узел - фотоальбом или представление
-    FRootNode: PVirtualNode;
      // Узел результатов поиска
-    FSearchedNode: PVirtualNode;
+    FSearchNode: PVirtualNode;
      // Список изображений - результаты поиска
     FSearchResults: TPhoaGroup;
      // Handle окна - следующего просмотрщика изменения содержимого clipboard
@@ -301,6 +299,8 @@ type
      // Отображает результаты поиска. Если bForceRemove=True, удаляет узел результатов, иначе, при bDoSelectNode=True,
      //   выделяет узел
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
+     // Возвращает вид узла
+    function  GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
      // Viewer events
     procedure ViewerSelectionChange(Sender: TObject);
     procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -417,13 +417,13 @@ uses
   procedure TfMain.aaEdit(Sender: TObject);
   begin
     ResetMode;
+     // Редактирование групп
     if ActiveControl=tvGroups then begin
-       // Корневой узел
-      if tvGroups.FocusedNode=FRootNode then
-        if ViewIndex>=0 then aPhoaView_Edit.Execute else EditPhoA(FPhoA, FOperations)
-       // Редактирование группы
-      else if (CurGroup<>nil) and (tvGroups.FocusedNode<>FSearchedNode) then
-        EditPicGroup(FPhoA, CurGroup, FOperations);
+      case GetNodeKind(tvGroups, tvGroups.FocusedNode) of
+        gnkPhoA:      EditPhoA(FPhoA, FOperations);
+        gnkView:      EditView(FPhoA.Views[ViewIndex], FPhoA, FOperations);
+        gnkPhoaGroup: EditPicGroup(FPhoA, CurGroup, FOperations);
+      end;
      // Редактирование изображения
     end else if (ActiveControl=Viewer) and (Viewer.SelCount>0) and EditPic(Viewer.GetSelectedPicArray, FPhoA, FOperations) then
       RefreshViewer;
@@ -745,7 +745,7 @@ uses
   procedure TfMain.ApplyLanguage;
   begin
      // Настраиваем прочие свойства
-    if Assigned(FRootNode) then begin
+    if FInitialized then begin
        // Перестраиваем представления, т.к. они содержат локализуемые названия узлов
       FPhoA.Views.UnprocessAllViews;
        // Перерисовываем дерево
@@ -876,16 +876,13 @@ uses
     if bForceRemove then FSearchResults.PicIDs.Clear;
      // Если есть результаты, следим, чтобы узел поиска существовал
     if FSearchResults.PicIDs.Count>0 then begin
-      if FSearchedNode=nil then FSearchedNode := tvGroups.AddChild(nil);
+      if FSearchNode=nil then FSearchNode := tvGroups.AddChild(nil);
        // Если надо выделить узел
-      if bDoSelectNode then begin
-        tvGroups.Selected[FSearchedNode] := True;
-        tvGroups.FocusedNode := FSearchedNode;
-      end;
+      if bDoSelectNode then ActivateVTNode(tvGroups, FSearchNode);
      // Если нет результатов - следим, чтобы его не было
-    end else if FSearchedNode<>nil then begin
-      tvGroups.DeleteNode(FSearchedNode);
-      FSearchedNode := nil;
+    end else if FSearchNode<>nil then begin
+      tvGroups.DeleteNode(FSearchNode);
+      FSearchNode := nil;
     end;
   end;
 
@@ -943,43 +940,40 @@ uses
   procedure TfMain.EnableActions;
   const asUnmod: Array[Boolean] of String[1] = ('*', '');
   var
-    bGr, bPic, bPics, bGrSel, bPicSel, bPhoANode, bSrchNode, bPicGroups: Boolean;
-    n: PVirtualNode;
+    bGr, bPic, bPics, bPicSel, bView: Boolean;
+    gnk: TGroupNodeKind;
   begin
     if not FInitialized or (csDestroying in ComponentState) then Exit;
-    n := tvGroups.FocusedNode;
-    bGr        := ActiveControl=tvGroups;
-    bPic       := ActiveControl=Viewer;
-    bPics      := FPhoA.Pics.Count>0;
-    bPhoANode  := n=FRootNode;
-    bSrchNode  := n=FSearchedNode;
-    bGrSel     := (n<>nil) and not bSrchNode;
-    bPicSel    := Viewer.SelCount>0;
-    bPicGroups := ViewIndex<0;
+    gnk := GetNodeKind(tvGroups, tvGroups.FocusedNode);
+    bGr     := ActiveControl=tvGroups;
+    bPic    := ActiveControl=Viewer;
+    bPics   := FPhoA.Pics.Count>0;
+    bPicSel := Viewer.SelCount>0;
+    bView   := ViewIndex>=0;
     aUndo.Caption := ConstVal(iif(FOperations.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FOperations.LastOpName]);
     aUndo.Enabled                := FOperations.CanUndo;
     smUndoHistory.Enabled        := FOperations.CanUndo;
-    aNewGroup.Enabled            := bPicGroups and bGrSel;
-    aNewPic.Enabled              := bPicGroups and bGrSel;
-    aDelete.Enabled              := bPicGroups and ((bGr and bGrSel and not bPhoANode) or (bPic and bPicSel and not bSrchNode));
-    aEdit.Enabled                := (not bPicGroups and bGr and bPhoANode) or (bPicGroups and bGr and bGrSel) or (bPicGroups and bPic and bPicSel);
-    aCut.Enabled                 := bPicGroups and bPicSel and (wClipbrdPicFormatID<>0);
+    aNewGroup.Enabled            := gnk in [gnkPhoA, gnkPhoaGroup];
+    aNewPic.Enabled              := gnk in [gnkPhoA, gnkPhoaGroup];
+    aDelete.Enabled              := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel);
+    aEdit.Enabled                := (bGr and (gnk in [gnkPhoA, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel);
+    aCut.Enabled                 := (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
     aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
-    aPaste.Enabled               := bPicGroups and bGrSel and Clipboard.HasFormat(wClipbrdPicFormatID);
-    aSortPics.Enabled            := bPicGroups and bPics;
-    aSelectAll.Enabled           := (CurGroup<>nil) and (Viewer.SelCount<CurGroup.PicIDs.Count);
+    aPaste.Enabled               := (gnk in [gnkPhoA, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
+    aSortPics.Enabled            := (gnk in [gnkPhoA, gnkPhoaGroup, gnkSearch]) and bPics;
+    aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelCount<CurGroup.PicIDs.Count);
     aSelectNone.Enabled          := bPicSel;
-    aView.Enabled                := bPicSel;
-    aRemoveSearchResults.Enabled := FSearchedNode<>nil;
-    aPicOps.Enabled              := bPicGroups and bPicSel;
-    aFileOperations.Enabled      := bPics and ((bGr and bGrSel) or (bPic and bPicSel));
+    aView.Enabled                := Viewer.ItemIndex>=0;
+    aRemoveSearchResults.Enabled := FSearchNode<>nil;
+    aPicOps.Enabled              := (gnk in [gnkPhoA, gnkPhoaGroup]) and bPicSel;
+    aFileOperations.Enabled      := bPics;
     aFind.Enabled                := bPics;
      // Views
-    aPhoaView_Delete.Enabled    := not bPicGroups;
-    aPhoaView_Edit.Enabled      := not bPicGroups;
-    aPhoaView_MakeGroup.Enabled := not bPicGroups;
+    aPhoaView_Delete.Enabled    := bView;
+    aPhoaView_Edit.Enabled      := bView;
+    aPhoaView_MakeGroup.Enabled := bView;
      // Drag-and-drop
-    Viewer.DragEnabled := bPicGroups and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
+    Viewer.DragEnabled := (gnk in [gnkPhoA, gnkPhoaGroup]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop);
      // Инструменты
     EnableTools;
      // Настраиваем Captions
@@ -999,11 +993,11 @@ uses
 
   function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
   begin
-    Result := FRootNode;
-    repeat
+    Result := tvGroups.GetFirst;
+    while Result<>nil do begin
       if PPhoaGroup(tvGroups.GetNodeData(Result))^.ID=iGroupID then Exit;
       Result := tvGroups.GetNext(Result);
-    until Result=nil;
+    end;
   end;
 
   procedure TfMain.FormActivate(Sender: TObject);
@@ -1070,9 +1064,8 @@ uses
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
-        tvGroups.NodeDataSize := SizeOf(Pointer);
+        tvGroups.NodeDataSize  := SizeOf(Pointer);
         tvGroups.RootNodeCount := 1;
-        FRootNode := tvGroups.GetFirst;
          // Обрабатываем параметры командной строки
         ProcessCommandLine;
       finally
@@ -1131,6 +1124,21 @@ uses
     Result := FPhoA.FileName;
   end;
 
+  function TfMain.GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
+  var g: TPhoaGroup;
+  begin
+    Result := gnkNone;
+    if Node<>nil then begin
+      g := PPhoaGroup(Tree.GetNodeData(Node))^;
+      if g.Owner=nil then begin
+        if g.ID=IGroupID_SearchResults then Result := gnkSearch
+        else if g=FPhoA.RootGroup      then Result := gnkPhoA
+        else if FViewIndex>=0          then Result := gnkView;
+      end else
+        if FViewIndex>=0 then Result := gnkViewGroup else Result := gnkPhoaGroup;
+    end;
+  end;
+
   function TfMain.GetSelectedPicLinks: TPhoaPicLinks;
   begin
     Result := TPhoaPicLinks.Create(True);
@@ -1162,8 +1170,8 @@ uses
     ResetMode;
     tvGroups.BeginUpdate;
     try
-      tvGroups.ReinitNode(FRootNode, True);
-      ActivateVTNode(tvGroups, FRootNode);
+      tvGroups.ReinitChildren(nil, True);
+      ActivateVTNode(tvGroups, tvGroups.GetFirst);
     finally
       tvGroups.EndUpdate;
     end;
@@ -1453,7 +1461,7 @@ uses
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   begin
-    if Node=FRootNode then begin
+    if GetNodeKind(tvGroups, Node) in [gnkPhoA, gnkView] then begin
       ItemColor := clBtnFace;
       EraseAction := eaColor;
     end;
@@ -1468,7 +1476,7 @@ uses
   var p: TPoint;
   begin
     ResetMode;
-    if Node=FRootNode then begin
+    if GetNodeKind(tvGroups, Node) in [gnkPhoA, gnkView] then begin
       with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
       pmPhoaView.Popup(p.x, p.y);
     end;
@@ -1536,7 +1544,7 @@ uses
       Effect := DROPEFFECT_NONE;
      // Перетаскивание изображений
     end else if Source=Viewer then begin
-      bCopy := (GetKeyState(VK_CONTROL) and $80<>0) or (nSrc=FSearchedNode);
+      bCopy := (GetKeyState(VK_CONTROL) and $80<>0) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
       gTgt := PPhoaGroup(Sender.GetNodeData(nTgt))^;
       iCnt := Viewer.SelCount;
       iCntBefore := gTgt.PicIDs.Count;
@@ -1551,22 +1559,26 @@ uses
 
   procedure TfMain.tvGroupsDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
   const aPicCur: Array[Boolean] of TCursor = (crDragMove, crDragCopy);
-  var nSrc, nTgt: PVirtualNode;
+  var
+    nSrc, nTgt: PVirtualNode;
+    gnkSrc, gnkTgt: TGroupNodeKind;
   begin
     Accept := False;
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
+    gnkSrc := GetNodeKind(tvGroups, nSrc);
+    gnkTgt := GetNodeKind(tvGroups, nTgt);
      // Перетаскивание группы
     if Sender=Source then begin
       Effect := DROPEFFECT_MOVE;
-      if (nTgt<>FSearchedNode) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
+      if (gnkTgt<>gnkSearch) and (Mode in [dmAbove, dmOnNode, dmBelow]) then begin
         case Mode of
            // НАД узлом - нельзя вставлять над фотоальбомом и над следующим за nSrc узлом
-          dmAbove:  Accept := (nTgt<>FRootNode) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
+          dmAbove:  Accept := (gnkTgt<>gnkPhoA) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index-1));
            // НА узле - нельзя таскать в родителя исходного узла
           dmOnNode: Accept := nSrc.Parent<>nTgt;
            // ПОД узлом - нельзя вставлять под фотоальбомом и под предыдущим перед nSrc узлом
-          dmBelow:  Accept := (nTgt<>FRootNode) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
+          dmBelow:  Accept := (gnkTgt<>gnkPhoA) and ((nSrc.Parent<>nTgt.Parent) or (nSrc.Index<>nTgt.Index+1));
         end;
          // nTgt не может быть ребёнком nSrc
         while Accept and (nTgt<>nil) do begin
@@ -1581,8 +1593,8 @@ uses
         (Viewer.SelCount>0) and
         (nTgt<>nil) and
         (nTgt<>nSrc) and
-        (nTgt<>FSearchedNode);
-      if Accept then Viewer.DragCursor := aPicCur[(nSrc=FSearchedNode) or (ssCtrl in Shift)];
+        (gnkTgt<>gnkSearch);
+      if Accept then Viewer.DragCursor := aPicCur[(gnkSrc=gnkSearch) or (ssCtrl in Shift)];
     end;
   end;
 
@@ -1598,31 +1610,31 @@ uses
 
   procedure TfMain.tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
   begin
-    Allowed :=
-      ((ViewIndex>=0) xor (Node<>FRootNode)) and // Когда активно дерево групп, можно редактировать любую папку, кроме
-                                                 //   корневой. Иначе, когда активно представление, можно редактировать
-                                                 //   только корневой узел (само представление)
-      (Node<>FSearchedNode);                     // Узел результатов поиска редактировать нельзя вообще
+    Allowed := GetNodeKind(Sender, Node) in [gnkView, gnkPhoaGroup];
   end;
 
   procedure TfMain.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  var s: String;
   begin
-    CellText := AnsiToUnicodeCP(
-      PPhoaGroup(Sender.GetNodeData(Node))^.GetPropStrs(FGroupTreeHintProps, ': ', S_CRLF),
-      cMainCodePage);
+    case GetNodeKind(Sender, Node) of
+      gnkPhoA:      s := FPhoA.Description;
+      gnkPhoaGroup: s := PPhoaGroup(Sender.GetNodeData(Node))^.GetPropStrs(FGroupTreeHintProps, ': ', S_CRLF);
+      else          s := '';
+    end;
+    CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+  const
+    aiImgIdx: Array[TGroupNodeKind] of Integer = (
+      -1,             // gnkNone
+      iiPhoA,         // gnkPhoA
+      iiView,         // gnkView
+      iiFolderSearch, // gnkSearch
+      iiFolder,       // gnkPhoaGroup
+      iiFolder);      // gnkViewGroup
   begin
-    if Kind in [ikNormal, ikSelected] then
-       // Обычная группа
-      if Sender.NodeParent[Node]<>nil then ImageIndex := iiFolder
-       // Узел результатов поиска
-      else if Node=FSearchedNode      then ImageIndex := iiFolderSearch
-       // Узел фотоальбома
-      else if ViewIndex<0             then ImageIndex := iiPhoA
-       // Узел представления
-      else                                 ImageIndex := iiView;
+    if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[GetNodeKind(Sender, Node)];
   end;
 
   procedure TfMain.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -1631,17 +1643,19 @@ uses
     s: String;
   begin
     p := Sender.GetNodeData(Node);
+    s := '';
      // Static text
-    if TextType=ttStatic then begin
-      {!!!if p^.PicIDs.Count>0 then }                  s := {!!!Format('(%d)', [p^.PicIDs.Count]);} Format('(%d) - %d', [p^.PicIDs.Count, p^.ID]);
-     // Обычная группа
-    end else if Sender.NodeParent[Node]<>nil then s := p^.Text
-     // Узел результатов поиска
-    else if Node=FSearchedNode      then          s := ConstVal('SSearchResultsNode')
-     // Узел фотоальбома
-    else if ViewIndex<0             then          s := ConstVal('SPhotoAlbumNode')
-     // Узел представления
-    else                                          s := FPhoA.Views[ViewIndex].Name;
+    case TextType of
+      ttNormal:
+        case GetNodeKind(Sender, Node) of
+          gnkPhoA:        s := ConstVal('SPhotoAlbumNode');
+          gnkView:        s := FPhoA.Views[ViewIndex].Name;
+          gnkSearch:      s := ConstVal('SSearchResultsNode');
+          gnkPhoaGroup,
+            gnkViewGroup: s := p^.Text;
+        end;
+      ttStatic: if p^.PicIDs.Count>0 then s := Format('(%d)', [p^.PicIDs.Count]);
+    end;
     CellText := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
@@ -1667,12 +1681,10 @@ uses
 
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
-     // Редактировали представление?
-    if (ViewIndex>=0) and (tvGroups.FocusedNode=FRootNode) then
-      PerformOperation(TPhoaOp_ViewEdit.Create(FOperations, FPhoA.Views[ViewIndex], Self, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil))
-     // Иначе редактировали группу
-    else
-      PerformOperation(TPhoaOp_GroupRename.Create(FOperations, FPhoA, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage)));
+    case GetNodeKind(Sender, Node) of
+      gnkView:      PerformOperation(TPhoaOp_ViewEdit.Create(FOperations, FPhoA.Views[ViewIndex], Self, UnicodetoAnsiCP(NewText, cMainCodePage), nil, nil));
+      gnkPhoaGroup: PerformOperation(TPhoaOp_GroupRename.Create(FOperations, FPhoA, CurGroup, UnicodetoAnsiCP(NewText, cMainCodePage)));
+    end;
   end;
 
   procedure TfMain.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);

@@ -63,10 +63,12 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowTreeLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused]
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
+    OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChecked = tvGroupsChecked
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText
     OnGetImageIndex = tvGroupsGetImageIndex
+    OnGetHint = tvGroupsGetHint
     OnInitNode = tvGroupsInitNode
     Columns = <>
     WideDefaultText = 'Photo Album'

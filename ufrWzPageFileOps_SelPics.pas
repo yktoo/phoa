@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.3 2004-05-11 03:36:48 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.4 2004-06-09 12:18:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -33,12 +33,14 @@ type
     rbValidityAny: TRadioButton;
     rbValidityValid: TRadioButton;
     rbValidityInvalid: TRadioButton;
+    procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure RBSelPicturesClick(Sender: TObject);
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure RBSelPicturesClick(Sender: TObject);
     procedure aaCheckAll(Sender: TObject);
     procedure aaUncheckAll(Sender: TObject);
     procedure aaInvertChecks(Sender: TObject);
@@ -71,7 +73,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, udFileOpsWizard, Main, phObj;
+uses phUtils, udFileOpsWizard, Main, phObj, phSettings;
 
   procedure TfrWzPageFileOps_SelPics.aaCheckAll(Sender: TObject);
   begin
@@ -156,7 +158,9 @@ uses phUtils, udFileOpsWizard, Main, phObj;
   begin
     inherited InitializePage;
      // Настраиваем дерево групп
-    tvGroups.NodeDataSize := SizeOf(Pointer);
+    ApplyTreeSettings(tvGroups); 
+    tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+    tvGroups.NodeDataSize  := SizeOf(Pointer);
     tvGroups.RootNodeCount := fMain.tvGroups.RootNodeCount;
   end;
 
@@ -202,9 +206,19 @@ uses phUtils, udFileOpsWizard, Main, phObj;
     rbValidityInvalid.Checked := Wiz.SelPicValidityFilter=fospvfInvalidOnly;
   end;
 
+  procedure TfrWzPageFileOps_SelPics.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+  begin
+    fMain.tvGroupsBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction);
+  end;
+
   procedure TfrWzPageFileOps_SelPics.tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
     if not (tsUpdating in Sender.TreeStates) then UpdateCountInfo;
+  end;
+
+  procedure TfrWzPageFileOps_SelPics.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  begin
+    fMain.tvGroupsGetHint(Sender, Node, Column, TextType, CellText);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

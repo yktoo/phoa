@@ -5,6 +5,7 @@ inherited dPicOps: TdPicOps
   ClientHeight = 433
   ClientWidth = 399
   OldCreateOrder = True
+  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
@@ -84,10 +85,12 @@ inherited dPicOps: TdPicOps
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowTreeLines, toThemeAware, toUseBlendedImages]
     TreeOptions.StringOptions = [toShowStaticText, toAutoAcceptEditChange]
+    OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChange = tvGroupsChange
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText
     OnGetImageIndex = tvGroupsGetImageIndex
+    OnGetHint = tvGroupsGetHint
     OnInitNode = tvGroupsInitNode
     Columns = <>
     WideDefaultText = 'Photo Album'
