@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.16 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -256,7 +256,7 @@ uses phUtils, Main, phSettings;
   begin
     case TextType of
        // Текст ключевого слова
-      ttNormal: CellText := AnsiToUnicodeCP(FKeywords[Node.Index], cMainCodePage);
+      ttNormal: CellText := PhoaAnsiToUnicode(FKeywords[Node.Index]);
        // Количество вхождений слова
       ttStatic: begin
         p := FKeywords.KWData[Node.Index];
@@ -279,7 +279,7 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_Keywords.tvMainNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
-    FNodeToFocusIndex := FKeywords.Rename(Node.Index, UnicodeToAnsiCP(NewText, cMainCodePage));
+    FNodeToFocusIndex := FKeywords.Rename(Node.Index, PhoaUnicodeToAnsi(NewText));
     tvMain.ReinitChildren(nil, False);
     Modified;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.35 2004-12-31 13:38:58 dale Exp $
+//  $Id: phoa.dpr,v 1.36 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -71,7 +71,8 @@ uses
   phParsingPicFilter in 'phParsingPicFilter.pas',
   phPicFilterHighlighter in 'phPicFilterHighlighter.pas',
   phIJLIntf in 'phIJLIntf.pas',
-  ufrExprPicFilter in 'ufrExprPicFilter.pas' {frExprPicFilter: TFrame};
+  ufrExprPicFilter in 'ufrExprPicFilter.pas' {frExprPicFilter: TFrame},
+  phPlugin in 'phPlugin.pas';
 
 {$R *.res}
 

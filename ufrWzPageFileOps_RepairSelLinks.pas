@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.12 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.13 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -104,7 +104,7 @@ uses phUtils, udFileOpsWizard, Main;
 //        3: s := DateTimeToStr(FL.FileTime, AppFormatSettings);
 //      end;
 //    end;
-//    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+//    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrWzPageFileOps_RepairSelLinks.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

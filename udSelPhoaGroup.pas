@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.16 2004-12-31 13:38:58 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -100,7 +100,7 @@ uses phUtils, ConsVars, Main, phSettings;
         if p^.Pics.Count>0 then s := Format('(%d)', [p^.Pics.Count]);
       end else if Sender.NodeParent[Node]<>nil then s := p^.Text
       else s := ConstVal('SPhotoAlbumNode');
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TdSelPhoaGroup.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

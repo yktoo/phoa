@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.14 2004-12-31 13:38:58 dale Exp $
+//  $Id: phValSetting.pas,v 1.15 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -755,7 +755,7 @@ type
           if Setting is TPhoaListSetting then s := ConstValEx(sVal) else s := sVal;
         end;
     end;
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TPhoaValSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

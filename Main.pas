@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.74 2004-12-31 13:38:58 dale Exp $
+//  $Id: Main.pas,v 1.75 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1790,7 +1790,7 @@ uses
       gnkPhoaGroup: s := GetPicGroupPropStrs(GetNodeGroup(Node), FGroupTreeHintProps, ': ', S_CRLF);
       else          s := '';
     end;
-    HintText := AnsiToUnicodeCP(s, cMainCodePage);
+    HintText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -1825,7 +1825,7 @@ uses
         end;
       ttStatic: if Group.Pics.Count>0 then s := Format('(%d)', [Group.Pics.Count]);
     end;
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfMain.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -1850,8 +1850,8 @@ uses
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
     case GetNodeKind(Sender, Node) of
-      gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', UnicodetoAnsiCP(NewText, cMainCodePage), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
-      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroup, 'NewText', UnicodetoAnsiCP(NewText, cMainCodePage)]);
+      gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', PhoaUnicodeToAnsi(NewText), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
+      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroup, 'NewText', PhoaUnicodeToAnsi(NewText)]);
     end;
   end;
 

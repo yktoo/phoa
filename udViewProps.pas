@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.16 2005-01-14 08:55:30 dale Exp $
+//  $Id: udViewProps.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -374,7 +374,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
 
   procedure TdViewProps.tvGroupingGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
-    if GroupingNode(Node) and (Column=0) then CellText := AnsiToUnicodeCP(GroupByPropName(FGroupings[Node.Index].Prop), cMainCodePage);
+    if GroupingNode(Node) and (Column=0) then CellText := PhoaAnsiToUnicode(GroupByPropName(FGroupings[Node.Index].Prop));
   end;
 
   procedure TdViewProps.tvGroupingInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

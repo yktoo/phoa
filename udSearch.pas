@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.33 2005-01-18 15:46:53 dale Exp $
+//  $Id: udSearch.pas,v 1.34 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1401,7 +1401,7 @@ type
         IColIdx_Simple_Condition: s := Crit.ConditionName;
         IColIdx_Simple_Value:     if not (Crit.Condition in SSCNoValueConditions) then s := Crit.ValueStr;
       end;
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TdSearch.tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

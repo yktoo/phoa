@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.11 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -101,8 +101,8 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TdSelKeywords.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
     case TextType of
-      ttNormal: CellText := AnsiToUnicodeCP(FKeywords[Node.Index], cMainCodePage);
-      ttStatic: CellText := AnsiToUnicodeCP(Format('(%d)', [FKeywords.KWData[Node.Index].iCount]), cMainCodePage);
+      ttNormal: CellText := PhoaAnsiToUnicode(FKeywords[Node.Index]);
+      ttStatic: CellText := PhoaAnsiToUnicode(Format('(%d)', [FKeywords.KWData[Node.Index].iCount]));
     end;
   end;
 

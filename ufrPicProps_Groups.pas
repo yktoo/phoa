@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.17 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.18 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -191,7 +191,7 @@ type
         if p.Group.Pics.Count>0 then s := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.Pics.Count]);
       end else if Sender.NodeParent[Node]<>nil then s := p.Group.Text
       else s := ConstVal('SPhotoAlbumNode');
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrPicProps_Groups.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

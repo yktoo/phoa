@@ -109,11 +109,11 @@ RemoteHost=10.0.2.110
 RemotePath=c:\tmp\phoa.exe
 [Version Info]
 IncludeVerInfo=1
-AutoIncBuild=0
+AutoIncBuild=1
 MajorVer=1
 MinorVer=1
 Release=10
-Build=275
+Build=281
 Debug=0
 PreRelease=0
 Special=0
@@ -124,7 +124,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=DK Software
 FileDescription=PhoA image arranging and searching tool
-FileVersion=1.1.10.275
+FileVersion=1.1.10.281
 InternalName=PhoA
 LegalCopyright=©2002-2005 DK Software
 LegalTrademarks=

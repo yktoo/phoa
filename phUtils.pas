@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.46 2005-02-12 15:36:37 dale Exp $
+//  $Id: phUtils.pas,v 1.47 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -59,6 +59,9 @@ uses
    // Преобразует Ansi-строку в Unicode-строку, используя указанную кодовую страницу и наоборот
   function  AnsiToUnicodeCP(const s: AnsiString; cCodePage: Cardinal): WideString;
   function  UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString;
+   // То же самое, но для cCodePage использует значение cMainCodePage
+  function  PhoaAnsiToUnicode(const s: AnsiString): WideString;
+  function  PhoaUnicodeToAnsi(const s: WideString): AnsiString;
 
    // Заменяет вхождения символов sReplaceChars в строке s на символ cReplaceWith и возвращает результат
   function  ReplaceChars(const s, sReplaceChars: String; cReplaceWith: Char): String;
@@ -496,6 +499,16 @@ var
     WideCharToMultiByte(cCodePage, 0, @s[1], iLen, @Result[1], iLen, nil, nil);
   end;
 
+  function PhoaAnsiToUnicode(const s: AnsiString): WideString;
+  begin
+    Result := AnsiToUnicodeCP(s, cMainCodePage);
+  end;
+
+  function PhoaUnicodeToAnsi(const s: WideString): AnsiString;
+  begin
+    Result := UnicodeToAnsiCP(s, cMainCodePage);
+  end;
+
    //-------------------------------------------------------------------------------------------------------------------
    // Misc
    //-------------------------------------------------------------------------------------------------------------------
@@ -783,7 +796,6 @@ var
   procedure EnableControl(bEnable: Boolean; Ctl: TControl);
   var
     pi: PPropInfo;
-    i: Integer;
     WCtl: TWinControl absolute Ctl;
   begin
     if Ctl is TWinControl then begin

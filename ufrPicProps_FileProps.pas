@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.16 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -195,7 +195,7 @@ type
         1: if NS=nil then s := ConstVal('SErrFileNotFound') else s := DiskFilePropValue(DFProp, NS);
       end;
     end;
-    CellText := AnsiToUnicodeCP(s, cMainCodePage);
+    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrPicProps_FileProps.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -229,7 +229,7 @@ type
 
   procedure TfrPicProps_FileProps.tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
   begin
-    Result := AnsiToUnicodeCP(ShortenFileName(TargetCanvas, TextSpace-10, UnicodeToAnsiCP(S, cMainCodePage)), cMainCodePage);
+    Result := PhoaAnsiToUnicode(ShortenFileName(TargetCanvas, TextSpace-10, PhoaUnicodeToAnsi(S)));
     Done := True;
   end;
 

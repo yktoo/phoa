@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.11 2005-02-13 19:16:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -72,7 +72,7 @@ const
   procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const); overload;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses phPhoa, Variants, ConsVars;
+uses phPhoa, Variants, phUtils, ConsVars;
 
 type
   TChars = set of Char;
@@ -237,14 +237,20 @@ type
     function  Top: IPhoaParsedItem;
     property  Items[Index: Integer]: IPhoaParsedItem read GetItems write SetItems; default;
      // IPhoaKeywordList
-    function  IPhoaKeywordList.IndexOf      = KWL_IndexOf;
-    function  IPhoaKeywordList.GetCommaText = KWL_GetCommaText;
-    function  IPhoaKeywordList.GetCount     = KWL_GetCount;
-    function  IPhoaKeywordList.GetItems     = KWL_GetItems;
+    function  IPhoaKeywordList.IndexOf       = KWL_IndexOf;
+    function  IPhoaKeywordList.IndexOfW      = KWL_IndexOfW;
+    function  IPhoaKeywordList.GetCommaText  = KWL_GetCommaText;
+    function  IPhoaKeywordList.GetCommaTextW = KWL_GetCommaTextW;
+    function  IPhoaKeywordList.GetCount      = KWL_GetCount;
+    function  IPhoaKeywordList.GetItems      = KWL_GetItems;
+    function  IPhoaKeywordList.GetItemsW     = KWL_GetItemsW;
     function  KWL_IndexOf(const sKeyword: String): Integer; stdcall;
+    function  KWL_IndexOfW(const sKeyword: WideString): Integer; stdcall;
     function  KWL_GetCommaText: String; stdcall;
+    function  KWL_GetCommaTextW: WideString; stdcall;
     function  KWL_GetCount: Integer; stdcall;
     function  KWL_GetItems(Index: Integer): String; stdcall;
+    function  KWL_GetItemsW(Index: Integer): WideString; stdcall;
   end;
 
   TPhoaParsedItem = class(TInterfacedObject, IPhoaParsedItem)
@@ -442,6 +448,12 @@ type
     end;
   end;
 
+  function TPhoaParsedItemsList.KWL_GetCommaTextW: WideString;
+  begin
+    Result := '';
+    { stub }
+  end;
+
   function TPhoaParsedItemsList.KWL_GetCount: Integer;
   begin
     Result := Count;
@@ -452,11 +464,21 @@ type
     Result := Items[Index].AsOperand.AsString(nil);
   end;
 
+  function TPhoaParsedItemsList.KWL_GetItemsW(Index: Integer): WideString;
+  begin
+    Result := PhoaAnsiToUnicode(KWL_GetItems(Index));
+  end;
+
   function TPhoaParsedItemsList.KWL_IndexOf(const sKeyword: String): Integer;
   begin
     for Result := 0 to Count-1 do
       if AnsiCompareText(Items[Result].AsOperand.AsString(nil), sKeyword)=0 then Exit;
     Result := -1;
+  end;
+
+  function TPhoaParsedItemsList.KWL_IndexOfW(const sKeyword: WideString): Integer;
+  begin
+    Result := KWL_IndexOf(PhoaUnicodeToAnsi(sKeyword));
   end;
 
   function TPhoaParsedItemsList.Pop: IPhoaParsedItem;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.11 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -185,7 +185,7 @@ uses phUtils, Main, Clipbrd, phSettings, udMsgBox;
        // Порядковый номер
       0: CellText := IntToStr(Node.Index+1);
        // Текст записи протокола
-      1: CellText := AnsiToUnicodeCP(Copy(GetLog[Node.Index], 5, MaxInt), cMainCodePage);
+      1: CellText := PhoaAnsiToUnicode(Copy(GetLog[Node.Index], 5, MaxInt));
     end;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrSorting.pas,v 1.11 2005-02-13 19:16:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -275,8 +275,8 @@ uses phUtils, ConsVars, Main, phSettings;
     if SortingNode(Node) then begin
       Sorting := FSortings[Node.Index];
       case Column of
-        0: CellText := AnsiToUnicodeCP(PicPropName(Sorting.Prop), cMainCodePage);
-        1: CellText := AnsiToUnicodeCP(ConstVal(iif(Sorting.Direction=psdAsc, 'SSort_Ascending', 'SSort_Descending')), cMainCodePage);
+        0: CellText := PhoaAnsiToUnicode(PicPropName(Sorting.Prop));
+        1: CellText := PhoaAnsiToUnicode(ConstVal(iif(Sorting.Direction=psdAsc, 'SSort_Ascending', 'SSort_Descending')));
       end;
     end;
   end;
