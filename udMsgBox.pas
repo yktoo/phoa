@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: udMsgBox.pas,v 1.11 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -313,6 +313,8 @@ uses phUtils, phSettings, ChmHlp;
   procedure TdMsgBox.AdjustMessage;
   begin
     with lMessage do begin
+       // Ставим точку в конце, если её нет
+      if (FMessage<>'') and not (FMessage[Length(FMessage)] in ['.', '!', '?', '…']) then FMessage := FMessage+'.';
       Caption  := FMessage;
        // Выставляем ширину текста побольше и пересчитываем размеры надписи
       Width    := Screen.WorkAreaWidth-IMsgBox_ScreenWidthGap-Left-IMsgBox_LabelRightMargin;

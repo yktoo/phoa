@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.17 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.18 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -94,7 +94,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
 
   procedure TfrWzPageFileOps_SelPics.AdjustPicControls;
   begin
-    EnableWndCtl(tvGroups, rbSelGroups.Checked);
+    EnableControl(rbSelGroups.Checked, tvGroups);
     UpdateCountInfo;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.8 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -40,21 +40,17 @@ implementation
 uses phUtils, udFileOpsWizard, phObj;
 
   procedure TfrWzPageFileOps_CDOptions.AdjustOptionControls;
-  var bCreatePhoa, bCreateAutorun: Boolean;
+  var bCreatePhoa: Boolean;
   begin
      // Create photo album
     bCreatePhoa := cbCreatePhoa.Checked;
-    EnableWndCtl(ePhoaFileName, bCreatePhoa);
-    EnableWndCtl(mPhoaDesc,     bCreatePhoa);
-    lPhoaDesc.Enabled      := bCreatePhoa;
+    EnableControls(bCreatePhoa, [ePhoaFileName, lPhoaDesc, mPhoaDesc]);
     cbIncludeViews.Enabled := bCreatePhoa;
      // Copy the executable
     cbCopyIniSettings.Enabled := cbCopyExecutable.Checked;
      // Create autorun.inf
     cbCreateAutorun.Enabled := bCreatePhoa;
-    bCreateAutorun := cbCreateAutorun.Enabled and cbCreateAutorun.Checked;
-    lMediaLabel.Enabled := bCreateAutorun;
-    EnableWndCtl(eMediaLabel, bCreateAutorun);
+    EnableControls(bCreatePhoa and cbCreateAutorun.Checked, [lMediaLabel, eMediaLabel]);
   end;
 
   procedure TfrWzPageFileOps_CDOptions.AdjustOptionsNotify(Sender: TObject);

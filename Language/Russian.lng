@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.9
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-02-05 18:50:49
+LastModified=2005-02-12 18:22:53
 SourceLANGID=1033
 
 [fMain]
@@ -206,6 +206,8 @@ SourceLANGID=1033
 00000022=Со&хранять исходную структуру папок
 00000025=Поме&щать файлы в папки, повторяя структуру групп изображений
 00000028=Разре&шать создание нескольких копий одного файла
+00000029=Составление имён файлов
+00000030=Переименовывать файлы, используя &формат:
 
 [frWzPageFileOps_DelOptions]
 00000007=&Удалять файлы в Корзину
@@ -927,19 +929,24 @@ SErrCannotCreateFolder=Ошибка при создании папки «%s»
 SErrCannotDecodePicture=Ошибка при декодировании файла изображения «%s»:\n%s
 SErrCannotLoadPicture=Ошибка при загрузке файла изображения «%s»:\n%s
 SErrCannotRead=Ошибка чтения из потока
+SErrCannotUsePathPropsInFormat=Свойство "%s" нельзя использовать в формате имени файла, поскольку оно содержит путь к файлу
 SErrCannotWrite=Ошибка записи в поток
 SErrDuplicateKeyword=Такое ключевое слово уже есть в списке
 SErrExecutingToolFailed=Ошибка выполнения инструмента «%s» для файла «%s»: %s
 SErrFileNotFound=Файл не найден
 SErrFileNotFoundFmt=Файл не найден: «%s»
 SErrFileRevHigher=Файл фотоальбома создан версией программы новее, чем эта. Открытие файла невозможно.
+SErrInvalidCharsInFileName=Имя файла не может содержать ни одного из следующих символов:\n\\ / : * ? " < > |\nУдалите эти символы и повторите попытку
 SErrInvalidPicFileName=Неверное имя файла изображения: «%s»
+SErrInvalidPicPropName=Недопустимое имя свойства изображения: "%s"
 SErrNotAllPicsLinked=%d из %d выбранных изображений не будут находиться ни в одной группе, что недопустимо. Необходимо, чтобы каждое изображение было связано как минимум с одной группой.
 SErrNoTargetPathDetermined=Не удалось определить путь назначения для файла «%s»
 SError=Ошибка
 SErrPicFileAlreadyInUse=Файл "%s" уже используется другим изображением (ID=%d) текущего фотоальбома
+SErrPicPropNameMissing=Имя свойства изображения отсутствует
 SErrSrcAndDestFoldersAreSame=Исходная папка и папка назначения совпадают («%s») для файла «%s»
 SErrTargetFileExists=Файл назначения «%s» уже существует
+SErrUnbalancedCurlyBraces=Фигурные скобки в выражении несбалансированы
 SErrUnknownPicFileExtension=Неизвестное расширение у файла изображения «%s»
 SFileFilter_Ini=Ini-файлы (*.ini)|*.ini
 SFileFilter_OpenPhoa=Файлы фотоальбомов (*.phoa)|*.phoa|Все файлы (*.*)|*.*
@@ -1025,10 +1032,6 @@ sscStrSpecified=присутствует
 sscStrStarts=начинается на
 SSearchResultsNode=Результаты поиска
 SSelectedPicCount=%d выделено
-SSizeBytes=%d байт
-SSizeGBytes=%.2f Гбайт
-SSizeKBytes=%.2f Кбайт
-SSizeMBytes=%.2f Мбайт
 SSort_Ascending=По возрастанию
 SSort_Descending=По убыванию
 SStats_DistinctPics=Количество различных изображений

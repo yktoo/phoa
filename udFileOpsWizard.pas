@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.28 2004-12-31 13:38:58 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.29 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -80,7 +80,7 @@ type
      // True, если в момент вызова Мастера фокус был у окна эскизов
     FSelPicsByDefault: Boolean;
      // Prop storage
-    FApp: IPhotoAlbumApp; 
+    FApp: IPhotoAlbumApp;
     FCDOpt_CopyExecutable: Boolean;
     FCDOpt_CopyIniSettings: Boolean;
     FCDOpt_CreateAutorun: Boolean;
@@ -99,8 +99,10 @@ type
     FMoveFile_BasePath: String;
     FMoveFile_DeleteOriginal: Boolean;
     FMoveFile_DeleteToRecycleBin: Boolean;
+    FMoveFile_FileNameFormat: String;
     FMoveFile_NoOriginalMode: TFileOpMoveFileNoOriginalMode;
     FMoveFile_OverwriteMode: TFileOpMoveFileOverwriteMode;
+    FMoveFile_RenameFiles: Boolean;
     FMoveFile_ReplaceChar: Char;
     FMoveFile_UseCDOptions: Boolean;
     FProjectChanged: Boolean;
@@ -199,12 +201,16 @@ type
      // -- Копирование/перемещение: если True, делать дубликаты файлов, помещая их в папки, соответствующие группам (при
      //    MoveFileArranging=fomfaMaintainGroupLayout)
     property MoveFile_AllowDuplicating: Boolean read FMoveFile_AllowDuplicating write FMoveFile_AllowDuplicating;
+     // -- Копирование/перемещение: если True, переименовывать файлы, используя значение MoveFile_FileNameFormat
+    property MoveFile_RenameFiles: Boolean read FMoveFile_RenameFiles write FMoveFile_RenameFiles;
+     // -- Копирование/перемещение: формат имени файла, используемый для переименовывания файлов при
+     //    MoveFile_RenameFiles=True
+    property MoveFile_FileNameFormat: String read FMoveFile_FileNameFormat write FMoveFile_FileNameFormat;
      // -- Копирование/перемещение: поведение при отсутствии исходного файла при перемещении
     property MoveFile_NoOriginalMode: TFileOpMoveFileNoOriginalMode read FMoveFile_NoOriginalMode write FMoveFile_NoOriginalMode;
      // -- Копирование/перемещение: режим перезаписи существующих файлов
     property MoveFile_OverwriteMode: TFileOpMoveFileOverwriteMode read FMoveFile_OverwriteMode write FMoveFile_OverwriteMode;
-     // -- Копирование/перемещение: символ, на который заменять недопустимые для пути символы в именах групп (при
-     //    MoveFileArranging=fomfaMaintainGroupLayout)
+     // -- Копирование/перемещение: символ, на который заменять недопустимые для пути/имени файлов символы
     property MoveFile_ReplaceChar: Char read FMoveFile_ReplaceChar write FMoveFile_ReplaceChar;
      // -- Копирование/перемещение: если True, удалять оригинальный файл
     property MoveFile_DeleteOriginal: Boolean read FMoveFile_DeleteOriginal write FMoveFile_DeleteOriginal;
@@ -357,7 +363,7 @@ uses
 
   procedure TFileOpThread.DoCopyMovePic(Pic: IPhotoAlbumPic);
   var
-    sFile, sSrcPath, sDestPath, sTargetPath: String;
+    sSrcFileName, sSrcPath, sSrcFullFileName, sDestPath, sTargetPath, sTargetFileName: String;
     SLRelTargetPaths: TStringList;
     i: Integer;
 
@@ -398,22 +404,55 @@ uses
       end;
     end;
 
+     // Возвращает отформатированное в соответствии с FWizard.MoveFile_FileNameFormat имя файла назначения для
+     //   обрабатываемого изображения
+    function GetFormattedTargetFileName: String;
+    var
+      s: String;
+      i1, i2: Integer;
+      PProp: TPicProperty;
+    begin
+      Result := '';
+      s := FWizard.MoveFile_FileNameFormat;
+      repeat
+         // Ищем фигурные скобки в строке
+        i1 := Pos('{', s);
+        i2 := Pos('}', s);
+         // Фигурные скобки закончились
+        if (i1=0) and (i2=0) then Break;
+         // Добавляем к результату начало строки, не содержащее фигурных скобок
+        Result := Result+Copy(s, 1, Min(i1, i2)-1);
+         // Выделяем имя свойства изображения, содержащееся между фигурных скобок
+        if (i1<>0) and (i2<>0) and (i1<i2-1) then begin
+          PProp := StrToPicProp(Copy(s, i1+1, i2-i1-1), True);
+           // Добавляем к результату значение свойства для обрабатываемого изображения
+          Result := Result+Pic.PropStrValues[PProp];
+        end;
+         // Удаляем обработанную часть строки из s
+        Delete(s, 1, Max(i1, i2));
+      until s='';
+       // Добавляем к результату остаток строки (не содержащий фигурных скобок) и расширение исходного файла
+      Result := Result+s+ExtractFileExt(sSrcFileName);
+       // Заменяем недопустимые символы в имени файла
+      Result := ReplaceChars(Result, SInvalidPathChars, FWizard.MoveFile_ReplaceChar);
+    end;
+
      // Копирует файл в путь sTargetPath
     procedure PerformCopying(const sTargetPath: String);
-    var sTargetDir, sTargetFile: String;
+    var sTargetDir, sTargetFullFileName: String;
     begin
       sTargetDir := ExcludeTrailingPathDelimiter(sTargetPath);
        // Проверяем, что исходный и целевой пути разные
-      if AnsiSameText(sSrcPath, sTargetPath) then FileOpError('SErrSrcAndDestFoldersAreSame', [sTargetDir, sFile]);
+      if AnsiSameText(sSrcPath, sTargetPath) then FileOpError('SErrSrcAndDestFoldersAreSame', [sTargetDir, sSrcFileName]);
        // Пытаемся создать каталог назначения
       if not ForceDirectories(sTargetDir) then FileOpError('SErrCannotCreateFolder', [sTargetDir]);
        // Проверяем перезапись файла
-      sTargetFile := sTargetPath+sFile;
+      sTargetFullFileName := sTargetPath+sTargetFileName;
       case FWizard.MoveFile_OverwriteMode of
-        fomfomNever: if FileExists(sTargetFile) then FileOpError('SErrTargetFileExists', [sTargetFile]);
+        fomfomNever: if FileExists(sTargetFullFileName) then FileOpError('SErrTargetFileExists', [sTargetFullFileName]);
         fomfomPrompt:
-          if FileExists(sTargetFile) then begin
-            FOverwriteFileName := sTargetFile;
+          if FileExists(sTargetFullFileName) then begin
+            FOverwriteFileName := sTargetFullFileName;
             Synchronize(AskOverwrite);
              // "Да"
             if mbrYes in FOverwriteResults then
@@ -423,11 +462,11 @@ uses
               FWizard.MoveFile_OverwriteMode := fomfomAlways
              // "Нет"
             else if mbrNo in FOverwriteResults then
-              FileOpError('SLogEntry_UserDeniedFileOverwrite', [sTargetFile])
+              FileOpError('SLogEntry_UserDeniedFileOverwrite', [sTargetFullFileName])
              // "Нет для всех"
             else if mbrNoToAll in FOverwriteResults then begin
               FWizard.MoveFile_OverwriteMode := fomfomNever;
-              FileOpError('SErrTargetFileExists', [sTargetFile]);
+              FileOpError('SErrTargetFileExists', [sTargetFullFileName]);
              // "Отмена"
             end else begin
               FWizard.InterruptProcessing;
@@ -436,17 +475,19 @@ uses
           end;
       end;
        // Копируем файл
-      if not CopyFile(PChar(sSrcPath+sFile), PChar(sTargetFile), False) then RaiseLastOSError;
+      if not CopyFile(PChar(sSrcFullFileName), PChar(sTargetFullFileName), False) then RaiseLastOSError;
        // Протоколируем успех
-      FWizard.LogSuccess('SLogEntry_FileCopiedOK', [sSrcPath+sFile, sTargetFile]);
+      FWizard.LogSuccess('SLogEntry_FileCopiedOK', [sSrcFullFileName, sTargetFullFileName]);
     end;
 
   begin
      // Получаем имя/путь исходного файла
-    sFile       := ExtractFileName(Pic.FileName);
-    sSrcPath    := ExtractFilePath(Pic.FileName);
-    sDestPath   := IncludeTrailingPathDelimiter(FWizard.DestinationFolder);
-    sTargetPath := '';
+    sSrcFullFileName := Pic.FileName;
+    sSrcFileName     := ExtractFileName(sSrcFullFileName);
+    sSrcPath         := ExtractFilePath(sSrcFullFileName);
+    sDestPath        := IncludeTrailingPathDelimiter(FWizard.DestinationFolder);
+    sTargetPath      := '';
+    sTargetFileName  := GetFormattedTargetFileName;
     case FWizard.MoveFile_Arranging of
        // Все в один каталог - каталог назначения
       fomfaPutFlatly: begin
@@ -483,12 +524,12 @@ uses
      // Если режим - перемещение
     if FWizard.FileOpKind=fokMoveFiles then begin
        // Исправляем ссылку
-      DoUpdateFileLink(Pic, sTargetPath+sFile);
+      DoUpdateFileLink(Pic, sTargetPath+sTargetFileName);
        // Удаляем исходный файл
-      if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcPath+sFile, FWizard.MoveFile_DeleteToRecycleBin);
+      if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcFullFileName, FWizard.MoveFile_DeleteToRecycleBin);
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
-    if FWizard.ExportedProject<>nil then FWizard.ExportedProject.PicsX.ItemsByIDX[Pic.ID].FileName := sTargetPath+sFile;
+    if FWizard.ExportedProject<>nil then FWizard.ExportedProject.PicsX.ItemsByIDX[Pic.ID].FileName := sTargetPath+sTargetFileName;
   end;
 
   procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
@@ -833,6 +874,7 @@ uses
     FCDOpt_PhoaDesc              := FApp.Project.Description;
     FCDOpt_PhoaFileName          := ExtractFileName(FApp.Project.FileName);
     FMoveFile_ReplaceChar        := '_';
+    FMoveFile_FileNameFormat     := 'Image_{ID}';
     FMoveFile_DeleteToRecycleBin := True;
     FMoveFile_OverwriteMode      := fomfomPrompt;
     FMoveFile_UseCDOptions       := True;

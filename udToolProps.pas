@@ -71,20 +71,11 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
   var k: TPhoaToolKind;
   begin
     k := TPhoaToolKind(cbKind.ItemIndex);
-    lName.Enabled           := k<>ptkSeparator;
-    lHint.Enabled           := k<>ptkSeparator;
-    lRunCommand.Enabled     := k=ptkCustom;
-    lRunParams.Enabled      := k=ptkCustom;
-    lRunFolder.Enabled      := k=ptkCustom;
-    lRunShowCommand.Enabled := k=ptkCustom;
-    EnableWndCtl(eName,             k<>ptkSeparator);
-    EnableWndCtl(eHint,             k<>ptkSeparator);
-    EnableWndCtl(eRunCommand,       k=ptkCustom);
-    EnableWndCtl(bBrowseRunCommand, k=ptkCustom);
-    EnableWndCtl(eRunParams,        k=ptkCustom);
-    EnableWndCtl(eRunFolder,        k=ptkCustom);
-    EnableWndCtl(bBrowseRunFolder,  k=ptkCustom);
-    EnableWndCtl(cbRunShowCommand,  k=ptkCustom);
+    EnableControls(k<>ptkSeparator, [lName, eName, lHint, eHint]);
+    EnableControls(
+      k=ptkCustom,
+      [lRunCommand, eRunCommand, bBrowseRunCommand, lRunParams, eRunParams, lRunShowCommand, cbRunShowCommand,
+       lRunFolder, eRunFolder, bBrowseRunFolder]);
   end;
 
   procedure TdToolProps.bBrowseRunCommandClick(Sender: TObject);

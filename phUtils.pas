@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.45 2005-02-05 16:16:52 dale Exp $
+//  $Id: phUtils.pas,v 1.46 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -129,8 +129,11 @@ uses
    // ¬озвращает текст результата автозаполнени€ даты/времени изображени€
   function  DateTimeFillResultName(DTFResult: TDateTimeFillResult): String;
 
-   // –азрешает или запрещает контрол, перекрашива€ его в clWindow или clBtnFace соответственно
-  procedure EnableWndCtl(Ctl: TWinControl; bEnable: Boolean);
+   // –азрешает или запрещает контрол; если это TWinControl, то он, перекрашиваетс€ в clWindow или clBtnFace
+   //   соответственно
+  procedure EnableControl(bEnable: Boolean; Ctl: TControl);
+   // “о же дл€ массива контролов. ¬ качестве элемента Ctls[] можно передавать nil
+  procedure EnableControls(bEnable: Boolean; const Ctls: Array of TControl);
 
    // ¬озвращает размер указанного файла, или iDefault, если такого файла не существует
   function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
@@ -626,13 +629,19 @@ var
   end;
 
   function HumanReadableSize(i64Size: Int64): String;
+  var fsu: TFileSizeUnit;
   begin
+     // ќпредел€ем требуемую единицу измерени€ размера
     case i64Size of
-      0..1023:             Result := ConstVal('SSizeBytes',  [i64Size]);
-      1024..1048575:       Result := ConstVal('SSizeKBytes', [i64Size/1024]);
-      1048576..1073741823: Result := ConstVal('SSizeMBytes', [i64Size/1048576]);
-      else                 Result := ConstVal('SSizeGBytes', [i64Size/1073741824]);
+      0..1023:                     fsu := fsuBytes;
+      1024..1024*1024-1:           fsu := fsuKBytes;
+      1024*1024..1024*1024*1024-1: fsu := fsuMBytes;
+      else                         fsu := fsuGBytes;
     end;
+     // ‘орматируем размер
+    Result := Format(
+      iif(fsu=fsuBytes, '%.0f %s', '%.2f %s'),
+      [i64Size/aFileSizeUnitMultipliers[fsu], FileSizeUnitName(fsu)]);
   end;
 
   function CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
@@ -771,13 +780,30 @@ var
     Result := ConstVal(GetEnumName(TypeInfo(TDateTimeFillResult), Byte(DTFResult)));
   end;
 
-  procedure EnableWndCtl(Ctl: TWinControl; bEnable: Boolean);
-  var pi: PPropInfo;
+  procedure EnableControl(bEnable: Boolean; Ctl: TControl);
+  var
+    pi: PPropInfo;
+    i: Integer;
+    WCtl: TWinControl absolute Ctl;
   begin
-    if not (csDestroying in Ctl.ComponentState) then Ctl.HandleNeeded; // Workaround ComboBoxEx's repaint bug
-    Ctl.Enabled := bEnable;
-    pi := GetPropInfo(Ctl, 'Color', [tkInteger]);
-    if pi<>nil then SetOrdProp(Ctl, pi, iif(bEnable, clWindow, clBtnFace));
+    if Ctl is TWinControl then begin
+      if not (csDestroying in WCtl.ComponentState) then WCtl.HandleNeeded; // Workaround ComboBoxEx's repaint bug
+      WCtl.Enabled := bEnable;
+      pi := GetPropInfo(WCtl, 'Color', [tkInteger]);
+      if pi<>nil then SetOrdProp(WCtl, pi, iif(bEnable, clWindow, clBtnFace));
+    end else
+      Ctl.Enabled := bEnable;
+  end;
+
+  procedure EnableControls(bEnable: Boolean; const Ctls: Array of TControl);
+  var
+    i: Integer;
+    c: TControl;
+  begin
+    for i := 0 to High(Ctls) do begin
+      c := Ctls[i];
+      if c<>nil then EnableControl(bEnable, c);
+    end;
   end;
 
   function GetFileSize(const sFileName: String; iDefault: Integer): Integer;

@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.44 2005-02-05 16:16:52 dale Exp $
+;  $Id: phoa.dklang,v 1.45 2005-02-12 15:36:37 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -539,6 +539,8 @@ rbPutFlatly.Caption=00000019,&Put all the files into the destination folder
 rbMaintainFolderLayout.Caption=00000022,&Maintain original folder layout
 rbMaintainGroupLayout.Caption=00000025,Arran&ge files into folders maintaining group layout
 cbAllowDuplicating.Caption=00000028,Allo&w multiple copies of the file
+gbFileNaming.Caption=00000029,File naming
+cbRenameFiles.Caption=00000030,Rename files using &format:
 
 [frWzPageFileOps_DelOptions]
 cbDeleteToRecycleBin.Caption=00000007,Delete files to the Rec&ycle Bin
@@ -923,19 +925,24 @@ SErrCannotCreateFolder=Unable to create folder "%s"
 SErrCannotDecodePicture=Error decoding picture file "%s":\n%s
 SErrCannotLoadPicture=Error loading picture file "%s":\n%s
 SErrCannotRead=Stream read error
+SErrCannotUsePathPropsInFormat=Property "%s" cannot be used in a file name format as it contains file path
 SErrCannotWrite=Stream write error
 SErrDuplicateKeyword=This keyword is already in the list
 SErrExecutingToolFailed=Error executing tool "%s" for file "%s": %s
 SErrFileNotFound=File not found
 SErrFileNotFoundFmt=File not found: "%s"
 SErrFileRevHigher=The photo album file is created by a program version higher than this. Unable to open the file.
+SErrInvalidCharsInFileName=A file name cannot contain any of the following characters:\n\\ / : * ? " < > |\nRemove them and try again
 SErrInvalidPicFileName=Invalid picture file name: "%s"
+SErrInvalidPicPropName=Invalid picture property name: "%s"
 SErrNotAllPicsLinked=%d of %d selected pictures won't be placed in a group, which is invalid. Each picture must be linked to at least one group.
 SErrNoTargetPathDetermined=No target path determined for file "%s"
 SError=Error
 SErrPicFileAlreadyInUse=File "%s" is already used by another picture (ID=%d) in the photo album
+SErrPicPropNameMissing=Picture property name missing
 SErrSrcAndDestFoldersAreSame=Source and destination folders are the same ("%s") for file "%s"
 SErrTargetFileExists=Target file "%s" already exists
+SErrUnbalancedCurlyBraces=Unbalanced curly braces in the expression
 SErrUnknownPicFileExtension=Unknown picture file extension for "%s"
 SFileFilter_Ini=Ini files (*.ini)|*.ini
 SFileFilter_OpenPhoa=Photo album files (*.phoa)|*.phoa|All files (*.*)|*.*
@@ -1021,10 +1028,6 @@ sscStrSpecified=is specified
 sscStrStarts=starts with
 SSearchResultsNode=Search Results
 SSelectedPicCount=%d selected
-SSizeBytes=%d bytes
-SSizeGBytes=%.2f Gbytes
-SSizeKBytes=%.2f Kbytes
-SSizeMBytes=%.2f Mbytes
 SSort_Ascending=Ascending
 SSort_Descending=Descending
 SStats_DistinctPics=Number of distinct pictures

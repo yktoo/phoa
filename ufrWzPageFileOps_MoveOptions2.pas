@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.8 2005-02-12 15:36:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -61,8 +61,7 @@ uses phUtils, udFileOpsWizard;
     cbUseCDOptions.Checked         := Wiz.MoveFile_UseCDOptions;
      // Контролы "Что делать, если нет исходного файла" и "Стирать исходные файлы" доступны только при операции перемещения
     bMoveOp := Wiz.FileOpKind=fokMoveFiles;
-    lNoOriginalFileMode.Enabled := bMoveOp;
-    EnableWndCtl(cbNoOriginalFileMode, bMoveOp);
+    EnableControls(bMoveOp, [lNoOriginalFileMode, cbNoOriginalFileMode]);
     cbDeleteOriginal.Enabled := bMoveOp;
     AdjustOptionControls;
   end;

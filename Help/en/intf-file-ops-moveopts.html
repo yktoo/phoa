@@ -1,4 +1,4 @@
-<!-- $Id: intf-file-ops-moveopts.html,v 1.4 2005-02-05 16:15:58 dale Exp $ -->
+<!-- $Id: intf-file-ops-moveopts.html,v 1.5 2005-02-12 15:36:37 dale Exp $ -->
 {[%hh_hdr_en:Picture file operations wizard :: Copy/move options page 1]}
 
 <p align=justify>This wizard page configures parameters for the following file operations:
@@ -22,7 +22,8 @@
     <td>This mode places all the files into a single folder - the <a href="intf-file-ops-selfolder.html">destination
         folder</a>.
         <div class=nb><b>NB:</b> Please note that it is allowed for files to have the same names. This may cause a
-          conflict when placing them into a single folder.</div>
+          conflict when placing them into a single folder. So consider using <b>Rename file</b> option described below
+          which helps to avoid such conflicts.</div>
     </td>
   </tr>
   <tr>
@@ -87,12 +88,43 @@
         require to place multiple copies of a file into different folders. If this check box is on the program will act
         just this way, otherwise the file will be copied only once (into the first folder in traversal path).</td>
   </tr>
+  <tr class=tblhdr>
+    <td colspan=2>  
+      <b>File naming</b><br>
+      These options specify target file naming algorithms being used.
+    </td>
+  </tr>
+  <tr>
+    <td class=command>Rename files using format</td>
+    <td>When this option is enabled the program provides file name for each picture formatted as specified in the edit
+        box. Format rules are as follows:
+        <ul>
+          <li>Curly brace characters <b>{</b> and <b>}</b> have special meaning: they enclose <b>picture property
+              names</b> which serve as placeholders for picture property values. Picture property names are the same as
+              ones used for <a href="info-filter-expr.html#pic_props">picture filter expressions</a> except that they
+              aren't prepended with dollar sign (<b>$</b>). Property names are case insensitive.<br>
+              <b>Note</b> that you cannot use <i>FullFileName</i> and <i>FilePath</i> picture properties in file name 
+              format as those properties contain file path while we're only dealing with file name here.<br>
+              Currently, there's no way to include a literal curly brace in file name format.
+          <li>You cannot use any of the characters forbidden in file names (see below which exactly).
+          <li>All other characters are treated as literals and copied verbatim to the file name.
+        </ul>
+        The program always retains the original extension for a file.<br>
+        <b>Sample</b> file name formats:
+        <ul>
+          <li><b>Image_{ID}</b> - files will be named Image_1, Image_2 etc. This method provides unique file names
+              because each picture has an unique ID.
+          <li><b>{FileName}</b> - files will have the same names as the original ones.
+          <li><b>{Date}_{FileName}</b> - each file name will start from picture date and an underscore.
+        </ul>
+    </td>
+  </tr>
   <tr>
     <td class=command>Replace unallowed symbols with the char</td>
-    <td>Specifies a character to replace the unallowed in folder names characters with (these are:
+    <td>Specifies a character to replace the unallowed in file or folder names characters with (these are:
         <b>\&nbsp;/&nbsp;:&nbsp;*&nbsp;?&nbsp;&quot;&nbsp;&lt;&nbsp;&gt;&nbsp;|</b>). E.g. if this char is an underscore
-        <b>_</b> (by default), and there's a group named <b>Friends/Enemies</b>, then it will have the corresponding
-        folder named <b>Friends_Enemies</b>.</td>
+        <b>_</b> (default), and a folder should be named <b>Friends/Enemies</b>, then it will have the name
+        <b>Friends_Enemies</b>.</td>
   </tr>
 </table>
 
