@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phObj.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -856,7 +856,7 @@ type
    //-------------------------------------------------------------------------------------------------------------------
    // Операция вставки нескольких изображений из буфера обмена
    //-------------------------------------------------------------------------------------------------------------------
-   
+
   TPhoaMultiOp_PicPaste = class(TPhoaMultiOp)
   protected
     function GetInvalidationFlags: TUndoInvalidationFlags; override;
@@ -1124,6 +1124,8 @@ type
     FShowThumbTooltips: Boolean;
     FThumbTooltipProps: TPicProperties;
     FThumbCacheSize: Integer;
+    FThumbBackColor: TColor;
+    FThumbFontColor: TColor;
      // Определяет количество эскизов в строчке
     procedure CalcLayout;
      // Отрисовывает один эскиз
@@ -1187,6 +1189,8 @@ type
     procedure SetShowThumbTooltips(Value: Boolean);
     procedure SetThumbTooltipProps(Value: TPicProperties);
     procedure SetThumbCacheSize(Value: Integer);
+    procedure SetThumbBackColor(Value: TColor);
+    procedure SetThumbFontColor(const Value: TColor);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -1274,6 +1278,10 @@ type
     property TabStop default True;
      // -- Если True, рамка эскиза рисуется более чётко
     property ThickThumbBorder: Boolean read FThickThumbBorder write SetThickThumbBorder default False;
+     // -- Цвет фона эскизов
+    property ThumbBackColor: TColor read FThumbBackColor write SetThumbBackColor default clBtnFace;
+     // -- Цвет шрифта эскизов
+    property ThumbFontColor: TColor read FThumbFontColor write SetThumbFontColor default clWindowText;
     property Visible;
     property OnContextPopup;
     property OnDblClick;
@@ -4989,9 +4997,10 @@ var
     FColCount        := 1;
     FCacheThumbnails := True;
     FNoMoveItemIndex := -1;
-    FPicLinks   := TPhoaPicLinks.Create(False);
-    FSelIndexes := TIntegerList.Create(False);
-    FThumbCache := TList.Create;
+    FPicLinks        := TPhoaPicLinks.Create(False);
+    FSelIndexes      := TIntegerList.Create(False);
+    FThumbBackColor  := clBtnFace;
+    FThumbCache      := TList.Create;
   end;
 
   procedure TThumbnailViewer.CreateParams(var Params: TCreateParams);
@@ -5328,10 +5337,21 @@ var
      // Если нажат Alt - начинаем выделение (marqueing)
     if ssAlt in Shift then begin
       if Button=mbLeft then MarqueingStart;
-     // Если нажат Ctrl - переключаем выделение эскиза, на котором кликнули
+     // Если нажат Ctrl
     end else if ssCtrl in Shift then begin
-      ToggleSelection(idx);
-      MoveItemIndex(idx);
+       // Если левая кнопка - переключаем выделение эскиза, на котором кликнули
+      if Button=mbLeft then begin
+        ToggleSelection(idx);
+        MoveItemIndex(idx);
+       // Если правая кнопка - вызываем Shell Context Menu
+      end else if Button=mbRight then begin
+        ClearSelection;
+        SetItemIndex(idx);
+        if idx>=0 then begin
+          ShowFileShellContextMenu(FPicLinks[idx].PicFileName);
+          Exit;
+        end;
+      end;
       FStreamSelStart := idx;
       SelectionChange;
      // Если нажат Shift - выделяем подряд идущие эскизы
@@ -5466,8 +5486,8 @@ var
 
   procedure TThumbnailViewer.PaintThumb(idx: Integer; bmp: TBitmap);
   const
-    aFClr: Array[Boolean, Boolean] of TColor = ((clWindowText, clWindowText), (clWindowText, clHighlightText));
-    aBClr: Array[Boolean, Boolean] of TColor = ((clBtnFace, clBtnFace), (clBtnShadow,  clHighlight));
+    aSelectedFontClr: Array[Boolean] of TColor = (clWindowText, clHighlightText);
+    aSelectedBackClr: Array[Boolean] of TColor = (clBtnShadow,  clHighlight);
     aEdges: Array[Boolean] of Integer = (BDR_RAISEDINNER, BDR_RAISEDINNER or BDR_RAISEDOUTER);
   var
     r: TRect;
@@ -5556,8 +5576,13 @@ var
       if (idx=FItemIndex) and bFocused then DrawFocusRect(r);
       InflateRect(r, -2, -2);
       Font.Assign(Self.Font);
-      Font.Color  := aFClr[bSel, bFocused];
-      Brush.Color := aBClr[bSel, bFocused];
+      if bSel then begin
+        Font.Color  := aSelectedFontClr[bFocused];
+        Brush.Color := aSelectedBackClr[bFocused]
+      end else begin
+        Font.Color  := FThumbFontColor;
+        Brush.Color := FThumbBackColor;
+      end;
       if ThemeServices.ThemesEnabled then begin
         ted := ThemeServices.GetElementDetails(teEditTextNormal);
         ThemeServices.DrawElement(Handle, ted, r);
@@ -5708,6 +5733,14 @@ var
     end;
   end;
 
+  procedure TThumbnailViewer.SetThumbBackColor(Value: TColor);
+  begin
+    if FThumbBackColor<>Value then begin
+      FThumbBackColor := Value;
+      if FPicLinks.Count>0 then Invalidate;
+    end;
+  end;
+
   procedure TThumbnailViewer.SetThumbCacheSize(Value: Integer);
   begin
     if FThumbCacheSize<>Value then begin
@@ -5720,6 +5753,14 @@ var
   begin
     FThumbCornerDetails[Corner] := Value;
     CalcLayout;
+  end;
+
+  procedure TThumbnailViewer.SetThumbFontColor(const Value: TColor);
+  begin
+    if FThumbFontColor<>Value then begin
+      FThumbFontColor := Value;
+      if FPicLinks.Count>0 then Invalidate;
+    end;
   end;
 
   procedure TThumbnailViewer.SetThumbTooltipProps(Value: TPicProperties);

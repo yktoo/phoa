@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udSettings.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -13,6 +13,9 @@ uses
   phDlg, VirtualTrees, TB2Dock, TB2Toolbar, TBX, ExtCtrls, DTLangTools,
   StdCtrls;
 
+const
+  WM_EMBEDCONTROL = WM_USER+1;
+
 type
   TdSettings = class(TPhoaDialog)
     pMain: TPanel;
@@ -25,6 +28,8 @@ type
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvMainAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvMainFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure EmbedControlNotify(Sender: TObject);
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
@@ -32,14 +37,28 @@ type
     FCurSetting: TPhoaSetting;
      // Индекс кнопки навигатора, которую следует выбрать по умочанию
     FDefNavBtnIndex: Integer;
-     // Создаёт кнопки навигации (уровень 0 из ConsVars.aPhoaSettings[])
+     // Контрол для редактирования значения текущего узла
+    FEditorControl: TWinControl;
+     // Флаг встраивания контрола-редактора. Используется для предотвращения вызовов EmbeddedControlChange во время его
+     //   начальной настройки, а также для игнорирования потери фокуса деревом 
+    FEmbeddingControl: Boolean;
+     // Создаёт кнопкtи навигации (уровень 0 из ConsVars.aPhoaSettings[])
     procedure CreateNavBar;
-     // Загружает в tvMain дерево настроек, относящихся к детям узла Item
-    procedure LoadSettingTree(Item: TPhoaSetting);
+     // Загружает в tvMain дерево настроек, относящихся к детям узла Setting
+    procedure LoadSettingTree(Setting: TPhoaSetting);
      // Событие нажатия NavBar-кнопки
     procedure NavBarButtonClick(Sender: TObject);
-     // Возвращает текст пункта
-    function  GetSettingText(Item: TPhoaSetting): String;
+     // Декодирует строку текста сообразно правилам (если требуется, то с использованием констант)
+    function  DecodeSettingText(const sText: String): String;
+     // Встраивает соответствующий контрол для текущего узла, если он нужен. Если нет (в том числе при
+     //   tvMain.FocusedNode=nil), удаляет текущий контрол
+    procedure EmbedControl;
+     // События встроенного контрола
+    procedure EmbeddedControlChange(Sender: TObject);
+    procedure EmbeddedControlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EmbeddedFontButtonClick(Sender: TObject);
+     // Message handlers
+    procedure WMEmbedControl(var Msg: TMessage); message WM_EMBEDCONTROL;
   protected
     procedure InitializeDialog; override;
     procedure FinalizeDialog; override;
@@ -49,9 +68,14 @@ type
    // Отображает диалог настроек. iBtnIndex - индекс кнопки навигатора, которую следует выбрать по умочанию
   function EditSettings(iBtnIndex: Integer): Boolean;
 
+const
+  ISetting_ValueGap        = 4;   // Отступ между текстом и значением пункта настройки, в пикселах
+
+  CValueBackColor          = $f7f7f7; // Цвет фона значения настройки
+
 implementation
 {$R *.dfm}
-uses phUtils, Main, udStringBox;
+uses phUtils, Main, TypInfo;
 
   function EditSettings(iBtnIndex: Integer): Boolean;
   begin
@@ -63,6 +87,25 @@ uses phUtils, Main, udStringBox;
         Free;
       end;
   end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // TSettingButton - потомок TButton, перехватывающий нажатия стрелок
+   //-------------------------------------------------------------------------------------------------------------------
+
+type
+  TSettingButton = class(TButton)
+  private
+    procedure WMGetDlgCode(var Msg: TWMGetDlgCode); message WM_GETDLGCODE;
+  end;
+
+  procedure TSettingButton.WMGetDlgCode(var Msg: TWMGetDlgCode);
+  begin
+    Msg.Result := DLGC_WANTARROWS;
+  end;
+
+   //-------------------------------------------------------------------------------------------------------------------
+   // TdSettings
+   //-------------------------------------------------------------------------------------------------------------------
 
   procedure TdSettings.ButtonClick_OK;
   begin
@@ -80,7 +123,7 @@ uses phUtils, Main, udStringBox;
     for i := 0 to FLocalRootSetting.ChildCount-1 do begin
       PS := FLocalRootSetting.Children[i];
       tbi := TTBXItem.Create(Self);
-      tbi.Caption     := GetSettingText(PS);
+      tbi.Caption     := DecodeSettingText(PS.Name);
       tbi.HelpContext := PS.HelpContext;
       tbi.ImageIndex  := PS.ImageIndex;
       tbi.Tag         := Integer(PS);
@@ -90,15 +133,9 @@ uses phUtils, Main, udStringBox;
     end;
   end;
 
-  procedure TdSettings.FinalizeDialog;
+  function TdSettings.DecodeSettingText(const sText: String): String;
   begin
-    FLocalRootSetting.Free;
-    inherited FinalizeDialog;
-  end;
-
-  function TdSettings.GetSettingText(Item: TPhoaSetting): String;
-  begin
-    Result := Item.Name;
+    Result := sText;
     if Result<>'' then
       case Result[1] of
          // Если наименование начинается на '@' - это константа из TdSettings.dtlsMain
@@ -106,6 +143,197 @@ uses phUtils, Main, udStringBox;
          // Если наименование начинается на '#' - это константа из fMain.dtlsMain
         '#': Result := ConstVal(Copy(Result, 2, MaxInt));
       end;
+  end;
+
+  procedure TdSettings.EmbedControl;
+  var
+    Setting: TPhoaSetting;
+    bBlurred: Boolean;
+    CurNode: PVirtualNode;
+
+     // Создаёт и присваивает в FEditorControl Control заданного класса в качестве редактора значения настройки
+    procedure NewControl(CtlClass: TWinControlClass);
+    var RAvail: TRect;
+
+      procedure BindKeyEvent(const sPropName: String; Event: TKeyEvent);
+      begin
+        SetMethodProp(FEditorControl, sPropName, TMethod(Event));
+      end;
+
+      procedure BindNotifyEvent(const sPropName: String; Event: TNotifyEvent);
+      begin
+        SetMethodProp(FEditorControl, sPropName, TMethod(Event));
+      end;
+
+    begin
+       // Прикидываем границы контрола
+      RAvail := tvMain.GetDisplayRect(CurNode, -1, True);
+      RAvail.Left  := RAvail.Right+ISetting_ValueGap;
+      RAvail.Right := tvMain.ClientWidth;
+       // Создаём контрол, если его ещё нет, или он другого класса
+      if (FEditorControl=nil) or (FEditorControl.ClassType<>CtlClass) then begin
+        FreeAndNil(FEditorControl);
+        FEditorControl := CtlClass.Create(Self);
+        FEditorControl.Parent := tvMain;
+      end;
+      with FEditorControl do begin
+         // Настраиваем размер
+        SetBounds(
+          RAvail.Left,
+          (RAvail.Top+RAvail.Bottom-Height) div 2,
+          Min(RAvail.Right-RAvail.Left, Setting.EditorWidth),
+          Height);
+         // Tag должен указывать на соответствующий узел
+        Tag := Integer(CurNode);
+      end;
+      BindNotifyEvent('OnEnter',   EmbedControlNotify);
+      BindNotifyEvent('OnExit',    EmbedControlNotify);
+      BindKeyEvent   ('OnKeyDown', EmbeddedControlKeyDown);
+    end;
+
+     // Создаёт и возвращает TComboBox в качестве редактора значения настройки
+    procedure NewComboBox;
+    var i: Integer;
+    begin
+      NewControl(TComboBox);
+      with TComboBox(FEditorControl) do begin
+         // Копируем список вариантов
+        Items.Clear;
+        for i := 0 to Setting.Variants.Count-1 do Items.AddObject(DecodeSettingText(Setting.Variants[i]), Setting.Variants.Objects[i]);
+         // Прочие опции
+        DropDownCount := 16;
+        Style         := csDropDownList;
+        ItemIndex     := Setting.VariantIndex;
+        OnChange      := EmbeddedControlChange;
+      end;
+    end;
+
+     // Создаёт и возвращает TColorBox в качестве редактора значения настройки
+    procedure NewColorBox;
+    begin
+      NewControl(TColorBox);
+      with TColorBox(FEditorControl) do begin
+        DropDownCount := 16;
+        Style         := [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames];
+        Selected      := Setting.ValueInt;
+        OnChange      := EmbeddedControlChange;
+      end;
+    end;
+
+     // Создаёт и возвращает TEdit в качестве редактора значения настройки
+    procedure NewEdit(iMaxLen: Integer);
+    begin
+      NewControl(TEdit);
+      with TEdit(FEditorControl) do begin
+        MaxLength := iMaxLen;
+        Text      := IntToStr(Setting.ValueInt);
+        OnChange  := EmbeddedControlChange;
+      end;
+    end;
+
+     // Создаёт и возвращает TSettingButton в качестве редактора шрифта
+    procedure NewFontButton;
+    begin
+      NewControl(TSettingButton);
+      with TSettingButton(FEditorControl) do begin
+        Height    := 23;
+        Caption   := GetFirstWord(Setting.ValueStr, '/');
+        OnClick   := EmbeddedFontButtonClick;
+      end;
+    end;
+
+  begin
+     // Определяем флаг дефокусировки дерева/редактора
+    bBlurred := (ActiveControl<>tvMain) and (ActiveControl<>FEditorControl);
+     // Проверяем необходимость [пере]создания контрола
+    CurNode := tvMain.FocusedNode;
+    if (FEditorControl=nil) or bBlurred or (CurNode<>PVirtualNode(FEditorControl.Tag)) then begin
+      FEmbeddingControl := True;
+      try
+         // Если нужно уничтожить контрол
+        if (CurNode=nil) or bBlurred then
+          FreeAndNil(FEditorControl)
+         // Иначе - создаём
+        else begin
+           // Получаем пункт настроек из данных узла
+          Setting := PPhoaSetting(tvMain.GetNodeData(CurNode))^;
+           // Создаём или уничтожаем контрол
+          case Setting.Datatype of
+            sdtComboIdx,
+              sdtComboObj: NewComboBox;
+            sdtColor:      NewColorBox;
+            sdtInt:        NewEdit(Length(IntToStr(Setting.MaxValue)));
+            sdtFont:       NewFontButton;
+            else           FreeAndNil(FEditorControl);
+          end;
+        end;
+      finally
+        FEmbeddingControl := False;
+      end;
+    end;
+     // Фокусируем контрол
+    if (FEditorControl<>nil) and not FEditorControl.Focused then FEditorControl.SetFocus;
+  end;
+
+  procedure TdSettings.EmbedControlNotify(Sender: TObject);
+  begin
+    if not FEmbeddingControl then PostMessage(Handle, WM_EMBEDCONTROL, 0, 0);
+  end;
+
+  procedure TdSettings.EmbeddedControlChange(Sender: TObject);
+  var
+    Node: PVirtualNode;
+    Setting: TPhoaSetting;
+  begin
+    if FEmbeddingControl then Exit;
+     // Tag контрола - это ссылка на его узел
+    Node := PVirtualNode(FEditorControl.Tag);
+     // Получаем пункт настроек из данных узла
+    Setting := PPhoaSetting(tvMain.GetNodeData(Node))^;
+    case Setting.Datatype of
+      sdtComboIdx,
+        sdtComboObj: Setting.VariantIndex := (FEditorControl as TComboBox).ItemIndex;
+      sdtColor:      Setting.ValueInt     := (FEditorControl as TColorBox).Selected;
+      sdtInt:        Setting.ValueInt     := StrToIntDef((FEditorControl as TEdit).Text, Setting.ValueInt);
+    end;
+    Modified := True;
+  end;
+
+  procedure TdSettings.EmbeddedControlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  begin
+    if (Shift*[ssShift, ssCtrl, ssAlt]=[]) and (not (Sender is TCustomComboBox) or not TCustomComboBox(Sender).DroppedDown) then
+      case Key of
+        VK_UP, VK_DOWN: begin
+          tvMain.Perform(WM_KEYDOWN, Key, 0);
+          tvMain.SetFocus;
+          Key := 0;
+        end;
+      end;
+  end;
+
+  procedure TdSettings.EmbeddedFontButtonClick(Sender: TObject);
+  var Setting: TPhoaSetting;
+  begin
+     // Tag контрола - это ссылка на его узел. Получаем пункт настроек из данных узла
+    Setting := PPhoaSetting(tvMain.GetNodeData(PVirtualNode(FEditorControl.Tag)))^;
+    with TFontDialog.Create(Self) do
+      try
+        FontFromStr(Font, Setting.ValueStr);
+        if Execute then begin
+          Setting.ValueStr := FontToStr(Font);
+          (FEditorControl as TSettingButton).Caption := Font.Name;
+          Modified := True;
+        end;
+      finally
+        Free;
+      end;
+  end;
+
+  procedure TdSettings.FinalizeDialog;
+  begin
+    FEditorControl.Free;
+    FLocalRootSetting.Free;
+    inherited FinalizeDialog;
   end;
 
   procedure TdSettings.InitializeDialog;
@@ -123,13 +351,13 @@ uses phUtils, Main, udStringBox;
     LoadSettingTree(FLocalRootSetting[FDefNavBtnIndex]);
   end;
 
-  procedure TdSettings.LoadSettingTree(Item: TPhoaSetting);
+  procedure TdSettings.LoadSettingTree(Setting: TPhoaSetting);
   var i: Integer;
   begin
-    FCurSetting := Item;
+    FCurSetting := Setting;
      // Нажимаем соотв. кнопку
     for i := 0 to tbNav.Items.Count-1 do
-      with tbNav.Items[i] do Checked := Tag=Integer(Item);
+      with tbNav.Items[i] do Checked := Tag=Integer(Setting);
      // Загружаем дерево
     with tvMain do begin
       BeginUpdate;
@@ -137,7 +365,7 @@ uses phUtils, Main, udStringBox;
          // Удаляем все узлы
         Clear;
          // Устанавливаем количество записей в корневом каталоге
-        RootNodeCount := Item.ChildCount;
+        RootNodeCount := Setting.ChildCount;
          // Инициализируем все узлы
         ReinitChildren(nil, True);
          // Выделяем первый узел
@@ -149,7 +377,7 @@ uses phUtils, Main, udStringBox;
       if Self.Visible then SetFocus;
     end;
      // Настраиваем HelpContext
-    HelpContext := Item.HelpContext;
+    HelpContext := Setting.HelpContext;
   end;
 
   procedure TdSettings.NavBarButtonClick(Sender: TObject);
@@ -158,44 +386,46 @@ uses phUtils, Main, udStringBox;
   end;
 
   procedure TdSettings.tvMainAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
-  var Item: TPhoaSetting;
+  var Setting: TPhoaSetting;
 
     procedure DoDraw(cBkColor: TColor; const sText: String);
     var r: TRect;
     begin
-       // Настраиваем Canvas
-      with TargetCanvas do begin
-        Pen.Color   := iif(vsSelected in Node.States, clHighlight, clGrayText);
-        Font.Color  := Pen.Color;
-        Brush.Color := cBkColor;
+      if sText<>'' then begin
+         // Настраиваем Canvas
+        with TargetCanvas do begin
+          Pen.Color   := iif(vsSelected in Node.States, clHighlight, clGrayText);
+          Font.Color  := Pen.Color;
+          Brush.Color := cBkColor;
+        end;
+         // Получаем прямоугольник текста в TargetCanvas
+        r := Sender.GetDisplayRect(Node, -1, True);
+        r  := Rect(r.Right+ISetting_ValueGap, CellRect.Top, r.Right+ISetting_ValueGap+(TargetCanvas.TextWidth(sText)+6), CellRect.Bottom);
+        TargetCanvas.RoundRect(r.Left, r.Top, r.Right, r.Bottom, 7, 7);
+        DrawText(TargetCanvas.Handle, PChar(sText), -1, r, DT_CENTER or DT_VCENTER or DT_SINGLELINE or DT_NOPREFIX);
       end;
-       // Получаем прямоугольник текста в TargetCanvas
-      r := Sender.GetDisplayRect(Node, -1, True);
-      r  := Rect(r.Right+4, CellRect.Top, r.Right+4+(TargetCanvas.TextWidth(sText)+6), CellRect.Bottom);
-      TargetCanvas.RoundRect(r.Left, r.Top, r.Right, r.Bottom, 7, 7);
-      DrawText(TargetCanvas.Handle, PChar(sText), -1, r, DT_CENTER or DT_VCENTER or DT_SINGLELINE or DT_NOPREFIX);
     end;
 
   begin
      // Получаем пункт
-    Item := PPhoaSetting(Sender.GetNodeData(Node))^;
+    Setting := PPhoaSetting(Sender.GetNodeData(Node))^;
      // "Дорисовываем"
-    case Item.Datatype of
-      sdtColor: DoDraw(Item.ValueInt, '    ');
-      sdtInt:   DoDraw($f7f7f7, IntToStr(Item.ValueInt));
-      sdtFont:  DoDraw($f7f7f7, GetFirstWord(Item.ValueStr, '/'));
+    case Setting.Datatype of
+      sdtComboIdx,
+        sdtComboObj: DoDraw(CValueBackColor,  DecodeSettingText(Setting.VariantText));
+      sdtColor:      DoDraw(Setting.ValueInt, '         ');
+      sdtInt:        DoDraw(CValueBackColor,  IntToStr(Setting.ValueInt));
+      sdtFont:       DoDraw(CValueBackColor,  GetFirstWord(Setting.ValueStr, '/'));
     end;
   end;
 
   procedure TdSettings.tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-  var
-    Item: TPhoaSetting;
-    s: String;
+  var Setting: TPhoaSetting;
   begin
-    Item := PPhoaSetting(Sender.GetNodeData(Node))^;
-    case Item.Datatype of
+    Setting := PPhoaSetting(Sender.GetNodeData(Node))^;
+    case Setting.Datatype of
       sdtBool: begin
-        Item.ValueBool := not Item.ValueBool;
+        Setting.ValueBool := not Setting.ValueBool;
         Modified := True;
       end;
       sdtParMsk: begin
@@ -207,39 +437,15 @@ uses phUtils, Main, udStringBox;
         Modified := True;
       end;
       sdtMutexInt: begin
-        PPhoaSetting(Sender.GetNodeData(Node.Parent))^.ValueInt := Item.ValueInt;
+        PPhoaSetting(Sender.GetNodeData(Node.Parent))^.ValueInt := Setting.ValueInt;
         Modified := True;
       end;
-      sdtColor:
-        with TColorDialog.Create(Self) do
-          try
-            Color := Item.ValueInt;
-            if Execute then begin
-              Item.ValueInt := Color;
-              Modified := True;
-            end;
-          finally
-            Free;
-          end;
-      sdtInt: begin
-        s := IntToStr(Item.ValueInt);
-        if StringBox(s, '', GetSettingText(Item), HelpContext) and (s<>'') then begin
-          Item.ValueInt := StrToInt(s);
-          Modified := True;
-        end;
-      end;
-      sdtFont:
-        with TFontDialog.Create(Self) do
-          try
-            FontFromStr(Font, Item.ValueStr);
-            if Execute then begin
-              Item.ValueStr := FontToStr(Font);
-              Modified := True;
-            end;
-          finally
-            Free;
-          end;
     end;
+  end;
+
+  procedure TdSettings.tvMainFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+  begin
+    PostMessage(Handle, WM_EMBEDCONTROL, 0, 0);
   end;
 
   procedure TdSettings.tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -249,26 +455,26 @@ uses phUtils, Main, udStringBox;
 
   procedure TdSettings.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
-    CellText := AnsiToUnicodeCP(GetSettingText(PPhoaSetting(Sender.GetNodeData(Node))^), cMainCodePage);
+    CellText := AnsiToUnicodeCP(DecodeSettingText(PPhoaSetting(Sender.GetNodeData(Node))^.Name), cMainCodePage);
   end;
 
   procedure TdSettings.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   var
-    ParentItem, Item: TPhoaSetting;
+    ParentItem, Setting: TPhoaSetting;
     bChecked: Boolean;
   begin
      // Ищем родительский узел
     if ParentNode=nil then ParentItem := FCurSetting else ParentItem := PPhoaSetting(Sender.GetNodeData(ParentNode))^;
      // Сохраняем пункт в Node.Data
-    Item := ParentItem[Node.Index];
-    PPhoaSetting(Sender.GetNodeData(Node))^ := Item;
+    Setting := ParentItem[Node.Index];
+    PPhoaSetting(Sender.GetNodeData(Node))^ := Setting;
      // Настраиваем CheckType и CheckState
     bChecked := False;
-    case Item.Datatype of
+    case Setting.Datatype of
        // Флажок
       sdtBool:  begin
         Node.CheckType := ctCheckBox;
-        bChecked := Item.ValueBool;
+        bChecked := Setting.ValueBool;
       end;
        // Бит в маске родителя
       sdtParMsk: begin
@@ -283,14 +489,12 @@ uses phUtils, Main, udStringBox;
        // RadioButton, где (значение родителя)=(значение выбранного ребёнка)
       sdtMutexInt: begin
         Node.CheckType := ctRadioButton;
-        bChecked := ParentItem.ValueInt=Item.ValueInt;
+        bChecked := ParentItem.ValueInt=Setting.ValueInt;
       end;
-       // Настраиваемое "извне" значение
-      sdtColor, sdtInt, sdtFont: Node.CheckType := ctButton;
     end;
     Node.CheckState := aCheckStates[bChecked];
      // Инициализируем к-во детей
-    tvMain.ChildCount[Node] := Item.ChildCount;
+    tvMain.ChildCount[Node] := Setting.ChildCount;
      // Разворачиваем все узлы
     Include(InitialStates, ivsExpanded);
   end;
@@ -299,6 +503,11 @@ uses phUtils, Main, udStringBox;
   begin
      // Выделяем жирным узлы, имеющие детей
     if Sender.ChildCount[Node]>0 then TargetCanvas.Font.Style := [fsBold];
+  end;
+
+  procedure TdSettings.WMEmbedControl(var Msg: TMessage);
+  begin
+    EmbedControl;
   end;
 
 end.

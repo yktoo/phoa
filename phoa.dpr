@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phoa.dpr,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -42,7 +42,6 @@ uses
   ufrPicProps_Groups in 'ufrPicProps_Groups.pas' {frPicProps_Groups: TFrame},
   phPicPropsDlgPage in 'phPicPropsDlgPage.pas' {PicPropsDialogPage: TFrame},
   ufrWzPage_Log in 'ufrWzPage_Log.pas' {frWzPage_Log: TFrame},
-  udStringBox in 'udStringBox.pas' {dStringBox},
   ufrSorting in 'ufrSorting.pas' {frSorting: TFrame},
   udStats in 'udStats.pas' {dStats},
   udFileOpsWizard in 'udFileOpsWizard.pas' {dFileOpsWizard},

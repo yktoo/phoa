@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: phUtils.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -9,9 +9,6 @@ unit phUtils;
 interface
 uses
   SysUtils, Windows, Messages, Classes, Controls, Graphics, GraphicEx, GR32, StdCtrls, ConsVars, VirtualTrees, VirtualShellUtilities;
-
-type
-  EPhoaError = class(Exception);
 
    // Exception raising
   procedure PhoaError(const sMsg: String; const aParams: Array of const);
@@ -117,6 +114,9 @@ type
 
    // Укорачивает строку как имя файла
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
+
+   // Отображает системное контекстное меню для заданного файла. Возвращает True, если удалось
+  function  ShowFileShellContextMenu(const sFileName: String): Boolean;
 
    // Показ/скрытие курсора HourGlass
   procedure StartWait;
@@ -619,6 +619,23 @@ uses Forms, Main, TypInfo, Registry, ShellAPI;
     r := Rect(0, 0, iWidth, 0);
     DrawText(Canvas.Handle, aBuf, -1, r, DT_LEFT or DT_PATH_ELLIPSIS or DT_MODIFYSTRING);
     Result := aBuf;
+  end;
+
+  function ShowFileShellContextMenu(const sFileName: String): Boolean;
+  var NS: TNamespace;
+  begin
+    Result := False;
+    NS := nil;
+    try
+      try
+        NS := TNamespace.CreateFromFileName(sFileName);
+      except
+        Error(ConstVal('SErrFileNotFoundFmt', [sFileName]));
+      end;
+      if NS<>nil then Result := NS.ShowContextMenu(fMain, nil, nil, nil);
+    finally
+      NS.Free;
+    end;
   end;
 
 var

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: Main.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -626,8 +626,8 @@ uses
       tcd: TThumbCornerDetail;
     begin
       i := RootSetting.Settings[iSettingID].ValueInt;
-      tcd.bDisplay := i>=0;
-      if i>=0 then tcd.Prop := TPicProperty(i);
+      tcd.bDisplay := (i>=Byte(Low(TPicProperty))) and (i<=Byte(High(TPicProperty)));
+      if tcd.bDisplay then tcd.Prop := TPicProperty(i);
       Viewer.ThumbCornerDetails[Corner] := tcd;
     end;
 
@@ -665,6 +665,8 @@ uses
         CacheThumbnails   := RootSetting.Settings[ISettingID_Browse_ViewerCacheThs].ValueBool;
         ThumbCacheSize    := RootSetting.Settings[ISettingID_Browse_ViewerCacheSze].ValueInt;
         Color             := RootSetting.Settings[ISettingID_Browse_ViewerBkColor].ValueInt;
+        ThumbBackColor    := RootSetting.Settings[ISettingID_Browse_ViewerThBColor].ValueInt;
+        ThumbFontColor    := RootSetting.Settings[ISettingID_Browse_ViewerThFColor].ValueInt;
         ShowThumbTooltips := RootSetting.Settings[ISettingID_Browse_ViewerTooltips].ValueBool;
         ThumbTooltipProps := IntToPicProps(RootSetting.Settings[ISettingID_Browse_ViewerTipProps].ValueInt);
         SetupViewerCorner(tcLeftTop,     ISettingID_Browse_ViewerThLTProp);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -583,7 +583,7 @@ uses
 
   procedure TFileOpThread.DoRepairFileLink(Pic: TPhoaPic);
   begin
-    //???!!!
+    //!!! Написать repair routine
   end;
 
   procedure TFileOpThread.DoUpdateFileLink(Pic: TPhoaPic; const sNewFileName: String);

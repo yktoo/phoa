@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.2 2004-04-15 12:54:10 dale Exp $
+//  $Id: ConsVars.pas,v 1.3 2004-04-17 12:06:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright 2002-2004 Dmitry Kann, http://phoa.narod.ru
@@ -13,6 +13,8 @@ uses
   TBX;
 
 type
+  EPhoaError = class(Exception);
+
   TPicProperty = (
     ppID, ppFileName, ppFullFileName, ppFilePath, ppFileSize, ppFileSizeBytes, ppPicWidth, ppPicHeight, ppPicDims,
     ppFormat, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia,
@@ -547,9 +549,11 @@ const
   ISettingID_Browse                    = 0;    // Режим обзора
   ISettingID_Browse_Viewer             = 0;    // Viewer
     ISettingID_Browse_ViewerBkColor    = 1000; // Viewer: Цвет фона
-    ISettingID_Browse_ViewerDragDrop   = 1001; // Viewer: Drag'n'Drop
-    ISettingID_Browse_ViewerTooltips   = 1002; // Viewer: Показывать всплывающие описания эскизов
-    ISettingID_Browse_ViewerTipProps   = 1003; // Viewer: Отображать во всплывающих описаниях
+    ISettingID_Browse_ViewerThBColor   = 1001; // Viewer: Цвет фона эскиза
+    ISettingID_Browse_ViewerThFColor   = 1002; // Viewer: Цвет шрифта эскиза
+    ISettingID_Browse_ViewerDragDrop   = 1003; // Viewer: Drag'n'Drop
+    ISettingID_Browse_ViewerTooltips   = 1004; // Viewer: Показывать всплывающие описания эскизов
+    ISettingID_Browse_ViewerTipProps   = 1005; // Viewer: Отображать во всплывающих описаниях
     ISettingID_Browse_ViewerThInfo     = 1010; // Viewer: Данные, отображаемые на эскизах
     ISettingID_Browse_ViewerThLTProp   = 1011; // Viewer: Left top corner
     ISettingID_Browse_ViewerThRTProp   = 1012; // Viewer: Right top corner
@@ -750,11 +754,16 @@ type
     sdtParMsk,   // Переключатель (CheckBox), представляющий собой бит в маске родителя
     sdtMutex,    // Взаимно исключающий выбор (RadioButton), индекс которого представляет собой значение родителя
     sdtMutexInt, // Взаимно исключающий выбор (RadioButton), значение которого представляет собой значение родителя
+    sdtComboIdx, // Список выбора (ComboBox), индекс которого представляет собой значение
+    sdtComboObj, // Список выбора (ComboBox), Objects[ItemIndex] которого представляет собой значение
     sdtColor,    // Цвет
     sdtInt,      // Целое число
     sdtFont);    // Шрифт
 
 type
+   // Exception настроек
+  EPhoaSettingError = class(EPhoaError);
+
    // Пункт настройки
   PPhoaSetting = ^TPhoaSetting;
   TPhoaSetting = class(TObject)
@@ -772,14 +781,14 @@ type
     FMinValue: Integer;
     FID: Integer;
     FHelpContext: THelpContext;
+    FVariants: TStrings;
+    FEditorWidth: Integer;
      // Добавление / удаление пункта из списка дочерних пунктов
     procedure AddSetting(Item: TPhoaSetting);
     procedure RemoveSetting(Item: TPhoaSetting);
     procedure DeleteSetting(Index: Integer);
      // Очищает список дочерних пунктов
     procedure ClearSettings;
-     // Вызывает Exception неверных данных
-    procedure InvalidDatatype;
      // Внутренняя процедура копирования все установок (не копирует данные, передаваемые в конструкторе и не стирает детей)
     procedure InternalAssign(Source: TPhoaSetting);
      // Ищет пункт по ID среди себя и своих детей. Если не найден, возвращает nil
@@ -795,9 +804,13 @@ type
     procedure SetValueStr(const Value: String);
     function  GetChildCount: Integer;
     function  GetChildren(Index: Integer): TPhoaSetting;
-    procedure SetMaxValue(const Value: Integer);
-    procedure SetMinValue(const Value: Integer);
+    procedure SetMaxValue(Value: Integer);
+    procedure SetMinValue(Value: Integer);
     function  GetSettings(iID: Integer): TPhoaSetting;
+    function  GetVariantIndex: Integer;
+    procedure SetVariantIndex(Value: Integer);
+    function  GetVariants: TStrings;
+    function GetVariantText: String;
   public
     constructor Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String); overload;
     constructor Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String; bValue: Boolean); overload;
@@ -819,6 +832,8 @@ type
     property Children[Index: Integer]: TPhoaSetting read GetChildren; default;
      // -- Тип данных пункта
     property Datatype: TSettingDatatype read FDatatype;
+     // -- Ширина встраиваемого в дерево редактора, в пикселах
+    property EditorWidth: Integer read FEditorWidth write FEditorWidth;
      // -- HelpContext ID пункта
     property HelpContext: THelpContext read FHelpContext write FHelpContext;
      // -- ID пункта
@@ -833,7 +848,16 @@ type
      // -- Пункт-владелец данного пункта
     property Owner: TPhoaSetting read FOwner;
      // -- Пункты по ID
-    property Settings[iID: Integer]: TPhoaSetting read GetSettings; 
+    property Settings[iID: Integer]: TPhoaSetting read GetSettings;
+     // -- Индекс в Variants, соответствующий текущему ValueInt; -1, если нет такого соответствия. Имеет смысл только
+     //    для Datatype, равного sdtComboIdx и sdtComboObj
+    property VariantIndex: Integer read GetVariantIndex write SetVariantIndex;
+     // -- Дочерние пункты (варианты) пункта. Текст закодирован по тем же правилам, что и Name. Имеет смысл только для
+     //    Datatype, равного sdtComboIdx и sdtComboObj
+    property Variants: TStrings read GetVariants;
+     // -- Текст из Variants, соответствующий текущему ValueInt; пустая строка, если нет такого соответствия. Имеет
+     //    смысл только для Datatype, равного sdtComboIdx и sdtComboObj
+    property VariantText: String read GetVariantText;
      // -- Типизированные значения пункта
     property ValueBool: Boolean read GetValueBool write SetValueBool;
     property ValueInt:  Integer read GetValueInt  write SetValueInt;
@@ -846,18 +870,37 @@ var
 
    // Применяет пользовательские настройки к TVirtualStringTree
   procedure ApplyTreeSettings(Tree: TVirtualStringTree);
-   // Применяет пользовательские настройки к докам/панелям инструментов 
+   // Применяет пользовательские настройки к докам/панелям инструментов
   procedure ApplyToolbarSettings(Dock: TTBXDock);
 
    // Составляет фильтр для диалога сохранения файла фотоальбома на основе массива ревизий
   function  GetPhoaSaveFilter: String;
    // Возвращает индекс в aFileRevisions[], соответствующий указанной ревизии, или -1, если такой нет
   function  GetIndexOfRevision(iRev: Integer): Integer;
-   // Возвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии) 
+   // Возвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии)
   function  ValidRevisionIndex(idxRev: Integer): Integer;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses Forms, TypInfo, phUtils, phPhoa;
+
+const
+   // Сообщения об ошибках
+  SSettingsErrMsg_InvalidSettingID   = 'Invalid setting ID (%d)';
+  SSettingsErrMsg_InvalidDataAccess  = 'Cannot access setting value as type %s';
+  SSettingsErrMsg_CannotUseVariants  = 'Variants inaccessible unless a Combo datatype used';
+  SSettingsErrMsg_VariantsNotCreated = 'Variants list has not been created';
+
+   // Вызывает EPhoaSettingError
+  procedure PhoaSettingError(const sMsg: String; const aParams: Array of const);
+
+     function RetAddr: Pointer;
+     asm
+       mov eax, [ebp+4]
+     end;
+
+  begin
+    raise EPhoaSettingError.CreateFmt(sMsg, aParams) at RetAddr;
+  end;
 
   procedure AddPicPropSettings(Owner: TPhoaSetting);
   var Prop: TPicProperty;
@@ -865,11 +908,12 @@ uses Forms, TypInfo, phUtils, phPhoa;
     for Prop := Low(Prop) to High(Prop) do TPhoaSetting.Create(Owner, sdtParMsk, 0, '#'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)));
   end;
 
-  procedure AddPicPropMutexSettings(Owner: TPhoaSetting);
+  procedure AdjustPicPropComboSettings(Setting: TPhoaSetting);
   var Prop: TPicProperty;
   begin
-    TPhoaSetting.Create(Owner, sdtMutexInt, 0, '#SNone', -1);
-    for Prop := Low(Prop) to High(Prop) do TPhoaSetting.Create(Owner, sdtMutexInt, 0, '#'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Byte(Prop));
+    Setting.Variants.AddObject('', Pointer(MaxInt));
+    for Prop := Low(Prop) to High(Prop) do
+      Setting.Variants.AddObject('#'+GetEnumName(TypeInfo(TPicProperty), Byte(Prop)), Pointer(Prop));
   end;
 
   procedure AddPicClipboardFormatSettings(Owner: TPhoaSetting);
@@ -887,10 +931,11 @@ uses Forms, TypInfo, phUtils, phPhoa;
     TPhoaSetting.Create(Owner, sdtMutexInt, 0, 'Mitchell',           Byte(sfMitchell));
   end;
 
-  procedure AddMagnificationSettings(Owner: TPhoaSetting);
+  procedure AdjustMagnificationSettings(Setting: TPhoaSetting);
   var b: Byte;
   begin
-    for b := 0 to High(adMagnifications) do TPhoaSetting.Create(Owner, sdtMutex, 0, IntToStr(Trunc((adMagnifications[b]-1)*100))+'%');
+    Setting.EditorWidth := 80;
+    for b := 0 to High(adMagnifications) do Setting.Variants.Add(Format('%d%%', [Trunc((adMagnifications[b]-1)*100)]));
   end;
 
   procedure AddDateTimeAutofillPropSettings(Owner: TPhoaSetting);
@@ -1019,10 +1064,18 @@ uses Forms, TypInfo, phUtils, phPhoa;
     inherited Create;
     FOwner := AOwner;
     if FOwner<>nil then FOwner.AddSetting(Self);
-    FDatatype   := ADatatype;
-    FID         := iID;
-    FImageIndex := -1;
-    FName       := sName;
+    FDatatype    := ADatatype;
+    FID          := iID;
+    FImageIndex  := -1;
+    FName        := sName;
+     // Инициализируем EditorWidth
+    case ADatatype of
+      sdtComboIdx,
+        sdtComboObj: FEditorWidth := 250;
+      sdtColor:      FEditorWidth := 180;
+      sdtInt:        FEditorWidth := 70;
+      sdtFont:       FEditorWidth := 150;
+    end;
   end;
 
   constructor TPhoaSetting.Create(AOwner: TPhoaSetting; ADatatype: TSettingDatatype; iID: Integer; const sName: String; bValue: Boolean);
@@ -1050,6 +1103,7 @@ uses Forms, TypInfo, phUtils, phPhoa;
 
   destructor TPhoaSetting.Destroy;
   begin
+    FVariants.Free;
      // Стираем и уничтожаем список дочерних пунктов
     ClearSettings;
     if FOwner<>nil then FOwner.RemoveSetting(Self);
@@ -1084,7 +1138,7 @@ uses Forms, TypInfo, phUtils, phPhoa;
   function TPhoaSetting.GetSettings(iID: Integer): TPhoaSetting;
   begin
     Result := FindID(iID);
-    if Result=nil then raise Exception.CreateFmt('Invalid setting ID (%d)', [iID]);
+    if Result=nil then PhoaSettingError(SSettingsErrMsg_InvalidSettingID, [iID]);
   end;
 
   function TPhoaSetting.GetValStr: String;
@@ -1094,20 +1148,46 @@ uses Forms, TypInfo, phUtils, phPhoa;
 
   function TPhoaSetting.GetValueBool: Boolean;
   begin
-    if not (FDatatype in [sdtBool]) then InvalidDatatype;
+    if not (FDatatype in [sdtBool]) then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Bool']);
     Result := FData<>0;
   end;
 
   function TPhoaSetting.GetValueInt: Integer;
   begin
-    if not (FDatatype in [sdtStatic, sdtMutexInt, sdtColor, sdtInt]) then InvalidDatatype;
+    if not (FDatatype in [sdtStatic, sdtMutexInt, sdtComboIdx, sdtComboObj, sdtColor, sdtInt]) then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
     Result := FData;
   end;
 
   function TPhoaSetting.GetValueStr: String;
   begin
-    if FDatatype<>sdtFont then InvalidDatatype;
+    if FDatatype<>sdtFont then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['String']);
     Result := String(FData);
+  end;
+
+  function TPhoaSetting.GetVariantIndex: Integer;
+  begin
+    if not (FDatatype in [sdtComboIdx, sdtComboObj]) then PhoaSettingError(SSettingsErrMsg_CannotUseVariants, []);
+     // Проверяем, что список вариантов создан
+    if FVariants=nil then PhoaSettingError(SSettingsErrMsg_VariantsNotCreated, []);
+    case FDatatype of
+      sdtComboIdx: Result := FData;
+      else {sdtComboObj} Result := FVariants.IndexOfObject(Pointer(FData));
+    end;
+  end;
+
+  function TPhoaSetting.GetVariants: TStrings;
+  begin
+    if not (FDatatype in [sdtComboIdx, sdtComboObj]) then PhoaSettingError(SSettingsErrMsg_CannotUseVariants, []);
+     // Создаём список Variants, если он ещё не создан
+    if FVariants=nil then FVariants := TStringList.Create;
+    Result := FVariants;
+  end;
+
+  function TPhoaSetting.GetVariantText: String;
+  var idx: Integer;
+  begin
+    idx := GetVariantIndex;
+    if idx<0 then Result := '' else Result := FVariants[idx];
   end;
 
   procedure TPhoaSetting.IniLoad(IniFile: TIniFile);
@@ -1141,22 +1221,19 @@ uses Forms, TypInfo, phUtils, phPhoa;
     Child, SrcChild: TPhoaSetting;
   begin
      // Копируем настройки
+    FEditorWidth := Source.FEditorWidth;
     FHelpContext := Source.FHelpContext;
     FImageIndex  := Source.FImageIndex;
     FMaxValue    := Source.FMaxValue;
     FMinValue    := Source.FMinValue;
     if FDatatype=sdtFont then SetValueStr(Source.GetValueStr) else FData := Source.FData;
+    if Source.FVariants=nil then FreeAndNil(FVariants) else GetVariants.Assign(Source.FVariants);
      // Повторяем то же для детей
     for i := 0 to Source.ChildCount-1 do begin
       SrcChild := Source.Children[i];
       Child := TPhoaSetting.Create(Self, SrcChild.Datatype, SrcChild.ID, SrcChild.Name);
       Child.InternalAssign(SrcChild);
     end;
-  end;
-
-  procedure TPhoaSetting.InvalidDatatype;
-  begin
-    raise Exception.Create('Invalid access to setting datatype');
   end;
 
   procedure TPhoaSetting.RegLoad(RegIniFile: TRegIniFile);
@@ -1189,38 +1266,49 @@ uses Forms, TypInfo, phUtils, phPhoa;
     FChildren.Remove(Item);
   end;
 
-  procedure TPhoaSetting.SetMaxValue(const Value: Integer);
+  procedure TPhoaSetting.SetMaxValue(Value: Integer);
   begin
-    if FDatatype<>sdtInt then InvalidDatatype;
+    if FDatatype<>sdtInt then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
     FMaxValue := Value;
   end;
 
-  procedure TPhoaSetting.SetMinValue(const Value: Integer);
+  procedure TPhoaSetting.SetMinValue(Value: Integer);
   begin
-    if FDatatype<>sdtInt then InvalidDatatype;
+    if FDatatype<>sdtInt then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
     FMinValue := Value;
   end;
 
   procedure TPhoaSetting.SetValueBool(Value: Boolean);
   begin
-    if FDatatype<>sdtBool then InvalidDatatype;
+    if FDatatype<>sdtBool then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Bool']);
     FData := Byte(Value);
   end;
 
   procedure TPhoaSetting.SetValueInt(Value: Integer);
   begin
-    if not (FDatatype in [sdtStatic, sdtMutexInt, sdtColor, sdtInt]) then InvalidDatatype;
+    if not (FDatatype in [sdtStatic, sdtMutexInt, sdtComboIdx, sdtComboObj, sdtColor, sdtInt]) then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['Int']);
      // Validate value
     if (FDatatype=sdtInt) and (FMaxValue>FMinValue) then
       if Value<FMinValue then Value := FMinValue
-      else if Value>FMaxValue then Value := FMaxValue; 
+      else if Value>FMaxValue then Value := FMaxValue;
     FData := Value;
   end;
 
   procedure TPhoaSetting.SetValueStr(const Value: String);
   begin
-    if FDatatype<>sdtFont then InvalidDatatype;
+    if FDatatype<>sdtFont then PhoaSettingError(SSettingsErrMsg_InvalidDataAccess, ['String']);
     String(FData) := Value;
+  end;
+
+  procedure TPhoaSetting.SetVariantIndex(Value: Integer);
+  begin
+    if not (FDatatype in [sdtComboIdx, sdtComboObj]) then PhoaSettingError(SSettingsErrMsg_CannotUseVariants, []);
+     // Проверяем, что список вариантов создан
+    if FVariants=nil then PhoaSettingError(SSettingsErrMsg_VariantsNotCreated, []);
+    case FDatatype of
+      sdtComboIdx: FData := Value;
+      else {sdtComboObj} if Value<0 then FData := -1 else FData := Integer(FVariants.Objects[Value]);
+    end;
   end;
 
   {$HINTS OFF} // Do not hint abount var not used
@@ -1229,158 +1317,160 @@ uses Forms, TypInfo, phUtils, phPhoa;
   begin
     Lvl0 := RootSetting;
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic, ISettingID_Gen,                   '@ISettingID_Gen');
+    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Gen,                   '@ISettingID_Gen');
     Lvl1.ImageIndex  := iiA_Props;
     Lvl1.HelpContext := IDH_setup_general;
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US});
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,   ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,    ISettingID_Gen_TooltipDisplTime,  '@ISettingID_Gen_TooltipDisplTime', 5000);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Intf,              '@ISettingID_Gen_Intf');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_Language,          '@ISettingID_Gen_Language', $409 {=1033, English-US});
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,     ISettingID_Gen_MainFont,          '@ISettingID_Gen_MainFont', 'Tahoma/8/0/0/1');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,      ISettingID_Gen_TooltipDisplTime,  '@ISettingID_Gen_TooltipDisplTime', 5000);
         Lvl3.MinValue := 100;
         Lvl3.MaxValue := MaxInt;
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,    ISettingID_Gen_OpenMRUCount,      '@ISettingID_Gen_OpenMRUCount', 10);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,      ISettingID_Gen_OpenMRUCount,      '@ISettingID_Gen_OpenMRUCount', 10);
         Lvl3.MinValue := 0;
         Lvl3.MaxValue := 15;
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Gen_LookupPhoaIni,     '@ISettingID_Gen_LookupPhoaIni', True);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Gen_Clipboard,         '@ISettingID_Gen_Clipboard');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_ClipFormats,       '@ISettingID_Gen_ClipFormats', Byte(DefaultPicClipboardFormats));
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Gen_LookupPhoaIni,     '@ISettingID_Gen_LookupPhoaIni', True);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Clipboard,         '@ISettingID_Gen_Clipboard');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_ClipFormats,       '@ISettingID_Gen_ClipFormats', Byte(DefaultPicClipboardFormats));
         AddPicClipboardFormatSettings(lvl3);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Gen_Toolbars,          '@ISettingID_Gen_Toolbars');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_ToolbarBtnSize,    '@ISettingID_Gen_ToolbarBtnSize', 0);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarBSz16,      '@ISettingID_Gen_ToolbarBSz16');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarBSz24,      '@ISettingID_Gen_ToolbarBSz24');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarBSz32,      '@ISettingID_Gen_ToolbarBSz32');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_ToolbarDragStyle,  '@ISettingID_Gen_ToolbarDragStyle', 3);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarDrgNone,    '@ISettingID_Gen_ToolbarDrgNone');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarDrgOneDock, '@ISettingID_Gen_ToolbarDrgOneDock');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarDrgNoFloat, '@ISettingID_Gen_ToolbarDrgNoFloat');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_ToolbarDrgFree,    '@ISettingID_Gen_ToolbarDrgFree');
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Gen_Tree,              '@ISettingID_Gen_Tree');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Gen_TreeAnimation,     '@ISettingID_Gen_TreeAnimation',  True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Gen_TreeWhPanning,     '@ISettingID_Gen_TreeWhPanning',  True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Gen_TreeCenterSel,     '@ISettingID_Gen_TreeCenterSel',  False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Gen_TreeIncrSearch,    '@ISettingID_Gen_TreeIncrSearch', True);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtInt,    ISettingID_Gen_TreeIncrSrchDelay, '@ISettingID_Gen_TreeIncrSrchDelay', 1000);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Toolbars,          '@ISettingID_Gen_Toolbars');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_ToolbarBtnSize,    '@ISettingID_Gen_ToolbarBtnSize', 0);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarBSz16,      '@ISettingID_Gen_ToolbarBSz16');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarBSz24,      '@ISettingID_Gen_ToolbarBSz24');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarBSz32,      '@ISettingID_Gen_ToolbarBSz32');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_ToolbarDragStyle,  '@ISettingID_Gen_ToolbarDragStyle', 3);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarDrgNone,    '@ISettingID_Gen_ToolbarDrgNone');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarDrgOneDock, '@ISettingID_Gen_ToolbarDrgOneDock');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarDrgNoFloat, '@ISettingID_Gen_ToolbarDrgNoFloat');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_ToolbarDrgFree,    '@ISettingID_Gen_ToolbarDrgFree');
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Gen_Tree,              '@ISettingID_Gen_Tree');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Gen_TreeAnimation,     '@ISettingID_Gen_TreeAnimation',  True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Gen_TreeWhPanning,     '@ISettingID_Gen_TreeWhPanning',  True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Gen_TreeCenterSel,     '@ISettingID_Gen_TreeCenterSel',  False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Gen_TreeIncrSearch,    '@ISettingID_Gen_TreeIncrSearch', True);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtInt,      ISettingID_Gen_TreeIncrSrchDelay, '@ISettingID_Gen_TreeIncrSrchDelay', 1000);
           Lvl4.MinValue := 100;
           Lvl4.MaxValue := 10000;
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_TreeButtonStyle,   '@ISettingID_Gen_TreeButtonStyle',   0);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeBS_Rectangle,  '@ISettingID_Gen_TreeBS_Rectangle');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeBS_Triangle,   '@ISettingID_Gen_TreeBS_Triangle');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP});
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_DarkCheck,  '@ISettingID_Gen_TreeCS_DarkCheck');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_DarkTick,   '@ISettingID_Gen_TreeCS_DarkTick');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_Flat,       '@ISettingID_Gen_TreeCS_Flat');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_LightCheck, '@ISettingID_Gen_TreeCS_LightCheck');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_LightTick,  '@ISettingID_Gen_TreeCS_LightTick');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_Std,        '@ISettingID_Gen_TreeCS_Std');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_StdFlat,    '@ISettingID_Gen_TreeCS_StdFlat');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeCS_XP,         '@ISettingID_Gen_TreeCS_XP');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,  ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeButtonStyle,   '@ISettingID_Gen_TreeButtonStyle',   0);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeBS_Rectangle,  '@ISettingID_Gen_TreeBS_Rectangle');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeBS_Triangle,   '@ISettingID_Gen_TreeBS_Triangle');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeCheckStyle,    '@ISettingID_Gen_TreeCheckStyle', 7 {XP});
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_DarkCheck,  '@ISettingID_Gen_TreeCS_DarkCheck');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_DarkTick,   '@ISettingID_Gen_TreeCS_DarkTick');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_Flat,       '@ISettingID_Gen_TreeCS_Flat');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_LightCheck, '@ISettingID_Gen_TreeCS_LightCheck');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_LightTick,  '@ISettingID_Gen_TreeCS_LightTick');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_Std,        '@ISettingID_Gen_TreeCS_Std');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_StdFlat,    '@ISettingID_Gen_TreeCS_StdFlat');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeCS_XP,         '@ISettingID_Gen_TreeCS_XP');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Gen_TreeSelStyle,      '@ISettingID_Gen_TreeSelStyle', 1);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelDotted,     '@ISettingID_Gen_TreeSelDotted');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtMutex,    ISettingID_Gen_TreeSelBlended,    '@ISettingID_Gen_TreeSelBlended');
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic, ISettingID_Browse,                '@ISettingID_Browse');
+    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Browse,                '@ISettingID_Browse');
     Lvl1.ImageIndex  := iiA_NewGroup;
     Lvl1.HelpContext := IDH_setup_browse_mode;
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,  ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor', $d7d7d7);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Browse_ViewerDragDrop, '@ISettingID_Browse_ViewerDragDrop', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Browse_ViewerTooltips, '@ISettingID_Browse_ViewerTooltips', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Browse_ViewerTipProps, '@ISettingID_Browse_ViewerTipProps');
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Browse_Viewer,         '@ISettingID_Browse_Viewer');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerBkColor,  '@ISettingID_Browse_ViewerBkColor',  $d7d7d7);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerThBColor, '@ISettingID_Browse_ViewerThBColor', clBtnFace);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_Browse_ViewerThFColor, '@ISettingID_Browse_ViewerThFColor', clWindowText);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Browse_ViewerDragDrop, '@ISettingID_Browse_ViewerDragDrop', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Browse_ViewerTooltips, '@ISettingID_Browse_ViewerTooltips', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Browse_ViewerTipProps, '@ISettingID_Browse_ViewerTipProps');
         Lvl3.ValueInt := PicPropsToInt([ppFileName, ppFileSize, ppPicDims, ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppMedia]);
         AddPicPropSettings(Lvl3);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Browse_ViewerThInfo,   '@ISettingID_Browse_ViewerThInfo');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtStatic, ISettingID_Browse_ViewerThLTProp, '@ISettingID_Browse_ViewerThLTProp', -1);
-          AddPicPropMutexSettings(Lvl4);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtStatic, ISettingID_Browse_ViewerThRTProp, '@ISettingID_Browse_ViewerThRTProp', -1);
-          AddPicPropMutexSettings(Lvl4);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtStatic, ISettingID_Browse_ViewerThLBProp, '@ISettingID_Browse_ViewerThLBProp', Byte(ppPlace));
-          AddPicPropMutexSettings(Lvl4);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtStatic, ISettingID_Browse_ViewerThRBProp, '@ISettingID_Browse_ViewerThRBProp', Byte(ppDate));
-          AddPicPropMutexSettings(Lvl4);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Browse_ViewerThBorder, '@ISettingID_Browse_ViewerThBorder', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Browse_ViewerCacheThs, '@ISettingID_Browse_ViewerCacheThs', True);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtInt,    ISettingID_Browse_ViewerCacheSze, '@ISettingID_Browse_ViewerCacheSze', 1000);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Browse_ViewerThInfo,   '@ISettingID_Browse_ViewerThInfo');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtComboObj,   ISettingID_Browse_ViewerThLTProp, '@ISettingID_Browse_ViewerThLTProp', -1);
+          AdjustPicPropComboSettings(Lvl4);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtComboObj,   ISettingID_Browse_ViewerThRTProp, '@ISettingID_Browse_ViewerThRTProp', -1);
+          AdjustPicPropComboSettings(Lvl4);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtComboObj,   ISettingID_Browse_ViewerThLBProp, '@ISettingID_Browse_ViewerThLBProp', Byte(ppPlace));
+          AdjustPicPropComboSettings(Lvl4);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtComboObj,   ISettingID_Browse_ViewerThRBProp, '@ISettingID_Browse_ViewerThRBProp', Byte(ppDate));
+          AdjustPicPropComboSettings(Lvl4);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Browse_ViewerThBorder, '@ISettingID_Browse_ViewerThBorder', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Browse_ViewerCacheThs, '@ISettingID_Browse_ViewerCacheThs', True);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtInt,      ISettingID_Browse_ViewerCacheSze, '@ISettingID_Browse_ViewerCacheSze', 1000);
           Lvl4.MinValue := 1;
           Lvl4.MaxValue := MaxInt;
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest));
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Browse_ViewerStchFilt, '@ISettingID_Browse_ViewerStchFilt', Byte(sfNearest));
         AddStretchFilterSettings(Lvl3);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtInt,    ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount', 32);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtInt,      ISettingID_Browse_MaxUndoCount,   '@ISettingID_Browse_MaxUndoCount', 32);
       Lvl2.MinValue := 1;
       Lvl2.MaxValue := MaxInt;
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic, ISettingID_View,                  '@ISettingID_View');
+    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_View,                  '@ISettingID_View');
     Lvl1.ImageIndex  := iiA_ViewMode;
     Lvl1.HelpContext := IDH_setup_view_mode;
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,   ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,   ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,   ISettingID_View_KeepCursorOverTB, '@ISettingID_View_KeepCursorOverTB', True);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,   ISettingID_View_HideCursor,       '@ISettingID_View_HideCursor', False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtColor,  ISettingID_View_BkColor,          '@ISettingID_View_BkColor', $000000);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,   ISettingID_View_ShowToolbar,      '@ISettingID_View_ShowToolbar', True);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_PicChange,        '@ISettingID_View_PicChange');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_FitWindowToPic,   '@ISettingID_View_FitWindowToPic', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_CenterWindow,     '@ISettingID_View_CenterWindow', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_ShrinkPicToFit,   '@ISettingID_View_ShrinkPicToFit', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_ZoomPicToFit,     '@ISettingID_View_ZoomPicToFit', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_Cyclic,           '@ISettingID_View_Cyclic', False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_View_Optimizing,       '@ISettingID_View_Optimizing');
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,   ISettingID_View_Predecode,        '@ISettingID_View_Predecode', True);
-          Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,   ISettingID_View_CacheBehind,      '@ISettingID_View_CacheBehind', True);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_ZoomFactor,       '@ISettingID_View_ZoomFactor', 3 {=50%});
-      AddMagnificationSettings(Lvl2);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_CaptionProps,     '@ISettingID_View_CaptionProps', PicPropsToInt([ppFileName]));
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_AlwaysOnTop,      '@ISettingID_View_AlwaysOnTop', False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_Fullscreen,       '@ISettingID_View_Fullscreen', False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_KeepCursorOverTB, '@ISettingID_View_KeepCursorOverTB', True);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_HideCursor,       '@ISettingID_View_HideCursor', False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtColor,    ISettingID_View_BkColor,          '@ISettingID_View_BkColor', $000000);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtBool,     ISettingID_View_ShowToolbar,      '@ISettingID_View_ShowToolbar', True);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_PicChange,        '@ISettingID_View_PicChange');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_FitWindowToPic,   '@ISettingID_View_FitWindowToPic', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_CenterWindow,     '@ISettingID_View_CenterWindow', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_ShrinkPicToFit,   '@ISettingID_View_ShrinkPicToFit', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_ZoomPicToFit,     '@ISettingID_View_ZoomPicToFit', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_Cyclic,           '@ISettingID_View_Cyclic', False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_View_Optimizing,       '@ISettingID_View_Optimizing');
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,     ISettingID_View_Predecode,        '@ISettingID_View_Predecode', True);
+          Lvl4 := TPhoaSetting.Create(Lvl3, sdtBool,     ISettingID_View_CacheBehind,      '@ISettingID_View_CacheBehind', True);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtComboIdx, ISettingID_View_ZoomFactor,       '@ISettingID_View_ZoomFactor', 3 {=50%});
+      AdjustMagnificationSettings(Lvl2);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_CaptionProps,     '@ISettingID_View_CaptionProps', PicPropsToInt([ppFileName]));
       AddPicPropSettings(Lvl2);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_StchFilt,         '@ISettingID_View_StchFilt', Byte(sfNearest));
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_StchFilt,         '@ISettingID_View_StchFilt', Byte(sfNearest));
       AddStretchFilterSettings(Lvl2);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_Info,             '@ISettingID_View_Info');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_ShowInfo,         '@ISettingID_View_ShowInfo', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_View_InfoPicProps,     '@ISettingID_View_InfoPicProps', PicPropsToInt([ppDate, ppTime, ppPlace, ppDescription]));
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_Info,             '@ISettingID_View_Info');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_ShowInfo,         '@ISettingID_View_ShowInfo', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_View_InfoPicProps,     '@ISettingID_View_InfoPicProps', PicPropsToInt([ppDate, ppTime, ppPlace, ppDescription]));
         AddPicPropSettings(Lvl3);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,   ISettingID_View_InfoFont,         '@ISettingID_View_InfoFont', 'Arial/14/0/16777215/1');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,  ISettingID_View_InfoBkColor,      '@ISettingID_View_InfoBkColor', $000000);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,    ISettingID_View_InfoBkOpacity,    '@ISettingID_View_InfoBkOpacity', $40);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtFont,     ISettingID_View_InfoFont,         '@ISettingID_View_InfoFont', 'Arial/14/0/16777215/1');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtColor,    ISettingID_View_InfoBkColor,      '@ISettingID_View_InfoBkColor', $000000);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,      ISettingID_View_InfoBkOpacity,    '@ISettingID_View_InfoBkOpacity', $40);
         Lvl3.MinValue := 0;
         Lvl3.MaxValue := 255;
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_View_Slideshow,        '@ISettingID_View_Slideshow');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,    ISettingID_View_SlideInterval,    '@ISettingID_View_SlideInterval', 5000);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_View_Slideshow,        '@ISettingID_View_Slideshow');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtInt,      ISettingID_View_SlideInterval,    '@ISettingID_View_SlideInterval', 5000);
         Lvl3.MinValue := 0;
         Lvl3.MaxValue := 600*1000;
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_View_SlideCyclic,      '@ISettingID_View_SlideCyclic', True);
      //=================================================================================================================
-    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic, ISettingID_Dialogs,               '@ISettingID_Dialogs');
+    Lvl1 := TPhoaSetting.Create(Lvl0, sdtStatic,   ISettingID_Dialogs,               '@ISettingID_Dialogs');
     Lvl1.ImageIndex  := iiA_Dialog;
     Lvl1.HelpContext := IDH_setup_dialogs;
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_ConfmDelView,     '@ISettingID_Dlgs_ConfmDelView',     True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_ConfmOldFile,     '@ISettingID_Dlgs_ConfmOldFile',     True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_ConfmAppExit,     '@ISettingID_Dlgs_ConfmAppExit',     False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Dlgs_Notifies,         '@ISettingID_Dlgs_Notifies');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_NotifyDragCopy,   '@ISettingID_Dlgs_NotifyDragCopy',   True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_NotifyDragMove,   '@ISettingID_Dlgs_NotifyDragMove',   True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_NotifyPaste,      '@ISettingID_Dlgs_NotifyPaste',      True);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Dlgs_AddPicWizard,     '@ISettingID_Dlgs_AddPicWizard');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_APW_ShowHidden,   '@ISettingID_Dlgs_APW_ShowHidden',   False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_APW_SkipChkPage,  '@ISettingID_Dlgs_APW_SkipChkPage',  False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_APW_LogOnErrOnly, '@ISettingID_Dlgs_APW_LogOnErrOnly', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Dlgs_APW_AutofillDate, '@ISettingID_Dlgs_APW_AutofillDate', Byte(DTAP_DefaultDateProps));
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_Confms,           '@ISettingID_Dlgs_Confms');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelGroup,    '@ISettingID_Dlgs_ConfmDelGroup',    True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelPics,     '@ISettingID_Dlgs_ConfmDelPics',     True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmDelView,     '@ISettingID_Dlgs_ConfmDelView',     True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmOldFile,     '@ISettingID_Dlgs_ConfmOldFile',     True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_ConfmAppExit,     '@ISettingID_Dlgs_ConfmAppExit',     False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_Notifies,         '@ISettingID_Dlgs_Notifies');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_NotifyDragCopy,   '@ISettingID_Dlgs_NotifyDragCopy',   True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_NotifyDragMove,   '@ISettingID_Dlgs_NotifyDragMove',   True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_NotifyPaste,      '@ISettingID_Dlgs_NotifyPaste',      True);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_AddPicWizard,     '@ISettingID_Dlgs_AddPicWizard');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_APW_ShowHidden,   '@ISettingID_Dlgs_APW_ShowHidden',   False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_APW_SkipChkPage,  '@ISettingID_Dlgs_APW_SkipChkPage',  False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_APW_LogOnErrOnly, '@ISettingID_Dlgs_APW_LogOnErrOnly', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Dlgs_APW_AutofillDate, '@ISettingID_Dlgs_APW_AutofillDate', Byte(DTAP_DefaultDateProps));
         AddDateTimeAutofillPropSettings(Lvl3);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_APW_ReplaceDate,  '@ISettingID_Dlgs_APW_ReplaceDate',  False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic, ISettingID_Dlgs_APW_AutofillTime, '@ISettingID_Dlgs_APW_AutofillTime', Byte(DTAP_DefaultTimeProps));
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_APW_ReplaceDate,  '@ISettingID_Dlgs_APW_ReplaceDate',  False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtStatic,   ISettingID_Dlgs_APW_AutofillTime, '@ISettingID_Dlgs_APW_AutofillTime', Byte(DTAP_DefaultTimeProps));
         AddDateTimeAutofillPropSettings(Lvl3);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_APW_ReplaceTime,  '@ISettingID_Dlgs_APW_ReplaceTime',  False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Dlgs_PicProps,         '@ISettingID_Dlgs_PicProps');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_PP_ExpFileProps,  '@ISettingID_Dlgs_PP_ExpFileProps',  False);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_PP_ExpMetadata ,  '@ISettingID_Dlgs_PP_ExpMetadata',   False);
-      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic, ISettingID_Dlgs_FileOpsWizard,    '@ISettingID_Dlgs_FileOpsWizard');
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_CfmCopyFiles, '@ISettingID_Dlgs_FOW_CfmCopyFiles', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_CfmMoveFiles, '@ISettingID_Dlgs_FOW_CfmMoveFiles', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_CfmDelFiles,  '@ISettingID_Dlgs_FOW_CfmDelFiles',  True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_CfmRebuildTh, '@ISettingID_Dlgs_FOW_CfmRebuildTh', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
-        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,   ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_APW_ReplaceTime,  '@ISettingID_Dlgs_APW_ReplaceTime',  False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_PicProps,         '@ISettingID_Dlgs_PicProps');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_PP_ExpFileProps,  '@ISettingID_Dlgs_PP_ExpFileProps',  False);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_PP_ExpMetadata ,  '@ISettingID_Dlgs_PP_ExpMetadata',   False);
+      Lvl2 := TPhoaSetting.Create(Lvl1, sdtStatic,   ISettingID_Dlgs_FileOpsWizard,    '@ISettingID_Dlgs_FileOpsWizard');
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmCopyFiles, '@ISettingID_Dlgs_FOW_CfmCopyFiles', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmMoveFiles, '@ISettingID_Dlgs_FOW_CfmMoveFiles', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmDelFiles,  '@ISettingID_Dlgs_FOW_CfmDelFiles',  True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmRebuildTh, '@ISettingID_Dlgs_FOW_CfmRebuildTh', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_CfmRepairFLs, '@ISettingID_Dlgs_FOW_CfmRepairFLs', True);
+        Lvl3 := TPhoaSetting.Create(Lvl2, sdtBool,     ISettingID_Dlgs_FOW_LogOnErrOnly, '@ISettingID_Dlgs_FOW_LogOnErrOnly', True);
   end;
   {$HINTS ON}
 
