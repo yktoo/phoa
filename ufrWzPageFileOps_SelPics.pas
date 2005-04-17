@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.19 2005-02-14 19:34:09 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.20 2005-04-17 05:06:42 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -16,24 +16,24 @@ uses
 
 type
   TfrWzPageFileOps_SelPics = class(TWizardPage)
-    rbAllPics: TRadioButton;
-    rbSelPics: TRadioButton;
-    rbSelGroups: TRadioButton;
-    tvGroups: TVirtualStringTree;
-    lCountInfo: TLabel;
-    alMain: TActionList;
     aCheckAll: TAction;
-    aUncheckAll: TAction;
     aInvertChecks: TAction;
-    pmGroups: TTBXPopupMenu;
-    ipmGroupsCheckAll: TTBXItem;
-    ipmGroupsUncheckAll: TTBXItem;
-    ipmGroupsInvertChecks: TTBXItem;
-    gbValidity: TGroupBox;
-    rbValidityAny: TRadioButton;
-    rbValidityValid: TRadioButton;
-    rbValidityInvalid: TRadioButton;
+    alMain: TActionList;
+    aUncheckAll: TAction;
     dklcMain: TDKLanguageController;
+    gbValidity: TGroupBox;
+    ipmGroupsCheckAll: TTBXItem;
+    ipmGroupsInvertChecks: TTBXItem;
+    ipmGroupsUncheckAll: TTBXItem;
+    lCountInfo: TLabel;
+    pmGroups: TTBXPopupMenu;
+    rbAllPics: TRadioButton;
+    rbSelGroups: TRadioButton;
+    rbSelPics: TRadioButton;
+    rbValidityAny: TRadioButton;
+    rbValidityInvalid: TRadioButton;
+    rbValidityValid: TRadioButton;
+    tvGroups: TVirtualStringTree;
     procedure aaCheckAll(Sender: TObject);
     procedure aaInvertChecks(Sender: TObject);
     procedure aaUncheckAll(Sender: TObject);
@@ -53,7 +53,7 @@ type
      // Количество выбранных изображений
     FSelPicCount: Integer;
      // Суммарный размер файлов выбранных изображений
-    FSelPicFileTotalSize: Integer;
+    FSelPicFileTotalSize: Int64;
      // Настраивает доступность [вторичных] контролов выбора изображений
     procedure AdjustPicControls;
      // Обновляет информацию о выбранных изображениях
