@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.48 2005-04-17 08:51:07 dale Exp $
+//  $Id: ufImgView.pas,v 1.49 2005-04-17 13:23:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -345,9 +345,11 @@ type
     procedure DP_DescribePic;
      // Ставит в очередь на загрузку следующее изображение, если нужно
     procedure DP_EnqueueNext;
-     // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bUserResize=False. При
-     //   bForceDefault=True игнорирует sNewZoom, а определяет его, исходя из настроек режима просмотра
-    procedure SetZoom(sNewZoom: Single; bForceDefault, bUserResize: Boolean);
+     // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bUserResize=False.
+     //   bForceDefault   - если True, то игнорирует sNewZoom, а определяет его, исходя из настроек режима просмотра
+     //   bPreserveCenter - если False, позиционирует область просмотра в центр изображения; если True, старается
+     //                     сохранить тем же
+    procedure SetZoom(sNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
      // События преобразования
     procedure TransformApplied(Sender: TObject);
      // Настраивает aShowInfo.Checked
@@ -754,25 +756,25 @@ uses
   procedure TfImgView.aaZoomActual(Sender: TObject);
   begin
     CommitInfoRelocation;
-    SetZoom(1.0, False, False);
+    SetZoom(1.0, False, False, True);
   end;
 
   procedure TfImgView.aaZoomFit(Sender: TObject);
   begin
     CommitInfoRelocation;
-    SetZoom(0.0, False, False); // 0 означает "best fit"
+    SetZoom(0.0, False, False, True); // 0 означает "best fit"
   end;
 
   procedure TfImgView.aaZoomIn(Sender: TObject);
   begin
     CommitInfoRelocation;
-    SetZoom(ZoomFactor*FZoomFactorChange, False, False);
+    SetZoom(ZoomFactor*FZoomFactorChange, False, False, True);
   end;
 
   procedure TfImgView.aaZoomOut(Sender: TObject);
   begin
     CommitInfoRelocation;
-    SetZoom(ZoomFactor/FZoomFactorChange, False, False);
+    SetZoom(ZoomFactor/FZoomFactorChange, False, False, True);
   end;
 
   procedure TfImgView.AdjustCursorVisibility(bForceShow: Boolean);
@@ -873,8 +875,8 @@ uses
       if bReload or bApplyTransforms then DP_ApplyTransforms;
        // Настраиваем описания
       DP_DescribePic;
-       // Отображаем картинку
-      SetZoom(0.0, True, False);
+       // Отображаем картинку (при перегрузке/применении преобразований центр области просмотра не сохраняем)
+      SetZoom(0.0, True, False, not (bReload or bApplyTransforms));
        // Ставим в очередь предыдущее/следующее (зависит от направления листания) изображение
       DP_EnqueueNext;
     finally
@@ -1328,10 +1330,11 @@ uses
     iMain.OffsetVert := iy;
   end;
 
-  procedure TfImgView.SetZoom(sNewZoom: Single; bForceDefault, bUserResize: Boolean);
+  procedure TfImgView.SetZoom(sNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
   var
     ixWindow, iyWindow, iwWindow, ihWindow: Integer;
     PrevMousePos, p: TPoint;
+    sgXRelativeCenter, sgYRelativeCenter: Single;
 
      // Рассчитывает размеры рабочей области, размеры окна и FBestFitZoomFactor
     procedure ComputeViewportDimensions;
@@ -1365,6 +1368,14 @@ uses
     end;
 
   begin
+     // Определяем относительные координаты viewport-центра (в диапазоне 0..1, относительно размеров изображения)
+    if bPreserveCenter and (FWScaled>0) and (FHScaled>0) then begin
+      sgXRelativeCenter := (FWClient/2-ViewOffset.x)/FWScaled;
+      sgYRelativeCenter := (FHClient/2-ViewOffset.y)/FHScaled;
+    end else begin
+      sgXRelativeCenter := 0.5;
+      sgYRelativeCenter := 0.5;
+    end;
      // Пересчитываем размеры и FBestFitZoomFactor
     ComputeViewportDimensions;
      // Сообщение об ошибке не масштабируем
@@ -1377,12 +1388,12 @@ uses
         sNewZoom := iif(((FBestFitZoomFactor<1.0) and FDoShrinkPic) or ((FBestFitZoomFactor>1.0) and FDoZoomPic), 0.0, 1.0);
        // Если передан 0, то это означает, что нужно использовать FBestFitZoomFactor
       if sNewZoom=0.0 then sNewZoom := FBestFitZoomFactor;
+       // Validate zoom value
+      if sNewZoom>SMaxPicZoom then sNewZoom := SMaxPicZoom
+      else if sNewZoom<SMinPicZoom then sNewZoom := SMinPicZoom;
+       // Если это не изменение размеров пользователем, запоминаем, если выставили BestFitZoom
+      if not bUserResize then FBestFitZoomUsed := sNewZoom=FBestFitZoomFactor;
     end;
-     // Validate zoom value
-    if sNewZoom>SMaxPicZoom then sNewZoom := SMaxPicZoom
-    else if sNewZoom<SMinPicZoom then sNewZoom := SMinPicZoom;
-     // Если это не изменение размеров пользователем, запоминаем, если выставили BestFitZoom
-    if not bUserResize then FBestFitZoomUsed := sNewZoom=FBestFitZoomFactor;
      // Применяем коэффициент масштабирования
     iMain.Scale := sNewZoom;
      // Находим размеры масштабированного изображения
@@ -1431,7 +1442,7 @@ uses
      // Настраиваем курсор
     UpdateCursor;
      // Находим начальное положение изображения
-    ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
+    ViewOffset := Point(Trunc(FWClient/2-sgXRelativeCenter*FWScaled), Trunc(FHClient/2-sgYRelativeCenter*FHScaled));
      // Настраиваем положение информации
     FDescLayer.Location := FloatRect(
       FWClient/10000*FViewInfoPos.Left,
@@ -1554,7 +1565,7 @@ uses
     if Visible and not FForcedResize then begin
       CommitInfoRelocation;
        // Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor без изменений
-      SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True);
+      SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True, True);
     end;
   end;
 
