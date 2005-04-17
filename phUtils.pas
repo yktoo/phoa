@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.47 2005-02-13 19:16:38 dale Exp $
+//  $Id: phUtils.pas,v 1.48 2005-04-17 08:49:17 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,8 @@ unit phUtils;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
+  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, Forms,
+  TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
   phIntf, ConsVars, phObj;
 
    // Exception raising
@@ -45,10 +46,12 @@ uses
    // Возвращает результат пересечения прямоугольников
   function  GetRectIntersection(const r1, r2: TRect): TRect;
 
-   // Преобразование Положение/размеры формы<->Строка. FormPositionFromStr возвращает True, если извлечение данных из
-   //   строки прошло успешно 
-  function  FormPositionToStr(const BoundsRect: TRect): String;
-  function  FormPositionFromStr(const sBounds: String; Constraints: TSizeConstraints; out BoundsRect: TRect): Boolean;
+   // Преобразование Положение/размеры формы<->Строка
+  function  FormPositionToStr(Form: TCustomForm): String;
+  procedure FormPositionFromStr(Form: TCustomForm; const sPosition: String);
+   // Возвращает объект-монитор, задаваемый свойством DefaultMonitor формы. Если подходящего монитора не найдено,
+   //   возвращает первичный монитор
+  function  GetDefaultMonitorForForm(Form: TCustomForm): TMonitor;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): String;
@@ -171,7 +174,7 @@ uses
 
 implementation
 uses
-  Forms, TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, udMsgBox, phPhoa;
+  TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, udMsgBox, phPhoa;
 
 type
    //===================================================================================================================
@@ -396,16 +399,18 @@ var
     IntersectRect(Result, r1, r2);
   end;
   
-  function FormPositionToStr(const BoundsRect: TRect): String;
+  function FormPositionToStr(Form: TCustomForm): String;
   begin
-    Result := Format('%d,%d,%d,%d', [BoundsRect.Left, BoundsRect.Top, BoundsRect.Right, BoundsRect.Bottom]);
+    with Form do
+      Result := Format('%d,%d,%d,%d,%d', [Left, Top, Left+Width, Top+Height, iif(WindowState=wsMaximized, 1, 0)]);
   end;
 
-  function FormPositionFromStr(const sBounds: String; Constraints: TSizeConstraints; out BoundsRect: TRect): Boolean;
+  procedure FormPositionFromStr(Form: TCustomForm; const sPosition: String);
   var
-    r, rScreen: TRect;
+    r, rWorkArea: TRect;
     iw, ih: Integer;
     s: String;
+    bMaximized: Boolean;
 
     function ConstrDef(iConstraint, iDefault: Integer): Integer;
     begin
@@ -413,27 +418,49 @@ var
     end;
 
   begin
-    s := sBounds;
-    r.Left    := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Top     := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Right   := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Bottom  := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    s := sPosition;
+    r.Left     := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Top      := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Right    := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    r.Bottom   := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
+    bMaximized := StrToIntDef(ExtractFirstWord(s, ','), 0)<>0;
      // Если все координаты нормальные
-    Result := (r.Left<MaxInt) and (r.Top<MaxInt) and (r.Right<MaxInt) and (r.Bottom<MaxInt);
-    if Result then begin
-      rScreen := Screen.WorkAreaRect;
+    if (r.Left<MaxInt) and (r.Top<MaxInt) and (r.Right<MaxInt) and (r.Bottom<MaxInt) then begin
+      rWorkArea := Form.Monitor.WorkAreaRect;
        // Исправляем размер при необходимости
-      iw := Min(Min(Max(r.Right-r.Left, ConstrDef(Constraints.MinWidth,  10)), rScreen.Right-rScreen.Left), ConstrDef(Constraints.MaxWidth,  MaxInt));
-      ih := Min(Min(Max(r.Bottom-r.Top, ConstrDef(Constraints.MinHeight, 10)), rScreen.Bottom-rScreen.Top), ConstrDef(Constraints.MaxHeight, MaxInt));
-       // Рассчитываем границы, при необходимости исправляя положение
-      BoundsRect := Bounds(
-        Max(rScreen.Left, Min(rScreen.Right-iw,  r.Left)),
-        Max(rScreen.Top,  Min(rScreen.Bottom-ih, r.Top)),
+      iw := Min(
+        Min(Max(r.Right-r.Left, ConstrDef(Form.Constraints.MinWidth, 10)), rWorkArea.Right-rWorkArea.Left),
+        ConstrDef(Form.Constraints.MaxWidth, MaxInt));
+      ih := Min(
+        Min(Max(r.Bottom-r.Top, ConstrDef(Form.Constraints.MinHeight, 10)), rWorkArea.Bottom-rWorkArea.Top),
+        ConstrDef(Form.Constraints.MaxHeight, MaxInt));
+       // Позиционируем форму, при необходимости исправляя положение
+      Form.BoundsRect := Bounds(
+        Max(rWorkArea.Left, Min(rWorkArea.Right-iw,  r.Left)),
+        Max(rWorkArea.Top,  Min(rWorkArea.Bottom-ih, r.Top)),
         iw,
         ih);
-     // Иначе стираем BoundsRect
-    end else
-      FillChar(BoundsRect, SizeOf(BoundsRect), 0);
+       // Восстанавливаем состояние
+      if bMaximized then Form.WindowState := wsMaximized;
+     // Иначе центрируем форму на экране
+    end else begin
+      rWorkArea := GetDefaultMonitorForForm(Form).WorkareaRect;
+      Form.SetBounds(
+        (rWorkArea.Left+rWorkArea.Right -Form.Width) div 2,
+        (rWorkArea.Top +rWorkArea.Bottom-Form.Height) div 2,
+        Form.Width,
+        Form.Height);
+    end;
+  end;
+
+  function GetDefaultMonitorForForm(Form: TCustomForm): TMonitor;
+  begin
+    Result := nil;
+    case TForm(Form).DefaultMonitor of
+      dmMainForm:   if Application.MainForm<>nil    then Result := Application.MainForm.Monitor;
+      dmActiveForm: if Screen.ActiveCustomForm<>nil then Result := Screen.ActiveCustomForm.Monitor;
+    end;
+    if Result=nil then Result := Screen.Monitors[0];
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
