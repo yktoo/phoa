@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.18 2004-12-31 13:38:58 dale Exp $
+//  $Id: phDlg.pas,v 1.19 2005-04-17 08:51:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -43,6 +43,8 @@ type
     procedure SetOKIgnoresOKIgnoresDataValidity(Value: Boolean);
   protected
     procedure Loaded; override;
+    procedure DoShow; override;
+    procedure DoHide; override;
      // Инициализация/финализация диалога
     procedure InitializeDialog; virtual;
     procedure FinalizeDialog; virtual;
@@ -143,6 +145,34 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     Modified := True;
   end;
 
+  procedure TPhoaDialog.DoHide;
+  var rif: TRegIniFile;
+  begin
+     // Сохраняем настройки, если требуется
+    rif := CreateRegIni;
+    if rif<>nil then
+      try
+        SettingsStore(rif);
+      finally
+        rif.Free;
+      end;
+    inherited DoHide;
+  end;
+
+  procedure TPhoaDialog.DoShow;
+  var rif: TRegIniFile;
+  begin
+    inherited DoShow;
+     // Восстанавливаем настройки, если требуется
+    rif := CreateRegIni;
+    if rif<>nil then
+      try
+        SettingsRestore(rif);
+      finally
+        rif.Free;
+      end;
+  end;
+
   procedure TPhoaDialog.EndUpdate;
   begin
     if FLockCounter>0 then Dec(FLockCounter);
@@ -169,16 +199,8 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   end;
 
   procedure TPhoaDialog.FinalizeDialog;
-  var rif: TRegIniFile;
   begin
-     // Сохраняем настройки, если требуется
-    rif := CreateRegIni;
-    if rif<>nil then
-      try
-        SettingsStore(rif);
-      finally
-        rif.Free;
-      end;
+    { does nothing }
   end;
 
   procedure TPhoaDialog.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -206,7 +228,6 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   end;
 
   procedure TPhoaDialog.InitializeDialog;
-  var rif: TRegIniFile;
   begin
      // Если нужно, делаем диалог Sizeable
     if Sizeable then begin
@@ -223,15 +244,7 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
     end;
      // Настраиваем шрифт
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
-     // Восстанавливаем настройки, если требуется
-    rif := CreateRegIni;
-    if rif<>nil then
-      try
-        SettingsRestore(rif);
-      finally
-        rif.Free;
-      end;
-  end;           
+  end;
 
   procedure TPhoaDialog.Loaded;
   begin
@@ -269,19 +282,15 @@ uses phUtils, ChmHlp, ConsVars, phSettings, phObj, phGUIObj;
   end;
 
   procedure TPhoaDialog.SettingsRestore(rif: TRegIniFile);
-  var r: TRect;
   begin
      // Если размер формы можно менять, восстанавливаем размеры формы
-    if Sizeable and FormPositionFromStr(rif.ReadString('', 'Position', ''), Constraints, r) then
-      BoundsRect := r
-    else
-      Position := poMainFormCenter;
+    if Sizeable then FormPositionFromStr(Self, rif.ReadString('', 'Position', ''));
   end;
 
   procedure TPhoaDialog.SettingsStore(rif: TRegIniFile);
   begin
      // Если размер формы можно менять, сохраняем её позицию
-    if Sizeable then rif.WriteString('', 'Position', FormPositionToStr(BoundsRect));
+    if Sizeable then rif.WriteString('', 'Position', FormPositionToStr(Self));
   end;
 
   procedure TPhoaDialog.StateChanged;

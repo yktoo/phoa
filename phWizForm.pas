@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.13 2004-12-31 13:38:58 dale Exp $
+//  $Id: phWizForm.pas,v 1.14 2005-04-17 08:51:19 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -50,6 +50,8 @@ type
     function  GetCurPageID: Integer;
     procedure SetHasUpdates(const Value: Boolean);
   protected
+    procedure DoShow; override;
+    procedure DoHide; override;
      // Инициализация/финализация Мастера
     procedure InitializeWizard; virtual;
     procedure FinalizeWizard; virtual;
@@ -141,6 +143,32 @@ uses phUtils, ChmHlp, phSettings, phGUIObj;
     TSizeGripper.Create(Self).Parent := pButtons;
   end;
 
+  procedure TPhoaWizardForm.DoHide;
+  var rif: TRegIniFile;
+  begin
+     // Сохраняем настройки
+    rif := TRegIniFile.Create(SRegRoot+'\'+GetFormRegistrySection);
+    try
+      SettingsStore(rif);
+    finally
+      rif.Free;
+    end;
+    inherited DoHide;
+  end;
+
+  procedure TPhoaWizardForm.DoShow;
+  var rif: TRegIniFile;
+  begin
+    inherited DoShow;
+     // Загружаем настройки
+    rif := TRegIniFile.Create(SRegRoot+'\'+GetFormRegistrySection);
+    try
+      SettingsRestore(rif);
+    finally
+      rif.Free;
+    end;
+  end;
+
   function TPhoaWizardForm.Execute: Boolean;
   begin
     InitializeWizard;
@@ -153,15 +181,7 @@ uses phUtils, ChmHlp, phSettings, phGUIObj;
   end;
 
   procedure TPhoaWizardForm.FinalizeWizard;
-  var rif: TRegIniFile;
   begin
-     // Сохраняем настройки
-    rif := TRegIniFile.Create(SRegRoot+'\'+GetFormRegistrySection);
-    try
-      SettingsStore(rif);
-    finally
-      rif.Free;
-    end;
     FController.Free;
   end;
 
@@ -176,20 +196,12 @@ uses phUtils, ChmHlp, phSettings, phGUIObj;
   end;
 
   procedure TPhoaWizardForm.InitializeWizard;
-  var rif: TRegIniFile;
   begin
     FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
      // Загружаем значок
     iIcon.Picture.Icon.Handle := LoadIcon(HInstance, 'MAINICON');
      // Создаём и настраиваем контроллер
     FController := TWizardController.Create(Self);
-     // Загружаем настройки
-    rif := TRegIniFile.Create(SRegRoot+'\'+GetFormRegistrySection);
-    try
-      SettingsRestore(rif);
-    finally
-      rif.Free;
-    end;
   end;
 
   function TPhoaWizardForm.IsBtnBackEnabled: Boolean;
@@ -226,19 +238,15 @@ uses phUtils, ChmHlp, phSettings, phGUIObj;
   end;
 
   procedure TPhoaWizardForm.SettingsRestore(rif: TRegIniFile);
-  var r: TRect;
   begin
      // Восстанавливаем размеры формы
-    if FormPositionFromStr(rif.ReadString('', 'Position', ''), Constraints, r) then
-      BoundsRect := r
-    else
-      Position := poMainFormCenter;
+    FormPositionFromStr(Self, rif.ReadString('', 'Position', ''));
   end;
 
   procedure TPhoaWizardForm.SettingsStore(rif: TRegIniFile);
   begin
      // Сохраняем размеры формы
-    rif.WriteString('', 'Position', FormPositionToStr(BoundsRect));
+    rif.WriteString('', 'Position', FormPositionToStr(Self));
   end;
 
   procedure TPhoaWizardForm.UpdateButtons;

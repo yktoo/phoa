@@ -2,7 +2,7 @@ object PhoaWizardForm: TPhoaWizardForm
   Left = 369
   Top = 278
   AutoScroll = False
-  BorderIcons = [biSystemMenu]
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = '<wizard caption>'
   ClientHeight = 401
   ClientWidth = 592
@@ -11,7 +11,6 @@ object PhoaWizardForm: TPhoaWizardForm
   Constraints.MinWidth = 600
   ParentFont = True
   OldCreateOrder = True
-  Position = poMainFormCenter
   ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13

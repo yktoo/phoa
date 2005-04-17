@@ -14,7 +14,6 @@ object PhoaDialog: TPhoaDialog
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  Position = poMainFormCenter
   OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
