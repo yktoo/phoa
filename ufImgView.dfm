@@ -270,7 +270,6 @@ object fImgView: TfImgView
     OnMouseDown = iMainMouseDown
     OnMouseMove = iMainMouseMove
     OnMouseUp = iMainMouseUp
-    OnResize = iMainResize
   end
   object dkTop: TTBXDock
     Left = 0

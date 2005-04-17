@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.47 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufImgView.pas,v 1.48 2005-04-17 08:51:07 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -232,7 +232,6 @@ type
     procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
-    procedure iMainResize(Sender: TObject);
     procedure pmMainPopup(Sender: TObject);
     procedure tbMainVisibleChanged(Sender: TObject);
   private
@@ -291,13 +290,12 @@ type
     FStretchFilter: TStretchFilter;
     FViewInfoPos: TRect;
     FZoomFactorChange: Single;
-     // Коэффициенты увеличения/уменьшения изображения
-    FDefaultZoomFactor: Single;
+     // Коэффициент наилучшего соответствия размеров изображения размерам области просмотра
     FBestFitZoomFactor: Single;
      // True, если в последний раз ZoomFactor устанавливался равным BestFitZoomFactor
     FBestFitZoomUsed: Boolean;
-     // Максимальные размеры окна и области отображения
-    FWMaxWindow, FHMaxWindow, FWMaxView, FHMaxView: Integer;
+     // Прямоугольник рабочей области (он же - прямоугольник максимальных размеров окна)
+    FRectWorkArea: TRect;
      // Внутренние размеры окна
     FWClient, FHClient: Integer;
      // Разница между внутренними и внешними размерами окна
@@ -313,8 +311,6 @@ type
     FUndoOperations: TPhoaOperations;
      // True, если текущее изображение не отображается из-за ошибки
     FErroneous: Boolean;
-     // Флаг блокировки перегрузки изображения
-    FDisplayLock: Integer;
      // Флаг того, что идёт процесс отображения изображения
     FDisplayingPic: Boolean;
      // Преобразование изображения
@@ -322,12 +318,11 @@ type
      // Текущая карта каналов
     FColorMap: TColor32Map;
      // Prop storage
-    FFullScreen: Boolean;
     FPicIdx: Integer;
     FShowInfo: Boolean;
     FSlideShow: Boolean;
-    FSlideShowDirection: TSlideShowDirection;
     FSlideShowCyclic: Boolean;
+    FSlideShowDirection: TSlideShowDirection;
      // Настраивает параметры окна и вычисляет базовые параметры отображения. При bUseInitFlags также учитывает
      //   FInitFlags
     procedure ApplySettings(bUseInitFlags: Boolean);
@@ -342,21 +337,17 @@ type
     procedure DisplayPic(bReload, bApplyTransforms: Boolean);
      // Перегружает текущее изображение
     procedure RedisplayPic(bReload, bApplyTransforms: Boolean);
-     // Установка/снятие блокировки перегрузки изображения
-    procedure RedisplayLock;
-    procedure RedisplayUnlock(bReload, bApplyTransforms: Boolean);
      // Вызывается из DisplayPic. Загружает изображение в iMain
     procedure DP_LoadImage;
      // Вызывается из DisplayPic. Применяет преобразования к iMain
     procedure DP_ApplyTransforms;
-     // Вызывается из DisplayPic. Рассчитывает параметры (размеры) изображения
-    procedure DP_ComputeDimensions;
      // Вызывается из DisplayPic. Инициализирует описания изображения (заголовок окна, текст информации, счётчик)
     procedure DP_DescribePic;
      // Ставит в очередь на загрузку следующее изображение, если нужно
     procedure DP_EnqueueNext;
-     // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bCanResize=True
-    procedure ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
+     // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bUserResize=False. При
+     //   bForceDefault=True игнорирует sNewZoom, а определяет его, исходя из настроек режима просмотра
+    procedure SetZoom(sNewZoom: Single; bForceDefault, bUserResize: Boolean);
      // События преобразования
     procedure TransformApplied(Sender: TObject);
      // Настраивает aShowInfo.Checked
@@ -383,28 +374,30 @@ type
      // Если активен режим ресайзинга информации, завершает его
     procedure CommitInfoRelocation;
      // Message handlers
+    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
     procedure WMDecodeFinished(var Msg: TMessage); message WM_DECODE_FINISHED;
      // Prop handlers
+    function  GetFullScreen: Boolean;
     function  GetViewOffset: TPoint;
     function  GetZoomFactor: Single;
     procedure SetFullScreen(Value: Boolean);
     procedure SetPicIdx(Value: Integer);
     procedure SetShowInfo(Value: Boolean);
     procedure SetSlideShow(Value: Boolean);
-    procedure SetViewOffset(const Value: TPoint);
-    procedure SetZoomFactor(Value: Single);
     procedure SetSlideShowCyclic(Value: Boolean);
     procedure SetSlideShowDirection(Value: TSlideShowDirection);
+    procedure SetViewOffset(const Value: TPoint);
   protected
      // Если True, то по выходу из ViewImage iPicIdx устанавливается равным индексу последнего просмотренного
      //   изображения
     FReturnUpdatedPicIdx: Boolean;
+    procedure DoShow; override;
   public
      // Props
-     // -- True, если в настоящий момент полноэкранный режим
-    property FullScreen: Boolean read FFullScreen write SetFullScreen;
+     // -- True, если активен режим полноэкранного просмотра
+    property FullScreen: Boolean read GetFullScreen write SetFullScreen;
      // -- Индекс текущего изображения в группе
     property PicIdx: Integer read FPicIdx write SetPicIdx;
      // -- True, если в данный момент информация об изображении отображается
@@ -418,7 +411,7 @@ type
      // -- Смещение левого верхнего угла просматриваемого изображения
     property ViewOffset: TPoint read GetViewOffset write SetViewOffset;
      // -- Масштаб просматриваемого изображения
-    property ZoomFactor: Single read GetZoomFactor write SetZoomFactor;
+    property ZoomFactor: Single read GetZoomFactor;
   end;
 
    // Переход в режим просмотра изображений
@@ -444,7 +437,9 @@ uses
         FPicCount       := FPics.Count;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
+         // Применяем настройки. Они влияют на стиль окна, поэтому делаем это ДО его отображения
         ApplySettings(True);
+         // Отображаем окно (перед отображением изображение будет загружено)
         ShowModal;
         if FReturnUpdatedPicIdx then iPicIdx := FPicIdx;
       finally
@@ -616,7 +611,12 @@ uses
   procedure TfImgView.aaFullScreen(Sender: TObject);
   begin
     CommitInfoRelocation;
+     // Переключаем режим
     FullScreen := not FullScreen;
+     // Настраиваем видимость курсора
+    AdjustCursorVisibility(False);
+     // Перегружаем картинку
+    RedisplayPic(False, False);
   end;
 
   procedure TfImgView.aaHelp(Sender: TObject);
@@ -709,6 +709,8 @@ uses
       fMain.ApplySettings;
       ApplySettings(False);
       RestartSlideShowTimer;
+       // Перегружаем изображение
+      RedisplayPic(False, False); 
     end else
       AdjustCursorVisibility(False);
   end;
@@ -751,34 +753,38 @@ uses
 
   procedure TfImgView.aaZoomActual(Sender: TObject);
   begin
-    ZoomFactor := 1.0;
+    CommitInfoRelocation;
+    SetZoom(1.0, False, False);
   end;
 
   procedure TfImgView.aaZoomFit(Sender: TObject);
   begin
-    ZoomFactor := FBestFitZoomFactor;
+    CommitInfoRelocation;
+    SetZoom(0.0, False, False); // 0 означает "best fit"
   end;
 
   procedure TfImgView.aaZoomIn(Sender: TObject);
   begin
-    ZoomFactor := ZoomFactor*FZoomFactorChange;
+    CommitInfoRelocation;
+    SetZoom(ZoomFactor*FZoomFactorChange, False, False);
   end;
 
   procedure TfImgView.aaZoomOut(Sender: TObject);
   begin
-    ZoomFactor := ZoomFactor/FZoomFactorChange;
+    CommitInfoRelocation;
+    SetZoom(ZoomFactor/FZoomFactorChange, False, False);
   end;
 
   procedure TfImgView.AdjustCursorVisibility(bForceShow: Boolean);
   begin
-    if (FHideCursorInFS and FFullScreen and not bForceShow)<>FCursorHidden then begin
+    if (FHideCursorInFS and FullScreen and not bForceShow)<>FCursorHidden then begin
       FCursorHidden := not FCursorHidden;
       ShowCursor(not FCursorHidden);
     end;
   end;
 
   procedure TfImgView.ApplySettings(bUseInitFlags: Boolean);
-  var bFullscreen: Boolean;
+  var bFullScreen: Boolean;
   begin
      // Кэшируем значения настроек
     FBackgroundColor    := SettingValueInt(ISettingID_View_BkColor);
@@ -820,15 +826,11 @@ uses
     ApplyTools;
      // Настраиваем установки текущей сессии
     if bUseInitFlags then bFullscreen := (bFullscreen or (ivifForceFullscreen in FInitFlags)) and not (ivifForceWindow in FInitFlags);
-    RedisplayLock;
-    try
-      FullScreen := bFullscreen;
-    finally
-       // Этот вызов загружает изображение
-      RedisplayUnlock(True, True);
-    end;
+    FullScreen := bFullScreen;
      // Если нужно включить режим показа слайдов, переданный при инициализации
     if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
+     // Настраиваем видимость курсора
+    AdjustCursorVisibility(False);
      // Обновляем actions
     UpdateShowInfoActions;
     UpdateSlideShowActions;
@@ -848,75 +850,6 @@ uses
     end;
   end;
 
-  procedure TfImgView.ApplyZoom(sNewZoom: Single; bCanResize: Boolean);
-  var
-    ixWindow, iyWindow, iwWindow, ihWindow: Integer;
-    PrevMousePos, p: TPoint;
-  begin
-     // Сообщение об ошибке не масштабируем
-    if FErroneous then sNewZoom := 1
-     // Verify zoom value
-    else if sNewZoom>SMaxPicZoom then sNewZoom := SMaxPicZoom
-    else if sNewZoom<SMinPicZoom then sNewZoom := SMinPicZoom;
-     // Применяем коэффициент масштабирования
-    iMain.Scale := sNewZoom;
-     // Находим размеры масштабированного изображения
-    FWScaled := Round(FWPic*sNewZoom);
-    FHScaled := Round(FHPic*sNewZoom);
-     // Находим размеры и положение окна
-    ixWindow := Left;
-    iyWindow := Top;
-    iwWindow := Width;
-    ihWindow := Height;
-    if bCanResize then begin
-      if FFullScreen then begin
-        iwWindow := Screen.Width;
-        ihWindow := Screen.Height;
-      end else if FFitWindowToPic then begin
-        iwWindow := Max(Min(FWScaled+FXGap, FWMaxWindow), Constraints.MinWidth);
-        ihWindow := Max(Min(FHScaled+FYGap, FHMaxWindow), Constraints.MinHeight);
-      end;
-      if FFullScreen then begin
-        ixWindow := 0;
-        iyWindow := 0;
-      end else if FCenterWindow then begin
-        ixWindow := (Screen.WorkAreaWidth-iwWindow) div 2;
-        iyWindow := (Screen.WorkAreaHeight-ihWindow) div 2;
-      end;
-       // Если нужно, сохраняем положение курсора мыши над панелью инструментов
-      PrevMousePos := Point(-1, -1);
-      if FKeepCursorOverTB and not FFullScreen and Application.Active and tbMain.Visible then begin
-        p := tbMain.ScreenToClient(Mouse.CursorPos);
-        if (p.x<tbMain.Width) and (p.y<tbMain.Height) then PrevMousePos := p;
-      end;
-       // Изменяем положение окна
-      FForcedResize := True;
-      try
-        SetBounds(ixWindow, iyWindow, iwWindow, ihWindow);
-      finally
-        FForcedResize := False;
-      end;
-       // Восстанавливаем положение мыши
-      if (PrevMousePos.x>=0) and (PrevMousePos.y>=0) and (PrevMousePos.x<tbMain.Width) and (PrevMousePos.y<tbMain.Height) then 
-        Mouse.CursorPos := tbMain.ClientToScreen(PrevMousePos);
-    end;
-     // Находим внутренние размеры
-    FWClient := iwWindow-FXGap;
-    FHClient := ihWindow-FYGap;
-     // Настраиваем курсор
-    UpdateCursor;
-     // Находим начальное положение изображения
-    ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
-     // Настраиваем положение информации
-    FDescLayer.Location := FloatRect(
-      FWClient/10000*FViewInfoPos.Left,
-      FHClient/10000*FViewInfoPos.Top,
-      FWClient/10000*FViewInfoPos.Right,
-      FHClient/10000*FViewInfoPos.Bottom);
-     // Настраиваем Actions (ZoomFactor и текущий индекс картинки влияют на это)
-    EnableActions;
-  end;
-
   procedure TfImgView.BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
   begin
     B := FColorMap.ApplyToColor(F);
@@ -929,7 +862,7 @@ uses
 
   procedure TfImgView.DisplayPic(bReload, bApplyTransforms: Boolean);
   begin
-    if FDisplayingPic or (FDisplayLock>0) then Exit;
+    if FDisplayingPic then Exit;
     CommitInfoRelocation;
     FTrackDrag := False;
     FDisplayingPic := True;
@@ -938,12 +871,10 @@ uses
       if bReload then DP_LoadImage;
        // Применяем преобразования к изображению
       if bReload or bApplyTransforms then DP_ApplyTransforms;
-       // Рассчитываем размеры окна и изображения
-      DP_ComputeDimensions;
        // Настраиваем описания
       DP_DescribePic;
        // Отображаем картинку
-      ApplyZoom(FDefaultZoomFactor, True);
+      SetZoom(0.0, True, False);
        // Ставим в очередь предыдущее/следующее (зависит от направления листания) изображение
       DP_EnqueueNext;
     finally
@@ -953,37 +884,17 @@ uses
     RestartSlideShowTimer;
   end;
 
+  procedure TfImgView.DoShow;
+  begin
+    inherited DoShow;
+     // Загружаем изображение
+    RedisplayPic(True, False);
+  end;
+
   procedure TfImgView.DP_ApplyTransforms;
   begin
      // Сообщение об ошибке не преобразовываем
     if not FErroneous then FTransform.ApplyValues(FPic.Rotation, FPic.Flips);
-  end;
-
-  procedure TfImgView.DP_ComputeDimensions;
-  begin
-     // Определяем максимальные размеры окна
-    if FFullScreen then begin
-      FXGap := ClientWidth-iMain.Width;
-      FYGap := ClientHeight-iMain.Height;
-      FWMaxWindow := Screen.Width;
-      FHMaxWindow := Screen.Height;
-    end else begin
-      FXGap := Width-iMain.Width;
-      FYGap := Height-iMain.Height;
-      FWMaxWindow := Screen.WorkAreaWidth;
-      FHMaxWindow := Screen.WorkAreaHeight;
-    end;
-     // Получаем размеры изображения (не допускаем нулевых значений)
-    FWPic := Max(iMain.Bitmap.Width,  1);
-    FHPic := Max(iMain.Bitmap.Height, 1);
-    FWMaxView := FWMaxWindow-FXGap;
-    FHMaxView := FHMaxWindow-FYGap;
-     // Определяем коэффициенты масштабирования
-    FBestFitZoomFactor := MinS(FWMaxView/FWPic, FHMaxView/FHPic);
-    if ((FBestFitZoomFactor<1.0) and FDoShrinkPic) or ((FBestFitZoomFactor>1.0) and FDoZoomPic) then
-      FDefaultZoomFactor := FBestFitZoomFactor
-    else
-      FDefaultZoomFactor := 1.0;
   end;
 
   procedure TfImgView.DP_DescribePic;
@@ -1252,6 +1163,11 @@ uses
     Handled := True;
   end;
 
+  function TfImgView.GetFullScreen: Boolean;
+  begin
+    Result := aFullScreen.Checked;
+  end;
+
   function TfImgView.GetViewOffset: TPoint;
   begin
     Result := Point(Trunc(iMain.OffsetHorz), Trunc(iMain.OffsetVert));
@@ -1293,14 +1209,6 @@ uses
     end;
   end;
 
-  procedure TfImgView.iMainResize(Sender: TObject);
-  begin
-     // Если изменение размеров вызвано не принудительным позиционированием в процессе подстройки размеров окна под
-     //   размеры изображения. Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor
-     //   без изменений
-    if not FForcedResize then ApplyZoom(iif(FBestFitZoomUsed, FBestFitZoomFactor, ZoomFactor), False);
-  end;
-
   procedure TfImgView.PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
   var r: TRect;
   begin
@@ -1338,25 +1246,12 @@ uses
     end;
   end;
 
-  procedure TfImgView.RedisplayLock;
-  begin
-    Inc(FDisplayLock);
-  end;
-
   procedure TfImgView.RedisplayPic(bReload, bApplyTransforms: Boolean);
   begin
      // Очищаем очередь (чтобы поток потом перегрузил изображение вновь)
     if bReload then FDecodeThread.QueuedFileName := '';
      // Вновь отображаем изображение
     DisplayPic(bReload, bApplyTransforms);
-  end;
-
-  procedure TfImgView.RedisplayUnlock(bReload, bApplyTransforms: Boolean);
-  begin
-    if FDisplayLock>0 then begin
-      Dec(FDisplayLock);
-      if FDisplayLock=0 then RedisplayPic(bReload, bApplyTransforms);
-    end;
   end;
 
   procedure TfImgView.RestartSlideShowTimer;
@@ -1371,15 +1266,10 @@ uses
     aWS: Array[Boolean] of TWindowState     = (wsNormal,   wsMaximized);
     aBS: Array[Boolean] of TFormBorderStyle = (bsSizeable, bsNone);
   begin
-    FFullScreen := Value;
     aFullScreen.Checked := Value;
     FormStyle   := aFS[FAlwaysOnTop and not Value];
     BorderStyle := aBS[Value];
     WindowState := aWS[Value];
-     // Настраиваем видимость курсора
-    AdjustCursorVisibility(False);
-     // Перегружаем картинку
-    RedisplayPic(False, False);
   end;
 
   procedure TfImgView.SetPicIdx(Value: Integer);
@@ -1438,13 +1328,118 @@ uses
     iMain.OffsetVert := iy;
   end;
 
-  procedure TfImgView.SetZoomFactor(Value: Single);
+  procedure TfImgView.SetZoom(sNewZoom: Single; bForceDefault, bUserResize: Boolean);
+  var
+    ixWindow, iyWindow, iwWindow, ihWindow: Integer;
+    PrevMousePos, p: TPoint;
+
+     // Рассчитывает размеры рабочей области, размеры окна и FBestFitZoomFactor
+    procedure ComputeViewportDimensions;
+    var MaxViewportSize: TSize;
+    begin
+       // Определяем максимальные размеры окна. В полноэкранном режиме окно может занимать весь свой монитор. В оконном
+       //   режиме окно может занимать только рабочую область своего монитора
+      if FullScreen then FRectWorkArea := Monitor.BoundsRect else FRectWorkArea := Monitor.WorkareaRect;
+       // Находим "зазоры" - разницу между размерами окна и размерами изображения
+      FXGap := Width-iMain.Width;
+      FYGap := Height-iMain.Height;
+       // Получаем размеры изображения (не допускаем нулевых значений)
+      FWPic := Max(iMain.Bitmap.Width,  1);
+      FHPic := Max(iMain.Bitmap.Height, 1);
+       // Определяем "наилучший" коэффициент масштабирования
+       // -- Когда позволена подгонка размеров окна под размеры изображения, и это не изменение размеров пользователем,
+       //    исходим из максимальных размеров рабочей области
+      if FFitWindowToPic and not bUserResize then begin
+        MaxViewportSize.cx := FRectWorkArea.Right-FRectWorkArea.Left-FXGap;
+        MaxViewportSize.cy := FRectWorkArea.Bottom-FRectWorkArea.Top-FYGap;
+       // -- В противном случае размер окна менять нельзя, исходим из них
+      end else begin
+        MaxViewportSize.cx := iMain.Width;
+        MaxViewportSize.cy := iMain.Height;
+      end;
+       // -- Рассчитываем коэффициент - это минимальное значение из значений коэффициента по ширине или по высоте. Также
+       //    учитываем здесь минимальные размеры окна (Constraints)
+      FBestFitZoomFactor := MinS(
+        Max(MaxViewportSize.cx, Constraints.MinWidth -FXGap)/FWPic,
+        Max(MaxViewportSize.cy, Constraints.MinHeight-FYGap)/FHPic);
+    end;
+
   begin
-    CommitInfoRelocation;
-     // Запоминаем, если выставили BestFitZoom
-    FBestFitZoomUsed := Value=FBestFitZoomFactor;
-     // Применяем новый коэффициент масштабирования
-    ApplyZoom(Value, True);
+     // Пересчитываем размеры и FBestFitZoomFactor
+    ComputeViewportDimensions;
+     // Сообщение об ошибке не масштабируем
+    if FErroneous then
+      sNewZoom := 1.0
+    else begin
+       // Если режим принудительного использования масштаба по умолчанию, игнорируем переданный sNewZoom и рассчитываем
+       //   новый, исходя из текущих настроек
+      if bForceDefault then
+        sNewZoom := iif(((FBestFitZoomFactor<1.0) and FDoShrinkPic) or ((FBestFitZoomFactor>1.0) and FDoZoomPic), 0.0, 1.0);
+       // Если передан 0, то это означает, что нужно использовать FBestFitZoomFactor
+      if sNewZoom=0.0 then sNewZoom := FBestFitZoomFactor;
+    end;
+     // Validate zoom value
+    if sNewZoom>SMaxPicZoom then sNewZoom := SMaxPicZoom
+    else if sNewZoom<SMinPicZoom then sNewZoom := SMinPicZoom;
+     // Если это не изменение размеров пользователем, запоминаем, если выставили BestFitZoom
+    if not bUserResize then FBestFitZoomUsed := sNewZoom=FBestFitZoomFactor;
+     // Применяем коэффициент масштабирования
+    iMain.Scale := sNewZoom;
+     // Находим размеры масштабированного изображения
+    FWScaled := Round(FWPic*sNewZoom);
+    FHScaled := Round(FHPic*sNewZoom);
+     // Находим размеры и положение окна
+    ixWindow := Left;
+    iyWindow := Top;
+    iwWindow := Width;
+    ihWindow := Height;
+    if not bUserResize then begin
+      if FullScreen then begin
+        iwWindow := FRectWorkArea.Right-FRectWorkArea.Left;
+        ihWindow := FRectWorkArea.Bottom-FRectWorkArea.Top;
+      end else if FFitWindowToPic then begin
+        iwWindow := Max(Min(FWScaled+FXGap, FRectWorkArea.Right-FRectWorkArea.Left), Constraints.MinWidth);
+        ihWindow := Max(Min(FHScaled+FYGap, FRectWorkArea.Bottom-FRectWorkArea.Top), Constraints.MinHeight);
+      end;
+      if FullScreen then begin
+        ixWindow := FRectWorkArea.Left;
+        iyWindow := FRectWorkArea.Top;
+      end else if FCenterWindow then begin
+        ixWindow := (FRectWorkArea.Left+FRectWorkArea.Right-iwWindow) div 2;
+        iyWindow := (FRectWorkArea.Top+FRectWorkArea.Bottom-ihWindow) div 2;
+      end;
+       // Если нужно, сохраняем положение курсора мыши над панелью инструментов
+      PrevMousePos := Point(-1, -1);
+      if FKeepCursorOverTB and not FullScreen and Application.Active and tbMain.Visible then begin
+        p := tbMain.ScreenToClient(Mouse.CursorPos);
+        if (p.x<tbMain.Width) and (p.y<tbMain.Height) then PrevMousePos := p;
+      end;
+       // Изменяем положение окна
+      FForcedResize := True;
+      try
+        SetBounds(ixWindow, iyWindow, iwWindow, ihWindow);
+      finally
+        FForcedResize := False;
+      end;
+       // Восстанавливаем положение мыши
+      if (PrevMousePos.x>=0) and (PrevMousePos.y>=0) and (PrevMousePos.x<tbMain.Width) and (PrevMousePos.y<tbMain.Height) then
+        Mouse.CursorPos := tbMain.ClientToScreen(PrevMousePos);
+    end;
+     // Находим внутренние размеры
+    FWClient := iwWindow-FXGap;
+    FHClient := ihWindow-FYGap;
+     // Настраиваем курсор
+    UpdateCursor;
+     // Находим начальное положение изображения
+    ViewOffset := Point((FWClient-FWScaled) div 2, (FHClient-FHScaled) div 2);
+     // Настраиваем положение информации
+    FDescLayer.Location := FloatRect(
+      FWClient/10000*FViewInfoPos.Left,
+      FHClient/10000*FViewInfoPos.Top,
+      FWClient/10000*FViewInfoPos.Right,
+      FHClient/10000*FViewInfoPos.Bottom);
+     // Настраиваем Actions (ZoomFactor и текущий индекс картинки влияют на это)
+    EnableActions;
   end;
 
   procedure TfImgView.tbMainVisibleChanged(Sender: TObject);
@@ -1548,6 +1543,18 @@ uses
         FPredecodeDirection := pddDisabled;
         PicIdx := Random(FPicCount);
       end;
+    end;
+  end;
+
+  procedure TfImgView.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
+  begin
+    inherited;
+     // Если изменение размеров вызвано не принудительным позиционированием в процессе подстройки размеров окна под
+     //   размеры изображения
+    if Visible and not FForcedResize then begin
+      CommitInfoRelocation;
+       // Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor без изменений
+      SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True);
     end;
   end;
 
