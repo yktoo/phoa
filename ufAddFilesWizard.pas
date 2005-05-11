@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.32 2005-02-14 19:34:09 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.33 2005-05-11 17:25:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -300,7 +300,7 @@ uses
       s := ExtractFileName(Pic.FileName);
       wy := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
       wm := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
-      wd := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
+      wd := StrToIntDef(ExtractFirstWord(s, '-,. '), 0);
       try
         Pic.Date := DateToPhoaDate(EncodeDate(wy, wm, wd));
         Result := True;
