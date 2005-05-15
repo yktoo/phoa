@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.81 2005-03-07 10:37:36 dale Exp $
+//  $Id: Main.pas,v 1.82 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,12 +11,11 @@ interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
-  ActiveX, XPMan,
-  phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps,
-  ConsVars,
-  DKLang, ImgList, TB2Item, Placemnt, TB2MRU, TBXExtItems, Menus,
-  TBX, ActnList, TBXStatusBars, VirtualTrees, TBXDkPanels, TBXLists,
-  TB2Dock, TB2Toolbar;
+  ActiveX, XPMan, Registry,
+  phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps, ConsVars,
+  phFrm, DKLang, ImgList, TB2Item, TB2MRU, TBXExtItems, Menus, TBX,
+  ActnList, TBXStatusBars, VirtualTrees, TBXDkPanels, TBXLists, TB2Dock,
+  TB2Toolbar;
 
 type
    // Состояние приложения
@@ -31,7 +30,7 @@ type
 
   TAppStates = set of TAppState;
 
-  TfMain = class(TForm, IPhoaApp, IPhoaMutableApp, IPhotoAlbumApp)
+  TfMain = class(TPhoaForm, IPhoaApp, IPhoaMutableApp, IPhotoAlbumApp)
     aAbout: TAction;
     aCopy: TAction;
     aCut: TAction;
@@ -96,7 +95,6 @@ type
     dkRight: TTBXDock;
     dkTop: TTBXDock;
     dpGroups: TTBXDockablePanel;
-    fpMain: TFormPlacement;
     gipmPhoaView: TTBGroupItem;
     gipmPhoaViewViews: TTBGroupItem;
     gismViewViews: TTBGroupItem;
@@ -252,10 +250,6 @@ type
     procedure dklcMainLanguageChanging(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure fpMainRestorePlacement(Sender: TObject);
-    procedure fpMainSavePlacement(Sender: TObject);
     procedure mruOpenClick(Sender: TObject; const Filename: String);
     procedure pmGroupsPopup(Sender: TObject);
     procedure pmPicsPopup(Sender: TObject);
@@ -296,8 +290,6 @@ type
     FUndo: TPhoaUndo;
      // Набор свойств, которые требуется отображать в подсказках дерева групп
     FGroupTreeHintProps: TGroupProperties;
-     // Счётчик блокировки обновления
-    FUpdateLock: Integer;
      // Состояние приложения
     FAppState: TAppStates;
      // Prop storage
@@ -325,8 +317,6 @@ type
     procedure ProcessCommandLine;
      // Изменяет текущее состояние приложения
     procedure StateChanged(EnterStates: TAppStates; LeaveStates: TAppStates = []);
-     // Обновляет состояние формы
-    procedure UpdateState;
      // Настраивает доступность инструментов для заданного контейнерного пункта
     procedure DoEnableTools(Item: TTBCustomItem);
      // Выполняет заданную операцию
@@ -360,9 +350,6 @@ type
     procedure ResetMode;
      // Находит и возвращает узел в tvGroups по ID группы; nil, если нет такого
     function  FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
-     // Установка/снятие блокировки обновления состояния
-    procedure BeginUpdate;
-    procedure EndUpdate;
      // Application events
     procedure AppActionExecute(Action: TBasicAction; var Handled: Boolean);
     procedure AppHint(Sender: TObject);
@@ -441,11 +428,19 @@ type
     procedure CMFocusChanged(var Msg: TCMFocusChanged);   message CM_FOCUSCHANGED;
     procedure WMHelp(var Msg: TWMHelp);                   message WM_HELP;
     procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
-     // Property handlers
+     // Prop handlers
     function  GetFileName: String;
     function  GetDisplayFileName: String;
     function  GetCurGroupID: Integer;
     procedure SetCurGroupID(Value: Integer);
+  protected
+    function  GetRelativeRegistryKey: String; override;
+    function  GetSizeable: Boolean; override;
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
+    procedure SettingsLoad(rif: TRegIniFile); override;
+    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure UpdateState; override;
   public
     function  IsShortCut(var Message: TWMKey): Boolean; override;
      // Применяет параметры настройки
@@ -473,7 +468,7 @@ var
 implementation
 {$R *.dfm}
 uses
-  GraphicStrings, Clipbrd, Math, Registry, jpeg, TypInfo, ChmHlp, // GraphicStrings => GraphicEx constants
+  GraphicStrings, Clipbrd, Math, jpeg, TypInfo, ChmHlp, // GraphicStrings => GraphicEx constants
   VirtualDataObject,
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
@@ -970,11 +965,6 @@ uses
     end;
   end;
 
-  procedure TfMain.BeginUpdate;
-  begin
-    Inc(FUpdateLock); 
-  end;
-
   procedure TfMain.bUndoPopup(Sender: TTBCustomItem; FromLink: Boolean);
   var i: Integer;
   begin
@@ -1034,6 +1024,76 @@ uses
     dkLeft.BeginUpdate;
     dkRight.BeginUpdate;
     dkBottom.BeginUpdate;
+  end;
+
+  procedure TfMain.DoCreate;
+  begin
+    inherited DoCreate;
+    BeginUpdate;
+    try
+       // Создаём интерфейсы
+      FProject       := NewPhotoAlbumProject;
+      FAppActionList := TPhoaActionList.Create(alMain);
+      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, nil, False, True);
+       // Настраиваем Application
+      Application.OnActionExecute := AppActionExecute;
+      Application.OnHint          := AppHint;
+      Application.OnException     := AppException;
+      Application.OnIdle          := AppIdle;
+       // Создаём группу - список результатов поиска
+      FSearchResults := NewPhotoAlbumPicGroup(nil, IGroupID_SearchResults);
+       // Create undoable operations list
+      FUndo := TPhoaUndo.Create;
+       // Create viewer
+      FViewer := TThumbnailViewer.Create(Self);
+      with FViewer do begin
+        Parent            := Self;
+        Align             := alClient;
+        //#TODO: Выставлять DisplayMode := tvdmDetail или tvdmTile;
+        DragCursor        := crDragMove;
+        PopupMenu         := pmPics;
+        OnDragDrop        := ViewerDragDrop;
+        OnSelectionChange := ViewerSelectionChange;
+        OnStartViewMode   := aaView;
+      end;
+       // Add self to the clipboard viewer chain
+      FHNextClipbrdViewer := SetClipboardViewer(Handle);
+       // Применяем настройки
+      ShowProgressInfo('SMsg_ApplyingSettings', []);
+      RootSetting.Modified := True;
+      ApplySettings;
+      ApplyLanguage;
+       // Настраиваем дерево папок
+      tvGroups.BeginSynch;
+      try
+        tvGroups.NodeDataSize  := SizeOf(Pointer);
+        tvGroups.RootNodeCount := 1;
+         // Обрабатываем параметры командной строки
+        ProcessCommandLine;
+      finally
+        tvGroups.EndSynch;
+      end;
+    finally
+      StateChanged([
+        asInitialized, asActionChangePending, asFileNameChangePending, asModifiedChangePending,
+        asStatusBarInfoChangePending]);
+      EndUpdate;
+    end;
+  end;
+
+  procedure TfMain.DoDestroy;
+  begin
+     // Remove self from the clipboard viewer chain
+    ChangeClipboardChain(Handle, FHNextClipbrdViewer);
+     // Free interfaces and destroy objects
+    FAppMenu       := nil;
+    FAppActionList := nil;
+    FViewer.Free;
+    FViewedPics    := nil;
+    FSearchResults := nil;
+    FProject       := nil;
+    FUndo.Free;
+    inherited DoDestroy;
   end;
 
   procedure TfMain.DoEnableTools(Item: TTBCustomItem);
@@ -1102,12 +1162,6 @@ uses
     end;
   end;
 
-  procedure TfMain.EndUpdate;
-  begin
-    if FUpdateLock>0 then Dec(FUpdateLock);
-    if FUpdateLock=0 then UpdateState;
-  end;
-
   function TfMain.FindGroupNodeByID(iGroupID: Integer): PVirtualNode;
   begin
     if iGroupID=0 then
@@ -1133,93 +1187,6 @@ uses
      // Иначе спрашиваем, сохранять ли данные 
     else
       CanClose := CheckSave;
-  end;
-
-  procedure TfMain.FormCreate(Sender: TObject);
-  begin
-    BeginUpdate;
-    try
-       // Настраиваем fpMain
-      fpMain.IniFileName := SRegRoot;
-      fpMain.IniSection  := SRegMainWindow_Root;
-       // Создаём интерфейсы
-      FProject       := NewPhotoAlbumProject;
-      FAppActionList := TPhoaActionList.Create(alMain);
-      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, nil, False, True);
-       // Настраиваем Application
-      Application.OnActionExecute := AppActionExecute;
-      Application.OnHint          := AppHint;
-      Application.OnException     := AppException;
-      Application.OnIdle          := AppIdle;
-       // Создаём группу - список результатов поиска
-      FSearchResults := NewPhotoAlbumPicGroup(nil, IGroupID_SearchResults);
-       // Create undoable operations list
-      FUndo := TPhoaUndo.Create;
-       // Create viewer
-      FViewer := TThumbnailViewer.Create(Self);
-      with FViewer do begin
-        Parent            := Self;
-        Align             := alClient;
-        //#TODO: Выставлять DisplayMode := tvdmDetail или tvdmTile;
-        DragCursor        := crDragMove;
-        PopupMenu         := pmPics;
-        OnDragDrop        := ViewerDragDrop;
-        OnSelectionChange := ViewerSelectionChange;
-        OnStartViewMode   := aaView;
-      end;
-       // Add self to the clipboard viewer chain
-      FHNextClipbrdViewer := SetClipboardViewer(Handle);
-       // Применяем настройки
-      ShowProgressInfo('SMsg_ApplyingSettings', []);
-      RootSetting.Modified := True;
-      ApplySettings;
-      ApplyLanguage;
-       // Настраиваем дерево папок
-      tvGroups.BeginSynch;
-      try
-        tvGroups.NodeDataSize  := SizeOf(Pointer);
-        tvGroups.RootNodeCount := 1;
-         // Обрабатываем параметры командной строки
-        ProcessCommandLine;
-      finally
-        tvGroups.EndSynch;
-      end;
-    finally
-      StateChanged([
-        asInitialized, asActionChangePending, asFileNameChangePending, asModifiedChangePending,
-        asStatusBarInfoChangePending]);
-      EndUpdate;
-    end;
-  end;
-
-  procedure TfMain.FormDestroy(Sender: TObject);
-  begin
-     // Remove self from the clipboard viewer chain
-    ChangeClipboardChain(Handle, FHNextClipbrdViewer);
-     // Free interfaces and destroy objects
-    FAppMenu       := nil; 
-    FAppActionList := nil;
-    FViewer.Free;
-    FViewedPics    := nil;
-    FSearchResults := nil;
-    FProject       := nil;
-    FUndo.Free;
-  end;
-
-  procedure TfMain.fpMainRestorePlacement(Sender: TObject);
-  begin
-     // Load history
-    mruOpen.LoadFromRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
-     // Load toolbars
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
-  end;
-
-  procedure TfMain.fpMainSavePlacement(Sender: TObject);
-  begin
-     // Save toolbars
-    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
-     // Save history
-    mruOpen.SaveToRegIni(fpMain.RegIniFile, SRegOpen_FilesMRU);
   end;
 
   function TfMain.GetCurGroupID: Integer;
@@ -1260,6 +1227,11 @@ uses
     end;
   end;
 
+  function TfMain.GetRelativeRegistryKey: String;
+  begin
+    Result := SRegMainWindow_Root;
+  end;
+
   function TfMain.GetSelectedPics: IPhoaPicList;
   begin
     case FocusedControl of
@@ -1267,6 +1239,11 @@ uses
       pafcThumbViewer: Result := Viewer.SelectedPics;
       else             Result := nil;
     end;
+  end;
+
+  function TfMain.GetSizeable: Boolean;
+  begin
+    Result := True;
   end;
 
   function TfMain.IApp_GetActionList: IPhoaActionList;
@@ -1699,6 +1676,24 @@ uses
     UpdateViewIndex;
   end;
 
+  procedure TfMain.SettingsLoad(rif: TRegIniFile);
+  begin
+    inherited SettingsLoad(rif);
+     // Load history
+    mruOpen.LoadFromRegIni(rif, SRegOpen_FilesMRU);
+     // Load toolbars
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
+  end;
+
+  procedure TfMain.SettingsSave(rif: TRegIniFile);
+  begin
+    inherited SettingsSave(rif);
+     // Save toolbars
+    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
+     // Save history
+    mruOpen.SaveToRegIni(rif, SRegOpen_FilesMRU);
+  end;
+
   procedure TfMain.StartViewMode(InitFlags: TImgViewInitFlags);
   var iPicIndex: Integer;
   begin
@@ -2115,7 +2110,8 @@ uses
     end;
 
   begin
-    if not (asInitialized in FAppState) or (FUpdateLock>0) or (csDestroying in ComponentState) then Exit;
+    inherited UpdateState;
+    if not (asInitialized in FAppState) or UpdateLocked or (csDestroying in ComponentState) then Exit;
      // Если есть изменения в состоянии Actions
     if asActionChangePending in FAppState then begin
       Adjust_Actions;

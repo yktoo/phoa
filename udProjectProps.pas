@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udProjectProps.pas,v 1.3 2005-02-14 19:34:08 dale Exp $
+//  $Id: udProjectProps.pas,v 1.4 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,7 +11,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phDlg, RXSpin, ComCtrls, StdCtrls, ExtCtrls, DKLang;
+  phDlg, DKLang, RXSpin, ComCtrls, StdCtrls, ExtCtrls;
 
 type
   TdProjectProps = class(TPhoaDialog)
@@ -32,8 +32,9 @@ type
      // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
-    procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   function EditProject(AApp: IPhotoAlbumApp; UndoOperations: TPhoaOperations): Boolean;
@@ -48,7 +49,7 @@ uses ConsVars, phUtils, Main;
       try
         FApp            := AApp;
         FUndoOperations := UndoOperations;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
@@ -69,12 +70,16 @@ uses ConsVars, phUtils, Main;
     inherited ButtonClick_OK;
   end;
 
-  procedure TdProjectProps.InitializeDialog;
+  procedure TdProjectProps.DoCreate;
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_album_props;
+  end;
+
+  procedure TdProjectProps.ExecuteInitialize;
   var Project: IPhotoAlbumProject;
   begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_album_props;
-     // Настраиваем контролы
+    inherited ExecuteInitialize;
     Project := FApp.ProjectX;
     eThumbSizeX.AsInteger   := Project.ThumbnailSize.cx;
     eThumbSizeY.AsInteger   := Project.ThumbnailSize.cy;

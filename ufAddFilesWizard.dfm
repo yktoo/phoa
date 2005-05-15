@@ -1,18 +1,9 @@
 inherited fAddFilesWizard: TfAddFilesWizard
-  Left = 364
   Caption = 'Add pictures wizard'
-  ClientWidth = 632
   OnCloseQuery = FormCloseQuery
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Width = 632
-  end
-  inherited bvTopPanel: TBevel
-    Width = 632
-  end
   inherited pMain: TPanel
-    Width = 632
     object dpPreview: TTBXDockablePanel
       Left = 40
       Top = 4
@@ -37,30 +28,6 @@ inherited fAddFilesWizard: TfAddFilesWizard
         ScaleMode = smScale
         TabOrder = 0
       end
-    end
-  end
-  inherited pButtons: TPanel
-    Width = 632
-    DesignSize = (
-      632
-      36)
-    inherited bCancel: TButton
-      Left = 548
-    end
-    inherited bNext: TButton
-      Left = 408
-    end
-    inherited bBack: TButton
-      Left = 328
-    end
-  end
-  inherited pHeader: TPanel
-    Width = 632
-    inherited lHeading: TLabel
-      Width = 571
-    end
-    inherited iIcon: TImage
-      Left = 579
     end
   end
   object pProcess: TPanel

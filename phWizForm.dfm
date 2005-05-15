@@ -1,23 +1,11 @@
-object PhoaWizardForm: TPhoaWizardForm
-  Left = 369
-  Top = 278
-  AutoScroll = False
+inherited PhoaWizardForm: TPhoaWizardForm
   BorderIcons = [biSystemMenu, biMaximize]
-  Caption = '<wizard caption>'
-  ClientHeight = 401
-  ClientWidth = 592
-  Color = clBtnFace
-  Constraints.MinHeight = 430
-  Constraints.MinWidth = 600
-  ParentFont = True
-  OldCreateOrder = True
-  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
   object bvBottom: TBevel
     Left = 0
-    Top = 363
-    Width = 592
+    Top = 397
+    Width = 632
     Height = 2
     Align = alBottom
     Shape = bsBottomLine
@@ -25,7 +13,7 @@ object PhoaWizardForm: TPhoaWizardForm
   object bvTopPanel: TBevel
     Left = 0
     Top = 61
-    Width = 592
+    Width = 632
     Height = 2
     Align = alTop
     Shape = bsBottomLine
@@ -33,8 +21,8 @@ object PhoaWizardForm: TPhoaWizardForm
   object pMain: TPanel
     Left = 0
     Top = 63
-    Width = 592
-    Height = 300
+    Width = 632
+    Height = 334
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 8
@@ -42,17 +30,17 @@ object PhoaWizardForm: TPhoaWizardForm
   end
   object pButtons: TPanel
     Left = 0
-    Top = 365
-    Width = 592
+    Top = 399
+    Width = 632
     Height = 36
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      592
+      632
       36)
     object bCancel: TButton
-      Left = 508
+      Left = 548
       Top = 6
       Width = 75
       Height = 23
@@ -63,7 +51,7 @@ object PhoaWizardForm: TPhoaWizardForm
       OnClick = bCancelClick
     end
     object bNext: TButton
-      Left = 368
+      Left = 408
       Top = 6
       Width = 75
       Height = 23
@@ -83,7 +71,7 @@ object PhoaWizardForm: TPhoaWizardForm
       OnClick = bHelpClick
     end
     object bBack: TButton
-      Left = 288
+      Left = 328
       Top = 6
       Width = 75
       Height = 23
@@ -96,7 +84,7 @@ object PhoaWizardForm: TPhoaWizardForm
   object pHeader: TPanel
     Left = 0
     Top = 0
-    Width = 592
+    Width = 632
     Height = 61
     Align = alTop
     BevelOuter = bvNone
@@ -107,7 +95,7 @@ object PhoaWizardForm: TPhoaWizardForm
     object lHeading: TLabel
       Left = 8
       Top = 8
-      Width = 531
+      Width = 571
       Height = 45
       Align = alClient
       AutoSize = False
@@ -117,7 +105,7 @@ object PhoaWizardForm: TPhoaWizardForm
       WordWrap = True
     end
     object iIcon: TImage
-      Left = 539
+      Left = 579
       Top = 8
       Width = 45
       Height = 45

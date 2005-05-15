@@ -1,22 +1,13 @@
 inherited dStats: TdStats
-  Left = 400
-  Top = 244
   Caption = 'Photo album statistics'
-  ClientHeight = 435
-  ClientWidth = 612
   OldCreateOrder = True
   Position = poScreenCenter
-  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 398
-    Width = 612
-  end
   object tvMain: TVirtualStringTree [1]
     Left = 12
     Top = 12
-    Width = 589
+    Width = 609
     Height = 373
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 1
@@ -45,25 +36,11 @@ inherited dStats: TdStats
       end
       item
         Position = 1
-        Width = 285
+        Width = 305
       end>
   end
   inherited pButtonsBottom: TPanel
-    Top = 400
-    Width = 612
     TabOrder = 1
-    DesignSize = (
-      612
-      35)
-    inherited bCancel: TButton
-      Left = 453
-    end
-    inherited bOK: TButton
-      Left = 373
-    end
-    inherited bHelp: TButton
-      Left = 531
-    end
   end
   object dklcMain: TDKLanguageController
     IgnoreList.Strings = (

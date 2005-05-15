@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.15 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.16 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -56,8 +56,8 @@ type
     function  GetCurrentFileName: String;
   protected
     function  GetDataValid: Boolean; override;
-    procedure InitializePage; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
   end;
 
 implementation
@@ -120,6 +120,13 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
     UpdateFileListInfo;
   end;
 
+  procedure TfrWzPageAddFiles_CheckFiles.DoCreate;
+  begin
+    inherited DoCreate;
+    ApplyTreeSettings(tvFiles);
+    FFiles := TfAddFilesWizard(StorageForm).FileList;
+  end;
+
   procedure TfrWzPageAddFiles_CheckFiles.EnableActions;
   var bFilesChecked, bFilesUnchecked: Boolean;
   begin
@@ -128,7 +135,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
      // Настраиваем Actions
     aFilesCheckAll.Enabled   := bFilesUnchecked;
     aFilesUncheckAll.Enabled := bFilesChecked;
-    StatusChanged;
+    StateChanged;
   end;
 
   function TfrWzPageAddFiles_CheckFiles.GetCurrentFileName: String;
@@ -141,13 +148,6 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
   function TfrWzPageAddFiles_CheckFiles.GetDataValid: Boolean;
   begin
     Result := FCheckedFilesCount>0;
-  end;
-
-  procedure TfrWzPageAddFiles_CheckFiles.InitializePage;
-  begin
-    inherited InitializePage;
-    ApplyTreeSettings(tvFiles);
-    FFiles := TfAddFilesWizard(StorageForm).FileList;
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.PreviewVisibilityChanged(bVisible: Boolean);

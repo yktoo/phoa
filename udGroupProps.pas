@@ -22,9 +22,10 @@ type
      // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   function EditPicGroup(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
@@ -39,7 +40,7 @@ uses ConsVars, phUtils, Main;
       try
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
@@ -57,20 +58,25 @@ uses ConsVars, phUtils, Main;
     inherited ButtonClick_OK;
   end;
 
-  function TdGroupProps.GetDataValid: Boolean;
+  procedure TdGroupProps.DoCreate;
   begin
-    Result := eText.Text<>'';
+    inherited DoCreate;
+    HelpContext := IDH_intf_group_props;
   end;
 
-  procedure TdGroupProps.InitializeDialog;
+  procedure TdGroupProps.ExecuteInitialize;
   var Group: IPhotoAlbumPicGroup;
   begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_group_props;
+    inherited ExecuteInitialize;
     Group := FApp.CurGroupX;
     eID.Text                := IntToStr(Group.ID);
     eText.Text              := Group.Text;
     mDescription.Lines.Text := Group.Description;
+  end;
+
+  function TdGroupProps.GetDataValid: Boolean;
+  begin
+    Result := eText.Text<>'';
   end;
 
 end.

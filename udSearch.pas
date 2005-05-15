@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.35 2005-02-14 19:34:08 dale Exp $
+//  $Id: udSearch.pas,v 1.36 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -184,12 +184,13 @@ type
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
-    function  GetFormRegistrySection: String; override;
+    function  GetRelativeRegistryKey: String; override;
     function  GetSizeable: Boolean; override;
-    procedure SettingsStore(rif: TRegIniFile); override;
-    procedure SettingsRestore(rif: TRegIniFile); override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
+    procedure SettingsLoad(rif: TRegIniFile); override;
+    procedure SettingsSave(rif: TRegIniFile); override;
     procedure UpdateState; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -307,7 +308,7 @@ var
       try
         FApp          := AApp;
         FResultsGroup := ResultsGroup;
-        Result := Execute;
+        Result := ExecuteModal(False, True);
       finally
         Free;
       end;
@@ -1135,7 +1136,43 @@ type
     inherited Destroy;
   end;
 
-  function TdSearch.GetFormRegistrySection: String;
+  procedure TdSearch.DoCreate;
+
+     // Создаёт в pmSimple пункты выбора свойства изображения
+    procedure CreateSimpleCrPicPropItems;
+    var pp: TPicProperty;
+    begin
+      for pp := Low(pp) to High(pp) do
+         // Если тип данных свойства поддерживает поиск
+        if aSSConditionsByDatatype[aPicPropDatatype[pp]]<>[] then
+          AddTBXMenuItem(ipmsmSimpleProp, PicPropName(pp), -1, Byte(pp), SimpleCrPicPropClick);
+    end;
+
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_search;
+     // Создаём в pmSimple пункты выбора свойства изображения
+    CreateSimpleCrPicPropItems;
+  end;
+
+  procedure TdSearch.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Загружаем списки мест, номеров плёнок, авторов
+    StringsLoadPFAM(FApp.Project, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
+     // Настраиваем контролы
+    rbCurGroup.Enabled      := (FApp.CurGroup<>nil) and (FApp.CurGroup.Pics.Count>0);
+    rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
+     // Инициализируем дерево / pmSimple
+    ApplyTreeSettings(tvSimpleCriteria);
+    SyncSimpleCriteria;
+    ActivateFirstVTNode(tvSimpleCriteria);
+     // Поиск по выражению
+    frExprPicFilter.Expression := sSearchExpression; 
+    UpdateSearchKind;
+  end;
+
+  function TdSearch.GetRelativeRegistryKey: String;
   begin
     Result := SRegSearch_Root;
   end;
@@ -1151,37 +1188,6 @@ type
   function TdSearch.GetSizeable: Boolean;
   begin
     Result := True;
-  end;
-
-  procedure TdSearch.InitializeDialog;
-
-     // Создаёт в pmSimple пункты выбора свойства изображения
-    procedure CreateSimpleCrPicPropItems;
-    var pp: TPicProperty;
-    begin
-      for pp := Low(pp) to High(pp) do
-         // Если тип данных свойства поддерживает поиск
-        if aSSConditionsByDatatype[aPicPropDatatype[pp]]<>[] then
-          AddTBXMenuItem(ipmsmSimpleProp, PicPropName(pp), -1, Byte(pp), SimpleCrPicPropClick);
-    end;
-
-  begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_search;
-    OKIgnoresModified := True;
-     // Загружаем списки мест, номеров плёнок, авторов
-    StringsLoadPFAM(FApp.Project, SLPhoaPlaces, SLPhoaFilmNumbers, SLPhoaAuthors, SLPhoaMedia);
-     // Настраиваем контролы
-    rbCurGroup.Enabled      := (FApp.CurGroup<>nil) and (FApp.CurGroup.Pics.Count>0);
-    rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
-     // Инициализируем дерево / pmSimple
-    ApplyTreeSettings(tvSimpleCriteria);
-    SyncSimpleCriteria;
-    CreateSimpleCrPicPropItems;
-    ActivateFirstVTNode(tvSimpleCriteria);
-     // Поиск по выражению
-    frExprPicFilter.Expression := sSearchExpression; 
-    UpdateSearchKind;
   end;
 
   procedure TdSearch.pcCriteriaChange(Sender: TObject);
@@ -1296,16 +1302,16 @@ type
         with ipmsmSimpleProp[i] do Checked := TPicProperty(Tag)=Crit.PicProperty;
   end;
 
-  procedure TdSearch.SettingsRestore(rif: TRegIniFile);
+  procedure TdSearch.SettingsLoad(rif: TRegIniFile);
   begin
-    inherited SettingsRestore(rif);
+    inherited SettingsLoad(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
     FSimpleCriteria.RegLoad(rif, SRegSearch_SimpleCriteria);
   end;
 
-  procedure TdSearch.SettingsStore(rif: TRegIniFile);
+  procedure TdSearch.SettingsSave(rif: TRegIniFile);
   begin
-    inherited SettingsStore(rif);
+    inherited SettingsSave(rif);
     rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);
     if ModalResult=mrOK then FSimpleCriteria.RegSave(rif, SRegSearch_SimpleCriteria);
   end;

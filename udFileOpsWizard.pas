@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.33 2005-03-08 09:47:29 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.34 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,8 +11,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   GraphicEx, GR32,
-  phWizard, phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
-  Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang;
+  phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, phOps, ConsVars, phWizard, phGraphics, 
+  phWizForm, DKLang, ExtCtrls, StdCtrls;
 
 type
    // Exception
@@ -152,17 +152,19 @@ type
     function  IPhoaWizardPageHost_Process.GetProgressCur      = ProcPage_GetProgressCur;
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
   protected
-    procedure InitializeWizard; override;
-    procedure FinalizeWizard; override;
-    function  IsBtnBackEnabled: Boolean; override;
-    function  IsBtnNextEnabled: Boolean; override;
-    function  IsBtnCancelEnabled: Boolean; override;
     function  GetNextPageID: Integer; override;
-    function  GetFormRegistrySection: String; override;
-    procedure SettingsStore(rif: TRegIniFile); override;
-    procedure SettingsRestore(rif: TRegIniFile); override;
+    function  GetRelativeRegistryKey: String; override;
+    function  GetStartPageID: Integer; override;
+    function  IsBtnBackEnabled: Boolean; override;
+    function  IsBtnCancelEnabled: Boolean; override;
+    function  IsBtnNextEnabled: Boolean; override;
     function  PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean; override;
+    procedure DoCreate; override;
+    procedure ExecuteFinalize; override;
+    procedure ExecuteInitialize; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
+    procedure SettingsInitialLoad(rif: TRegIniFile); override;
+    procedure SettingsInitialSave(rif: TRegIniFile); override;
   public
      // Props
      // -- Приложение
@@ -299,9 +301,9 @@ uses
   begin
     with TdFileOpsWizard.Create(Application) do
       try
-        FApp := AApp;
+        FApp              := AApp;
         FSelPicsByDefault := FApp.FocusedControl=pafcThumbViewer;
-        Result := Execute;
+        Result := ExecuteModal;
         bProjectChanged := ProjectChanged;
       finally
         Free;
@@ -734,6 +736,25 @@ uses
     if FCDOpt_IncludeViews then FExportedProject.ViewsX.Assign(FApp.Project.Views);
   end;
 
+  procedure TdFileOpsWizard.DoCreate;
+  var sOptPageTitle: String;
+  begin
+    inherited DoCreate;
+     // Создаём страницы
+    sOptPageTitle := ConstVal('SWzPageFileOps_Options');
+    Controller.CreatePage(TfrWzPageFileOps_SelTask,        IWzFileOpsPageID_SelTask,        IDH_intf_file_ops_seltask,   ConstVal('SWzPageFileOps_SelTask'));
+    Controller.CreatePage(TfrWzPageFileOps_SelPics,        IWzFileOpsPageID_SelPics,        IDH_intf_file_ops_selpics,   ConstVal('SWzPageFileOps_SelPics'));
+    Controller.CreatePage(TfrWzPageFileOps_SelFolder,      IWzFileOpsPageID_SelFolder,      IDH_intf_file_ops_selfolder, ConstVal('SWzPageFileOps_SelFolder'));
+    Controller.CreatePage(TfrWzPageFileOps_MoveOptions,    IWzFileOpsPageID_MoveOptions,    IDH_intf_file_ops_moveopts,  sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   IDH_intf_file_ops_moveopts2, sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  sOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{#ToDo3: Завести HelpTopic}, ConstVal('SWzPageFileOps_RepairSelLinks'));
+    Controller.CreatePage(TfrWzPage_Processing,            IWzFileOpsPageID_Processing,     IDH_intf_file_ops_process,   ConstVal('SWzPageFileOps_Processing'));
+    Controller.CreatePage(TfrWzPage_Log,                   IWzFileOpsPageID_Log,            IDH_intf_file_ops_log,       ConstVal('SWzPageFileOps_Log'));
+  end;
+
   procedure TdFileOpsWizard.DoSelectPictures;
   var i: Integer;
   begin
@@ -749,6 +770,46 @@ uses
     if FSelPicValidityFilter<>fospvfAny then
       for i := FSelectedPics.Count-1 downto 0 do
         if FileExists(FSelectedPics[i].FileName)<>(FSelPicValidityFilter=fospvfValidOnly) then FSelectedPics.Delete(i);
+  end;
+
+  procedure TdFileOpsWizard.ExecuteFinalize;
+  begin
+    FreeAndNil(FRepair_FileLinks);
+    FExportedProject := nil;
+    FSelectedPics    := nil;
+    FSelectedGroups  := nil;
+    FreeAndNil(FLog);
+    inherited ExecuteFinalize;
+  end;
+
+  procedure TdFileOpsWizard.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+    FSelectedGroups := NewPhotoAlbumPicGroupList(nil);
+     // Если во вьюере выбрана группа, заносим её в список
+    if FApp.CurGroup<>nil then FSelectedGroups.Add(FApp.CurGroup);
+     // Настраиваем режим выбора изображений по умолчанию
+    if FSelPicsByDefault and (FApp.SelectedPics.Count>0) then FSelPicMode := fospmSelPics
+    else if FSelectedGroups.Count>0 then                      FSelPicMode := fospmSelGroups
+    else                                                      FSelPicMode := fospmAll;
+     // Инициализируем опции
+    FCDOpt_CopyExecutable        := True;
+    FCDOpt_IncludeViews          := True;
+    FCDOpt_CreatePhoa            := True;
+    FCDOpt_CreateAutorun         := True;
+    FCDOpt_CopyIniSettings       := True;
+    FCDOpt_CopyLangFile          := True;
+    FCDOpt_MediaLabel            := ConstVal('SPhotoAlbumNode');
+    FCDOpt_PhoaDesc              := FApp.Project.Description;
+    FCDOpt_PhoaFileName          := ExtractFileName(FApp.Project.FileName);
+    FMoveFile_ReplaceChar        := '_';
+    FMoveFile_FileNameFormat     := 'Image_{ID}';
+    FMoveFile_DeleteToRecycleBin := True;
+    FMoveFile_OverwriteMode      := fomfomPrompt;
+    FMoveFile_UseCDOptions       := True;
+    FDelFile_DeleteToRecycleBin  := True;
+    FRepair_MatchFlags           := [formfName, formfSize];
+    FRepair_LookSubfolders       := True;
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
@@ -854,21 +915,6 @@ uses
       Controller.SetVisiblePageID(IWzFileOpsPageID_Log, pcmNextBtn);
   end;
 
-  procedure TdFileOpsWizard.FinalizeWizard;
-  begin
-    FRepair_FileLinks.Free;
-    FExportedProject := nil;
-    FSelectedPics    := nil;
-    FSelectedGroups  := nil;
-    FLog.Free;
-    inherited FinalizeWizard;
-  end;
-
-  function TdFileOpsWizard.GetFormRegistrySection: String;
-  begin
-    Result := SRegFileOps_Root;
-  end;
-
   function TdFileOpsWizard.GetNextPageID: Integer;
   begin
     Result := 0;
@@ -898,49 +944,14 @@ uses
     end;
   end;
 
-  procedure TdFileOpsWizard.InitializeWizard;
-  var sOptPageTitle: String;
+  function TdFileOpsWizard.GetRelativeRegistryKey: String;
   begin
-    inherited InitializeWizard;
-    FSelectedGroups := NewPhotoAlbumPicGroupList(nil);
-     // Если во вьюере выбрана группа, заносим её в список
-    if FApp.CurGroup<>nil then FSelectedGroups.Add(FApp.CurGroup);
-     // Настраиваем режим выбора изображений по умолчанию
-    if FSelPicsByDefault and (FApp.SelectedPics.Count>0) then FSelPicMode := fospmSelPics
-    else if FSelectedGroups.Count>0 then                      FSelPicMode := fospmSelGroups
-    else                                                      FSelPicMode := fospmAll;
-     // Инициализируем опции
-    FCDOpt_CopyExecutable        := True;
-    FCDOpt_IncludeViews          := True;
-    FCDOpt_CreatePhoa            := True;
-    FCDOpt_CreateAutorun         := True;
-    FCDOpt_CopyIniSettings       := True;
-    FCDOpt_CopyLangFile          := True;
-    FCDOpt_MediaLabel            := ConstVal('SPhotoAlbumNode');
-    FCDOpt_PhoaDesc              := FApp.Project.Description;
-    FCDOpt_PhoaFileName          := ExtractFileName(FApp.Project.FileName);
-    FMoveFile_ReplaceChar        := '_';
-    FMoveFile_FileNameFormat     := 'Image_{ID}';
-    FMoveFile_DeleteToRecycleBin := True;
-    FMoveFile_OverwriteMode      := fomfomPrompt;
-    FMoveFile_UseCDOptions       := True;
-    FDelFile_DeleteToRecycleBin  := True;
-    FRepair_MatchFlags           := [formfName, formfSize];
-    FRepair_LookSubfolders       := True;
-     // Создаём страницы и отображаем первую страницу
-    sOptPageTitle := ConstVal('SWzPageFileOps_Options');
-    Controller.CreatePage(TfrWzPageFileOps_SelTask,        IWzFileOpsPageID_SelTask,        IDH_intf_file_ops_seltask,   ConstVal('SWzPageFileOps_SelTask'));
-    Controller.CreatePage(TfrWzPageFileOps_SelPics,        IWzFileOpsPageID_SelPics,        IDH_intf_file_ops_selpics,   ConstVal('SWzPageFileOps_SelPics'));
-    Controller.CreatePage(TfrWzPageFileOps_SelFolder,      IWzFileOpsPageID_SelFolder,      IDH_intf_file_ops_selfolder, ConstVal('SWzPageFileOps_SelFolder'));
-    Controller.CreatePage(TfrWzPageFileOps_MoveOptions,    IWzFileOpsPageID_MoveOptions,    IDH_intf_file_ops_moveopts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   IDH_intf_file_ops_moveopts2, sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{#ToDo3: Завести HelpTopic}, ConstVal('SWzPageFileOps_RepairSelLinks'));                        
-    Controller.CreatePage(TfrWzPage_Processing,            IWzFileOpsPageID_Processing,     IDH_intf_file_ops_process,   ConstVal('SWzPageFileOps_Processing'));
-    Controller.CreatePage(TfrWzPage_Log,                   IWzFileOpsPageID_Log,            IDH_intf_file_ops_log,       ConstVal('SWzPageFileOps_Log'));
-    Controller.SetVisiblePageID(IWzFileOpsPageID_SelTask, pcmForced);
+    Result := SRegFileOps_Root;
+  end;
+
+  function TdFileOpsWizard.GetStartPageID: Integer;
+  begin
+    Result := IWzFileOpsPageID_SelTask;
   end;
 
   procedure TdFileOpsWizard.InterruptProcessing;
@@ -1113,15 +1124,15 @@ uses
     AddFolder(IncludeTrailingPathDelimiter(FDestinationFolder), FRepair_LookSubfolders);
   end;
 
-  procedure TdFileOpsWizard.SettingsRestore(rif: TRegIniFile);
+  procedure TdFileOpsWizard.SettingsInitialLoad(rif: TRegIniFile);
   begin
-    inherited SettingsRestore(rif);
+    inherited SettingsInitialLoad(rif);
     FDestinationFolder := rif.ReadString('', 'DestinationFolder', '');
   end;
 
-  procedure TdFileOpsWizard.SettingsStore(rif: TRegIniFile);
+  procedure TdFileOpsWizard.SettingsInitialSave(rif: TRegIniFile);
   begin
-    inherited SettingsStore(rif);
+    inherited SettingsInitialSave(rif);
     rif.WriteString ('', 'DestinationFolder', FDestinationFolder);
   end;
 
@@ -1165,7 +1176,7 @@ uses
   procedure TdFileOpsWizard.UpdateProgressInfo;
   begin
     Controller.ItemsByID[IWzFileOpsPageID_Processing].Perform(WM_PAGEUPDATE, 0, 0);
-    UpdateButtons;
+    StateChanged;
   end;
 
 end.

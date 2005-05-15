@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.19 2005-02-14 19:34:09 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.20 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -27,7 +27,7 @@ type
      // ¬озвращает количество выбранных изображений среди изображений группы
     function  GetSelCount(Group: IPhotoAlbumPicGroup): Integer;
   protected
-    procedure InitializePage; override;
+    procedure DoCreate; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
@@ -141,19 +141,19 @@ type
     end;
   end;
 
+  procedure TfrPicProps_Groups.DoCreate;
+  begin
+    inherited DoCreate;
+    ApplyTreeSettings(tvMain);
+    tvMain.NodeDataSize := SizeOf(TGroupData);
+  end;
+
   function TfrPicProps_Groups.GetSelCount(Group: IPhotoAlbumPicGroup): Integer;
   var i: Integer;
   begin
     Result := 0;
     for i := 0 to EditedPics.Count-1 do
       if Group.IsPicLinked(EditedPics[i].ID, False) then Inc(Result);
-  end;
-
-  procedure TfrPicProps_Groups.InitializePage;
-  begin
-    inherited InitializePage;
-    ApplyTreeSettings(tvMain);
-    tvMain.NodeDataSize := SizeOf(TGroupData);
   end;
 
   procedure TfrPicProps_Groups.tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);

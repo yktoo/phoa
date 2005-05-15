@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.20 2005-04-17 05:06:42 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.21 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -64,10 +64,10 @@ type
     function  GetValidityFilter: TFileOpSelPicValidityFilter;
     procedure SetValidityFilter(Value: TFileOpSelPicValidityFilter);
   protected
-    procedure InitializePage; override;
     function  GetDataValid: Boolean; override;
-    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
      // Props
      // -- Текущий фильтр выбора по наличию соответствующих файлов
     property ValidityFilter: TFileOpSelPicValidityFilter read GetValidityFilter write SetValidityFilter;
@@ -148,6 +148,16 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     UpdateCountInfo;
   end;
 
+  procedure TfrWzPageFileOps_SelPics.DoCreate;
+  begin
+    inherited DoCreate;
+     // Настраиваем дерево групп
+    ApplyTreeSettings(tvGroups);
+    tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+    tvGroups.NodeDataSize  := SizeOf(Pointer);
+    tvGroups.RootNodeCount := fMain.tvGroups.RootNodeCount;
+  end;
+
   function TfrWzPageFileOps_SelPics.GetDataValid: Boolean;
   begin
     Result := FSelPicCount>0;
@@ -158,16 +168,6 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     if rbValidityAny.Checked        then Result := fospvfAny
     else if rbValidityValid.Checked then Result := fospvfValidOnly
     else                                 Result := fospvfInvalidOnly;
-  end;
-
-  procedure TfrWzPageFileOps_SelPics.InitializePage;
-  begin
-    inherited InitializePage;
-     // Настраиваем дерево групп
-    ApplyTreeSettings(tvGroups); 
-    tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
-    tvGroups.NodeDataSize  := SizeOf(Pointer);
-    tvGroups.RootNodeCount := fMain.tvGroups.RootNodeCount;
   end;
 
   function TfrWzPageFileOps_SelPics.NextPage: Boolean;
@@ -310,7 +310,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
       end;
        // Обновляем информацию
       lCountInfo.Caption := ConstVal('SWzFileOps_PicGroupSelectedCount', [FSelPicCount, FSelGroupCount, HumanReadableSize(FSelPicFileTotalSize)]);
-      StatusChanged;
+      StateChanged;
     finally
       StopWait;
     end;

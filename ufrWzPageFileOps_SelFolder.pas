@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelFolder.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_SelFolder.pas,v 1.8 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,22 +15,22 @@ uses
 
 type
   TfrWzPageFileOps_SelFolder = class(TWizardPage)
-    tvFolder: TVirtualExplorerTree;
-    pFolderOptions: TPanel;
     bCreateFolder: TButton;
-    eFolderPath: TEdit;
     dklcMain: TDKLanguageController;
-    procedure tvFolderChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    eFolderPath: TEdit;
+    pFolderOptions: TPanel;
+    tvFolder: TVirtualExplorerTree;
     procedure bCreateFolderClick(Sender: TObject);
+    procedure tvFolderChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvFolderEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
      // Настраивает контролы папки
     procedure AdjustFolderControls;
   protected
     function  GetDataValid: Boolean; override;
-    procedure InitializePage; override;
-    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
   end;
 
 implementation
@@ -55,17 +55,17 @@ uses phUtils, ConsVars, udFileOpsWizard, Main, phObj, VirtualShellUtilities;
     AdjustFolderControls;
   end;
 
+  procedure TfrWzPageFileOps_SelFolder.DoCreate;
+  begin
+    inherited DoCreate;
+     // Настраиваем файл-браузер
+    tvFolder.Active := True;
+    tvFolder.BrowseTo(TdFileOpsWizard(StorageForm).DestinationFolder, False, True, False, True);
+  end;
+
   function TfrWzPageFileOps_SelFolder.GetDataValid: Boolean;
   begin
     Result := eFolderPath.Text<>'';
-  end;
-
-  procedure TfrWzPageFileOps_SelFolder.InitializePage;
-  begin
-    inherited InitializePage;
-     // Настраиваем браузер
-    tvFolder.Active := True;
-    tvFolder.BrowseTo(TdFileOpsWizard(StorageForm).DestinationFolder, False, True, False, True);
   end;
 
   function TfrWzPageFileOps_SelFolder.NextPage: Boolean;

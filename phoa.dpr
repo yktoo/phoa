@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.41 2005-03-02 17:13:45 dale Exp $
+//  $Id: phoa.dpr,v 1.42 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -73,7 +73,8 @@ uses
   ufrWzPageFileOps_RepairSelLinks in 'ufrWzPageFileOps_RepairSelLinks.pas' {frWzPageFileOps_RepairSelLinks: TFrame},
   ufrWzPageFileOps_SelFolder in 'ufrWzPageFileOps_SelFolder.pas' {frWzPageFileOps_SelFolder: TFrame},
   ufrWzPageFileOps_SelPics in 'ufrWzPageFileOps_SelPics.pas' {frWzPageFileOps_SelPics: TFrame},
-  ufrWzPageFileOps_SelTask in 'ufrWzPageFileOps_SelTask.pas' {frWzPageFileOps_SelTask: TFrame};
+  ufrWzPageFileOps_SelTask in 'ufrWzPageFileOps_SelTask.pas' {frWzPageFileOps_SelTask: TFrame},
+  phFrm in 'phFrm.pas' {PhoaForm};
 
 {$R *.res}
 

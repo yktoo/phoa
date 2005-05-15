@@ -1,19 +1,15 @@
 inherited dSortPics: TdSortPics
-  Left = 566
-  Top = 327
   Caption = 'Sort pictures'
-  ClientHeight = 344
-  ClientWidth = 398
+  ClientWidth = 392
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
-    Top = 307
-    Width = 398
+    Width = 392
   end
   object bReset: TButton [1]
-    Left = 315
-    Top = 314
+    Left = 309
+    Top = 405
     Width = 75
     Height = 23
     Anchors = [akRight, akBottom]
@@ -22,26 +18,25 @@ inherited dSortPics: TdSortPics
     OnClick = bResetClick
   end
   inherited pButtonsBottom: TPanel
-    Top = 309
-    Width = 398
+    Width = 392
     TabOrder = 1
     DesignSize = (
-      398
+      392
       35)
     inherited bCancel: TButton
-      Left = 240
+      Left = 234
     end
     inherited bOK: TButton
-      Left = 160
+      Left = 154
     end
     inherited bHelp: TButton
-      Left = 318
+      Left = 312
     end
   end
   object gbWhereToSort: TGroupBox
     Left = 12
     Top = 12
-    Width = 373
+    Width = 367
     Height = 69
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Where to sort pictures'
@@ -68,22 +63,22 @@ inherited dSortPics: TdSortPics
   inline frSorting: TfrSorting
     Left = 13
     Top = 86
-    Width = 372
-    Height = 207
+    Width = 366
+    Height = 298
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
     inherited lMain: TLabel
-      Width = 372
+      Width = 366
       Caption = '&Sort pictures by:'
     end
     inherited tvMain: TVirtualStringTree
-      Width = 372
-      Height = 192
+      Width = 366
+      Height = 283
       Header.Font.Name = 'Tahoma'
       Columns = <
         item
           Position = 0
-          Width = 218
+          Width = 212
           WideText = 'Picture property'
         end
         item

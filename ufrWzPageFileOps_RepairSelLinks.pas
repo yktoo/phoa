@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.13 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.14 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -16,19 +16,18 @@ uses
 
 type
   TfrWzPageFileOps_RepairSelLinks = class(TWizardPage)
-    tvMain: TVirtualStringTree;
-    pBottom: TPanel;
     cbDeleteUnmatched: TCheckBox;
     dklcMain: TDKLanguageController;
+    pBottom: TPanel;
+    tvMain: TVirtualStringTree;
+    procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
-  private
   protected
-    procedure InitializePage; override;
-    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
   end;
 
 implementation
@@ -46,9 +45,9 @@ uses phUtils, udFileOpsWizard, Main;
     cbDeleteUnmatched.Checked := Wiz.Repair_DeleteUnmatchedPics;
   end;
 
-  procedure TfrWzPageFileOps_RepairSelLinks.InitializePage;
+  procedure TfrWzPageFileOps_RepairSelLinks.DoCreate;
   begin
-    inherited InitializePage;
+    inherited DoCreate;
     tvMain.NodeDataSize := SizeOf(Integer);
   end;
 

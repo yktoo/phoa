@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.32 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.33 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -123,8 +123,8 @@ type
     procedure SetViewOffset(const Value: TPoint);
     procedure SetViewZoomFactor(Value: Single);
   protected
-    procedure InitializePage; override;
-    procedure FinalizePage; override;
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
@@ -234,7 +234,7 @@ uses phUtils, Main, phSettings;
     if FInitialized then begin
        // Если нужно загрузить изображение
       if not FImageLoaded then SetViewImageTimer;
-     // Иначе инициализируем 
+     // Иначе инициализируем
     end else begin
        // Создаём преобразование
       FTransform := TPicTransform.Create(iMain.Bitmap);
@@ -272,6 +272,22 @@ uses phUtils, Main, phSettings;
     SetViewImageTimer;
   end;
 
+  procedure TfrPicProps_View.DoCreate;
+  begin
+    inherited DoCreate;
+    gipmMainToolbar.LinkSubitems  := tbMain.Items;
+    gipmToolsToolbar.LinkSubitems := tbTools.Items;
+    cbViewFile.Images        := FileImages;
+    cbViewFile.SubMenuImages := FileImages;
+    FZoomFactorChange := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
+  end;
+
+  procedure TfrPicProps_View.DoDestroy;
+  begin
+    FTransform.Free;
+    inherited DoDestroy;
+  end;
+
   procedure TfrPicProps_View.EnableActions;
   begin
     aZoomIn.Enabled     := FImageLoaded and (ViewZoomFactor<SMaxPicZoom);
@@ -290,12 +306,6 @@ uses phUtils, Main, phSettings;
       if cbViewFile.ItemIndex=iIndex then
         if Visible then SetViewImageTimer else FImageLoaded := False;
     end;
-  end;
-
-  procedure TfrPicProps_View.FinalizePage;
-  begin
-    FTransform.Free;
-    inherited FinalizePage;
   end;
 
   procedure TfrPicProps_View.FrameContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
@@ -363,16 +373,6 @@ uses phUtils, Main, phSettings;
   procedure TfrPicProps_View.iMainResize(Sender: TObject);
   begin
     AdjustView;
-  end;
-
-  procedure TfrPicProps_View.InitializePage;
-  begin
-    inherited InitializePage;
-    gipmMainToolbar.LinkSubitems  := tbMain.Items;
-    gipmToolsToolbar.LinkSubitems := tbTools.Items;
-    cbViewFile.Images        := FileImages;
-    cbViewFile.SubMenuImages := FileImages;
-    FZoomFactorChange := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
   end;
 
   procedure TfrPicProps_View.LoadViewImage;

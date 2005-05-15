@@ -1,17 +1,9 @@
 inherited dProjectProps: TdProjectProps
-  Left = 574
-  Top = 287
   ActiveControl = eThumbSizeX
   Caption = 'Properties: photo album'
-  ClientHeight = 296
-  ClientWidth = 386
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 259
-    Width = 386
-  end
   object lDesc: TLabel [1]
     Left = 12
     Top = 80
@@ -59,30 +51,20 @@ inherited dProjectProps: TdProjectProps
     Caption = 'higher'#13#10'greater size'
   end
   inherited pButtonsBottom: TPanel
-    Top = 261
-    Width = 386
     TabOrder = 4
-    DesignSize = (
-      386
-      35)
     inherited bCancel: TButton
-      Left = 227
       Caption = 'Close'
       TabOrder = 1
     end
     inherited bOK: TButton
-      Left = 147
       TabOrder = 0
-    end
-    inherited bHelp: TButton
-      Left = 305
     end
   end
   object mDesc: TMemo
     Left = 12
     Top = 96
-    Width = 359
-    Height = 149
+    Width = 605
+    Height = 288
     Anchors = [akLeft, akTop, akRight, akBottom]
     ScrollBars = ssVertical
     TabOrder = 3

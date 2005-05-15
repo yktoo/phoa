@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.11 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.12 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -49,7 +49,7 @@ type
      // Осуществляет поиск записи протокола
     procedure DoFind(const sPattern: String; bDown, bMatchCase: Boolean);
   protected
-    procedure InitializePage; override;
+    procedure DoCreate; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   end;
 
@@ -116,6 +116,12 @@ uses phUtils, Main, Clipbrd, phSettings, udMsgBox;
     end;
   end;
 
+  procedure TfrWzPage_Log.DoCreate;
+  begin
+    inherited DoCreate;
+    ApplyTreeSettings(tvMain);
+  end;
+
   procedure TfrWzPage_Log.DoFind(const sPattern: String; bDown, bMatchCase: Boolean);
   var
     n: PVirtualNode;
@@ -153,12 +159,6 @@ uses phUtils, Main, Clipbrd, phSettings, udMsgBox;
   function TfrWzPage_Log.GetLog: TStrings;
   begin
     Result := (StorageForm as IPhoaWizardPageHost_Log).Log[ID];
-  end;
-
-  procedure TfrWzPage_Log.InitializePage;
-  begin
-    inherited InitializePage;
-    ApplyTreeSettings(tvMain);
   end;
 
   function TfrWzPage_Log.IsNodeError(Node: PVirtualNode): Boolean;

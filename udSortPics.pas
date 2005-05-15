@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.16 2005-02-14 19:34:09 dale Exp $
+//  $Id: udSortPics.pas,v 1.17 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,12 +15,12 @@ uses
 
 type
   TdSortPics = class(TPhoaDialog)
-    dklcMain: TDKLanguageController;
     bReset: TButton;
-    gbWhereToSort: TGroupBox;
-    rbCurGroup: TRadioButton;
-    rbAllGroups: TRadioButton;
+    dklcMain: TDKLanguageController;
     frSorting: TfrSorting;
+    gbWhereToSort: TGroupBox;
+    rbAllGroups: TRadioButton;
+    rbCurGroup: TRadioButton;
     procedure bResetClick(Sender: TObject);
   private
      // Приложение
@@ -29,12 +29,11 @@ type
     FUndoOperations: TPhoaOperations;
      // Если True, сортировать напрямую, без сохранения данных отката
     FDirectSort: Boolean;
-     // Событие изменения frSorting
-    procedure frSortingChange(Sender: TObject);
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
    // Отображает диалог сортировки изображений. Если bDirectSort=True, то сортирует выбранную группу непосредственно,
@@ -52,7 +51,7 @@ uses phUtils, ConsVars, Main;
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
         FDirectSort     := bDirectSort;
-        Result := Execute;
+        Result := ExecuteModal(False, True);
       finally
         Free;
       end;
@@ -82,30 +81,30 @@ uses phUtils, ConsVars, Main;
     inherited ButtonClick_OK;
   end;
 
-  procedure TdSortPics.frSortingChange(Sender: TObject);
+  procedure TdSortPics.DoCreate;
   begin
-    Modified := True;
+    inherited DoCreate;
+    HelpContext := IDH_intf_sort_pics;
+    frSorting.OnChange := DlgDataChange;
   end;
 
-  function TdSortPics.GetDataValid: Boolean;
-  begin
-    Result := frSorting.Sortings.Count>0;
-  end;
-
-  procedure TdSortPics.InitializeDialog;
+  procedure TdSortPics.ExecuteInitialize;
   var b: Boolean;
   begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_sort_pics;
-    OKIgnoresModified := True;
+    inherited ExecuteInitialize;
+     // Настраиваем frSorting
     frSorting.Sortings.RegLoad(SRegRoot, SRegSort_LastSortings);
     frSorting.SyncSortings;
-    frSorting.OnChange := frSortingChange;
      // Adjust RadioButtons
     b := FApp.CurGroup<>nil;
     rbCurGroup.Enabled  := b;
     rbCurGroup.Checked  := b;
     rbAllGroups.Checked := not b;
+  end;
+
+  function TdSortPics.GetDataValid: Boolean;
+  begin
+    Result := frSorting.Sortings.Count>0;
   end;
 
 end.

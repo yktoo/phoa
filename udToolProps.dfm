@@ -1,15 +1,11 @@
 inherited dToolProps: TdToolProps
-  Left = 424
-  Top = 308
   Caption = 'Properties: Tool'
   ClientHeight = 371
-  ClientWidth = 592
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
   inherited bvBottom: TBevel
     Top = 334
-    Width = 592
   end
   object lKind: TLabel [1]
     Left = 296
@@ -71,22 +67,12 @@ inherited dToolProps: TdToolProps
   end
   inherited pButtonsBottom: TPanel
     Top = 336
-    Width = 592
     TabOrder = 11
-    inherited bCancel: TButton
-      Left = 433
-    end
-    inherited bOK: TButton
-      Left = 353
-    end
-    inherited bHelp: TButton
-      Left = 511
-    end
   end
   object cbKind: TComboBox
     Left = 296
     Top = 28
-    Width = 285
+    Width = 325
     Height = 22
     Style = csOwnerDrawFixed
     ItemHeight = 16
@@ -99,14 +85,13 @@ inherited dToolProps: TdToolProps
     Top = 68
     Width = 281
     Height = 21
-    Anchors = [akLeft, akTop, akRight]
     TabOrder = 2
     OnChange = DlgDataChange
   end
   object eHint: TEdit
     Left = 296
     Top = 68
-    Width = 285
+    Width = 325
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 3
@@ -115,14 +100,14 @@ inherited dToolProps: TdToolProps
   object eRunCommand: TEdit
     Left = 12
     Top = 108
-    Width = 485
+    Width = 525
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 4
     OnChange = DlgDataChange
   end
   object bBrowseRunCommand: TButton
-    Left = 500
+    Left = 540
     Top = 108
     Width = 81
     Height = 23
@@ -134,7 +119,7 @@ inherited dToolProps: TdToolProps
   object eRunParams: TEdit
     Left = 12
     Top = 148
-    Width = 365
+    Width = 405
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 6
@@ -143,14 +128,14 @@ inherited dToolProps: TdToolProps
   object eRunFolder: TEdit
     Left = 12
     Top = 188
-    Width = 485
+    Width = 525
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 8
     OnChange = DlgDataChange
   end
   object bBrowseRunFolder: TButton
-    Left = 500
+    Left = 540
     Top = 188
     Width = 81
     Height = 23
@@ -176,19 +161,19 @@ inherited dToolProps: TdToolProps
   object gbUsage: TGroupBox
     Left = 12
     Top = 212
-    Width = 569
+    Width = 609
     Height = 109
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Tool usage'
     ParentBackground = False
     TabOrder = 10
     DesignSize = (
-      569
+      609
       109)
     object cbUsageTools: TCheckBox
       Left = 16
       Top = 20
-      Width = 537
+      Width = 577
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show in Tools menu'
@@ -200,7 +185,7 @@ inherited dToolProps: TdToolProps
     object cbUsageGroups: TCheckBox
       Left = 16
       Top = 40
-      Width = 537
+      Width = 577
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show in Picture Groups popup menu'
@@ -210,7 +195,7 @@ inherited dToolProps: TdToolProps
     object cbUsageThViewer: TCheckBox
       Left = 16
       Top = 60
-      Width = 537
+      Width = 577
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show in Thumbnails Window popup menu'
@@ -220,7 +205,7 @@ inherited dToolProps: TdToolProps
     object cbUsageViewMode: TCheckBox
       Left = 16
       Top = 80
-      Width = 537
+      Width = 577
       Height = 17
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Show in View mode popup menu'

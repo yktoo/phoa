@@ -1,9 +1,6 @@
 inherited dSelPhoaGroup: TdSelPhoaGroup
-  Left = 509
-  Top = 244
+  ActiveControl = tvGroups
   Caption = 'Select picture group'
-  ClientHeight = 435
-  ClientWidth = 473
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
@@ -15,14 +12,10 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Caption = '&Group:'
     FocusControl = tvGroups
   end
-  inherited bvBottom: TBevel
-    Top = 398
-    Width = 473
-  end
   object tvGroups: TVirtualStringTree [2]
     Left = 12
     Top = 28
-    Width = 449
+    Width = 608
     Height = 357
     Anchors = [akLeft, akTop, akRight, akBottom]
     DefaultNodeHeight = 16
@@ -51,20 +44,15 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     WideDefaultText = 'Photo Album'
   end
   inherited pButtonsBottom: TPanel
-    Top = 400
-    Width = 473
     TabOrder = 1
-    DesignSize = (
-      473
-      35)
     inherited bCancel: TButton
-      Left = 313
+      Left = 472
     end
     inherited bOK: TButton
-      Left = 233
+      Left = 392
     end
     inherited bHelp: TButton
-      Left = 391
+      Left = 550
     end
   end
   object dklcMain: TDKLanguageController

@@ -1,8 +1,5 @@
 inherited dSelKeywords: TdSelKeywords
-  Left = 599
-  Top = 248
   Caption = 'Select keywords'
-  ClientHeight = 431
   ClientWidth = 354
   OldCreateOrder = True
   PixelsPerInch = 96
@@ -17,12 +14,11 @@ inherited dSelKeywords: TdSelKeywords
     WordWrap = True
   end
   inherited bvBottom: TBevel
-    Top = 394
     Width = 354
   end
   object bReset: TButton [2]
     Left = 8
-    Top = 399
+    Top = 403
     Width = 75
     Height = 23
     Anchors = [akLeft, akBottom]
@@ -34,7 +30,7 @@ inherited dSelKeywords: TdSelKeywords
     Left = 12
     Top = 40
     Width = 331
-    Height = 341
+    Height = 345
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = -1
     Header.Font.Charset = DEFAULT_CHARSET
@@ -61,7 +57,6 @@ inherited dSelKeywords: TdSelKeywords
     WideDefaultText = ''
   end
   inherited pButtonsBottom: TPanel
-    Top = 396
     Width = 354
     TabOrder = 2
     DesignSize = (

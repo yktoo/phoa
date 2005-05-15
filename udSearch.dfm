@@ -1,21 +1,12 @@
 inherited dSearch: TdSearch
-  Left = 451
-  Top = 212
   Caption = 'Find pictures'
-  ClientHeight = 464
-  ClientWidth = 640
   OldCreateOrder = True
-  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 427
-    Width = 640
-  end
   object gbSearch: TGroupBox [1]
     Left = 12
     Top = 8
-    Width = 617
+    Width = 609
     Height = 41
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Perform search'
@@ -51,30 +42,25 @@ inherited dSearch: TdSearch
     end
   end
   inherited pButtonsBottom: TPanel
-    Top = 429
-    Width = 640
     TabOrder = 2
-    DesignSize = (
-      640
-      35)
     inherited bCancel: TButton
-      Left = 479
+      Left = 471
       TabOrder = 1
     end
     inherited bOK: TButton
-      Left = 399
+      Left = 391
       Caption = 'Find'
       TabOrder = 0
     end
     inherited bHelp: TButton
-      Left = 557
+      Left = 549
     end
   end
   object pcCriteria: TPageControl
     Left = 12
     Top = 56
-    Width = 616
-    Height = 362
+    Width = 608
+    Height = 333
     ActivePage = tsSimple
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
@@ -84,8 +70,8 @@ inherited dSearch: TdSearch
       object tvSimpleCriteria: TVirtualStringTree
         Left = 0
         Top = 26
-        Width = 608
-        Height = 308
+        Width = 600
+        Height = 279
         Align = alClient
         Header.AutoSizeIndex = 2
         Header.Font.Charset = DEFAULT_CHARSET
@@ -125,7 +111,7 @@ inherited dSearch: TdSearch
           item
             Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
-            Width = 294
+            Width = 286
             WideText = 'Value'
           end>
         WideDefaultText = ''
@@ -133,7 +119,7 @@ inherited dSearch: TdSearch
       object dkSimpleTop: TTBXDock
         Left = 0
         Top = 0
-        Width = 608
+        Width = 600
         Height = 26
         AllowDrag = False
         object tbSimpleMain: TTBXToolbar
@@ -163,16 +149,16 @@ inherited dSearch: TdSearch
       inline frExprPicFilter: TfrExprPicFilter
         Left = 0
         Top = 0
-        Width = 608
-        Height = 334
+        Width = 600
+        Height = 305
         Align = alClient
         TabOrder = 0
         inherited dkExprTop: TTBXDock
-          Width = 608
+          Width = 600
         end
         inherited eExpression: TSynEdit
-          Width = 608
-          Height = 308
+          Width = 600
+          Height = 279
         end
         inherited dklcMain: TDKLanguageController
           Options = [dklcoIgnoreEmptyProps]
@@ -213,7 +199,7 @@ inherited dSearch: TdSearch
       '*.ChevronHint'
       'tvSimpleCriteria.Header.Columns*')
     Left = 64
-    Top = 432
+    Top = 404
     LangData = {
       070064536561726368010100000003000000070043617074696F6E011A000000
       08006276426F74746F6D00000E0070427574746F6E73426F74746F6D00000700
@@ -258,7 +244,7 @@ inherited dSearch: TdSearch
     Images = fMain.ilActionsSmall
     OnPopup = pmSimplePopup
     Left = 8
-    Top = 432
+    Top = 404
     object ipmsmSimpleProp: TTBXSubmenuItem
       Caption = '&Picture property'
     end
@@ -269,7 +255,7 @@ inherited dSearch: TdSearch
   object alMain: TActionList
     Images = fMain.ilActionsSmall
     Left = 36
-    Top = 432
+    Top = 404
     object aSimpleReset: TAction
       Caption = '&Reset'
       Hint = 'Reset|Clear entered criteria'

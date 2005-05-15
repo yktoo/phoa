@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.8 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,9 +31,9 @@ type
     FKindRadioButtons: Array[TFileOperationKind] of TRadioButton;
   protected
     function  GetDataValid: Boolean; override;
-    procedure InitializePage; override;
-    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
   end;
 
 implementation
@@ -48,22 +48,10 @@ uses phUtils, udFileOpsWizard;
     for fok := Low(fok) to High(fok) do FKindRadioButtons[fok].Checked := TdFileOpsWizard(StorageForm).FileOpKind=fok;
   end;
 
-  function TfrWzPageFileOps_SelTask.GetDataValid: Boolean;
+  procedure TfrWzPageFileOps_SelTask.DoCreate;
   var fok: TFileOperationKind;
   begin
-    Result := False;
-     // Можно идти дальше, если выбрана операция радиокнопкой
-    for fok := Low(fok) to High(fok) do
-      if FKindRadioButtons[fok].Checked then begin
-        Result := True;
-        Break;
-      end;
-  end;
-
-  procedure TfrWzPageFileOps_SelTask.InitializePage;
-  var fok: TFileOperationKind;
-  begin
-    inherited InitializePage;
+    inherited DoCreate;
      // Инициализируем массив радиокнопок
     FKindRadioButtons[fokCopyFiles]       := rbCopyFiles;
     FKindRadioButtons[fokMoveFiles]       := rbMoveFiles;
@@ -75,6 +63,18 @@ uses phUtils, udFileOpsWizard;
       with FKindRadioButtons[fok].Font do Style := Style+[fsBold];
      // Выделяем lNBUndoable жирным
     with lNBUndoable.Font do Style := Style+[fsBold];
+  end;
+
+  function TfrWzPageFileOps_SelTask.GetDataValid: Boolean;
+  var fok: TFileOperationKind;
+  begin
+    Result := False;
+     // Можно идти дальше, если выбрана операция радиокнопкой
+    for fok := Low(fok) to High(fok) do
+      if FKindRadioButtons[fok].Checked then begin
+        Result := True;
+        Break;
+      end;
   end;
 
   function TfrWzPageFileOps_SelTask.NextPage: Boolean;

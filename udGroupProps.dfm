@@ -1,16 +1,8 @@
 inherited dGroupProps: TdGroupProps
-  Left = 534
-  Top = 306
   ActiveControl = eText
   Caption = 'Properties: Picture group'
-  ClientHeight = 209
-  ClientWidth = 427
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 172
-    Width = 427
-  end
   object lID: TLabel [1]
     Left = 12
     Top = 12
@@ -36,19 +28,12 @@ inherited dGroupProps: TdGroupProps
     FocusControl = mDescription
   end
   inherited pButtonsBottom: TPanel
-    Top = 174
-    Width = 427
     TabOrder = 3
     inherited bCancel: TButton
-      Left = 268
       TabOrder = 1
     end
     inherited bOK: TButton
-      Left = 188
       TabOrder = 0
-    end
-    inherited bHelp: TButton
-      Left = 346
     end
   end
   object eID: TEdit
@@ -63,7 +48,7 @@ inherited dGroupProps: TdGroupProps
   object eText: TEdit
     Left = 76
     Top = 28
-    Width = 337
+    Width = 542
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 1
@@ -72,8 +57,8 @@ inherited dGroupProps: TdGroupProps
   object mDescription: TMemo
     Left = 12
     Top = 68
-    Width = 401
-    Height = 89
+    Width = 606
+    Height = 315
     Anchors = [akLeft, akTop, akRight, akBottom]
     ScrollBars = ssVertical
     TabOrder = 2
@@ -83,7 +68,8 @@ inherited dGroupProps: TdGroupProps
     IgnoreList.Strings = (
       '*.Font.Name'
       '*.SecondaryShortCuts')
-    Top = 176
+    Left = 4
+    Top = 404
     LangData = {
       0B006447726F757050726F7073010100000003000000070043617074696F6E01
       0B00000008006276426F74746F6D00000E0070427574746F6E73426F74746F6D

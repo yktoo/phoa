@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.49 2005-03-07 10:37:36 dale Exp $
+;  $Id: phoa.dklang,v 1.50 2005-05-15 09:03:08 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -1122,3 +1122,4 @@ TPhoaOp_ViewNew=Create view
 [frPicProps_FileProps]
 aChangeFile.Caption=00000001,&Change file...
 aChangeFile.Hint=00000002,Change file...|Change file for selected picture
+

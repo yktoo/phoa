@@ -45,8 +45,9 @@ type
      // Настраивает доступность контролов в зависимости от текущего вида инструмента
     procedure ApplyCurKind; 
   protected
-    procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
@@ -61,11 +62,15 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
       try
         FTool := ATool;
         FPage := APage;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
   end;
+
+   //===================================================================================================================
+   // TdToolProps
+   //===================================================================================================================
 
   procedure TdToolProps.ApplyCurKind;
   var k: TPhoaToolKind;
@@ -159,20 +164,25 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
     DrawText(cbKind.Canvas.Handle, PChar(cbKind.Items[Index]), -1, Rect, DT_LEFT or DT_NOPREFIX or DT_SINGLELINE or DT_VCENTER);
   end;
 
-  procedure TdToolProps.InitializeDialog;
+  procedure TdToolProps.DoCreate;
   var k: TPhoaToolKind;
   begin
-    inherited InitializeDialog;
+    inherited DoCreate;
     HelpContext := IDH_intf_tool_props;
      // Заполняем cbKind
-    for k := Low(k) to High(k) do cbKind.Items.Add(PhoaToolKindName(k)); 
+    for k := Low(k) to High(k) do cbKind.Items.Add(PhoaToolKindName(k));
      // Заполняем cbRunShowCommand
     with cbRunShowCommand.Items do begin
       Objects[0] := Pointer(SW_SHOWNORMAL);
       Objects[1] := Pointer(SW_SHOWMINIMIZED);
       Objects[2] := Pointer(SW_SHOWMAXIMIZED);
     end;
-     // Инициализируем значения контролов 
+  end;
+
+  procedure TdToolProps.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Инициализируем значения контролов
     if FTool=nil then begin
       cbKind.ItemIndex           := Byte(ptkOpen);
       SetCurrentCBObject(cbRunShowCommand, SW_SHOWNORMAL);

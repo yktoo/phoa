@@ -1,18 +1,8 @@
 inherited dPicOps: TdPicOps
-  Left = 490
-  Top = 246
   ActiveControl = cbOp
   Caption = 'Picture operations'
-  ClientHeight = 433
-  ClientWidth = 399
-  OldCreateOrder = True
-  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 396
-    Width = 399
-  end
   object lGroup: TLabel [1]
     Left = 12
     Top = 52
@@ -30,25 +20,20 @@ inherited dPicOps: TdPicOps
     FocusControl = cbOp
   end
   inherited pButtonsBottom: TPanel
-    Top = 398
-    Width = 399
-    DesignSize = (
-      399
-      35)
     inherited bCancel: TButton
-      Left = 239
+      Left = 472
     end
     inherited bOK: TButton
-      Left = 159
+      Left = 392
     end
     inherited bHelp: TButton
-      Left = 317
+      Left = 550
     end
   end
   object cbOp: TComboBox
     Left = 12
     Top = 28
-    Width = 375
+    Width = 608
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
@@ -67,8 +52,8 @@ inherited dPicOps: TdPicOps
   object tvGroups: TVirtualStringTree
     Left = 12
     Top = 68
-    Width = 375
-    Height = 315
+    Width = 608
+    Height = 317
     Anchors = [akLeft, akTop, akRight, akBottom]
     DefaultNodeHeight = 16
     Header.AutoSizeIndex = 0

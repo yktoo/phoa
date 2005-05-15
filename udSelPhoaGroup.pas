@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.18 2005-02-14 19:34:08 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -30,9 +30,10 @@ type
      // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   function MakeGroupFromView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
@@ -47,7 +48,7 @@ uses phUtils, ConsVars, Main, phSettings;
       try
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
-        Result := Execute;
+        Result := ExecuteModal(False, True);
       finally
         Free;
       end;
@@ -59,19 +60,23 @@ uses phUtils, ConsVars, Main, phSettings;
     inherited ButtonClick_OK;
   end;
 
+  procedure TdSelPhoaGroup.DoCreate;
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_sel_phoa_group;
+    tvGroups.NodeDataSize := SizeOf(Pointer);
+    ApplyTreeSettings(tvGroups);
+  end;
+
+  procedure TdSelPhoaGroup.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+    tvGroups.RootNodeCount := 1;
+  end;
+
   function TdSelPhoaGroup.GetDataValid: Boolean;
   begin
     Result := tvGroups.FocusedNode<>nil;
-  end;
-
-  procedure TdSelPhoaGroup.InitializeDialog;
-  begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_sel_phoa_group;
-    OKIgnoresModified := True;
-    ApplyTreeSettings(tvGroups);
-    tvGroups.NodeDataSize  := SizeOf(Pointer);
-    tvGroups.RootNodeCount := 1;
   end;
 
   procedure TdSelPhoaGroup.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);

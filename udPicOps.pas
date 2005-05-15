@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.17 2004-12-31 13:38:58 dale Exp $
+//  $Id: udPicOps.pas,v 1.18 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -34,9 +34,10 @@ type
      // Буфер отката
     FUndoOperations: TPhoaOperations;
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
    // Отображает диалог операций с изображениями.
@@ -52,7 +53,7 @@ uses phUtils, Main, phSettings;
       try
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
-        Result := Execute;
+        Result := ExecuteModal(False, True);
       finally
         Free;
       end;
@@ -69,25 +70,20 @@ uses phUtils, Main, phSettings;
     inherited ButtonClick_OK;
   end;
 
-  function TdPicOps.GetDataValid: Boolean;
-  var n: PVirtualNode;
+  procedure TdPicOps.DoCreate;
   begin
-    n := tvGroups.FocusedNode;
-    Result :=
-      (cbOp.ItemIndex>=0) and
-      (n<>nil) and
-      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FApp.CurGroup);
-  end;
-
-  procedure TdPicOps.InitializeDialog;
-  begin
-    inherited InitializeDialog;
+    inherited DoCreate;
     HelpContext := IDH_intf_pic_operations;
-    OKIgnoresModified := True;
     ApplyTreeSettings(tvGroups);
     tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
     tvGroups.NodeDataSize  := fMain.tvGroups.NodeDataSize;
-    tvGroups.RootNodeCount := 1; // "Результаты поиска" тут опускаем
+  end;
+
+  procedure TdPicOps.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Загружаем дерево ("Результаты поиска" тут опускаем)
+    tvGroups.RootNodeCount := 1;
      // Инициализируем все узлы, чтобы они раскрылись быстро
     tvGroups.BeginUpdate;
     try
@@ -96,6 +92,16 @@ uses phUtils, Main, phSettings;
       tvGroups.EndUpdate;
     end;
     cbOp.ItemIndex := 0;
+  end;
+
+  function TdPicOps.GetDataValid: Boolean;
+  var n: PVirtualNode;
+  begin
+    n := tvGroups.FocusedNode;
+    Result :=
+      (cbOp.ItemIndex>=0) and
+      (n<>nil) and
+      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FApp.CurGroup);
   end;
 
   procedure TdPicOps.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);

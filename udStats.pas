@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.21 2005-02-14 19:34:09 dale Exp $
+//  $Id: udStats.pas,v 1.22 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -25,20 +25,20 @@ type
   TdStats = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
     tvMain: TVirtualStringTree;
-    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
      // Приложение
     FApp: IPhotoAlbumApp;
-     // Создаёт в памяти новый объект данных статистики
-    function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
-    function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
+     // Собирает и отображает статистику проекта
+    procedure LoadStats;
   protected
-    procedure InitializeDialog; override;
-    function  GetFormRegistrySection: String; override;
+    function  GetRelativeRegistryKey: String; override;
     function  GetSizeable: Boolean; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   procedure ShowProjectStats(AApp: IPhotoAlbumApp);
@@ -52,13 +52,29 @@ uses phUtils, Main, phPhoa, phSettings;
     with TdStats.Create(Application) do
       try
         FApp := AApp;
-        Execute;
+        ExecuteModal(False, False);
       finally
         Free;
       end;
   end;
 
-  function TdStats.GetFormRegistrySection: String;
+  procedure TdStats.DoCreate;
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_stats;
+     // Настраиваем tvMain
+    tvMain.NodeDataSize := SizeOf(Pointer);
+    ApplyTreeSettings(tvMain);
+  end;
+
+  procedure TdStats.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Заполняем данные
+    LoadStats;
+  end;
+
+  function TdStats.GetRelativeRegistryKey: String;
   begin
     Result := SRegStats_Root;
   end;
@@ -68,8 +84,25 @@ uses phUtils, Main, phPhoa, phSettings;
     Result := True;
   end;
 
-  procedure TdStats.InitializeDialog;
+  procedure TdStats.LoadStats;
   var n0, n1: PVirtualNode;
+
+     // Создаёт в памяти новый объект данных статистики
+    function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
+    var s: String;
+    begin
+       // Если строка начинается на '@' - это имя константы
+      if sName[1]='@' then s := ConstVal(Copy(sName, 2, MaxInt)) else s := sName;
+      New(Result);
+      Result^.sName   := s;
+      Result^.sValue  := sValue;
+      Result^.iImgIdx := iImgIdx;
+    end;
+
+    function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
+    begin
+      Result := NewStatData(sName, IntToStr(iValue));
+    end;
 
      // Добавляет узлы свойств файла фотоальбома
     procedure AddPhoaFileProps(nParent: PVirtualNode);
@@ -186,12 +219,6 @@ uses phUtils, Main, phPhoa, phSettings;
     end;
 
   begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_stats;
-     // Настраиваем tvMain
-    tvMain.NodeDataSize := SizeOf(Pointer);
-    ApplyTreeSettings(tvMain);
-     // Заполняем данные
     StartWait;
     tvMain.BeginUpdate;
     try
@@ -213,22 +240,6 @@ uses phUtils, Main, phPhoa, phSettings;
       tvMain.EndUpdate;
       StopWait;
     end;
-  end;
-
-  function TdStats.NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData;
-  var s: String;
-  begin
-     // Если строка начинается на '@' - это имя константы
-    if sName[1]='@' then s := ConstVal(Copy(sName, 2, MaxInt)) else s := sName;
-    New(Result);
-    Result^.sName   := s;
-    Result^.sValue  := sValue;
-    Result^.iImgIdx := iImgIdx;
-  end;
-
-  function TdStats.NewStatData(const sName: String; iValue: Integer): PStatsData;
-  begin
-    Result := NewStatData(sName, IntToStr(iValue));
   end;
 
   procedure TdStats.tvMainFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);

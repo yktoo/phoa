@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.11 2005-02-13 19:16:38 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.12 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,15 +15,15 @@ uses
 
 type
   TdSelKeywords = class(TPhoaDialog)
+    bReset: TButton;
     dklcMain: TDKLanguageController;
     lMain: TLabel;
-    bReset: TButton;
     tvMain: TVirtualStringTree;
     procedure bResetClick(Sender: TObject);
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvMainPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
      // Проект
@@ -33,8 +33,9 @@ type
      // Строка с ключевыми словами
     FKeywordStr: String;
   protected
-    procedure InitializeDialog; override;
     procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
   function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var sKeywords: String): Boolean;
@@ -49,7 +50,7 @@ uses phUtils, ConsVars, Main, phSettings;
       try
         FProject    := AProject;
         FKeywordStr := sKeywords;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
         if Result then sKeywords := FKeywordStr;
       finally
         Free;
@@ -70,16 +71,21 @@ uses phUtils, ConsVars, Main, phSettings;
     inherited ButtonClick_OK;
   end;
 
-  procedure TdSelKeywords.InitializeDialog;
+  procedure TdSelKeywords.DoCreate;
   begin
-    inherited InitializeDialog;
+    inherited DoCreate;
     HelpContext := IDH_intf_select_keywords;
-     // Составляем список ключевых слов
     FKeywords := NewPhotoAlbumKeywordList;
+    ApplyTreeSettings(tvMain);
+  end;
+
+  procedure TdSelKeywords.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Составляем список ключевых слов
     FKeywords.PopulateFromPicList(FProject.Pics, nil, 0);
     FKeywords.SelectedKeywords := FKeywordStr;
      // Настраиваем дерево
-    ApplyTreeSettings(tvMain);
     tvMain.RootNodeCount := FKeywords.Count;
   end;
 

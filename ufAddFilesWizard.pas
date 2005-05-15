@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.33 2005-05-11 17:25:55 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.34 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,20 +12,19 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   GR32, GraphicEx,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
-  Placemnt, StdCtrls, ExtCtrls, phWizForm, DKLang, GR32_Image, TB2Dock,
-  TBXDkPanels;
+  phWizForm, DKLang, GR32_Image, TB2Dock, TBXDkPanels, ExtCtrls, StdCtrls;
 
 type
   TAddFilesThread = class;
 
   TfAddFilesWizard = class(TPhoaWizardForm, IPhoaWizardPageHost_Log, IPhoaWizardPageHost_Process)
     dklcMain: TDKLanguageController;
-    pProcess: TPanel;
     dpPreview: TTBXDockablePanel;
     iPreview: TImage32;
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    pProcess: TPanel;
     procedure dpPreviewResize(Sender: TObject);
     procedure dpPreviewVisibleChanged(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
      // Поток, добавляющий файлы
     FAddFilesThread: TAddFilesThread;
@@ -103,20 +102,23 @@ type
      // Prop handlers
     procedure SetShowPreview(Value: Boolean);
   protected
-    procedure InitializeWizard; override;
-    procedure FinalizeWizard; override;
-    function  IsBtnBackEnabled: Boolean; override;
-    function  IsBtnNextEnabled: Boolean; override;
-    function  IsBtnCancelEnabled: Boolean; override;
     function  GetNextPageID: Integer; override;
-    function  GetFormRegistrySection: String; override;
-    procedure SettingsStore(rif: TRegIniFile); override;
-    procedure SettingsRestore(rif: TRegIniFile); override;
+    function  GetRelativeRegistryKey: String; override;
+    function  GetStartPageID: Integer; override;
+    function  IsBtnBackEnabled: Boolean; override;
+    function  IsBtnCancelEnabled: Boolean; override;
+    function  IsBtnNextEnabled: Boolean; override;
     function  PageChanging(ChangeMethod: TPageChangeMethod; var iNewPageID: Integer): Boolean; override;
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
+    procedure ExecuteFinalize; override;
+    procedure ExecuteInitialize; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
+    procedure SettingsInitialLoad(rif: TRegIniFile); override;
+    procedure SettingsInitialSave(rif: TRegIniFile); override;
+    procedure SettingsLoad(rif: TRegIniFile); override;
+    procedure SettingsSave(rif: TRegIniFile); override;
   public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
      // Загружает файл для просмотра
     procedure UpdatePreview;
      // Запускает добавление файлов
@@ -212,7 +214,7 @@ uses
           bShowWizard := LoadFileList(True, False);
         end else
           bShowWizard := True;
-        Result := bShowWizard and Execute;
+        Result := bShowWizard and ExecuteModal;
       finally
         Free;
       end;
@@ -485,18 +487,26 @@ uses
    // TfAddFilesWizard
    //===================================================================================================================
 
-  constructor TfAddFilesWizard.Create(AOwner: TComponent);
+  procedure TfAddFilesWizard.DoCreate;
   begin
-    inherited Create(AOwner);
-    FAddList := TStringList.Create;
+    inherited DoCreate;
+    FAddList   := TStringList.Create;
     FFileList  := TFileList.Create;
+    FPics      := NewPhotoAlbumPicList(False);
+     // Настраиваем окно просмотра
+    dpPreview.Floating := True;
+     // Создаём страницы
+    Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
+    Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
+    Controller.CreatePage(TfrWzPage_Processing,         IWzAddFilesPageID_Processing, IDH_intf_pic_add_process,    ConstVal('SWzPageAddFiles_Processing'));
+    Controller.CreatePage(TfrWzPage_Log,                IWzAddFilesPageID_Log,        IDH_intf_pic_add_log,        ConstVal('SWzPageAddFiles_Log'));
   end;
 
-  destructor TfAddFilesWizard.Destroy;
+  procedure TfAddFilesWizard.DoDestroy;
   begin
     FAddList.Free;
     FFileList.Free;
-    inherited Destroy;
+    inherited DoDestroy;
   end;
 
   procedure TfAddFilesWizard.dpPreviewResize(Sender: TObject);
@@ -514,23 +524,24 @@ uses
       PreviewInfoIntf.PreviewVisibilityChanged(FShowPreview);
   end;
 
-  procedure TfAddFilesWizard.FinalizeWizard;
+  procedure TfAddFilesWizard.ExecuteFinalize;
   begin
-    FLog.Free;
+    FreeAndNil(FLog);
      // Если есть добавленные изображения, выполняем операцию
     if (FPics<>nil) and (FPics.Count>0) then FApp.PerformOperation('PicAdd', ['Group', FGroup, 'Pics', FPics]);
-    inherited FinalizeWizard;
+    inherited ExecuteFinalize;
+  end;
+
+  procedure TfAddFilesWizard.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+    FFreePicID := FApp.ProjectX.PicsX.MaxPicID+1;
   end;
 
   procedure TfAddFilesWizard.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   begin
      // Нельзя закрывать окошко, пока добавляются файлы
     CanClose := not FProcessingFiles;
-  end;
-
-  function TfAddFilesWizard.GetFormRegistrySection: String;
-  begin
-    Result := SRegAddFiles_Root;
   end;
 
   function TfAddFilesWizard.GetNextPageID: Integer;
@@ -544,26 +555,20 @@ uses
     end;
   end;
 
-  procedure TfAddFilesWizard.InitializeWizard;
-  var iPageID: Integer;
+  function TfAddFilesWizard.GetRelativeRegistryKey: String;
   begin
-    inherited InitializeWizard;
-    FPics       := NewPhotoAlbumPicList(False);
-    FFreePicID  := FApp.ProjectX.PicsX.MaxPicID+1;
-     // Настраиваем окно просмотра
-    dpPreview.Floating := True;
-     // Создаём страницы
-    Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
-    Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
-    Controller.CreatePage(TfrWzPage_Processing,         IWzAddFilesPageID_Processing, IDH_intf_pic_add_process,    ConstVal('SWzPageAddFiles_Processing'));
-    Controller.CreatePage(TfrWzPage_Log,                IWzAddFilesPageID_Log,        IDH_intf_pic_add_log,        ConstVal('SWzPageAddFiles_Log'));
+    Result := SRegAddFiles_Root;
+  end;
+
+  function TfAddFilesWizard.GetStartPageID: Integer;
+  begin
      // Если изначально список файлов не пуст, пропускаем страницу выбора файлов
     if FFileList.Count>0 then
-      iPageID := iif(SettingValueBool(ISettingID_Dlgs_APW_SkipChkPage), IWzAddFilesPageID_Processing, IWzAddFilesPageID_CheckFiles)
+      Result := iif(
+        SettingValueBool(ISettingID_Dlgs_APW_SkipChkPage), IWzAddFilesPageID_Processing, IWzAddFilesPageID_CheckFiles)
       // Иначе отображаем страницу выбора файлов
     else
-      iPageID := IWzAddFilesPageID_SelFiles;
-    Controller.SetVisiblePageID(iPageID, pcmForced);
+      Result := IWzAddFilesPageID_SelFiles;
   end;
 
   procedure TfAddFilesWizard.InterruptFileProcessing;
@@ -794,10 +799,9 @@ uses
     end;
   end;
 
-  procedure TfAddFilesWizard.SettingsRestore(rif: TRegIniFile);
-  var r: TRect;
+  procedure TfAddFilesWizard.SettingsInitialLoad(rif: TRegIniFile);
   begin
-    inherited SettingsRestore(rif);
+    inherited SettingsInitialLoad(rif);
     FDefaultPath         := rif.ReadString ('', 'DefaultFolder',       '');
     FRecurseFolders      := rif.ReadBool   ('', 'RecurseFolders',      True);
     FShowAdvancedOptions := rif.ReadBool   ('', 'ShowAdvancedOptions', False);
@@ -816,20 +820,9 @@ uses
     FFilter_SizeTo       := rif.ReadInteger('', 'FilterSizeTo',        999999999);
     FFilter_SizeToUnit   := TFileSizeUnit(
                             rif.ReadInteger('', 'FilterSizeToUnit',    Byte(fsuKBytes)));
-     // Восстанавливаем параметры просмотра
-    FShowPreview         := rif.ReadBool   ('', 'ShowPreview',         False);
-    r                    := StrToRect(
-                            rif.ReadString ('', 'PreviewBounds',       ''),
-                            Rect(-1, -1, -1, -1));
-    if (r.Left>=0) and (r.Top>=0) then begin
-      dpPreview.FloatingPosition := r.TopLeft;
-      dpPreview.FloatingWidth    := r.Right-r.Left;
-      dpPreview.FloatingHeight   := r.Bottom-r.Top;
-    end else
-      dpPreview.FloatingPosition := pMain.ClientToScreen(Point(40, 40));
   end;
 
-  procedure TfAddFilesWizard.SettingsStore(rif: TRegIniFile);
+  procedure TfAddFilesWizard.SettingsInitialSave(rif: TRegIniFile);
 
     procedure PutDate(const d: TDateTime; const sValueName: String);
     begin
@@ -842,7 +835,7 @@ uses
     end;
 
   begin
-    inherited SettingsStore(rif);
+    inherited SettingsInitialSave(rif);
     rif.WriteString ('', 'DefaultFolder',       FDefaultPath);
     rif.WriteBool   ('', 'RecurseFolders',      FRecurseFolders);
     rif.WriteBool   ('', 'ShowAdvancedOptions', FShowAdvancedOptions);
@@ -856,12 +849,38 @@ uses
     rif.WriteInteger('', 'FilterSizeFromUnit',  Byte(FFilter_SizeFromUnit));
     rif.WriteInteger('', 'FilterSizeTo',        FFilter_SizeTo);
     rif.WriteInteger('', 'FilterSizeToUnit',    Byte(FFilter_SizeToUnit));
+  end;
+
+  procedure TfAddFilesWizard.SettingsLoad(rif: TRegIniFile);
+  var r: TRect;
+  begin
+    inherited SettingsLoad(rif);
+     // Восстанавливаем параметры просмотра
+    FShowPreview := rif.ReadBool   ('', 'ShowPreview',   False);
+    r            := StrToRect(
+                    rif.ReadString ('', 'PreviewBounds', ''),
+                    Rect(-1, -1, -1, -1));
+    if (r.Left>=0) and (r.Top>=0) then begin
+      dpPreview.FloatingPosition := r.TopLeft;
+      dpPreview.FloatingWidth    := r.Right-r.Left;
+      dpPreview.FloatingHeight   := r.Bottom-r.Top;
+    end else
+      dpPreview.FloatingPosition := pMain.ClientToScreen(Point(40, 40));
+  end;
+
+  procedure TfAddFilesWizard.SettingsSave(rif: TRegIniFile);
+  begin
+    inherited SettingsSave(rif);
      // Сохраняем параметры просмотра
-    rif.WriteBool   ('', 'ShowPreview',         FShowPreview);
+    rif.WriteBool   ('', 'ShowPreview', FShowPreview);
     rif.WriteString (
       '',
       'PreviewBounds',
-      RectToStr(Bounds(dpPreview.FloatingPosition.x, dpPreview.FloatingPosition.y, dpPreview.FloatingWidth, dpPreview.FloatingHeight)));
+      RectToStr(Bounds(
+        dpPreview.FloatingPosition.x,
+        dpPreview.FloatingPosition.y,
+        dpPreview.FloatingWidth,
+        dpPreview.FloatingHeight)));
   end;
 
   procedure TfAddFilesWizard.StartFileProcessing;
@@ -970,7 +989,7 @@ uses
   procedure TfAddFilesWizard.UpdateProgressInfo;
   begin
     Controller.ItemsByID[IWzAddFilesPageID_Processing].Perform(WM_PAGEUPDATE, 0, 0);
-    UpdateButtons;
+    StateChanged;
   end;
 
 end.

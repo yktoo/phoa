@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.18 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -19,9 +19,9 @@ type
     aChangeFile: TAction;
     alMain: TActionList;
     bChangeFile: TTBXItem;
+    dklcMain: TDKLanguageController;
     tbMain: TTBXToolbar;
     tvMain: TVirtualStringTree;
-    dklcMain: TDKLanguageController;
     procedure aaChangeFile(Sender: TObject);
     procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
@@ -37,7 +37,7 @@ type
      // Возвращает индекс файла, соответствующего текущему выделенному узлу; -1, если нет выделенного узла
     function  GetCurFileIndex: Integer;
   protected
-    procedure InitializePage; override;
+    procedure DoCreate; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure FileChanged(iIndex: Integer); override;
@@ -114,12 +114,21 @@ type
     end;
   end;
 
+  procedure TfrPicProps_FileProps.DoCreate;
+  begin
+    inherited DoCreate;
+    ApplyTreeSettings(tvMain);
+    tvMain.NodeDataSize := SizeOf(Pointer);
+    tvMain.Images := FileImages;
+    FExpandAll := SettingValueBool(ISettingID_Dlgs_PP_ExpFileProps);
+  end;
+
   procedure TfrPicProps_FileProps.FileChanged(iIndex: Integer);
   var n: PVirtualNode;
   begin
     inherited FileChanged(iIndex);
      // При изменении файла "сбрасываем" (очищаем) узел
-    n := GetVTRootNodeByIndex(tvMain, iIndex); 
+    n := GetVTRootNodeByIndex(tvMain, iIndex);
     if n<>nil then tvMain.ResetNode(n);
   end;
 
@@ -133,15 +142,6 @@ type
       if tvMain.NodeParent[n]<>nil then n := tvMain.NodeParent[n];
       Result := n.Index;
     end;
-  end;
-
-  procedure TfrPicProps_FileProps.InitializePage;
-  begin
-    inherited InitializePage;
-    ApplyTreeSettings(tvMain);
-    tvMain.NodeDataSize := SizeOf(Pointer);
-    tvMain.Images := FileImages;
-    FExpandAll := SettingValueBool(ISettingID_Dlgs_PP_ExpFileProps);
   end;
 
   procedure TfrPicProps_FileProps.tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);

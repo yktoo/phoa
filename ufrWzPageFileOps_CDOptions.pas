@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.9 2005-03-06 19:04:38 dale Exp $
+//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.10 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -58,7 +58,7 @@ uses phUtils, udFileOpsWizard, phObj;
   procedure TfrWzPageFileOps_CDOptions.AdjustOptionsNotify(Sender: TObject);
   begin
     AdjustOptionControls;
-    StatusChanged;
+    StateChanged;
   end;
 
   procedure TfrWzPageFileOps_CDOptions.BeforeDisplay(ChangeMethod: TPageChangeMethod);

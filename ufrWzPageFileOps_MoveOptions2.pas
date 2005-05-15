@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.8 2005-02-12 15:36:37 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.9 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -43,7 +43,7 @@ uses phUtils, udFileOpsWizard;
   procedure TfrWzPageFileOps_MoveOptions2.AdjustOptionsNotify(Sender: TObject);
   begin
     AdjustOptionControls;
-    StatusChanged;
+    StateChanged;
   end;
 
   procedure TfrWzPageFileOps_MoveOptions2.BeforeDisplay(ChangeMethod: TPageChangeMethod);

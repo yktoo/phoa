@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.11 2004-12-31 13:38:58 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.12 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -26,7 +26,7 @@ type
     function  GetFileImageIndex(Index: Integer): Integer;
     function  GetFileImages: TImageList;
   protected
-    procedure InitializePage; override;
+    procedure DoCreate; override;
      // Уведомляет форму диалога об изменении
     procedure Modified;
      // Установка/снятие блокировки изменения Modified
@@ -73,6 +73,12 @@ implementation
     Result := True;
   end;
 
+  procedure TPicPropsDialogPage.DoCreate;
+  begin
+    inherited DoCreate;
+    FDialog := StorageForm as TdPicProps;
+  end;
+
   procedure TPicPropsDialogPage.EndUpdate;
   begin
     FDialog.EndUpdate;
@@ -101,12 +107,6 @@ implementation
   function TPicPropsDialogPage.GetFileImages: TImageList;
   begin
     Result := FDialog.ilFiles;
-  end;
-
-  procedure TPicPropsDialogPage.InitializePage;
-  begin
-    inherited InitializePage;
-    FDialog := StorageForm as TdPicProps;
   end;
 
   procedure TPicPropsDialogPage.Modified;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.23 2005-02-05 16:16:52 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.24 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -51,10 +51,10 @@ type
     procedure PreviewVisibilityChanged(bVisible: Boolean);
     function  GetCurrentFileName: String;
   protected
-    procedure InitializePage; override;
     function  GetDataValid: Boolean; override;
-    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     function  NextPage: Boolean; override;
+    procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
+    procedure DoCreate; override;
   end;
 
 implementation
@@ -115,6 +115,15 @@ uses
     TfAddFilesWizard(StorageForm).ShowPreview := cbShowPreview.Checked;
   end;
 
+  procedure TfrWzPageAddFiles_SelFiles.DoCreate;
+  var fsu: TFileSizeUnit;
+  begin
+    inherited DoCreate;
+     // Заполняем комбо-боксы единиц размера файла
+    for fsu := Low(fsu) to High(fsu) do cbFileSizeFromUnit.Items.Add(FileSizeUnitName(fsu));
+    cbFileSizeToUnit.Items.Assign(cbFileSizeFromUnit.Items);
+  end;
+
   function TfrWzPageAddFiles_SelFiles.GetCurrentFileName: String;
   var
     Namespace: TNamespace;
@@ -141,15 +150,6 @@ uses
       until Node=nil;
       Result := True;
     end;
-  end;
-
-  procedure TfrWzPageAddFiles_SelFiles.InitializePage;
-  var fsu: TFileSizeUnit;
-  begin
-    inherited InitializePage;
-     // Заполняем комбо-боксы единиц размера файла
-    for fsu := Low(fsu) to High(fsu) do cbFileSizeFromUnit.Items.Add(FileSizeUnitName(fsu));
-    cbFileSizeToUnit.Items.Assign(cbFileSizeFromUnit.Items);
   end;
 
   function TfrWzPageAddFiles_SelFiles.NextPage: Boolean;
@@ -193,7 +193,7 @@ uses
 
   procedure TfrWzPageAddFiles_SelFiles.tvMainChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    StatusChanged;
+    StateChanged;
     TfAddFilesWizard(StorageForm).UpdatePreview;
   end;
 

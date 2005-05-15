@@ -1,21 +1,12 @@
 inherited dViewProps: TdViewProps
-  Left = 370
-  Top = 189
   Caption = 'Properties: photo album view'
-  ClientHeight = 435
-  ClientWidth = 592
   OldCreateOrder = True
-  ShowHint = True
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 398
-    Width = 592
-  end
   object pcMain: TPageControl [1]
     Left = 4
     Top = 4
-    Width = 583
+    Width = 623
     Height = 390
     ActivePage = tsGeneral
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -24,7 +15,7 @@ inherited dViewProps: TdViewProps
     object tsGeneral: TTabSheet
       Caption = 'General'
       DesignSize = (
-        575
+        615
         362)
       object lName: TLabel
         Left = 8
@@ -44,7 +35,7 @@ inherited dViewProps: TdViewProps
       object eName: TEdit
         Left = 8
         Top = 20
-        Width = 557
+        Width = 597
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
@@ -53,7 +44,7 @@ inherited dViewProps: TdViewProps
       object tvGrouping: TVirtualStringTree
         Left = 8
         Top = 60
-        Width = 556
+        Width = 596
         Height = 137
         Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
@@ -86,7 +77,7 @@ inherited dViewProps: TdViewProps
           item
             Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
-            Width = 402
+            Width = 442
             WideText = 'Grouping property'
           end
           item
@@ -101,23 +92,23 @@ inherited dViewProps: TdViewProps
       inline frSorting: TfrSorting
         Left = 8
         Top = 200
-        Width = 556
+        Width = 596
         Height = 150
         Anchors = [akLeft, akRight, akBottom]
         TabOrder = 2
         inherited lMain: TLabel
-          Width = 556
+          Width = 596
           Caption = '&Sort pictures in each group by:'
         end
         inherited tvMain: TVirtualStringTree
-          Width = 556
+          Width = 596
           Height = 135
           Header.Font.Name = 'Tahoma'
           Columns = <
             item
               Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
-              Width = 402
+              Width = 442
               WideText = 'Picture property'
             end
             item
@@ -136,15 +127,15 @@ inherited dViewProps: TdViewProps
       inline frExprPicFilter: TfrExprPicFilter
         Left = 0
         Top = 0
-        Width = 575
+        Width = 615
         Height = 362
         Align = alClient
         TabOrder = 0
         inherited dkExprTop: TTBXDock
-          Width = 575
+          Width = 615
         end
         inherited eExpression: TSynEdit
-          Width = 575
+          Width = 615
         end
         inherited dklcMain: TDKLanguageController
           Options = [dklcoIgnoreEmptyProps]
@@ -177,22 +168,17 @@ inherited dViewProps: TdViewProps
     end
   end
   inherited pButtonsBottom: TPanel
-    Top = 400
-    Width = 592
     TabOrder = 1
-    DesignSize = (
-      592
-      35)
     inherited bCancel: TButton
-      Left = 432
+      Left = 472
       TabOrder = 1
     end
     inherited bOK: TButton
-      Left = 352
+      Left = 392
       TabOrder = 0
     end
     inherited bHelp: TButton
-      Left = 510
+      Left = 550
     end
   end
   object dklcMain: TDKLanguageController

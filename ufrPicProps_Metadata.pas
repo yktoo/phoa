@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.18 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -37,7 +37,7 @@ type
      // Обновляет описание
     procedure UpdateDesc;
   protected
-    procedure InitializePage; override;
+    procedure DoCreate; override;
     function  GetRegistrySection: String; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
@@ -60,6 +60,19 @@ type
     end;
   end;
 
+  procedure TfrPicProps_Metadata.DoCreate;
+  begin
+    inherited DoCreate;
+     // Настраиваем tvMain
+    ApplyTreeSettings(tvMain);
+    tvMain.NodeDataSize := SizeOf(Pointer);
+    tvMain.Images := FileImages;
+     // Кэшируем настройки
+    FExpandAll := SettingValueBool(ISettingID_Dlgs_PP_ExpMetadata);
+     // Обновляем описание
+    UpdateDesc;
+  end;
+
   procedure TfrPicProps_Metadata.FileChanged(iIndex: Integer);
   var n: PVirtualNode;
   begin
@@ -72,19 +85,6 @@ type
   function TfrPicProps_Metadata.GetRegistrySection: String;
   begin
     Result := SRegWizPage_PicProp_Metadata;
-  end;
-
-  procedure TfrPicProps_Metadata.InitializePage;
-  begin
-    inherited InitializePage;
-     // Настраиваем tvMain
-    ApplyTreeSettings(tvMain);
-    tvMain.NodeDataSize := SizeOf(Pointer);
-    tvMain.Images := FileImages;
-     // Кэшируем настройки
-    FExpandAll := SettingValueBool(ISettingID_Dlgs_PP_ExpMetadata);
-     // Обновляем описание
-    UpdateDesc;
   end;
 
   procedure TfrPicProps_Metadata.tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.6 2004-12-31 13:38:58 dale Exp $
+//  $Id: phWizard.pas,v 1.7 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phFrm;
 
 type
    // Exception
@@ -26,18 +26,18 @@ type
      // Вызывается после отображения [другой] страницы
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
      // Вызывается при изменении состояния страниц
-    procedure StatusChanged;
+    procedure StateChanged;
      // Prop handlers
     function  GetHostControl: TWinControl; 
     function  GetNextPageID: Integer;
-    function  GetStorageForm: TForm;
+    function  GetStorageForm: TPhoaForm;
      // Props
      // -- Хост-контрол для размещения страниц
     property HostControl: TWinControl read GetHostControl;
      // -- Должна возвращать ID следующей страницы, или 0, если нет больше страниц
     property NextPageID: Integer read GetNextPageID;
      // -- Форма мастера
-    property StorageForm: TForm read GetStorageForm;
+    property StorageForm: TPhoaForm read GetStorageForm;
   end;
 
   TWizardController = class;
@@ -51,14 +51,14 @@ type
     FID: Integer;
     FPageTitle: String;
      // Prop handlers
-    function GetStorageForm: TForm;
+    function GetStorageForm: TPhoaForm;
     function GetIndex: Integer;
   protected
-     // Вызывает Controller.OnStatusChange
-    procedure StatusChanged;
-     // Инициализация/финализация страницы. В базовом классе восстанавливают/сохраняют панели инструментов
-    procedure InitializePage; virtual;
-    procedure FinalizePage; virtual;
+     // Вызываются после создания и перед уничтожением страницы
+    procedure DoCreate; virtual;
+    procedure DoDestroy; virtual;
+     // Вызывает StateChanged хост-формы
+    procedure StateChanged;
      // Вызывается перед отображением страницы. В базовом классе не делает ничего
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); virtual;
      // Вызывается после отображения страницы. В базовом классе не делает ничего
@@ -91,7 +91,7 @@ type
      //    требуется
     property RegistrySection: String read GetRegistrySection;
      // -- Форма мастера. Получается через Controller
-    property StorageForm: TForm read GetStorageForm;
+    property StorageForm: TPhoaForm read GetStorageForm;
   end;
 
   TWizardPageClass = class of TWizardPage;
@@ -112,7 +112,6 @@ type
     procedure SetKeepHistory(Value: Boolean);
   public
     constructor Create(AHostFormIntf: IWizardHostForm);
-    destructor Destroy; override;
     procedure Add(Page: TWizardPage);
     procedure Remove(Page: TWizardPage);
     procedure Delete(Index: Integer);
@@ -196,15 +195,25 @@ uses VCLUtils, ConsVars, TB2Dock;
     FPageTitle  := sPageTitle;
     FController := Controller;
     FController.Add(Self);
+    Parent      := FController.HostFormIntf.HostControl;
+    Align       := alClient;
+    DoCreate;          
   end;
 
   destructor TWizardPage.Destroy;
   begin
+    DoDestroy;
     FController.Remove(Self);
     inherited Destroy;
   end;
 
-  procedure TWizardPage.FinalizePage;
+  procedure TWizardPage.DoCreate;
+  begin
+     // Восстанавливаем панели инструментов
+    if RegistrySection<>'' then TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegWizPagesRoot+'\'+RegistrySection+SRegWizPages_Toolbars);
+  end;
+
+  procedure TWizardPage.DoDestroy;
   begin
      // Сохраняем панели инструментов
     if RegistrySection<>'' then TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegWizPagesRoot+'\'+RegistrySection+SRegWizPages_Toolbars);
@@ -225,15 +234,9 @@ uses VCLUtils, ConsVars, TB2Dock;
     Result := '';
   end;
 
-  function TWizardPage.GetStorageForm: TForm;
+  function TWizardPage.GetStorageForm: TPhoaForm;
   begin
     Result := FController.HostFormIntf.StorageForm;
-  end;
-
-  procedure TWizardPage.InitializePage;
-  begin
-     // Восстанавливаем панели инструментов
-    if RegistrySection<>'' then TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegWizPagesRoot+'\'+RegistrySection+SRegWizPages_Toolbars);
   end;
 
   function TWizardPage.NextPage: Boolean;
@@ -243,12 +246,12 @@ uses VCLUtils, ConsVars, TB2Dock;
 
   procedure TWizardPage.PageDataChange(Sender: TObject);
   begin
-    StatusChanged;
+    StateChanged;
   end;
 
-  procedure TWizardPage.StatusChanged;
+  procedure TWizardPage.StateChanged;
   begin
-    FController.HostFormIntf.StatusChanged;
+    FController.HostFormIntf.StateChanged;
   end;
 
    //===================================================================================================================
@@ -276,21 +279,11 @@ uses VCLUtils, ConsVars, TB2Dock;
   function TWizardController.CreatePage(PClass: TWizardPageClass; iID, iHelpContext: Integer; const sPageTitle: String): TWizardPage;
   begin
     Result := PClass.Create(Self, iID, iHelpContext, sPageTitle);
-    Result.Parent := FHostFormIntf.HostControl;
-    Result.Align := alClient;
-    Result.InitializePage;
   end;
 
   procedure TWizardController.Delete(Index: Integer);
   begin
     GetItems(Index).Free;
-  end;
-
-  destructor TWizardController.Destroy;
-  var i: Integer;
-  begin
-    for i := 0 to Count-1 do GetItems(i).FinalizePage;
-    inherited Destroy;
   end;
 
   function TWizardController.GetHistoryEmpty: Boolean;
@@ -300,7 +293,7 @@ uses VCLUtils, ConsVars, TB2Dock;
 
   function TWizardController.GetItems(Index: Integer): TWizardPage;
   begin
-    Result := TWizardPage(inherited Items[Index]);
+    Result := TWizardPage(Get(Index));
   end;
 
   function TWizardController.GetItemsByID(iID: Integer): TWizardPage;
@@ -352,7 +345,7 @@ uses VCLUtils, ConsVars, TB2Dock;
        // Если не надо хранить, стираем историю
       if not Value and (High(FPageIDHistory)>=0) then begin
         FPageIDHistory := nil;
-        FHostFormIntf.StatusChanged;
+        FHostFormIntf.StateChanged;
       end;
     end;
   end;
@@ -421,7 +414,7 @@ uses VCLUtils, ConsVars, TB2Dock;
            // Уведомляем новую страницу
           NewPage.AfterDisplay(ChangeMethod);
            // Уведомляем об изменении статуса
-          FHostFormIntf.StatusChanged;
+          FHostFormIntf.StateChanged;
           Result := True;
         end;
       finally

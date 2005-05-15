@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.18 2004-12-31 13:38:58 dale Exp $
+//  $Id: udSettings.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -19,7 +19,6 @@ type
     dkNav: TTBXDock;
     tbNav: TTBXToolbar;
     pEditor: TPanel;
-    procedure FormShow(Sender: TObject);
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
@@ -29,8 +28,6 @@ type
     FCurPageSetting: TPhoaPageSetting;
      // Текущий редактор настроек
     FEditor: TWinControl;
-     // Создаёт кнопкtи навигации (уровень 0 из ConsVars.aPhoaSettings[])
-    procedure CreateNavBar;
      // Событие нажатия NavBar-кнопки
     procedure NavBarButtonClick(Sender: TObject);
      // Событие изменения данных настроек
@@ -38,11 +35,13 @@ type
      // Prop handlers
     procedure SetCurPageSetting(Value: TPhoaPageSetting);
   protected
-    procedure InitializeDialog; override;
-    procedure FinalizeDialog; override;
-    procedure ButtonClick_OK; override;
-    function  GetFormRegistrySection: String; override;
+    function  GetRelativeRegistryKey: String; override;
     function  GetSizeable: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
+    procedure DoShow; override;
+    procedure ExecuteInitialize; override;
   public
      // Props
      // -- Текущая выбранная страница-настройка (кнопка на NavBar)
@@ -61,15 +60,15 @@ uses phUtils, Main, TypInfo;
     with TdSettings.Create(Application) do
       try
         FDefPageSettingID := DefPageSettingID;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
   end;
 
-   //-------------------------------------------------------------------------------------------------------------------
+   //===================================================================================================================
    // TdSettings
-   //-------------------------------------------------------------------------------------------------------------------
+   //===================================================================================================================
 
   procedure TdSettings.ButtonClick_OK;
   begin
@@ -78,39 +77,59 @@ uses phUtils, Main, TypInfo;
     inherited ButtonClick_OK;
   end;
 
-  procedure TdSettings.CreateNavBar;
-  var
-    i: Integer;
-    tbi: TTBXCustomItem;
-    PPS: TPhoaPageSetting;
-  begin
-    for i := 0 to FLocalRootSetting.ChildCount-1 do begin
-      PPS := FLocalRootSetting.Children[i] as TPhoaPageSetting;
-      if PPS.Visible then begin
-        tbi := TTBXItem.Create(Self);
-        tbi.Caption     := ConstValEx(PPS.Name);
-        tbi.HelpContext := PPS.HelpContext;
-        tbi.ImageIndex  := PPS.ImageIndex;
-        tbi.Tag         := Integer(PPS);
-        tbi.OnClick     := NavBarButtonClick;
-        if i<9 then tbi.ShortCut := 16433+i; // Ctrl+1..9 keys
-        tbNav.Items.Add(tbi);
+  procedure TdSettings.DoCreate;
+
+     // Создаёт кнопки навигации (корневой уровень FLocalRootSetting)
+    procedure CreateNavBar;
+    var
+      i: Integer;
+      tbi: TTBXCustomItem;
+      PPS: TPhoaPageSetting;
+    begin
+      for i := 0 to FLocalRootSetting.ChildCount-1 do begin
+        PPS := FLocalRootSetting.Children[i] as TPhoaPageSetting;
+        if PPS.Visible then begin
+          tbi := TTBXItem.Create(Self);
+          tbi.Caption     := ConstValEx(PPS.Name);
+          tbi.HelpContext := PPS.HelpContext;
+          tbi.ImageIndex  := PPS.ImageIndex;
+          tbi.Tag         := Integer(PPS);
+          tbi.OnClick     := NavBarButtonClick;
+          if i<9 then tbi.ShortCut := 16433+i; // Ctrl+1..9 keys
+          tbNav.Items.Add(tbi);
+        end;
       end;
     end;
+
+  begin
+    inherited DoCreate;
+     // Копируем настройки
+    FLocalRootSetting := TPhoaSetting.Create(nil, 0, '');
+    FLocalRootSetting.Assign(RootSetting);
+     // Создаём кнопки навигации
+    CreateNavBar;
   end;
 
-  procedure TdSettings.FinalizeDialog;
+  procedure TdSettings.DoDestroy;
   begin
     FLocalRootSetting.Free;
-    inherited FinalizeDialog;
+    inherited DoDestroy;
   end;
 
-  procedure TdSettings.FormShow(Sender: TObject);
+  procedure TdSettings.DoShow;
   begin
+    inherited DoShow;
     ActiveControl := FEditor;
   end;
 
-  function TdSettings.GetFormRegistrySection: String;
+  procedure TdSettings.ExecuteInitialize;
+  begin
+    inherited ExecuteInitialize;
+     // Выбираем стартовую кнопку
+    CurPageSetting := FLocalRootSetting.Settings[FDefPageSettingID] as TPhoaPageSetting;
+  end;
+
+  function TdSettings.GetRelativeRegistryKey: String;
   begin
     Result := SRegSettings_Root;
   end;
@@ -118,18 +137,6 @@ uses phUtils, Main, TypInfo;
   function TdSettings.GetSizeable: Boolean;
   begin
     Result := True;
-  end;
-
-  procedure TdSettings.InitializeDialog;
-  begin
-    inherited InitializeDialog;
-     // Копируем настройки
-    FLocalRootSetting := TPhoaSetting.Create(nil, 0, '');
-    FLocalRootSetting.Assign(RootSetting);
-     // Создаём кнопки навигации
-    CreateNavBar;
-     // Выбираем стартовую кнопку
-    CurPageSetting := FLocalRootSetting.Settings[FDefPageSettingID] as TPhoaPageSetting;
   end;
 
   procedure TdSettings.NavBarButtonClick(Sender: TObject);

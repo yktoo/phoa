@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.17 2005-02-13 19:16:39 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.18 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -67,7 +67,7 @@ type
     procedure FocusNode(Index: Integer);
   protected
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
-    procedure InitializePage; override;
+    procedure DoCreate; override;
   public
     procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
   end;
@@ -169,6 +169,14 @@ uses phUtils, Main, phSettings;
     Modified;
   end;
 
+  procedure TfrPicProps_Keywords.DoCreate;
+  begin
+    inherited DoCreate;
+    ApplyTreeSettings(tvMain);
+    pmMain.LinkSubitems := tbMain.Items;
+    FKeywords := NewPhotoAlbumKeywordList;
+  end;
+
   procedure TfrPicProps_Keywords.EnableActions;
   begin
     aEdit.Enabled := tvMain.FocusedNode<>nil;
@@ -189,14 +197,6 @@ uses phUtils, Main, phSettings;
         Selected[n] := True;
         FocusedNode := n;
       end;
-  end;
-
-  procedure TfrPicProps_Keywords.InitializePage;
-  begin
-    inherited InitializePage;
-    ApplyTreeSettings(tvMain);
-    pmMain.LinkSubitems := tbMain.Items;
-    FKeywords := NewPhotoAlbumKeywordList;
   end;
 
   procedure TfrPicProps_Keywords.IsPicSelectedCallback(Pic: IPhoaPic; out bSelected: Boolean);

@@ -1,26 +1,13 @@
 inherited dPicProps: TdPicProps
-  Left = 423
-  Top = 246
   Caption = 'Properties: picture'
-  ClientHeight = 433
-  ClientWidth = 590
-  Constraints.MinHeight = 400
-  Constraints.MinWidth = 550
   OldCreateOrder = True
-  Position = poScreenCenter
-  ShowHint = True
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  inherited bvBottom: TBevel
-    Top = 396
-    Width = 590
-  end
   object pMain: TPanel [1]
     Left = 0
     Top = 0
-    Width = 590
-    Height = 395
+    Width = 632
+    Height = 397
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelOuter = bvNone
     TabOrder = 0
@@ -28,7 +15,7 @@ inherited dPicProps: TdPicProps
       Left = 0
       Top = 0
       Width = 82
-      Height = 395
+      Height = 397
       AllowDrag = False
       PopupMenu = pmNav
       Position = dpLeft
@@ -87,29 +74,24 @@ inherited dPicProps: TdPicProps
     object pPages: TPanel
       Left = 82
       Top = 0
-      Width = 508
-      Height = 395
+      Width = 550
+      Height = 397
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
     end
   end
   inherited pButtonsBottom: TPanel
-    Top = 398
-    Width = 590
     TabOrder = 1
-    DesignSize = (
-      590
-      35)
     inherited bCancel: TButton
-      Left = 429
+      Left = 471
       Caption = 'Close'
     end
     inherited bOK: TButton
-      Left = 349
+      Left = 391
     end
     inherited bHelp: TButton
-      Left = 507
+      Left = 549
     end
   end
   object dklcMain: TDKLanguageController

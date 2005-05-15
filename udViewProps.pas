@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.18 2005-02-14 19:34:09 dale Exp $
+//  $Id: udViewProps.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -17,21 +17,25 @@ uses
 type
   TdViewProps = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
-    pmGrouping: TTBXPopupMenu;
-    ipmsmProp: TTBXSubmenuItem;
-    ipmDelete: TTBXItem;
-    ipmSep: TTBXSeparatorItem;
-    ipmMoveUp: TTBXItem;
-    ipmMoveDown: TTBXItem;
-    lName: TLabel;
-    lGrouping: TLabel;
     eName: TEdit;
-    tvGrouping: TVirtualStringTree;
-    frSorting: TfrSorting;
-    pcMain: TPageControl;
-    tsGeneral: TTabSheet;
-    tsFilterExpr: TTabSheet;
     frExprPicFilter: TfrExprPicFilter;
+    frSorting: TfrSorting;
+    ipmDelete: TTBXItem;
+    ipmMoveDown: TTBXItem;
+    ipmMoveUp: TTBXItem;
+    ipmSep: TTBXSeparatorItem;
+    ipmsmProp: TTBXSubmenuItem;
+    lGrouping: TLabel;
+    lName: TLabel;
+    pcMain: TPageControl;
+    pmGrouping: TTBXPopupMenu;
+    tsFilterExpr: TTabSheet;
+    tsGeneral: TTabSheet;
+    tvGrouping: TVirtualStringTree;
+    procedure ipmDeleteClick(Sender: TObject);
+    procedure ipmMoveDownClick(Sender: TObject);
+    procedure ipmMoveUpClick(Sender: TObject);
+    procedure pcMainChange(Sender: TObject);
     procedure tvGroupingAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupingChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupingChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -43,10 +47,6 @@ type
     procedure tvGroupingInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure tvGroupingKeyAction(Sender: TBaseVirtualTree; var CharCode: Word; var Shift: TShiftState; var DoDefault: Boolean);
     procedure tvGroupingMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure ipmDeleteClick(Sender: TObject);
-    procedure ipmMoveUpClick(Sender: TObject);
-    procedure ipmMoveDownClick(Sender: TObject);
-    procedure pcMainChange(Sender: TObject);
   private
      // True, если режим добавления представления
     FIsAdding: Boolean;
@@ -66,12 +66,11 @@ type
     procedure GroupingPropClick(Sender: TObject);
      // Возвращает True, если узел соответствует реальному пункту в списке группировок
     function  GroupingNode(Node: PVirtualNode): Boolean;
-     // Событие изменения frSorting
-    procedure frSortingChange(Sender: TObject);
   protected
-    procedure InitializeDialog; override;
-    procedure ButtonClick_OK; override;
     function  GetDataValid: Boolean; override;
+    procedure ButtonClick_OK; override;
+    procedure DoCreate; override;
+    procedure ExecuteInitialize; override;
   end;
 
    // Редактирует представление
@@ -81,8 +80,8 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
-  phParsingPicFilter;
+uses
+  phUtils, ConsVars, Main, CommCtrl, Themes, phSettings, phParsingPicFilter;
 
   function EditView(AApp: IPhotoAlbumApp; AUndoOperations: TPhoaOperations): Boolean;
   begin
@@ -90,7 +89,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
       try
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
@@ -103,7 +102,7 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
         FApp            := AApp;
         FUndoOperations := AUndoOperations;
         FIsAdding       := True;
-        Result := Execute;
+        Result := ExecuteModal(False, False);
       finally
         Free;
       end;
@@ -145,6 +144,21 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
     inherited ButtonClick_OK;
   end;
 
+  procedure TdViewProps.DoCreate;
+  var gbp: TPicGroupByProperty;
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_view_props;
+    FGroupings := NewPhotoAlbumPicGroupingList;
+     // Настраиваем tvGrouping
+    ApplyTreeSettings(tvGrouping);
+    frSorting.OnChange                 := DlgDataChange;
+    frExprPicFilter.OnExpressionChange := DlgDataChange;
+     // Создаём пункты меню "Добавить группировку"
+    for gbp := Low(gbp) to High(gbp) do
+      AddTBXMenuItem(ipmsmProp, GroupByPropName(gbp), iiGrouping, Byte(gbp), GroupingPropClick);
+  end;
+
   procedure TdViewProps.EnableActions;
   var
     n: PVirtualNode;
@@ -159,9 +173,20 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
     ipmMoveDown.Enabled := (idx>=0) and (idx<iCnt-1);
   end;
 
-  procedure TdViewProps.frSortingChange(Sender: TObject);
+  procedure TdViewProps.ExecuteInitialize;
+  var View: IPhotoAlbumView;
   begin
-    Modified := True;
+    inherited ExecuteInitialize;
+    if not FIsAdding then begin
+      View := FApp.ProjectX.CurrentViewX;
+      eName.Text := View.Name;
+      FGroupings.Assign(View.Groupings);
+      frSorting.Sortings.Assign(View.Sortings);
+      frSorting.SyncSortings;
+      frExprPicFilter.Expression := View.FilterExpression;
+    end;
+    SyncGroupings;
+    pcMain.ActivePage := tsGeneral;
   end;
 
   function TdViewProps.GetDataValid: Boolean;
@@ -196,42 +221,6 @@ uses phUtils, ConsVars, Main, CommCtrl, Themes, phSettings,
       SyncGroupings;
     end;
     Modified := True;
-  end;
-
-  procedure TdViewProps.InitializeDialog;
-  var
-    tbi: TTBCustomItem;
-    gbp: TPicGroupByProperty;
-    View: IPhotoAlbumView;
-  begin
-    inherited InitializeDialog;
-    HelpContext := IDH_intf_view_props;
-    FGroupings := NewPhotoAlbumPicGroupingList;
-    pcMain.ActivePage := tsGeneral;
-     // Создаём пункты меню "Добавить группировку"
-    for gbp := Low(gbp) to High(gbp) do begin
-      tbi := TTBXItem.Create(Self);
-      with tbi do begin
-        Caption    := GroupByPropName(gbp);
-        ImageIndex := iiGrouping;
-        Tag        := Byte(gbp);
-        OnClick    := GroupingPropClick;
-      end;
-      ipmsmProp.Add(tbi);
-    end;
-    if not FIsAdding then begin
-      View := FApp.ProjectX.CurrentViewX;
-      eName.Text := View.Name;
-      FGroupings.Assign(View.Groupings);
-      frSorting.Sortings.Assign(View.Sortings);
-      frSorting.SyncSortings;
-      frSorting.OnChange := frSortingChange;
-      frExprPicFilter.Expression         := View.FilterExpression;
-      frExprPicFilter.OnExpressionChange := DlgDataChange;
-    end;
-     // Настраиваем tvGrouping
-    ApplyTreeSettings(tvGrouping);
-    SyncGroupings;
   end;
 
   procedure TdViewProps.ipmDeleteClick(Sender: TObject);
