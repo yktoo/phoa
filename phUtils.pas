@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.48 2005-04-17 08:49:17 dale Exp $
+//  $Id: phUtils.pas,v 1.49 2005-05-15 18:09:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -411,6 +411,7 @@ var
     iw, ih: Integer;
     s: String;
     bMaximized: Boolean;
+    Monitor: TMonitor;
 
     function ConstrDef(iConstraint, iDefault: Integer): Integer;
     begin
@@ -425,8 +426,10 @@ var
     r.Bottom   := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
     bMaximized := StrToIntDef(ExtractFirstWord(s, ','), 0)<>0;
      // Если все координаты нормальные
-    if (r.Left<MaxInt) and (r.Top<MaxInt) and (r.Right<MaxInt) and (r.Bottom<MaxInt) then begin
-      rWorkArea := Form.Monitor.WorkAreaRect;
+    if (r.Right<MaxInt) and (r.Bottom<MaxInt) and (r.Left<r.Right) and (r.Top<r.Bottom) then begin
+       // Находим монитор, наиболее подходящий по координатам
+      Monitor := Screen.MonitorFromRect(r, mdNearest);
+      rWorkArea := Monitor.WorkAreaRect;
        // Исправляем размер при необходимости
       iw := Min(
         Min(Max(r.Right-r.Left, ConstrDef(Form.Constraints.MinWidth, 10)), rWorkArea.Right-rWorkArea.Left),
