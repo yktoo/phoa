@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.49 2005-05-15 18:09:54 dale Exp $
+//  $Id: phUtils.pas,v 1.50 2005-05-16 03:51:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -400,9 +400,14 @@ var
   end;
   
   function FormPositionToStr(Form: TCustomForm): String;
+  var Placement: TWindowPlacement;
   begin
-    with Form do
-      Result := Format('%d,%d,%d,%d,%d', [Left, Top, Left+Width, Top+Height, iif(WindowState=wsMaximized, 1, 0)]);
+    Placement.length := SizeOf(Placement);
+    GetWindowPlacement(Form.Handle, @Placement);
+    Result := Format(
+      '%d,%d,%d,%d,%d',
+      [Placement.rcNormalPosition.Left, Placement.rcNormalPosition.Top, Placement.rcNormalPosition.Right,
+       Placement.rcNormalPosition.Bottom, iif(Placement.showCmd=SW_SHOWMAXIMIZED, 1, 0)]);
   end;
 
   procedure FormPositionFromStr(Form: TCustomForm; const sPosition: String);
