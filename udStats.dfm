@@ -1,7 +1,6 @@
 inherited dStats: TdStats
   Caption = 'Photo album statistics'
   OldCreateOrder = True
-  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object tvMain: TVirtualStringTree [1]
