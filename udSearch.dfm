@@ -126,6 +126,7 @@ inherited dSearch: TdSearch
           Left = 0
           Top = 0
           Caption = 'Toolbar'
+          ChevronHint = 'More buttons|'
           Images = fMain.ilActionsSmall
           TabOrder = 0
           object bSimpleReset: TTBXItem
@@ -196,7 +197,6 @@ inherited dSearch: TdSearch
       '*.SecondaryShortCuts'
       'frExprPicFilter.*')
     StoreList.Strings = (
-      '*.ChevronHint'
       'tvSimpleCriteria.Header.Columns*')
     Left = 64
     Top = 404

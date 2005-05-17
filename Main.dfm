@@ -14,6 +14,7 @@ inherited fMain: TfMain
       Left = 162
       Top = 0
       Caption = 'Toolbar'
+      ChevronHint = 'More buttons|'
       CloseButtonWhenDocked = True
       DockPos = 154
       Images = ilActionsSmall
@@ -101,6 +102,7 @@ inherited fMain: TfMain
       Left = 0
       Top = 0
       Caption = 'Menu'
+      ChevronHint = 'More buttons|'
       CloseButton = False
       Images = ilActionsSmall
       MenuBar = True
@@ -2864,8 +2866,6 @@ inherited fMain: TfMain
       '*.Font.Name'
       '*.SecondaryShortCuts'
       'mruOpen.Prefix')
-    StoreList.Strings = (
-      '*.ChevronHint')
     OnLanguageChanged = dklcMainLanguageChanged
     Left = 484
     Top = 44

@@ -280,6 +280,7 @@ object fImgView: TfImgView
       Left = 0
       Top = 0
       Caption = 'Main Menu'
+      ChevronHint = 'More buttons|'
       CloseButtonWhenDocked = True
       Images = fMain.ilActionsSmall
       MenuBar = True
@@ -448,6 +449,7 @@ object fImgView: TfImgView
       Left = 195
       Top = 0
       Caption = 'Main Toolbar'
+      ChevronHint = 'More buttons|'
       CloseButtonWhenDocked = True
       DockPos = 188
       Images = fMain.ilActionsSmall
@@ -521,22 +523,24 @@ object fImgView: TfImgView
       end
     end
     object tbTransforms: TTBXToolbar
-      Left = 426
+      Left = 418
       Top = 0
       Caption = 'Transformations'
+      ChevronHint = 'More buttons|'
       CloseButtonWhenDocked = True
-      DockPos = 500
+      DockPos = 419
       Images = fMain.ilActionsSmall
       LinkSubitems = smTransforms
       TabOrder = 2
       Visible = False
     end
     object tbSlideShow: TTBXToolbar
-      Left = 479
+      Left = 471
       Top = 0
       Caption = 'Slide Show'
+      ChevronHint = 'More buttons|'
       CloseButtonWhenDocked = True
-      DockPos = 516
+      DockPos = 471
       Images = fMain.ilActionsSmall
       LinkSubitems = smSlideShow
       TabOrder = 3
@@ -829,8 +833,6 @@ object fImgView: TfImgView
       '*.Font.Name'
       '*.SecondaryShortCuts'
       'eCounter.Text')
-    StoreList.Strings = (
-      '*.ChevronHint')
     Left = 92
     Top = 48
     LangData = {

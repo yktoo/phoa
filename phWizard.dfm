@@ -4,8 +4,6 @@ object WizardPage: TWizardPage
   Width = 576
   Height = 284
   AutoScroll = False
-  Constraints.MinHeight = 284
-  Constraints.MinWidth = 576
   ParentBackground = False
   TabOrder = 0
   Visible = False
