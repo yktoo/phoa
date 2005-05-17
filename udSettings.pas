@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
+//  $Id: udSettings.pas,v 1.20 2005-05-17 13:14:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,10 +15,10 @@ uses
 type
   TdSettings = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
-    pMain: TPanel;
     dkNav: TTBXDock;
-    tbNav: TTBXToolbar;
     pEditor: TPanel;
+    pMain: TPanel;
+    tbNav: TTBXToolbar;
   private
      // Локальная копия настроек
     FLocalRootSetting: TPhoaSetting;
