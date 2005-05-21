@@ -51,10 +51,11 @@ inherited dToolProps: TdToolProps
     Caption = '&Folder (leave empty for defaults):'
   end
   object lRunShowCommand: TLabel [7]
-    Left = 380
+    Left = 420
     Top = 132
     Width = 70
     Height = 13
+    Anchors = [akTop, akRight]
     Caption = 'W&indow state:'
     FocusControl = cbRunShowCommand
   end
@@ -145,11 +146,12 @@ inherited dToolProps: TdToolProps
     OnClick = bBrowseRunFolderClick
   end
   object cbRunShowCommand: TComboBox
-    Left = 380
+    Left = 420
     Top = 148
     Width = 201
     Height = 21
     Style = csDropDownList
+    Anchors = [akTop, akRight]
     ItemHeight = 13
     TabOrder = 7
     OnChange = DlgDataChange
