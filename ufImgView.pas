@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.49 2005-04-17 13:23:39 dale Exp $
+//  $Id: ufImgView.pas,v 1.50 2005-05-21 17:50:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,11 +9,11 @@ unit ufImgView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, Registry,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
   GR32_Layers, 
   TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
-  TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang;
+  TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang, phFrm;
 
 const  
    // Событие окончания декодирования
@@ -68,7 +68,7 @@ type
     pddForward,   // Вперёд
     pddBackward); // Назад
 
-  TfImgView = class(TForm)
+  TfImgView = class(TPhoaForm)
     aClose: TAction;
     aEdit: TAction;
     aFirstPic: TAction;
@@ -148,6 +148,7 @@ type
     iRotate90: TTBXItem;
     iSepCustomTools: TTBXSeparatorItem;
     iSepFileClose: TTBXSeparatorItem;
+    iSepFileEdit: TTBXSeparatorItem;
     iSepFlipHorz: TTBXSeparatorItem;
     iSepFullScreen: TTBXSeparatorItem;
     iSepSlideShowBackward: TTBXSeparatorItem;
@@ -191,7 +192,6 @@ type
     tbSepEdit: TTBXSeparatorItem;
     tbSlideShow: TTBXToolbar;
     tbTransforms: TTBXToolbar;
-    iSepFileEdit: TTBXSeparatorItem;
     procedure aaClose(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaFirstPic(Sender: TObject);
@@ -221,20 +221,15 @@ type
     procedure aaZoomIn(Sender: TObject);
     procedure aaZoomOut(Sender: TObject);
     procedure eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure FormKeyPress(Sender: TObject; var Key: Char);
-    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure iMainDblClick(Sender: TObject);
     procedure iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure iMainMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure pmMainPopup(Sender: TObject);
     procedure tbMainVisibleChanged(Sender: TObject);
   private
+     // True, если форма инициализирована (устанавливается перед самым оказом)
+    FInitialized: Boolean;
      // Приложение
     FApp: IPhotoAlbumApp;
      // Список просматриваемых изображений. Нужен из-за того, что исходный список может меняться из-за редактирования
@@ -345,11 +340,11 @@ type
     procedure DP_DescribePic;
      // Ставит в очередь на загрузку следующее изображение, если нужно
     procedure DP_EnqueueNext;
-     // Применяет коэффициент масштабирования sNewZoom, позиционируя окно при необходимости и bUserResize=False.
-     //   bForceDefault   - если True, то игнорирует sNewZoom, а определяет его, исходя из настроек режима просмотра
+     // Применяет коэффициент масштабирования sgNewZoom, позиционируя окно при необходимости и bUserResize=False.
+     //   bForceDefault   - если True, то игнорирует sgNewZoom, а определяет его, исходя из настроек режима просмотра
      //   bPreserveCenter - если False, позиционирует область просмотра в центр изображения; если True, старается
      //                     сохранить тем же
-    procedure SetZoom(sNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
+    procedure SetZoom(sgNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
      // События преобразования
     procedure TransformApplied(Sender: TObject);
      // Настраивает aShowInfo.Checked
@@ -370,7 +365,7 @@ type
      // Событие клика на пункте инструмента
     procedure ToolItemClick(Sender: TObject);
      // События слоёв и битмэпов
-    procedure PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
+    procedure DescLayerPaint(Sender: TObject; Buffer: TBitmap32);
     procedure RBLayerResizing(Sender: TObject; const OldLocation: TFloatRect; var NewLocation: TFloatRect; DragState: TDragState; Shift: TShiftState);
     procedure BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
      // Если активен режим ресайзинга информации, завершает его
@@ -392,10 +387,20 @@ type
     procedure SetSlideShowDirection(Value: TSlideShowDirection);
     procedure SetViewOffset(const Value: TPoint);
   protected
-     // Если True, то по выходу из ViewImage iPicIdx устанавливается равным индексу последнего просмотренного
-     //   изображения
-    FReturnUpdatedPicIdx: Boolean;
+    function  DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    function  DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    function  GetRelativeRegistryKey: String; override;
+    function  GetSizeable: Boolean; override;
+    procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
+    procedure DoHide; override;
     procedure DoShow; override;
+    procedure ExecuteInitialize; override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyPress(var Key: Char); override;
+    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure SettingsLoad(rif: TRegIniFile); override;
   public
      // Props
      // -- True, если активен режим полноэкранного просмотра
@@ -435,15 +440,9 @@ uses
       try
         FInitFlags      := AInitFlags;
         FApp            := AApp;
-        FPics.Assign(FApp.ViewedPics);
-        FPicCount       := FPics.Count;
         FPicIdx         := iPicIdx;
         FUndoOperations := AUndoOperations;
-         // Применяем настройки. Они влияют на стиль окна, поэтому делаем это ДО его отображения
-        ApplySettings(True);
-         // Отображаем окно (перед отображением изображение будет загружено)
-        ShowModal;
-        if FReturnUpdatedPicIdx then iPicIdx := FPicIdx;
+        if ExecuteModal then iPicIdx := FPicIdx;
       finally
         if FCursorHidden then ShowCursor(True);
         Free;
@@ -862,6 +861,18 @@ uses
     if FRBLayer<>nil then aRelocateInfo.Execute;
   end;
 
+  procedure TfImgView.DescLayerPaint(Sender: TObject; Buffer: TBitmap32);
+  var r: TRect;
+  begin
+     // Если надо отображать описание и оно есть
+    if FShowInfo and (FPicDesc<>'') then begin
+      r := MakeRect(FDescLayer.GetAdjustedLocation);
+      FontFromStr(Buffer.Font, FInfoFont);
+      Buffer.FillRectTS(r, (Color32(FInfoBkColor) and $00ffffff) or (Cardinal(FInfoBkOpacity) shl 24));
+      Buffer.Textout(r, DT_CENTER or DT_VCENTER or DT_WORDBREAK or DT_NOPREFIX, FPicDesc);
+    end;
+  end;
+
   procedure TfImgView.DisplayPic(bReload, bApplyTransforms: Boolean);
   begin
     if FDisplayingPic then Exit;
@@ -886,11 +897,75 @@ uses
     RestartSlideShowTimer;
   end;
 
+  procedure TfImgView.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
+  begin
+     // При нажатом Ctrl вместо стандартного отображаем Shell Context Menu для текущего файла
+    if GetKeyState(VK_CONTROL) and $80<>0 then begin
+      if not FErroneous then ShowFileShellContextMenu(FPic.FileName);
+      Handled := True;
+    end else
+      inherited DoContextPopup(MousePos, Handled);
+  end;
+
+  procedure TfImgView.DoCreate;
+  begin
+    inherited DoCreate;
+    HelpContext := IDH_intf_view_mode;
+     // Создаём поток декодера
+    FDecodeThread := TDecodeThread.Create(Self);
+     // Создаём слой для отрисовки описания
+    FDescLayer := TPositionedLayer.Create(iMain.Layers);
+    FDescLayer.OnPaint := DescLayerPaint;
+     // Создаём преобразование
+    FTransform := TPicTransform.Create(iMain.Bitmap);
+    FTransform.OnApplied := TransformApplied;
+     // Создаём карту цветов
+    FColorMap := TColor32Map.Create;
+     // Создаём список изображений
+    FPics := NewPhotoAlbumPicList(False);
+  end;
+ 
+  procedure TfImgView.DoDestroy;
+  begin
+     // Уничтожаем объекты
+    FPics := nil;
+    FColorMap.Free;
+    FTransform.Free;
+     // Уведомляем фоновый поток о необходимости завершиться
+    FDecodeThread.Terminate;
+     // Уничтожаем таймер слайдшоу
+    if FTimerID<>0 then KillTimer(Handle, FTimerID);
+     // Уничтожаем кэш
+    FCachedBitmap.Free;
+    inherited DoDestroy;
+  end;
+
+  procedure TfImgView.DoHide;
+  begin
+    CommitInfoRelocation;
+    inherited DoHide;
+  end;
+
+  function TfImgView.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean;
+  begin
+    inherited DoMouseWheelDown(Shift, MousePos);
+    if ssCtrl in Shift then aZoomOut.Execute else aNextPic.Execute;
+    Result := True;
+  end;
+
+  function TfImgView.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
+  begin
+    inherited DoMouseWheelUp(Shift, MousePos);
+    if ssCtrl in Shift then aZoomIn.Execute else aPrevPic.Execute;
+    Result := True;
+  end;
+
   procedure TfImgView.DoShow;
   begin
     inherited DoShow;
      // Загружаем изображение
     RedisplayPic(True, False);
+    FInitialized := True;
   end;
 
   procedure TfImgView.DP_ApplyTransforms;
@@ -1067,107 +1142,29 @@ uses
     RestartSlideShowTimer;
   end;
 
-  procedure TfImgView.FormClose(Sender: TObject; var Action: TCloseAction);
+  procedure TfImgView.ExecuteInitialize;
   begin
-    CommitInfoRelocation;
-  end;
-
-  procedure TfImgView.FormContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
-  begin
-     // При нажатом Ctrl вместо стандартного отображаем Shell Context Menu для текущего файла
-    if GetKeyState(VK_CONTROL) and $80<>0 then begin
-      if not FErroneous then ShowFileShellContextMenu(FPic.FileName);
-      Handled := True;
-    end;
-  end;
-
-  procedure TfImgView.FormCreate(Sender: TObject);
-  begin
-    HelpContext := IDH_intf_view_mode;
-     // Создаём поток декодера
-    FDecodeThread := TDecodeThread.Create(Self);
-     // Создаём слой для отрисовки описания
-    FDescLayer := TPositionedLayer.Create(iMain.Layers);
-    FDescLayer.OnPaint := PaintDescLayer;
-     // Создаём преобразование
-    FTransform := TPicTransform.Create(iMain.Bitmap);
-    FTransform.OnApplied := TransformApplied;
-     // Создаём карту цветов
-    FColorMap := TColor32Map.Create;
-     // Создаём список изображений
-    FPics := NewPhotoAlbumPicList(False);
-     // Восстанавливаем положение и видимость панелей инструментов
-    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
-  end;
-
-  procedure TfImgView.FormDestroy(Sender: TObject);
-  begin
-     // Сохраняем положение и видимость панелей инструментов
-    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
-     // Уничтожаем объекты
-    FPics := nil;
-    FColorMap.Free;
-    FTransform.Free;
-     // Уведомляем фоновый поток о необходимости завершиться
-    FDecodeThread.Terminate;
-     // Уничтожаем таймер слайдшоу
-    if FTimerID<>0 then KillTimer(Handle, FTimerID);
-     // Уничтожаем кэш
-    FCachedBitmap.Free;
-  end;
-
-  procedure TfImgView.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-  var
-    pTmpOffs: TPoint;
-    iStep: Integer;
-  begin
-    pTmpOffs := ViewOffset;
-    iStep := iif(ssCtrl in Shift, IKeyQuickScrollStep, iif(ssShift in Shift, IKeySlowScrollStep, IKeyScrollStep));
-    case Key of
-      VK_LEFT:  Inc(pTmpOffs.x, iStep);
-      VK_RIGHT: Dec(pTmpOffs.x, iStep);
-      VK_UP:    Inc(pTmpOffs.y, iStep);
-      VK_DOWN:  Dec(pTmpOffs.y, iStep);
-      VK_PAUSE: begin
-        aSlideShow.Execute;
-        Exit;
-      end;
-      else Exit;
-    end;
-    ViewOffset := pTmpOffs;
-  end;
-
-  procedure TfImgView.FormKeyPress(Sender: TObject; var Key: Char);
-  begin
-    case Key of
-      #8:  aPrevPic.Execute;
-      #13: begin
-        FReturnUpdatedPicIdx := True;
-        aClose.Execute;
-      end;
-      '+': aZoomIn.Execute;
-      '-': aZoomOut.Execute;
-      '*': aZoomFit.Execute;
-      '/': aZoomActual.Execute;
-      ' ': aNextPic.Execute;
-    end;
-  end;
-
-  procedure TfImgView.FormMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-  begin
-    if ssCtrl in Shift then aZoomOut.Execute else aNextPic.Execute;
-    Handled := True;
-  end;
-
-  procedure TfImgView.FormMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-  begin
-    if ssCtrl in Shift then aZoomIn.Execute else aPrevPic.Execute;
-    Handled := True;
+    inherited ExecuteInitialize;
+     // Получаем список изоражений с приложения 
+    FPics.Assign(FApp.ViewedPics);
+    FPicCount := FPics.Count;
+     // Применяем настройки. Они влияют на стиль окна, поэтому делаем это ДО его отображения
+    ApplySettings(True);
   end;
 
   function TfImgView.GetFullScreen: Boolean;
   begin
     Result := aFullScreen.Checked;
+  end;
+
+  function TfImgView.GetRelativeRegistryKey: String;
+  begin
+    Result := SRegViewWindow_Root;
+  end;
+
+  function TfImgView.GetSizeable: Boolean;
+  begin
+    Result := True;
   end;
 
   function TfImgView.GetViewOffset: TPoint;
@@ -1178,6 +1175,12 @@ uses
   function TfImgView.GetZoomFactor: Single;
   begin
     Result := iMain.Scale;
+  end;
+
+  procedure TfImgView.iMainDblClick(Sender: TObject);
+  begin
+    HasUpdates := True;
+    aClose.Execute;
   end;
 
   procedure TfImgView.iMainMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
@@ -1211,15 +1214,44 @@ uses
     end;
   end;
 
-  procedure TfImgView.PaintDescLayer(Sender: TObject; Buffer: TBitmap32);
-  var r: TRect;
+  procedure TfImgView.KeyDown(var Key: Word; Shift: TShiftState);
+  var
+    pTmpOffs: TPoint;
+    iStep: Integer;
   begin
-     // Если надо отображать описание и оно есть
-    if FShowInfo and (FPicDesc<>'') then begin
-      r := MakeRect(FDescLayer.GetAdjustedLocation);
-      FontFromStr(Buffer.Font, FInfoFont);
-      Buffer.FillRectTS(r, (Color32(FInfoBkColor) and $00ffffff) or (Cardinal(FInfoBkOpacity) shl 24));
-      Buffer.Textout(r, DT_CENTER or DT_VCENTER or DT_WORDBREAK or DT_NOPREFIX, FPicDesc);
+    pTmpOffs := ViewOffset;
+    iStep := iif(ssCtrl in Shift, IKeyQuickScrollStep, iif(ssShift in Shift, IKeySlowScrollStep, IKeyScrollStep));
+    case Key of
+      VK_LEFT:  Inc(pTmpOffs.x, iStep);
+      VK_RIGHT: Dec(pTmpOffs.x, iStep);
+      VK_UP:    Inc(pTmpOffs.y, iStep);
+      VK_DOWN:  Dec(pTmpOffs.y, iStep);
+      VK_PAUSE: begin
+        aSlideShow.Execute;
+        Exit;
+      end;
+      else begin
+        inherited KeyDown(Key, Shift);
+        Exit;
+      end;
+    end;
+    ViewOffset := pTmpOffs;
+  end;
+
+  procedure TfImgView.KeyPress(var Key: Char);
+  begin
+    case Key of
+      #8:  aPrevPic.Execute;
+      #13: begin
+        HasUpdates := True;
+        aClose.Execute;
+      end;
+      '+': aZoomIn.Execute;
+      '-': aZoomOut.Execute;
+      '*': aZoomFit.Execute;
+      '/': aZoomActual.Execute;
+      ' ': aNextPic.Execute;
+      else inherited KeyPress(Key);
     end;
   end;
 
@@ -1320,6 +1352,20 @@ uses
     end;
   end;
 
+  procedure TfImgView.SettingsLoad(rif: TRegIniFile);
+  begin
+    inherited SettingsLoad(rif);
+     // Восстанавливаем положение и видимость панелей инструментов
+    TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+  end;
+
+  procedure TfImgView.SettingsSave(rif: TRegIniFile);
+  begin
+    inherited SettingsSave(rif);
+     // Сохраняем положение и видимость панелей инструментов
+    TBRegSavePositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
+  end;
+
   procedure TfImgView.SetViewOffset(const Value: TPoint);
   var ix, iy: Integer;
   begin
@@ -1330,7 +1376,7 @@ uses
     iMain.OffsetVert := iy;
   end;
 
-  procedure TfImgView.SetZoom(sNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
+  procedure TfImgView.SetZoom(sgNewZoom: Single; bForceDefault, bUserResize, bPreserveCenter: Boolean);
   var
     ixWindow, iyWindow, iwWindow, ihWindow: Integer;
     PrevMousePos, p: TPoint;
@@ -1380,25 +1426,25 @@ uses
     ComputeViewportDimensions;
      // Сообщение об ошибке не масштабируем
     if FErroneous then
-      sNewZoom := 1.0
+      sgNewZoom := 1.0
     else begin
-       // Если режим принудительного использования масштаба по умолчанию, игнорируем переданный sNewZoom и рассчитываем
+       // Если режим принудительного использования масштаба по умолчанию, игнорируем переданный sgNewZoom и рассчитываем
        //   новый, исходя из текущих настроек
       if bForceDefault then
-        sNewZoom := iif(((FBestFitZoomFactor<1.0) and FDoShrinkPic) or ((FBestFitZoomFactor>1.0) and FDoZoomPic), 0.0, 1.0);
+        sgNewZoom := iif(((FBestFitZoomFactor<1.0) and FDoShrinkPic) or ((FBestFitZoomFactor>1.0) and FDoZoomPic), 0.0, 1.0);
        // Если передан 0, то это означает, что нужно использовать FBestFitZoomFactor
-      if sNewZoom=0.0 then sNewZoom := FBestFitZoomFactor;
+      if sgNewZoom=0.0 then sgNewZoom := FBestFitZoomFactor;
        // Validate zoom value
-      if sNewZoom>SMaxPicZoom then sNewZoom := SMaxPicZoom
-      else if sNewZoom<SMinPicZoom then sNewZoom := SMinPicZoom;
+      if sgNewZoom>SMaxPicZoom then sgNewZoom := SMaxPicZoom
+      else if sgNewZoom<SMinPicZoom then sgNewZoom := SMinPicZoom;
        // Если это не изменение размеров пользователем, запоминаем, если выставили BestFitZoom
-      if not bUserResize then FBestFitZoomUsed := sNewZoom=FBestFitZoomFactor;
+      if not bUserResize then FBestFitZoomUsed := sgNewZoom=FBestFitZoomFactor;
     end;
      // Применяем коэффициент масштабирования
-    iMain.Scale := sNewZoom;
+    iMain.Scale := sgNewZoom;
      // Находим размеры масштабированного изображения
-    FWScaled := Round(FWPic*sNewZoom);
-    FHScaled := Round(FHPic*sNewZoom);
+    FWScaled := Round(FWPic*sgNewZoom);
+    FHScaled := Round(FHPic*sgNewZoom);
      // Находим размеры и положение окна
     ixWindow := Left;
     iyWindow := Top;
@@ -1562,7 +1608,7 @@ uses
     inherited;
      // Если изменение размеров вызвано не принудительным позиционированием в процессе подстройки размеров окна под
      //   размеры изображения
-    if Visible and not FForcedResize then begin
+    if FInitialized and not FForcedResize then begin
       CommitInfoRelocation;
        // Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor без изменений
       SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True, True);

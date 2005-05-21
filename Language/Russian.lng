@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.10
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-05-17 18:46:49
+LastModified=2005-05-21 15:22:26
 SourceLANGID=1033
 
 [fMain]
@@ -814,7 +814,7 @@ ISettingID_View_AlwaysOnTop=Окно просмотра поверх всех окон
 ISettingID_View_BkColor=Цвет фона окна просмотра:
 ISettingID_View_CacheBehind=Кэшировать предыдущее изображение
 ISettingID_View_CaptionProps=Отображать в заголовке окна
-ISettingID_View_CenterWindow=Центрировать окно на рабочем стое
+ISettingID_View_CenterWindow=Центрировать окно на рабочем столе
 ISettingID_View_Cyclic=Циклический просмотр
 ISettingID_View_FitWindowToPic=Подгонять размер окна под размер изображения
 ISettingID_View_Fullscreen=Полноэкранный режим

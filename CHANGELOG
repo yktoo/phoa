@@ -8,7 +8,14 @@ File operations wizard:
   An option for renaming picture files being copied or moved, with using picture property values. 
   An option for copying the language file currently being used.
 
+Viewer:
+  Double-clicking the image acts like pressing Enter
+  Viewport center position is preserved on resize and scale change.
+  With <b>Fit window to picture size</b> turned off, the last used window size is remembered. Similarly, with <b>Center window on the desktop</b> turned off, the last used window position is restored. Additionally, in multimonitor systems the last used monitor is remembered.
+
 New -r command-line option.
+
+More accurate window handling in multimonitor systems.
 
 Help:
   Added Common tasks chapter

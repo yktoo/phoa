@@ -1,17 +1,6 @@
-object fImgView: TfImgView
-  Left = 484
-  Top = 235
-  AutoScroll = False
-  ClientHeight = 271
-  ClientWidth = 532
-  Color = clBtnFace
+inherited fImgView: TfImgView
   Constraints.MinHeight = 300
   Constraints.MinWidth = 540
-  Font.Charset = RUSSIAN_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'Tahoma'
-  Font.Style = []
   Icon.Data = {
     0000010001003030000000000000A81C00001600000028000000300000006000
     00000100180000000000801C0000000000000000000000000000000000000000
@@ -243,30 +232,20 @@ object fImgView: TfImgView
     000001FF0000E000000001FF0000E000000001FF0000E000000001FF0000E000
     000003FF0000E000000007FF0000E00000000FFF0000E00000001FFF0000E000
     00003FFF0000E00000007FFF0000E0000000FFFF0000E0000001FFFF0000}
-  OldCreateOrder = False
   PopupMenu = pmMain
-  Scaled = False
-  ShowHint = True
-  OnClose = FormClose
-  OnContextPopup = FormContextPopup
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
-  OnKeyPress = FormKeyPress
-  OnMouseWheelDown = FormMouseWheelDown
-  OnMouseWheelUp = FormMouseWheelUp
   PixelsPerInch = 96
   TextHeight = 13
   object iMain: TImage32
     Left = 9
     Top = 26
-    Width = 514
-    Height = 236
+    Width = 614
+    Height = 400
     Align = alClient
     BitmapAlign = baCustom
     Scale = 1.000000000000000000
     ScaleMode = smScale
     TabOrder = 0
+    OnDblClick = iMainDblClick
     OnMouseDown = iMainMouseDown
     OnMouseMove = iMainMouseMove
     OnMouseUp = iMainMouseUp
@@ -274,7 +253,7 @@ object fImgView: TfImgView
   object dkTop: TTBXDock
     Left = 0
     Top = 0
-    Width = 532
+    Width = 632
     Height = 26
     object tbMenu: TTBXToolbar
       Left = 0
@@ -551,20 +530,20 @@ object fImgView: TfImgView
     Left = 0
     Top = 26
     Width = 9
-    Height = 236
+    Height = 400
     Position = dpLeft
   end
   object dkRight: TTBXDock
-    Left = 523
+    Left = 623
     Top = 26
     Width = 9
-    Height = 236
+    Height = 400
     Position = dpRight
   end
   object dkBottom: TTBXDock
     Left = 0
-    Top = 262
-    Width = 532
+    Top = 426
+    Width = 632
     Height = 9
     Position = dpBottom
   end
@@ -832,6 +811,7 @@ object fImgView: TfImgView
     IgnoreList.Strings = (
       '*.Font.Name'
       '*.SecondaryShortCuts'
+      '.Caption'
       'eCounter.Text')
     Left = 92
     Top = 48

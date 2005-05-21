@@ -1,4 +1,4 @@
-<!-- $Id: general-rev-history.html,v 1.20 2005-03-13 19:21:06 dale Exp $ -->
+<!-- $Id: general-rev-history.html,v 1.21 2005-05-21 17:51:36 dale Exp $ -->
 {[%hh_hdr_en:Revision History]}
 
 <p align=justify>This document summarizes the differences between versions of <b>PhoA</b> in reverse chronological
@@ -29,7 +29,16 @@
             <li>An option for renaming picture files being copied or moved, with using picture property values.
             <li>An option for copying the language file currently used.
           </ul>
+      <li>Viewer:
+          <ul>
+            <li>Double-clicking the image acts like pressing <b>Enter</b>.
+            <li>Viewport center position is preserved on resize and scale change.
+            <li>With <b>Fit window to picture size</b> turned off, the last used window size is remembered. Similarly,
+                with <b>Center window on the desktop</b> turned off, the last used window position is restored.
+                Additionally, in multimonitor systems the last used monitor is remembered.
+          </ul>
       <li>New <b>-r</b> command-line option.
+      <li>More accurate window handling in multimonitor systems.
       <li>Help:
           <ul>
             <li>Added <b>Common tasks</b> chapter.
