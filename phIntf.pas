@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.22 2005-02-19 13:30:16 dale Exp $
+//  $Id: phIntf.pas,v 1.23 2005-05-31 17:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -248,6 +248,7 @@ type
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
     function  GetGroupByPath(const sPath: String): IPhoaPicGroup; stdcall;
     function  GetGroupByPathW(const sPath: WideString): IPhoaPicGroup; stdcall;
+    function  GetIconData: String; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
@@ -274,6 +275,8 @@ type
      //    the first owned group. If sPath starts with '/', ignores this char
     property GroupByPath[const sPath: String]: IPhoaPicGroup read GetGroupByPath;
     property GroupByPathW[const sPath: WideString]: IPhoaPicGroup read GetGroupByPathW;
+     // -- Icon raw binary PNG data
+    property IconData: String read GetIconData;
      // -- An unique group ID
     property ID: Integer read GetID;
      // -- Group index in its Owner's list

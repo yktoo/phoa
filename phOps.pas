@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.20 2004-12-31 13:38:58 dale Exp $
+//  $Id: phOps.pas,v 1.21 2005-05-31 17:29:49 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -327,6 +327,7 @@ type
    //     Group:          IPhotoAlbumPicGroup - редактируемая группа
    //     NewText:        String              - новое наименование группы
    //     NewDescription: String              - новое описание группы
+   //     NewIconData:    String              - PNG-данные значка группы
    //===================================================================================================================
 
   TPhoaOp_GroupEdit = class(TPhoaOperation)
@@ -1386,9 +1387,11 @@ type
     OpGroup := Group;
     UndoStream.WriteStr(Group.Text);
     UndoStream.WriteStr(Group.Description);
+    UndoStream.WriteStr(Group.IconData);
      // Выполняем операцию
     Group.Text        := Params.ValStr['NewText'];
     Group.Description := Params.ValStr['NewDescription'];
+    Group.IconData    := Params.ValStr['NewIconData'];
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
   end;
@@ -1401,6 +1404,7 @@ type
      // Восстанавливаем свойства
     Group.Text        := UndoStream.ReadStr;
     Group.Description := UndoStream.ReadStr;
+    Group.IconData    := UndoStream.ReadStr;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
     inherited RollbackChanges(UndoStream, Changes);
@@ -1437,6 +1441,7 @@ type
     UndoStream.WriteStr (Group.Description);
     UndoStream.WriteInt (Group.Index);
     UndoStream.WriteBool(Group.Expanded);
+    UndoStream.WriteStr (Group.IconData);
      // Записываем ID изображений и удаляем изображения из группы
     UndoStream.WriteInt(Group.Pics.Count);
     for i := 0 to Group.Pics.Count-1 do UndoStream.WriteInt(Group.Pics[i].ID);
@@ -1461,6 +1466,7 @@ type
     g.Description := UndoStream.ReadStr;
     g.Index       := UndoStream.ReadInt;
     g.Expanded    := UndoStream.ReadBool;
+    g.IconData    := UndoStream.ReadStr;
      // Восстанавливаем изображения
     for i := 0 to UndoStream.ReadInt-1 do g.PicsX.Add(Project.Pics.ItemsByID[UndoStream.ReadInt], False);
      // Добавляем флаги изменений

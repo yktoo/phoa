@@ -76,11 +76,15 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
   var k: TPhoaToolKind;
   begin
     k := TPhoaToolKind(cbKind.ItemIndex);
-    EnableControls(k<>ptkSeparator, [lName, eName, lHint, eHint]);
+    EnableControls(not (k in [ptkSeparator, ptkExtViewer]), [lName, eName, lHint, eHint]);
     EnableControls(
-      k=ptkCustom,
+      k in [ptkCustom, ptkExtViewer],
       [lRunCommand, eRunCommand, bBrowseRunCommand, lRunParams, eRunParams, lRunShowCommand, cbRunShowCommand,
        lRunFolder, eRunFolder, bBrowseRunFolder]);
+    cbUsageTools.Enabled    := k<>ptkExtViewer;
+    cbUsageGroups.Enabled   := k<>ptkExtViewer;
+    cbUsageThViewer.Enabled := k<>ptkExtViewer;
+    cbUsageViewMode.Enabled := k<>ptkExtViewer;
   end;
 
   procedure TdToolProps.bBrowseRunCommandClick(Sender: TObject);
@@ -104,14 +108,14 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
     sName, sHint, sRunCommand, sRunFolder, sRunParams: String;
   begin
     Kind    := TPhoaToolKind(cbKind.ItemIndex);
-    if Kind=ptkSeparator then begin
+    if Kind in [ptkSeparator, ptkExtViewer] then begin
       sName := '';
       sHint := '';
     end else begin
       sName := eName.Text;
       sHint := eHint.Text;
     end;
-    if Kind=ptkCustom then begin
+    if Kind in [ptkCustom, ptkExtViewer] then begin
       iShowCmd    := GetCurrentCBObject(cbRunShowCommand);
       sRunCommand := eRunCommand.Text;
       sRunFolder  := eRunFolder.Text;
@@ -123,10 +127,12 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
       sRunParams  := '';
     end;
     Usages := [];
-    if cbUsageTools.Checked    then Include(Usages, ptuToolsMenu);
-    if cbUsageGroups.Checked   then Include(Usages, ptuGroupPopupMenu);
-    if cbUsageThViewer.Checked then Include(Usages, ptuThViewerPopupMenu);
-    if cbUsageViewMode.Checked then Include(Usages, ptuViewModePopupMenu);
+    if Kind<>ptkExtViewer then begin
+      if cbUsageTools.Checked    then Include(Usages, ptuToolsMenu);
+      if cbUsageGroups.Checked   then Include(Usages, ptuGroupPopupMenu);
+      if cbUsageThViewer.Checked then Include(Usages, ptuThViewerPopupMenu);
+      if cbUsageViewMode.Checked then Include(Usages, ptuViewModePopupMenu);
+    end;
      // Новый инструмент
     if FTool=nil then begin
       FTool := TPhoaToolSetting.Create(FPage, sName, sHint, sRunCommand, sRunFolder, sRunParams, eMasks.Text, Kind, iShowCmd, Usages);

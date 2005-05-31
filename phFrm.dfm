@@ -1,5 +1,5 @@
 object PhoaForm: TPhoaForm
-  Left = 400
+  Left = 384
   Top = 200
   AutoScroll = False
   Caption = '<caption>'

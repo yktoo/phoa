@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.15 2005-02-19 13:30:16 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.16 2005-05-31 17:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -149,7 +149,7 @@ type
 
   IPhoaMutablePicGroup = interface(IPhoaPicGroup)
     ['{9C951B51-2C66-4C35-B61B-8EDCBEAD8ABF}']
-     // Copies the group properties: Text, Expanded;
+     // Copies the group properties: Text, Description, Expanded, Icon;
      //   when bCopyIDs=True       - also IDs
      //   when bCopyPics=True      - also picture list
      //   when bCopySubgroups=True - recurses owned groups
@@ -165,6 +165,7 @@ type
     procedure SetDescription(const Value: String); stdcall;
     procedure SetDescriptionW(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
+    procedure SetIconData(const Value: String); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
     procedure SetText(const Value: String); stdcall;
@@ -182,6 +183,8 @@ type
      // -- 'Mutable' version of GroupByPath[]
     property GroupByPathM[const sPath: String]: IPhoaMutablePicGroup read GetGroupByPathM;
     property GroupByPathMW[const sPath: WideString]: IPhoaMutablePicGroup read GetGroupByPathMW;
+     // -- 'Mutable' version of IconData
+    property IconData: String read GetIconData write SetIconData;
      // -- Group index in its Owner's list
     property Index: Integer read GetIndex write SetIndex;
      // -- Group owner

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.64 2005-03-07 10:37:36 dale Exp $
+//  $Id: phObj.pas,v 1.65 2005-05-31 17:29:49 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1657,6 +1657,7 @@ type
     FDescription: String;
     FExpanded: Boolean;
     FGroups: IPhotoAlbumPicGroupList;
+    FIconData: String;
     FID: Integer;
     FPics: IPhotoAlbumPicList;
     FText: String;
@@ -1670,6 +1671,7 @@ type
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
     function  GetGroupByPath(const sPath: String): IPhoaPicGroup; stdcall;
     function  GetGroupByPathW(const sPath: WideString): IPhoaPicGroup; stdcall;
+    function  GetIconData: String; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
@@ -1694,6 +1696,7 @@ type
     procedure SetDescription(const Value: String); stdcall;
     procedure SetDescriptionW(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
+    procedure SetIconData(const Value: String); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
     procedure SetText(const Value: String); stdcall;
@@ -1722,6 +1725,7 @@ type
     FText        := Source.Text;
     FDescription := Source.Description;
     FExpanded    := Source.Expanded;
+    FIconData    := Source.IconData;
      // Копируем список изображений
     if bCopyPics then FPics.Assign(Source.Pics);
      // Копируем подчинённые группы
@@ -1855,6 +1859,11 @@ type
   function TPhotoAlbumPicGroup.GetGroupsX: IPhotoAlbumPicGroupList;
   begin
     Result := FGroups;
+  end;
+
+  function TPhotoAlbumPicGroup.GetIconData: String;
+  begin
+    Result := FIconData;
   end;
 
   function TPhotoAlbumPicGroup.GetID: Integer;
@@ -2038,6 +2047,11 @@ type
     FExpanded := Value;
   end;
 
+  procedure TPhotoAlbumPicGroup.SetIconData(const Value: String);
+  begin
+    FIconData := Value;
+  end;
+
   procedure TPhotoAlbumPicGroup.SetIndex(Value: Integer);
   var idxCur: Integer;
   begin
@@ -2104,6 +2118,7 @@ type
           IPhChunk_Group_Text:        FText        := vValue;
           IPhChunk_Group_Expanded:    FExpanded    := vValue<>Byte(0);
           IPhChunk_Group_Description: FDescription := vValue;
+          IPhChunk_Group_IconData:    FIconData    := vValue;
            // Picture IDs
           IPhChunk_GroupPics_Open:
             while Streamer.ReadChunkValue(Code, Datatype, vValue, True, True)=rcrOK do
@@ -2149,6 +2164,7 @@ type
       Streamer.WriteChunkString(IPhChunk_Group_Text,        FText);
       Streamer.WriteChunkByte  (IPhChunk_Group_Expanded,    Byte(FExpanded));
       Streamer.WriteChunkString(IPhChunk_Group_Description, FDescription);
+      Streamer.WriteChunkString(IPhChunk_Group_IconData,    FIconData);
        // Write picture IDs
       Streamer.WriteChunk(IPhChunk_GroupPics_Open);
       for i := 0 to FPics.Count-1 do Streamer.WriteChunkInt(IPhChunk_GroupPic_ID, FPics[i].ID);

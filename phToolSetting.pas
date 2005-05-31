@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.18 2005-02-13 19:16:38 dale Exp $
+//  $Id: phToolSetting.pas,v 1.19 2005-05-31 17:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -19,7 +19,8 @@ type
     ptkOpen,       // Инструмент, выполняющий открытие файла изображения
     ptkEdit,       // Инструмент, выполняющий редактирование файла изображения
     ptkPrint,      // Инструмент, выполняющий печать файла изображения
-    ptkCustom);    // Инструмент, задаваемый командной строкой
+    ptkCustom,     // Инструмент, задаваемый командной строкой
+    ptkExtViewer); // Внешний инструмент просмотра (external viewer)
 const
   IPhoaToolKindPrefixLen = 3; // Длина префикса названий элементов TPhoaToolKind
 
@@ -78,10 +79,14 @@ type
     procedure RegSave(RegIniFile: TRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
+     // Возвращает True, если инструмент подходит файлу изображения sFileName
+    function  MatchesFile(const sFileName: String): Boolean;
      // Возвращает True, если инструмент подходит всем файлам из Pics (Pics может быть nil)
-    function  MatchesFiles(Pics: IPhoaPicList): Boolean;
+    function  MatchesPicFiles(Pics: IPhoaPicList): Boolean;
+     // Выполняет инструмент для одного изображения
+    procedure Execute(const sFileName: String); overload;
      // Выполняет инструмент для заданных изображений (Pics может быть nil)
-    procedure Execute(Pics: IPhoaPicList);
+    procedure Execute(Pics: IPhoaPicList); overload;
      // Props
      // -- Подсказка. Закодирована по правилам ConstValEx()
     property Hint: String read FHint write SetHint;
@@ -89,11 +94,11 @@ type
     property Kind: TPhoaToolKind read FKind write SetKind;
      // -- Наименование, доступное для записи. Закодировано по правилам ConstValEx()
     property Name read FName write SetName;
-     // -- Команда запуска (для Kind=ptkCustom)
+     // -- Команда запуска (для Kind in [ptkCustom, ptkExtViewer])
     property RunCommand: String read FRunCommand write SetRunCommand;
-     // -- Каталог запуска (для Kind=ptkCustom)
+     // -- Каталог запуска (для Kind in [ptkCustom, ptkExtViewer])
     property RunFolder: String read FRunFolder write SetRunFolder;
-     // -- Параметры запуска (для Kind=ptkCustom)
+     // -- Параметры запуска (для Kind in [ptkCustom, ptkExtViewer])
     property RunParameters: String read FRunParameters write SetRunParameters;
      // -- Команда показа при запуске (состояние окна SW_xxx)
     property RunShowCommand: Integer read FRunShowCommand write SetRunShowCommand;
@@ -144,7 +149,17 @@ const
     iiOpen,      // ptkOpen
     iiEdit,      // ptkEdit
     iiPrint,     // ptkPrint
-    iiAction);   // ptkCustom
+    iiAction,    // ptkCustom
+    iiViewMode); // ptkExtViewer
+
+   // Индексы столбцов дерева редактора
+  IColIdx_ToolEditor_Masks       = 0;
+  IColIdx_ToolEditor_Kind        = 1;
+  IColIdx_ToolEditor_Name        = 2;
+  IColIdx_ToolEditor_Hint        = 3;
+  IColIdx_ToolEditor_Application = 4;
+  IColIdx_ToolEditor_Folder      = 5;
+  IColIdx_ToolEditor_Params      = 6;
 
 implementation
 uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
@@ -187,20 +202,22 @@ uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
   procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
   var ti: TTBCustomItem;
   begin
-    if Tool.Kind=ptkSeparator then
-      ti := TTBXSeparatorItem.Create(Item)
-    else begin
-      ti := TTBXItem.Create(Item);
-      ti.Caption    := ConstValEx(Tool.Name);
-      ti.Hint       := ConstValEx(Tool.Hint);
-      ti.ImageIndex := aToolImageIndexes[Tool.Kind];
-      ti.OnClick    := AOnClick;
+    if Tool.Kind<>ptkExtViewer then begin
+      if Tool.Kind=ptkSeparator then
+        ti := TTBXSeparatorItem.Create(Item)
+      else begin
+        ti := TTBXItem.Create(Item);
+        ti.Caption    := ConstValEx(Tool.Name);
+        ti.Hint       := ConstValEx(Tool.Hint);
+        ti.ImageIndex := aToolImageIndexes[Tool.Kind];
+        ti.OnClick    := AOnClick;
+      end;
+       // Tag пункта меню = индексу инструмента в родительском списке, т.е. в странице (прямые ссылки на инструменты тут
+       //   неприменимы, поскольку объекты инструментов меняются при переприсваивании через Assign каждый раз при вызове
+       //   диалога настроек)
+      ti.Tag := Tool.Index;
+      Item.Add(ti);
     end;
-     // Tag пункта меню = индексу инструмента в родительском списке, т.е. в странице (прямые ссылки на инструменты тут
-     //   неприменимы, поскольку объекты инструментов меняются при переприсваивании через Assign каждый раз при вызове
-     //   диалога настроек)
-    ti.Tag := Tool.Index;
-    Item.Add(ti);
   end;
 
   procedure AdjustToolAvailability(Page: TPhoaToolPageSetting; Item: TTBCustomItem; Pics: IPhoaPicList);
@@ -210,7 +227,7 @@ uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
   begin
     for i := 0 to Item.Count-1 do begin
       ti := Item[i];
-      ti.Visible := (Page[ti.Tag] as TPhoaToolSetting).MatchesFiles(Pics);
+      ti.Visible := (Page[ti.Tag] as TPhoaToolSetting).MatchesPicFiles(Pics);
     end;
   end;
 
@@ -328,27 +345,30 @@ type
     inherited Destroy;
   end;
 
-  procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
+  procedure TPhoaToolSetting.Execute(const sFileName: String);
   var
-    i, iRes: Integer;
-    sFileName, sQFileName: String;
+    iRes: Integer;
+    sQFileName: String;
   begin
-    if (FKind<>ptkSeparator) and (Pics<>nil) then begin
-      iRes := 0; // Satisfy the compiler
-      for i := 0 to Pics.Count-1 do begin
-        sFileName  := Pics[i].FileName;
-        sQFileName := AnsiQuotedStr(sFileName, '"');
-        case FKind of
-          ptkDefault: iRes := ShellExecute(Application.Handle, nil,     PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-          ptkOpen:    iRes := ShellExecute(Application.Handle, 'open',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-          ptkEdit:    iRes := ShellExecute(Application.Handle, 'edit',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-          ptkPrint:   iRes := ShellExecute(Application.Handle, 'print', PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-          ptkCustom:  iRes := ShellExecute(Application.Handle, nil,     PChar(FRunCommand), PChar(FRunParameters+' '+sQFileName), PChar(FRunFolder), SW_SHOWNORMAL);
-        end;
-         // Проверяем результат
-        if iRes<=32 then PhoaException(ConstVal('SErrExecutingToolFailed'), [FName, sFileName, SysErrorMessage(GetLastError)]);
-      end;
+    sQFileName := AnsiQuotedStr(sFileName, '"');
+    case FKind of
+      ptkDefault:  iRes := ShellExecute(Application.Handle, nil,     PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkOpen:     iRes := ShellExecute(Application.Handle, 'open',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkEdit:     iRes := ShellExecute(Application.Handle, 'edit',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkPrint:    iRes := ShellExecute(Application.Handle, 'print', PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkExtViewer,
+        ptkCustom: iRes := ShellExecute(Application.Handle, nil,     PChar(FRunCommand), PChar(FRunParameters+' '+sQFileName), PChar(FRunFolder), SW_SHOWNORMAL);
+     else          iRes := 0;
     end;
+     // Проверяем результат
+    if iRes<=32 then PhoaException(ConstVal('SErrExecutingToolFailed'), [FName, sFileName, SysErrorMessage(GetLastError)]);
+  end;
+
+  procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
+  var i: Integer;
+  begin
+    if (FKind<>ptkSeparator) and (Pics<>nil) then
+      for i := 0 to Pics.Count-1 do Execute(Pics[i].FileName);
   end;
 
   function TPhoaToolSetting.GetModified: Boolean;
@@ -371,7 +391,15 @@ type
     { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
-  function TPhoaToolSetting.MatchesFiles(Pics: IPhoaPicList): Boolean;
+  function TPhoaToolSetting.MatchesFile(const sFileName: String): Boolean;
+  begin
+     // Создаём маски, если нужно
+    if FMaskObj=nil then FMaskObj := TPhoaMasks.Create(FMasks);
+     // Если маска пустая - подходит всегда. Иначе натравливаем маску на имя файла
+    Result := FMaskObj.Empty or FMaskObj.Matches(sFileName);
+  end;
+
+  function TPhoaToolSetting.MatchesPicFiles(Pics: IPhoaPicList): Boolean;
   var i: Integer;
   begin
      // Если выбранных изображений нет - не подходит
@@ -703,7 +731,7 @@ type
   begin
     if (Kind in [ikNormal, ikSelected]) and IsSettingNode(Node) then
       case Column of
-        1: Index := aToolImageIndexes[GetSetting(Node).Kind];
+        IColIdx_ToolEditor_Kind: Index := aToolImageIndexes[GetSetting(Node).Kind];
       end;
   end;
 
@@ -716,20 +744,13 @@ type
     Setting := GetSetting(Node);
     if Setting<>nil then
       case Column of
-         // Маски
-        0: if Setting.Masks='' then s := ConstVal('SAll') else s := Setting.Masks;
-         // Вид
-        1: s := PhoaToolKindName(Setting.Kind);
-         // Имя
-        2: s := ConstValEx(Setting.Name);
-         // Hint
-        3: s := ConstValEx(Setting.Hint);
-         // Приложение
-        4: if Setting.Kind=ptkCustom then s := Setting.RunCommand;
-         // Папка
-        5: if Setting.Kind=ptkCustom then s := Setting.RunFolder;
-         // Параметры
-        6: if Setting.Kind=ptkCustom then s := Setting.RunParameters;
+        IColIdx_ToolEditor_Masks:       if Setting.Masks='' then s := ConstVal('SAll') else s := Setting.Masks;
+        IColIdx_ToolEditor_Kind:        s := PhoaToolKindName(Setting.Kind);
+        IColIdx_ToolEditor_Name:        s := ConstValEx(Setting.Name);
+        IColIdx_ToolEditor_Hint:        s := ConstValEx(Setting.Hint);
+        IColIdx_ToolEditor_Application: if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunCommand;
+        IColIdx_ToolEditor_Folder:      if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunFolder;
+        IColIdx_ToolEditor_Params:      if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunParameters;
       end;
     CellText := PhoaAnsiToUnicode(s);
   end;

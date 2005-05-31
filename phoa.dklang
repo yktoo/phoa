@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.51 2005-05-17 13:15:10 dale Exp $
+;  $Id: phoa.dklang,v 1.52 2005-05-31 17:29:49 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -616,6 +616,14 @@ bHelp.Caption=00000018,Help
 lID.Caption=00000021,&ID:
 lText.Caption=00000024,&Text:
 lDesc.Caption=00000027,&Description:
+gbGroupIcon.Caption=00000028,Group icon
+aGroupIconSelect.Caption=00000031,&Select...
+aGroupIconSelect.Category=00000030,Group icon
+aGroupIconSelect.Hint=00000032,Select...|Load group icon from a file
+aGroupIconReset.Caption=00000034,&Reset
+aGroupIconReset.Category=00000033,Group icon
+aGroupIconReset.Hint=00000035,Reset|Revert group icon to the default one
+lGroupIconInfo.Caption=00000036,Group icon should be a 16x16 image.
 
 [frExprPicFilter]
 tbExprMain.Caption=00000001,Toolbar
@@ -877,6 +885,7 @@ ppTime=Time
 ptkCustom=Custom action
 ptkDefault=Default action
 ptkEdit=Standard Edit action
+ptkExtViewer=External viewer
 ptkOpen=Standard Open action
 ptkPrint=Standard Print action
 ptkSeparator=Separator item

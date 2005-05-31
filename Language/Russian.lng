@@ -2,7 +2,7 @@ LANGID=1049
 TargetApplication=PhoA v1.1.10
 Author=Dmitry Kann, http://www.dk-soft.org/
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-05-21 15:22:26
+LastModified=2005-05-23 22:10:33
 SourceLANGID=1033
 
 [fMain]
@@ -882,6 +882,7 @@ ppTime=Время
 ptkCustom=Заданное действие
 ptkDefault=Действие по умолчанию
 ptkEdit=Стандартное действие «Изменить»
+ptkExtViewer=Внешнее средство просмотра
 ptkOpen=Стандартное действие «Открыть»
 ptkPrint=Стандартное действие «Печать»
 ptkSeparator=Пункт-разделитель

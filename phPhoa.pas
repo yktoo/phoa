@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.11 2004-12-31 13:38:58 dale Exp $
+//  $Id: phPhoa.pas,v 1.12 2005-05-31 17:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -30,6 +30,7 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   May 25, 2005 - dale - Added IPhChunk_Group_IconData chunk
 //   Dec 07, 2004 - dale - Added IPhChunk_View_FilterExpression chunk
 //   Nov 24, 2004 - dale - Fixes to TimeToPhoaTime() (now rounds the time value to minimize the errors)
 //   Nov 19, 2004 - dale - Added new sorting properties (thumbnail width, height and dimensions) and sorting prop constants
@@ -273,7 +274,8 @@ const
   IPhChunk_Group_ID                = $1200; // Int      Group ID
   IPhChunk_Group_Text              = $1201; // StringW  Group text (name)
   IPhChunk_Group_Expanded          = $1202; // Byte     Group-node expanded flag (0/1)
-  IPhChunk_Group_Description       = $1203; // StringW  Group description 
+  IPhChunk_Group_Description       = $1203; // StringW  Group description
+  IPhChunk_Group_IconData          = $1204; // StringI  Group icon: 32-bit bitmap data stream. When missing or empty, the default icon should be used 
    // Picture linked in group properties
   IPhChunk_GroupPic_ID             = $1220; // Int      Link to picture (the picture's ID)
    // Photo album view properties
@@ -347,7 +349,7 @@ type
 
    // List of chunks known for the moment, and their datatypes and ranges
 const
-  aPhChunks: Array[0..61] of TPhChunkEntry = (
+  aPhChunks: Array[0..62] of TPhChunkEntry = (
     (wCode: IPhChunk_Remark;                 Datatype: pcdStringW),
     (wCode: IPhChunk_PhoaGenerator;          Datatype: pcdStringB),
     (wCode: IPhChunk_PhoaSavedDate;          Datatype: pcdInt;    iRangeMin: 0;  iRangeMax: 3652058 {Dec 31, 9999}),
@@ -381,6 +383,7 @@ const
     (wCode: IPhChunk_Group_Text;             Datatype: pcdStringW),
     (wCode: IPhChunk_Group_Expanded;         Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_Group_Description;      Datatype: pcdStringW),
+    (wCode: IPhChunk_Group_IconData;         Datatype: pcdStringI),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_View_Name;              Datatype: pcdStringW),
     (wCode: IPhChunk_View_FilterExpression;  Datatype: pcdStringW),

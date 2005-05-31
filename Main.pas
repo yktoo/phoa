@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.82 2005-05-15 09:03:08 dale Exp $
+//  $Id: Main.pas,v 1.83 2005-05-31 17:29:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1695,13 +1695,37 @@ uses
   end;
 
   procedure TfMain.StartViewMode(InitFlags: TImgViewInitFlags);
-  var iPicIndex: Integer;
+  var
+    iPicIndex: Integer;
+    ViewerTool: TPhoaToolSetting;
+    sPicFileName: String;
+
+     // Пытается найти инструмент вида ptkExtViewer, подходящий под текущее изображение. Если не нашла, возвращает nil
+    function FindViewerTool(const sFileName: String): TPhoaToolSetting;
+    var i: Integer;
+    begin
+      for i := 0 to RootSetting.Settings[ISettingID_Tools].ChildCount-1 do begin
+        Result := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
+        if (Result.Kind=ptkExtViewer) and Result.MatchesFile(sFileName) then Exit;
+      end;
+      Result := nil;
+    end;
+
   begin
     iPicIndex := Viewer.ItemIndex;
     if (FViewedPics<>nil) and (iPicIndex>=0) then begin
       ResetMode;
-      ViewImage(InitFlags, Self, iPicIndex, FUndo);
-      Viewer.ItemIndex := iPicIndex;
+       // Пытаемся найти внешний вьюер
+      sPicFileName := FViewedPics[iPicIndex].FileName;
+      ViewerTool := FindViewerTool(sPicFileName);
+       // Если нашли - запускаем
+      if ViewerTool<>nil then
+        ViewerTool.Execute(sPicFileName)
+       // Иначе входим в режим просмотра
+      else begin
+        ViewImage(InitFlags, Self, iPicIndex, FUndo);
+        Viewer.ItemIndex := iPicIndex;
+      end;
     end;
   end;
 

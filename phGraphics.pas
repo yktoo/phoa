@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.18 2004-12-31 13:38:58 dale Exp $
+//  $Id: phGraphics.pas,v 1.19 2005-05-31 17:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -7,7 +7,7 @@
 unit phGraphics;
 
 interface
-uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars, phIntf;
+uses Windows, SysUtils, Classes, Graphics, GR32, ConsVars, phIntf, phMutableIntf, phNativeIntf;
 
 type
    // Исключение для прерывания загрузки изображения
@@ -96,13 +96,21 @@ type
    // Рисует на Target тень из заготовки ShadowTemplate для прямоугольника rObject
   procedure DropShadow(Target, ShadowTemplate: TBitmap32; const rObject, rClipOuter: TRect; iOffsetX, iOffsetY: Integer; Color: TColor);
 
-   // Открывает файл, создаёт эскиз и возвращает его данные в виде бинарной строки
+   // Открывает файл и создаёт уменьшенный эскиз на ThumbBitmap
+  procedure MakeThumbnail(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; out ImageSize, ThumbSize: TSize; ThumbBitmap: TBitmap32);
+   // Открывает файл, создаёт эскиз и возвращает его данные в виде бинарной строки в формате JPEG
   function  GetThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; bJPEGQuality: Byte; out ImageSize, ThumbSize: TSize): String;
+   // То же, но в формате 32-bit bitmap
+  function  GetBmp32ThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; out ImageSize, ThumbSize: TSize): String;
    // Отрисовывает эскиз на битмэпе в заданном прямоугольнике. В r возвращает фактически использованный для отрисовки
    //   прямоугольник
   procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect); overload;
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32; var r: TRect); overload;
   procedure PaintThumbnail(Pic: IPhoaPic; Bitmap32: TBitmap32); overload;
+   // Отрисовывает Bitmap32-данные на битмэпе в заданной позиции
+  procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
+   // Отрисовывает значок группы на битмэпе в заданной позиции
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
@@ -112,7 +120,7 @@ const
   BColor_Alpha_Opaque      = $ff;
 
 implementation
-uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
+uses JPEG, Math, CommCtrl, GraphicEx, phUtils, phIJLIntf;
 
   procedure RenderShadowTemplate(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
   var
@@ -283,35 +291,42 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
     end;
   end;
 
-  function GetThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; bJPEGQuality: Byte; out ImageSize, ThumbSize: TSize): String;
+  procedure MakeThumbnail(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; out ImageSize, ThumbSize: TSize; ThumbBitmap: TBitmap32);
   const
      // Таблица перекодировки TPhoaStretchFilter -> GR32.TStretchFilter
     aPhoaSFtoGR32SF: Array[TPhoaStretchFilter] of GR32.TStretchFilter = (
       GR32.sfNearest, GR32.sfDraft, GR32.sfLinear, GR32.sfCosine, GR32.sfSpline, GR32.sfLanczos, GR32.sfMitchell);
   var
     sScale: Single;
-    ThumbBitmap, LargeBitmap: TBitmap32;
+    LargeBitmap: TBitmap32;
+  begin
+    LargeBitmap := TBitmap32.Create;
+    try
+      LoadGraphicFromFile(sFileName, LargeBitmap, MaxSize, ImageSize, nil);
+      LargeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
+       // Определяем коэффициент масштабирования
+      if (ImageSize.cx>0) and (ImageSize.cy>0) then sScale := MinS(MinS(MaxSize.cx/ImageSize.cx, MaxSize.cy/ImageSize.cy), 1) else sScale := 1;
+       // Масштабируем изображение
+      ThumbSize.cx := Max(Trunc(ImageSize.cx*sScale), 1);
+      ThumbSize.cy := Max(Trunc(ImageSize.cy*sScale), 1);
+      ThumbBitmap.SetSize(ThumbSize.cx, ThumbSize.cy);
+      LargeBitmap.DrawTo(ThumbBitmap, ThumbBitmap.BoundsRect);
+    finally
+      LargeBitmap.Free;
+    end;
+  end;
+
+  function GetThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; bJPEGQuality: Byte; out ImageSize, ThumbSize: TSize): String;
+  var
+    ThumbBitmap: TBitmap32;
     Stream: TStringStream;
     bmp: TBitmap;
   begin
      // Масштабируем изображение
     ThumbBitmap := TBitmap32.Create;
     try
-       // Создаём, загружаем картинку и превращаем её в Bitmap32
-      LargeBitmap := TBitmap32.Create;
-      try
-        LoadGraphicFromFile(sFileName, LargeBitmap, MaxSize, ImageSize, nil);
-        LargeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
-         // Определяем коэффициент масштабирования
-        if (ImageSize.cx>0) and (ImageSize.cy>0) then sScale := MinS(MinS(MaxSize.cx/ImageSize.cx, MaxSize.cy/ImageSize.cy), 1) else sScale := 1;
-         // Масштабируем изображение
-        ThumbSize.cx := Max(Trunc(ImageSize.cx*sScale), 1);
-        ThumbSize.cy := Max(Trunc(ImageSize.cy*sScale), 1);
-        ThumbBitmap.SetSize(ThumbSize.cx, ThumbSize.cy);
-        LargeBitmap.DrawTo(ThumbBitmap, ThumbBitmap.BoundsRect);
-      finally
-        LargeBitmap.Free;
-      end;
+       // Загружаем уменьшенную версию картинки в ThumbBitmap
+      MakeThumbnail(sFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
        // Преобразуем TBitmap32 в TBitmap
       bmp := TBitmap.Create;
       try
@@ -343,10 +358,33 @@ uses JPEG, Math, GraphicEx, phUtils, phIJLIntf;
     end;
   end;
 
+  function GetBmp32ThumbnailData(const sFileName: String; const MaxSize: TSize; StretchFilter: TPhoaStretchFilter; out ImageSize, ThumbSize: TSize): String;
+  var
+    ThumbBitmap: TBitmap32;
+    Stream: TStringStream;
+  begin
+     // Масштабируем изображение
+    ThumbBitmap := TBitmap32.Create;
+    try
+       // Загружаем уменьшенную версию картинки в ThumbBitmap
+      MakeThumbnail(sFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
+       // Сохраняем эскиз в поток
+      Stream := TStringStream.Create('');
+      try
+        ThumbBitmap.SaveToStream(Stream);
+        Result := Stream.DataString;
+      finally
+        Stream.Free;
+      end;
+    finally
+      ThumbBitmap.Free;
+    end;
+  end;
+
 var
-   // Буферные переменные для отрисовки эскизов. Not thread-safe!
-  JPGThumbBuffer: TJPEGImage = nil;
-  BMPThumbBuffer: TBitmap32  = nil;
+   // Буферные переменные для отрисовки. Not thread-safe!
+  _JPGBuffer: TJPEGImage  = nil;
+  _BMPBuffer: TBitmap32   = nil;
 
   procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect);
   var
@@ -359,20 +397,20 @@ var
       FillChar(r, SizeOf(r), 0)
     else begin
        // Создаём буферные изображения
-      if JPGThumbBuffer=nil then JPGThumbBuffer := TJPEGImage.Create;
-      if BMPThumbBuffer=nil then BMPThumbBuffer := TBitmap32.Create;
+      if _JPGBuffer=nil then _JPGBuffer := TJPEGImage.Create;
+      if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
        // Загружаем JPEG-изображение эскиза
       Stream := TStringStream.Create(sThumbnailData);
       try
-        JPGThumbBuffer.LoadFromStream(Stream);
+        _JPGBuffer.LoadFromStream(Stream);
       finally
         Stream.Free;
       end;
        // Декодируем эскиз
-      BMPThumbBuffer.Assign(JPGThumbBuffer);
+      _BMPBuffer.Assign(_JPGBuffer);
        // Применяем преобразования, если они есть
       if (Rotation<>pr0) or (Flips<>[]) then begin
-        Transform := TPicTransform.Create(BMPThumbBuffer);
+        Transform := TPicTransform.Create(_BMPBuffer);
         try
           Transform.Rotation := Rotation;
           Transform.Flips    := Flips;
@@ -381,13 +419,13 @@ var
         end;
       end;
        // Определяем размеры отрисовки
-      iw := Min(BMPThumbBuffer.Width,  r.Right-r.Left);
-      ih := Min(BMPThumbBuffer.Height, r.Bottom-r.Top);
+      iw := Min(_BMPBuffer.Width,  r.Right-r.Left);
+      ih := Min(_BMPBuffer.Height, r.Bottom-r.Top);
        // Определяем границы для отрисовки эскиза
-      rSrc := Bounds(Max(0, (BMPThumbBuffer.Width-iw) div 2),  Max(0, (BMPThumbBuffer.Height-ih) div 2), iw, ih);
+      rSrc := Bounds(Max(0, (_BMPBuffer.Width-iw) div 2),  Max(0, (_BMPBuffer.Height-ih) div 2), iw, ih);
       r    := Bounds(r.Left+Max(0, (r.Right-r.Left-iw) div 2), r.Top+Max(0, (r.Bottom-r.Top-ih) div 2),  iw, ih);
        // Отрисовываем изображение на битмэпе
-      Bitmap32.Draw(r.Left, r.Top, rSrc, BMPThumbBuffer);
+      Bitmap32.Draw(r.Left, r.Top, rSrc, _BMPBuffer);
     end;
   end;
 
@@ -401,6 +439,34 @@ var
   begin
     r := Bitmap32.BoundsRect;
     PaintThumbnail(Pic, Bitmap32, r);
+  end;
+
+  procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
+  var Stream: TStringStream;
+  begin
+     // Создаём буферное изображение
+    if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
+     // Загружаем данные
+    Stream := TStringStream.Create(sBmpData);
+    try
+      _BMPBuffer.LoadFromStream(Stream);
+    finally
+      Stream.Free;
+    end;
+     // Рисуем картинку на Bitmap32
+    Bitmap32.Draw(p.x, p.y, _BMPBuffer);
+  end;
+
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  begin
+    Bitmap32.SetSize(16, 16);
+     // Если нет данных - рисуем значок папки
+    if sBmpData='' then begin
+      Bitmap32.DrawMode := dmBlend;
+      ImageList_DrawEx(App.ImageList.Handle, iif(bSelected, iiFolderOpen, iiFolder), Bitmap32.Canvas.Handle, 0, 0, 0, 0, CLR_NONE, CLR_NONE, ILD_trNORMAL);
+     // Иначе рисуем заданный значок
+    end else
+      PaintBmp32Data(sBmpData, Bitmap32, p);
   end;
 
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
@@ -611,6 +677,6 @@ var
 
 initialization
 finalization
-  JPGThumbBuffer.Free;
-  BMPThumbBuffer.Free;
+  _JPGBuffer.Free;
+  _BMPBuffer.Free;
 end.

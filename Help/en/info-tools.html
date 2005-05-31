@@ -1,4 +1,4 @@
-<!-- $Id: info-tools.html,v 1.3 2005-02-05 16:15:58 dale Exp $ -->
+<!-- $Id: info-tools.html,v 1.4 2005-05-31 17:29:49 dale Exp $ -->
 {[%hh_hdr_en:Tools]}
 
 <p align=justify>A <b>tool</b> in <b>PhoA</b> is an user-defined (and user-configurable) command. Tools introduce the
@@ -21,6 +21,7 @@
   <li><a href="#ptkEdit">Standard Edit action</a>
   <li><a href="#ptkPrint">Standard Print action</a>
   <li><a href="#ptkCustom">Custom action</a>
+  <li><a href="#ptkExtViewer">External viewer</a>
 </ul>
 
 <h3><a name=ptkSeparator>Separator item</a></h3>
@@ -44,6 +45,11 @@
 <h3><a name=ptkCustom>Custom action</a></h3>
 <p align=justify>You specify the application and its parameters using <a href="intf-tool-props.html">Tool properties
   dialog</a> by yourself.
+
+<h3><a name=ptkExtViewer>External viewer</a></h3>
+<p align=justify>Like about a <a href="#ptkCustom">Custom action</a>, you can specify an application and its parameters. 
+  The major difference of this tool kind is that those tools <i>don't appear</i> in any menus. Such a tool is launched
+  instead of the internal viewer when you try to view a picture whose file mathes its masks.
 
 {[%hh_h2:<a name=masks>File masks</a>]}
 <p align=justify>A tool is only accessible (and visible, as with <a href="#ptkSeparator">separator item</a>) when
