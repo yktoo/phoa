@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.19 2005-05-31 17:29:49 dale Exp $
+//  $Id: phGraphics.pas,v 1.20 2005-06-05 16:36:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -110,7 +110,8 @@ type
    // Отрисовывает Bitmap32-данные на битмэпе в заданной позиции
   procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
    // Отрисовывает значок группы на битмэпе в заданной позиции
-  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp); overload;
+  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp); overload;
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
@@ -458,15 +459,34 @@ var
   end;
 
   procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  var i: Integer;
   begin
     Bitmap32.SetSize(16, 16);
      // Если нет данных - рисуем значок папки
     if sBmpData='' then begin
+       // Рисуем значок папки на фоне цвета clFuchsia
+      Bitmap32.DrawMode := dmOpaque;
+      ImageList_DrawEx(App.ImageList.Handle, iif(bSelected, iiFolderOpen, iiFolder), Bitmap32.Canvas.Handle, 0, 0, 0, 0, clFuchsia, CLR_NONE, ILD_NORMAL);
+      Bitmap32.ResetAlpha;
+       // Заменяем clFuchsia прозрачным цветом
       Bitmap32.DrawMode := dmBlend;
-      ImageList_DrawEx(App.ImageList.Handle, iif(bSelected, iiFolderOpen, iiFolder), Bitmap32.Canvas.Handle, 0, 0, 0, 0, CLR_NONE, CLR_NONE, ILD_trNORMAL);
+      for i := 0 to 16*16-1 do
+        if Bitmap32.Bits[i]=clFuchsia32 then Bitmap32.Bits[i] := 0;
      // Иначе рисуем заданный значок
-    end else
+    end else begin
+      Bitmap32.DrawMode := dmBlend;
       PaintBmp32Data(sBmpData, Bitmap32, p);
+    end;
+  end;
+
+  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  begin
+     // Создаём буферное изображение
+    if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
+     // Рисуем значок на буферном битмэпе
+    PaintGroupIcon(sBmpData, _BMPBuffer, p, bSelected, App);
+     // Переносим буферный битмэп на DC
+    _BMPBuffer.DrawTo(DC, p.x, p.y);
   end;
 
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);

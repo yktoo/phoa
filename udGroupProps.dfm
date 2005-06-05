@@ -58,7 +58,7 @@ inherited dGroupProps: TdGroupProps
     Left = 12
     Top = 68
     Width = 606
-    Height = 253
+    Height = 257
     Anchors = [akLeft, akTop, akRight, akBottom]
     ScrollBars = ssVertical
     TabOrder = 2
@@ -66,38 +66,31 @@ inherited dGroupProps: TdGroupProps
   end
   object gbGroupIcon: TGroupBox
     Left = 12
-    Top = 324
+    Top = 328
     Width = 606
-    Height = 65
+    Height = 57
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Group icon'
     TabOrder = 3
-    object lGroupIconInfo: TLabel
-      Left = 64
-      Top = 16
-      Width = 177
-      Height = 13
-      Caption = 'Group icon should be a 16x16 image.'
-    end
     object bGroupIconSelect: TButton
-      Left = 64
-      Top = 32
+      Left = 44
+      Top = 20
       Width = 85
       Height = 23
       Action = aGroupIconSelect
       TabOrder = 1
     end
     object bGroupIconReset: TButton
-      Left = 156
-      Top = 32
+      Left = 136
+      Top = 20
       Width = 85
       Height = 23
       Action = aGroupIconReset
       TabOrder = 2
     end
     object iGroupIcon: TImage32
-      Left = 20
-      Top = 28
+      Left = 16
+      Top = 24
       Width = 16
       Height = 16
       BitmapAlign = baTopLeft
@@ -114,7 +107,7 @@ inherited dGroupProps: TdGroupProps
     Top = 404
     LangData = {
       0B006447726F757050726F7073010100000003000000070043617074696F6E01
-      1300000008006276426F74746F6D00000E0070427574746F6E73426F74746F6D
+      1200000008006276426F74746F6D00000E0070427574746F6E73426F74746F6D
       000007006243616E63656C01010000000C000000070043617074696F6E000300
       624F4B01010000000F000000070043617074696F6E0005006248656C70010100
       000012000000070043617074696F6E0003006C49440101000000150000000700
@@ -127,8 +120,7 @@ inherited dGroupProps: TdGroupProps
       0000080043617465676F727920000000040048696E74000F006247726F757049
       636F6E526573657400000F006147726F757049636F6E52657365740103000000
       22000000070043617074696F6E21000000080043617465676F72792300000004
-      0048696E74000E006C47726F757049636F6E496E666F01010000002400000007
-      0043617074696F6E000A006947726F757049636F6E0000}
+      0048696E74000A006947726F757049636F6E0000}
   end
   object alMain: TActionList
     Left = 32

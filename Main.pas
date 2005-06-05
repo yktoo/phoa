@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.83 2005-05-31 17:29:48 dale Exp $
+//  $Id: Main.pas,v 1.84 2005-06-05 16:36:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -255,6 +255,7 @@ type
     procedure pmPicsPopup(Sender: TObject);
     procedure SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure SetPhoaViewClick(Sender: TObject);
+    procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -473,7 +474,7 @@ uses
   phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
-  phToolSetting, udMsgBox, udGroupProps, phPluginUsage;
+  phToolSetting, udMsgBox, udGroupProps, phPluginUsage, phGraphics;
 
    // Загружает ImageList из PNG-ресурса, если он ещё не загружен
   procedure MakeImagesLoaded(const sResourceName: String; Images: TCustomImageList);
@@ -1741,6 +1742,13 @@ uses
     (RootSetting.Settings[ISettingID_Tools][TComponent(Sender).Tag] as TPhoaToolSetting).Execute(GetSelectedPics);
   end;
 
+  procedure TfMain.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  begin
+    if GetNodeKind(Sender, Node) in [gnkPhoaGroup, gnkViewGroup] then begin
+      PaintGroupIcon(GetNodeGroup(Node).IconData, TargetCanvas.Handle, CellRect.TopLeft, vsSelected in Node.States, Self);
+    end;
+  end;
+
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   begin
     if GetNodeKind(tvGroups, Node) in [gnkProject, gnkView] then begin
@@ -1944,8 +1952,8 @@ uses
       (iiPhoA,         iiPhoA),         // gnkProject
       (iiView,         iiView),         // gnkView
       (iiFolderSearch, iiFolderSearch), // gnkSearch
-      (iiFolder,       iiFolderOpen),   // gnkPhoaGroup
-      (iiFolder,       iiFolderOpen));  // gnkViewGroup
+      (iiBlank{!!!iiFolder},       iiBlank{!!!iiFolder}),   // gnkPhoaGroup
+      (iiBlank{!!!iiFolder},       iiBlank{!!!iiFolder}));  // gnkViewGroup
   begin
     if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[GetNodeKind(Sender, Node), Kind=ikSelected];
   end;

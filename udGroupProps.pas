@@ -20,7 +20,6 @@ type
     gbGroupIcon: TGroupBox;
     iGroupIcon: TImage32;
     lDesc: TLabel;
-    lGroupIconInfo: TLabel;
     lID: TLabel;
     lText: TLabel;
     mDescription: TMemo;
