@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.20 2005-06-05 16:36:55 dale Exp $
+//  $Id: phGraphics.pas,v 1.21 2005-06-20 19:34:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -110,8 +110,8 @@ type
    // Отрисовывает Bitmap32-данные на битмэпе в заданной позиции
   procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
    // Отрисовывает значок группы на битмэпе в заданной позиции
-  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp); overload;
-  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp); overload;
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp); overload;
+  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp); overload;
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
@@ -119,6 +119,8 @@ type
 const
   BColor_Alpha_Transparent = $00;
   BColor_Alpha_Opaque      = $ff;
+
+  C32Transparent           = 0; // "Прозрачный" цвет типа TColor32
 
 implementation
 uses JPEG, Math, CommCtrl, GraphicEx, phUtils, phIJLIntf;
@@ -458,7 +460,7 @@ var
     Bitmap32.Draw(p.x, p.y, _BMPBuffer);
   end;
 
-  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp);
   var i: Integer;
   begin
     Bitmap32.SetSize(16, 16);
@@ -471,7 +473,7 @@ var
        // Заменяем clFuchsia прозрачным цветом
       Bitmap32.DrawMode := dmBlend;
       for i := 0 to 16*16-1 do
-        if Bitmap32.Bits[i]=clFuchsia32 then Bitmap32.Bits[i] := 0;
+        if Bitmap32.Bits[i]=clFuchsia32 then Bitmap32.Bits[i] := BackColor;
      // Иначе рисуем заданный значок
     end else begin
       Bitmap32.DrawMode := dmBlend;
@@ -479,12 +481,12 @@ var
     end;
   end;
 
-  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; bSelected: Boolean; App: IPhotoAlbumApp);
+  procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp);
   begin
      // Создаём буферное изображение
     if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
      // Рисуем значок на буферном битмэпе
-    PaintGroupIcon(sBmpData, _BMPBuffer, p, bSelected, App);
+    PaintGroupIcon(sBmpData, _BMPBuffer, p, BackColor, bSelected, App);
      // Переносим буферный битмэп на DC
     _BMPBuffer.DrawTo(DC, p.x, p.y);
   end;

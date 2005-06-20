@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.84 2005-06-05 16:36:55 dale Exp $
+//  $Id: Main.pas,v 1.85 2005-06-20 19:34:24 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1743,9 +1743,12 @@ uses
   end;
 
   procedure TfMain.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  var p: TPoint;
   begin
     if GetNodeKind(Sender, Node) in [gnkPhoaGroup, gnkViewGroup] then begin
-      PaintGroupIcon(GetNodeGroup(Node).IconData, TargetCanvas.Handle, CellRect.TopLeft, vsSelected in Node.States, Self);
+      p := CellRect.TopLeft;
+      Inc(p.x, tvGroups.GetNodeLevel(Node)*tvGroups.Indent+4);
+      PaintGroupIcon(GetNodeGroup(Node).IconData, TargetCanvas.Handle, p, Color32(tvGroups.Color), vsSelected in Node.States, Self);
     end;
   end;
 

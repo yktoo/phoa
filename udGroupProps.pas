@@ -124,7 +124,7 @@ uses GR32, GraphicEx, ConsVars, phUtils, phGraphics, Main, phFrm;
   procedure TdGroupProps.UpdateGroupIcon;
   begin
     iGroupIcon.Bitmap.Clear(Color32(0, 0, 0, BColor_Alpha_Transparent));
-    PaintGroupIcon(FGroupIconData, iGroupIcon.Bitmap, Point(0, 0), False, FApp);
+    PaintGroupIcon(FGroupIconData, iGroupIcon.Bitmap, Point(0, 0), C32Transparent, False, FApp);
   end;
 
   procedure TdGroupProps.UpdateState;
