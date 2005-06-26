@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.11 2005-02-13 19:16:38 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.12 2005-06-26 16:04:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -727,9 +727,14 @@ type
    //===================================================================================================================
 
   function TPhoaParsedPicProp.AsDate(Pic: IPhoaPic): Integer;
+  var v: Variant;
   begin
     if Datatype<>ppdtDate then InvalidDatatype;
-    if Pic=nil then Result := 0 else Result := Pic.PropValues[FProp];
+    Result := 0;
+    if Pic<>nil then begin
+      v := Pic.PropValues[FProp];
+      if not VarIsNull(v) then Result := v;
+    end;
   end;
 
   function TPhoaParsedPicProp.AsInteger(Pic: IPhoaPic): Integer;

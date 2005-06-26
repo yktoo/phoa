@@ -80,7 +80,7 @@ uses GR32, GraphicEx, ConsVars, phUtils, phGraphics, Main, phFrm;
         Options  := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
         Title    := ConstVal('SDlgTitle_SelectPicFile');
         if Execute then begin
-          FGroupIconData := GetBmp32ThumbnailData(FileName, Size(16, 16), psfSpline, ImageSize, ThumbSize);
+          FGroupIconData := GetBmp32ThumbnailData(FileName, Size(16, 16), psfLanczos, ImageSize, ThumbSize);
           UpdateGroupIcon;
           Modified := True;
         end;
@@ -123,8 +123,7 @@ uses GR32, GraphicEx, ConsVars, phUtils, phGraphics, Main, phFrm;
 
   procedure TdGroupProps.UpdateGroupIcon;
   begin
-    iGroupIcon.Bitmap.Clear(Color32(0, 0, 0, BColor_Alpha_Transparent));
-    PaintGroupIcon(FGroupIconData, iGroupIcon.Bitmap, Point(0, 0), C32Transparent, False, FApp);
+    PaintGroupIcon(FGroupIconData, iGroupIcon.Bitmap, C32Transparent, False, FApp);
   end;
 
   procedure TdGroupProps.UpdateState;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.50 2005-05-21 17:50:38 dale Exp $
+//  $Id: ufImgView.pas,v 1.51 2005-06-26 16:04:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -262,8 +262,9 @@ type
     FTrackDrag: Boolean;
     FTrackX: Integer;
     FTrackY: Integer;
-     // Флаг принудительного изменения размеров окна
-    FForcedResize: Boolean;
+     // Счётчик принудительного изменения размеров окна (если  >0, то размер/положение окна устанавливаются
+     //   принудительно)
+    FResizeProcessingLock: Integer;
      // Кэшированные настройки просмотра
     FAlwaysOnTop: Boolean;
     FBackgroundColor: TColor;
@@ -370,11 +371,14 @@ type
     procedure BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
      // Если активен режим ресайзинга информации, завершает его
     procedure CommitInfoRelocation;
+     // Установка/снятие блокировки отработки изменения размера окна
+    procedure BeginForcedResize;
+    procedure EndForcedResize;
      // Message handlers
-    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
-    procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
-    procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
     procedure WMDecodeFinished(var Msg: TMessage); message WM_DECODE_FINISHED;
+    procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
+    procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+    procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
      // Prop handlers
     function  GetFullScreen: Boolean;
     function  GetViewOffset: TPoint;
@@ -787,54 +791,59 @@ uses
   procedure TfImgView.ApplySettings(bUseInitFlags: Boolean);
   var bFullScreen: Boolean;
   begin
-     // Кэшируем значения настроек
-    FBackgroundColor    := SettingValueInt(ISettingID_View_BkColor);
-    FZoomFactorChange   := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
-    FCaptionProps       := IntToPicProps(SettingValueInt(ISettingID_View_CaptionProps));
-    FDoShrinkPic        := SettingValueBool(ISettingID_View_ShrinkPicToFit);
-    FDoZoomPic          := SettingValueBool(ISettingID_View_ZoomPicToFit);
-    bFullscreen         := SettingValueBool(ISettingID_View_Fullscreen);
-    FAlwaysOnTop        := SettingValueBool(ISettingID_View_AlwaysOnTop);
-    FKeepCursorOverTB   := SettingValueBool(ISettingID_View_KeepCursorOverTB);
-    FHideCursorInFS     := SettingValueBool(ISettingID_View_HideCursor);
-    FFitWindowToPic     := SettingValueBool(ISettingID_View_FitWindowToPic);
-    FCenterWindow       := SettingValueBool(ISettingID_View_CenterWindow);
-    FCyclicViewing      := SettingValueBool(ISettingID_View_Cyclic);
-    FPredecodePic       := SettingValueBool(ISettingID_View_Predecode);
-    FCacheBehindPic     := SettingValueBool(ISettingID_View_CacheBehind);
-    FStretchFilter      := TStretchFilter(SettingValueInt(ISettingID_View_StchFilt));
-    FSlideShowInterval  := SettingValueInt(ISettingID_View_SlideInterval);
-    FSlideShowDirection := TSlideShowDirection(SettingValueInt(ISettingID_View_SlideDirection));
-    FSlideShowCyclic    := SettingValueBool(ISettingID_View_SlideCyclic);
-    FShowInfo           := SettingValueBool(ISettingID_View_ShowInfo);
-    FInfoProps          := IntToPicProps(SettingValueInt(ISettingID_View_InfoPicProps));
-    FInfoFont           := SettingValueStr(ISettingID_View_InfoFont);
-    FInfoBkColor        := SettingValueInt(ISettingID_View_InfoBkColor);
-    FInfoBkOpacity      := SettingValueInt(ISettingID_View_InfoBkOpacity);
-    FViewInfoPos        := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
-     // Настраиваем параметры окна
-    FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
-    Color               := FBackgroundColor;
-     // Настраиваем доки/панели инструментов
-     // -- Видимость
-    tbMain.Visible      := SettingValueBool(ISettingID_View_ShowToolbar);
-     // -- Перетаскиваемость
-    ApplyToolbarSettings(dkTop);
-    ApplyToolbarSettings(dkLeft);
-    ApplyToolbarSettings(dkRight);
-    ApplyToolbarSettings(dkBottom);
-     // Настраиваем инструменты
-    ApplyTools;
-     // Настраиваем установки текущей сессии
-    if bUseInitFlags then bFullscreen := (bFullscreen or (ivifForceFullscreen in FInitFlags)) and not (ivifForceWindow in FInitFlags);
-    FullScreen := bFullScreen;
-     // Если нужно включить режим показа слайдов, переданный при инициализации
-    if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
-     // Настраиваем видимость курсора
-    AdjustCursorVisibility(False);
-     // Обновляем actions
-    UpdateShowInfoActions;
-    UpdateSlideShowActions;
+    BeginForcedResize;
+    try
+       // Кэшируем значения настроек
+      FBackgroundColor    := SettingValueInt(ISettingID_View_BkColor);
+      FZoomFactorChange   := adMagnifications[SettingValueInt(ISettingID_View_ZoomFactor)];
+      FCaptionProps       := IntToPicProps(SettingValueInt(ISettingID_View_CaptionProps));
+      FDoShrinkPic        := SettingValueBool(ISettingID_View_ShrinkPicToFit);
+      FDoZoomPic          := SettingValueBool(ISettingID_View_ZoomPicToFit);
+      bFullscreen         := SettingValueBool(ISettingID_View_Fullscreen);
+      FAlwaysOnTop        := SettingValueBool(ISettingID_View_AlwaysOnTop);
+      FKeepCursorOverTB   := SettingValueBool(ISettingID_View_KeepCursorOverTB);
+      FHideCursorInFS     := SettingValueBool(ISettingID_View_HideCursor);
+      FFitWindowToPic     := SettingValueBool(ISettingID_View_FitWindowToPic);
+      FCenterWindow       := SettingValueBool(ISettingID_View_CenterWindow);
+      FCyclicViewing      := SettingValueBool(ISettingID_View_Cyclic);
+      FPredecodePic       := SettingValueBool(ISettingID_View_Predecode);
+      FCacheBehindPic     := SettingValueBool(ISettingID_View_CacheBehind);
+      FStretchFilter      := TStretchFilter(SettingValueInt(ISettingID_View_StchFilt));
+      FSlideShowInterval  := SettingValueInt(ISettingID_View_SlideInterval);
+      FSlideShowDirection := TSlideShowDirection(SettingValueInt(ISettingID_View_SlideDirection));
+      FSlideShowCyclic    := SettingValueBool(ISettingID_View_SlideCyclic);
+      FShowInfo           := SettingValueBool(ISettingID_View_ShowInfo);
+      FInfoProps          := IntToPicProps(SettingValueInt(ISettingID_View_InfoPicProps));
+      FInfoFont           := SettingValueStr(ISettingID_View_InfoFont);
+      FInfoBkColor        := SettingValueInt(ISettingID_View_InfoBkColor);
+      FInfoBkOpacity      := SettingValueInt(ISettingID_View_InfoBkOpacity);
+      FViewInfoPos        := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
+       // Настраиваем параметры окна
+      FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+      Color               := FBackgroundColor;
+       // Настраиваем доки/панели инструментов
+       // -- Видимость
+      tbMain.Visible      := SettingValueBool(ISettingID_View_ShowToolbar);
+       // -- Перетаскиваемость
+      ApplyToolbarSettings(dkTop);
+      ApplyToolbarSettings(dkLeft);
+      ApplyToolbarSettings(dkRight);
+      ApplyToolbarSettings(dkBottom);
+       // Настраиваем инструменты
+      ApplyTools;
+       // Настраиваем установки текущей сессии
+      if bUseInitFlags then bFullscreen := (bFullscreen or (ivifForceFullscreen in FInitFlags)) and not (ivifForceWindow in FInitFlags);
+      FullScreen := bFullScreen;
+       // Если нужно включить режим показа слайдов, переданный при инициализации
+      if bUseInitFlags and (ivifSlideShow in FInitFlags) then SlideShow := True;
+       // Настраиваем видимость курсора
+      AdjustCursorVisibility(False);
+       // Обновляем actions
+      UpdateShowInfoActions;
+      UpdateSlideShowActions;
+    finally
+      EndForcedResize;
+    end;
   end;
 
   procedure TfImgView.ApplyTools;
@@ -849,6 +858,11 @@ uses
       Tool := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
       if ptuViewModePopupMenu in Tool.Usages then AddToolItem(Tool, gipmTools, ToolItemClick);
     end;
+  end;
+
+  procedure TfImgView.BeginForcedResize;
+  begin
+    Inc(FResizeProcessingLock);
   end;
 
   procedure TfImgView.BitmapPixelCombine(F: TColor32; var B: TColor32; M: TColor32);
@@ -964,8 +978,10 @@ uses
   begin
     inherited DoShow;
      // Загружаем изображение
-    RedisplayPic(True, False);
-    FInitialized := True;
+    if not FInitialized then begin
+      RedisplayPic(True, False);
+      FInitialized := True;
+    end;
   end;
 
   procedure TfImgView.DP_ApplyTransforms;
@@ -1136,6 +1152,15 @@ uses
     aStoreTransform.Enabled := bNoErr and ((FPic.Rotation<>FTransform.Rotation) or (FPic.Flips<>FTransform.Flips));
   end;
 
+  procedure TfImgView.EndForcedResize;
+  begin
+    if FResizeProcessingLock>0 then begin
+       // Если блокировка будет снята, пропускаем все сообщения изменения размера
+      if FResizeProcessingLock=1 then Application.ProcessMessages;
+      Dec(FResizeProcessingLock);
+    end;
+  end;
+
   procedure TfImgView.eSlideShowIntervalValueChange(Sender: TTBXCustomSpinEditItem; const AValue: Extended);
   begin
     FSlideShowInterval := Trunc(AValue*1000);
@@ -1299,11 +1324,30 @@ uses
     aFS: Array[Boolean] of TFormStyle       = (fsNormal,   fsStayOnTop);
     aWS: Array[Boolean] of TWindowState     = (wsNormal,   wsMaximized);
     aBS: Array[Boolean] of TFormBorderStyle = (bsSizeable, bsNone);
+  var
+    rSavedBounds: TRect;
+    bWasVisible: Boolean;
   begin
-    aFullScreen.Checked := Value;
-    FormStyle   := aFS[FAlwaysOnTop and not Value];
-    BorderStyle := aBS[Value];
-    WindowState := aWS[Value];
+    BeginForcedResize;
+    try
+      bWasVisible := Visible;
+      Hide;
+       // Настраиваем Action
+      aFullScreen.Checked := Value;
+       // Сохраняем позицию окна
+      rSavedBounds := BoundsRect;
+       // Настраиваем стиль AlwaysOnTop
+      FormStyle    := aFS[FAlwaysOnTop and not Value];
+       // Настраиваем BorderStyle
+      BorderStyle  := aBS[Value];
+       // Восстанавливаем положение окна (изменение BorderStyle портит его)
+      BoundsRect   := rSavedBounds;
+       // Настраиваем состояние окна
+      WindowState  := aWS[Value];
+      if bWasVisible then Show;
+    finally
+      EndForcedResize;
+    end;
   end;
 
   procedure TfImgView.SetPicIdx(Value: Integer);
@@ -1384,11 +1428,15 @@ uses
 
      // Рассчитывает размеры рабочей области, размеры окна и FBestFitZoomFactor
     procedure ComputeViewportDimensions;
-    var MaxViewportSize: TSize;
+    var
+      MaxViewportSize: TSize;
+      CurMonitor: TMonitor;
     begin
        // Определяем максимальные размеры окна. В полноэкранном режиме окно может занимать весь свой монитор. В оконном
-       //   режиме окно может занимать только рабочую область своего монитора
-      if FullScreen then FRectWorkArea := Monitor.BoundsRect else FRectWorkArea := Monitor.WorkareaRect;
+       //   режиме окно может занимать только рабочую область своего монитора (вычисляем монитор по координатам, а не
+       //   используем свойство Monitor формы, т.к. оно возвращает не тот монитор, что нам нужен)
+      CurMonitor := Screen.MonitorFromRect(BoundsRect, mdNearest);
+      if FullScreen then FRectWorkArea := CurMonitor.BoundsRect else FRectWorkArea := CurMonitor.WorkareaRect;
        // Находим "зазоры" - разницу между размерами окна и размерами изображения
       FXGap := Width-iMain.Width;
       FYGap := Height-iMain.Height;
@@ -1472,11 +1520,11 @@ uses
         if (p.x<tbMain.Width) and (p.y<tbMain.Height) then PrevMousePos := p;
       end;
        // Изменяем положение окна
-      FForcedResize := True;
+      BeginForcedResize;
       try
         SetBounds(ixWindow, iyWindow, iwWindow, ihWindow);
       finally
-        FForcedResize := False;
+        EndForcedResize;
       end;
        // Восстанавливаем положение мыши
       if (PrevMousePos.x>=0) and (PrevMousePos.y>=0) and (PrevMousePos.x<tbMain.Width) and (PrevMousePos.y<tbMain.Height) then
@@ -1581,6 +1629,18 @@ uses
     HtmlHelpContext(HelpContext);
   end;
 
+  procedure TfImgView.WMSize(var Msg: TWMSize);
+  begin
+    inherited;
+     // Если изменение размеров вызвано не принудительным позиционированием в процессе подстройки размеров окна под
+     //   размеры изображения
+    if FInitialized and (FResizeProcessingLock=0) then begin
+      CommitInfoRelocation;
+       // Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor без изменений
+      SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True, True);
+    end;
+  end;
+
   procedure TfImgView.WMTimer(var Msg: TWMTimer);
   begin
     case SlideShowDirection of
@@ -1600,18 +1660,6 @@ uses
         FPredecodeDirection := pddDisabled;
         PicIdx := Random(FPicCount);
       end;
-    end;
-  end;
-
-  procedure TfImgView.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
-  begin
-    inherited;
-     // Если изменение размеров вызвано не принудительным позиционированием в процессе подстройки размеров окна под
-     //   размеры изображения
-    if FInitialized and not FForcedResize then begin
-      CommitInfoRelocation;
-       // Если в последний раз был выбран BestFitZoom, применяем его, иначе сохраняем ZoomFactor без изменений
-      SetZoom(iif(FBestFitZoomUsed, 0.0, ZoomFactor), False, True, True);
     end;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.21 2005-06-20 19:34:24 dale Exp $
+//  $Id: phGraphics.pas,v 1.22 2005-06-26 16:04:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -110,7 +110,7 @@ type
    // Отрисовывает Bitmap32-данные на битмэпе в заданной позиции
   procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
    // Отрисовывает значок группы на битмэпе в заданной позиции
-  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp); overload;
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp); overload;
   procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp); overload;
 
    // Создаёт, загружает изображение, и возвращает преобразованное в TBitmap32 изображение
@@ -384,51 +384,59 @@ uses JPEG, Math, CommCtrl, GraphicEx, phUtils, phIJLIntf;
     end;
   end;
 
-var
-   // Буферные переменные для отрисовки. Not thread-safe!
-  _JPGBuffer: TJPEGImage  = nil;
-  _BMPBuffer: TBitmap32   = nil;
-
   procedure PaintThumbnail(const sThumbnailData: String; Rotation: TPicRotation; Flips: TPicFlips; Bitmap32: TBitmap32; var r: TRect);
   var
     Stream: TStringStream;
     Transform: TPicTransform;
     iw, ih: Integer;
     rSrc: TRect;
+    BufJPEG: TJPEGImage;
+    BufBmp32: TBitmap32;
   begin
     if sThumbnailData='' then
       FillChar(r, SizeOf(r), 0)
     else begin
-       // Создаём буферные изображения
-      if _JPGBuffer=nil then _JPGBuffer := TJPEGImage.Create;
-      if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
-       // Загружаем JPEG-изображение эскиза
-      Stream := TStringStream.Create(sThumbnailData);
+       // Создаём буферные изображения. Отказался от создания "постоянных" буферных изображений, т.к.
+       //   создание+уничтожение их занимает незначительное время:
+       //   TJPEGImage: менее 1.4 мкс на Pentium 4 - 2.8 GHz (проверено на 1 млн. операций создания/уничтожения)
+       //   TBitmap32:  менее 3.7 мкс на Pentium 4 - 2.8 GHz (проверено на 1 млн. операций создания/уничтожения)
+      BufBmp32 := TBitmap32.Create;
       try
-        _JPGBuffer.LoadFromStream(Stream);
-      finally
-        Stream.Free;
-      end;
-       // Декодируем эскиз
-      _BMPBuffer.Assign(_JPGBuffer);
-       // Применяем преобразования, если они есть
-      if (Rotation<>pr0) or (Flips<>[]) then begin
-        Transform := TPicTransform.Create(_BMPBuffer);
+        BufJPEG := TJPEGImage.Create;
         try
-          Transform.Rotation := Rotation;
-          Transform.Flips    := Flips;
+           // Загружаем JPEG-изображение эскиза
+          Stream := TStringStream.Create(sThumbnailData);
+          try
+            BufJPEG.LoadFromStream(Stream);
+          finally
+            Stream.Free;
+          end;
+           // Декодируем эскиз
+          BufBmp32.Assign(BufJPEG);
         finally
-          Transform.Free;
+          BufJPEG.Free;
         end;
+         // Применяем преобразования, если они есть
+        if (Rotation<>pr0) or (Flips<>[]) then begin
+          Transform := TPicTransform.Create(BufBmp32);
+          try
+            Transform.Rotation := Rotation;
+            Transform.Flips    := Flips;
+          finally
+            Transform.Free;
+          end;
+        end;
+         // Определяем размеры отрисовки
+        iw := Min(BufBmp32.Width,  r.Right-r.Left);
+        ih := Min(BufBmp32.Height, r.Bottom-r.Top);
+         // Определяем границы для отрисовки эскиза
+        rSrc := Bounds(Max(0, (BufBmp32.Width-iw) div 2),  Max(0, (BufBmp32.Height-ih) div 2), iw, ih);
+        r    := Bounds(r.Left+Max(0, (r.Right-r.Left-iw) div 2), r.Top+Max(0, (r.Bottom-r.Top-ih) div 2),  iw, ih);
+         // Отрисовываем изображение на битмэпе
+        Bitmap32.Draw(r.Left, r.Top, rSrc, BufBmp32);
+      finally
+        BufBmp32.Free;
       end;
-       // Определяем размеры отрисовки
-      iw := Min(_BMPBuffer.Width,  r.Right-r.Left);
-      ih := Min(_BMPBuffer.Height, r.Bottom-r.Top);
-       // Определяем границы для отрисовки эскиза
-      rSrc := Bounds(Max(0, (_BMPBuffer.Width-iw) div 2),  Max(0, (_BMPBuffer.Height-ih) div 2), iw, ih);
-      r    := Bounds(r.Left+Max(0, (r.Right-r.Left-iw) div 2), r.Top+Max(0, (r.Bottom-r.Top-ih) div 2),  iw, ih);
-       // Отрисовываем изображение на битмэпе
-      Bitmap32.Draw(r.Left, r.Top, rSrc, _BMPBuffer);
     end;
   end;
 
@@ -445,22 +453,29 @@ var
   end;
 
   procedure PaintBmp32Data(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint);
-  var Stream: TStringStream;
+  var
+    Stream: TStringStream;
+    BufBmp32: TBitmap32;
   begin
      // Создаём буферное изображение
-    if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
-     // Загружаем данные
-    Stream := TStringStream.Create(sBmpData);
+    BufBmp32 := TBitmap32.Create;
     try
-      _BMPBuffer.LoadFromStream(Stream);
+       // Загружаем данные
+      Stream := TStringStream.Create(sBmpData);
+      try
+        BufBmp32.LoadFromStream(Stream);
+      finally
+        Stream.Free;
+      end;
+       // Рисуем картинку на Bitmap32
+      BufBmp32.DrawMode := dmBlend;
+      Bitmap32.Draw(p.x, p.y, BufBmp32);
     finally
-      Stream.Free;
+      BufBmp32.Free;
     end;
-     // Рисуем картинку на Bitmap32
-    Bitmap32.Draw(p.x, p.y, _BMPBuffer);
   end;
 
-  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp);
+  procedure PaintGroupIcon(const sBmpData: String; Bitmap32: TBitmap32; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp);
   var i: Integer;
   begin
     Bitmap32.SetSize(16, 16);
@@ -470,25 +485,31 @@ var
       Bitmap32.DrawMode := dmOpaque;
       ImageList_DrawEx(App.ImageList.Handle, iif(bSelected, iiFolderOpen, iiFolder), Bitmap32.Canvas.Handle, 0, 0, 0, 0, clFuchsia, CLR_NONE, ILD_NORMAL);
       Bitmap32.ResetAlpha;
-       // Заменяем clFuchsia прозрачным цветом
+       // Заменяем clFuchsia цветом фона
       Bitmap32.DrawMode := dmBlend;
       for i := 0 to 16*16-1 do
         if Bitmap32.Bits[i]=clFuchsia32 then Bitmap32.Bits[i] := BackColor;
      // Иначе рисуем заданный значок
     end else begin
       Bitmap32.DrawMode := dmBlend;
-      PaintBmp32Data(sBmpData, Bitmap32, p);
+      Bitmap32.Clear(BackColor);
+      PaintBmp32Data(sBmpData, Bitmap32, Point(0, 0));
     end;
   end;
 
   procedure PaintGroupIcon(const sBmpData: String; DC: HDC; const p: TPoint; BackColor: TColor32; bSelected: Boolean; App: IPhotoAlbumApp);
+  var BufBmp32: TBitmap32;
   begin
      // Создаём буферное изображение
-    if _BMPBuffer=nil then _BMPBuffer := TBitmap32.Create;
-     // Рисуем значок на буферном битмэпе
-    PaintGroupIcon(sBmpData, _BMPBuffer, p, BackColor, bSelected, App);
-     // Переносим буферный битмэп на DC
-    _BMPBuffer.DrawTo(DC, p.x, p.y);
+    BufBmp32 := TBitmap32.Create;
+    try
+       // Рисуем значок на буферном битмэпе
+      PaintGroupIcon(sBmpData, BufBmp32, BackColor, bSelected, App);
+       // Переносим буферный битмэп на DC
+      BufBmp32.DrawTo(DC, p.x, p.y);
+    finally
+      BufBmp32.Free;
+    end;
   end;
 
   procedure LoadGraphicFromFile(const sFileName: String; Bitmap32: TBitmap32; const DesiredSize: TSize; out FullSize: TSize; const OnProgress: TProgressEvent);
@@ -697,8 +718,4 @@ var
     if FApplyLock=0 then ApplyTransform;
   end;
 
-initialization
-finalization
-  _JPGBuffer.Free;
-  _BMPBuffer.Free;
 end.

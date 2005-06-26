@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.36 2005-05-15 09:03:08 dale Exp $
+//  $Id: udSearch.pas,v 1.37 2005-06-26 16:04:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1169,7 +1169,6 @@ type
     ActivateFirstVTNode(tvSimpleCriteria);
      // Поиск по выражению
     frExprPicFilter.Expression := sSearchExpression; 
-    UpdateSearchKind;
   end;
 
   function TdSearch.GetRelativeRegistryKey: String;
@@ -1307,6 +1306,7 @@ type
     inherited SettingsLoad(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
     FSimpleCriteria.RegLoad(rif, SRegSearch_SimpleCriteria);
+    UpdateSearchKind;
   end;
 
   procedure TdSearch.SettingsSave(rif: TRegIniFile);
