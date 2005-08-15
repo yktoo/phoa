@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.51 2005-06-26 16:04:01 dale Exp $
+//  $Id: ufImgView.pas,v 1.52 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -376,7 +376,6 @@ type
     procedure EndForcedResize;
      // Message handlers
     procedure WMDecodeFinished(var Msg: TMessage); message WM_DECODE_FINISHED;
-    procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
      // Prop handlers
@@ -436,7 +435,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  Types, ChmHlp, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
+  Types, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
   procedure ViewImage(AInitFlags: TImgViewInitFlags; AApp: IPhotoAlbumApp; var iPicIdx: Integer; AUndoOperations: TPhoaOperations);
   begin
@@ -627,7 +626,7 @@ uses
   procedure TfImgView.aaHelp(Sender: TObject);
   begin
     CommitInfoRelocation;
-    HtmlHelpContext(HelpContext);
+    Perform(WM_HELP, 0, 0);
   end;
 
   procedure TfImgView.aaLastPic(Sender: TObject);
@@ -1622,11 +1621,6 @@ uses
   procedure TfImgView.WMDecodeFinished(var Msg: TMessage);
   begin
     UpdateCursor;
-  end;
-
-  procedure TfImgView.WMHelp(var Msg: TWMHelp);
-  begin
-    HtmlHelpContext(HelpContext);
   end;
 
   procedure TfImgView.WMSize(var Msg: TWMSize);

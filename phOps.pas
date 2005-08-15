@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.21 2005-05-31 17:29:49 dale Exp $
+//  $Id: phOps.pas,v 1.22 2005-08-15 11:25:11 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -132,7 +132,8 @@ type
     pocGroupStructure,   // Изменилась структура групп
     pocGroupProps,       // Изменились свойства групп
     pocGroupPicList,     // Изменилось содержимое списков изображений групп
-    pocPicProps);        // Изменились свойства изображений
+    pocPicProps,         // Изменились свойства изображений
+    pocNonUndoable);     // Внесённые изменения не предполагают отката
   TPhoaOperationChanges = set of TPhoaOperationChange;
 
    //===================================================================================================================
@@ -475,6 +476,18 @@ type
   end;
 
    //===================================================================================================================
+   // Внутренняя операция удаления изображений из списка изображений проекта
+   //   Params:
+   //     Pics: IPhotoAlbumPicList - список удаляемых изображений
+   //===================================================================================================================
+
+  TPhoaOp_InternalPicFromProjectRemoving = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+    procedure RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+  end;
+
+   //===================================================================================================================
    // Внутренняя операция удаления изображений (по списку их ID) из группы. Не выполняет поиск несвязанных изображений!
    //   Params:
    //     Group: IPhotoAlbumPicGroup - группа, откуда удаляются изображения
@@ -517,6 +530,28 @@ type
    //===================================================================================================================
 
   TPhoaOp_PicDelete = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+  end;
+
+   //===================================================================================================================
+   // Операция удаления изображений из всех групп и фотоальбома
+   //   Params:
+   //     Pics: IPhotoAlbumPicList  - список удаляемых изображений
+   //===================================================================================================================
+
+  TPhoaOp_PicDeleteFromProject = class(TPhoaOperation)
+  protected
+    procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
+  end;
+
+   //===================================================================================================================
+   // Операция удаления изображений из всех групп и удаления соответствующих файлов
+   //   Params:
+   //     Pics: IPhotoAlbumPicList  - список удаляемых изображений
+   //===================================================================================================================
+
+  TPhoaOp_PicDeleteWithFiles = class(TPhoaOperation)
   protected
     procedure Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges); override;
   end;
@@ -1892,6 +1927,50 @@ type
   end;
 
    //===================================================================================================================
+   // TPhoaOp_InternalPicFromProjectRemoving
+   //===================================================================================================================
+
+  procedure TPhoaOp_InternalPicFromProjectRemoving.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
+  var
+    Pics: IPhotoAlbumPicList;
+    Pic: IPhotoAlbumPic;
+    i: Integer;
+  begin
+    inherited Perform(Params, UndoStream, Changes);
+     // Получаем параметры
+    Params.ObtainValIntf('Pics', IPhotoAlbumPicList, Pics);
+     // Удаляем изображения из фотоальбома
+    for i := 0 to Pics.Count-1 do begin
+       // Пишем флаг продолжения
+      UndoStream.WriteBool(True);
+       // Сохраняем данные изображения
+      Pic := Pics[i];
+      UndoStream.WriteStr(Pic.RawData[PPAllProps]);
+       // Удаляем изображение из списка
+      Project.PicsX.Remove(Pic.ID);
+       // Добавляем флаги изменений
+      Include(Changes, pocProjectPicList);
+    end;
+     // Пишем стоп-флаг
+    UndoStream.WriteBool(False);
+  end;
+
+  procedure TPhoaOp_InternalPicFromProjectRemoving.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
+  begin
+     // Читаем данные, пока не встретим стоп-флаг
+    while UndoStream.ReadBool do
+       // Создаём изображение
+      with NewPhotoAlbumPic do begin
+         // Загружаем данные
+        RawData[PPAllProps] := UndoStream.ReadStr;
+         // Кладём в список (ID уже загружен)
+        PutToList(Project.PicsX);
+         // Добавляем флаги изменений
+        Include(Changes, pocProjectPicList);
+      end;
+  end;
+
+   //===================================================================================================================
    // TPhoaOp_InternalPicFromGroupRemoving
    //===================================================================================================================
 
@@ -2144,6 +2223,69 @@ type
     AddChild(TPhoaOp_InternalPicFromGroupRemoving, Params, Changes);
      // Удаляем несвязанные изображения из фотоальбома
     AddChild(TPhoaOp_InternalUnlinkedPicsRemoving, nil, Changes);
+  end;
+
+   //===================================================================================================================
+   // TPhoaOp_PicDeleteFromProject
+   //===================================================================================================================
+
+  procedure TPhoaOp_PicDeleteFromProject.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream;var Changes: TPhoaOperationChanges);
+
+     // Рекурсивная процедура удаления изображений из группы Group
+    procedure DoDeletePics(Group: IPhotoAlbumPicGroup);
+    var i: Integer;
+    begin
+       // Удаляем изображения из группы
+      Params.Values['Group'] := Group;
+      AddChild(TPhoaOp_InternalPicFromGroupRemoving, Params, Changes);
+       // Рекурсивно вызываем для подгрупп
+      for i := 0 to Group.GroupsX.Count-1 do DoDeletePics(Group.GroupsX[i]);
+    end;
+
+  begin
+    inherited Perform(Params, UndoStream, Changes);
+     // Удаляем изображения из групп
+    DoDeletePics(Project.RootGroupX);
+     // Удаляем изображения из фотоальбома
+    AddChild(TPhoaOp_InternalPicFromProjectRemoving, Params, Changes);
+  end;
+
+   //===================================================================================================================
+   // TPhoaOp_PicDeleteWithFiles
+   //===================================================================================================================
+
+  procedure TPhoaOp_PicDeleteWithFiles.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
+  var
+    i: Integer;
+    Pics: IPhotoAlbumPicList;
+    Pic: IPhotoAlbumPic;
+
+     // Удаляет изображение из группы Group и всех её подгрупп
+    procedure DoDeletePic(iPicID: Integer; Group: IPhotoAlbumPicGroup);
+    var i: Integer;
+    begin
+       // Удаляем изображения из группы
+      Group.PicsX.Remove(iPicID);
+       // Повторяем то же для подгрупп
+      for i := 0 to Group.GroupsX.Count-1 do DoDeletePic(iPicID, Group.GroupsX[i]);
+    end;
+
+  begin
+    inherited Perform(Params, UndoStream, Changes);
+     // Получаем параметры
+    Params.ObtainValIntf('Pics', IPhotoAlbumPicList, Pics);
+     // Цикл по изображениям
+    for i := 0 to Pics.Count-1 do begin
+      Pic := Pics[i];
+       // Удаляем файл
+      if not DeleteFile(Pic.FileName) then PhoaException(ConstVal('SErrCannotDeleteFile', [Pic.FileName, SysErrorMessage(GetLastError)]));
+       // Удаляем изображение из всех групп
+      DoDeletePic(Pic.ID, Project.RootGroupX);
+       // Удаляем изображение из списка изображений проекта
+      Project.PicsX.Remove(Pic.ID);
+       // Добавляем флаги изменений
+      Changes := Changes+[pocGroupPicList, pocProjectPicList, pocNonUndoable];
+    end;
   end;
 
    //===================================================================================================================
@@ -2402,7 +2544,7 @@ type
   procedure TPhoaOp_PicDragAndDropToGroup.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
     SourceGroup, TargetGroup: IPhotoAlbumPicGroup;
-    Pics: IPhoaPicList;
+    Pics: IPhotoAlbumPicList;
   begin
     inherited Perform(Params, UndoStream, Changes);
      // Получаем параметры
@@ -2889,6 +3031,8 @@ initialization
     RegisterOpClass('InternalUnlinkedPicsRemoving',    TPhoaOp_InternalUnlinkedPicsRemoving);
     RegisterOpClass('PicAdd',                          TPhoaOp_PicAdd);
     RegisterOpClass('PicDelete',                       TPhoaOp_PicDelete);
+    RegisterOpClass('PicDeleteFromProject',            TPhoaOp_PicDeleteFromProject);
+    RegisterOpClass('PicDeleteWithFiles',              TPhoaOp_PicDeleteWithFiles);
     RegisterOpClass('PicDragAndDropInsideGroup',       TPhoaOp_PicDragAndDropInsideGroup);
     RegisterOpClass('PicDragAndDropToGroup',           TPhoaOp_PicDragAndDropToGroup);
     RegisterOpClass('PicEdit',                         TPhoaOp_PicEdit);

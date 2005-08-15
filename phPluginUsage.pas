@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.6 2005-03-02 17:13:45 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.7 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -51,7 +51,7 @@ var
   procedure PluginsFinalize;
 
 implementation
-uses ConsVars, udMsgBox, udAbout;
+uses ConsVars, phMsgBox, udAbout;
 
 type
 

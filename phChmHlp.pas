@@ -1,10 +1,10 @@
 //**********************************************************************************************************************
-//  $Id: ChmHlp.pas,v 1.4 2004-12-31 13:38:57 dale Exp $
+//  $Id: phChmHlp.pas,v 1.1 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
-unit ChmHlp;
+unit phChmHlp;
 
 interface
 uses Windows;
@@ -370,22 +370,22 @@ type
 implementation
 uses Forms, SysUtils;
 
-  function HtmlHelpShowHelp : HWND;
+  function HtmlHelpShowHelp: HWND;
   begin
     Result := HtmlHelp(0, PChar(Application.CurrentHelpFile), HH_DISPLAY_TOPIC, 0);
   end;
 
-  function HtmlHelpShowTopic(const aTopic : String) : HWND;
+  function HtmlHelpShowTopic(const aTopic: String): HWND;
   begin
     Result := HtmlHelp(0, PChar(Application.CurrentHelpFile+'::'+aTopic), HH_DISPLAY_TOPIC, 0);
   end;
 
-  function HtmlHelpShowContents : HWND;
+  function HtmlHelpShowContents: HWND;
   begin
     Result := HtmlHelp(0, PChar(Application.CurrentHelpFile), HH_DISPLAY_TOC, 0);
   end;
 
-  function HtmlHelpShowIndex : HWND;
+  function HtmlHelpShowIndex: HWND;
   begin
     Result := HtmlHelp(0, PChar(Application.CurrentHelpFile), HH_DISPLAY_INDEX, 0);
   end;

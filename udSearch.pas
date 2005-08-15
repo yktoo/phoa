@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.37 2005-06-26 16:04:01 dale Exp $
+//  $Id: udSearch.pas,v 1.38 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -290,7 +290,7 @@ implementation /////////////////////////////////////////////////////////////////
 {$R *.dfm}
 uses
   TypInfo, StrUtils, Mask, ToolEdit,
-  phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, udMsgBox,
+  phPhoa, phUtils, ConsVars, udSelKeywords, phSettings, phMsgBox,
   phParsingPicFilter, Main;
 
 var
@@ -1165,8 +1165,6 @@ type
     rbSearchResults.Enabled := FResultsGroup.Pics.Count>0;
      // Инициализируем дерево / pmSimple
     ApplyTreeSettings(tvSimpleCriteria);
-    SyncSimpleCriteria;
-    ActivateFirstVTNode(tvSimpleCriteria);
      // Поиск по выражению
     frExprPicFilter.Expression := sSearchExpression; 
   end;
@@ -1305,7 +1303,11 @@ type
   begin
     inherited SettingsLoad(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
+     // Загружаем список критериев
     FSimpleCriteria.RegLoad(rif, SRegSearch_SimpleCriteria);
+    SyncSimpleCriteria;
+    ActivateFirstVTNode(tvSimpleCriteria);
+     // Обновляем состояние
     UpdateSearchKind;
   end;
 

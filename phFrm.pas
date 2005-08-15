@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.1 2005-05-15 09:03:08 dale Exp $
+//  $Id: phFrm.pas,v 1.2 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phFrm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, ConsVars;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry;
 
 type
   TPhoaForm = class(TForm)
@@ -77,7 +77,7 @@ type
 
 implementation
 {$R *.dfm}
-uses ChmHlp, phUtils, phSettings;
+uses phChmHlp, phUtils, phSettings, ConsVars;
 
   procedure TPhoaForm.BeginUpdate;
   begin

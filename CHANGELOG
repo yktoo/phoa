@@ -8,6 +8,9 @@ File operations wizard:
   An option for renaming picture files being copied or moved, with using picture property values. 
   An option for copying the language file currently being used.
 
+Browser:
+  Delete pictures from all groups (shortcut Ctrl+Del) and Delete files (shortcut Shift+Ctrl+Del) functions.
+  Thumbnail focus rectangle color option.
 Viewer:
   Double-clicking the image acts like pressing Enter.
   Viewport center position is preserved on resize and scale change.

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.85 2005-06-20 19:34:24 dale Exp $
+//  $Id: Main.pas,v 1.86 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -207,6 +207,10 @@ type
     tbxlToolbarUndo: TTBXLabelItem;
     tvGroups: TVirtualStringTree;
     ulToolbarUndo: TTBXUndoList;
+    aDeletePicsFromProject: TAction;
+    aDeletePicsWithFiles: TAction;
+    iDeletePicsWithFiles: TTBXItem;
+    iDeletePicsFromProject: TTBXItem;
     procedure aaAbout(Sender: TObject);
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
@@ -276,6 +280,8 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
+    procedure aaDeletePicFromProject(Sender: TObject);
+    procedure aaDeletePicsWithFiles(Sender: TObject);
   private
      // Активный проект
     FProject: IPhotoAlbumProject;
@@ -469,12 +475,12 @@ var
 implementation
 {$R *.dfm}
 uses
-  GraphicStrings, Clipbrd, Math, jpeg, TypInfo, ChmHlp, // GraphicStrings => GraphicEx constants
+  GraphicStrings, Clipbrd, Math, jpeg, TypInfo, // GraphicStrings => GraphicEx constants
   VirtualDataObject,
-  phUtils, phPhoa,
+  phChmHlp, phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
-  phToolSetting, udMsgBox, udGroupProps, phPluginUsage, phGraphics;
+  phToolSetting, phMsgBox, udGroupProps, phPluginUsage, phGraphics;
 
    // Загружает ImageList из PNG-ресурса, если он ещё не загружен
   procedure MakeImagesLoaded(const sResourceName: String; Images: TCustomImageList);
@@ -535,6 +541,18 @@ uses
           if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPics', ISettingID_Dlgs_ConfmDelPics) then
             PerformOperation('PicDelete', ['Group', CurGroupX, 'Pics', Viewer.SelectedPics]);
       end;
+  end;
+
+  procedure TfMain.aaDeletePicFromProject(Sender: TObject);
+  begin
+    if (Viewer.SelectedPics.Count>0) and PhoaConfirm(False, 'SConfirm_DelPicsFromProject', ISettingID_Dlgs_ConfmDelPicsFromPj) then
+      PerformOperation('PicDeleteFromProject', ['Pics', Viewer.SelectedPics]);
+  end;
+
+  procedure TfMain.aaDeletePicsWithFiles(Sender: TObject);
+  begin
+    if (Viewer.SelectedPics.Count>0) and (mbrOK in PhoaMsgBox(mbkConfirmWarning, 'SConfirm_DelPicsWithFiles', True, False, [mbbOK, mbbCancel])) then
+      PerformOperation('PicDeleteWithFiles', ['Pics', Viewer.SelectedPics]);
   end;
 
   procedure TfMain.aaEdit(Sender: TObject);
@@ -922,6 +940,7 @@ uses
           ThumbBackBorderColor  := SettingValueInt (ISettingID_Browse_ViewerThBordCl);
           Color                 := SettingValueInt (ISettingID_Browse_ViewerBkColor);
           ThumbBackColor        := SettingValueInt (ISettingID_Browse_ViewerThBColor);
+          ThumbFocusRectColor   := SettingValueInt (ISettingID_Browse_ViewerThFocusClr);
           ThumbFontColor        := SettingValueInt (ISettingID_Browse_ViewerThFColor);
           ThumbShadowVisible    := SettingValueBool(ISettingID_Browse_ViewerThShadow);
           ThumbShadowBlurRadius := SettingValueInt(ISettingID_Browse_ViewerThShRadius);
@@ -1528,7 +1547,7 @@ uses
   begin
     BeginUpdate;
     try
-       // Изменились свойства проекта - нас интересуют только размерэ эскизов
+       // Изменились свойства проекта - нас интересуют только размеры эскизов
       if pocProjectProps in Changes then UpdateThumbnailSize;
        // Изменился список изображений проекта - уничтожаем результаты поиска
       if pocProjectPicList in Changes then DisplaySearchResults(True, False);
@@ -1557,6 +1576,8 @@ uses
           if FProject.ViewIndex>=0 then LoadGroupTree;
         end;
       end;
+       // Не поддерживает отката?
+      if pocNonUndoable in Changes then FUndo.SetNonUndoable(True);
     finally
       EndUpdate;
     end;
@@ -2090,28 +2111,30 @@ uses
       bView   := FProject.ViewIndex>=0;
        // Настраиваем Actions/Menus
       aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
-      aUndo.Enabled                := FUndo.CanUndo;
-      smUndoHistory.Enabled        := FUndo.CanUndo;
-      aNewGroup.Enabled            := gnk in [gnkProject, gnkPhoaGroup];
-      aNewPic.Enabled              := gnk in [gnkProject, gnkPhoaGroup];
-      aDelete.Enabled              := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel);
-      aEdit.Enabled                := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkSearch, gnkPhoaGroup, gnkViewGroup]) and bPicSel {!!!and not bView});
-      aCut.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
-      aCopy.Enabled                := bPicSel and (wClipbrdPicFormatID<>0);
-      aPaste.Enabled               := (gnk in [gnkProject, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
-      aSortPics.Enabled            := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPics;
-      aSelectAll.Enabled           := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<FViewedPics.Count);
-      aSelectNone.Enabled          := bPicSel;
-      aView.Enabled                := Viewer.ItemIndex>=0;
-      aViewSlideShow.Enabled       := Viewer.ItemIndex>=0;
-      aRemoveSearchResults.Enabled := FSearchNode<>nil;
-      aPicOps.Enabled              := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel;
-      aFileOperations.Enabled      := bPics;
-      aFind.Enabled                := bPics;
-       // Views
-      aPhoaView_Delete.Enabled     := bView;
-      aPhoaView_Edit.Enabled       := bView;
-      aPhoaView_MakeGroup.Enabled  := bView;
+      aUndo.Enabled                  := FUndo.CanUndo;
+      smUndoHistory.Enabled          := FUndo.CanUndo;
+      aNewGroup.Enabled              := gnk in [gnkProject, gnkPhoaGroup];
+      aNewPic.Enabled                := gnk in [gnkProject, gnkPhoaGroup];
+      aDelete.Enabled                := (bGr and (gnk=gnkPhoaGroup)) or (bPic and (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel);
+      aDeletePicsFromProject.Enabled := bPic and (gnk<>gnkNone) and bPicSel;
+      aDeletePicsWithFiles.Enabled   := bPic and (gnk<>gnkNone) and bPicSel;
+      aEdit.Enabled                  := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkSearch, gnkPhoaGroup, gnkViewGroup]) and bPicSel {!!!and not bView});
+      aCut.Enabled                   := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
+      aCopy.Enabled                  := bPicSel and (wClipbrdPicFormatID<>0);
+      aPaste.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
+      aSortPics.Enabled              := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPics;
+      aSelectAll.Enabled             := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<FViewedPics.Count);
+      aSelectNone.Enabled            := bPicSel;
+      aView.Enabled                  := Viewer.ItemIndex>=0;
+      aViewSlideShow.Enabled         := Viewer.ItemIndex>=0;
+      aRemoveSearchResults.Enabled   := FSearchNode<>nil;
+      aPicOps.Enabled                := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel;
+      aFileOperations.Enabled        := bPics;
+      aFind.Enabled                  := bPics;
+       // Views                      
+      aPhoaView_Delete.Enabled       := bView;
+      aPhoaView_Edit.Enabled         := bView;
+      aPhoaView_MakeGroup.Enabled    := bView;
        // Drag-and-drop
       Viewer.DragEnabled       := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and SettingValueBool(ISettingID_Browse_ViewerDragDrop) and not bView;
        // -- Переупорядочивать эскизы можно в группах фотоальбома, если не рекурсивный режим или у текущей группы нет

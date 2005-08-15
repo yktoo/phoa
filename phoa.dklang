@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.53 2005-06-05 16:36:55 dale Exp $
+;  $Id: phoa.dklang,v 1.54 2005-08-15 11:25:11 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -140,6 +140,12 @@ aHelpSupport.Hint=00000218,Product support|Open the product support page in the 
 aViewSlideShow.Caption=00000220,Vie&w slide show
 aViewSlideShow.Category=00000219,Edit
 aViewSlideShow.Hint=00000221,View slide show|Start view mode with slide show
+aDeletePicsFromProject.Caption=00000223,De&lete from all groups
+aDeletePicsFromProject.Category=00000222,Edit
+aDeletePicsFromProject.Hint=00000224,Delete from all groups|Delete selected pictures from all photo album groups
+aDeletePicsWithFiles.Caption=00000226,Delete &files
+aDeletePicsWithFiles.Category=00000225,Edit
+aDeletePicsWithFiles.Hint=00000227,Delete files|Delete selected pictures from all groups and wipe corresponding files
 
 [dPicProps]
 Caption=00000003,Properties: picture
@@ -721,6 +727,7 @@ ISettingID_Browse_ViewerThBColor=Thumbnail background color:
 ISettingID_Browse_ViewerThBordCl=Thumbnail background border custom color
 ISettingID_Browse_ViewerThBordSt=Thumbnail background border style
 ISettingID_Browse_ViewerThFColor=Thumbnail font color:
+ISettingID_Browse_ViewerThFocusClr=Thumbnail focus rectangle color:
 ISettingID_Browse_ViewerThInfo=Picture details displayed on the thumbnails
 ISettingID_Browse_ViewerThLBProp=At the left bottom corner:
 ISettingID_Browse_ViewerThLTProp=At the left top corner:
@@ -748,6 +755,7 @@ ISettingID_Dlgs_APW_SkipChkPage=Always skip 'Check files' page
 ISettingID_Dlgs_ConfmAppExit=Before exit (when photo album is not modified)
 ISettingID_Dlgs_ConfmDelGroup=Before group deletion
 ISettingID_Dlgs_ConfmDelPics=Before picture deletion
+ISettingID_Dlgs_ConfmDelPicsFromPj=Before picture from all photo album groups deletion
 ISettingID_Dlgs_ConfmDelView=Before view deletion
 ISettingID_Dlgs_ConfmOldFile=Before saving file of an older version
 ISettingID_Dlgs_Confms=Confirmations
@@ -915,6 +923,8 @@ SCannotUndo=(cannot undo)
 SConfirm_AppExit=Exit the program?
 SConfirm_DelGroup=Delete selected group?
 SConfirm_DelPics=Delete selected pictures?
+SConfirm_DelPicsFromProject=Selected pictures will be deleted from all photo album groups.\nDo you wish to continue?
+SConfirm_DelPicsWithFiles=Selected pictures will be deleted from all photo album groups, and also all corresponding files will be erased.\nWARNING: this operation is not undoable!\n\nDo you wish to continue?
 SConfirm_DelView=Delete current view?
 SConfirm_FileNotSaved=Photo album file "%s" is not saved. Do you wish to save changes?
 SConfirm_FileOverwrite=Overwrite the file "%s"?
@@ -937,6 +947,7 @@ SDlgTitle_SelectPicFile=Select a picture file
 SDlgTitle_Warning=PhoA: Warning
 SErrCannotCreateFolder=Unable to create folder "%s"
 SErrCannotDecodePicture=Error decoding picture file "%s":\n%s
+SErrCannotDeleteFile=Error deleting file "%s":\n%s
 SErrCannotLoadPicture=Error loading picture file "%s":\n%s
 SErrCannotRead=Stream read error
 SErrCannotUsePathPropsInFormat=Property "%s" cannot be used in a file name format as it contains file path
@@ -1118,6 +1129,7 @@ TPhoaOp_GroupNew=New group
 TPhoaOp_GroupRename=Rename group
 TPhoaOp_PicAdd=Add pictures
 TPhoaOp_PicDelete=Delete pictures
+TPhoaOp_PicDeleteFromProject=Delete pictures from all groups
 TPhoaOp_PicDragAndDropInsideGroup=Drag pictures
 TPhoaOp_PicDragAndDropToGroup=Drag pictures
 TPhoaOp_PicEdit=Edit picture properties

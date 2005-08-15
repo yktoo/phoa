@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.20 2005-05-15 09:03:08 dale Exp $
+//  $Id: phDlg.pas,v 1.21 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -49,7 +49,7 @@ type
 
 implementation
 {$R *.dfm}
-uses ChmHlp, phUtils, ConsVars, phObj, phGUIObj;
+uses phChmHlp, phUtils, ConsVars, phObj, phGUIObj;
 
    //===================================================================================================================
    // TPhoaDialog

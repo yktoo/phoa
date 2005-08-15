@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.97 2005-06-05 16:36:55 dale Exp $
+//  $Id: ConsVars.pas,v 1.98 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -568,6 +568,8 @@ const
   iiConvert                       = 81;
   iiSomething                     = 82;
   iiBlank                         = 83;
+  iiDeleteFromProject             = 84;
+  iiDeletePicsWithFiles           = 85;
 
    // Help topics
   IDH_start                       = 00001;
@@ -750,10 +752,11 @@ const
   ISettingID_Browse_Viewer             = 0;    // Viewer
     ISettingID_Browse_ViewerBkColor    = 1110; // Viewer: Цвет фона
     ISettingID_Browse_ViewerThBColor   = 1111; // Viewer: Цвет фона эскиза
-    ISettingID_Browse_ViewerThFColor   = 1112; // Viewer: Цвет шрифта эскиза
-    ISettingID_Browse_ViewerDragDrop   = 1113; // Viewer: Drag'n'Drop
-    ISettingID_Browse_ViewerTooltips   = 1114; // Viewer: Показывать всплывающие описания эскизов
-    ISettingID_Browse_ViewerTipProps   = 1115; // Viewer: Отображать во всплывающих описаниях
+    ISettingID_Browse_ViewerThFocusClr = 1112; // Viewer: Цвет рамки сфокусированного эскиза
+    ISettingID_Browse_ViewerThFColor   = 1113; // Viewer: Цвет шрифта эскиза
+    ISettingID_Browse_ViewerDragDrop   = 1114; // Viewer: Drag'n'Drop
+    ISettingID_Browse_ViewerTooltips   = 1115; // Viewer: Показывать всплывающие описания эскизов
+    ISettingID_Browse_ViewerTipProps   = 1116; // Viewer: Отображать во всплывающих описаниях
     ISettingID_Browse_ViewerThInfo     = 1120; // Viewer: Данные, отображаемые на эскизах
     ISettingID_Browse_ViewerThLTProp   = 1121; // Viewer: Left top corner
     ISettingID_Browse_ViewerThRTProp   = 1122; // Viewer: Right top corner
@@ -810,9 +813,10 @@ const
   ISettingID_Dlgs_Confms               = 0;    // Подтверждения
     ISettingID_Dlgs_ConfmDelGroup      = 3010; // Подтверждение: Перед удалением группы
     ISettingID_Dlgs_ConfmDelPics       = 3011; // Подтверждение: Перед удалением изображений
-    ISettingID_Dlgs_ConfmDelView       = 3012; // Подтверждение: Перед удалением представления
-    ISettingID_Dlgs_ConfmOldFile       = 3013; // Подтверждение: Перед сохранением файла устаревшей версии
-    ISettingID_Dlgs_ConfmAppExit       = 3014; // Подтверждение: Перед выходом (при сохранённом фотоальбоме)
+    ISettingID_Dlgs_ConfmDelPicsFromPj = 3012; // Подтверждение: Перед удалением изображений из всех групп проекта
+    ISettingID_Dlgs_ConfmDelView       = 3013; // Подтверждение: Перед удалением представления
+    ISettingID_Dlgs_ConfmOldFile       = 3014; // Подтверждение: Перед сохранением файла устаревшей версии
+    ISettingID_Dlgs_ConfmAppExit       = 3015; // Подтверждение: Перед выходом (при сохранённом проекте)
   ISettingID_Dlgs_Notifies             = 0;    // Уведомления
     ISettingID_Dlgs_NotifyDragCopy     = 3030; // Уведомление: После копирования изображений через Drag'n'Drop
     ISettingID_Dlgs_NotifyDragMove     = 3031; // Уведомление: После перемещения изображений через Drag'n'Drop
@@ -1177,6 +1181,7 @@ type
       Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Browse_Viewer,           '@ISettingID_Browse_Viewer');          
         Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerBkColor,    '@ISettingID_Browse_ViewerBkColor',    $d7d7d7);
         Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerThBColor,   '@ISettingID_Browse_ViewerThBColor',   clBtnFace);
+        Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerThFocusClr, '@ISettingID_Browse_ViewerThFocusClr', clHighlight);
         Lvl3 := TPhoaColorSetting.Create     (Lvl2, ISettingID_Browse_ViewerThFColor,   '@ISettingID_Browse_ViewerThFColor',   clWindowText);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Browse_ViewerDragDrop,   '@ISettingID_Browse_ViewerDragDrop',   True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Browse_ViewerTooltips,   '@ISettingID_Browse_ViewerTooltips',   True);
@@ -1249,6 +1254,7 @@ type
       Lvl2 := TPhoaSetting.Create            (Lvl1, ISettingID_Dlgs_Confms,             '@ISettingID_Dlgs_Confms');            
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmDelGroup,      '@ISettingID_Dlgs_ConfmDelGroup',      True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmDelPics,       '@ISettingID_Dlgs_ConfmDelPics',       True);
+        Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmDelPicsFromPj, '@ISettingID_Dlgs_ConfmDelPicsFromPj', True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmDelView,       '@ISettingID_Dlgs_ConfmDelView',       True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmOldFile,       '@ISettingID_Dlgs_ConfmOldFile',       True);
         Lvl3 := TPhoaBoolSetting.Create      (Lvl2, ISettingID_Dlgs_ConfmAppExit,       '@ISettingID_Dlgs_ConfmAppExit',       False);

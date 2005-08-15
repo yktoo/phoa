@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.37 2005-03-02 17:13:45 dale Exp $
+//  $Id: phGUIObj.pas,v 1.38 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -135,26 +135,27 @@ type
      //   контекстное меню
     FShellCtxMenuOnMouseUp: Boolean;
      // Props storage
+    FBorderStyle: TBorderStyle;
+    FDisplayMode: TThumbViewerDisplayMode;
+    FDragEnabled: Boolean;
     FDragInsideEnabled: Boolean;
     FOnSelectionChange: TNotifyEvent;
-    FBorderStyle: TBorderStyle;
-    FDragEnabled: Boolean;
-    FShowThumbTooltips: Boolean;
-    FThumbTooltipProps: TPicProperties;
-    FThumbBackColor: TColor;
-    FThumbFontColor: TColor;
     FOnStartViewMode: TNotifyEvent;
-    FDisplayMode: TThumbViewerDisplayMode;
-    FTopOffset: Integer;
-    FThumbnailSize: TSize;
-    FThumbBackBorderStyle: TThumbBackBorderStyle;
+    FShowThumbTooltips: Boolean;
+    FStates: TThumbnailViewerStates;
     FThumbBackBorderColor: TColor;
-    FThumbShadowOpacity: Byte;
+    FThumbBackBorderStyle: TThumbBackBorderStyle;
+    FThumbBackColor: TColor;
+    FThumbFocusRectColor: TColor;
+    FThumbFontColor: TColor;
+    FThumbnailSize: TSize;
+    FThumbShadowBlurRadius: Integer;
     FThumbShadowColor: TColor;
     FThumbShadowOffset: TPoint;
-    FThumbShadowBlurRadius: Integer;
+    FThumbShadowOpacity: Byte;
     FThumbShadowVisible: Boolean;
-    FStates: TThumbnailViewerStates;
+    FThumbTooltipProps: TPicProperties;
+    FTopOffset: Integer;
      // Painting stage handlers
     procedure Paint_EraseBackground(const Info: TThumbnailViewerPaintInfo);
     procedure Paint_Thumbnails(const Info: TThumbnailViewerPaintInfo);
@@ -218,6 +219,7 @@ type
     function  GetIndexSelected(iIndex: Integer): Boolean;
     function  GetSelectedIndexes(Index: Integer): Integer;
     function  GetThumbCornerDetails(Corner: TThumbCorner): TThumbCornerDetail;
+    function  GetUpdateLocked: Boolean;
     procedure SetBorderStyle(Value: TBorderStyle);
     procedure SetDisplayMode(Value: TThumbViewerDisplayMode);
     procedure SetItemIndex(Value: Integer);
@@ -226,6 +228,7 @@ type
     procedure SetThumbBackBorderStyle(Value: TThumbBackBorderStyle);
     procedure SetThumbBackColor(Value: TColor);
     procedure SetThumbCornerDetails(Corner: TThumbCorner; const Value: TThumbCornerDetail);
+    procedure SetThumbFocusRectColor(Value: TColor);
     procedure SetThumbFontColor(Value: TColor);
     procedure SetThumbnailSize(const Value: TSize);
     procedure SetThumbShadowBlurRadius(Value: Integer);
@@ -235,7 +238,6 @@ type
     procedure SetThumbShadowVisible(Value: Boolean);
     procedure SetThumbTooltipProps(Value: TPicProperties);
     procedure SetTopOffset(Value: Integer);
-    function GetUpdateLocked: Boolean;
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -305,6 +307,8 @@ type
     property ThumbBackBorderStyle: TThumbBackBorderStyle read FThumbBackBorderStyle write SetThumbBackBorderStyle;
      // -- Цвет фона эскизов
     property ThumbBackColor: TColor read FThumbBackColor write SetThumbBackColor;
+     // -- Цвет рамки сфокусированного эскиза
+    property ThumbFocusRectColor: TColor read FThumbFocusRectColor write SetThumbFocusRectColor; 
      // -- Цвет шрифта эскизов
     property ThumbFontColor: TColor read FThumbFontColor write SetThumbFontColor;
      // -- Данные, отображаемые на эскизах
@@ -618,6 +622,7 @@ uses Math, Themes, phUtils;
     FThumbBackBorderColor  := clGray;
     FThumbBackBorderStyle  := tbbsXP;
     FThumbBackColor        := clBtnFace;
+    FThumbFocusRectColor   := clHighlight;
     FThumbFontColor        := clWindowText;
     FThumbnailSize.cx      := 100;
     FThumbnailSize.cy      := 100;
@@ -1217,13 +1222,12 @@ uses Math, Themes, phUtils;
 
      // Отрисовывает FocusRect эскиза, если эскиз сфокусирован
     procedure DrawThumbFocusRect(iIndex: Integer; const r: TRect);
+    var c32: TColor32;
     begin
       if not Info.bFocused or (i<>FItemIndex) then Exit;
-      with Info.Bitmap.Canvas do begin
-        SetTextColor(Handle, $ffffff);
-        SetBkColor  (Handle, $000000);
-        DrawFocusRect(r);
-      end;
+      c32 := Color32(FThumbFocusRectColor);
+      Info.Bitmap.FrameRectS(r, c32);
+      Info.Bitmap.FrameRectS(r.Left+1, r.Top+1, r.Right-1, r.Bottom-1, c32);
     end;
 
      // Возвращает битмэп с "подложкой" эскиза: выделенного или обычного (в зависимости от bSelected); кэширует
@@ -1533,6 +1537,14 @@ uses Math, Themes, phUtils;
   begin
     FThumbCornerDetails[Corner] := Value;
     LayoutChanged;
+  end;
+
+  procedure TThumbnailViewer.SetThumbFocusRectColor(Value: TColor);
+  begin
+    if FThumbFocusRectColor<>Value then begin
+      FThumbFocusRectColor := Value;
+      InvalidateItem(FItemIndex);
+    end;
   end;
 
   procedure TThumbnailViewer.SetThumbFontColor(Value: TColor);

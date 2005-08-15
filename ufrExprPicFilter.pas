@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrExprPicFilter.pas,v 1.2 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrExprPicFilter.pas,v 1.3 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -111,7 +111,7 @@ implementation
 {$R *.dfm}
 uses
   SynEditTypes,
-  phIntf, phUtils, phSettings, phParsingPicFilter, phPicFilterHighlighter, ConsVars, udMsgBox, Main;
+  phIntf, phUtils, phSettings, phParsingPicFilter, phPicFilterHighlighter, ConsVars, phMsgBox, Main;
 
 var
    // Файл, использовавшийся в последний раз для загрузки/сохранения файла выражения

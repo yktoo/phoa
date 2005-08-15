@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.12 2005-05-15 09:03:08 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.13 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -55,7 +55,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, Main, Clipbrd, phSettings, udMsgBox;
+uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
 
   procedure TfrWzPage_Log.aaCopy(Sender: TObject);
   var n: PVirtualNode;

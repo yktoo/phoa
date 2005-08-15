@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.50 2005-05-16 03:51:01 dale Exp $
+//  $Id: phUtils.pas,v 1.51 2005-08-15 11:25:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, Forms,
   TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
-  phIntf, ConsVars, phObj;
+  phIntf, phObj, ConsVars;
 
    // Exception raising
   procedure PhoaException(const sMsg: String); overload;
@@ -174,7 +174,7 @@ uses
 
 implementation
 uses
-  TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, udMsgBox, phPhoa;
+  TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, phMsgBox, phPhoa;
 
 type
    //===================================================================================================================
