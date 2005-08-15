@@ -1,10 +1,10 @@
 //**********************************************************************************************************************
-//  $Id: udMsgBox.pas,v 1.11 2005-02-12 15:36:37 dale Exp $
+//  $Id: phMsgBox.pas,v 1.1 2005-08-15 11:19:54 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
-unit udMsgBox;
+unit phMsgBox;
 
 interface
 
@@ -114,7 +114,7 @@ const
 
 implementation
 {$R *.dfm}
-uses phUtils, phSettings, ChmHlp;
+uses phUtils, phSettings, phChmHlp;
 
   function PhoaMsgBox(AKind: TMessageBoxKind; const sMessage: String; bMsgIsConstName, bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
   begin
