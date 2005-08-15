@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.14 2005-05-15 09:03:08 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/

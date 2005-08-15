@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.24 2005-05-15 09:03:08 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -60,7 +60,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  phUtils, ufAddFilesWizard, phSettings, udMsgBox, phGraphics;
+  phUtils, ufAddFilesWizard, phSettings, phMsgBox, phGraphics;
 
   procedure TfrWzPageAddFiles_SelFiles.AdjustAdvancedCtls(bShowAdvanced: Boolean);
   begin

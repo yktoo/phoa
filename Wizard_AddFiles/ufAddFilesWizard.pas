@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.34 2005-05-15 09:03:08 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -198,7 +198,7 @@ implementation
 uses
   phUtils, phMetadata, Main, VirtualShellUtilities,
   ufrWzPage_Log, ufrWzPage_Processing, ufrWzPageAddFiles_SelFiles, ufrWzPageAddFiles_CheckFiles,
-  phPhoa, phSettings, udMsgBox;
+  phPhoa, phSettings, phMsgBox;
 
   function AddFiles(AApp: IPhotoAlbumApp; AGroup: IPhotoAlbumPicGroup; AUndoOperations: TPhoaOperations; AAddList: TStrings): Boolean;
   var bShowWizard: Boolean;

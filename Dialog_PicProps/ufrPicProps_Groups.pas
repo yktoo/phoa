@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.20 2005-05-15 09:03:08 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -36,7 +36,7 @@ type
 
 implementation
 {$R *.dfm}
-uses Main, phUtils, phSettings, udMsgBox;
+uses Main, phUtils, phSettings, phMsgBox;
 
 type
    // Данные, ассоциированные с каждым узлом дерева групп

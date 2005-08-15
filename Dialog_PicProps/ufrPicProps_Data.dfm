@@ -157,7 +157,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     EditMask = '!99:99:99;1;_'
     MaxLength = 8
     TabOrder = 1
-    Text = '  *  *  '
+    Text = '  :  :  '
     OnChange = PicPropEditorChange
   end
   object cbMedia: TComboBox

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.34 2005-05-15 09:03:08 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -295,7 +295,7 @@ uses
   ufrWzPage_Processing, ufrWzPageFileOps_SelTask, ufrWzPageFileOps_SelPics, ufrWzPageFileOps_SelFolder,
   ufrWzPageFileOps_MoveOptions, ufrWzPageFileOps_DelOptions, ufrWzPageFileOps_RepairOptions,
   Main, ufrWzPageFileOps_CDOptions, ufrWzPageFileOps_RepairSelLinks,
-  ufrWzPageFileOps_MoveOptions2, phSettings, udMsgBox;
+  ufrWzPageFileOps_MoveOptions2, phSettings, phMsgBox;
 
   function DoFileOperations(AApp: IPhotoAlbumApp; out bProjectChanged: Boolean): Boolean;
   begin
