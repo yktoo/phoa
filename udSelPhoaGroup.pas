@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelPhoaGroup.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
+//  $Id: udSelPhoaGroup.pas,v 1.20 2005-08-18 13:20:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -18,8 +18,13 @@ type
     dklcMain: TDKLanguageController;
     lGroup: TLabel;
     tvGroups: TVirtualStringTree;
+    procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+    procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -56,7 +61,7 @@ uses phUtils, ConsVars, Main, phSettings;
 
   procedure TdSelPhoaGroup.ButtonClick_OK;
   begin
-    FApp.PerformOperation('ViewMakeGroup', ['Group', PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^]);
+    FApp.PerformOperation('ViewMakeGroup', ['Group', PicGroupsVT_GetNodeGroup(tvGroups, tvGroups.FocusedNode)]);
     inherited ButtonClick_OK;
   end;
 
@@ -64,7 +69,8 @@ uses phUtils, ConsVars, Main, phSettings;
   begin
     inherited DoCreate;
     HelpContext := IDH_intf_sel_phoa_group;
-    tvGroups.NodeDataSize := SizeOf(Pointer);
+    tvGroups.HintMode     := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+    tvGroups.NodeDataSize := SizeOf(TObject);
     ApplyTreeSettings(tvGroups);
   end;
 
@@ -79,53 +85,59 @@ uses phUtils, ConsVars, Main, phSettings;
     Result := tvGroups.FocusedNode<>nil;
   end;
 
+  procedure TdSelPhoaGroup.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  begin
+    PicGroupsVT_HandleBeforeCellPaint(Sender, TargetCanvas, Node, Column, CellRect, FApp, False);
+  end;
+
+  procedure TdSelPhoaGroup.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+  begin
+    PicGroupsVT_HandleBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction, False);
+  end;
+
   procedure TdSelPhoaGroup.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
     Modified := True;
   end;
 
+  procedure TdSelPhoaGroup.tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+  begin
+    PicGroupsVT_HandleCollapsing(Sender, Node, Allowed);
+  end;
+
+  procedure TdSelPhoaGroup.tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PicGroupsVT_HandleExpandedCollapsed(Sender, Node, False);
+  end;
+
   procedure TdSelPhoaGroup.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^ := nil;
+    PicGroupsVT_HandleFreeNode(Sender, Node);
+  end;
+
+  procedure TdSelPhoaGroup.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+  begin
+    PicGroupsVT_HandleGetHint(Sender, Node, Column, LineBreakStyle, HintText, FApp, False);
   end;
 
   procedure TdSelPhoaGroup.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := iif(Sender.NodeParent[Node]=nil, iiPhoA, iif(Kind=ikSelected, iiFolderOpen, iiFolder));
+    PicGroupsVT_HandleGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex, False);
   end;
 
   procedure TdSelPhoaGroup.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    p: PPhotoAlbumPicGroup;
-    s: String;
   begin
-    p := Sender.GetNodeData(Node);
-    if p<>nil then
-      if TextType=ttStatic then begin
-        if p^.Pics.Count>0 then s := Format('(%d)', [p^.Pics.Count]);
-      end else if Sender.NodeParent[Node]<>nil then s := p^.Text
-      else s := ConstVal('SPhotoAlbumNode');
-    CellText := PhoaAnsiToUnicode(s);
+    PicGroupsVT_HandleGetText(Sender, Node, Column, TextType, CellText, nil);
   end;
 
   procedure TdSelPhoaGroup.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var p, pp: PPhotoAlbumPicGroup;
   begin
-    p := Sender.GetNodeData(Node);
-    if ParentNode=nil then
-      p^ := FApp.ProjectX.RootGroupX 
-    else begin
-      pp := Sender.GetNodeData(ParentNode);
-      p^ := pp^.GroupsX[Node.Index];
-    end;
-    Sender.ChildCount[Node] := p^.Groups.Count;
-     // Разворачиваем корневой узел или если группа развёрнута
-    if (ParentNode=nil) or p^.Expanded then Include(InitialStates, ivsExpanded);
+    PicGroupsVT_HandleInitNode(Sender, ParentNode, Node, InitialStates, FApp.ProjectX.RootGroupX, nil, False, True);
   end;
 
   procedure TdSelPhoaGroup.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   begin
-    if TextType=ttStatic then TargetCanvas.Font.Color := clGrayText;
+    PicGroupsVT_HandlePaintText(Sender, TargetCanvas, Node, Column, TextType);
   end;
 
 end.

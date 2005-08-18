@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.18 2005-05-15 09:03:08 dale Exp $
+//  $Id: udPicOps.pas,v 1.19 2005-08-18 13:20:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -20,8 +20,11 @@ type
     lGroup: TLabel;
     lOp: TLabel;
     tvGroups: TVirtualStringTree;
+    procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -64,7 +67,7 @@ uses phUtils, Main, phSettings;
     FApp.PerformOperation(
       'PicOperation',
       ['SourceGroup',  FApp.CurGroup,
-       'TargetGroup',  PPhotoAlbumPicGroup(tvGroups.GetNodeData(tvGroups.FocusedNode))^,
+       'TargetGroup',  PicGroupsVT_GetNodeGroup(tvGroups, tvGroups.FocusedNode),
        'Pics',         FApp.SelectedPics,
        'PicOperation', Byte(cbOp.ItemIndex)]);
     inherited ButtonClick_OK;
@@ -75,8 +78,8 @@ uses phUtils, Main, phSettings;
     inherited DoCreate;
     HelpContext := IDH_intf_pic_operations;
     ApplyTreeSettings(tvGroups);
-    tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
-    tvGroups.NodeDataSize  := fMain.tvGroups.NodeDataSize;
+    tvGroups.HintMode     := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
+    tvGroups.NodeDataSize := SizeOf(TObject);
   end;
 
   procedure TdPicOps.ExecuteInitialize;
@@ -98,15 +101,17 @@ uses phUtils, Main, phSettings;
   var n: PVirtualNode;
   begin
     n := tvGroups.FocusedNode;
-    Result :=
-      (cbOp.ItemIndex>=0) and
-      (n<>nil) and
-      (PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^<>FApp.CurGroup);
+    Result := (cbOp.ItemIndex>=0) and (n<>nil) and (PicGroupsVT_GetNodeGroup(tvGroups, n)<>FApp.CurGroup);
+  end;
+
+  procedure TdPicOps.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  begin
+    PicGroupsVT_HandleBeforeCellPaint(Sender, TargetCanvas, Node, Column, CellRect, FApp, False);
   end;
 
   procedure TdPicOps.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   begin
-    fMain.tvGroupsBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction);
+    PicGroupsVT_HandleBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction, False);
   end;
 
   procedure TdPicOps.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -114,38 +119,46 @@ uses phUtils, Main, phSettings;
     Modified := True;
   end;
 
+  procedure TdPicOps.tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+  begin
+    PicGroupsVT_HandleCollapsing(Sender, Node, Allowed);
+  end;
+
+  procedure TdPicOps.tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PicGroupsVT_HandleExpandedCollapsed(Sender, Node, False);
+  end;
+
   procedure TdPicOps.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    fMain.tvGroupsFreeNode(Sender, Node);
+    PicGroupsVT_HandleFreeNode(Sender, Node);
   end;
 
   procedure TdPicOps.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
   begin
-    fMain.tvGroupsGetHint(Sender, Node, Column, LineBreakStyle, HintText);
+    PicGroupsVT_HandleGetHint(Sender, Node, Column, LineBreakStyle, HintText, FApp, False);
   end;
 
   procedure TdPicOps.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   begin
+    PicGroupsVT_HandleGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex, False);
      // Операции группы с самой собой делать бессмысленно
-    if (Kind in [ikNormal, ikSelected]) and (PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^=FApp.CurGroup) then
-      ImageIndex := iiNo
-    else
-      fMain.tvGroupsGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex);
+    if (Kind=ikOverlay) and (PicGroupsVT_GetNodeGroup(Sender, Node)=FApp.CurGroup) then ImageIndex := iiNo;
   end;
 
   procedure TdPicOps.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
-    fMain.tvGroupsGetText(Sender, Node, Column, TextType, CellText);
+    PicGroupsVT_HandleGetText(Sender, Node, Column, TextType, CellText, nil);
   end;
 
   procedure TdPicOps.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
   begin
-    fMain.tvGroupsInitNode(Sender, ParentNode, Node, InitialStates);
+    PicGroupsVT_HandleInitNode(Sender, ParentNode, Node, InitialStates, FApp.ProjectX.RootGroupX, nil, False, True);
   end;
 
   procedure TdPicOps.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   begin
-    fMain.tvGroupsPaintText(Sender, TargetCanvas, Node, Column, TextType);
+    PicGroupsVT_HandlePaintText(Sender, TargetCanvas, Node, Column, TextType);
   end;
 
 end.

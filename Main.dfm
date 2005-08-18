@@ -346,7 +346,7 @@ inherited fMain: TfMain
         OnBeforeItemErase = tvGroupsBeforeItemErase
         OnChange = tvGroupsChange
         OnChecked = tvGroupsChecked
-        OnCollapsed = SetGroupExpanded
+        OnCollapsed = tvGroupsExpandedCollapsed
         OnCollapsing = tvGroupsCollapsing
         OnCreateEditor = tvGroupsCreateEditor
         OnDragAllowed = tvGroupsDragAllowed
@@ -355,7 +355,7 @@ inherited fMain: TfMain
         OnEditCancelled = tvGroupsEditCancelled
         OnEdited = tvGroupsEdited
         OnEditing = tvGroupsEditing
-        OnExpanded = SetGroupExpanded
+        OnExpanded = tvGroupsExpandedCollapsed
         OnFreeNode = tvGroupsFreeNode
         OnGetText = tvGroupsGetText
         OnPaintText = tvGroupsPaintText

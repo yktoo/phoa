@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.51 2005-08-15 11:25:11 dale Exp $
+//  $Id: phUtils.pas,v 1.52 2005-08-18 13:20:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, Forms,
   TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
-  phIntf, phObj, ConsVars;
+  phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, ConsVars;
 
    // Exception raising
   procedure PhoaException(const sMsg: String); overload;
@@ -162,6 +162,47 @@ uses
    // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
   function  GTreeHintModeToVTHintMode(GTHM: TGroupTreeHintMode): TVTHintMode;
 
+   // Возвращает вид узла виртуального дерева, отображающего группы изображений. bViewGroups должен быть True, если
+   //   дерево отображает иерархию групп представления; False, если иерархию групп проекта
+  function  PicGroupsVT_GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode; bViewGroups: Boolean): TGroupNodeKind;
+   // Возвращает группу изображений, соответствующую узлу виртуального дерева, отображающего группы изображений
+  function  PicGroupsVT_GetNodeGroup(Tree: TBaseVirtualTree; Node: PVirtualNode): IPhotoAlbumPicGroup;
+   // Обработчики событий виртуальных деревьев, отображающих группы изображений. NB: нет поддержки для editable-деревьев
+   // -- OnBeforeCellPaint
+   //      App         - приложение
+   //      bViewGroups - True, если дерево отображает иерархию групп представления; False, если иерархию групп проекта
+  procedure PicGroupsVT_HandleBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect; App: IPhotoAlbumApp; bViewGroups: Boolean);
+   // -- OnBeforeItemErase
+   //      bViewGroups - True, если дерево отображает иерархию групп представления; False, если иерархию групп проекта
+  procedure PicGroupsVT_HandleBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction; bViewGroups: Boolean);
+   // -- OnCollapsing
+  procedure PicGroupsVT_HandleCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+   // -- OnExpanded/OnCollapsed
+   //      bStoreExpanded - если True, то "развёрнутость" узла сохраняется в свойство Expanded соответствующей ему
+   //                       группы
+  procedure PicGroupsVT_HandleExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode; bStoreExpanded: Boolean);
+   // -- OnFreeNode
+  procedure PicGroupsVT_HandleFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+   // -- OnGetHint
+   //      App         - приложение
+   //      bViewGroups - True, если дерево отображает иерархию групп представления; False, если иерархию групп проекта
+  procedure PicGroupsVT_HandleGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString; App: IPhotoAlbumApp; bViewGroups: Boolean);
+   // -- OnGetImageIndex
+   //      bViewGroups - True, если дерево отображает иерархию групп представления; False, если иерархию групп проекта
+  procedure PicGroupsVT_HandleGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; bViewGroups: Boolean);
+   // -- OnGetText
+   //      View - отображаемое в дереве представление; nil, если дерево отображает иерархию групп проекта
+  procedure PicGroupsVT_HandleGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString; View: IPhoaView);
+   // -- OnInitNode
+   //      RootGroup          - корневая группа, отображаемая в дереве в настоящий момент (проекта или представления)
+   //      SearchResultsGroup - группа результатов поиска; nil, если неприменимо
+   //      bRootButton        - если True, у корневого узла выставляется CheckType=ctButton
+   //      bInitExpanded      - если True, "развёрнутость" узла инициализируется значением свойства Expanded
+   //                           соответствующей узлу группы для некорневых узлов (корневые узлы ВСЕГДА разворачиваются)
+  procedure PicGroupsVT_HandleInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates; RootGroup, SearchResultsGroup: IPhotoAlbumPicGroup; bRootButton, bInitExpanded: Boolean);
+   // -- OnPaintText
+  procedure PicGroupsVT_HandlePaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+
    // Укорачивает строку как имя файла
   function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
 
@@ -174,7 +215,10 @@ uses
 
 implementation
 uses
-  TypInfo, Variants, Registry, ShellAPI, DKLang, phSettings, phMsgBox, phPhoa;
+  TypInfo, Variants, Registry, ShellAPI,
+  GR32,
+  DKLang,
+  phSettings, phMsgBox, phPhoa, phGraphics;
 
 type
    //===================================================================================================================
@@ -966,6 +1010,149 @@ type
       hmHint);   // gthmInfo
   begin
     Result := aHM[GTHM];
+  end;
+
+  function PicGroupsVT_GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode; bViewGroups: Boolean): TGroupNodeKind;
+  var Group: IPhotoAlbumPicGroup;
+  begin
+    Result := gnkNone;
+    if Node<>nil then begin
+      Group := PicGroupsVT_GetNodeGroup(Tree, Node);
+      if Group.Owner=nil then begin
+        if Group.ID=IGroupID_SearchResults then Result := gnkSearch
+        else if bViewGroups                then Result := gnkView
+        else                                    Result := gnkProject;
+      end else
+        if bViewGroups then Result := gnkViewGroup else Result := gnkPhoaGroup;
+    end;
+  end;
+
+  function PicGroupsVT_GetNodeGroup(Tree: TBaseVirtualTree; Node: PVirtualNode): IPhotoAlbumPicGroup;
+  begin
+    if Node=nil then Result := nil else Result := PPhotoAlbumPicGroup(Tree.GetNodeData(Node))^;
+  end;
+
+  procedure PicGroupsVT_HandleBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect; App: IPhotoAlbumApp; bViewGroups: Boolean);
+  var p: TPoint;
+  begin
+    if PicGroupsVT_GetNodeKind(Sender, Node, bViewGroups) in [gnkPhoaGroup, gnkViewGroup] then begin
+      p := CellRect.TopLeft;
+      Inc(p.x, Sender.GetNodeLevel(Node)*(Sender as TVirtualStringTree).Indent+4);
+      if Node.CheckType<>ctNone then Inc(p.x, 18);
+      PaintGroupIcon(
+        PicGroupsVT_GetNodeGroup(Sender, Node).IconData,
+        TargetCanvas.Handle,
+        p,
+        Color32(TVirtualStringTree(Sender).Color),
+        vsSelected in Node.States,
+        App);
+    end;
+  end;
+
+  procedure PicGroupsVT_HandleBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction; bViewGroups: Boolean);
+  begin
+    if PicGroupsVT_GetNodeKind(Sender, Node, bViewGroups) in [gnkProject, gnkView] then begin
+      ItemColor   := clBtnFace;
+      EraseAction := eaColor;
+    end;
+  end;
+
+  procedure PicGroupsVT_HandleCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+  begin
+     // Нельзя свёртывать корневые узлы (фотоальбома, результатов поиска etc)
+    Allowed := Sender.NodeParent[Node]<>nil;
+  end;
+
+  procedure PicGroupsVT_HandleExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode; bStoreExpanded: Boolean);
+  var Group: IPhotoAlbumPicGroup;
+  begin
+    if not (tsUpdating in Sender.TreeStates) and bStoreExpanded then begin
+      Group := PicGroupsVT_GetNodeGroup(Sender, Node);
+      if (Group<>nil) then Group.Expanded := vsExpanded in Node.States;
+    end;
+  end;
+
+  procedure PicGroupsVT_HandleFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^ := nil;
+  end;
+
+  procedure PicGroupsVT_HandleGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString; App: IPhotoAlbumApp; bViewGroups: Boolean);
+  var s: String;
+  begin
+    LineBreakStyle := hlbForceMultiLine;
+    case PicGroupsVT_GetNodeKind(Sender, Node, bViewGroups) of
+      gnkProject:   s := App.Project.Description;
+      gnkPhoaGroup: s := GetPicGroupPropStrs(PicGroupsVT_GetNodeGroup(Sender, Node), IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps)), ': ', S_CRLF);
+      else          s := '';
+    end;
+    HintText := PhoaAnsiToUnicode(s);
+  end;
+
+  procedure PicGroupsVT_HandleGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; bViewGroups: Boolean);
+  const
+     // Индексы значков для элементов дерева. Там, где отрисовка производится в обработчике OnBeforeCellPaint, стоят
+     //   iiBlank
+    aiImgIdx: Array[TGroupNodeKind, Boolean] of Integer = (
+      (-1,             -1),             // gnkNone
+      (iiPhoA,         iiPhoA),         // gnkProject
+      (iiView,         iiView),         // gnkView
+      (iiFolderSearch, iiFolderSearch), // gnkSearch
+      (iiBlank,        iiBlank),        // gnkPhoaGroup
+      (iiBlank,        iiBlank));       // gnkViewGroup
+  begin
+    if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[PicGroupsVT_GetNodeKind(Sender, Node, bViewGroups), Kind=ikSelected];
+  end;
+
+  procedure PicGroupsVT_HandleGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString; View: IPhoaView);
+  var
+    Group: IPhotoAlbumPicGroup;
+    s: String;
+  begin
+    Group := PicGroupsVT_GetNodeGroup(Sender, Node);
+    s := '';
+    case TextType of
+      ttNormal:
+        case PicGroupsVT_GetNodeKind(Sender, Node, View<>nil) of
+          gnkProject:     s := ConstVal('SPhotoAlbumNode');
+          gnkView:        s := View.Name;
+          gnkSearch:      s := ConstVal('SSearchResultsNode');
+          gnkPhoaGroup,
+            gnkViewGroup: s := Group.Text;
+        end;
+      ttStatic: if Group.Pics.Count>0 then s := Format('(%d)', [Group.Pics.Count]);
+    end;
+    CellText := PhoaAnsiToUnicode(s);
+  end;
+
+  procedure PicGroupsVT_HandleInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates; RootGroup, SearchResultsGroup: IPhotoAlbumPicGroup; bRootButton, bInitExpanded: Boolean);
+  var p: PPhotoAlbumPicGroup;
+  begin
+    p := Sender.GetNodeData(Node);
+     // Узел обычной группы
+    if ParentNode<>nil then
+      p^ := PicGroupsVT_GetNodeGroup(Sender, ParentNode).GroupsX[Node.Index]
+     // Узел фотоальбома/представления
+    else if Node.Index=0 then begin
+      p^ := RootGroup;
+      if bRootButton then Node.CheckType := ctButton;
+     // Узел результатов поиска
+    end else
+      p^ := SearchResultsGroup;
+    Sender.ChildCount[Node] := p^.Groups.Count;
+     // Разворачиваем корневой узел или если группа развёрнута
+    if (ParentNode=nil) or (bInitExpanded and p^.Expanded) then
+      Include(InitialStates, ivsExpanded)
+    else
+      Sender.Expanded[Node] := False;
+  end;
+
+  procedure PicGroupsVT_HandlePaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+  begin
+     // Статический текст красим серым
+    if TextType=ttStatic then TargetCanvas.Font.Color := clGrayText
+     // Корневые узлы выделяем жирным
+    else if Sender.NodeParent[Node]=nil then TargetCanvas.Font.Style := [fsBold];
   end;
 
   function ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;

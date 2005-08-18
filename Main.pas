@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.86 2005-08-15 11:25:11 dale Exp $
+//  $Id: Main.pas,v 1.87 2005-08-18 13:20:09 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -257,7 +257,6 @@ type
     procedure mruOpenClick(Sender: TObject; const Filename: String);
     procedure pmGroupsPopup(Sender: TObject);
     procedure pmPicsPopup(Sender: TObject);
-    procedure SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure SetPhoaViewClick(Sender: TObject);
     procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -282,6 +281,8 @@ type
     procedure ulToolbarUndoClick(Sender: TObject);
     procedure aaDeletePicFromProject(Sender: TObject);
     procedure aaDeletePicsWithFiles(Sender: TObject);
+    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode);
   private
      // Активный проект
     FProject: IPhotoAlbumProject;
@@ -295,8 +296,6 @@ type
     FHNextClipbrdViewer: HWND;
      // Стек операций для отмены
     FUndo: TPhoaUndo;
-     // Набор свойств, которые требуется отображать в подсказках дерева групп
-    FGroupTreeHintProps: TGroupProperties;
      // Состояние приложения
     FAppState: TAppStates;
      // Prop storage
@@ -339,9 +338,9 @@ type
     procedure DisplaySearchResults(bForceRemove, bDoSelectNode: Boolean);
      // Обновляет состояние aFlatMode
     procedure UpdateFlatModeAction;
-     // Возвращает вид узла
-    function  GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
-     // Возвращает группу, соответствующую узлу
+     // Возвращает вид узла Node из tvGroups
+    function  GetNodeKind(Node: PVirtualNode): TGroupNodeKind;
+     // Возвращает группу, соответствующую узлу Node из tvGroups
     function  GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
      // Отрабатывает флаги изменения операций путём обновления соответствующих частей приложения
     procedure ProcessOpChanges(Changes: TPhoaOperationChanges);
@@ -560,7 +559,7 @@ uses
     case FocusedControl of
        // Редактирование групп
       pafcGroupTree:
-        case GetNodeKind(tvGroups, tvGroups.FocusedNode) of
+        case GetNodeKind(tvGroups.FocusedNode) of
           gnkProject:   EditProject (Self, FUndo);
           gnkView:      EditView    (Self, FUndo);
           gnkPhoaGroup: EditPicGroup(Self, FUndo);
@@ -929,7 +928,6 @@ uses
        // Настраиваем дерево групп
       ApplyTreeSettings(tvGroups);
       tvGroups.HintMode := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
-      FGroupTreeHintProps := IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps));
        // Обновляем режим отображения
       UpdateFlatModeAction;
        // Настраиваем Viewer
@@ -1086,7 +1084,7 @@ uses
        // Настраиваем дерево папок
       tvGroups.BeginSynch;
       try
-        tvGroups.NodeDataSize  := SizeOf(Pointer);
+        tvGroups.NodeDataSize  := SizeOf(TObject);
         tvGroups.RootNodeCount := 1;
          // Обрабатываем параметры командной строки
         ProcessCommandLine;
@@ -1229,22 +1227,12 @@ uses
 
   function TfMain.GetNodeGroup(Node: PVirtualNode): IPhotoAlbumPicGroup;
   begin
-    if Node=nil then Result := nil else Result := PPhotoAlbumPicGroup(tvGroups.GetNodeData(Node))^;
+    Result := PicGroupsVT_GetNodeGroup(tvGroups, Node);
   end;
 
-  function TfMain.GetNodeKind(Tree: TBaseVirtualTree; Node: PVirtualNode): TGroupNodeKind;
-  var g: IPhotoAlbumPicGroup;
+  function TfMain.GetNodeKind(Node: PVirtualNode): TGroupNodeKind;
   begin
-    Result := gnkNone;
-    if Node<>nil then begin
-      g := PPhotoAlbumPicGroup(Tree.GetNodeData(Node))^;
-      if g.Owner=nil then begin
-        if g.ID=IGroupID_SearchResults then Result := gnkSearch
-        else if g=FProject.RootGroupX  then Result := gnkProject
-        else if FProject.ViewIndex>=0  then Result := gnkView;
-      end else
-        if FProject.ViewIndex>=0 then Result := gnkViewGroup else Result := gnkPhoaGroup;
-    end;
+    Result := PicGroupsVT_GetNodeKind(tvGroups, Node, FProject.ViewIndex>=0);
   end;
 
   function TfMain.GetRelativeRegistryKey: String;
@@ -1684,14 +1672,6 @@ uses
     ActivateVTNode(tvGroups, n);
   end;
 
-  procedure TfMain.SetGroupExpanded(Sender: TBaseVirtualTree; Node: PVirtualNode);
-  var Group: IPhotoAlbumPicGroup;
-  begin
-    if tsUpdating in tvGroups.TreeStates then Exit;
-    Group := GetNodeGroup(Node);
-    if (Group<>nil) then Group.Expanded := Sender.Expanded[Node];
-  end;
-
   procedure TfMain.SetPhoaViewClick(Sender: TObject);
   begin
     FProject.ViewIndex := TComponent(Sender).Tag-1;
@@ -1764,21 +1744,13 @@ uses
   end;
 
   procedure TfMain.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
-  var p: TPoint;
   begin
-    if GetNodeKind(Sender, Node) in [gnkPhoaGroup, gnkViewGroup] then begin
-      p := CellRect.TopLeft;
-      Inc(p.x, tvGroups.GetNodeLevel(Node)*tvGroups.Indent+4);
-      PaintGroupIcon(GetNodeGroup(Node).IconData, TargetCanvas.Handle, p, Color32(tvGroups.Color), vsSelected in Node.States, Self);
-    end;
+    PicGroupsVT_HandleBeforeCellPaint(Sender, TargetCanvas, Node, Column, CellRect, Self, FProject.ViewIndex>=0);
   end;
 
   procedure TfMain.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   begin
-    if GetNodeKind(tvGroups, Node) in [gnkProject, gnkView] then begin
-      ItemColor  := clBtnFace;
-      EraseAction := eaColor;
-    end;
+    PicGroupsVT_HandleBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction, FProject.ViewIndex>=0);
   end;
 
   procedure TfMain.tvGroupsChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -1790,7 +1762,7 @@ uses
   var p: TPoint;
   begin
     ResetMode;
-    if GetNodeKind(tvGroups, Node) in [gnkProject, gnkView] then begin
+    if GetNodeKind(Node) in [gnkProject, gnkView] then begin
       with Sender.GetDisplayRect(Node, -1, False) do p := Sender.ClientToScreen(Point(Left, Bottom));
       pmPhoaView.Popup(p.x, p.y);
     end;
@@ -1798,8 +1770,7 @@ uses
 
   procedure TfMain.tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
   begin
-     // Нельзя свёртывать узлы фотоальбома и результатов поиска
-    Allowed := Sender.NodeParent[Node]<>nil;
+    PicGroupsVT_HandleCollapsing(Sender, Node, Allowed);
   end;
 
   procedure TfMain.tvGroupsCreateEditor(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
@@ -1846,7 +1817,7 @@ uses
       Effect := DROPEFFECT_NONE;
      // Перетаскивание изображений
     end else if Source=Viewer then begin
-      bCopy := (ssCtrl in Shift) or (GetNodeKind(tvGroups, nSrc)=gnkSearch);
+      bCopy := (ssCtrl in Shift) or (GetNodeKind(nSrc)=gnkSearch);
       gTgt := GetNodeGroup(nTgt);
       iCnt := Viewer.SelectedPics.Count;
       iCntBefore := gTgt.Pics.Count;
@@ -1890,8 +1861,8 @@ uses
   begin
     nSrc := Sender.FocusedNode;
     nTgt := Sender.DropTargetNode;
-    gnkSrc := GetNodeKind(tvGroups, nSrc);
-    gnkTgt := GetNodeKind(tvGroups, nTgt);
+    gnkSrc := GetNodeKind(nSrc);
+    gnkTgt := GetNodeKind(nTgt);
      // Перетаскивание группы
     if Sender=Source then begin
       Accept := False;
@@ -1949,92 +1920,50 @@ uses
 
   procedure TfMain.tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
   begin
-    Allowed := GetNodeKind(Sender, Node) in [gnkView, gnkPhoaGroup];
+    Allowed := GetNodeKind(Node) in [gnkView, gnkPhoaGroup];
+  end;
+
+  procedure TfMain.tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PicGroupsVT_HandleExpandedCollapsed(Sender, Node, True);
   end;
 
   procedure TfMain.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^ := nil;
+    PicGroupsVT_HandleFreeNode(Sender, Node);
   end;
 
   procedure TfMain.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-  var s: String;
   begin
-    LineBreakStyle := hlbForceMultiLine;
-    case GetNodeKind(Sender, Node) of
-      gnkProject:   s := FProject.Description;
-      gnkPhoaGroup: s := GetPicGroupPropStrs(GetNodeGroup(Node), FGroupTreeHintProps, ': ', S_CRLF);
-      else          s := '';
-    end;
-    HintText := PhoaAnsiToUnicode(s);
+    PicGroupsVT_HandleGetHint(Sender, Node, Column, LineBreakStyle, HintText, Self, FProject.ViewIndex>=0);
   end;
 
   procedure TfMain.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-  const
-    aiImgIdx: Array[TGroupNodeKind, Boolean] of Integer = (
-      (-1,             -1),             // gnkNone
-      (iiPhoA,         iiPhoA),         // gnkProject
-      (iiView,         iiView),         // gnkView
-      (iiFolderSearch, iiFolderSearch), // gnkSearch
-      (iiBlank{!!!iiFolder},       iiBlank{!!!iiFolder}),   // gnkPhoaGroup
-      (iiBlank{!!!iiFolder},       iiBlank{!!!iiFolder}));  // gnkViewGroup
   begin
-    if Kind in [ikNormal, ikSelected] then ImageIndex := aiImgIdx[GetNodeKind(Sender, Node), Kind=ikSelected];
+    PicGroupsVT_HandleGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex, FProject.ViewIndex>=0);
   end;
 
   procedure TfMain.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    Group: IPhotoAlbumPicGroup;
-    s: String;
   begin
-    Group := GetNodeGroup(Node);
-    s := '';
-     // Static text
-    case TextType of
-      ttNormal:
-        case GetNodeKind(Sender, Node) of
-          gnkProject:     s := ConstVal('SPhotoAlbumNode');
-          gnkView:        s := FProject.CurrentView.Name;
-          gnkSearch:      s := ConstVal('SSearchResultsNode');
-          gnkPhoaGroup,
-            gnkViewGroup: s := Group.Text;
-        end;
-      ttStatic: if Group.Pics.Count>0 then s := Format('(%d)', [Group.Pics.Count]);
-    end;
-    CellText := PhoaAnsiToUnicode(s);
+    PicGroupsVT_HandleGetText(Sender, Node, Column, TextType, CellText, FProject.CurrentView);
   end;
 
   procedure TfMain.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var p: PPhotoAlbumPicGroup;
   begin
-    p := Sender.GetNodeData(Node);
-     // Узел обычной группы
-    if ParentNode<>nil then
-      p^ := GetNodeGroup(ParentNode).GroupsX[Node.Index]
-     // Узел фотоальбома/представления
-    else if Node.Index=0 then begin
-      p^ := FProject.ViewRootGroupX;
-      Node.CheckType := ctButton;
-     // Узел результатов поиска
-    end else
-      p^ := FSearchResults;
-    Sender.ChildCount[Node] := p^.Groups.Count;
-     // Разворачиваем корневой узел или если группа развёрнута
-    if (ParentNode=nil) or p^.Expanded then Include(InitialStates, ivsExpanded) else Sender.Expanded[Node] := False;
+    PicGroupsVT_HandleInitNode(Sender, ParentNode, Node, InitialStates, FProject.ViewRootGroupX, FSearchResults, True, True);
   end;
 
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
-    case GetNodeKind(Sender, Node) of
-      gnkView: PerformOperation('ViewEdit', ['View', FProject.CurrentViewX, 'Name', PhoaUnicodeToAnsi(NewText), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
+    case GetNodeKind(Node) of
+      gnkView:      PerformOperation('ViewEdit',    ['View', FProject.CurrentViewX, 'Name', PhoaUnicodeToAnsi(NewText), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
       gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroupX, 'NewText', PhoaUnicodeToAnsi(NewText)]);
     end;
   end;
 
   procedure TfMain.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   begin
-    if TextType=ttStatic then TargetCanvas.Font.Color := clGrayText
-    else if Sender.NodeParent[Node]=nil then TargetCanvas.Font.Style := [fsBold];
+    PicGroupsVT_HandlePaintText(Sender, TargetCanvas, Node, Column, TextType);
   end;
 
   procedure TfMain.ulToolbarUndoChange(Sender: TObject);
@@ -2105,7 +2034,7 @@ uses
       bGr  := FCtl=pafcGroupTree;
       bPic := FCtl=pafcThumbViewer;
        // Определяем текущие выделенные элементы
-      gnk := GetNodeKind(tvGroups, tvGroups.FocusedNode);
+      gnk := GetNodeKind(tvGroups.FocusedNode);
       bPics   := FProject.Pics.Count>0;
       bPicSel := Viewer.SelectedPics.Count>0;
       bView   := FProject.ViewIndex>=0;

@@ -71,8 +71,12 @@ inherited dPicOps: TdPicOps
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowTreeLines, toThemeAware, toUseBlendedImages]
     TreeOptions.StringOptions = [toShowStaticText, toAutoAcceptEditChange]
+    OnBeforeCellPaint = tvGroupsBeforeCellPaint
     OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChange = tvGroupsChange
+    OnCollapsed = tvGroupsExpandedCollapsed
+    OnCollapsing = tvGroupsCollapsing
+    OnExpanded = tvGroupsExpandedCollapsed
     OnFreeNode = tvGroupsFreeNode
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText

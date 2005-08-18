@@ -63,8 +63,12 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowTreeLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused]
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
+    OnBeforeCellPaint = tvGroupsBeforeCellPaint
     OnBeforeItemErase = tvGroupsBeforeItemErase
     OnChecked = tvGroupsChecked
+    OnCollapsed = tvGroupsExpandedCollapsed
+    OnCollapsing = tvGroupsCollapsing
+    OnExpanded = tvGroupsExpandedCollapsed
     OnFreeNode = tvGroupsFreeNode
     OnGetText = tvGroupsGetText
     OnPaintText = tvGroupsPaintText

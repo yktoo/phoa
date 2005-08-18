@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.2 2005-08-18 13:20:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -38,8 +38,11 @@ type
     procedure aaInvertChecks(Sender: TObject);
     procedure aaUncheckAll(Sender: TObject);
     procedure RBSelPicturesClick(Sender: TObject);
+    procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -132,7 +135,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     try
       n := tvGroups.GetFirst;
       while n<>nil do begin
-        if not (vsDisabled in n.States) then begin
+        if tvGroups.CheckType[n]=ctCheckBox then begin
           case Mode of
             mcmAll:  cs := csCheckedNormal;
             mcmNone: cs := csUncheckedNormal;
@@ -154,8 +157,8 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
      // Настраиваем дерево групп
     ApplyTreeSettings(tvGroups);
     tvGroups.HintMode      := GTreeHintModeToVTHintMode(TGroupTreeHintMode(SettingValueInt(ISettingID_Browse_GT_Hints)));
-    tvGroups.NodeDataSize  := SizeOf(Pointer);
-    tvGroups.RootNodeCount := fMain.tvGroups.RootNodeCount;
+    tvGroups.NodeDataSize  := SizeOf(TObject);
+    tvGroups.RootNodeCount := 1;
   end;
 
   function TfrWzPageFileOps_SelPics.GetDataValid: Boolean;
@@ -189,7 +192,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
       Wiz.SelPicMode := fospmSelGroups;
       n := tvGroups.GetFirst;
       while n<>nil do begin
-        if n.CheckState=csCheckedNormal then Wiz.SelectedGroups.Add(PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^);
+        if n.CheckState=csCheckedNormal then Wiz.SelectedGroups.Add(PicGroupsVT_GetNodeGroup(tvGroups, n));
         n := tvGroups.GetNext(n);
       end;
     end;
@@ -212,9 +215,18 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     rbValidityInvalid.Checked := Wiz.SelPicValidityFilter=fospvfInvalidOnly;
   end;
 
-  procedure TfrWzPageFileOps_SelPics.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+  procedure TfrWzPageFileOps_SelPics.tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+  var Wiz: TdFileOpsWizard;
   begin
-    fMain.tvGroupsBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction);
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleBeforeCellPaint(Sender, TargetCanvas, Node, Column, CellRect, Wiz.App, Wiz.App.Project.ViewIndex>=0);
+  end;
+
+  procedure TfrWzPageFileOps_SelPics.tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+  var Wiz: TdFileOpsWizard;
+  begin
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleBeforeItemErase(Sender, TargetCanvas, Node, ItemRect, ItemColor, EraseAction, Wiz.App.Project.ViewIndex>=0);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -222,42 +234,61 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
     if not (tsUpdating in Sender.TreeStates) then UpdateCountInfo;
   end;
 
+  procedure TfrWzPageFileOps_SelPics.tvGroupsCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+  begin
+    PicGroupsVT_HandleCollapsing(Sender, Node, Allowed);
+  end;
+
+  procedure TfrWzPageFileOps_SelPics.tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
+  begin
+    PicGroupsVT_HandleExpandedCollapsed(Sender, Node, False);
+  end;
+
   procedure TfrWzPageFileOps_SelPics.tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   begin
-    fMain.tvGroupsFreeNode(Sender, Node);
+    PicGroupsVT_HandleFreeNode(Sender, Node);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+  var Wiz: TdFileOpsWizard;
   begin
-    fMain.tvGroupsGetHint(Sender, Node, Column, LineBreakStyle, HintText);
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleGetHint(Sender, Node, Column, LineBreakStyle, HintText, Wiz.App, Wiz.App.Project.ViewIndex>=0);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+  var Wiz: TdFileOpsWizard;
   begin
-    fMain.tvGroupsGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex);
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleGetImageIndex(Sender, Node, Kind, Column, Ghosted, ImageIndex, Wiz.App.Project.ViewIndex>=0);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+  var Wiz: TdFileOpsWizard;
   begin
-    fMain.tvGroupsGetText(Sender, Node, Column, TextType, CellText);
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleGetText(Sender, Node, Column, TextType, CellText, Wiz.App.Project.CurrentView);
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-  var Group: IPhotoAlbumPicGroup;
+  var
+    Group: IPhotoAlbumPicGroup;
+    Wiz: TdFileOpsWizard;
   begin
-    fMain.tvGroupsInitNode(Sender, ParentNode, Node, InitialStates);
+    Wiz := TdFileOpsWizard(StorageForm);
+    PicGroupsVT_HandleInitNode(Sender, ParentNode, Node, InitialStates, Wiz.App.ProjectX.ViewRootGroupX, nil, False, True);
      // Получаем группу, с которой ассоциирован узел
-    Group := PPhotoAlbumPicGroup(Sender.GetNodeData(Node))^;
-     // Запрещаем узел, если у него нет изображений
-    if Group.Pics.Count=0 then Include(InitialStates, ivsDisabled);
-     // Настраиваем птицу узла
-    Node.CheckType := ctCheckBox;
-    Node.CheckState := aCheckStates[not (ivsDisabled in InitialStates) and (TdFileOpsWizard(StorageForm).SelectedGroups.IndexOfID(Group.ID)>=0)];
+    Group := PicGroupsVT_GetNodeGroup(Sender, Node);
+     // Если у узла есть изображения, настраиваем птицу
+    if Group.Pics.Count>0 then begin
+      Node.CheckType  := ctCheckBox;
+      Node.CheckState := aCheckStates[Wiz.SelectedGroups.IndexOfID(Group.ID)>=0];
+    end;
   end;
 
   procedure TfrWzPageFileOps_SelPics.tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   begin
-    fMain.tvGroupsPaintText(Sender, TargetCanvas, Node, Column, TextType);
+    PicGroupsVT_HandlePaintText(Sender, TargetCanvas, Node, Column, TextType);
   end;
 
   procedure TfrWzPageFileOps_SelPics.UpdateCountInfo;
@@ -293,13 +324,13 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
         while n<>nil do begin
           if n.CheckState=csCheckedNormal then begin
             Inc(FSelGroupCount);
-            GroupPics.Add(PPhotoAlbumPicGroup(tvGroups.GetNodeData(n))^.Pics, True);
+            GroupPics.Add(PicGroupsVT_GetNodeGroup(tvGroups, n).Pics, True);
           end;
           n := tvGroups.GetNext(n);
         end;
         Pics := GroupPics;
       end;
-       // Добавляем изображения 
+       // Добавляем изображения
       for i := 0 to Pics.Count-1 do begin
         Pic := Pics[i];
          // Если нужно учитывать валидность - проверяем наличие файла
