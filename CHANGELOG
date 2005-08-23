@@ -11,6 +11,7 @@ File operations wizard:
 Browser:
   Delete pictures from all groups (shortcut Ctrl+Del) and Delete files (shortcut Shift+Ctrl+Del) functions.
   Thumbnail focus rectangle color option.
+
 Viewer:
   Double-clicking the image acts like pressing Enter.
   Viewport center position is preserved on resize and scale change.
