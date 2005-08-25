@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.52 2005-08-18 13:20:09 dale Exp $
+//  $Id: phUtils.pas,v 1.53 2005-08-25 12:46:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -89,7 +89,12 @@ uses
   function  iif(b: Boolean; const sTrue, sFalse: String): String; overload;
   function  iif(b: Boolean; iTrue, iFalse: Integer): Integer;     overload;
   function  iif(b: Boolean; pTrue, pFalse: Pointer): Pointer;     overload;
-  function  iif(b: Boolean; sTrue, sFalse: Single): Single; overload;
+  function  iif(b: Boolean; sTrue, sFalse: Single): Single;       overload;
+
+  procedure Swap(var A, B: String);  overload;
+  procedure Swap(var A, B: Integer); overload;
+  procedure Swap(var A, B: Pointer); overload;
+  procedure Swap(var A, B: Single);  overload;
 
    // Преобразует размер файла в удобочитаемую форму
   function  HumanReadableSize(i64Size: Int64): String; 
@@ -718,6 +723,38 @@ var
   function iif(b: Boolean; sTrue, sFalse: Single): Single;
   begin
     if b then Result := sTrue else Result := sFalse;
+  end;
+
+  procedure Swap(var A, B: String);
+  var C: String;
+  begin
+    C := A;
+    A := B;
+    B := C;
+  end;
+
+  procedure Swap(var A, B: Integer);
+  var C: Integer;
+  begin
+    C := A;
+    A := B;
+    B := C;
+  end;
+
+  procedure Swap(var A, B: Pointer);
+  var C: Pointer;
+  begin
+    C := A;
+    A := B;
+    B := C;
+  end;
+
+  procedure Swap(var A, B: Single);
+  var C: Single;
+  begin
+    C := A;
+    A := B;
+    B := C;
   end;
 
   function HumanReadableSize(i64Size: Int64): String;
