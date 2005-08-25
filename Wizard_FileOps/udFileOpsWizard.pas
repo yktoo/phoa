@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.2 2005-08-25 13:10:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -596,14 +596,19 @@ uses
   end;
 
   procedure TFileOpThread.DoRebuildThumb(Pic: IPhotoAlbumPic);
-  var iPrevThumbSize, iPrevFileSize: Integer;
+  var
+    iPrevThumbSize, iPrevFileSize: Integer;
+    ThumbSize: TSize;
   begin
      // Запоминаем прежние размеры эскиза и файла
     iPrevThumbSize := Length(Pic.ThumbnailData);
     iPrevFileSize  := Pic.FileSize;
+     // Определяем максимальные размеры эскиза
+    ThumbSize := FWizard.App.Project.ThumbnailSize;
+    if Pic.Rotation in [pr90, pr270] then Swap(ThumbSize.cx, ThumbSize.cy); 
      // Перестраиваем эскиз
     Pic.ReloadPicFileData(
-      FWizard.App.Project.ThumbnailSize,
+      ThumbSize,
       TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
       FWizard.App.Project.ThumbnailQuality);
      // Протоколируем успех
