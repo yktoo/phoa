@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.38 2005-08-15 11:25:11 dale Exp $
+//  $Id: udSearch.pas,v 1.39 2005-08-25 12:46:38 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -909,8 +909,8 @@ type
             ppAuthor:     Items.Assign(SLPhoaAuthors);
             ppMedia:      Items.Assign(SLPhoaMedia);
           end;
-//!!!          else
-//!!!            RegLoadHistory(psce.sHistKey, Result, False);
+//!!! Загружать историю ввода?          else
+//            RegLoadHistory(psce.sHistKey, Result, False);
           Text := FCriterion.ValueStr;
         end;
       end;
