@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.52 2005-08-15 11:25:11 dale Exp $
+//  $Id: ufImgView.pas,v 1.53 2005-08-28 06:08:41 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -435,7 +435,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  Types, udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
+  udSettings, phUtils, udPicProps, phSettings, phToolSetting, Main;
 
   procedure ViewImage(AInitFlags: TImgViewInitFlags; AApp: IPhotoAlbumApp; var iPicIdx: Integer; AUndoOperations: TPhoaOperations);
   begin
