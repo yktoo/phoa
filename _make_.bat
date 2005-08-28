@@ -1,10 +1,12 @@
-  @echo off
+@echo off
 rem ********************************************************************************************************************
-rem $Id: _make_.bat,v 1.19 2004-12-31 13:38:58 dale Exp $
+rem $Id: _make_.bat,v 1.20 2005-08-28 07:57:23 dale Exp $
 rem --------------------------------------------------------------------------------------------------------------------
 rem PhoA image arranging and searching tool
 rem Copyright DK Software, http://www.dk-soft.org/
 rem ********************************************************************************************************************
+
+set CLEANER="C:\Delphi\CVS projects\dale\phoa\_cleanup.bat"
 
 rem DK Software Text Preprocessor defines
 set PREPROCESSOR="C:\Delphi\CVS projects\dale\txpproc\txpproc.exe"
@@ -34,9 +36,6 @@ echo.
 echo == Compile Delphi DPR project ==
 %COMPILER% phoa.dpr %OPTIONS% -$%SWITCHES% "-U%LIBRARY_PATH%"
 if errorlevel == 1 goto :err
-del *.~*
-del *.dcu
-del *.ddp
 if "%1"=="app" goto success
 
 rem == Compile Help CHM project ==
@@ -124,3 +123,4 @@ goto success
 pause
 :success
 rmdir /s /q %PREPROCESSOR_OUT%
+call %CLEANER%
