@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.39 2005-08-25 12:46:38 dale Exp $
+//  $Id: udSearch.pas,v 1.40 2005-08-28 06:05:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -340,7 +340,7 @@ var
 
   procedure TSimpleSearchCriterion.AdjustPicProperty;
   begin
-    FDatatype  := aPicPropDatatype[FPicProperty];
+    FDatatype := aPicPropDatatype[FPicProperty];
     Condition := aSSDefaultConditionsForDatatype[FDatatype];
     Value := Null;
   end;
@@ -816,7 +816,15 @@ type
         ppDate:     s := (FWControl as TDateEdit).Text;
         ppTime:     s := ChangeTimeSeparator((FWControl as TMaskEdit).Text, False);
         ppKeywords: s := (FWControl as TComboEdit).Text;
-        else        s := (FWControl as TComboBox).Text;
+        else begin
+          s := (FWControl as TComboBox).Text;
+           // Сохраняем историю ввода
+          if not (FCriterion.PicProperty in [ppPlace, ppFilmNumber, ppAuthor, ppMedia]) then
+            RegSaveHistory(
+              Format(SRegSearch_PropMRUFormat, [GetEnumName(TypeInfo(TPicProperty), Integer(FCriterion.PicProperty))]),
+              TComboBox(FWControl),
+              True);
+        end;
       end;
       FCriterion.ValueStr := s;
     end;
@@ -908,9 +916,12 @@ type
             ppFilmNumber: Items.Assign(SLPhoaFilmNumbers);
             ppAuthor:     Items.Assign(SLPhoaAuthors);
             ppMedia:      Items.Assign(SLPhoaMedia);
+            else
+              RegLoadHistory(
+                Format(SRegSearch_PropMRUFormat, [GetEnumName(TypeInfo(TPicProperty), Integer(FCriterion.PicProperty))]),
+                Result,
+                False);
           end;
-//!!! Загружать историю ввода?          else
-//            RegLoadHistory(psce.sHistKey, Result, False);
           Text := FCriterion.ValueStr;
         end;
       end;
