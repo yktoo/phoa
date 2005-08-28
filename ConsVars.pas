@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.98 2005-08-15 11:25:11 dale Exp $
+//  $Id: ConsVars.pas,v 1.99 2005-08-28 06:02:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -317,10 +317,10 @@ type
 
 const
    // Версия программы
-  SAppVersion                     = 'v1.1.10';
-  
+  SAppVersion                     = 'v1.1.10 beta';
+
   SAppProductSID                  = 'phoa';
-  SAppVersionSID                  = '1.1.10';
+  SAppVersionSID                  = '1.1.10beta';
 
   SProject_Generator              = 'PhoA '+SAppVersion;
   SProject_Remark                 = 'Created by PhoA '+SAppVersion+', '+SWeb_MainSite;
@@ -422,15 +422,7 @@ const
   SRegFileOps_Root                = SRegDialogsRoot+'\FileOpsWizard';
 
   SRegSearch_Root                 = SRegDialogsRoot+'\Search';
-    SRegSearch_IDMRU              = SRegSearch_Root+'\IDMRU';
-    SRegSearch_FMaskMRU           = SRegSearch_Root+'\FileMaskMRU';
-    SRegSearch_FPathMRU           = SRegSearch_Root+'\FilePathMRU';
-    SRegSearch_FSizeMRU           = SRegSearch_Root+'\FileSizeMRU';
-    SRegSearch_PWidthMRU          = SRegSearch_Root+'\PicWidthMRU';
-    SRegSearch_PHeightMRU         = SRegSearch_Root+'\PicHeightMRU';
-    SRegSearch_FrNumberMRU        = SRegSearch_Root+'\FrameNumberMRU';
-    SRegSearch_DescMRU            = SRegSearch_Root+'\DescMRU';
-    SRegSearch_NotesMRU           = SRegSearch_Root+'\NotesMRU';
+    SRegSearch_PropMRUFormat      = SRegSearch_Root+'\MRU\%s';
     SRegSearch_SimpleCriteria     = 'SimpleCriteria';
 
   SRegSort_Root                   = SRegDialogsRoot+'\Sort';
