@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.38 2005-08-15 11:25:11 dale Exp $
+//  $Id: phGUIObj.pas,v 1.39 2005-08-28 06:04:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -383,7 +383,23 @@ type
    //===================================================================================================================
 
   TPhoAHintWindow = class(THintWindow)
+  private
+     // True в процессе вызова ActivateHint()
+    FActivating: Boolean;
+     // Количество тиков, когда в последний раз была вызвана ActivateHint()
+    FLastActive: Cardinal;
+     // Prop storage
+    FMonitor: TMonitor;
+     // Message handlers
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+  protected
     procedure Paint; override;
+  public
+    procedure ActivateHint(Rect: TRect; const AHint: string); override;
+    function  CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect; override;
+     // Props
+     // -- Монитор, на котором отображается окно. nil до вызова ActivateHint()
+    property Monitor: TMonitor read FMonitor;
   end;
 
    //===================================================================================================================
@@ -1736,26 +1752,105 @@ uses Math, Themes, phUtils;
    // TPhoAHintWindow
    //===================================================================================================================
 
+  procedure TPhoAHintWindow.ActivateHint(Rect: TRect; const AHint: string);
+  var
+    bAnimate: BOOL;
+    cStyle: Cardinal;
+    r: TRect;
+  begin
+    FActivating := True;
+    try
+       // Присваиваем тексту окна текст Hint-а
+      Caption := AHint;
+       // Определяем монитор окна (должно вписываться на один монитор)
+      FMonitor := Screen.MonitorFromPoint(Rect.TopLeft, mdNearest);
+       // Подстраиваем положение и размер
+      Inc(Rect.Bottom, 4);
+      r := FitRect(Rect, FMonitor.BoundsRect);
+       // Позиционируем окно, поднимая его наверх (topmost)
+      SetWindowPos(Handle, HWND_TOPMOST, r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top, SWP_NOACTIVATE);
+       // Рисуем анимацию, если нужно
+      if (GetTickCount-FLastActive>250) and (Length(AHint)<500) and Assigned(AnimateWindowProc) then begin
+        SystemParametersInfo(SPI_GETTOOLTIPANIMATION, 0, @bAnimate, 0);
+        if bAnimate then begin
+          SystemParametersInfo(SPI_GETTOOLTIPFADE, 0, @bAnimate, 0);
+          if bAnimate then                        cStyle := AW_BLEND
+          else if Mouse.CursorPos.y>Rect.Top then cStyle := AW_VER_NEGATIVE or AW_SLIDE
+          else                                    cStyle := AW_VER_POSITIVE or AW_SLIDE;
+          AnimateWindowProc(Handle, 200, cStyle);
+        end;
+      end;
+      ParentWindow := Application.Handle;
+      ShowWindow(Handle, SW_SHOWNOACTIVATE);
+      Invalidate;
+    finally
+      FLastActive := GetTickCount;
+      FActivating := False;
+    end;
+  end;
+
+  function TPhoAHintWindow.CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect;
+  var iFlags, iXAdd: Integer;
+  begin
+     // Ограничиваем ширину окна
+    if Monitor<>nil then MaxWidth := Min(MaxWidth, Monitor.Width-50);
+    Result := Rect(0, 0, MaxWidth, 0);
+     // Определяем флаги отрисовки: если текст содержит символ табуляции, отключаем перенос по словам
+    iFlags := DT_CALCRECT or DT_LEFT or DT_NOPREFIX or DrawTextBiDiModeFlagsReadingOnly;
+    if Pos(#9, AHint)=0 then begin
+      iFlags := iFlags or DT_WORDBREAK;
+      iXAdd  := 6;
+    end else
+      iXAdd  := 12; // Оставляем "запас" на пробел между левой и правой частями подсказки
+     // Определяем размеры текста
+    DrawText(Canvas.Handle, PChar(AHint), -1, Result, iFlags);
+    Inc(Result.Right, iXAdd);
+    Inc(Result.Bottom, 2);
+  end;
+
+  procedure TPhoAHintWindow.CMTextChanged(var Message: TMessage);
+  var r: TRect;
+  begin
+    if FActivating then Exit;
+    r := CalcHintRect(MaxInt, Caption, nil);
+    SetBounds(Left, Top, r.Right-r.Left, r.Bottom-r.Top);
+  end;
+
   procedure TPhoAHintWindow.Paint;
   var
-    r: TRect;
-    s, sLine: String;
+    r, rLeft, rRight: TRect;
+    s, sLine, sLeft: String;
   begin
     r := ClientRect;
     InflateRect(r, -2, -2);
     r.Bottom := r.Top+Canvas.TextHeight('Wg');
     Canvas.Font.Color := Screen.HintFont.Color;
-     // Цикл по строкам
     s := AdjustLineBreaks(Caption, tlbsLF);
-    repeat
-      sLine := ExtractFirstWord(s, #10);
-      if sLine='' then Break;
-       // Рисуем левую часть
-      DrawText(Canvas.Handle, PChar(ExtractFirstWord(sLine, #9)), -1, r, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
-       // Рисуем правую часть
-      if sLine<>'' then DrawText(Canvas.Handle, PChar(sLine), -1, r, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
-      OffsetRect(r, 0, r.Bottom-r.Top);
-    until False;
+     // Если нет табуляций - просто выводим текст с переносом по словам
+    if Pos(#9, s)=0 then
+      DrawText(Canvas.Handle, PChar(s), -1, r, DT_LEFT or DT_NOPREFIX or DT_WORDBREAK or DrawTextBiDiModeFlagsReadingOnly)
+     // Иначе - цикл по строкам
+    else
+      repeat
+        sLine := ExtractFirstWord(s, #10);
+        if sLine='' then Break;
+         // Рисуем левую часть
+        sLeft := ExtractFirstWord(sLine, #9);
+        rRight := r;
+         // Если после табуляции нет строки - значит, это продолжение предыдущей строки ПОСЛЕ табуляции
+        if sLine='' then
+          sLine := sLeft
+        else begin
+          rLeft := r;
+          DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_CALCRECT);
+          DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
+          rRight.Left := rLeft.Right+6;
+        end;
+         // Рисуем правую часть
+        DrawText(Canvas.Handle, PChar(sLine), -1, rRight, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
+         // Смещаем прямоугольник на следующую строку
+        OffsetRect(r, 0, r.Bottom-r.Top);
+      until False;
   end;
 
    //===================================================================================================================
