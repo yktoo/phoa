@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.53 2005-08-25 12:46:23 dale Exp $
+//  $Id: phUtils.pas,v 1.54 2005-08-28 06:09:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -34,13 +34,15 @@ uses
   function  SetCurrentCBObject(ComboBox: TComboBox; iObj: Integer): Boolean;
 
    // Изготовление типа TSize
-  function  Size(cx, cy: Integer): TSize; 
+  function  Size(cx, cy: Integer): TSize;
 
    // Преобразование TRect<->Строка вида '1,2,3,4'
   function  RectToStr(const r: TRect): String;
   function  StrToRect(const s: String; const rDefault: TRect): TRect;
    // "Упорядочивает" координаты в r так, что TopLeft всегда левее и выше, чем BottomRight
   function  OrderRect(const r: TRect): TRect;
+   // Корректирует и возвращает прямоугольник r так, чтобы он вписался в rBounds, по возможности сохранив размеры
+  function  FitRect(const r, rBounds: TRect): TRect;
    // Возвращает True, если прямоугольники пересекаются
   function  RectsOverlap(const r1, r2: TRect): Boolean;
    // Возвращает результат пересечения прямоугольников
@@ -436,6 +438,25 @@ var
       Result.Top    := r.Bottom;
       Result.Bottom := r.Top;
     end;
+  end;
+
+  function FitRect(const r, rBounds: TRect): TRect;
+  var idx, idy: Integer;
+  begin
+     // Подстраиваем ширину
+    Result := Rect(
+      r.Left,
+      r.Top,
+      Min(r.Right,  r.Left+(rBounds.Right-rBounds.Left)),
+      Min(r.Bottom, r.Top+(rBounds.Bottom-rBounds.Top)));
+     // Подстраиваем координаты
+    if Result.Left<rBounds.Left        then idx := rBounds.Left-Result.Left
+    else if Result.Right>rBounds.Right then idx := rBounds.Right-Result.Right
+    else                                    idx := 0;
+    if Result.Top<rBounds.Top            then idy := rBounds.Top-Result.Top
+    else if Result.Bottom>rBounds.Bottom then idy := rBounds.Bottom-Result.Bottom
+    else                                      idy := 0;
+    OffsetRect(Result, idx, idy);
   end;
 
   function RectsOverlap(const r1, r2: TRect): Boolean;
