@@ -1,9 +1,9 @@
-TargetApplication=PhoA 1.1.9
-Author=Alberto Polizzano
+TargetApplication=PhoA 1.1.10 beta
+Author=Alberto Polizzano (alpoli@libero.it)
 SourceLANGID=1033
 LANGID=1040
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-01-10 15.11.55
+LastModified=2005-08-29 10.41.47
 
 [dAbout]
 00000003=Informazioni
@@ -24,6 +24,13 @@ LastModified=2005-01-10 15.11.55
 00000021=&ID:
 00000024=&Testo:
 00000027=&Descrizione:
+00000028=Icona di gruppo
+00000030=Icona di gruppo
+00000031=&Seleziona...
+00000032=Seleziona...|Carica icona di gruppo da un file
+00000033=Icona di gruppo
+00000034=Azze&ra
+00000035=Reset|Riporta l'icona di gruppo al default
 
 [dMsgBox]
 00000012=Non mo&strare questo messaggio di nuovo
@@ -47,6 +54,7 @@ LastModified=2005-01-10 15.11.55
 00000032=Dati
 00000034=Parole chiave
 00000036=Gruppi
+00000037=Altri bottoni|
 
 [dProjectProps]
 00000003=Prpietà: Album foto
@@ -103,6 +111,7 @@ LastModified=2005-01-10 15.11.55
 00000012=Chiudi
 00000015=OK
 00000018=Aiuto
+00000019=Altri bottoni|
 
 [dSortPics]
 00000003=Ordina immagini
@@ -408,6 +417,12 @@ LastModified=2005-01-10 15.11.55
 00000219=Modifica
 00000220=&Visualizza lo Slide show
 00000221=Visualizza lo slide show|Attiva la modalità slide show
+00000222=Modifica
+00000223=Cance&llada tutti i gruppi
+00000224=Cancella da tutti i gruppi|Canella le immagini selezionate da tutti i gruppi di album
+00000225=Modifica
+00000226=Cancella i &file
+00000227=Cancella i file|Cancella le immagini selezionate da tutti i gruppi e pulisce i file corrispondenti
 
 [frPicProps_Data]
 00000007=&Posto:
@@ -474,6 +489,8 @@ LastModified=2005-01-10 15.11.55
 00000104=Strumenti
 00000105=Metti in &verticale
 00000107=Metti in verticale|Mette l'immagine in verticale
+00000108=Altri bottoni|
+00000109=Altri bottoni|
 
 [frWzPageAddFiles_CheckFiles]
 00000012=Seleziona &tutti i file
@@ -499,6 +516,8 @@ LastModified=2005-01-10 15.11.55
 00000057=Grandezza
 00000058=Modificato
 00000059=Mostra ante&prima
+00000060=Grande&zza File da:
+00000063=a:
 
 [frWzPageFileOps_CDOptions]
 00000007=&Etichetta il media come:
@@ -508,6 +527,7 @@ LastModified=2005-01-10 15.11.55
 00000023=Crea un file &autorun.inf per lanciare in automatico il play del
 00000034=Includi anche le &viste esistenti
 00000037=Copia le impostazioni correnti nel file phoa.&ini
+00000038=Copia il file di lin&guaggi correntemente usato
 
 [frWzPageFileOps_DelOptions]
 00000007=Sposta i file nel &cestino
@@ -521,6 +541,8 @@ LastModified=2005-01-10 15.11.55
 00000022=&Mantieni il formato della cartella originale
 00000025=Rior&ganizza i file nella cartella mantenendo il formato del gruppo
 00000028=Permetti &copie multiple del file
+00000029=Rinomina File
+00000030=Rinomina i file usando il &formato:
 
 [frWzPageFileOps_MoveOptions2]
 00000007=Se il file &esiste già:
@@ -609,10 +631,12 @@ LastModified=2005-01-10 15.11.55
 00000033=Controllo sintassi
 00000034=Controlla la sintassi dell'espressione
 00000038=Proprietà
+00000039=Altri bottoni|
 
 [frPicProps_FileProps]
 00000001=&Cambia file...
 00000002=Cambia file...|Cambia file per l'immagine selezionata
+00000003=Altri bottoni|
 
 [$CONSTANTS]
 dfpArchive=Archivio
@@ -679,6 +703,7 @@ ISettingID_Browse_ViewerThBColor=Colore sfondo miniature:
 ISettingID_Browse_ViewerThBordCl=Colore personalizzato del bordo dello
 ISettingID_Browse_ViewerThBordSt=Stile del bordo dello sfondo della
 ISettingID_Browse_ViewerThFColor=Colore font miniatura:
+ISettingID_Browse_ViewerThFocusClr=Colore del rettangolo di focus delle miniature:
 ISettingID_Browse_ViewerThInfo=Dettaglio delle immagini visualizzato sulle
 ISettingID_Browse_ViewerThLBProp=Nell'angolo in basso a sinistra:
 ISettingID_Browse_ViewerThLTProp=Nell'angolo in alto a sinistra:
@@ -697,6 +722,7 @@ ISettingID_Dlgs_AddPicWizard=Procedura guidata aggiunta immagini
 ISettingID_Dlgs_APW_AutofillDate=Riempi automaticamente la data
 ISettingID_Dlgs_APW_AutofillTime=Riempi automaticamente l'ora dell'immagine
 ISettingID_Dlgs_APW_AutofillXfrm=Riempi automaticamente le trasformazioni
+ISettingID_Dlgs_APW_ExtractIcons=Estrai le icone del file
 ISettingID_Dlgs_APW_LogOnErrOnly=Mostra la pagina di log solo se si sono
 ISettingID_Dlgs_APW_ReplaceDate=Sovrascrivi la data se già specificata
 ISettingID_Dlgs_APW_ReplaceTime=Sovrascrivi l'ora se già specificata
@@ -705,6 +731,7 @@ ISettingID_Dlgs_APW_SkipChkPage=Salta sempre la pagina 'Controlla file'
 ISettingID_Dlgs_ConfmAppExit=Prima di uscire (quando l'album non è stato
 ISettingID_Dlgs_ConfmDelGroup=Prima di cancellare un gruppo
 ISettingID_Dlgs_ConfmDelPics=Prima di cancellare una immagine
+ISettingID_Dlgs_ConfmDelPicsFromPj=Prima della cancellazione della imagine da tutti i gruppi di album
 ISettingID_Dlgs_ConfmDelView=Prima di cancellare una vista
 ISettingID_Dlgs_ConfmOldFile=Prima di salvare file di una vecchia versione
 ISettingID_Dlgs_Confms=Conferme
@@ -835,6 +862,7 @@ ppTime=Ora
 ptkCustom=Azione personalizzata
 ptkDefault=Azione di default
 ptkEdit=Azione di modifica standard
+ptkExtViewer=Visualizzatore esterno
 ptkOpen=Azione apertura standard
 ptkPrint=Azione stampa standard
 ptkSeparator=Carattere separatore
@@ -864,6 +892,8 @@ SCannotUndo=(Non posso annullare)
 SConfirm_AppExit=Esci dal programma?
 SConfirm_DelGroup=Cancello il gruppo selezionato?
 SConfirm_DelPics=Cancello le immagini selezionate?
+SConfirm_DelPicsFromProject=Le immagini selezionate saranno cancellate dai gruppi di album.\nVuoi continuare?
+SConfirm_DelPicsWithFiles=Le immagini selezionate saranno cancellate da tutti i gruppi di album, ad inoltre i file corrispondenti saranno cancellati.\nATTENZIONE: questa operazione not è reversibile!\n\nVuoi continuare?
 SConfirm_DelView=Cancello la vista corrente?
 SConfirm_FileNotSaved=File dell'album "%s" non salvato. Vuoi salvare i
 SConfirm_FileOverwrite=Sovrascrivi il file "%s"?
@@ -885,21 +915,29 @@ SDlgTitle_SelectPicFile=Seleziona un file immagine
 SDlgTitle_Warning=PhoA: Attenzione
 SErrCannotCreateFolder=Non riesco a creare la cartella "%s"
 SErrCannotDecodePicture=Errore decodificando il file "%s":\n%s
+SErrCannotDeleteFile=Errore cancellando il file "%s":\n%s
 SErrCannotLoadPicture=Errore caricando l'immagine "%s":\n%s
 SErrCannotRead=Errore lettura stream
+SErrCannotUsePathPropsInFormat=La proprietà "%s" non può essere usata nel formato di un nome di file se contiene il path
 SErrCannotWrite=Errore scrittura stream
+SErrCreatingPluginModule=Errore creando il modulo plugin.\nLibreria: "%s":\nErrore: %s
 SErrDuplicateKeyword=Questa parola chiave è già nella lista
 SErrExecutingToolFailed=Errore eseguendo il tool "%s" per il file "%s": %s
 SErrFileNotFound=File non trovato
 SErrFileNotFoundFmt=File non trovato: "%s"
 SErrFileRevHigher=L'album è stato creato con una versione più nuova di
+SErrInvalidCharsInFileName=Un nome di file non può contenere i seguenti caratteri::\n\\ / : * ? " < > |\nRimuovili e prova di nuovo
 SErrInvalidPicFileName=Nome dell'immagine non valido: "%s"
+SErrInvalidPicPropName=Nome di proprietà dell'immagine non valido: "%s"
+SErrLoadingPluginModule=Errore caricando il modulo plugin.\nLibreria: "%s":\nErrore: %s
 SErrNotAllPicsLinked=%d immagini selezionate di %d non sono inserite in un
 SErrNoTargetPathDetermined=Nessun percorso di arrivo trovato per il file
 SError=Errore
 SErrPicFileAlreadyInUse=Il file "%s" è già usato da un'altra immagine (ID=%d) nell'album
+SErrPicPropNameMissing=Nome della proprietà dell'immagine mancante
 SErrSrcAndDestFoldersAreSame=Le cartelle sorgente e destinazione sono le
 SErrTargetFileExists=File di destinazione "%s" già esiste
+SErrUnbalancedCurlyBraces=Parentesi graffe non bilanciate nell'espressione
 SErrUnknownPicFileExtension=Estensione sconosciuta per il file "%s"
 SFileFilter_Ini=File Ini (*.ini)|*.ini
 SFileFilter_OpenPhoa=Album (*.phoa)|*.phoa|Tutti i file (*.*)|*.*
@@ -920,6 +958,8 @@ SLogEntry_FileOpError=Elaborazione immagine "%s" failita: %s
 SLogEntry_FileOpFinalizationError=Operazione di finalizzazione fallita: %s
 SLogEntry_FileRecycledOK=Il file "%s" è stato spostato nel cestino
 SLogEntry_FileRecyclingError=Impossibile spostare il file "%s" nel cestino
+SLogEntry_LangFileCopiedOK=Il file di linguaggio "%s" è stato copiato con successo su "%s"
+SLogEntry_LangFileCopyingError=Fallita la copia del file di linguaggio "%s" su "%s": %s
 SLogEntry_PhoaSavedOK=L'album è stato salvato su "%s" senza errori
 SLogEntry_PhoaSaveError=Errore durante il salvataggio dell'album sul
 SLogEntry_PicDeletedOK=L'immagine "%s" è stata rimossa dall'album
@@ -935,9 +975,11 @@ SMsg_ApplyingLanguage=Sto applicando il corrente linguaggio...
 SMsg_ApplyingSettings=Sto applicando le impostazioni...
 SMsg_Initializing=Sto inializzando...
 SMsg_LoadingPhoa=Sto caricando l'album %s...
+SMsg_LoadingPlugin=Sto caricando la libreria di plugin: %s...
 SMsg_NoMetatagSelected=Nessun metatag selezionato. Seleziona un elemento per
 SMsg_ProcessingSomething=Sto elaborando %s...
 SMsg_ScanningLanguages=Sto cercando file di linguaggio...
+SMsg_ScanningPlugins=Sto cercando i plugin...
 SMsg_SelectSearchPicProp=(seleziona una proprietà)
 SMsg_Starting=Sto lanciando l'applicazione...
 SMsg_SyntaxOK=La sintassi dell'espressione è corretta.
@@ -1051,6 +1093,7 @@ TPhoaOp_GroupNew=Nuovo gruppo
 TPhoaOp_GroupRename=Rinomina gruppo
 TPhoaOp_PicAdd=Aggiungi immagini
 TPhoaOp_PicDelete=Cancella immagini
+TPhoaOp_PicDeleteFromProject=Cancella immagini da tutti i gruppi
 TPhoaOp_PicDragAndDropInsideGroup=Trascina immagini
 TPhoaOp_PicDragAndDropToGroup=Trascina immagini
 TPhoaOp_PicEdit=Modifica proprietà immagine
