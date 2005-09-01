@@ -1,9 +1,9 @@
-TargetApplication=PhoA 1.1.9
+TargetApplication=PhoA 1.1.10 beta
 Author=Petran Liket <revage@home.nl>
 SourceLANGID=1033
 LANGID=1043
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-01-01 20:23:05
+LastModified=2005-08-28 22:25:57
 
 [dAbout]
 00000003=Over
@@ -24,6 +24,13 @@ LastModified=2005-01-01 20:23:05
 00000021=ID:
 00000024=Tekst:
 00000027=Omschrijving
+00000028=Groep icoon
+00000030=Groep icoon
+00000031=Selecteer...
+00000032=Selecteer...|Laad groep icoon uit een bestand
+00000033=Groep icoon
+00000034=Reset
+00000035=Reset|Hersteld standaard groep icoon
 
 [dMsgBox]
 00000012=Toon dit venster niet meer
@@ -48,6 +55,7 @@ LastModified=2005-01-01 20:23:05
 00000032=Data
 00000034=Sleutelwoorden
 00000036=Groepen
+00000037=Meer knoppen|
 
 [dProjectProps]
 00000003=Eigenschappen: foto album
@@ -104,6 +112,7 @@ LastModified=2005-01-01 20:23:05
 00000012=Sluiten
 00000015=OK
 00000018=Help
+00000019=Meer knoppen|
 
 [dSortPics]
 00000003=Sorteer afbeeldingen
@@ -431,6 +440,12 @@ LastModified=2005-01-01 20:23:05
 00000219=Bewerken
 00000220=Toon diashow
 00000221=Toon diashow|Start diashow in venster
+00000222=Bewerken
+00000223=Wis uit alle groepen
+00000224=Wis uit alle groepen|Wist geselecteerde afbeeldingen uit alle foto-album groepen
+00000225=Bewerken
+00000226=Wis bestanden
+00000227=Wis bestanden|Wist geselecteerde afbeeldingen uit alle groepen en verwijdert corresponderende bestanden
 
 [frPicProps_Data]
 00000007=Plaats:
@@ -497,6 +512,8 @@ LastModified=2005-01-01 20:23:05
 00000104=Extra
 00000105=Spiegel verticaal
 00000107=Spiegel verticaal|Spiegel de afbeelding over de verticale as
+00000108=Meer knoppen|
+00000109=Meer knoppen|
 
 [frWzPageAddFiles_CheckFiles]
 00000012=Selecteer alle bestanden
@@ -523,6 +540,8 @@ LastModified=2005-01-01 20:23:05
 00000057=Grootte
 00000058=Gewijzigd
 00000059=Toon voorbeeld
+00000060=Bestandsgrootte van:
+00000063=tot:
 
 [frWzPageFileOps_CDOptions]
 00000007=Geef een naam op voor de CD/DVD:
@@ -532,6 +551,7 @@ LastModified=2005-01-01 20:23:05
 00000023=Maak een autorun.inf bestand voor automatisch afspelen van de CD/DVD
 00000034=Voeg bestaande foto-album vensters toe
 00000037=Kopiëer de huidige programma instellingen naar phoa.ini
+00000038=Kopieër het gebruikte taalbestand
 
 [frWzPageFileOps_DelOptions]
 00000007=Wis bestanden naar de prullenbak
@@ -545,6 +565,8 @@ LastModified=2005-01-01 20:23:05
 00000022=Behoud originele map layout
 00000025=Rangschik bestanden in de map met behoud van groep layout
 00000028=Sta meerdere kopieën van een bestand toe
+00000029=Bestanden hernoemen
+00000030=Hernoem bestanden:
 
 [frWzPageFileOps_MoveOptions2]
 00000007=Als het doelbestand al bestaat:
@@ -586,17 +608,17 @@ LastModified=2005-01-01 20:23:05
 00000091=Draait de selectie om
 
 [frWzPageFileOps_SelTask]
-00000007=Kopiëert de geselecteerde afbeeldingen en bestanden, naar de gekozen map. Gebruik deze optie om een foto-album te maken op CD of DVD
-00000010=Verplaatst geselecteerde afbeeldingen en bestanden naar de gekozen map, en werkt de verwijzingen bij
-00000013=Verwijdert geselecteerde afbeeldingen, en wist de originele bestanden.
-00000016=Hersteld ongeldige verwijzingen door te zoeken naar bestanden in de gekozen map, en, optioneel, verwijdert afbeeldingen met ongeldige verwijzingen
+00000007=Kopiëer de geselecteerde afbeeldingen en bestanden naar de gekozen map. Gebruik deze optie om een foto-album te maken op CD of DVD
+00000010=Verplaats geselecteerde afbeeldingen en bestanden naar de gekozen map, en werk de verwijzingen bij
+00000013=Verwijder geselecteerde afbeeldingen, en wis de originele bestanden.
+00000016=Herstel ongeldige verwijzingen door te zoeken naar bestanden in de gekozen map, en, optioneel, verwijder afbeeldingen met ongeldige verwijzingen
 00000019=• LET OP: Deze handelingen zijn niet ongedaan te maken!
-00000022=Leest bestanden opnieuw in, maakt nieuwe Miniaturen, en werkt beeld specifieke informatie bij
-00000025=Kopiëert afbeeldingsbestanden naar een map
-00000028=Verplaatst afbeeldingsbestanden naar een map
-00000031=Verwijdert afbeeldingen en bestanden
-00000034=Hersteld verwijzingen naar bestanden
-00000037=Bouwt Miniaturen opnieuw op
+00000022=Lees bestanden opnieuw in, maak nieuwe Miniaturen, en werk beeld-specifieke informatie bij
+00000025=Kopiëer afbeeldingsbestanden naar een map
+00000028=Verplaats afbeeldingsbestanden naar een map
+00000031=Verwijder afbeeldingen en bestanden
+00000034=Herstel verwijzingen naar bestanden
+00000037=Bouw Miniaturen opnieuw op
 
 [frWzPage_Log]
 00000122=Kopiëren
@@ -633,10 +655,12 @@ LastModified=2005-01-01 20:23:05
 00000033=Spellingscontrôle
 00000034=Controleer de gebruikte spelling
 00000038=Eigenschappen
+00000039=Meer knoppen|
 
 [frPicProps_FileProps]
 00000001=Wijzig bestand...
 00000002=Wijzig bestand...|Wijzig bestand voor geselecteerde afbeelding
+00000003=Meer knoppen|
 
 [$CONSTANTS]
 dfpArchive=Archief
@@ -664,6 +688,10 @@ dtfrEXIF=Waarde afgeleid van EXIF label
 dtfrFilename=Waarde afgeleid van bestandsnaam
 dtfrModified=Waarde afgeleid van wijzigingstijd bestand
 dtfrSpecified=Waarde al gespecificeerd, onveranderd
+fsuBytes=bytes
+fsuGBytes=Gigabytes
+fsuKBytes=Kilobytes
+fsuMBytes=Megabytes
 gbpAuthor=Auteur
 gbpDateByDay=Datum - dag
 gbpDateByMonth=Datum - maand
@@ -704,6 +732,7 @@ ISettingID_Browse_ViewerThBColor=Miniatuur achtergrondkleur:
 ISettingID_Browse_ViewerThBordCl=Miniatuur achtergrondrand eigen kleur
 ISettingID_Browse_ViewerThBordSt=Miniatuur achtergrondrand stijl
 ISettingID_Browse_ViewerThFColor=Miniatuur lettertype kleur:
+ISettingID_Browse_ViewerThFocusClr=Miniatuur selectierechthoek kleur:
 ISettingID_Browse_ViewerThInfo=Afbeelding details getoond op de miniatuur
 ISettingID_Browse_ViewerThLBProp=Links onder:
 ISettingID_Browse_ViewerThLTProp=Links boven:
@@ -722,6 +751,7 @@ ISettingID_Dlgs_AddPicWizard=Voeg afbeeldingen toe wizard
 ISettingID_Dlgs_APW_AutofillDate=Automatisch invullen van afbeeldingsdatum vanuit (in volgorde van voorkeur):
 ISettingID_Dlgs_APW_AutofillTime=Automatisch invullen van afbeeldingstijd vanuit (in volgorde van voorkeur):
 ISettingID_Dlgs_APW_AutofillXfrm=Automatisch invullen van afbeeldingstransformatie vanuit metadata
+ISettingID_Dlgs_APW_ExtractIcons=zoek bestands iconen
 ISettingID_Dlgs_APW_LogOnErrOnly=Toon logboek alleen bij het voorkomen van fouten
 ISettingID_Dlgs_APW_ReplaceDate=Overschrijf datum indien al gespecificeerd
 ISettingID_Dlgs_APW_ReplaceTime=Overschrijf tijd indien al gespecificeerd
@@ -730,6 +760,7 @@ ISettingID_Dlgs_APW_SkipChkPage=Sla 'controleer bestanden' dialoog altijd over
 ISettingID_Dlgs_ConfmAppExit=Bij afsluiten (als foto-album niet is gewijzigd)
 ISettingID_Dlgs_ConfmDelGroup=Bij wissen van een groep
 ISettingID_Dlgs_ConfmDelPics=Bij wissen van een afbeelding
+ISettingID_Dlgs_ConfmDelPicsFromPj=Bij wissen van een afbeelding uit alle album groepen
 ISettingID_Dlgs_ConfmDelView=Bij wissen van een foto-album venster
 ISettingID_Dlgs_ConfmOldFile=Bij opslaan van een oudere versie van een bestand
 ISettingID_Dlgs_Confms=Vraag bevestiging
@@ -866,6 +897,7 @@ ppTime=Tijd
 ptkCustom=Aangepaste actie
 ptkDefault=Standaard actie
 ptkEdit=Standaard bewerken actie
+ptkExtViewer=Externe viewer
 ptkOpen=Standaard openen actie
 ptkPrint=Standaard print actie
 ptkSeparator=Scheidingsteken
@@ -896,6 +928,8 @@ SCannotUndo=(kan niet ongedaan maken)
 SConfirm_AppExit=Programma afsluiten?
 SConfirm_DelGroup=Geselecteerde groep wissen?
 SConfirm_DelPics=Geselecteerde afbeeldingen wissen?
+SConfirm_DelPicsFromProject=Geselecteerde afbeeldingen worden gewist uit alle album groepen.\nWilt U doorgaan?
+SConfirm_DelPicsWithFiles=Geselecteerde afbeeldingen worden gewist uit alle album groepen en alle corresponderende bestanden worden verwijdert.\nWAARSCHUWING: deze handeling kan niet ongedaan gemaakt worden!\n\nWilt U doorgaan?
 SConfirm_DelView=Huidig venster wissen?
 SConfirm_FileNotSaved=Foto album bestand "%s" is niet opgeslagen. Wijzigingen opslaan?
 SConfirm_FileOverwrite=Overschrijven van bestand "%s"?
@@ -918,22 +952,30 @@ SDlgTitle_SelectPicFile=Selecteer een afbeeldingsbestand
 SDlgTitle_Warning=PhoA: Waarschuwing
 SErrCannotCreateFolder=Kan map niet maken "%s"
 SErrCannotDecodePicture=Fout in decoderen van afbeeldingsbestand "%s":\n%s
+SErrCannotDeleteFile=Fout in wissen bestand "%s":\n%s
 SErrCannotLoadPicture=Fout in laden afbeeldingsbestand "%s":\n%s
 SErrCannotRead=Gegevens leesfout
+SErrCannotUsePathPropsInFormat=Eigenschap "%s" kan niet worden gebruikt in een bestandsnaam omdat het een pad bevat
 SErrCannotWrite=Gegevens schrijffout
+SErrCreatingPluginModule=Fout aanmaken plugin module.\nBibliotheek: "%s":\nFout: %s
 SErrDuplicateKeyword=Dit sleutelwoord staat al in de lijst
 SErrExecutingToolFailed=Kan gereedschap "%s" niet gebruiken voor bestand "%s": %s
 SErrFileNotFound=Bestand niet gevonden
 SErrFileNotFoundFmt=Bestand niet gevonden: "%s"
 SErrFileRevHigher=Het foto-album is gemaakt met een nieuwere versie van Phoa dan deze. Kan het bestand niet openen.
+SErrInvalidCharsInFileName=Een bestandsnaam mag niet een van de volgende lettertekens bevatten:\n\\ / : * ? " < > |\nVerwijder deze en probeer opnieuw
 SErrInvalidPicFileName=Ongeldige afbeeldingsbestand naam: "%s"
+SErrInvalidPicPropName=Onjuiste afbeeldings eigenschap naam: "%s"
+SErrLoadingPluginModule=Fout bij laden plugin module.\nBibliotheek: "%s":\nFout: %s
 SErrNotAllPicsLinked=%d of %d geselecteerde afbeeldingen worden niet in een groep geplaatst, wat niet is toegestaan. Iedere afbeelding moet verbonden zijn met minimaal één groep.
 SErrNoTargetPathDetermined=Geen doelpad aangegeven voor bestand "%s"
 SError=Fout
 SErrPicFileAlreadyInUse=Bestand "%s"wordt al gebruikt door een andere afbeelding (ID=%d) in het foto-album
+SErrPicPropNameMissing=Naam afbeeldings eigenschap ontbreekt
 SErrSrcAndDestFoldersAreSame=Bron en doel mappen zijn gelijk ("%s") voor bestand "%s"
 SErrTargetFileExists=Doelbestand "%s" bestaat reeds
-SErrUnknownPicFileExtension=Onbekend afbeeldingsbestand extensie voor "%s"
+SErrUnbalancedCurlyBraces=Oneven aantal haakjes in expressie
+SErrUnknownPicFileExtension=Onbekende afbeeldingsbestand extensie voor "%s"
 SFileFilter_Ini=Ini bestanden (*.ini)|*.ini
 SFileFilter_OpenPhoa=Foto-album bestanden (*.phoa)|*.phoa|Alle bestanden (*.*)|*.*
 SFileFilter_SearchExpr=Tekst bestanden(*.txt)|*.txt|Alle bestanden (*.*)|*.*
@@ -954,6 +996,8 @@ SLogEntry_FileOpError=Verwerken afbeelding "%s" mislukt: %s
 SLogEntry_FileOpFinalizationError=Handeling uitvoeren mislukt: %s
 SLogEntry_FileRecycledOK=Bestand "%s" is verplaatst naar de prullenbak
 SLogEntry_FileRecyclingError=Kan bestand "%s" niet verplaatsen naar de prullenbak
+SLogEntry_LangFileCopiedOK=Taalbestand "%s" met succes gekopieërt "%s"
+SLogEntry_LangFileCopyingError=Fout tijdens kopiëren taalbestand "%s" naar "%s": %s
 SLogEntry_PhoaSavedOK=Foto-album is opgeslagen naar "%s"
 SLogEntry_PhoaSaveError=Kan foto-album niet opslaan naar "%s": %s
 SLogEntry_PicDeletedOK=Afbeelding "%s" is gewist uit het foto-album
@@ -969,9 +1013,11 @@ SMsg_ApplyingLanguage=Pas huidige taal toe...
 SMsg_ApplyingSettings=Pas instellingen toe...
 SMsg_Initializing=Initialiseren...
 SMsg_LoadingPhoa=Laden foto-album %s...
+SMsg_LoadingPlugin=Laden van plugin bibliotheek: %s...
 SMsg_NoMetatagSelected=Geen metatag geselecteerd. Selecteer een item om de beschrijving te zien
 SMsg_ProcessingSomething=Uitvoeren %s...
 SMsg_ScanningLanguages=Controleren op taal bestanden...
+SMsg_ScanningPlugins=Zoeken naar plugins...
 SMsg_SelectSearchPicProp=(selecteer eigenschap)
 SMsg_Starting=Starten van het programma...
 SMsg_SyntaxOK=Expressie spelling is OK.
@@ -1018,10 +1064,6 @@ sscStrSpecified=is specifiek
 sscStrStarts=begint met
 SSearchResultsNode=Zoek resultaat
 SSelectedPicCount=%d geselecteerd
-SSizeBytes=%d bytes
-SSizeGBytes=%.2f Gbytes
-SSizeKBytes=%.2f Kbytes
-SSizeMBytes=%.2f Mbytes
 SSort_Ascending=Oplopend
 SSort_Descending=Aflopend
 SStats_DistinctPics=Aantal afzonderlijke bestanden
@@ -1092,6 +1134,7 @@ TPhoaOp_GroupNew=Nieuwe groep
 TPhoaOp_GroupRename=Hernoem groep
 TPhoaOp_PicAdd=Voeg afbeeldingen toe
 TPhoaOp_PicDelete=Wis afbeeldingen
+TPhoaOp_PicDeleteFromProject=Verwijder afbeeldingen uit alle groepen
 TPhoaOp_PicDragAndDropInsideGroup=Sleep afbeeldingen
 TPhoaOp_PicDragAndDropToGroup=Sleep afbeeldingen
 TPhoaOp_PicEdit=Bewerk afbeeldings-eigenschappen
@@ -1105,3 +1148,5 @@ TPhoaOp_ViewDelete=Verwijder venster
 TPhoaOp_ViewEdit=Bewerk venster
 TPhoaOp_ViewMakeGroup=Maak een groep van het venster
 TPhoaOp_ViewNew=Maak nieuw venster
+
+
