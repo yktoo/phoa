@@ -1,9 +1,9 @@
-TargetApplication=PhoA 1.1.9
+TargetApplication=PhoA 1.1.10 beta
 Author=Dara SARNIRAND (dara@sarnirand.com)
 SourceLANGID=1033
 LANGID=1036
 Generator=DKLang Translation Editor v2.4
-LastModified=2005-08-03 02:36:22
+LastModified=2005-09-06 21:36:34
 
 [dAbout]
 00000003=À propos de
@@ -24,6 +24,13 @@ LastModified=2005-08-03 02:36:22
 00000021=&ID:
 00000024=&Texte:
 00000027=&Description:
+00000028=Icône du groupe
+00000030=Icône du groupe
+00000031=&Sélectionner...
+00000032=Sélectionner...|Charger l'icône du groupe à partir d'un fichier
+00000033=Icône du groupe
+00000034=&RAZ
+00000035=RAZ|Rétablir l'icône du groupe avec l'icône par défaut
 
 [dMsgBox]
 00000012=Ne pa&s afficher à nouveau ce message
@@ -48,6 +55,7 @@ LastModified=2005-08-03 02:36:22
 00000032=Données
 00000034=Mots clés
 00000036=Groupes
+00000037=Plus de boutons|
 
 [dProjectProps]
 00000003=Propriétés de l'album
@@ -104,6 +112,7 @@ LastModified=2005-08-03 02:36:22
 00000012=Annuler
 00000015=OK
 00000018=Aide
+00000019=Plus de boutons|
 
 [dSortPics]
 00000003=Trier les images
@@ -431,6 +440,12 @@ LastModified=2005-08-03 02:36:22
 00000219=Edit
 00000220=Voir le &diaporama
 00000221=Voir le diaporama|Démarrer le diaporama
+00000222=Propriétés
+00000223=Supprimer de tous &les groupes
+00000224=Supprimer de tous les groupes|Supprimer les images sélectionnées de tous les groupes d'album photo
+00000225=Propriétés
+00000226=Supprimer les &fichiers
+00000227=Supprimer les fichiers|Supprimer les images sélectionnées de tous les groupes et supprimer les fichiers correspondants
 
 [frExprPicFilter]
 00000001=Barre d'outils
@@ -457,6 +472,7 @@ LastModified=2005-08-03 02:36:22
 00000033=Vérifier la syntaxe
 00000034=Vérifier la syntaxe de l'expression
 00000038=Propriétés
+00000039=Plus de boutons|
 
 [frPicProps_Data]
 00000007=&Lieu:
@@ -472,6 +488,7 @@ LastModified=2005-08-03 02:36:22
 [frPicProps_FileProps]
 00000001=&Remplacer le fichier...
 00000002=Remplacer le fichier...|Remplacer le fichier pour l'image sélectionnée
+00000003=Plus de boutons|
 
 [frPicProps_Keywords]
 00000009=Plus de boutons|
@@ -527,6 +544,8 @@ LastModified=2005-08-03 02:36:22
 00000104=Tools
 00000105=Miroir &vertical
 00000107=Miroir vertical|Renverser l'image verticalement
+00000108=Plus de boutons|
+00000109=Plus de boutons|
 
 [frWzPageAddFiles_CheckFiles]
 00000012=Sélectionner &tous les fichiers
@@ -553,6 +572,8 @@ LastModified=2005-08-03 02:36:22
 00000057=Taille
 00000058=Modifié le
 00000059=Afficher l'&aperçu
+00000060=&Taille de fichier à partir de:
+00000063=&à:
 
 [frWzPageFileOps_CDOptions]
 00000007=&Libeller le média comme:
@@ -562,6 +583,7 @@ LastModified=2005-08-03 02:36:22
 00000023=Créer un fichier &AUTORUN.INF dans le dossier de destination pour démarrer automatiquement le CD/DVD
 00000034=Inclure également les &vues existantes
 00000037=Enregistrer les préférences dans le fichier PHOA.&INI
+00000038=Copier le fichier de localisation actue&llement utilisé
 
 [frWzPageFileOps_DelOptions]
 00000007=Supprimer les fichiers et les placer dans la &corbeille
@@ -575,6 +597,8 @@ LastModified=2005-08-03 02:36:22
 00000022=&Maintenir la structure du dossier original
 00000025=Arran&ger les fichiers dans des dossiers structurés comme le groupe
 00000028=Aut&oriser les copies multiple de fichier
+00000029=Renommage des fichiers
+00000030=Renommer les fichiers avec ce &masque:
 
 [frWzPageFileOps_MoveOptions2]
 00000007=Si le fichier de destination e&xiste déjà:
@@ -664,6 +688,10 @@ dtfrEXIF=Valeur extraite à partir de la balise EXIF
 dtfrFilename=Valeur extraite à partir du nom du fichier
 dtfrModified=Valeur extraite à partir de l'heure de modification du fichier
 dtfrSpecified=Valeur déjà spécifiée, pas de mise à jour
+fsuBytes=octets
+fsuGBytes=Goctets
+fsuKBytes=Koctets
+fsuMBytes=Moctets
 gbpAuthor=Par auteur
 gbpDateByDay=Par jour
 gbpDateByMonth=Par mois
@@ -704,6 +732,7 @@ ISettingID_Browse_ViewerThBColor=Couleur d'arrière plan des vignettes:
 ISettingID_Browse_ViewerThBordCl=Couleur des bordures de vignettes
 ISettingID_Browse_ViewerThBordSt=Style des bordures de vignettes
 ISettingID_Browse_ViewerThFColor=Couleur de premier plan des vignettes:
+ISettingID_Browse_ViewerThFocusClr=Couleur du rectangle de focus des vignettes:
 ISettingID_Browse_ViewerThInfo=Détails de l'image affichés sur les vignettes
 ISettingID_Browse_ViewerThLBProp=Dans le coin inférieur gauche:
 ISettingID_Browse_ViewerThLTProp=Dans le coin supérieur gauche:
@@ -722,6 +751,7 @@ ISettingID_Dlgs_AddPicWizard=Assistant d'ajout d'images
 ISettingID_Dlgs_APW_AutofillDate=Obtenir la date de l'image à partir de (par ordre de préférence):
 ISettingID_Dlgs_APW_AutofillTime=Obtenir l'heure de l'image à partir de (par ordre de préférence):
 ISettingID_Dlgs_APW_AutofillXfrm=Obtenir les transformations de l'image à partir de:
+ISettingID_Dlgs_APW_ExtractIcons=Extraire les icônes
 ISettingID_Dlgs_APW_LogOnErrOnly=Afficher la page d'historique si une erreur se produit
 ISettingID_Dlgs_APW_ReplaceDate=Remplacer la date si elle est spécifiée
 ISettingID_Dlgs_APW_ReplaceTime=Remplacer l'heure si elle est spécifiée
@@ -730,6 +760,7 @@ ISettingID_Dlgs_APW_SkipChkPage=Toujours ignorer la page 'Sélection des fichiers
 ISettingID_Dlgs_ConfmAppExit=Avant de quitter (quand un album photo n'est pas modifié)
 ISettingID_Dlgs_ConfmDelGroup=Avant la suppression d'un groupe
 ISettingID_Dlgs_ConfmDelPics=Avant la suppression d'une image
+ISettingID_Dlgs_ConfmDelPicsFromPj=Avant la suppression d'une image de tous les groupes d'album photo
 ISettingID_Dlgs_ConfmDelView=Avant la suppression d'une vue
 ISettingID_Dlgs_ConfmOldFile=Avant l'enregistrement sur une version antérieure
 ISettingID_Dlgs_Confms=Confirmations
@@ -866,6 +897,7 @@ ppTime=Heure
 ptkCustom=Action personnalisée
 ptkDefault=Action par défaut
 ptkEdit=Action d'édition standard
+ptkExtViewer=Visionneuse externe
 ptkOpen=Action d'ouverture standard
 ptkPrint=Action d'impression standard
 ptkSeparator=Séparateur
@@ -896,6 +928,8 @@ SCannotUndo=(ne peut pas annuler)
 SConfirm_AppExit=Quitter le programme ?
 SConfirm_DelGroup=Supprimer le groupe sélectionné ?
 SConfirm_DelPics=Supprimer les images sélectionnés ?
+SConfirm_DelPicsFromProject=Les images sélectionnées seront supprimées de tous les groupes d'album photo.\nSouhaitez-vous continuer ?
+SConfirm_DelPicsWithFiles=Les images sélectionnées seront supprimées de tous les groupes d'album photo, et les fichiers correspondants seront supprimés.\nATTENTION! Vous ne pourrez pas annuler ce traitement !\n\nSouhaitez-vous continuer ?
 SConfirm_DelView=Supprimer la vue courante ?
 SConfirm_FileNotSaved=L'album photo "%s" n'est pas enregistré. Souhaitez-vous enregistrer les modifications ?
 SConfirm_FileOverwrite=Remplacer le fichier "%s" ?
@@ -918,21 +952,29 @@ SDlgTitle_SelectPicFile=Sélectionner une image
 SDlgTitle_Warning=PhoA: Attention
 SErrCannotCreateFolder=Impossible de créer le dossier "%s"
 SErrCannotDecodePicture=Erreur de décodage du fichier "%s":\n%s
+SErrCannotDeleteFile=Erreur de suppression du fichier "%s":\n%s
 SErrCannotLoadPicture=Erreur de chargement du fichier "%s":\n%s
 SErrCannotRead=Erreur de lecture de flux
+SErrCannotUsePathPropsInFormat=La propriété "%s" ne peut pas être utilisée dans un format de nom de fichier car il contient le chemin du fichier
 SErrCannotWrite=Erreur d'écriture de flux
+SErrCreatingPluginModule=Erreur de création du module extere.\nLibrairie: "%s":\nErreur: %s
 SErrDuplicateKeyword=Ce mot-clé est déjà dans la liste
-SErrExecutingToolFailed=Erreurr d'exécution de l'outil "%s" pour le fichier "%s": %s
+SErrExecutingToolFailed=Erreur d'exécution de l'outil "%s" pour le fichier "%s": %s
 SErrFileNotFound=Le fichier n'a pas été trouvé
 SErrFileNotFoundFmt=Le fichier n'a pas été trouvé: "%s"
 SErrFileRevHigher=L'album photo a été créé par une version postérieur de ce programme. Impossible d'ouvrir le fichier.
+SErrInvalidCharsInFileName=Un nom de fichier ne peut contenir aucun des caractères suivants:\n\\ / : * ? " < > |\nRetirer les et réessayer
 SErrInvalidPicFileName=Nom de fichier d'image invalide: "%s"
+SErrInvalidPicPropName=Nom de la propriété de l'image invalide: "%s"
+SErrLoadingPluginModule=Erreur de chargement du module externe.\nLibrairie: "%s":\nErreur: %s
 SErrNotAllPicsLinked=%d des %d images sélectionnées ne seront pas placées dans un groupe, qui est invalide. Chaque image doit être liée à au moins un groupe.
 SErrNoTargetPathDetermined=Pas de chemin de destination déterminé pour le fichier "%s"
 SError=Erreur
 SErrPicFileAlreadyInUse=Le fichier "%s" est déjà utilisé par une autre image (ID=%d) dans l'album photo
+SErrPicPropNameMissing=Nom de la propriété de l'image manquante
 SErrSrcAndDestFoldersAreSame=Les dossiers source et destination sont les mêmes ("%s") pour le fichier "%s"
 SErrTargetFileExists=Le fichier de destination "%s" existe déjà
+SErrUnbalancedCurlyBraces=Croisillons bouclés non équilibrés dans l'expression
 SErrUnknownPicFileExtension=Extension de fichier d'image inconnue pour "%s"
 SFileFilter_Ini=Fichiers INI (*.ini)|*.ini
 SFileFilter_OpenPhoa=Album Photo PhoA (*.phoa)|*.phoa|Tous les fichiers (*.*)|*.*
@@ -954,6 +996,8 @@ SLogEntry_FileOpError=Traitement de l'image "%s" échoué: %s
 SLogEntry_FileOpFinalizationError=Impossible de terminer le traitement: %s
 SLogEntry_FileRecycledOK=Le fichier "%s" a été placé avec succès dans la corbeille
 SLogEntry_FileRecyclingError=Impossible de placer le fichier "%s" dans la corbeille
+SLogEntry_LangFileCopiedOK=Le fichier de localisation "%s" a été copié vers "%s" avec succès
+SLogEntry_LangFileCopyingError=Impossible de copier le fichier de localisation "%s" vers "%s": %s
 SLogEntry_PhoaSavedOK=L'album photo a été enregistré avec succès dans le fichier "%s"
 SLogEntry_PhoaSaveError=Impossible d'enregistrer l'album photo dans le fichier "%s": %s
 SLogEntry_PicDeletedOK=L'image "%s" a été retiré de l'album photo avec succès
@@ -969,9 +1013,11 @@ SMsg_ApplyingLanguage=Application de la localisation courante...
 SMsg_ApplyingSettings=Application des préférences...
 SMsg_Initializing=Initialisation...
 SMsg_LoadingPhoa=Chargement de l'album photo %s...
+SMsg_LoadingPlugin=Chargement du module externe: %s...
 SMsg_NoMetatagSelected=Pas de metabalise sélectionnée. Sélectionner un objet pour voir sa description.
 SMsg_ProcessingSomething=Traitement de %s...
 SMsg_ScanningLanguages=Recherche des fichiers de localisation...
+SMsg_ScanningPlugins=Recherche des modules externes...
 SMsg_SelectSearchPicProp=(selectionner une propriété)
 SMsg_Starting=Démarrage de l'application...
 SMsg_SyntaxOK=La syntaxe de l'expression est valide.
@@ -1018,10 +1064,6 @@ sscStrSpecified=est spécifié
 sscStrStarts=commence par
 SSearchResultsNode=Résultat de la recherche
 SSelectedPicCount=%d sélectionné(s)
-SSizeBytes=%d octets
-SSizeGBytes=%.2f Go
-SSizeKBytes=%.2f Ko
-SSizeMBytes=%.2f Mo
 SSort_Ascending=Croissant
 SSort_Descending=Décroissant
 SStats_DistinctPics=Nombre d'images distinctes
@@ -1091,7 +1133,8 @@ TPhoaOp_GroupEdit=Propriétés du groupe
 TPhoaOp_GroupNew=Nouveau groupe
 TPhoaOp_GroupRename=Renommer le groupe
 TPhoaOp_PicAdd=Ajouter des images
-TPhoaOp_PicDelete=Supprimer des images
+TPhoaOp_PicDelete=Supprimer les images
+TPhoaOp_PicDeleteFromProject=Supprimer les images de tous les groupes
 TPhoaOp_PicDragAndDropInsideGroup=Glisser des images
 TPhoaOp_PicDragAndDropToGroup=Glisser des images
 TPhoaOp_PicEdit=Propriétés de l'image
