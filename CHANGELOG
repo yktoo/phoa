@@ -1,28 +1,5 @@
-PhoA changelog: changes since verison 1.1.9
+PhoA changelog: changes since verison 1.1.10 beta
 
-Add pictures wizard: 
-  Using Extract file icons option you can now disable icon extraction from picture files (it is the default now), which speeds up file list compilation, especially for large lists. 
-  An option for filtering picture files by size. 
-  
-File operations wizard: 
-  An option for renaming picture files being copied or moved, with using picture property values. 
-  An option for copying the language file currently being used.
-
-Browser:
-  Delete pictures from all groups (shortcut Ctrl+Del) and Delete files (shortcut Shift+Ctrl+Del) functions.
-  Thumbnail focus rectangle color option.
-
-Viewer:
-  Double-clicking the image acts like pressing Enter.
-  Viewport center position is preserved on resize and scale change.
-  With "Fit window to picture size" turned off, the last used window size is remembered. Similarly, with "Center window on the desktop" turned off, the last used window position is restored. Additionally, in multimonitor systems the last used monitor is remembered.
-
-An option for launching an external viewer instead of built-in one, using a new "External viewer" tool kind.
-
-New -r command-line option.
-
-More accurate window handling in multimonitor systems.
-
-Help:
-  Added Common tasks chapter
-  Added Acknowledgements page
+Fixed tool editor bug (Mantis #47)
+Fixed tooltip drawing (Mantis #48)
+Fixed viewer issues (Mantis #49)
