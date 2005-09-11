@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.39 2005-08-28 06:04:29 dale Exp $
+//  $Id: phGUIObj.pas,v 1.40 2005-09-11 12:59:03 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1756,7 +1756,6 @@ uses Math, Themes, phUtils;
   var
     bAnimate: BOOL;
     cStyle: Cardinal;
-    r: TRect;
   begin
     FActivating := True;
     try
@@ -1766,9 +1765,11 @@ uses Math, Themes, phUtils;
       FMonitor := Screen.MonitorFromPoint(Rect.TopLeft, mdNearest);
        // Подстраиваем положение и размер
       Inc(Rect.Bottom, 4);
-      r := FitRect(Rect, FMonitor.BoundsRect);
-       // Позиционируем окно, поднимая его наверх (topmost)
-      SetWindowPos(Handle, HWND_TOPMOST, r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top, SWP_NOACTIVATE);
+      Rect := FitRect(Rect, FMonitor.BoundsRect);
+       // Позиционируем окно, поднимая его наверх (topmost). Делаем это столь странным способом, т.к. иначе почему-то
+       //   глючит прорисовка NC area (навеяно VCL)
+      UpdateBoundsRect(Rect);
+      SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
        // Рисуем анимацию, если нужно
       if (GetTickCount-FLastActive>250) and (Length(AHint)<500) and Assigned(AnimateWindowProc) then begin
         SystemParametersInfo(SPI_GETTOOLTIPANIMATION, 0, @bAnimate, 0);
@@ -1811,6 +1812,7 @@ uses Math, Themes, phUtils;
   procedure TPhoAHintWindow.CMTextChanged(var Message: TMessage);
   var r: TRect;
   begin
+     { inherited не вызываем, т.к. он ничего хорошего не делает }
     if FActivating then Exit;
     r := CalcHintRect(MaxInt, Caption, nil);
     SetBounds(Left, Top, r.Right-r.Left, r.Bottom-r.Top);
@@ -1820,37 +1822,46 @@ uses Math, Themes, phUtils;
   var
     r, rLeft, rRight: TRect;
     s, sLine, sLeft: String;
+    iTab: Integer;
   begin
     r := ClientRect;
     InflateRect(r, -2, -2);
-    r.Bottom := r.Top+Canvas.TextHeight('Wg');
     Canvas.Font.Color := Screen.HintFont.Color;
     s := AdjustLineBreaks(Caption, tlbsLF);
      // Если нет табуляций - просто выводим текст с переносом по словам
     if Pos(#9, s)=0 then
       DrawText(Canvas.Handle, PChar(s), -1, r, DT_LEFT or DT_NOPREFIX or DT_WORDBREAK or DrawTextBiDiModeFlagsReadingOnly)
      // Иначе - цикл по строкам
-    else
-      repeat
+    else begin
+       // Рассчитываем прямоугольник для одной строки
+      r.Bottom := r.Top+Canvas.TextHeight('Wg');
+      while s<>'' do begin
         sLine := ExtractFirstWord(s, #10);
-        if sLine='' then Break;
-         // Рисуем левую часть
-        sLeft := ExtractFirstWord(sLine, #9);
-        rRight := r;
-         // Если после табуляции нет строки - значит, это продолжение предыдущей строки ПОСЛЕ табуляции
-        if sLine='' then
-          sLine := sLeft
-        else begin
-          rLeft := r;
-          DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_CALCRECT);
-          DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
-          rRight.Left := rLeft.Right+6;
+        if sLine<>'' then begin
+           // Инициализируем прямоугольник для правой части строки
+          rRight := r;
+           // Ищем табуляцию
+          iTab := Pos(#9, sLine);
+           // Если в строке нет табуляции - значит, это продолжение предыдущей строки ПОСЛЕ табуляции. Иначе строка
+           //   состоит из двух частей
+          if iTab>0 then begin
+             // Выделяем левую часть
+            sLeft := Copy(sLine, 1, iTab-1);
+            Delete(sLine, 1, iTab);
+             // Рисуем левую часть
+            rLeft := r;
+            DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_CALCRECT);
+            DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
+             // Обрезаем прямоугольник правой части
+            rRight.Left := rLeft.Right+6;
+          end;
+           // Рисуем правую часть
+          if sLine<>'' then DrawText(Canvas.Handle, PChar(sLine), -1, rRight, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
         end;
-         // Рисуем правую часть
-        DrawText(Canvas.Handle, PChar(sLine), -1, rRight, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
          // Смещаем прямоугольник на следующую строку
         OffsetRect(r, 0, r.Bottom-r.Top);
-      until False;
+      end;
+    end;
   end;
 
    //===================================================================================================================
