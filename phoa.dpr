@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.43 2005-08-15 11:25:11 dale Exp $
+//  $Id: phoa.dpr,v 1.44 2005-09-11 06:45:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -102,9 +102,9 @@ begin
   ShowProgressInfo('SMsg_Starting', []);
   Application.Initialize;
   Application.CreateForm(TfMain, fMain);
-  PluginModules.AppInitialized(fMain);
+  PluginModules.InitializeAll(fMain);
    // Создаём плагины режима обзора
-  PluginModules.CreatePlugins([ppkBrowseMode]); 
+  PluginModules.CreatePlugins([ppkBrowseMode]);
    //-------------------------------------------------------------------------------------------------------------------
    // Выполняем приложение
    //-------------------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ begin
    // Уничтожаем все плагины
   PluginModules.ReleasePlugins(PluginKinds_All);
    // Уведомляем модули
-  PluginModules.AppFinalizing;
+  PluginModules.FinalizeAll;
    // Сохраняем настройки
   SaveAllSettings;
    // Выгружаем плагины

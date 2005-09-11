@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.7 2005-03-02 17:13:45 dale Exp $
+//  $Id: Main.pas,v 1.8 2005-09-11 06:45:57 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -21,8 +21,8 @@ type
      // Plugin class which is being created only once
     FPluginClass: IPhoaPluginClass;
      // IPhoaPluginModule
-    procedure AppInitialized(App: IPhoaApp); stdcall;
-    procedure AppFinalizing; stdcall;
+    procedure Initialize(App: IPhoaApp); stdcall;
+    procedure Finalize; stdcall;
     function  GetInfoAuthor: WideString; stdcall;
     function  GetInfoCopyright: WideString; stdcall;
     function  GetInfoDescription: WideString; stdcall;
@@ -71,13 +71,19 @@ var
    // Globally accessible application reference. Should be thread-safe since initialization and finalization are always
    //   performed "in the foreground", by the main thread. If your plugin contains multiple threads, be sure to
    //   terminate them before finalization (and interface cleanup) takes place; otherwise you'll always get an Access
-   //   Violation because the plugin module gets unloaded shortly after the finalization (Module.AppFinalizing call). 
+   //   Violation because the plugin module gets unloaded shortly after the finalization (Module.Finalize call).
   PhoaApp: IPhoaApp;
 
-   // Exported function
+   // Exported functions
+  function PhoaGetPluginSubsystemRevision: Integer; stdcall; 
   function PhoaGetPluginModule: IPhoaPluginModule; stdcall;
 
 implementation
+
+  function PhoaGetPluginSubsystemRevision: Integer;
+  begin
+    Result := IPhoaPluginSubsystemRevision;
+  end;
 
   function PhoaGetPluginModule: IPhoaPluginModule;
   begin
@@ -88,16 +94,10 @@ implementation
    // TPhoaDemoPluginModule
    //===================================================================================================================
 
-  procedure TPhoaDemoPluginModule.AppFinalizing;
+  procedure TPhoaDemoPluginModule.Finalize;
   begin
      // ALWAYS RELEASE ALL INTERFACE REFERENCES HERE because it's the last point where plugin library is still loaded!
     PhoaApp := nil;
-  end;
-
-  procedure TPhoaDemoPluginModule.AppInitialized(App: IPhoaApp);
-  begin
-     // Store global application reference
-    PhoaApp := App;
   end;
 
   function TPhoaDemoPluginModule.GetInfoAuthor: WideString;
@@ -147,6 +147,12 @@ implementation
     Result := FPluginClass;
   end;
 
+  procedure TPhoaDemoPluginModule.Initialize(App: IPhoaApp);
+  begin
+     // Store global application reference
+    PhoaApp := App;
+  end;
+
    //===================================================================================================================
    // TPhoaDemoPluginClass
    //===================================================================================================================
@@ -158,7 +164,7 @@ implementation
 
   function TPhoaDemoPluginClass.GetDescription: WideString;
   begin
-    Result := 'This is a sample plugin to show how PhoA plugin mechanism.';
+    Result := 'This is a sample plugin to show how PhoA plugin mechanism works.';
   end;
 
   function TPhoaDemoPluginClass.GetKind: TPhoaPluginKind;
@@ -183,7 +189,7 @@ implementation
 
   procedure TPhoaDemoPlugin.ActionExec;
   begin
-    MessageBox(0, 'Hello world!', 'Greetings', MB_OK);
+    MessageBox(PhoaApp.Handle, 'Hello world!', 'Greetings', MB_OK);
   end;
 
   constructor TPhoaDemoPlugin.Create(APluginClass: IPhoaPluginClass);
@@ -198,7 +204,8 @@ implementation
     Action.Category := 'Demo';
     Action.Caption  := '&Demo plugin info...';
     Action.Hint     := 'Demo plugin info...|Click and you''ll see!';
-     // Store self reference into action tag to track the target of the action in execute handler
+     // Store self reference into action tag to track the target of the action in execute handler (weak reference to
+     //   avoid circular dependency!)
     Action.Tag       := Integer(Self);
      // Find the 'Exit' item
     ExitItem := PhoaApp.Menu.ItemByActionName['aExit', True];

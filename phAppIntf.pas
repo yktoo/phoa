@@ -1,11 +1,11 @@
 //**********************************************************************************************************************
-//  $Id: phAppIntf.pas,v 1.7 2005-03-03 14:53:59 dale Exp $
+//  $Id: phAppIntf.pas,v 1.8 2005-09-11 06:45:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 // This unit contains application-related interface declarations and API designated mainly for plugins. Pure Unicode
-// implementation to allow cross-platform development.
+// implementation to allow cross-language development.
 
 unit phAppIntf;
 
@@ -49,9 +49,9 @@ type
      //    messages displayed, separate tooltip text from status bar text with a pipe ('|'). Example:
      //    'Import...|Invokes the Import dialog'
     property Hint: WideString read GetHint write SetHint;
-     // -- Action name: an unique case-insensitive action identifier. The name is assigned to an action when it is
+     // -- Action name: an unique case-insensitive action identifier. The name is assigned to the action when it is
      //    created and cannot be changed afterwards.
-     //    Standard PhoA actions all start with small 'a'. It would be good to conform that rule, but add your specific
+     //    Standard PhoA actions all start with small 'a'. It would be good if you follow that rule adding your specific
      //    Id after a. For example: assume your plugin is named 'Door opener', and you write a knock action. So the
      //    action should be named 'aDoorOpener_Knock': your plugin name acts like a prefix.
     property Name: WideString read GetName;
@@ -69,7 +69,7 @@ type
   IPhoaActionList = interface(IInterface)
     ['{03A7EFBC-0C77-481B-A3B9-1D25BB2D458D}']
      // Adds and returns a new action interface. The action interface isn't referenced in the list, so you will have to
-     //   keep action references in your plugin module! Once the action is no more referenced, it is automatically
+     //   keep action references in your plugin module! Once an action is no more referenced, it is automatically
      //   deleted from the list
     function  Add(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
      // Finds and returns the action by name; returns nil if no such action found
@@ -173,6 +173,7 @@ type
     function  GetActionList: IPhoaActionList; stdcall;
     function  GetCurGroup: IPhoaPicGroup; stdcall;
     function  GetFocusedControl: TPhoaAppFocusedControl; stdcall;
+    function  GetHandle: Cardinal; stdcall;
     function  GetMenu: IPhoaMenu; stdcall;
     function  GetProject: IPhoaProject; stdcall;
     function  GetSelectedPics: IPhoaPicList; stdcall;
@@ -185,6 +186,8 @@ type
     property CurGroup: IPhoaPicGroup read GetCurGroup write SetCurGroup;
      // -- Control currently focused
     property FocusedControl: TPhoaAppFocusedControl read GetFocusedControl;
+     // -- Main window's handle (use to make it owner of other windows)
+    property Handle: Cardinal read GetHandle;
      // -- The main menu of the application 
     property Menu: IPhoaMenu read GetMenu;
      // -- Active project
@@ -199,6 +202,10 @@ type
    // Plugin declarations
    //===================================================================================================================
 
+   // A plugin module subsystem revision obtaining function prototype. Should be exported from a plugin DLL named
+   //   'PhoaGetPluginSubsystemRevision'; the revision it returns must be the same as IPhoaPluginSubsystemRevision (used
+   //   to avoid loading of modules not compatible with the current revision)
+  TPhoaGetPluginSubsystemRevision = function: Integer; stdcall;
    // A plugin module interface obtaining function prototype. Should be exported from a plugin DLL named
    //   'PhoaGetPluginModule'. Must create and return a module instance.
   TPhoaGetPluginModuleProc = function: IPhoaPluginModule; stdcall;
@@ -218,10 +225,9 @@ type
      // Called by the application once all of the modules have been loaded and application initialization process is
      //   finished. Should perform any required module initialization. App is the main application interface, the
      //   module can (and should) copy and store it locally for future reference
-    procedure AppInitialized(App: IPhoaApp); stdcall;
-     // Called by the application when it needs to close and just before cleanup routine starts. Should perform any
-     //   required module cleanup
-    procedure AppFinalizing; stdcall;
+    procedure Initialize(App: IPhoaApp); stdcall;
+     // Called by the application before the module gets unloaded. Should perform any required module cleanup
+    procedure Finalize; stdcall;
      // Prop handlers
     function  GetInfoAuthor: WideString; stdcall;
     function  GetInfoCopyright: WideString; stdcall;
@@ -271,7 +277,7 @@ type
     property Description: WideString read GetDescription;
      // -- Kind of plugins of the class
     property Kind: TPhoaPluginKind read GetKind;
-     // -- Plugin class name. Example: 'SuperPlugin '
+     // -- Plugin class name. Example: 'SuperPlugin'
     property Name: WideString read GetName;
   end;
 
@@ -289,6 +295,8 @@ type
   end;
 
 const
+   // The revision of the plugin subsystem. Only modules of the same revision can be loaded by the application
+  IPhoaPluginSubsystemRevision = 1;
    // All plugin kinds
   PluginKinds_All = [Low(TPhoaPluginKind)..High(TPhoaPluginKind)];   
 

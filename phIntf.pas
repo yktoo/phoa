@@ -1,11 +1,11 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.23 2005-05-31 17:29:49 dale Exp $
+//  $Id: phIntf.pas,v 1.24 2005-09-11 06:45:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
 //**********************************************************************************************************************
 // This unit contains fundamental PhoA entity interface declarations and API, such as picture, picture group, view and
-// project
+// project. Those interfaces only allow read access to PhoA objects.
 
 unit phIntf;
 

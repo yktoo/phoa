@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.87 2005-08-18 13:20:09 dale Exp $
+//  $Id: Main.pas,v 1.88 2005-09-11 06:45:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -35,6 +35,8 @@ type
     aCopy: TAction;
     aCut: TAction;
     aDelete: TAction;
+    aDeletePicsFromProject: TAction;
+    aDeletePicsWithFiles: TAction;
     aEdit: TAction;
     aExit: TAction;
     aFileOperations: TAction;
@@ -105,6 +107,8 @@ type
     iCopy: TTBXItem;
     iCut: TTBXItem;
     iDelete: TTBXItem;
+    iDeletePicsFromProject: TTBXItem;
+    iDeletePicsWithFiles: TTBXItem;
     iEdit: TTBXItem;
     iEditSep1: TTBXSeparatorItem;
     iEditSep2: TTBXSeparatorItem;
@@ -207,14 +211,12 @@ type
     tbxlToolbarUndo: TTBXLabelItem;
     tvGroups: TVirtualStringTree;
     ulToolbarUndo: TTBXUndoList;
-    aDeletePicsFromProject: TAction;
-    aDeletePicsWithFiles: TAction;
-    iDeletePicsWithFiles: TTBXItem;
-    iDeletePicsFromProject: TTBXItem;
     procedure aaAbout(Sender: TObject);
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
     procedure aaDelete(Sender: TObject);
+    procedure aaDeletePicFromProject(Sender: TObject);
+    procedure aaDeletePicsWithFiles(Sender: TObject);
     procedure aaEdit(Sender: TObject);
     procedure aaExit(Sender: TObject);
     procedure aaFileOperations(Sender: TObject);
@@ -270,6 +272,7 @@ type
     procedure tvGroupsEditCancelled(Sender: TBaseVirtualTree; Column: TColumnIndex);
     procedure tvGroupsEdited(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure tvGroupsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure tvGroupsGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure tvGroupsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -279,10 +282,6 @@ type
     procedure tvGroupsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ulToolbarUndoChange(Sender: TObject);
     procedure ulToolbarUndoClick(Sender: TObject);
-    procedure aaDeletePicFromProject(Sender: TObject);
-    procedure aaDeletePicsWithFiles(Sender: TObject);
-    procedure tvGroupsExpandedCollapsed(Sender: TBaseVirtualTree;
-      Node: PVirtualNode);
   private
      // Активный проект
     FProject: IPhotoAlbumProject;
@@ -368,6 +367,7 @@ type
     function  IPhoaApp.GetActionList     = IApp_GetActionList;
     function  IPhoaApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhoaApp.GetHandle         = IApp_GetHandle;
     function  IPhoaApp.GetMenu           = IApp_GetMenu;
     function  IPhoaApp.GetProject        = IApp_GetProject;
     function  IPhoaApp.GetSelectedPics   = IApp_GetSelectedPics;
@@ -376,6 +376,7 @@ type
     function  IApp_GetActionList: IPhoaActionList; stdcall;
     function  IApp_GetCurGroup: IPhoaPicGroup; stdcall;
     function  IApp_GetFocusedControl: TPhoaAppFocusedControl; stdcall;
+    function  IApp_GetHandle: Cardinal; stdcall;
     function  IApp_GetMenu: IPhoaMenu; stdcall;
     function  IApp_GetProject: IPhoaProject; stdcall;
     function  IApp_GetSelectedPics: IPhoaPicList; stdcall;
@@ -385,6 +386,7 @@ type
     function  IPhoaMutableApp.GetActionList     = IApp_GetActionList;
     function  IPhoaMutableApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaMutableApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhoaMutableApp.GetHandle         = IApp_GetHandle;
     function  IPhoaMutableApp.GetProject        = IApp_GetProject;
     function  IPhoaMutableApp.GetMenu           = IApp_GetMenu;
     function  IPhoaMutableApp.GetSelectedPics   = IApp_GetSelectedPics;
@@ -404,6 +406,7 @@ type
     function  IPhotoAlbumApp.GetActionList     = IApp_GetActionList;
     function  IPhotoAlbumApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhotoAlbumApp.GetFocusedControl = IApp_GetFocusedControl;
+    function  IPhotoAlbumApp.GetHandle         = IApp_GetHandle;
     function  IPhotoAlbumApp.GetMenu           = IApp_GetMenu;
     function  IPhotoAlbumApp.GetProject        = IApp_GetProject;
     function  IPhotoAlbumApp.GetSelectedPics   = IApp_GetSelectedPics;
@@ -1279,6 +1282,11 @@ uses
     if      ActiveControl=tvGroups then Result := pafcGroupTree
     else if ActiveControl=FViewer  then Result := pafcThumbViewer
     else                                Result := pafcNone;
+  end;
+
+  function TfMain.IApp_GetHandle: Cardinal;
+  begin
+    Result := Application.Handle;
   end;
 
   function TfMain.IApp_GetImageList: TCustomImageList;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.7 2005-08-15 11:25:11 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.8 2005-09-11 06:45:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -17,10 +17,10 @@ type
 
   IPhoaPluginModules = interface(IInterface)
     ['{A96A3A43-3A4B-4514-86FF-40876AA9B508}']
-     // Вызывает AppInitialized для каждого плагина
-    procedure AppInitialized(App: IPhoaApp);
-     // Вызывает AppFinalizing для каждого плагина
-    procedure AppFinalizing;
+     // Вызывает Initialize для каждого модуля
+    procedure InitializeAll(App: IPhoaApp);
+     // Вызывает Finalize для каждого модуля
+    procedure FinalizeAll;
      // Создаёт плагины указанного вида и сохраняет их в списке Plugins
     procedure CreatePlugins(Kinds: TPhoaPluginKinds);
      // Удаляет плагины указанного вида из списка Plugins
@@ -144,6 +144,7 @@ type
   function T_PluginModuleInfoList.RegisterPluginLib(const sPluginLib: String): Boolean;
   var
     hLib: HINST;
+    GetRevisionProc: TPhoaGetPluginSubsystemRevision;
     GetModuleProc: TPhoaGetPluginModuleProc;
   begin
     Result := False;
@@ -151,16 +152,22 @@ type
     ShowProgressInfo('SMsg_LoadingPlugin', [ExtractFileName(sPluginLib)]);
     hLib := LoadLibrary(PChar(sPluginLib));
     if hLib<>0 then begin
-       // Пытаемся получить процедуру
-      GetModuleProc := GetProcAddress(hLib, 'PhoaGetPluginModule');
-       // Если удалось - регистрируем модуль
-      if Assigned(GetModuleProc) then
-        try
-          Add(hLib, GetModuleProc);
-          Result := True;
-        except
-          on e: Exception do PhoaError('SErrCreatingPluginModule', [sPluginLib, e.Message]);
+      try
+         // Пытаемся получить функцию получения версии подсистемы
+        GetRevisionProc := GetProcAddress(hLib, 'PhoaGetPluginSubsystemRevision');
+         // Если удалось, и версия именно та, что надо
+        if Assigned(GetRevisionProc) and (GetRevisionProc=IPhoaPluginSubsystemRevision) then begin
+           // Пытаемся получить процедуру
+          GetModuleProc := GetProcAddress(hLib, 'PhoaGetPluginModule');
+           // Если удалось - регистрируем модуль
+          if Assigned(GetModuleProc) then begin
+            Add(hLib, GetModuleProc);
+            Result := True;
+          end;
         end;
+      except
+        on e: Exception do PhoaError('SErrCreatingPluginModule', [sPluginLib, e.Message]);
+      end;
        // При неудаче выгружаем билиотеку
       if not Result then FreeLibrary(hLib);
     end else
@@ -175,11 +182,11 @@ type
   private
      // Список модулей
     FModuleList: T_PluginModuleInfoList;
-     // Список созданный плагинов
+     // Список созданных плагинов
     FPlugins: IInterfaceList; 
      // IPhoaPluginModules
-    procedure AppInitialized(App: IPhoaApp);
-    procedure AppFinalizing;
+    procedure InitializeAll(App: IPhoaApp);
+    procedure FinalizeAll;
     procedure CreatePlugins(Kinds: TPhoaPluginKinds);
     procedure ReleasePlugins(Kinds: TPhoaPluginKinds);
     function  GetModuleCount: Integer;
@@ -189,18 +196,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-  end;
-
-  procedure TPhoaPluginModules.AppFinalizing;
-  var i: Integer;
-  begin
-    for i := 0 to FModuleList.Count-1 do FModuleList[i].Module.AppFinalizing;
-  end;
-
-  procedure TPhoaPluginModules.AppInitialized(App: IPhoaApp);
-  var i: Integer;
-  begin
-    for i := 0 to FModuleList.Count-1 do FModuleList[i].Module.AppInitialized(App);
   end;
 
   constructor TPhoaPluginModules.Create;
@@ -239,6 +234,12 @@ type
     inherited Destroy;
   end;
 
+  procedure TPhoaPluginModules.FinalizeAll;
+  var i: Integer;
+  begin
+    for i := 0 to FModuleList.Count-1 do FModuleList[i].Module.Finalize;
+  end;
+
   function TPhoaPluginModules.GetModuleCount: Integer;
   begin
     Result := FModuleList.Count;
@@ -257,6 +258,12 @@ type
   function TPhoaPluginModules.GetPlugins(Index: Integer): IPhoaPlugin;
   begin
     Result := IPhoaPlugin(FPlugins[Index]);
+  end;
+
+  procedure TPhoaPluginModules.InitializeAll(App: IPhoaApp);
+  var i: Integer;
+  begin
+    for i := 0 to FModuleList.Count-1 do FModuleList[i].Module.Initialize(App);
   end;
 
   procedure TPhoaPluginModules.ReleasePlugins(Kinds: TPhoaPluginKinds);
