@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.19 2005-05-31 17:29:49 dale Exp $
+//  $Id: phToolSetting.pas,v 1.20 2005-09-11 12:55:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -663,6 +663,7 @@ type
       GetSetting(n).Free;
       DeleteNode(n);
       FRootSetting.Modified := True;
+      DoSettingChange;
     end;
   end;
 
