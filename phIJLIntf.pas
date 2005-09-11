@@ -791,7 +791,7 @@ type
     // SCAN persistent members.
     jscan: PSCAN;
 
-    Pad  : DWORD;  // 8-byte alignment!!!
+    Pad  : DWORD;  // 8-byte alignment!
 
     // State members.
     state         : TSTATE;
@@ -803,7 +803,7 @@ type
 
     // Intermediate buffers.
     MCUBuf : PByte;
-    tMCUBuf: array [0..720*2-1] of Byte; // ???
+    tMCUBuf: array [0..720*2-1] of Byte;
 
     // Processor detected.
     processor_type: TPROCESSOR_TYPE;

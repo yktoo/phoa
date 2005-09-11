@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.2 2005-08-15 11:25:11 dale Exp $
+//  $Id: phFrm.pas,v 1.3 2005-09-11 12:48:16 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -221,7 +221,7 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
   procedure TPhoaForm.Loaded;
   begin
     inherited Loaded;
-{???}    AutoScroll := False;
+    AutoScroll := False;
   end;
 
   procedure TPhoaForm.SetHasUpdates(Value: Boolean);
