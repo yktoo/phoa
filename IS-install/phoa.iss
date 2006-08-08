@@ -1,5 +1,5 @@
 ;***********************************************************************************************************************
-;   $Id: phoa.iss,v 1.22 2005-08-28 06:02:59 dale Exp $
+;   $Id: phoa.iss,v 1.23 2006-08-08 14:00:46 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;   PhoA image arranging and searching tool
 ;   Copyright DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@
   AppCopyright           = Copyright ©2002-2005 DK Software
   AppPublisher           = DK Software
   AppPublisherURL        = http://www.dk-soft.org/
-  AppSupportURL          = http://www.dk-soft.org/forum/
+  AppSupportURL          = http://www.dk-soft.org/redir.php?action=support
   AppUpdatesURL          = http://www.dk-soft.org/redir.php?action=vercheck&product=phoa&version=1.1.10beta
   AppMutex               = PHOA_RUNNING_MUTEX
   AllowNoIcons           = yes
