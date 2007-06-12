@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.20 2005-09-11 12:55:08 dale Exp $
+//  $Id: phToolSetting.pas,v 1.21 2007-06-12 13:21:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -162,7 +162,7 @@ const
   IColIdx_ToolEditor_Params      = 6;
 
 implementation
-uses TypInfo, ShellAPI, Menus, phUtils, Main, udToolProps, Forms, VTHeaderPopup;
+uses TypInfo, ShellAPI, Menus, ImgList, Forms, VTHeaderPopup, phUtils, Main, udToolProps;
 
   function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
   begin
@@ -280,7 +280,7 @@ type
     procedure DoChecked(Node: PVirtualNode); override;
     procedure DoFocusChange(Node: PVirtualNode; Column: TColumnIndex); override;
     procedure DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates); override;
-    procedure DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer); override;
+    function  DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList; override;
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString); override;
     procedure DoHeaderDragged(Column: TColumnIndex; OldPosition: TColumnPosition); override;
     function  DoBeforeDrag(Node: PVirtualNode; Column: TColumnIndex): Boolean; override;
@@ -728,8 +728,9 @@ type
     EnablePopupMenuItems;
   end;
 
-  procedure TPhoaToolSettingEditor.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer);
+  function TPhoaToolSettingEditor.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList;
   begin
+    Result := nil;
     if (Kind in [ikNormal, ikSelected]) and IsSettingNode(Node) then
       case Column of
         IColIdx_ToolEditor_Kind: Index := aToolImageIndexes[GetSetting(Node).Kind];

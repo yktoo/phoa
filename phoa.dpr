@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phoa.dpr,v 1.44 2005-09-11 06:45:57 dale Exp $
+//  $Id: phoa.dpr,v 1.45 2007-06-12 13:21:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -77,6 +77,7 @@ uses
   ufrWzPageFileOps_SelTask in 'Wizard_FileOps\ufrWzPageFileOps_SelTask.pas' {frWzPageFileOps_SelTask: TFrame};
 
 {$R *.res}
+{$R *.dkl_const.res}  
 
 var
   hMtx: THandle;

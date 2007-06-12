@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.2 2005-08-25 13:10:08 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.3 2007-06-12 13:21:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -290,7 +290,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  ShellAPI,
+  ShellAPI, TntSysUtils,
   phUtils, ufrWzPage_Log,
   ufrWzPage_Processing, ufrWzPageFileOps_SelTask, ufrWzPageFileOps_SelPics, ufrWzPageFileOps_SelFolder,
   ufrWzPageFileOps_MoveOptions, ufrWzPageFileOps_DelOptions, ufrWzPageFileOps_RepairOptions,
@@ -818,7 +818,7 @@ uses
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
-  var sDestPath: String;
+  var sDestPath: {!!!}String;
 
     procedure SaveExportedProject;
     begin
@@ -844,7 +844,7 @@ uses
     procedure CopyLangFile;
     var
       pRes: PDKLang_LangResource;
-      sLangFile, sDestLangFile: String;
+      wsLangFile, wsDestLangFile: WideString;
     begin
        // Если язык отличается от языка по умолчанию
       if LangManager.LanguageID<>LangManager.DefaultLanguageID then begin
@@ -852,15 +852,15 @@ uses
          // Если ресурс - это языковой файл
         if pRes.Kind=dklrkFile then begin
            // Находим имена файлов
-          sLangFile     := pRes.sName;
-          sDestLangFile := sDestPath+SRelativeLangFilesPath+ExtractFileName(sLangFile);
+          wsLangFile     := pRes.wsName;
+          wsDestLangFile := sDestPath+SRelativeLangFilesPath+WideExtractFileName(wsLangFile);
            // Создаём каталог языковых файлов
-          if ForceDirectories(sDestPath+SRelativeLangFilesPath) then
+          if WideForceDirectories(sDestPath+SRelativeLangFilesPath) then
              // Копируем
-            if CopyFile(PChar(sLangFile), PChar(sDestLangFile), False) then
-              LogSuccess('SLogEntry_LangFileCopiedOK', [sLangFile, sDestLangFile])
+            if CopyFileW(PWideChar(wsLangFile), PWideChar(wsDestLangFile), False) then
+              LogSuccess('SLogEntry_LangFileCopiedOK', [wsLangFile, wsDestLangFile])
             else
-              LogFailure('SLogEntry_LangFileCopyingError', [sLangFile, sDestLangFile, SysErrorMessage(GetLastError)])
+              LogFailure('SLogEntry_LangFileCopyingError', [wsLangFile, wsDestLangFile, SysErrorMessage(GetLastError)])
           else
             LogFailure('SErrCannotCreateFolder', [sDestPath+SRelativeLangFilesPath]);
         end;

@@ -1,5 +1,5 @@
-;***********************************************************************************************************************
-;  $Id: phoa.dklang,v 1.54 2005-08-15 11:25:11 dale Exp $
+ï»¿;***********************************************************************************************************************
+;  $Id: phoa.dklang,v 1.55 2007-06-12 13:21:49 dale Exp $
 ;-----------------------------------------------------------------------------------------------------------------------
 ;  PhoA image arranging and searching tool
 ;  Copyright DK Software, http://www.dk-soft.org/
@@ -226,15 +226,15 @@ aClose.Hint=00000227,Close|Close viewing window
 aRotate0.Caption=00000229,&No rotation
 aRotate0.Category=00000228,Tools
 aRotate0.Hint=00000231,No rotation|Don't apply rotation to the image
-aRotate90.Caption=00000233,Rotate CW by &90°
+aRotate90.Caption=00000233,Rotate CW by &90Â°
 aRotate90.Category=00000232,Tools
-aRotate90.Hint=00000235,Rotate CW by 90°|Rotate the image clockwise by 90°
-aRotate180.Caption=00000237,Rotate by &180°
+aRotate90.Hint=00000235,Rotate CW by 90Â°|Rotate the image clockwise by 90Â°
+aRotate180.Caption=00000237,Rotate by &180Â°
 aRotate180.Category=00000236,Tools
-aRotate180.Hint=00000239,Rotate by 180°|Rotate the image by 180°
-aRotate270.Caption=00000241,Rotate CCW by 9&0°
+aRotate180.Hint=00000239,Rotate by 180Â°|Rotate the image by 180Â°
+aRotate270.Caption=00000241,Rotate CCW by 9&0Â°
 aRotate270.Category=00000240,Tools
-aRotate270.Hint=00000243,Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)
+aRotate270.Hint=00000243,Rotate CCW by 90Â°|Rotate the image counter-clockwise by 90Â° (or clockwise by 270Â°)
 aFlipHorz.Caption=00000245,Flip &horizontally
 aFlipHorz.Category=00000244,Tools
 aFlipHorz.Hint=00000247,Flip horizontally|Flip the image horizontally
@@ -445,15 +445,15 @@ aZoomFit.Hint=00000083,Set zoom to fit window
 aRotate0.Caption=00000085,&No rotation
 aRotate0.Category=00000084,Tools
 aRotate0.Hint=00000087,No rotation|Don't apply rotation to the image
-aRotate90.Caption=00000089,Rotate CW by &90°
+aRotate90.Caption=00000089,Rotate CW by &90Â°
 aRotate90.Category=00000088,Tools
-aRotate90.Hint=00000091,Rotate CW by 90°|Rotate the image clockwise by 90°
-aRotate180.Caption=00000093,Rotate by &180°
+aRotate90.Hint=00000091,Rotate CW by 90Â°|Rotate the image clockwise by 90Â°
+aRotate180.Caption=00000093,Rotate by &180Â°
 aRotate180.Category=00000092,Tools
-aRotate180.Hint=00000095,Rotate by 180°|Rotate the image by 180°
-aRotate270.Caption=00000097,Rotate CCW by 9&0°
+aRotate180.Hint=00000095,Rotate by 180Â°|Rotate the image by 180Â°
+aRotate270.Caption=00000097,Rotate CCW by 9&0Â°
 aRotate270.Category=00000096,Tools
-aRotate270.Hint=00000099,Rotate CCW by 90°|Rotate the image counter-clockwise by 90° (or clockwise by 270°)
+aRotate270.Hint=00000099,Rotate CCW by 90Â°|Rotate the image counter-clockwise by 90Â° (or clockwise by 270Â°)
 aFlipHorz.Caption=00000101,Flip &horizontally
 aFlipHorz.Category=00000100,Tools
 aFlipHorz.Hint=00000103,Flip horizontally|Flip the image horizontally
@@ -515,7 +515,7 @@ lCopyFiles.Caption=00000007,Copies the files of pictures you select, in the spec
 lMoveFiles.Caption=00000010,Moves the files of pictures you select, into the specified folder, and updates picture file links appropriately
 lDeleteFiles.Caption=00000013,Deletes pictures you select, and physically deletes corresponding files. Use this option to delete unwanted picture files
 lRepairFileLinks.Caption=00000016,Allows you to repair broken file links by finding the files in the specified folder, and, optionally, to delete pictures no longer associated with valid (existent) files
-lNBUndoable.Caption=00000019,• NB: These operations are not undoable!
+lNBUndoable.Caption=00000019,â€¢ NB: These operations are not undoable!
 lRebuildThumbs.Caption=00000022,Rereads the picture files, recreates the thumbnails and updates the file-related information, such as image dimensions
 rbCopyFiles.Caption=00000025,&Copy picture files to a folder
 rbMoveFiles.Caption=00000028,&Move picture files to a folder
@@ -929,7 +929,7 @@ SConfirm_DelView=Delete current view?
 SConfirm_FileNotSaved=Photo album file "%s" is not saved. Do you wish to save changes?
 SConfirm_FileOverwrite=Overwrite the file "%s"?
 SConfirm_PerformFileOperation=Are you sure you want to proceed with the chosen operation?\n\nWARNING! You won't be able to undo this operation!
-SConfirm_SavingOldFormatFile=Warning!\nYou are saving the file format of a program version older than this. If you save the photo album into this file, you may lose some of your data due to the unsupported features of this format.\n  • To save the file in the up-to-date format click Cancel, then use File | Save as... menu item.\n  • To learn more about differences between formats of various PhoA versions please refer to the PhoA help system.\n\nDo you wish to continue?
+SConfirm_SavingOldFormatFile=Warning!\nYou are saving the file format of a program version older than this. If you save the photo album into this file, you may lose some of your data due to the unsupported features of this format.\n  â€¢ To save the file in the up-to-date format click Cancel, then use File | Save as... menu item.\n  â€¢ To learn more about differences between formats of various PhoA versions please refer to the PhoA help system.\n\nDo you wish to continue?
 SDefaultNewGroupName=New group
 SDefaultNewKeyword=New keyword
 SDlgTitle_Confirm=PhoA: Confirm
@@ -1020,8 +1020,8 @@ SNoFilesSelected=No files selected in the result list
 SNone=(none)
 SNotAValidDate="%s" is not a valid date
 SNotAValidTime="%s" is not a valid time
-SNotify_DragCopy=Totals: %0:d pictures copied, including:\n  • %1:d were new for the target group;\n  • %2:d were already contained in the target group.\n
-SNotify_DragMove=Totals: %0:d pictures moved, including:\n  • %1:d were new for the target group;\n  • %2:d were already contained in the target group.\n
+SNotify_DragCopy=Totals: %0:d pictures copied, including:\n  â€¢ %1:d were new for the target group;\n  â€¢ %2:d were already contained in the target group.\n
+SNotify_DragMove=Totals: %0:d pictures moved, including:\n  â€¢ %1:d were new for the target group;\n  â€¢ %2:d were already contained in the target group.\n
 SNotify_Paste=Pasted from the clipboard: %d pictures
 SPhotoAlbumNode=Photo Album
 SPicCount=%d pictures

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.12 2005-05-31 17:29:49 dale Exp $
+//  $Id: phPhoa.pas,v 1.13 2007-06-12 13:21:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -30,6 +30,7 @@
 // Language:        Object Pascal
 //
 // Change log:
+//   Jun 12, 2007 - dale - Added Unicode (UCS-2) support
 //   May 25, 2005 - dale - Added IPhChunk_Group_IconData chunk
 //   Dec 07, 2004 - dale - Added IPhChunk_View_FilterExpression chunk
 //   Nov 24, 2004 - dale - Fixes to TimeToPhoaTime() (now rounds the time value to minimize the errors)
@@ -120,16 +121,26 @@ uses SysUtils, Windows, Classes;
    //
    // 3.1 Chunk datatypes
    // -------------------
-   // Code Name        Data length        Description
-   //                    (bytes)
-   // ---- --------  -----------------  --------------------------------------------------------------------------------
-   //    0 Empty            0           A chunk with no data
-   //    1 Byte             1           unsigned 1-byte (0..255)
-   //    2 Word             2           unsigned 2-byte (0..65535)
-   //    3 Int              4           signed 4-byte (-2147483648..2147483647)
-   //    4 StringB      1+(0..255)      Ansi string, with length Byte preceding (max length 255 bytes)
-   //    5 StringW     2+(0..65535)     Ansi string (not a *wide* string), with length Word preceding (max length 65 KB)
-   //    6 StringI   4+(0..2147483647)  Ansi string, with length Int preceding (max length 2 GB)
+   // Code Name           Data length        Description
+   //                       (bytes)
+   // ---- -----------  -----------------  --------------------------------------------------------------------------------
+   //    0 Empty               0           A chunk with no data
+   //    1 Byte                1           unsigned 1-byte (0..255)
+   //    2 Word                2           unsigned 2-byte (0..65535)
+   //    3 Int                 4           signed 4-byte (-2147483648..2147483647)
+   //    4 StringB      Non-Unicode version:
+   //                      1+(0..255)      Ansi string, with length Byte preceding (max length 255 bytes)
+   //                   Unicode version:
+   //                      1+(0..510)      Unicode string, with length Byte preceding (max length 255 bytes)
+   //    5 StringW      Non-Unicode version:
+   //                     2+(0..65535)     Ansi string, with length Word preceding (max length 65 KB)
+   //                   Unicode version:
+   //                     2+(0..131070)    Unicode string, with length Word preceding (max length 65 KB)
+   //    6 StringI      Non-Unicode version:
+   //                   4+(0..2147483647)  Ansi string, with length Int preceding (max length 2 GB)
+   //                   Unicode version:
+   //                   4+(0..4294967294)  Unicode string, with length Int preceding (max length 2 GB)
+   //    7 Raw          4+(0..2147483647)  Raw binary data (max length 2 GB; the same as StringI in non-Unicode version)
    //
    //  * Note on chunk data types:
    //    Only Intel byte-order is used, where $12345678 is represented as byte
@@ -206,7 +217,8 @@ uses SysUtils, Windows, Classes;
 
 type
    // Possible chunk datatypes
-  TPhChunkDatatype = (pcdEmpty, pcdByte, pcdWord, pcdInt, pcdStringB, pcdStringW, pcdStringI);
+  TPhChunkDatatype = (
+    pcdEmpty, pcdByte, pcdWord, pcdInt, pcdStringB, pcdStringW, pcdStringI, pcdRaw);
 
   TPhChunkCode = Word;
 
@@ -215,19 +227,22 @@ const
   SPhoAFileSignature               = 'PhoA [PhotoAlbum] project file'; // NEVER LOCALIZE!
 
    // Phoa-files revisions. Revision at index 0 is always the latest one
-  aPhFileRevisions: Array[0..2] of record
+  aPhFileRevisions: Array[0..3] of record
     iNumber:  Integer; // Phoa-file Revision Number
     sName:    String;  // Name of version family to recognize that revision
     sMinName: String;  // Name of PhoA version introduced that revision
   end = (
+    (iNumber: $0004; sName: 'PhoA 1.2+';  sMinName: '1.2.0 beta'),
     (iNumber: $0003; sName: 'PhoA 1.1+';  sMinName: '1.1.1a'),
     (iNumber: $0002; sName: 'PhoA 1.0.x'; sMinName: '1.0.1a'),
     (iNumber: $0001; sName: 'PhoA 0.x';   sMinName: '0.02b'));
 
    // Current photo album file Revision Number
-  IPhFileRevisionNumber            = $0003;
+  IPhFileRevisionNumber            = $0004;
    // Starting revision for chunk-based handling
   IPhFile_MinChunkRevNumber        = $0003;
+   // Starting revision for Unicode-enabled data stream
+  IPhFile_MinUnicodeRevNumber      = $0004;
 
    //-------------------------------------------------------------------------------------------------------------------
    // Chunk codes
@@ -250,7 +265,7 @@ const
   IPhChunk_PhoaThumbHeight         = $1022; // Word     Photo album thumbnail height [32..1024]
    // Picture properties
   IPhChunk_Pic_ID                  = $1101; // Int      ID: an unique picture identifier, >=1
-  IPhChunk_Pic_ThumbnailData       = $1110; // StringI  Picture thumnail: JPEG data stream
+  IPhChunk_Pic_ThumbnailData       = $1110; // Raw      Picture thumbnail: JPEG data stream
   IPhChunk_Pic_ThumbWidth          = $1111; // Word     Thumbnail width in pixels
   IPhChunk_Pic_ThumbHeight         = $1112; // Word     Thumbnail height in pixels
   IPhChunk_Pic_PicFileName         = $1120; // StringW  Absolute or relative (to the phoa-file) picture filename
@@ -275,7 +290,7 @@ const
   IPhChunk_Group_Text              = $1201; // StringW  Group text (name)
   IPhChunk_Group_Expanded          = $1202; // Byte     Group-node expanded flag (0/1)
   IPhChunk_Group_Description       = $1203; // StringW  Group description
-  IPhChunk_Group_IconData          = $1204; // StringI  Group icon: 32-bit bitmap data stream. When missing or empty, the default icon should be used 
+  IPhChunk_Group_IconData          = $1204; // Raw      Group icon: 32-bit bitmap data stream. When missing or empty, the default icon should be used
    // Picture linked in group properties
   IPhChunk_GroupPic_ID             = $1220; // Int      Link to picture (the picture's ID)
    // Photo album view properties
@@ -359,7 +374,7 @@ const
     (wCode: IPhChunk_PhoaThumbWidth;         Datatype: pcdWord;   iRangeMin: 32; iRangeMax: 1024),
     (wCode: IPhChunk_PhoaThumbHeight;        Datatype: pcdWord;   iRangeMin: 32; iRangeMax: 1024),
     (wCode: IPhChunk_Pic_ID;                 Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
-    (wCode: IPhChunk_Pic_ThumbnailData;      Datatype: pcdStringI),
+    (wCode: IPhChunk_Pic_ThumbnailData;      Datatype: pcdRaw),
     (wCode: IPhChunk_Pic_ThumbWidth;         Datatype: pcdWord;   iRangeMin: 32; iRangeMax: 1024),
     (wCode: IPhChunk_Pic_ThumbHeight;        Datatype: pcdWord;   iRangeMin: 32; iRangeMax: 1024),
     (wCode: IPhChunk_Pic_PicFileName;        Datatype: pcdStringW),
@@ -383,7 +398,7 @@ const
     (wCode: IPhChunk_Group_Text;             Datatype: pcdStringW),
     (wCode: IPhChunk_Group_Expanded;         Datatype: pcdByte;   iRangeMin: 0;  iRangeMax: 1),
     (wCode: IPhChunk_Group_Description;      Datatype: pcdStringW),
-    (wCode: IPhChunk_Group_IconData;         Datatype: pcdStringI),
+    (wCode: IPhChunk_Group_IconData;         Datatype: pcdRaw),
     (wCode: IPhChunk_GroupPic_ID;            Datatype: pcdInt;    iRangeMin: 1;  iRangeMax: High(Integer)),
     (wCode: IPhChunk_View_Name;              Datatype: pcdStringW),
     (wCode: IPhChunk_View_FilterExpression;  Datatype: pcdStringW),
@@ -482,6 +497,7 @@ const
   IPhStatus_UnknownChunkToWrite    =  8; // Code of a chunk is unknown
   IPhStatus_WrongDatatypePassed    =  9; // Wrong datatype passed to a WriteChunkxxxx() procedure
   IPhStatus_InvalidDatatype        = 10; // Chunk datatype invalid or unknown
+  IPhStatus_InvalidUnicodeMode     = 11; // Invalid Unicode mode (trying to handle Ansi stream as Unicode and vice versa)
 
 type
    //-------------------------------------------------------------------------------------------------------------------
@@ -514,15 +530,16 @@ type
   TPhoaStreamer = class(TObject)
   private
      // Prop storage
-    FStream: TStream;
-    FMode: TPhoaStreamingMode;
-    FTransferredBytes: Cardinal;
-    FRevisionNumber: Integer;
     FBasePath: String;
     FErrorsOccured: Boolean;
+    FMode: TPhoaStreamingMode;
+    FRevisionNumber: Integer;
+    FStream: TStream;
+    FTransferredBytes: Cardinal;
      // Prop handlers
-    procedure SetRevisionNumber(Value: Integer);
     function  GetChunked: Boolean;
+    function  GetIsRevisionUnicode: Boolean;
+    procedure SetRevisionNumber(Value: Integer);
   protected
      // Writes specified number of bytes from Buffer to the file
     procedure Write(const Buffer; iSize: Integer);
@@ -530,24 +547,35 @@ type
     procedure Read(var Buffer; iSize: Integer);
      // Raises an exception if RequiredMode<>Mode
     procedure CheckMode(RequiredMode: TPhoaStreamingMode);
+     // Raises an exception if bUnicodeRequired<>IsRevisionUnicode
+    procedure CheckIsUnicode(bUnicodeRequired: Boolean);
      // Checking header data validity, virtual to have possibility to alter behaviour in a descendant
     procedure ValidateSignature(const sReadSignature: String); virtual;
     procedure ValidateRevision; virtual;
   public
     constructor Create(AStream: TStream; AMode: TPhoaStreamingMode; const sBasePath: String);
-     // Writing/reading routines for typed data
+     // Writing routines for typed data
     procedure WriteByte(b: Byte);
     procedure WriteWord(w: Word);
     procedure WriteInt(i: Integer);
     procedure WriteStringB(const s: String);
     procedure WriteStringW(const s: String);
     procedure WriteStringI(const s: String);
+    procedure WriteWideStringB(const ws: WideString);
+    procedure WriteWideStringW(const ws: WideString);
+    procedure WriteWideStringI(const ws: WideString);
+    procedure WriteRaw(const s: String);
+     // Reading routines for typed data
     function  ReadByte: Byte;
     function  ReadWord: Word;
     function  ReadInt: Integer;
     function  ReadStringB: String;
     function  ReadStringW: String;
     function  ReadStringI: String;
+    function  ReadWideStringB: WideString;
+    function  ReadWideStringW: WideString;
+    function  ReadWideStringI: WideString;
+    function  ReadRaw: String;
      // Writes/reads file header
     procedure WriteHeader;
     procedure ReadHeader;
@@ -560,7 +588,8 @@ type
     procedure WriteChunkByte(Code: TPhChunkCode; b: Byte);
     procedure WriteChunkWord(Code: TPhChunkCode; w: Word);
     procedure WriteChunkInt(Code: TPhChunkCode; i: Integer);
-    procedure WriteChunkString(Code: TPhChunkCode; const s: String); // Auto-detecting type
+    procedure WriteChunkString(Code: TPhChunkCode; const ws: WideString); // Auto-detecting type
+    procedure WriteChunkRaw(Code: TPhChunkCode; const s: String); 
      // -- Reads chunk code and datatype
     function  ReadChunk(out Code: TPhChunkCode; out Datatype: TPhChunkDatatype): TPhReadingChunkResult;
      // -- Reads chunk code, datatype and value. Value is being read only if result is not rcrInvalidDatatype or rcrEOF,
@@ -577,6 +606,8 @@ type
     property BasePath: String read FBasePath;
      // -- True if there were errors while reading or writing using the streamer
     property ErrorsOccured: Boolean read FErrorsOccured write FErrorsOccured;
+     // -- True if current revision assumes an Unicode-enabled data stream
+    property IsRevisionUnicode: Boolean read GetIsRevisionUnicode;
      // -- Mode in which the object was created
     property Mode: TPhoaStreamingMode read FMode;
      // -- PhoA Revision Number, readonly in Read mode; can only be modified before any data are written
@@ -637,6 +668,7 @@ resourcestring
   SPhStreamErr_UnknownChunkToWrite = 'Unknown chunk code to write (%d)';
   SPhStreamErr_WrongDatatypePassed = 'Wrong Datatype of chunk passed to WriteChunkxxxxxx() (%s needed)';
   SPhStreamErr_InvalidDatatype     = 'Chunk datatype invalid or unknown (code: %d)';
+  SPhStreamErr_InvalidUnicodeMode  = 'Invalid Unicode mode';
 
 implementation
 uses Math, Variants;
@@ -714,6 +746,12 @@ uses Math, Variants;
    // TPhoaStreamer
    //-------------------------------------------------------------------------------------------------------------------
 
+  procedure TPhoaStreamer.CheckIsUnicode(bUnicodeRequired: Boolean);
+  begin
+    if IsRevisionUnicode<>bUnicodeRequired then
+      raise EPhoaStreamerError.Create(SPhStreamErr_InvalidUnicodeMode, IPhStatus_InvalidUnicodeMode);
+  end;
+
   procedure TPhoaStreamer.CheckMode(RequiredMode: TPhoaStreamingMode);
   begin
     if FMode<>RequiredMode then raise EPhoaStreamerError.Create(SPhStreamErr_InvalidMode, IPhStatus_InvalidMode);
@@ -731,6 +769,11 @@ uses Math, Variants;
   function TPhoaStreamer.GetChunked: Boolean;
   begin
     Result := FRevisionNumber>=IPhFile_MinChunkRevNumber;
+  end;
+
+  function TPhoaStreamer.GetIsRevisionUnicode: Boolean;
+  begin
+    Result := FRevisionNumber>=IPhFile_MinUnicodeRevNumber;
   end;
 
   procedure TPhoaStreamer.Read(var Buffer; iSize: Integer);
@@ -770,8 +813,9 @@ uses Math, Variants;
         if not (Datatype in [Low(Datatype)..High(Datatype)]) then Result := rcrInvalidDatatype
          // If not found
         else if pe=nil then Result := rcrUnknown
-         // Compare Datatype
-        else if Datatype<>pe.Datatype then Result := rcrDatatypeMismatch
+         // Compare Datatype (in non-Unicode revisions Raw was StringI)
+        else if (Datatype<>pe.Datatype) and not (not IsRevisionUnicode and (Datatype=pcdStringI) and (pe.Datatype=pcdRaw)) then
+          Result := rcrDatatypeMismatch
          // Ok
         else Result := rcrOK;
       end;
@@ -797,9 +841,10 @@ uses Math, Variants;
           pcdByte:    vValue := ReadByte;
           pcdWord:    vValue := ReadWord;
           pcdInt:     vValue := ReadInt;
-          pcdStringB: vValue := ReadStringB;
-          pcdStringW: vValue := ReadStringW;
-          pcdStringI: vValue := ReadStringI;
+          pcdStringB: if IsRevisionUnicode then vValue := ReadWideStringB else vValue := ReadStringB;
+          pcdStringW: if IsRevisionUnicode then vValue := ReadWideStringW else vValue := ReadStringW;
+          pcdStringI: if IsRevisionUnicode then vValue := ReadWideStringI else vValue := ReadStringI;
+          pcdRaw:     vValue := ReadRaw;
         end;
          // Validate ranges for ordinal types. Outranged values assume unmatched
         if (Result=rcrOK) and (Datatype in [pcdByte, pcdWord, pcdInt]) then begin
@@ -843,9 +888,18 @@ uses Math, Variants;
     Read(Result, SizeOf(Result));
   end;
 
+  function TPhoaStreamer.ReadRaw: String;
+  var i: Integer;
+  begin
+    i := ReadInt;
+    SetLength(Result, i);
+    Read(Result[1], i);
+  end;
+
   function TPhoaStreamer.ReadStringB: String;
   var b: Byte;
   begin
+    CheckIsUnicode(False);
     b := ReadByte;
     SetLength(Result, b);
     Read(Result[1], b);
@@ -854,6 +908,7 @@ uses Math, Variants;
   function TPhoaStreamer.ReadStringI: String;
   var i: Integer;
   begin
+    CheckIsUnicode(False);
     i := ReadInt;
     SetLength(Result, i);
     Read(Result[1], i);
@@ -862,9 +917,37 @@ uses Math, Variants;
   function TPhoaStreamer.ReadStringW: String;
   var w: Word;
   begin
+    CheckIsUnicode(False);
     w := ReadWord;
     SetLength(Result, w);
     Read(Result[1], w);
+  end;
+
+  function TPhoaStreamer.ReadWideStringB: WideString;
+  var b: Byte;
+  begin
+    CheckIsUnicode(True);
+    b := ReadByte;
+    SetLength(Result, b);
+    Read(Result[1], b*2);
+  end;
+
+  function TPhoaStreamer.ReadWideStringI: WideString;
+  var i: Integer;
+  begin
+    CheckIsUnicode(True);
+    i := ReadInt;
+    SetLength(Result, i);
+    Read(Result[1], i*2);
+  end;
+
+  function TPhoaStreamer.ReadWideStringW: WideString;
+  var w: Word;
+  begin
+    CheckIsUnicode(True);
+    w := ReadWord;
+    SetLength(Result, w);
+    Read(Result[1], w*2);
   end;
 
   function TPhoaStreamer.ReadWord: Word;
@@ -957,6 +1040,8 @@ uses Math, Variants;
   procedure TPhoaStreamer.WriteChunk(Code: TPhChunkCode; Datatype: TPhChunkDatatype);
   begin
     WriteWord(Code);
+     // In non-Unicode revisions Raw was StringI
+    if (Datatype=pcdRaw) and not IsRevisionUnicode then Datatype := pcdStringI;
     WriteByte(Byte(Datatype));
   end;
 
@@ -994,7 +1079,24 @@ uses Math, Variants;
     end;
   end;
 
-  procedure TPhoaStreamer.WriteChunkString(Code: TPhChunkCode; const s: String);
+  procedure TPhoaStreamer.WriteChunkRaw(Code: TPhChunkCode; const s: String);
+  var pe: PPhChunkEntry;
+  begin
+    try
+       // Find chunk entry
+      pe := FindChunkStrict(Code);
+      if pe.Datatype<>pcdRaw then WrongWriteChunkDatatype('Raw');
+       // Write chunk/datatype code
+      WriteChunk(Code, pcdRaw);
+       // Write chunk data
+      WriteRaw(s);
+    except
+      FErrorsOccured := True;
+      raise;
+    end;
+  end;
+
+  procedure TPhoaStreamer.WriteChunkString(Code: TPhChunkCode; const ws: WideString);
   var pe: PPhChunkEntry;
   begin
     try
@@ -1004,11 +1106,18 @@ uses Math, Variants;
        // Write chunk/datatype code
       WriteChunk(Code, pe.Datatype);
        // Write chunk data
-      case pe.Datatype of
-        pcdStringB: WriteStringB(s);
-        pcdStringW: WriteStringW(s);
-        pcdStringI: WriteStringI(s);
-      end;
+      if IsRevisionUnicode then
+        case pe.Datatype of
+          pcdStringB: WriteWideStringB(ws);
+          pcdStringW: WriteWideStringW(ws);
+          pcdStringI: WriteWideStringI(ws);
+        end
+      else
+        case pe.Datatype of
+          pcdStringB: WriteStringB(ws);
+          pcdStringW: WriteStringW(ws);
+          pcdStringI: WriteStringI(ws);
+        end;
     except
       FErrorsOccured := True;
       raise;
@@ -1047,9 +1156,18 @@ uses Math, Variants;
     Write(i, SizeOf(i));
   end;
 
+  procedure TPhoaStreamer.WriteRaw(const s: String);
+  var i: Integer;
+  begin
+    i := Length(s);
+    WriteInt(i);
+    if i>0 then Write(s[1], i);
+  end;
+
   procedure TPhoaStreamer.WriteStringB(const s: String);
   var b: Byte;
   begin
+    CheckIsUnicode(False);
     b := Min(High(b), Length(s));
     WriteByte(b);
     if b>0 then Write(s[1], b);
@@ -1058,6 +1176,7 @@ uses Math, Variants;
   procedure TPhoaStreamer.WriteStringI(const s: String);
   var i: Integer;
   begin
+    CheckIsUnicode(False);
     i := Length(s);
     WriteInt(i);
     if i>0 then Write(s[1], i);
@@ -1066,9 +1185,37 @@ uses Math, Variants;
   procedure TPhoaStreamer.WriteStringW(const s: String);
   var w: Word;
   begin
+    CheckIsUnicode(False);
     w := Min(High(w), Length(s));
     WriteWord(w);
     if w>0 then Write(s[1], w);
+  end;
+
+  procedure TPhoaStreamer.WriteWideStringB(const ws: WideString);
+  var b: Byte;
+  begin
+    CheckIsUnicode(True);
+    b := Min(High(b), Length(ws));
+    WriteByte(b);
+    if b>0 then Write(ws[1], b*2);
+  end;
+
+  procedure TPhoaStreamer.WriteWideStringI(const ws: WideString);
+  var i: Integer;
+  begin
+    CheckIsUnicode(True);
+    i := Length(ws);
+    WriteInt(i);
+    if i>0 then Write(ws[1], i*2);
+  end;
+
+  procedure TPhoaStreamer.WriteWideStringW(const ws: WideString);
+  var w: Word;
+  begin
+    CheckIsUnicode(True);
+    w := Min(High(w), Length(ws));
+    WriteWord(w);
+    if w>0 then Write(ws[1], w*2);
   end;
 
   procedure TPhoaStreamer.WriteWord(w: Word);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.65 2005-05-31 17:29:49 dale Exp $
+//  $Id: phObj.pas,v 1.66 2007-06-12 13:21:49 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -891,7 +891,7 @@ type
      // *** New format
     end else begin
       if ppID          in PProps                                                  then Streamer.WriteChunkInt   (IPhChunk_Pic_ID,            FID);
-      if ppFileName    in PProps                                                  then Streamer.WriteChunkString(IPhChunk_Pic_ThumbnailData, FThumbnailData);
+      if ppFileName    in PProps                                                  then Streamer.WriteChunkRaw   (IPhChunk_Pic_ThumbnailData, FThumbnailData);
       if ([ppThumbWidth,  ppThumbDims]*PProps<>[])  and (FThumbnailSize.cx>0)     then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbWidth,    FThumbnailSize.cx);
       if ([ppThumbHeight, ppThumbDims]*PProps<>[])  and (FThumbnailSize.cy>0)     then Streamer.WriteChunkWord  (IPhChunk_Pic_ThumbHeight,   FThumbnailSize.cy);
       if ppFileName    in PProps                                                  then Streamer.WriteChunkString(IPhChunk_Pic_PicFileName,   XFilename);
@@ -2164,7 +2164,7 @@ type
       Streamer.WriteChunkString(IPhChunk_Group_Text,        FText);
       Streamer.WriteChunkByte  (IPhChunk_Group_Expanded,    Byte(FExpanded));
       Streamer.WriteChunkString(IPhChunk_Group_Description, FDescription);
-      Streamer.WriteChunkString(IPhChunk_Group_IconData,    FIconData);
+      Streamer.WriteChunkRaw   (IPhChunk_Group_IconData,    FIconData);
        // Write picture IDs
       Streamer.WriteChunk(IPhChunk_GroupPics_Open);
       for i := 0 to FPics.Count-1 do Streamer.WriteChunkInt(IPhChunk_GroupPic_ID, FPics[i].ID);
