@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.13 2007-06-12 13:21:49 dale Exp $
+//  $Id: phPhoa.pas,v 1.14 2007-06-16 09:15:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -228,14 +228,14 @@ const
 
    // Phoa-files revisions. Revision at index 0 is always the latest one
   aPhFileRevisions: Array[0..3] of record
-    iNumber:  Integer; // Phoa-file Revision Number
-    sName:    String;  // Name of version family to recognize that revision
-    sMinName: String;  // Name of PhoA version introduced that revision
+    iNumber:   Integer;    // Phoa-file Revision Number
+    wsName:    WideString; // Name of version family to recognize that revision
+    wsMinName: WideString; // Name of PhoA version introduced that revision
   end = (
-    (iNumber: $0004; sName: 'PhoA 1.2+';  sMinName: '1.2.0 beta'),
-    (iNumber: $0003; sName: 'PhoA 1.1+';  sMinName: '1.1.1a'),
-    (iNumber: $0002; sName: 'PhoA 1.0.x'; sMinName: '1.0.1a'),
-    (iNumber: $0001; sName: 'PhoA 0.x';   sMinName: '0.02b'));
+    (iNumber: $0004; wsName: 'PhoA 1.2+';  wsMinName: '1.2.0 beta'),
+    (iNumber: $0003; wsName: 'PhoA 1.1+';  wsMinName: '1.1.1a'),
+    (iNumber: $0002; wsName: 'PhoA 1.0.x'; wsMinName: '1.0.1a'),
+    (iNumber: $0001; wsName: 'PhoA 0.x';   wsMinName: '0.02b'));
 
    // Current photo album file Revision Number
   IPhFileRevisionNumber            = $0004;
@@ -507,13 +507,17 @@ type
    // Base Exception class
   EPhoaStreamerError = class(Exception)
   private
+     // Prop storage
     FErrorCode: Integer;
+    FMessageW: WideString;
   public
-    constructor Create(const Msg: String; iErrCode: Integer);
-    constructor CreateFmt(const Msg: String; const Args: Array of const; iErrCode: Integer);
+    constructor Create(const wsMsg: WideString; iErrCode: Integer);
+    constructor CreateFmt(const wsMsg: WideString; const Args: Array of const; iErrCode: Integer);
      // Props
      // -- Code of error encountered, one of the IPhStatus_xxxxxx constants
     property ErrorCode: Integer read FErrorCode;
+     // -- Unicode message
+    property MessageW: WideString read FMessageW;
   end;
 
   TPhoaStreamingMode = (psmRead, psmWrite);
@@ -530,7 +534,7 @@ type
   TPhoaStreamer = class(TObject)
   private
      // Prop storage
-    FBasePath: String;
+    FBasePath: WideString;
     FErrorsOccured: Boolean;
     FMode: TPhoaStreamingMode;
     FRevisionNumber: Integer;
@@ -551,9 +555,10 @@ type
     procedure CheckIsUnicode(bUnicodeRequired: Boolean);
      // Checking header data validity, virtual to have possibility to alter behaviour in a descendant
     procedure ValidateSignature(const sReadSignature: String); virtual;
+     // Raises an exception if RevisionNumber is invalid
     procedure ValidateRevision; virtual;
   public
-    constructor Create(AStream: TStream; AMode: TPhoaStreamingMode; const sBasePath: String);
+    constructor Create(AStream: TStream; AMode: TPhoaStreamingMode; const wsBasePath: WideString);
      // Writing routines for typed data
     procedure WriteByte(b: Byte);
     procedure WriteWord(w: Word);
@@ -603,7 +608,7 @@ type
      // -- True if chunk-based revision used
     property Chunked: Boolean read GetChunked;
      // -- Photo album file path (for translating relative picture file paths)
-    property BasePath: String read FBasePath;
+    property BasePath: WideString read FBasePath;
      // -- True if there were errors while reading or writing using the streamer
     property ErrorsOccured: Boolean read FErrorsOccured write FErrorsOccured;
      // -- True if current revision assumes an Unicode-enabled data stream
@@ -622,15 +627,15 @@ type
   TPhoaFiler = class(TPhoaStreamer)
   private
      // Real name of the file used to save the data
-    FWriteFilename: String;
+    FWriteFilename: WideString;
      // Prop handlers
-    FFilename: String;
+    FFilename: WideString;
   public
-    constructor Create(AMode: TPhoaStreamingMode; const sFilename: String);
+    constructor Create(AMode: TPhoaStreamingMode; const wsFilename: WideString);
     destructor Destroy; override;
      // Props
      // -- Open file name
-    property Filename: String read FFilename;
+    property Filename: WideString read FFilename;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -671,7 +676,7 @@ resourcestring
   SPhStreamErr_InvalidUnicodeMode  = 'Invalid Unicode mode';
 
 implementation
-uses Math, Variants;
+uses Math, Variants, TntClasses, TntSysUtils;
 
   function FindChunk(Code: TPhChunkCode): PPhChunkEntry;
   var i: Integer;
@@ -730,16 +735,18 @@ uses Math, Variants;
    // EPhoaStreamerError
    //-------------------------------------------------------------------------------------------------------------------
 
-  constructor EPhoaStreamerError.Create(const Msg: String; iErrCode: Integer);
+  constructor EPhoaStreamerError.Create(const wsMsg: WideString; iErrCode: Integer);
   begin
-    inherited Create(Msg);
+    inherited Create(wsMsg); // Implicit conversion to Ansi is done here
     FErrorCode := iErrCode;
+    FMessageW  := wsMsg;
   end;
 
-  constructor EPhoaStreamerError.CreateFmt(const Msg: String; const Args: Array of const; iErrCode: Integer);
+  constructor EPhoaStreamerError.CreateFmt(const wsMsg: WideString; const Args: Array of const; iErrCode: Integer);
   begin
-    inherited CreateFmt(Msg, Args);
+    inherited CreateFmt(wsMsg, Args); // Implicit conversion to Ansi is done here
     FErrorCode := iErrCode;
+    FMessageW  := wsMsg;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -757,12 +764,12 @@ uses Math, Variants;
     if FMode<>RequiredMode then raise EPhoaStreamerError.Create(SPhStreamErr_InvalidMode, IPhStatus_InvalidMode);
   end;
 
-  constructor TPhoaStreamer.Create(AStream: TStream; AMode: TPhoaStreamingMode; const sBasePath: String);
+  constructor TPhoaStreamer.Create(AStream: TStream; AMode: TPhoaStreamingMode; const wsBasePath: WideString);
   begin
     inherited Create;
     FStream         := AStream;
     FMode           := AMode;
-    FBasePath       := sBasePath;
+    FBasePath       := wsBasePath;
     FRevisionNumber := IPhFileRevisionNumber; // Assume most modern revision by default
   end;
 
@@ -1227,19 +1234,19 @@ uses Math, Variants;
    // TPhoaFiler
    //-------------------------------------------------------------------------------------------------------------------
 
-  constructor TPhoaFiler.Create(AMode: TPhoaStreamingMode; const sFilename: String);
+  constructor TPhoaFiler.Create(AMode: TPhoaStreamingMode; const wsFilename: WideString);
   var AStream: TStream;
   begin
     try
        // Determine the file to read from or write to and create a file stream
-      FFilename := sFilename;
+      FFilename := wsFilename;
       if AMode=psmWrite then begin
         FWriteFilename := FFilename+'.tmp';
-        AStream := TFileStream.Create(FWriteFilename, fmCreate);
+        AStream := TTntFileStream.Create(FWriteFilename, fmCreate);
       end else
-        AStream := TFileStream.Create(FFilename, fmOpenRead or fmShareDenyWrite);
+        AStream := TTntFileStream.Create(FFilename, fmOpenRead or fmShareDenyWrite);
        // Create the streamer
-      inherited Create(AStream, AMode, ExtractFilePath(FFilename));
+      inherited Create(AStream, AMode, WideExtractFilePath(FFilename));
     except
       ErrorsOccured := True;
       raise;
@@ -1251,8 +1258,8 @@ uses Math, Variants;
     Stream.Free;
      // On successful writing, replace the original file with new (.tmp)
     if (Mode=psmWrite) and not ErrorsOccured then begin
-      DeleteFile(PChar(FFilename));
-      MoveFile(PChar(FWriteFilename), PChar(FFilename));
+      WideDeleteFile(FFilename);
+      WideRenameFile(FWriteFilename, FFilename);
     end;
     inherited Destroy;
   end;

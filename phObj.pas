@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.66 2007-06-12 13:21:49 dale Exp $
+//  $Id: phObj.pas,v 1.67 2007-06-16 09:15:44 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -57,12 +57,12 @@ type
    // Запись с данными о файле
   PFileRec = ^TFileRec;
   TFileRec = record
-    sName:      String;    // Имя файла
-    sPath:      String;    // Путь к файлу
-    i64Size:    Int64;     // Размер файла в байтах
-    iIconIndex: Integer;   // Индекс значка из системного ImageList'а, -1 если нет
-    dModified:  TDateTime; // Дата/время модификации файла
-    bChecked:   Boolean;   // True, если файл отмечен (custom value), по умолчанию False
+    wsName:     WideString; // Имя файла
+    wsPath:     WideString; // Путь к файлу
+    i64Size:    Int64;      // Размер файла в байтах
+    iIconIndex: Integer;    // Индекс значка из системного ImageList'а, -1 если нет
+    dModified:  TDateTime;  // Дата/время модификации файла
+    bChecked:   Boolean;    // True, если файл отмечен (custom value), по умолчанию False
   end;
 
    // Режим сортировки списка файлов
@@ -75,8 +75,8 @@ type
      // Внутренняя процедура сортировки
     procedure InternalQuickSort(iL, iR: Integer; Prop: TFileListSortProperty; Direction: TPhoaSortDirection);
      // Prop handlers
-    function GetItems(Index: Integer): PFileRec;
-    function GetFiles(Index: Integer): String;
+    function  GetFiles(Index: Integer): WideString;
+    function  GetItems(Index: Integer): PFileRec;
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
@@ -84,7 +84,7 @@ type
      //   Если iIconIndex=-1, это означает отсутствие иконки у файла
      //   Если iIconIndex=-2, иконка файла получается вызовом SHGetFileInfo; Handle системного ImageList'а в этом
      //     случае будет находиться в SysImageListHandle
-    function  Add(const sName, sPath: String; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
+    function  Add(const wsName, wsPath: WideString; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
      // Удаляет файл с заданными именем и путём, возвращает его прежний индекс или -1, если нет такого в списке
     function  Remove(const sName, sPath: String): Integer;
      // Возвращает индекс файла с заданными именем и путём, или -1, если нет такого в списке
@@ -95,7 +95,7 @@ type
     procedure DeleteUnchecked;
      // Props
      // -- Полные пути к файлам по индексу
-    property Files[Index: Integer]: String read GetFiles;
+    property Files[Index: Integer]: WideString read GetFiles;
      // -- Элементы списка по индексу
     property Items[Index: Integer]: PFileRec read GetItems; default;
      // -- Handle системного ImageList'а после определения иконки файла в Add()
@@ -4101,19 +4101,19 @@ type
    // TFileList
    //===================================================================================================================
 
-  function TFileList.Add(const sName, sPath: String; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
+  function TFileList.Add(const wsName, wsPath: WideString; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
   var
     p: PFileRec;
     FileInfo: TSHFileInfo;
   begin
      // Ищем такой же файл
-    Result := IndexOf(sName, sPath);
+    Result := IndexOf(wsName, wsPath);
      // Не нашли, добавляем запись
     if Result<0 then begin
       New(p);
       Result := inherited Add(p);
-      p.sName    := sName;
-      p.sPath    := sPath;
+      p.wsName   := wsName;
+      p.wsPath   := wsPath;
       p.bChecked := True;
      // Нашли, получаем указатель
     end else

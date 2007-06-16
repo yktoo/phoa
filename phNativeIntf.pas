@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.12 2005-03-02 17:13:45 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.13 2007-06-16 09:15:44 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -50,12 +50,12 @@ type
    // Дополнительные данные ключевого слова
   PPhoaKeywordData = ^TPhoaKeywordData;
   TPhoaKeywordData = record
-    sKeyword:    String;             // Ключевое слово
-    sOldKeyword: String;             // Прежнее ключевое слово, если нужно заменить существующее на другое
-    Change:      TPhoaKeywordChange; // Требуемое изменение [текста] ключевого слова
-    State:       TPhoaKeywordState;  // Состояние выбора ключевого слова
-    iCount:      Integer;            // Количество вхождений в фотоальбом (для существующих, т.е. Change<>kcAdd)
-    iSelCount:   Integer;            // Количество упоминаний среди выбранных изображений (заполняется в PopulateFromPicList при предоставлении Callback-процедуры)
+    wsKeyword:    WideString;         // Ключевое слово
+    wsOldKeyword: WideString;         // Прежнее ключевое слово, если нужно заменить существующее на другое
+    Change:       TPhoaKeywordChange; // Требуемое изменение [текста] ключевого слова
+    State:        TPhoaKeywordState;  // Состояние выбора ключевого слова
+    iCount:       Integer;            // Количество вхождений в фотоальбом (для существующих, т.е. Change<>kcAdd)
+    iSelCount:    Integer;            // Количество упоминаний среди выбранных изображений (заполняется в PopulateFromPicList при предоставлении Callback-процедуры)
   end;
 
    // Callback-процедура, вызываемая из IPhotoAlbumKeywordList.PopulateFromPicList() для определения, выбрано
@@ -66,7 +66,7 @@ type
     ['{B14C063F-43EC-48BA-9724-562A97E5E2C7}']
      // Добавляет слово. При повторном добавлении слова оно не добавляется, только приращивается счётчик. Если
      //   bSelected=True, приращивается также счётчик iSelCount
-    function  AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+    function  AddEx(const wsKeyword: WideString; bSelected: Boolean): Integer;
      // Заполняет список на основе ключевых слов изображений из списка. Если передана процедура IsPicSelCallback,
      //   параллельно заполняются счётчики TKeywordRec.iSelCount, в соответствии с iTotalSelCount выставляется
      //   TKeywordRec.State
@@ -75,13 +75,13 @@ type
     function  InsertNew: Integer;
      // Prop handlers
     function  GetKWData(Index: Integer): PPhoaKeywordData;
-    function  GetSelectedKeywords: String;
-    procedure SetSelectedKeywords(const Value: String);
+    function  GetSelectedKeywords: WideString;
+    procedure SetSelectedKeywords(const Value: WideString);
      // Props
      // -- Данные ключевых слов по индексу
     property KWData[Index: Integer]: PPhoaKeywordData read GetKWData; 
      // -- Разделённые запятой выбранные слова. При присваивании расставляет выбранность слов
-    property SelectedKeywords: String read GetSelectedKeywords write SetSelectedKeywords;
+    property SelectedKeywords: WideString read GetSelectedKeywords write SetSelectedKeywords;
   end;
 
    //===================================================================================================================
@@ -99,13 +99,13 @@ type
     procedure DuplicatePics(PicList: IPhoaPicList);
      // Prop handlers
     function  GetItemsByIDX(iID: Integer): IPhotoAlbumPic;
-    function  GetItemsByFileNameX(const sFileName: String): IPhotoAlbumPic;
+    function  GetItemsByFileNameX(const wsFileName: WideString): IPhotoAlbumPic;
     function  GetItemsX(Index: Integer): IPhotoAlbumPic;
      // Props
      // -- 'Native' version of ItemsByID[]
     property ItemsByIDX[iID: Integer]: IPhotoAlbumPic read GetItemsByIDX;
      // -- 'Native' version of ItemsByFileName[]
-    property ItemsByFileNameX[const sFileName: String]: IPhotoAlbumPic read GetItemsByFileNameX;
+    property ItemsByFileNameX[const wsFileName: WideString]: IPhotoAlbumPic read GetItemsByFileNameX;
      // -- 'Native' version of Items[]
     property ItemsX[Index: Integer]: IPhotoAlbumPic read GetItemsX; default;
   end;
@@ -130,7 +130,7 @@ type
     procedure InternalFixupIDs(var iMaxGroupID: Integer);
      // Prop handlers
     function  GetGroupByIDX(iID: Integer): IPhotoAlbumPicGroup;
-    function  GetGroupByPathX(const sPath: String): IPhotoAlbumPicGroup;
+    function  GetGroupByPathX(const wsPath: WideString): IPhotoAlbumPicGroup;
     function  GetGroupsX: IPhotoAlbumPicGroupList;
     function  GetOwnerX: IPhotoAlbumPicGroup;
     function  GetPicsX: IPhotoAlbumPicList;
@@ -141,7 +141,7 @@ type
      // -- 'Native' version of GroupByID[]
     property GroupByIDX[iID: Integer]: IPhotoAlbumPicGroup read GetGroupByIDX;
      // -- 'Native' version of GroupByPath[]
-    property GroupByPathX[const sPath: String]: IPhotoAlbumPicGroup read GetGroupByPathX;
+    property GroupByPathX[const wsPath: WideString]: IPhotoAlbumPicGroup read GetGroupByPathX;
      // -- 'Native' version of Owner
     property OwnerX: IPhotoAlbumPicGroup read GetOwnerX;
      // -- 'Native' version of Pics
@@ -187,8 +187,8 @@ type
   IPhotoAlbumPicSortingList = interface(IPhoaMutablePicSortingList)
     ['{6010D0DF-0EA5-4461-96DC-956131E4BD35}']
      // Сохранение/загрузка из реестра
-    procedure RegSave(const sRoot, sSection: String);
-    procedure RegLoad(const sRoot, sSection: String);
+    procedure RegSave(const wsRoot, wsSection: WideString);
+    procedure RegLoad(const wsRoot, wsSection: WideString);
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
@@ -282,7 +282,7 @@ type
     ['{769DBE0B-D86B-4F89-A557-9A8DA083E508}']
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
-    procedure StreamerSave(Streamer: TPhoaStreamer; const sGenerator, sRemark: String);
+    procedure StreamerSave(Streamer: TPhoaStreamer; const wsGenerator, wsRemark: WideString);
      // Prop handlers
     function  GetCurrentViewX: IPhotoAlbumView;
     function  GetPicsX: IPhotoAlbumPicList;
@@ -322,7 +322,7 @@ type
   IPhotoAlbumApp = interface(IPhoaMutableApp)
     ['{328D859C-8CDA-494B-B5E8-6AF9AB5E51FD}']
      // Выполняет заданную операцию с заданными параметрами
-    procedure PerformOperation(const sOpName: String; const aParams: Array of Variant);
+    procedure PerformOperation(const wsOpName: WideString; const aParams: Array of Variant);
      // Prop handlers
     function  GetCurGroupX: IPhotoAlbumPicGroup;
     function  GetImageList: TCustomImageList;
@@ -353,12 +353,14 @@ type
     procedure Clear;
      // Методы для записи данных в поток
     procedure WriteStr (const s: String);
+    procedure WriteStrW(const ws: WideString);
     procedure WriteInt (i: Integer);
     procedure WriteByte(b: Byte);
     procedure WriteBool(b: Boolean);
      // Методы для чтения данных из потока
-    function  ReadStr: String;
-    function  ReadInt: Integer;
+    function  ReadStr:  String;
+    function  ReadStrW: WideString;
+    function  ReadInt:  Integer;
     function  ReadByte: Byte;
     function  ReadBool: Boolean;
      // Prop handlers
@@ -381,10 +383,10 @@ type
     procedure BeginUndo(i64Position: Int64);
     procedure EndUndo(bTruncate: Boolean);
      // Prop handlers
-    function  GetFileName: String; 
+    function  GetFileName: WideString;
      // Props
      // -- Имя файла данных (временного)
-    property FileName: String read GetFileName;
+    property FileName: WideString read GetFileName;
   end;
 
 implementation

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.16 2005-05-31 17:29:49 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.17 2007-06-16 09:15:44 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -28,8 +28,7 @@ type
      // Prop handlers
     function  GetKeywordsM: IPhoaMutableKeywordList; stdcall;
     procedure SetDate(Value: Integer); stdcall;
-    procedure SetFileName(const Value: String); stdcall;
-    procedure SetFileNameW(const Value: WideString); stdcall;
+    procedure SetFileName(const Value: WideString); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
     procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
     procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
@@ -39,8 +38,7 @@ type
      // -- Writable Date
     property Date: Integer read GetDate write SetDate;
      // -- Writable FileName
-    property FileName: String read GetFileName write SetFileName;
-    property FileNameW: WideString read GetFileNameW write SetFileNameW;
+    property FileName: WideString read GetFileName write SetFileName;
      // -- Writable Flips
     property Flips: TPicFlips read GetFlips write SetFlips;
      // -- 'Mutable' version of Keywords
@@ -64,27 +62,22 @@ type
      // Creates an exact copy of list content
     procedure Assign(Source: IPhoaKeywordList); stdcall;
      // Adds an item; returns the index of the newly-added item
-    function  Add(const sKeyword: String): Integer; stdcall;
-    function  AddW(const sKeyword: WideString): Integer; stdcall;
+    function  Add(const wsKeyword: WideString): Integer; stdcall;
      // Deletes an item
     procedure Delete(Index: Integer); stdcall;
      // Removes a keyword; returns the index of the removed item, or -1 if no such item found
-    function  Remove(const sKeyword: String): Integer; stdcall;
-    function  RemoveW(const sKeyword: WideString): Integer; stdcall;
+    function  Remove(const wsKeyword: WideString): Integer; stdcall;
      // Clears the list
     procedure Clear; stdcall;
-     // Replaces a keyword for another one; checks that the new keyword is not in list yet, raises an Exception
+     // Replaces a keyword for another one; checks that the new keyword is not in list yet, raises an exception
      //   otherwise. After replace moves the word into new position according to sort order, and return the new index of
      //   the keyword
-    function  Rename(Index: Integer; const sNewKeyword: String): Integer; stdcall;
-    function  RenameW(Index: Integer; const sNewKeyword: WideString): Integer; stdcall;
+    function  Rename(Index: Integer; const wsNewKeyword: WideString): Integer; stdcall;
      // Prop handlers
-    procedure SetCommaText(const Value: String); stdcall;
-    procedure SetCommaTextW(const Value: WideString); stdcall;
+    procedure SetCommaText(const Value: WideString); stdcall;
      // Props
      // -- Writable CommaText property
-    property CommaText: String read GetCommaText write SetCommaText;
-    property CommaTextW: WideString read GetCommaTextW write SetCommaTextW;
+    property CommaText: WideString read GetCommaText write SetCommaText;
   end;
 
    //===================================================================================================================
@@ -124,17 +117,15 @@ type
      // Moves an item into new position. Only allowed when Sorted=False
     procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
      // Prop handlers
+    function  GetItemsByFileNameM(const wsFileName: WideString): IPhoaMutablePic; stdcall;
     function  GetItemsByIDM(iID: Integer): IPhoaMutablePic; stdcall;
-    function  GetItemsByFileNameM(const sFileName: String): IPhoaMutablePic; stdcall;
-    function  GetItemsByFileNameMW(const sFileName: WideString): IPhoaMutablePic; stdcall;
     function  GetItemsM(Index: Integer): IPhoaMutablePic; stdcall;
     function  GetSorted: Boolean; stdcall;
      // Props
      // -- 'Mutable' version of ItemsByID[]
     property ItemsByIDM[iID: Integer]: IPhoaMutablePic read GetItemsByIDM;
      // -- 'Mutable' version of ItemsByFileName[]
-    property ItemsByFileNameM[const sFileName: String]: IPhoaMutablePic read GetItemsByFileNameM;
-    property ItemsByFileNameMW[const sFileName: WideString]: IPhoaMutablePic read GetItemsByFileNameMW;
+    property ItemsByFileNameM[const wsFileName: WideString]: IPhoaMutablePic read GetItemsByFileNameM;
      // -- 'Mutable' version of Items[]
     property ItemsM[Index: Integer]: IPhoaMutablePic read GetItemsM; default;
      // -- True if the list is sorted by picture ID and allows no ID duplicates or resorting
@@ -157,23 +148,19 @@ type
      // Prop handlers
     function  GetGroupsM: IPhoaMutablePicGroupList; stdcall;
     function  GetGroupByIDM(iID: Integer): IPhoaMutablePicGroup; stdcall;
-    function  GetGroupByPathM(const sPath: String): IPhoaMutablePicGroup; stdcall;
-    function  GetGroupByPathMW(const sPath: WideString): IPhoaMutablePicGroup; stdcall;
+    function  GetGroupByPathM(const wsPath: WideString): IPhoaMutablePicGroup; stdcall;
     function  GetOwnerM: IPhoaMutablePicGroup; stdcall;
     function  GetPicsM: IPhoaMutablePicList; stdcall;
     function  GetRootM: IPhoaMutablePicGroup; stdcall;
-    procedure SetDescription(const Value: String); stdcall;
-    procedure SetDescriptionW(const Value: WideString); stdcall;
+    procedure SetDescription(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
     procedure SetIconData(const Value: String); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
-    procedure SetText(const Value: String); stdcall;
-    procedure SetTextW(const Value: WideString); stdcall;
+    procedure SetText(const Value: WideString); stdcall;
      // Props
      // -- Group description
-    property Description: String read GetDescription write SetDescription;
-    property DescriptionW: WideString read GetDescriptionW write SetDescriptionW;
+    property Description: WideString read GetDescription write SetDescription;
      // -- True if a group node is expanded
     property Expanded: Boolean read GetExpanded write SetExpanded;
      // -- 'Mutable' version of Groups
@@ -181,8 +168,7 @@ type
      // -- 'Mutable' version of GroupByID[]
     property GroupByIDM[iID: Integer]: IPhoaMutablePicGroup read GetGroupByIDM;
      // -- 'Mutable' version of GroupByPath[]
-    property GroupByPathM[const sPath: String]: IPhoaMutablePicGroup read GetGroupByPathM;
-    property GroupByPathMW[const sPath: WideString]: IPhoaMutablePicGroup read GetGroupByPathMW;
+    property GroupByPathM[const wsPath: WideString]: IPhoaMutablePicGroup read GetGroupByPathM;
      // -- 'Mutable' version of IconData
     property IconData: String read GetIconData write SetIconData;
      // -- Group index in its Owner's list
@@ -196,8 +182,7 @@ type
      // -- 'Mutable' version of Root
     property RootM: IPhoaMutablePicGroup read GetRootM;
      // -- Group text (name)
-    property Text: String read GetText write SetText;
-    property TextW: WideString read GetTextW write SetTextW;
+    property Text: WideString read GetText write SetText;
   end;
 
    //===================================================================================================================
@@ -334,21 +319,17 @@ type
     function  GetGroupingsM: IPhoaMutablePicGroupingList; stdcall;
     function  GetListM: IPhoaMutableViewList; stdcall;
     function  GetSortingsM: IPhoaMutablePicSortingList; stdcall;
-    procedure SetFilterExpression(const Value: String); stdcall;
-    procedure SetFilterExpressionW(const Value: WideString); stdcall;
-    procedure SetName(const Value: String); stdcall;
-    procedure SetNameW(const Value: WideString); stdcall;
+    procedure SetFilterExpression(const Value: WideString); stdcall;
+    procedure SetName(const Value: WideString); stdcall;
      // Props
      // -- Writable FilterExpression
-    property FilterExpression: String read GetFilterExpression write SetFilterExpression;
-    property FilterExpressionW: WideString read GetFilterExpressionW write SetFilterExpressionW;
+    property FilterExpression: WideString read GetFilterExpression write SetFilterExpression;
      // -- 'Mutable' version of Groupings
     property GroupingsM: IPhoaMutablePicGroupingList read GetGroupingsM;
      // -- 'Mutable' version of List
     property ListM: IPhoaMutableViewList read GetListM;
      // -- Writable Name
-    property Name: String read GetName write SetName;
-    property NameW: WideString read GetNameW write SetNameW;
+    property Name: WideString read GetName write SetName;
      // -- 'Mutable' version of Sortings
     property SortingsM: IPhoaMutablePicSortingList read GetSortingsM;
   end;
@@ -388,20 +369,16 @@ type
      // Clears and initializes the project
     procedure New; stdcall;
      // File loading and saving
-    procedure LoadFromFile(const sFileName: String); stdcall;
-    procedure LoadFromFileW(const sFileName: WideString); stdcall;
-    procedure SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer); stdcall;
-    procedure SaveToFileW(const sFileName, sGenerator, sRemark: WideString; iRevisionNumber: Integer); stdcall;
+    procedure LoadFromFile(const wsFileName: WideString); stdcall;
+    procedure SaveToFile(const wsFileName, wsGenerator, wsRemark: WideString; iRevisionNumber: Integer); stdcall;
      // Prop handlers
     function  GetCurrentViewM: IPhoaMutableView; stdcall;
     function  GetPicsM: IPhoaMutablePicList; stdcall;
     function  GetRootGroupM: IPhoaMutablePicGroup; stdcall;
     function  GetViewRootGroupM: IPhoaMutablePicGroup; stdcall;
     function  GetViewsM: IPhoaMutableViewList; stdcall;
-    procedure SetDescription(const Value: String); stdcall;
-    procedure SetDescriptionW(const Value: WideString); stdcall;
-    procedure SetFileName(const Value: String); stdcall;
-    procedure SetFileNameW(const Value: WideString); stdcall;
+    procedure SetDescription(const Value: WideString); stdcall;
+    procedure SetFileName(const Value: WideString); stdcall;
     procedure SetThumbnailQuality(Value: Byte); stdcall;
     procedure SetThumbnailSize(const Value: TSize); stdcall;
     procedure SetViewIndex(Value: Integer); stdcall;
@@ -409,11 +386,9 @@ type
      // -- 'Mutable' version of CurrentView
     property CurrentViewM: IPhoaMutableView read GetCurrentViewM;
      // -- Writable Description
-    property Description: String read GetDescription write SetDescription;
-    property DescriptionW: WideString read GetDescriptionW write SetDescriptionW;
+    property Description: WideString read GetDescription write SetDescription;
      // -- Writable FileName
-    property FileName: String read GetFileName write SetFileName;
-    property FileNameW: WideString read GetFileNameW write SetFileNameW;
+    property FileName: WideString read GetFileName write SetFileName;
      // -- 'Mutable' version of Pics
     property PicsM: IPhoaMutablePicList read GetPicsM;
      // -- 'Mutable' version of RootGroup

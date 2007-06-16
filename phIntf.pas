@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.24 2005-09-11 06:45:57 dale Exp $
+//  $Id: phIntf.pas,v 1.25 2007-06-16 09:15:44 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -78,31 +78,22 @@ type
     ['{7AC3D444-5A48-4396-95C9-82AACDCF68EE}']
      // Prop handlers
     function  GetID: Integer; stdcall;
-    function  GetAuthor: String; stdcall;
-    function  GetAuthorW: WideString; stdcall;
+    function  GetAuthor: WideString; stdcall;
     function  GetDate: Integer; stdcall;
     function  GetTime: Integer; stdcall;
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
-    function  GetFileName: String; stdcall;
-    function  GetFileNameW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
+    function  GetFileName: WideString; stdcall;
     function  GetFileSize: Integer; stdcall;
-    function  GetFilmNumber: String; stdcall;
-    function  GetFilmNumberW: WideString; stdcall;
+    function  GetFilmNumber: WideString; stdcall;
     function  GetFlips: TPicFlips; stdcall;
-    function  GetFrameNumber: String; stdcall;
-    function  GetFrameNumberW: WideString; stdcall;
+    function  GetFrameNumber: WideString; stdcall;
     function  GetImageFormat: TPhoaPixelFormat; stdcall;
     function  GetImageSize: TSize; stdcall;
     function  GetKeywords: IPhoaKeywordList; stdcall;
-    function  GetMedia: String; stdcall;
-    function  GetMediaW: WideString; stdcall;
-    function  GetNotes: String; stdcall;
-    function  GetNotesW: WideString; stdcall;
-    function  GetPlace: String; stdcall;
-    function  GetPlaceW: WideString; stdcall;
-    function  GetPropStrValues(PicProp: TPicProperty): String; stdcall;
-    function  GetPropStrValuesW(PicProp: TPicProperty): WideString; stdcall;
+    function  GetMedia: WideString; stdcall;
+    function  GetNotes: WideString; stdcall;
+    function  GetPlace: WideString; stdcall;
+    function  GetPropStrValues(PicProp: TPicProperty): WideString; stdcall;
     function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
     function  GetRawData(PProps: TPicProperties): String; stdcall;
     function  GetRotation: TPicRotation; stdcall;
@@ -112,28 +103,23 @@ type
      // -- Unique ID
     property ID: Integer read GetID;
      // -- Author
-    property Author: String read GetAuthor;
-    property AuthorW: WideString read GetAuthorW;
+    property Author: WideString read GetAuthor;
      // -- Picture date: number of days since Jan 01, 0001
     property Date: Integer read GetDate;
      // -- Picture date: number of seconds since midnight
     property Time: Integer read GetTime;
      // -- Description (for display)
-    property Description: String read GetDescription;
-    property DescriptionW: WideString read GetDescriptionW;
+    property Description: WideString read GetDescription;
      // -- Full picture file name
-    property FileName: String read GetFileName;
-    property FileNameW: WideString read GetFileNameW;
+    property FileName: WideString read GetFileName;
      // -- Picture file size in bytes
     property FileSize: Integer read GetFileSize;
      // -- Film number or name
-    property FilmNumber: String read GetFilmNumber;
-    property FilmNumberW: WideString read GetFilmNumberW;
+    property FilmNumber: WideString read GetFilmNumber;
      // -- Picture flip flags
     property Flips: TPicFlips read GetFlips;
      // -- Frame number
-    property FrameNumber: String read GetFrameNumber;
-    property FrameNumberW: WideString read GetFrameNumberW;
+    property FrameNumber: WideString read GetFrameNumber;
      // -- Pixel image format
     property ImageFormat: TPhoaPixelFormat read GetImageFormat;
      // -- Image dimensions in pixels
@@ -141,17 +127,13 @@ type
      // -- Keyword list
     property Keywords: IPhoaKeywordList read GetKeywords;
      // -- Picture file media name or code
-    property Media: String read GetMedia;
-    property MediaW: WideString read GetMediaW;
+    property Media: WideString read GetMedia;
      // -- Notes
-    property Notes: String read GetNotes;
-    property NotesW: WideString read GetNotesW;
+    property Notes: WideString read GetNotes;
      // -- Place
-    property Place: String read GetPlace;
-    property PlaceW: WideString read GetPlaceW;
-     // -- Property values of type String, by index
-    property PropStrValues[PicProp: TPicProperty]: String read GetPropStrValues;
-    property PropStrValuesW[PicProp: TPicProperty]: WideString read GetPropStrValuesW;
+    property Place: WideString read GetPlace;
+     // -- Property values of type WideString, by index
+    property PropStrValues[PicProp: TPicProperty]: WideString read GetPropStrValues;
      // -- Property values of type Variant, by index
     property PropValues[PicProp: TPicProperty]: Variant read GetPropValues;
      // -- Picture raw binary data (for PProps properties). No WideString version as it's meaningless
@@ -171,23 +153,18 @@ type
   IPhoaKeywordList = interface(IInterface)
     ['{C000BFAE-CE13-4DF3-A774-8A21E1727D53}']
      // Returns index of a keyword, or -1 if no such item found
-    function  IndexOf(const sKeyword: String): Integer; stdcall;
-    function  IndexOfW(const sKeyword: WideString): Integer; stdcall;
+    function  IndexOf(const wsKeyword: WideString): Integer; stdcall;
      // Prop handlers
-    function  GetCommaText: String; stdcall;
-    function  GetCommaTextW: WideString; stdcall;
+    function  GetCommaText: WideString; stdcall;
     function  GetCount: Integer; stdcall;
-    function  GetItems(Index: Integer): String; stdcall;
-    function  GetItemsW(Index: Integer): WideString; stdcall;
+    function  GetItems(Index: Integer): WideString; stdcall;
      // Props
      // -- Comma-separated keyword list; keywords containing commas and/or spaces are double-quoted
-    property CommaText: String read GetCommaText;
-    property CommaTextW: WideString read GetCommaTextW;
+    property CommaText: WideString read GetCommaText;
      // -- Number of keywords in the list
     property Count: Integer read GetCount;
      // -- Keywords by index; Index in range 0..Count-1
-    property Items[Index: Integer]: String read GetItems; default;
-    property ItemsW[Index: Integer]: WideString read GetItemsW;
+    property Items[Index: Integer]: WideString read GetItems;
   end;
 
    //===================================================================================================================
@@ -199,16 +176,14 @@ type
      // Returns index of a picture by its ID, or -1 if no such item found
     function  IndexOfID(iID: Integer): Integer; stdcall;
      // Returns index of a picture by its full file name (case-insensitive search), or -1 if no such item found
-    function  IndexOfFileName(const sFileName: String): Integer; stdcall;
-    function  IndexOfFileNameW(const sFileName: WideString): Integer; stdcall;
+    function  IndexOfFileName(const wsFileName: WideString): Integer; stdcall;
      // Searches a picture by ID and returns True if found, and its position in Index. Otherwise returns False, and
      //   position of the nearest greater ID in Index
     function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
      // Prop handlers
     function  GetCount: Integer; stdcall;
     function  GetItemsByID(iID: Integer): IPhoaPic; stdcall;
-    function  GetItemsByFileName(const sFileName: String): IPhoaPic; stdcall;
-    function  GetItemsByFileNameW(const sFileName: WideString): IPhoaPic; stdcall;
+    function  GetItemsByFileName(const wsFileName: WideString): IPhoaPic; stdcall;
     function  GetItems(Index: Integer): IPhoaPic; stdcall;
     function  GetMaxPicID: Integer; stdcall;
      // Props
@@ -217,8 +192,7 @@ type
      // -- Pictures by ID; returns nil if no such item found
     property ItemsByID[iID: Integer]: IPhoaPic read GetItemsByID;
      // -- Pictures by full file name (case-insensitive search); returns nil if no such item found
-    property ItemsByFileName[const sFileName: String]: IPhoaPic read GetItemsByFileName;
-    property ItemsByFileNameW[const sFileName: WideString]: IPhoaPic read GetItemsByFileNameW;
+    property ItemsByFileName[const wsFileName: WideString]: IPhoaPic read GetItemsByFileName;
      // -- Pictures by index; Index in range 0..Count-1
     property Items[Index: Integer]: IPhoaPic read GetItems; default;
      // -- Maximum picture ID of the list
@@ -240,31 +214,25 @@ type
      // Returns True if a picture ID is in the group's list (when bRecursive=True also in any of its subgroups)
     function  IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean; stdcall;
      // Prop handlers
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
     function  GetExpanded: Boolean; stdcall;
     function  GetMaxGroupID: Integer; stdcall;
     function  GetGroups: IPhoaPicGroupList; stdcall;
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
-    function  GetGroupByPath(const sPath: String): IPhoaPicGroup; stdcall;
-    function  GetGroupByPathW(const sPath: WideString): IPhoaPicGroup; stdcall;
+    function  GetGroupByPath(const wsPath: WideString): IPhoaPicGroup; stdcall;
     function  GetIconData: String; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
     function  GetOwner: IPhoaPicGroup; stdcall;
-    function  GetPath(const sRootName: String): String; stdcall;
-    function  GetPathW(const sRootName: WideString): WideString; stdcall;
+    function  GetPath(const wsRootName: WideString): WideString; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
-    function  GetProps(GroupProp: TGroupProperty): String; stdcall;
-    function  GetPropsW(GroupProp: TGroupProperty): WideString; stdcall;
+    function  GetProps(GroupProp: TGroupProperty): WideString; stdcall;
     function  GetRoot: IPhoaPicGroup; stdcall;
-    function  GetText: String; stdcall;
-    function  GetTextW: WideString; stdcall;
+    function  GetText: WideString; stdcall;
      // Props
      // -- Group description
-    property Description: String read GetDescription;
-    property DescriptionW: WideString read GetDescriptionW;
+    property Description: WideString read GetDescription;
      // -- True if a group node is expanded
     property Expanded: Boolean read GetExpanded;
      // -- Owned group list
@@ -273,8 +241,7 @@ type
     property GroupByID[iID: Integer]: IPhoaPicGroup read GetGroupByID;
      // -- Returns the group by its path; nil if no such group. The search is case-insensitive; starts searching from
      //    the first owned group. If sPath starts with '/', ignores this char
-    property GroupByPath[const sPath: String]: IPhoaPicGroup read GetGroupByPath;
-    property GroupByPathW[const sPath: WideString]: IPhoaPicGroup read GetGroupByPathW;
+    property GroupByPath[const wsPath: WideString]: IPhoaPicGroup read GetGroupByPath;
      // -- Icon raw binary PNG data
     property IconData: String read GetIconData;
      // -- An unique group ID
@@ -288,18 +255,15 @@ type
      // -- Group owner
     property Owner: IPhoaPicGroup read GetOwner;
      // -- Group path in form '<sRootName>/Group1/Group2/.../CurrentGroup'
-    property Path[const sRootName: String]: String read GetPath;
-    property PathW[const sRootName: WideString]: WideString read GetPathW;
+    property Path[const wsRootName: WideString]: WideString read GetPath;
      // -- Pictures in the group
     property Pics: IPhoaPicList read GetPics;
      // -- Group properties by index
-    property Props[GroupProp: TGroupProperty]: String read GetProps;
-    property PropsW[GroupProp: TGroupProperty]: WideString read GetPropsW;
+    property Props[GroupProp: TGroupProperty]: WideString read GetProps;
      // -- Returns the ultimate owner of the group (all the groups)
     property Root: IPhoaPicGroup read GetRoot;
      // -- Group text (name)
-    property Text: String read GetText;
-    property TextW: WideString read GetTextW;
+    property Text: WideString read GetText;
   end;
 
    //===================================================================================================================
@@ -425,19 +389,16 @@ type
      // Invalidates the built group hierarchy
     procedure Invalidate; stdcall;
      // Prop handlers
-    function  GetFilterExpression: String; stdcall;
-    function  GetFilterExpressionW: WideString; stdcall;
+    function  GetFilterExpression: WideString; stdcall;
     function  GetGroupings: IPhoaPicGroupingList; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetList: IPhoaViewList; stdcall;
-    function  GetName: String; stdcall;
-    function  GetNameW: WideString; stdcall;
+    function  GetName: WideString; stdcall;
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetSortings: IPhoaPicSortingList; stdcall;
      // Props
      // -- Picture filter expression
-    property FilterExpression: String read GetFilterExpression;
-    property FilterExpressionW: WideString read GetFilterExpressionW;
+    property FilterExpression: WideString read GetFilterExpression;
      // -- Picture grouping list
     property Groupings: IPhoaPicGroupingList read GetGroupings;
      // -- View index in its Owner's list
@@ -445,8 +406,7 @@ type
      // -- Owner list
     property List: IPhoaViewList read GetList;
      // -- View name
-    property Name: String read GetName;
-    property NameW: WideString read GetNameW;
+    property Name: WideString read GetName;
      // -- View root group. The group hierarchy is created automatically when the property value is requested
     property RootGroup: IPhoaPicGroup read GetRootGroup;
      // -- Picture sorting list
@@ -460,8 +420,7 @@ type
   IPhoaViewList = interface(IInterface)
     ['{5ADA8486-1E50-44BA-A9F7-2AB729234A22}']
      // Returns index of a view by its name (case-insensitive search); -1 if no such view
-    function  IndexOfName(const sName: String): Integer; stdcall;
-    function  IndexOfNameW(const sName: WideString): Integer; stdcall;
+    function  IndexOfName(const wsName: WideString): Integer; stdcall;
      // Invalidates all the views
     procedure Invalidate; stdcall;
      // Prop handlers
@@ -470,7 +429,7 @@ type
     function  GetPics: IPhoaPicList; stdcall;
      // Searches a view by name (case-insensitively) and returns True if found, and its position in Index. Otherwise
      //   returns False, and position of the nearest greater name in Index
-    function  FindName(const sName: String; var Index: Integer): Boolean; stdcall;
+    function  FindName(const wsName: WideString; var Index: Integer): Boolean; stdcall;
      // Props
      // -- Item count
     property Count: Integer read GetCount;
@@ -488,10 +447,8 @@ type
     ['{769DBE0B-D86B-4F89-A557-9A8DA083E506}']
      // Prop handlers
     function  GetCurrentView: IPhoaView; stdcall;
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
-    function  GetFileName: String; stdcall;
-    function  GetFileNameW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
+    function  GetFileName: WideString; stdcall;
     function  GetFileRevision: Integer; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
     function  GetRootGroup: IPhoaPicGroup; stdcall;
@@ -504,11 +461,9 @@ type
      // -- Current view, if ViewIndex>=0; nil otherwise
     property CurrentView: IPhoaView read GetCurrentView;
      // -- Photo album description
-    property Description: String read GetDescription;
-    property DescriptionW: WideString read GetDescriptionW;
+    property Description: WideString read GetDescription;
      // -- Project file name
-    property FileName: String read GetFileName;
-    property FileNameW: WideString read GetFileNameW;
+    property FileName: WideString read GetFileName;
      // -- Current file revision
     property FileRevision: Integer read GetFileRevision;
      // -- Photo album picture list
@@ -555,7 +510,7 @@ const
   SPicPropName_Rotation      = 'Rotation';
   SPicPropName_Flips         = 'Flips';
 
-  asPicPropNames: Array[TPicProperty] of String = (
+  awsPicPropNames: Array[TPicProperty] of WideString = (
     SPicPropName_ID,            // ppID
     SPicPropName_FileName,      // ppFileName
     SPicPropName_FullFileName,  // ppFullFileName
@@ -611,23 +566,23 @@ const
     ppdtFlips);      // ppFlips
 
    // Translation TPicProperty<->Property name
-  function  PicPropToStr(Prop: TPicProperty; bStrict: Boolean): String;
-  function  StrToPicProp(const sPropName: String; bStrict: Boolean): TPicProperty;
+  function  PicPropToStr(Prop: TPicProperty; bStrict: Boolean): WideString;
+  function  StrToPicProp(const wsPropName: WideString; bStrict: Boolean): TPicProperty;
 
 implementation
 
-  function PicPropToStr(Prop: TPicProperty; bStrict: Boolean): String;
+  function PicPropToStr(Prop: TPicProperty; bStrict: Boolean): WideString;
   begin
-    if Prop in [Low(Prop)..High(Prop)] then Result := asPicPropNames[Prop]
+    if Prop in [Low(Prop)..High(Prop)] then Result := awsPicPropNames[Prop]
     else if not bStrict then Result := ''
     else raise EPhIntfException.CreateFmt('Invalid picture property value (%d)', [Byte(Prop)]);
   end;
 
-  function StrToPicProp(const sPropName: String; bStrict: Boolean): TPicProperty;
+  function StrToPicProp(const wsPropName: WideString; bStrict: Boolean): TPicProperty;
   begin
     for Result := Low(Result) to High(Result) do
-      if SameText(sPropName, asPicPropNames[Result]) then Exit;
-    if bStrict then raise EPhIntfException.CreateFmt('Invalid picture property name ("%s")', [sPropName]);
+      if WideSameText(wsPropName, awsPicPropNames[Result]) then Exit;
+    if bStrict then raise EPhIntfException.CreateFmt('Invalid picture property name ("%s")', [wsPropName]);
     Result := TPicProperty(-1);
   end;
 
