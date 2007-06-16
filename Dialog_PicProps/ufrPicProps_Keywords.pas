@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -69,7 +69,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure DoCreate; override;
   public
-    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: CellTextString; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -131,12 +131,12 @@ uses phUtils, Main, phSettings;
     CheckKeywords(mcmNone);
   end;
 
-  procedure TfrPicProps_Keywords.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_Keywords.Apply(var wsOpParamName: CellTextString; var OpParams: IPhoaOperationParams);
   begin
      // Если страница инициализирована, возвращаем параметры для операции изменения списка ключевых слов
     if FInitialized then begin
-      sOpParamName := 'EditKeywordsOpParams';
-      OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'KeywordList', FKeywords]);
+      wsOpParamName := 'EditKeywordsOpParams';
+      OpParams      := NewPhoaOperationParams(['Pics', EditedPics, 'KeywordList', FKeywords]);
     end;
   end;
 

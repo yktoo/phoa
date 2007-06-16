@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -41,7 +41,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure FileChanged(iIndex: Integer); override;
-    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -54,15 +54,15 @@ type
   procedure TfrPicProps_FileProps.aaChangeFile(Sender: TObject);
   var idx: Integer;
 
-    procedure UpdatePicFile(const sFileName: String);
+    procedure UpdatePicFile(const wsFileName: WideString);
     var iPicID: Integer;
     begin
        // Ищем изображение с таким файлом
-      iPicID := Dialog.FindPicIDByFileName(sFileName);
+      iPicID := Dialog.FindPicIDByFileName(wsFileName);
        // Не нашли - изменяем файл
-      if iPicID=0 then Dialog.PictureFiles[idx] := sFileName
+      if iPicID=0 then Dialog.PictureFiles[idx] := wsFileName
        // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
-      else if iPicID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [sFileName, iPicID]));
+      else if iPicID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [wsFileName, iPicID]));
     end;
 
   begin
@@ -81,26 +81,26 @@ type
     end;
   end;
 
-  procedure TfrPicProps_FileProps.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_FileProps.Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams);
   var
     i: Integer;
     ChgList: IPhoaPicFileChangeList;
     Pic: IPhotoAlbumPic;
-    sFileName: String;
+    wsFileName: WideString;
   begin
      // Если страница посещалась/есть файлы
     if tvMain.RootNodeCount>0 then begin
        // Составляем список изменений файлов
       ChgList := NewPhoaPicFileChangeList;
       for i := 0 to EditedPics.Count-1 do begin
-        Pic       := EditedPics[i];
-        sFileName := Dialog.PictureFiles[i];
-        if Pic.FileName<>sFileName then ChgList.Add(Pic, sFileName);
+        Pic        := EditedPics[i];
+        wsFileName := Dialog.PictureFiles[i];
+        if Pic.FileName<>wsFileName then ChgList.Add(Pic, wsFileName);
       end;
        // Если есть изменения - возвращаем параметры подоперации
       if ChgList.Count>0 then begin
-        sOpParamName := 'EditFilesOpParams';
-        OpParams     := NewPhoaOperationParams(['FileChangeList', ChgList]);
+        wsOpParamName := 'EditFilesOpParams';
+        OpParams      := NewPhoaOperationParams(['FileChangeList', ChgList]);
       end;
     end;
   end;
@@ -178,21 +178,21 @@ type
     nParent: PVirtualNode;
     NS: TNamespace;
     DFProp: TDiskFileProp;
-    s: String;
+    ws: WideString;
   begin
     nParent := Sender.NodeParent[Node];
      // Для узлов файлов (корневых)
     if nParent=nil then begin
-      if Column=0 then s := Dialog.PictureFiles[Node.Index];
+      if Column=0 then ws := Dialog.PictureFiles[Node.Index];
      // Для элементов свойств файла (дочерних узлов по отношению к файлам)
     end else begin
       NS := PNamespace(Sender.GetNodeData(nParent))^;
       DFProp := TDiskFileProp(Node.Index);
       case Column of
          // Имя свойства
-        0: if NS=nil then s := ConstVal('SError') else s := DiskFilePropName(DFProp);
+        0: if NS=nil then ws := ConstVal('SError') else ws := DiskFilePropName(DFProp);
          // Значение свойства
-        1: if NS=nil then s := ConstVal('SErrFileNotFound') else s := DiskFilePropValue(DFProp, NS);
+        1: if NS=nil then ws := ConstVal('SErrFileNotFound') else ws := DiskFilePropValue(DFProp, NS);
       end;
     end;
     CellText := PhoaAnsiToUnicode(s);

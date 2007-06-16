@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,7 +31,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
-    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -46,7 +46,7 @@ type
     iSelCount: Integer;         //  оличество изображений в группе из числа выбранных
   end;
 
-  procedure TfrPicProps_Groups.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_Groups.Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams);
   var
     n: PVirtualNode;
     pgd: PGroupData;
@@ -57,7 +57,7 @@ type
       AddToGroups      := NewPhotoAlbumPicGroupList(nil);
       RemoveFromGroups := NewPhotoAlbumPicGroupList(nil);
        //  рутим цикл по узлам дерева (по группам), заполн€€ списки групп, в которые надо добавить (AddToGroups) и из
-       //   которых надо удалить (RemoveFromGroups) изображени€ 
+       //   которых надо удалить (RemoveFromGroups) изображени€
       n := tvMain.GetFirst;
       while n<>nil do begin
          // ќпредел€ем, есть ли изменени€
@@ -73,8 +73,8 @@ type
       end;
        // ≈сли есть изменени€ в принадлежности группам, возвращаем параметры соответствующей подоперации
       if (AddToGroups.Count>0) or (RemoveFromGroups.Count>0) then begin
-        sOpParamName := 'EditGroupOpParams';
-        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'AddToGroups', AddToGroups, 'RemoveFromGroups', RemoveFromGroups]);
+        wsOpParamName := 'EditGroupOpParams';
+        OpParams      := NewPhoaOperationParams(['Pics', EditedPics, 'AddToGroups', AddToGroups, 'RemoveFromGroups', RemoveFromGroups]);
       end;
     end;
   end;
@@ -181,17 +181,14 @@ type
   end;
 
   procedure TfrPicProps_Groups.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    p: PGroupData;
-    s: String;
+  var p: PGroupData;
   begin
     p := Sender.GetNodeData(Node);
     if p<>nil then
       if TextType=ttStatic then begin
-        if p.Group.Pics.Count>0 then s := Format(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.Pics.Count]);
-      end else if Sender.NodeParent[Node]<>nil then s := p.Group.Text
-      else s := ConstVal('SPhotoAlbumNode');
-    CellText := PhoaAnsiToUnicode(s);
+        if p.Group.Pics.Count>0 then CellText := WideFormat(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.Pics.Count]);
+      end else if Sender.NodeParent[Node]<>nil then CellText := p.Group.Text
+      else CellText := ConstVal('SPhotoAlbumNode');
   end;
 
   procedure TfrPicProps_Groups.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

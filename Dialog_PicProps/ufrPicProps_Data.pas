@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -70,7 +70,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     function  CanApply: Boolean; override;
-    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -82,7 +82,7 @@ const
   EditablePicProps: TPicProperties = [
     ppDate, ppTime, ppPlace, ppFilmNumber, ppFrameNumber, ppAuthor, ppDescription, ppNotes, ppMedia];
 
-  procedure TfrPicProps_Data.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_Data.Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams);
   var
     ChgList: IPhoaPicPropertyChangeList;
     Prop: TPicProperty;
@@ -95,8 +95,8 @@ const
         if (Prop in EditablePicProps) and (FPropVals[Prop].State=pvsModified) then ChgList.Add(FPropVals[Prop].vValue, Prop);
        // Если есть изменения - возвращаем параметры подоперации
       if ChgList.Count>0 then begin
-        sOpParamName := 'EditDataOpParams';
-        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
+        wsOpParamName := 'EditDataOpParams';
+        OpParams      := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
       end;
     end;
   end;

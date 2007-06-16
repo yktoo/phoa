@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -38,7 +38,7 @@ type
     procedure UpdateDesc;
   protected
     procedure DoCreate; override;
-    function  GetRegistrySection: String; override;
+    function  GetRegistrySection: WideString; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
     procedure FileChanged(iIndex: Integer); override;
@@ -82,7 +82,7 @@ type
     if n<>nil then tvMain.ResetNode(n);
   end;
 
-  function TfrPicProps_Metadata.GetRegistrySection: String;
+  function TfrPicProps_Metadata.GetRegistrySection: WideString;
   begin
     Result := SRegWizPage_PicProp_Metadata;
   end;
@@ -115,42 +115,39 @@ type
   end;
 
   procedure TfrPicProps_Metadata.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    nParent: PVirtualNode;
-    s: String;
+  var nParent: PVirtualNode;
   begin
     nParent := Sender.NodeParent[Node];
      // Для узлов файлов (корневых)
     if nParent=nil then begin
       case Column of
          // Имя файла
-        0: s := Dialog.PictureFiles[Node.Index];
+        0: CellText := Dialog.PictureFiles[Node.Index];
          // Если ошибка - выводим сюда
         2: begin
           case PImageMetadata(Sender.GetNodeData(Node))^.StatusCode of
-            IMS_OK:                s := '';
-            IMS_CannotOpenFile:    s := 'IMS_CannotOpenFile';
-            IMS_ReadFailure:       s := 'IMS_ReadFailure';
-            IMS_NotAJPEGFile:      s := 'IMS_NotAJPEGFile';
-            IMS_NoMetadata:        s := 'IMS_NoMetadata';
-            IMS_InvalidEXIFHeader: s := 'IMS_InvalidEXIFHeader';
-            IMS_InvalidTIFFHeader: s := 'IMS_InvalidTIFFHeader';
-            else                   s := 'IMS_InternalError';
+            IMS_OK:                CellText := '';
+            IMS_CannotOpenFile:    CellText := 'IMS_CannotOpenFile';
+            IMS_ReadFailure:       CellText := 'IMS_ReadFailure';
+            IMS_NotAJPEGFile:      CellText := 'IMS_NotAJPEGFile';
+            IMS_NoMetadata:        CellText := 'IMS_NoMetadata';
+            IMS_InvalidEXIFHeader: CellText := 'IMS_InvalidEXIFHeader';
+            IMS_InvalidTIFFHeader: CellText := 'IMS_InvalidTIFFHeader';
+            else                   CellText := 'IMS_InternalError';
           end;
-          if s<>'' then s := ConstVal(s);
+          if CellText<>'' then CellText := ConstVal(CellText);
         end;
       end;
      // Для элементов строк метаданных (дочерних узлов по отношению к файлам)
     end else
       case Column of
          // Код тега
-        0: s := Format('%.4x', [PPExifTag(Sender.GetNodeData(Node))^.iTag]);
+        0: CellText := WideFormat('%.4x', [PPExifTag(Sender.GetNodeData(Node))^.iTag]);
          // Имя тега
-        1: s := PPExifTag(Sender.GetNodeData(Node))^.sName;
+        1: CellText := PPExifTag(Sender.GetNodeData(Node))^.wsName;
          // Загруженное значение тега
-        2: s := Copy(PImageMetadata(Sender.GetNodeData(nParent))^.EXIFData[Node.Index], 1, 200);
+        2: CellText := Copy(PImageMetadata(Sender.GetNodeData(nParent))^.EXIFData[Node.Index], 1, 200);
       end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrPicProps_Metadata.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -198,16 +195,16 @@ type
   procedure TfrPicProps_Metadata.UpdateDesc;
   var
     n: PVirtualNode;
-    s: String;
+    ws: WideString;
   begin
     n := tvMain.FocusedNode;
     if tvMain.NodeParent[n]=nil then
-      s := ConstVal('SMsg_NoMetatagSelected')
+      ws := ConstVal('SMsg_NoMetatagSelected')
     else begin
-      s := PPExifTag(tvMain.GetNodeData(n))^^.sDesc;
-      if s='' then s := ConstVal('SNone');
+      ws := PPExifTag(tvMain.GetNodeData(n))^^.wsDesc;
+      if ws='' then ws := ConstVal('SNone');
     end;
-    lDesc.Caption := s;
+    lDesc.Caption := ws;
   end;
 
 end.

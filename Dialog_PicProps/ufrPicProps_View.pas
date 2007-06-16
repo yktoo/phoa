@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -125,10 +125,10 @@ type
   protected
     procedure DoCreate; override;
     procedure DoDestroy; override;
-    function  GetRegistrySection: String; override;
+    function  GetRegistrySection: WideString; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
   public
-    procedure Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams); override;
     procedure FileChanged(iIndex: Integer); override;
      // Props
      // -- Масштаб просматриваемого изображения
@@ -207,7 +207,7 @@ uses phUtils, Main, phSettings;
     end;
   end;
 
-  procedure TfrPicProps_View.Apply(var sOpParamName: String; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_View.Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams);
   var ChgList: IPhoaPicPropertyChangeList;
   begin
      // Если страница инициализирована, создаём операции применения преобразований
@@ -218,8 +218,8 @@ uses phUtils, Main, phSettings;
       if not (FNoFlipHorz or FNoFlipVert) then ChgList.Add(Byte(FTransform.Flips),    ppFlips);
        // Если есть изменения - возвращаем параметры подоперации
       if ChgList.Count>0 then begin
-        sOpParamName := 'EditViewOpParams';
-        OpParams     := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
+        wsOpParamName := 'EditViewOpParams';
+        OpParams      := NewPhoaOperationParams(['Pics', EditedPics, 'ChangeList', ChgList]);
       end;
     end;
   end;
@@ -323,7 +323,7 @@ uses phUtils, Main, phSettings;
     Handled := True;
   end;
 
-  function TfrPicProps_View.GetRegistrySection: String;
+  function TfrPicProps_View.GetRegistrySection: WideString;
   begin
     Result := SRegWizPage_PicProp_View;
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.67 2007-06-16 09:15:44 dale Exp $
+//  $Id: phObj.pas,v 1.68 2007-06-16 13:49:45 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,9 @@ unit phObj;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Masks, phPhoa, phIntf, phMutableIntf, phNativeIntf;
+  Windows, Messages, SysUtils, Classes, Graphics, Masks,
+  TntClasses,
+  phPhoa, phIntf, phMutableIntf, phNativeIntf;
 
 type
    // Phoa Exception  
@@ -86,9 +88,9 @@ type
      //     случае будет находиться в SysImageListHandle
     function  Add(const wsName, wsPath: WideString; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
      // Удаляет файл с заданными именем и путём, возвращает его прежний индекс или -1, если нет такого в списке
-    function  Remove(const sName, sPath: String): Integer;
+    function  Remove(const wsName, wsPath: WideString): Integer;
      // Возвращает индекс файла с заданными именем и путём, или -1, если нет такого в списке
-    function  IndexOf(const sName, sPath: String): Integer;
+    function  IndexOf(const wsName, wsPath: WideString): Integer;
      // Сортирует список файлов по заданному свойству
     procedure Sort(Prop: TFileListSortProperty; Direction: TPhoaSortDirection);
      // Оставляет в списке только отмеченные (bChecked) файлы
@@ -110,9 +112,9 @@ type
   private
     FNegative: Boolean;
   public
-    constructor Create(const sMask: String; bNegative: Boolean);
+    constructor Create(const wsMask: WideString; bNegative: Boolean);
      // Возвращает True, если имя файла [не]соответствует маске
-    function Matches(const sFilename: String): Boolean;
+    function  Matches(const wsFilename: WideString): Boolean;
   end;
 
    //===================================================================================================================
@@ -121,14 +123,16 @@ type
 
   TPhoaMasks = class(TObject)
   private
+     // Список масок
     FMasks: TList;
-    function GetEmpty: Boolean;
+     // Prop handlers
+    function  GetEmpty: Boolean;
   public
      // Принимает на вход список масок, разделённых символом ';'
-    constructor Create(const sMasks: String);
+    constructor Create(const wsMasks: WideString);
     destructor Destroy; override;
      // Возвращает True, если имя файла соответствует любой из масок
-    function Matches(const sFilename: String): Boolean;
+    function Matches(const wsFilename: WideString): Boolean;
      // Props
      // -- True, если нет реальных масок, и Matches вернёт True в любом случае
     property Empty: Boolean read GetEmpty;
@@ -161,7 +165,7 @@ type
   TPhoaCommandLine = class(TObject)
   private
      // Список ключей/значений (Strings[] - значения, Objects[] - ключи)
-    FKeyValues: TStringList;
+    FKeyValues: TTntStringList;
      // Prop storage
     FKeys: TCmdLineKeys;
      // Разбирает текущую командную строку
@@ -169,7 +173,7 @@ type
      // Возвращает индекс значения для ключа в FKeyValues или -1, если нет такого
     function  KeyValIndex(Key: TCmdLineKey): Integer;
      // Prop handlers
-    function  GetKeyValues(Key: TCmdLineKey): String;
+    function  GetKeyValues(Key: TCmdLineKey): WideString;
   public
     constructor Create;
     destructor Destroy; override;
@@ -177,7 +181,7 @@ type
      // -- Набор ключей, указанных в командной строке
     property Keys: TCmdLineKeys read FKeys;
      // -- Значения ключей, указанные в командной строке
-    property KeyValues[Key: TCmdLineKey]: String read GetKeyValues;
+    property KeyValues[Key: TCmdLineKey]: WideString read GetKeyValues;
   end;
 
    // Параметры ключей
@@ -185,16 +189,16 @@ const
    aCmdLineKeys: Array[TCmdLineKey] of
      record
        ValueMode: TCmdLineKeyValueMode; // Потребность ключа в значении
-       cChar:     Char;                 // Символ (имя) ключа
+       wcChar:    WideChar;             // Символ (имя) ключа
      end = (
-     (ValueMode: clkvmOptional; cChar: #0),   // clkOpenPhoa
-     (ValueMode: clkvmOptional; cChar: 'r'),  // clkFlatMode
-     (ValueMode: clkvmRequired; cChar: 'w'),  // clkSelectView
-     (ValueMode: clkvmRequired; cChar: 'g'),  // clkSelectGroup
-     (ValueMode: clkvmRequired; cChar: 'i'),  // clkSelectPicID
-     (ValueMode: clkvmNo;       cChar: 'v'),  // clkViewMode
-     (ValueMode: clkvmNo;       cChar: 's'),  // clkSlideShow
-     (ValueMode: clkvmOptional; cChar: 'f')); // clkFullScreen
+     (ValueMode: clkvmOptional; wcChar: #0),   // clkOpenPhoa
+     (ValueMode: clkvmOptional; wcChar: 'r'),  // clkFlatMode
+     (ValueMode: clkvmRequired; wcChar: 'w'),  // clkSelectView
+     (ValueMode: clkvmRequired; wcChar: 'g'),  // clkSelectGroup
+     (ValueMode: clkvmRequired; wcChar: 'i'),  // clkSelectPicID
+     (ValueMode: clkvmNo;       wcChar: 'v'),  // clkViewMode
+     (ValueMode: clkvmNo;       wcChar: 's'),  // clkSlideShow
+     (ValueMode: clkvmOptional; wcChar: 'f')); // clkFullScreen
 
 resourcestring
   SPhObjErrMsg_InvalidSortedPicListMethodCall = 'Cannot invoke %s on sorted IPhoaMutablePicList';
@@ -213,16 +217,19 @@ resourcestring
 
    // Запись/чтение из потока
   procedure StreamWriteByte(Stream: TStream; b: Byte);
-  procedure StreamWriteInt(Stream: TStream; i: Integer);
-  procedure StreamWriteDbl(Stream: TStream; const d: Double);
-  procedure StreamWriteStr(Stream: TStream; const s: String);
+  procedure StreamWriteInt (Stream: TStream; i: Integer);
+  procedure StreamWriteDbl (Stream: TStream; const d: Double);
+  procedure StreamWriteStr (Stream: TStream; const s: String);
+  procedure StreamWriteStrW(Stream: TStream; const ws: WideString);
+
   function  StreamReadByte(Stream: TStream): Byte;
-  function  StreamReadInt(Stream: TStream): Integer;
-  function  StreamReadDbl(Stream: TStream): Double;
-  function  StreamReadStr(Stream: TStream): String;
+  function  StreamReadInt (Stream: TStream): Integer;
+  function  StreamReadDbl (Stream: TStream): Double;
+  function  StreamReadStr (Stream: TStream): String;
+  function  StreamReadStrW(Stream: TStream): WideString;
 
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
-  procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
+  procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TWideStrings);
 
    // Создание новых экземпляров интерфейсов
   function  NewPhotoAlbumPic: IPhotoAlbumPic;
@@ -287,6 +294,14 @@ uses
     if (i>0) and (Stream.Write(s[1], i)<>i) then PhoaWriteError;
   end;
 
+  procedure StreamWriteStrW(Stream: TStream; const ws: WideString);
+  var i: Integer;
+  begin
+    i := Length(ws);
+    StreamWriteInt(Stream, i);
+    if (i>0) and (Stream.Write(ws[1], i*2)<>i) then PhoaWriteError;
+  end;
+
   function StreamReadByte(Stream: TStream): Byte;
   begin
     if Stream.Read(Result, SizeOf(Result))<>SizeOf(Result) then PhoaReadError;
@@ -310,17 +325,25 @@ uses
     if (i>0) and (Stream.Read(Result[1], i)<>i) then PhoaReadError;
   end;
 
+  function StreamReadStrW(Stream: TStream): WideString;
+  var i: Integer;
+  begin
+    i := StreamReadInt(Stream);
+    SetLength(Result, i);
+    if (i>0) and (Stream.Read(Result[1], i*2)<>i) then PhoaReadError;
+  end;
+
    //===================================================================================================================
    // Misc routines
    //===================================================================================================================
 
-  procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TStrings);
+  procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TWideStrings);
   var i: Integer;
 
-    procedure AddStr(SL: TStrings; const s: String);
+    procedure AddStr(SL: TWideStrings; const ws: WideString);
     begin
-      if s<>'' then
-        if SL.IndexOf(s)<0 then SL.Add(s);
+      if ws<>'' then
+        if SL.IndexOf(ws)<0 then SL.Add(ws);
     end;
 
   begin
@@ -356,51 +379,42 @@ type
   TPhotoAlbumPic = class(TInterfacedObject, IPhoaPic, IPhoaMutablePic, IPhotoAlbumPic)
   private
      // Prop storage
-    FAuthor: String;
+    FAuthor: WideString;
     FDate: Integer;
     FTime: Integer;
-    FDescription: String;
-    FFileName: String;
+    FDescription: WideString;
+    FFileName: WideString;
     FFileSize: Integer;
-    FFilmNumber: String;
+    FFilmNumber: vString;
     FFlips: TPicFlips;
-    FFrameNumber: String;
+    FFrameNumber: WideString;
     FID: Integer;
     FImageFormat: TPhoaPixelFormat;
     FImageSize: TSize;
     FKeywords: IPhotoAlbumKeywordList;
-    FMedia: String;
-    FNotes: String;
-    FPlace: String;
+    FMedia: WideString;
+    FNotes: WideString;
+    FPlace: WideString;
     FRotation: TPicRotation;
-    FThumbnailData: String;
+    FThumbnailData: WideString;
     FThumbnailSize: TSize;
      // IPhoaPic
-    function  GetAuthor: String; stdcall;
-    function  GetAuthorW: WideString; stdcall;
+    function  GetAuthor: WideString; stdcall;
     function  GetDate: Integer; stdcall;
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
-    function  GetFileName: String; stdcall;
-    function  GetFileNameW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
+    function  GetFileName: WideString; stdcall;
     function  GetFileSize: Integer; stdcall;
-    function  GetFilmNumber: String; stdcall;
-    function  GetFilmNumberW: WideString; stdcall;
+    function  GetFilmNumber: WideString; stdcall;
     function  GetFlips: TPicFlips; stdcall;
-    function  GetFrameNumber: String; stdcall;
-    function  GetFrameNumberW: WideString; stdcall;
+    function  GetFrameNumber: WideString; stdcall;
     function  GetID: Integer; stdcall;
     function  GetImageFormat: TPhoaPixelFormat; stdcall;
     function  GetImageSize: TSize; stdcall;
     function  GetKeywords: IPhoaKeywordList; stdcall;
-    function  GetMedia: String; stdcall;
-    function  GetMediaW: WideString; stdcall;
-    function  GetNotes: String; stdcall;
-    function  GetNotesW: WideString; stdcall;
-    function  GetPlace: String; stdcall;
-    function  GetPlaceW: WideString; stdcall;
-    function  GetPropStrValues(PicProp: TPicProperty): String; stdcall;
-    function  GetPropStrValuesW(PicProp: TPicProperty): WideString; stdcall;
+    function  GetMedia: WideString; stdcall;
+    function  GetNotes: WideString; stdcall;
+    function  GetPlace: WideString; stdcall;
+    function  GetPropStrValues(PicProp: TPicProperty): WideString; stdcall;
     function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
     function  GetRawData(PProps: TPicProperties): String; stdcall;
     function  GetRotation: TPicRotation; stdcall;
@@ -413,8 +427,7 @@ type
     procedure CleanupProps(Props: TPicProperties); stdcall;
     procedure ReloadPicFileData(const AThumbnailSize: TSize; StretchFilter: TPhoaStretchFilter; AThumbnailQuality: Byte); stdcall;
     procedure SetDate(Value: Integer); stdcall;
-    procedure SetFileName(const Value: String); stdcall;
-    procedure SetFileNameW(const Value: WideString); stdcall;
+    procedure SetFileName(const Value: WideString); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
     procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
     procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
@@ -481,14 +494,9 @@ type
     FKeywords := NewPhotoAlbumKeywordList;
   end;
 
-  function TPhotoAlbumPic.GetAuthor: String;
+  function TPhotoAlbumPic.GetAuthor: WideString;
   begin
     Result := FAuthor;
-  end;
-
-  function TPhotoAlbumPic.GetAuthorW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FAuthor);
   end;
 
   function TPhotoAlbumPic.GetDate: Integer;
@@ -496,24 +504,14 @@ type
     Result := FDate;
   end;
 
-  function TPhotoAlbumPic.GetDescription: String;
+  function TPhotoAlbumPic.GetDescription: WideString;
   begin
     Result := FDescription;
   end;
 
-  function TPhotoAlbumPic.GetDescriptionW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FDescription);
-  end;
-
-  function TPhotoAlbumPic.GetFileName: String;
+  function TPhotoAlbumPic.GetFileName: WideString;
   begin
     Result := FFileName;
-  end;
-
-  function TPhotoAlbumPic.GetFileNameW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FFileName);
   end;
 
   function TPhotoAlbumPic.GetFileSize: Integer;
@@ -521,14 +519,9 @@ type
     Result := FFileSize;
   end;
 
-  function TPhotoAlbumPic.GetFilmNumber: String;
+  function TPhotoAlbumPic.GetFilmNumber: WideString;
   begin
     Result := FFilmNumber;
-  end;
-
-  function TPhotoAlbumPic.GetFilmNumberW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FFilmNumber);
   end;
 
   function TPhotoAlbumPic.GetFlips: TPicFlips;
@@ -536,14 +529,9 @@ type
     Result := FFlips;
   end;
 
-  function TPhotoAlbumPic.GetFrameNumber: String;
+  function TPhotoAlbumPic.GetFrameNumber: WideString;
   begin
     Result := FFrameNumber;
-  end;
-
-  function TPhotoAlbumPic.GetFrameNumberW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FFrameNumber);
   end;
 
   function TPhotoAlbumPic.GetID: Integer;
@@ -576,55 +564,40 @@ type
     Result := FKeywords;
   end;
 
-  function TPhotoAlbumPic.GetMedia: String;
+  function TPhotoAlbumPic.GetMedia: WideString;
   begin
     Result := FMedia;
   end;
 
-  function TPhotoAlbumPic.GetMediaW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FMedia);
-  end;
-
-  function TPhotoAlbumPic.GetNotes: String;
+  function TPhotoAlbumPic.GetNotes: WideString;
   begin
     Result := FNotes;
   end;
 
-  function TPhotoAlbumPic.GetNotesW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FNotes);
-  end;
-
-  function TPhotoAlbumPic.GetPlace: String;
+  function TPhotoAlbumPic.GetPlace: WideString;
   begin
     Result := FPlace;
   end;
 
-  function TPhotoAlbumPic.GetPlaceW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FPlace);
-  end;
-
-  function TPhotoAlbumPic.GetPropStrValues(PicProp: TPicProperty): String;
+  function TPhotoAlbumPic.GetPropStrValues(PicProp: TPicProperty): WideString;
   begin
     Result := '';
     case PicProp of
       ppID:            Result := IntToStr(FID);
-      ppFileName:      Result := ExtractFileName(FFileName);
+      ppFileName:      Result := WideExtractFileName(FFileName);
       ppFullFileName:  Result := FFileName;
-      ppFilePath:      Result := ExtractFileDir(FFileName);
+      ppFilePath:      Result := WideExtractFileDir(FFileName);
       ppFileSize:      Result := HumanReadableSize(FFileSize);
       ppFileSizeBytes: Result := IntToStr(FFileSize);
       ppPicWidth:      if FImageSize.cx>0 then Result := IntToStr(FImageSize.cx);
       ppPicHeight:     if FImageSize.cy>0 then Result := IntToStr(FImageSize.cy);
-      ppPicDims:       if (FImageSize.cx>0) and (FImageSize.cy>0) then Result := Format('%dx%d', [FImageSize.cx, FImageSize.cy]);
+      ppPicDims:       if (FImageSize.cx>0) and (FImageSize.cy>0) then Result := WideFormat('%dx%d', [FImageSize.cx, FImageSize.cy]);
       ppThumbWidth:    if FThumbnailSize.cx>0 then Result := IntToStr(FThumbnailSize.cx);
       ppThumbHeight:   if FThumbnailSize.cy>0 then Result := IntToStr(FThumbnailSize.cy);
-      ppThumbDims:     if (FThumbnailSize.cx>0) and (FThumbnailSize.cy>0) then Result := Format('%dx%d', [FThumbnailSize.cx, FThumbnailSize.cy]);
+      ppThumbDims:     if (FThumbnailSize.cx>0) and (FThumbnailSize.cy>0) then Result := WideFormat('%dx%d', [FThumbnailSize.cx, FThumbnailSize.cy]);
       ppFormat:        Result := PixelFormatName(FImageFormat);
-      ppDate:          if FDate>0 then Result := DateToStr(PhoaDateToDate(FDate), AppFormatSettings);
-      ppTime:          if FTime>0 then Result := TimeToStr(PhoaTimeToTime(FTime), AppFormatSettings);
+      ppDate:          if FDate>0 then Result := DateToStr(PhoaDateToDate(FDate), AppFormatSettings); {???}
+      ppTime:          if FTime>0 then Result := TimeToStr(PhoaTimeToTime(FTime), AppFormatSettings); {???}
       ppPlace:         Result := FPlace;
       ppFilmNumber:    Result := FFilmNumber;
       ppFrameNumber:   Result := FFrameNumber;
@@ -638,13 +611,8 @@ type
     end;
   end;
 
-  function TPhotoAlbumPic.GetPropStrValuesW(PicProp: TPicProperty): WideString;
-  begin
-    Result := PhoaAnsiToUnicode(GetPropStrValues(PicProp));
-  end;
-
   function TPhotoAlbumPic.GetPropValues(PicProp: TPicProperty): Variant;
-  var sVal: String;
+  var wsVal: WideString;
   begin
     Result := Null;
     case PicProp of
@@ -662,8 +630,8 @@ type
       ppFlips:         Result := Byte(FFlips);
        // Все прочие свойства берём как строки, только вместо пустой строки возвращаем Null
       else begin
-        sVal := GetPropStrValues(PicProp);
-        if sVal<>'' then Result := sVal;
+        wsVal := GetPropStrValues(PicProp);
+        if wsVal<>'' then Result := wsVal;
       end;
     end;
   end;
@@ -729,14 +697,9 @@ type
     FDate := Value;
   end;
 
-  procedure TPhotoAlbumPic.SetFileName(const Value: String);
+  procedure TPhotoAlbumPic.SetFileName(const Value: WideString);
   begin
     FFileName := Value;
-  end;
-
-  procedure TPhotoAlbumPic.SetFileNameW(const Value: WideString);
-  begin
-    FFileName := PhoaUnicodeToAnsi(Value);
   end;
 
   procedure TPhotoAlbumPic.SetFlips(Value: TPicFlips);
@@ -807,9 +770,9 @@ type
     Datatype: TPhChunkDatatype;
     vValue: Variant;
 
-    function XFilename(const s: String): String;
+    function XFilename(const ws: WideString): WideString;
     begin
-      if bExpandRelative then Result := ExpandRelativePath(Streamer.BasePath, s) else Result := s;
+      if bExpandRelative then Result := WideExpandRelativePath(Streamer.BasePath, ws) else Result := ws;
     end;
 
   begin
@@ -867,9 +830,9 @@ type
 
   procedure TPhotoAlbumPic.StreamerSave(Streamer: TPhoaStreamer; bExtractRelative: Boolean; PProps: TPicProperties);
 
-    function XFilename: String;
+    function XFilename: WideString;
     begin
-      if bExtractRelative then Result := ExtractRelativePath(Streamer.BasePath, FFileName) else Result := FFileName;
+      if bExtractRelative then Result := WideExtractRelativePath(Streamer.BasePath, FFileName) else Result := FFileName;
     end;
 
   begin
@@ -929,19 +892,16 @@ type
     function  FindID(iID: Integer; var Index: Integer): Boolean; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaPic; stdcall;
-    function  GetItemsByFileName(const sFileName: String): IPhoaPic; stdcall;
-    function  GetItemsByFileNameW(const sFileName: WideString): IPhoaPic; stdcall;
+    function  GetItemsByFileName(const wsFileName: WideString): IPhoaPic; stdcall;
     function  GetItemsByID(iID: Integer): IPhoaPic; stdcall;
     function  GetMaxPicID: Integer; stdcall;
-    function  IndexOfFileName(const sFileName: String): Integer; stdcall;
-    function  IndexOfFileNameW(const sFileName: WideString): Integer; stdcall;
+    function  IndexOfFileName(const wsFileName: WideString): Integer; stdcall;
     function  IndexOfID(iID: Integer): Integer; stdcall;
      // IPhoaMutablePicList
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean): Integer; overload; stdcall;
     function  Add(Pic: IPhoaPic; bSkipDuplicates: Boolean; out bAdded: Boolean): Integer; overload; stdcall;
     function  Add(PicList: IPhoaPicList; bSkipDuplicates: Boolean): Integer; overload; stdcall;
-    function  GetItemsByFileNameM(const sFileName: String): IPhoaMutablePic; stdcall;
-    function  GetItemsByFileNameMW(const sFileName: WideString): IPhoaMutablePic; stdcall;
+    function  GetItemsByFileNameM(const wsFileName: WideString): IPhoaMutablePic; stdcall;
     function  GetItemsByIDM(iID: Integer): IPhoaMutablePic; stdcall;
     function  GetItemsM(Index: Integer): IPhoaMutablePic; stdcall;
     function  GetSorted: Boolean; stdcall;
@@ -958,7 +918,7 @@ type
     procedure StreamerSave(Streamer: TPhoaStreamer);
     procedure DuplicatePics(PicList: IPhoaPicList);
     function  GetItemsByIDX(iID: Integer): IPhotoAlbumPic;
-    function  GetItemsByFileNameX(const sFileName: String): IPhotoAlbumPic;
+    function  GetItemsByFileNameX(const wsFileName: WideString): IPhotoAlbumPic;
     function  GetItemsX(Index: Integer): IPhotoAlbumPic;
   public
     constructor Create(bSorted: Boolean);
@@ -1125,31 +1085,21 @@ type
     Result := IPhoaPic(FList[Index]);
   end;
 
-  function TPhotoAlbumPicList.GetItemsByFileName(const sFileName: String): IPhoaPic;
+  function TPhotoAlbumPicList.GetItemsByFileName(const wsFileName: WideString): IPhoaPic;
   var idx: Integer;
   begin
-    idx := IndexOfFileName(sFileName);
+    idx := IndexOfFileName(wsFileName);
     if idx<0 then Result := nil else Result := GetItems(idx);
   end;
 
-  function TPhotoAlbumPicList.GetItemsByFileNameM(const sFileName: String): IPhoaMutablePic;
+  function TPhotoAlbumPicList.GetItemsByFileNameM(const wsFileName: WideString): IPhoaMutablePic;
   begin
-    Result := GetItemsByFileName(sFileName) as IPhoaMutablePic;
+    Result := GetItemsByFileName(wsFileName) as IPhoaMutablePic;
   end;
 
-  function TPhotoAlbumPicList.GetItemsByFileNameMW(const sFileName: WideString): IPhoaMutablePic;
+  function TPhotoAlbumPicList.GetItemsByFileNameX(const wsFileName: WideString): IPhotoAlbumPic;
   begin
-    Result := GetItemsByFileNameM(PhoaUnicodeToAnsi(sFileName));
-  end;
-
-  function TPhotoAlbumPicList.GetItemsByFileNameW(const sFileName: WideString): IPhoaPic;
-  begin
-    Result := GetItemsByFileName(PhoaUnicodeToAnsi(sFileName));
-  end;
-
-  function TPhotoAlbumPicList.GetItemsByFileNameX(const sFileName: String): IPhotoAlbumPic;
-  begin
-    Result := GetItemsByFileName(sFileName) as IPhotoAlbumPic;
+    Result := GetItemsByFileName(wsFileName) as IPhotoAlbumPic;
   end;
 
   function TPhotoAlbumPicList.GetItemsByID(iID: Integer): IPhoaPic;
@@ -1189,10 +1139,10 @@ type
     Result := FSorted;
   end;
 
-  function TPhotoAlbumPicList.IndexOfFileName(const sFileName: String): Integer;
+  function TPhotoAlbumPicList.IndexOfFileName(const wsFileName: WideString): Integer;
   begin
     for Result := 0 to FList.Count-1 do
-      if ReverseCompare(GetItems(Result).FileName, sFileName) then Exit;
+      if ReverseCompare(GetItems(Result).FileName, wsFileName) then Exit;
     Result := -1;
   end;
 
@@ -1296,60 +1246,53 @@ type
     procedure CreateList;
      // Ищет ключевое слово и возвращает True и его индекс в Index, если нашла; иначе возвращает False, а в Index -
      //   место вставки нового слова
-    function  FindKeyword(const sKeyword: String; var Index: Integer): Boolean;
+    function  FindKeyword(const wsKeyword: WideString; var Index: Integer): Boolean;
      // Возвращает записи, разделённые запятыми: при bSelectedOnly=False все, при bSelectedOnly=True - только те, у
      //   которых State=pksOn. Ключевые слова, содержащие запятые и пробелы, заключаются в двойные кавычки
-    function  InternalGetCommaText(bSelectedOnly: Boolean): String;
+    function  InternalGetCommaText(bSelectedOnly: Boolean): WideString;
      // IPhoaKeywordList
-    function  GetCommaText: String; stdcall;
-    function  GetCommaTextW: WideString; stdcall;
+    function  GetCommaText: WideString; stdcall;
     function  GetCount: Integer; stdcall;
-    function  GetItems(Index: Integer): String; stdcall;
-    function  GetItemsW(Index: Integer): WideString; stdcall;
-    function  IndexOf(const sKeyword: String): Integer; stdcall;
-    function  IndexOfW(const sKeyword: WideString): Integer; stdcall;
+    function  GetItems(Index: Integer): WideString; stdcall;
+    function  IndexOf(const wsKeyword: WideString): Integer; stdcall;
      // IPhoaMutableKeywordList
-    function  Add(const sKeyword: String): Integer; stdcall;
-    function  AddW(const sKeyword: WideString): Integer; stdcall;
-    function  Remove(const sKeyword: String): Integer; stdcall;
-    function  RemoveW(const sKeyword: WideString): Integer; stdcall;
-    function  Rename(Index: Integer; const sNewKeyword: String): Integer; stdcall;
-    function  RenameW(Index: Integer; const sNewKeyword: WideString): Integer; stdcall;
+    function  Add(const wsKeyword: WideString): Integer; stdcall;
+    function  Remove(const wsKeyword: WideString): Integer; stdcall;
+    function  Rename(Index: Integer; const wsNewKeyword: WideString): Integer; stdcall;
     procedure Assign(Source: IPhoaKeywordList); stdcall;
     procedure Clear; stdcall;
     procedure Delete(Index: Integer); stdcall;
-    procedure SetCommaText(const Value: String); stdcall;
-    procedure SetCommaTextW(const Value: WideString); stdcall;
+    procedure SetCommaText(const Value: WideString); stdcall;
      // IPhotoAlbumKeywordList
-    function  AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+    function  AddEx(const wsKeyword: WideString; bSelected: Boolean): Integer;
     function  GetKWData(Index: Integer): PPhoaKeywordData;
-    function  GetSelectedKeywords: String;
+    function  GetSelectedKeywords: WideString;
     function  InsertNew: Integer;
     procedure PopulateFromPicList(Pics: IPhoaPicList; IsPicSelCallback: TPhoaKeywordIsPicSelectedProc; iTotalSelCount: Integer);
-    procedure SetSelectedKeywords(const Value: String);
+    procedure SetSelectedKeywords(const Value: WideString);
   public
     destructor Destroy; override;
   end;
 
-  function TPhotoAlbumKeywordList.Add(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.Add(const wsKeyword: WideString): Integer;
   begin
-    Result := AddEx(sKeyword, False);
+    Result := AddEx(wsKeyword, False);
   end;
 
-  function TPhotoAlbumKeywordList.AddEx(const sKeyword: String; bSelected: Boolean): Integer;
+  function TPhotoAlbumKeywordList.AddEx(const wsKeyword: WideString; bSelected: Boolean): Integer;
   var p: PPhoaKeywordData;
   begin
      // Создаём список, если он ещё не создан
     CreateList;
      // Ищем такое слово. Если нашли - приращиваем счётчик
-    if FindKeyword(sKeyword, Result) then begin
+    if FindKeyword(wsKeyword, Result) then begin
       p := GetKWData(Result);
       Inc(p.iCount);
      // Иначе вставляем
     end else begin
       New(p);
       FList.Insert(Result, p);
-      p.sKeyword  := sKeyword;
+      p.wsKeyword := wsKeyword;
       p.Change    := pkcNone;
       p.State     := pksOff;
       p.iCount    := 1;
@@ -1413,7 +1356,7 @@ type
     inherited Destroy;
   end;
 
-  function TPhotoAlbumKeywordList.FindKeyword(const sKeyword: String; var Index: Integer): Boolean;
+  function TPhotoAlbumKeywordList.FindKeyword(const wsKeyword: WideString; var Index: Integer): Boolean;
   var i1, i2, i, iCompare: Integer;
   begin
     Result := False;
@@ -1425,7 +1368,7 @@ type
       i2 := FList.Count-1;
       while i1<=i2 do begin
         i := (i1+i2) shr 1;
-        iCompare := AnsiCompareText(GetKWData(i).sKeyword, sKeyword);
+        iCompare := WideCompareText(GetKWData(i).wsKeyword, wsKeyword);
         if iCompare<0 then
           i1 := i+1
         else begin
@@ -1440,14 +1383,9 @@ type
     end;
   end;
 
-  function TPhotoAlbumKeywordList.GetCommaText: String;
+  function TPhotoAlbumKeywordList.GetCommaText: WideString;
   begin
     Result := InternalGetCommaText(False);
-  end;
-
-  function TPhotoAlbumKeywordList.GetCommaTextW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(GetCommaText);
   end;
 
   function TPhotoAlbumKeywordList.GetCount: Integer;
@@ -1455,14 +1393,9 @@ type
     if FList=nil then Result := 0 else Result := FList.Count;
   end;
 
-  function TPhotoAlbumKeywordList.GetItems(Index: Integer): String;
+  function TPhotoAlbumKeywordList.GetItems(Index: Integer): WideString;
   begin
-    Result := GetKWData(Index).sKeyword;
-  end;
-
-  function TPhotoAlbumKeywordList.GetItemsW(Index: Integer): WideString;
-  begin
-    Result := PhoaAnsiToUnicode(GetItems(Index));
+    Result := GetKWData(Index).wsKeyword;
   end;
 
   function TPhotoAlbumKeywordList.GetKWData(Index: Integer): PPhoaKeywordData;
@@ -1470,46 +1403,41 @@ type
     Result := FList[Index];
   end;
 
-  function TPhotoAlbumKeywordList.GetSelectedKeywords: String;
+  function TPhotoAlbumKeywordList.GetSelectedKeywords: WideString;
   begin
     Result := InternalGetCommaText(True);
   end;
 
-  function TPhotoAlbumKeywordList.IndexOf(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.IndexOf(const wsKeyword: WideString): Integer;
   begin
-    if not FindKeyword(sKeyword, Result) then Result := -1;
-  end;
-
-  function TPhotoAlbumKeywordList.IndexOfW(const sKeyword: WideString): Integer;
-  begin
-    Result := IndexOf(PhoaUnicodeToAnsi(sKeyword));
+    if not FindKeyword(wsKeyword, Result) then Result := -1;
   end;
 
   function TPhotoAlbumKeywordList.InsertNew: Integer;
   var
-    sKWBase, sNewKeyword: String;
+    wsKWBase, wsNewKeyword: WideString;
     iAttempt: Integer;
     p: PPhoaKeywordData;
   begin
      // Ищем уникальное ключевое слово вида "Новое ключевое слово (n)"
-    sKWBase := ConstVal('SDefaultNewKeyword');
+    wsKWBase := ConstVal('SDefaultNewKeyword');
     iAttempt := 0;
     repeat
       Inc(iAttempt);
-      sNewKeyword := Format(iif(iAttempt<2, '%s', '%s (%d)'), [sKWBase, iAttempt]);
-    until not FindKeyword(sNewKeyword, Result);
+      wsNewKeyword := WideFormat(iif(iAttempt<2, '%s', '%s (%d)'), [wsKWBase, iAttempt]);
+    until not FindKeyword(wsNewKeyword, Result);
      // Добавляем
     CreateList; 
     New(p);
     FList.Insert(Result, p);
-    p.sKeyword  := sNewKeyword;
+    p.wsKeyword := wsNewKeyword;
     p.Change    := pkcAdd;
     p.State     := pksOn;
     p.iCount    := 0;
     p.iSelCount := 0;
   end;
 
-  function TPhotoAlbumKeywordList.InternalGetCommaText(bSelectedOnly: Boolean): String;
+  function TPhotoAlbumKeywordList.InternalGetCommaText(bSelectedOnly: Boolean): WideString;
   var
     i: Integer;
     p: PPhoaKeywordData;
@@ -1519,10 +1447,10 @@ type
       for i := 0 to FList.Count-1 do begin
         p := FList[i];
         if not bSelectedOnly or (p.State=pksOn) then
-          if LastDelimiter(' ,"', p.sKeyword)>0 then
-            AccumulateStr(Result, ',', AnsiQuotedStr(p.sKeyword, '"'))
+          if WideLastDelimiter(' ,"', p.wsKeyword)>0 then
+            AccumulateStr(Result, ',', WideQuotedStr(p.wsKeyword, '"'))
           else
-            AccumulateStr(Result, ',', p.sKeyword);
+            AccumulateStr(Result, ',', p.wsKeyword);
       end;
   end;
 
@@ -1551,27 +1479,22 @@ type
           else                                  State := pksGrayed;
   end;
 
-  function TPhotoAlbumKeywordList.Remove(const sKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.Remove(const wsKeyword: WideString): Integer;
   begin
-    if FindKeyword(sKeyword, Result) then Delete(Result) else Result := -1;
+    if FindKeyword(wsKeyword, Result) then Delete(Result) else Result := -1;
   end;
 
-  function TPhotoAlbumKeywordList.RemoveW(const sKeyword: WideString): Integer;
-  begin
-    Result := Remove(PhoaUnicodeToAnsi(sKeyword));
-  end;
-
-  function TPhotoAlbumKeywordList.Rename(Index: Integer; const sNewKeyword: String): Integer;
+  function TPhotoAlbumKeywordList.Rename(Index: Integer; const wsNewKeyword: WideString): Integer;
   var p: PPhoaKeywordData;
   begin
      // Если вообще совпадает, делать нечего
     Result := Index;
     p := GetKWData(Index);
-    if p.sKeyword=sNewKeyword then Exit;
+    if p.wsKeyword=wsNewKeyword then Exit;
      // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
-    if not AnsiSameText(p.sKeyword, sNewKeyword) then begin
+    if not WideSameText(p.wsKeyword, wsNewKeyword) then begin
        // Если уже есть такое в списке, вызываем Exception
-      if FindKeyword(sNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'));
+      if FindKeyword(wsNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'));
        // Иначе сдвигаем на новое место
       if Index<Result then Dec(Result); 
       FList.Move(Index, Result); 
@@ -1580,33 +1503,28 @@ type
     case p.Change of
        // Первое изменение - сохраняем старое значение и устанавливаем изменение kcReplace
       pkcNone: begin
-        p.sOldKeyword := p.sKeyword;
-        p.Change      := pkcReplace;
+        p.wsOldKeyword := p.wsKeyword;
+        p.Change       := pkcReplace;
       end;
        // Не первое изменение - если возвращаем старое значение, снимаем изменение
       pkcReplace:
-        if p.sOldKeyword=sNewKeyword then begin
-          p.Change      := pkcNone;
-          p.sOldKeyword := '';
+        if p.wsOldKeyword=wsNewKeyword then begin
+          p.Change       := pkcNone;
+          p.wsOldKeyword := '';
         end;
     end;
      // Записываем новое слово
-    p.sKeyword := sNewKeyword;
+    p.wsKeyword := wsNewKeyword;
   end;
 
-  function TPhotoAlbumKeywordList.RenameW(Index: Integer; const sNewKeyword: WideString): Integer;
-  begin
-    Result := Rename(Index, PhoaUnicodeToAnsi(sNewKeyword));
-  end;
-
-  procedure TPhotoAlbumKeywordList.SetCommaText(const Value: String);
+  procedure TPhotoAlbumKeywordList.SetCommaText(const Value: WideString);
   var
-    SL: TStringList;
+    SL: TTntStringList;
     i: Integer;
   begin
     Clear;
     if Value<>'' then begin
-      SL := TStringList.Create;
+      SL := TTntStringList.Create;
       try
         SL.CommaText := Value;
         for i := 0 to SL.Count-1 do Add(SL[i]);
@@ -1616,27 +1534,22 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumKeywordList.SetCommaTextW(const Value: WideString);
-  begin
-    SetCommaText(PhoaUnicodeToAnsi(Value));
-  end;
-
-  procedure TPhotoAlbumKeywordList.SetSelectedKeywords(const Value: String);
+  procedure TPhotoAlbumKeywordList.SetSelectedKeywords(const Value: WideString);
   var
-    SL: TStringList;
+    SL: TTntStringList;
     i: Integer;
   begin
     if FList<>nil then begin
-      SL := TStringList.Create;
+      SL := TTntStringList.Create;
       try
          // Переписываем слова в виде StringList
-        SL.Sorted := True;
+        SL.Sorted     := True;
         SL.Duplicates := dupIgnore;
-        SL.CommaText := Value;
+        SL.CommaText  := Value;
          // Проверяем наличие слов
         for i := 0 to FList.Count-1 do
           with GetKWData(i)^ do
-            if SL.IndexOf(sKeyword)<0 then State := pksOff else State := pksOn;
+            if SL.IndexOf(wsKeyword)<0 then State := pksOff else State := pksOn;
       finally
         SL.Free;
       end;
@@ -1654,56 +1567,48 @@ type
      // ID изображений в группе для загрузки из Streamer-a (существует только между вызовами StreamerLoad и Loaded)
     FStreamerPicIDs: TIntegerList;
      // Prop storage
-    FDescription: String;
+    FDescription: WideString;
     FExpanded: Boolean;
     FGroups: IPhotoAlbumPicGroupList;
     FIconData: String;
     FID: Integer;
     FPics: IPhotoAlbumPicList;
-    FText: String;
+    FText: WideString;
      // IPhoaPicGroup
     function  IsPicLinked(iID: Integer; bRecursive: Boolean): Boolean; stdcall;
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
     function  GetExpanded: Boolean; stdcall;
     function  GetMaxGroupID: Integer; stdcall;
     function  GetGroups: IPhoaPicGroupList; stdcall;
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
-    function  GetGroupByPath(const sPath: String): IPhoaPicGroup; stdcall;
-    function  GetGroupByPathW(const sPath: WideString): IPhoaPicGroup; stdcall;
+    function  GetGroupByPath(const wsPath: WideString): IPhoaPicGroup; stdcall;
     function  GetIconData: String; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
     function  GetOwner: IPhoaPicGroup; stdcall;
-    function  GetPath(const sRootName: String): String; stdcall;
-    function  GetPathW(const sRootName: WideString): WideString; stdcall;
+    function  GetPath(const wsRootName: WideString): WideString; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
-    function  GetProps(GroupProp: TGroupProperty): String; stdcall;
-    function  GetPropsW(GroupProp: TGroupProperty): WideString; stdcall;
+    function  GetProps(GroupProp: TGroupProperty): WideString; stdcall;
     function  GetRoot: IPhoaPicGroup; stdcall;
-    function  GetText: String; stdcall;
-    function  GetTextW: WideString; stdcall;
+    function  GetText: WideString; stdcall;
      // IPhoaMutablePicGroup
     function  GetGroupByIDM(iID: Integer): IPhoaMutablePicGroup; stdcall;
-    function  GetGroupByPathM(const sPath: String): IPhoaMutablePicGroup; stdcall;
-    function  GetGroupByPathMW(const sPath: WideString): IPhoaMutablePicGroup; stdcall;
+    function  GetGroupByPathM(const wsPath: WideString): IPhoaMutablePicGroup; stdcall;
     function  GetGroupsM: IPhoaMutablePicGroupList; stdcall;
     function  GetOwnerM: IPhoaMutablePicGroup; stdcall;
     function  GetPicsM: IPhoaMutablePicList; stdcall;
     function  GetRootM: IPhoaMutablePicGroup; stdcall;
     procedure Assign(Source: IPhoaPicGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean); stdcall;
-    procedure SetDescription(const Value: String); stdcall;
-    procedure SetDescriptionW(const Value: WideString); stdcall;
+    procedure SetDescription(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
     procedure SetIconData(const Value: String); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
-    procedure SetText(const Value: String); stdcall;
-    procedure SetTextW(const Value: WideString); stdcall;
+    procedure SetText(const Value: WideString); stdcall;
      // IPhotoAlbumPicGroup
     function  GetGroupByIDX(iID: Integer): IPhotoAlbumPicGroup;
-    function  GetGroupByPathX(const sPath: String): IPhotoAlbumPicGroup;
+    function  GetGroupByPathX(const sPath: WideString): IPhotoAlbumPicGroup;
     function  GetGroupsX: IPhotoAlbumPicGroupList;
     function  GetOwnerX: IPhotoAlbumPicGroup;
     function  GetPicsX: IPhotoAlbumPicList;
@@ -1760,14 +1665,9 @@ type
     InternalFixupIDs(iMaxID);
   end;
 
-  function TPhotoAlbumPicGroup.GetDescription: String;
+  function TPhotoAlbumPicGroup.GetDescription: WideString;
   begin
     Result := FDescription;
-  end;
-
-  function TPhotoAlbumPicGroup.GetDescriptionW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FDescription);
   end;
 
   function TPhotoAlbumPicGroup.GetExpanded: Boolean;
@@ -1800,50 +1700,40 @@ type
     Result := GetGroupByID(iID) as IPhotoAlbumPicGroup;
   end;
 
-  function TPhotoAlbumPicGroup.GetGroupByPath(const sPath: String): IPhoaPicGroup;
+  function TPhotoAlbumPicGroup.GetGroupByPath(const wsPath: WideString): IPhoaPicGroup;
   var
-    s, sFirst: String;
+    ws, wsFirst: WideString;
     i: Integer;
     g: IPhoaPicGroup;
   begin
     Result := nil;
-    s := sPath;
-    if s<>'' then begin
+    ws := wsPath;
+    if ws<>'' then begin
        // Удаляем символ '/' в начале, если он есть
-      if s[1]='/' then Delete(s, 1, 1);
+      if ws[1]='/' then Delete(ws, 1, 1);
        // Выделяем первую часть пути
-      sFirst := ExtractFirstWord(s, '/');
+      wsFirst := ExtractFirstWord(ws, '/');
        // Ищем ребёнка с именем, совпадающим с первой частью пути
       for i := 0 to FGroups.Count-1 do begin
         g := FGroups[i];
          // Нашли
-        if AnsiSameText(g.Text, sFirst) then begin
+        if WideSameText(g.Text, wsFirst) then begin
            // Если путь кончился, его мы и искали. Иначе ищем по остатку пути среди детей ребёнка
-          if s='' then Result := g else Result := g.GroupByPath[s];
+          if ws='' then Result := g else Result := g.GroupByPath[ws];
           Break; 
         end;
       end;
     end;
   end;
 
-  function TPhotoAlbumPicGroup.GetGroupByPathM(const sPath: String): IPhoaMutablePicGroup;
+  function TPhotoAlbumPicGroup.GetGroupByPathM(const wsPath: WideString): IPhoaMutablePicGroup;
   begin
-    Result := GetGroupByPath(sPath) as IPhoaMutablePicGroup;
+    Result := GetGroupByPath(wsPath) as IPhoaMutablePicGroup;
   end;
 
-  function TPhotoAlbumPicGroup.GetGroupByPathMW(const sPath: WideString): IPhoaMutablePicGroup;
+  function TPhotoAlbumPicGroup.GetGroupByPathX(const wsPath: WideString): IPhotoAlbumPicGroup;
   begin
-    Result := GetGroupByPathM(PhoaUnicodeToAnsi(sPath));
-  end;
-
-  function TPhotoAlbumPicGroup.GetGroupByPathW(const sPath: WideString): IPhoaPicGroup;
-  begin
-    Result := GetGroupByPath(PhoaUnicodeToAnsi(sPath));
-  end;
-
-  function TPhotoAlbumPicGroup.GetGroupByPathX(const sPath: String): IPhotoAlbumPicGroup;
-  begin
-    Result := GetGroupByPath(sPath) as IPhotoAlbumPicGroup;
+    Result := GetGroupByPath(wsPath) as IPhotoAlbumPicGroup;
   end;
 
   function TPhotoAlbumPicGroup.GetGroups: IPhoaPicGroupList;
@@ -1913,14 +1803,9 @@ type
     Result := GetOwner as IPhotoAlbumPicGroup;
   end;
 
-  function TPhotoAlbumPicGroup.GetPath(const sRootName: String): String;
+  function TPhotoAlbumPicGroup.GetPath(const wsRootName: WideString): WideString;
   begin
-    if GetOwner=nil then Result := sRootName else Result := GetOwner.Path[sRootName]+'/'+FText;
-  end;
-
-  function TPhotoAlbumPicGroup.GetPathW(const sRootName: WideString): WideString;
-  begin
-    Result := PhoaAnsiToUnicode(GetPath(PhoaUnicodeToAnsi(sRootName)));
+    if GetOwner=nil then Result := wsRootName else Result := GetOwner.Path[wsRootName]+'/'+FText;
   end;
 
   function TPhotoAlbumPicGroup.GetPics: IPhoaPicList;
@@ -1938,9 +1823,9 @@ type
     Result := FPics;
   end;
 
-  function TPhotoAlbumPicGroup.GetProps(GroupProp: TGroupProperty): String;
+  function TPhotoAlbumPicGroup.GetProps(GroupProp: TGroupProperty): WideString;
 
-    function IntToStrPositive(i: Integer): String;
+    function IntToStrPositive(i: Integer): WideString;
     begin
       if i>0 then Result := IntToStr(i) else Result := '';
     end;
@@ -1976,14 +1861,9 @@ type
     Result := GetRoot as IPhotoAlbumPicGroup;
   end;
 
-  function TPhotoAlbumPicGroup.GetText: String;
+  function TPhotoAlbumPicGroup.GetText: WideString;
   begin
     Result := FText;
-  end;
-
-  function TPhotoAlbumPicGroup.GetTextW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FText);
   end;
 
   procedure TPhotoAlbumPicGroup.InternalFixupIDs(var iMaxGroupID: Integer);
@@ -2032,14 +1912,9 @@ type
     for i := 0 to FGroups.Count-1 do FGroups[i].Loaded(Project);
   end;
 
-  procedure TPhotoAlbumPicGroup.SetDescription(const Value: String);
+  procedure TPhotoAlbumPicGroup.SetDescription(const Value: WideString);
   begin
     FDescription := Value;
-  end;
-
-  procedure TPhotoAlbumPicGroup.SetDescriptionW(const Value: WideString);
-  begin
-    FDescription := PhoaUnicodeToAnsi(Value);
   end;
 
   procedure TPhotoAlbumPicGroup.SetExpanded(Value: Boolean);
@@ -2074,14 +1949,9 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumPicGroup.SetText(const Value: String);
+  procedure TPhotoAlbumPicGroup.SetText(const Value: WideString);
   begin
     FText := Value;
-  end;
-
-  procedure TPhotoAlbumPicGroup.SetTextW(const Value: WideString);
-  begin
-    FText := PhoaUnicodeToAnsi(Value);
   end;
 
   procedure TPhotoAlbumPicGroup.StreamerLoad(Streamer: TPhoaStreamer);
@@ -2458,8 +2328,8 @@ type
     procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
     function  GetItemsM(Index: Integer): IPhoaMutablePicSorting; stdcall;
      // IPhotoAlbumPicSortingList
-    procedure RegSave(const sRoot, sSection: String);
-    procedure RegLoad(const sRoot, sSection: String);
+    procedure RegSave(const wsRoot, wsSection: WideString);
+    procedure RegLoad(const wsRoot, wsSection: WideString);
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
     procedure RevertToDefaults;
@@ -2542,18 +2412,19 @@ type
     FList.Insert(iNewIndex, Item);
   end;
 
-  procedure TPhotoAlbumPicSortingList.RegLoad(const sRoot, sSection: String);
+  procedure TPhotoAlbumPicSortingList.RegLoad(const wsRoot, wsSection: WideString);
   var
-    sl: TStringList;
+    sl: TTntStringList;
     i: Integer;
-    s: String;
+    ws: WideString;
     Item: IPhotoAlbumPicSorting;
   begin
-    sl := TStringList.Create;
+     //!!! Not Unicode-enabled solution
+    sl := TTntStringList.Create;
     try
-      with TRegIniFile.Create(sRoot) do
+      with TRegIniFile.Create(wsRoot) do
         try
-          ReadSectionValues(sSection, sl);
+          ReadSectionValues(wsSection, sl);
         finally
           Free;
         end;
@@ -2561,10 +2432,10 @@ type
       if sl.Count>0 then begin
         Clear;
         for i := 0 to sl.Count-1 do begin
-          s := sl.ValueFromIndex[i];
+          ws := sl.ValueFromIndex[i];
           Item := NewPhotoAlbumPicSorting;
-          Item.Prop      := TPicProperty      (StrToIntDef(ExtractFirstWord(s, ','), 0));
-          Item.Direction := TPhoaSortDirection(StrToIntDef(ExtractFirstWord(s, ','), 0));
+          Item.Prop      := TPicProperty      (StrToIntDef(ExtractFirstWord(ws, ','), 0));
+          Item.Direction := TPhoaSortDirection(StrToIntDef(ExtractFirstWord(ws, ','), 0));
           Add(Item);
         end;
        // Иначе берём по умолчанию
@@ -2575,17 +2446,18 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumPicSortingList.RegSave(const sRoot, sSection: String);
+  procedure TPhotoAlbumPicSortingList.RegSave(const wsRoot, wsSection: WideString);
   var
     i: Integer;
     Item: IPhoaPicSorting;
   begin
-    with TRegIniFile.Create(sRoot) do
+     //!!! Not Unicode-enabled solution
+    with TRegIniFile.Create(wsRoot) do
       try
-        EraseSection(sSection);
+        EraseSection(wsSection);
         for i := 0 to GetCount-1 do begin
           Item := GetItems(i);
-          WriteString(sSection, 'Item'+IntToStr(i), Format('%d,%d', [Byte(Item.Prop), Byte(Item.Direction)]));
+          WriteString(wsSection, 'Item'+IntToStr(i), WideFormat('%d,%d', [Byte(Item.Prop), Byte(Item.Direction)]));
         end;
       finally
         Free;
@@ -2984,22 +2856,20 @@ type
   private
      // Prop storage
     FList: Pointer;
-    FFilterExpression: String;
+    FFilterExpression: WideString;
     FGroupings: IPhotoAlbumPicGroupingList;
-    FName: String;
+    FName: WideString;
     FRootGroup: IPhotoAlbumPicGroup;
     FSortings: IPhotoAlbumPicSortingList;
      // Создаёт иерархию групп по критериям представления
     procedure ProcessGroups;
      // IPhoaView
     procedure Invalidate; stdcall;
-    function  GetFilterExpression: String; stdcall;
-    function  GetFilterExpressionW: WideString; stdcall;
+    function  GetFilterExpression: WideString; stdcall;
     function  GetGroupings: IPhoaPicGroupingList; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetList: IPhoaViewList; stdcall;
-    function  GetName: String; stdcall;
-    function  GetNameW: WideString; stdcall;
+    function  GetName: WideString; stdcall;
     function  GetRootGroup: IPhoaPicGroup; stdcall;
     function  GetSortings: IPhoaPicSortingList; stdcall;
      // IPhoaMutableView
@@ -3007,10 +2877,8 @@ type
     function  GetListM: IPhoaMutableViewList; stdcall;
     function  GetSortingsM: IPhoaMutablePicSortingList; stdcall;
     procedure Assign(Source: IPhoaView); stdcall;
-    procedure SetFilterExpression(const Value: String); stdcall;
-    procedure SetFilterExpressionW(const Value: WideString); stdcall;
-    procedure SetName(const Value: String); stdcall;
-    procedure SetNameW(const Value: WideString); stdcall;
+    procedure SetFilterExpression(const Value: WideString); stdcall;
+    procedure SetName(const Value: WideString); stdcall;
      // IPhotoAlbumView
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
@@ -3047,14 +2915,9 @@ type
     FSortings  := NewPhotoAlbumPicSortingList;
   end;
 
-  function TPhotoAlbumView.GetFilterExpression: String;
+  function TPhotoAlbumView.GetFilterExpression: WideString;
   begin
     Result := FFilterExpression;
-  end;
-
-  function TPhotoAlbumView.GetFilterExpressionW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FFilterExpression);
   end;
 
   function TPhotoAlbumView.GetGroupings: IPhoaPicGroupingList;
@@ -3100,14 +2963,9 @@ type
     Result := GetList as IPhotoAlbumViewList;
   end;
 
-  function TPhotoAlbumView.GetName: String;
+  function TPhotoAlbumView.GetName: WideString;
   begin
     Result := FName;
-  end;
-
-  function TPhotoAlbumView.GetNameW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FName);
   end;
 
   function TPhotoAlbumView.GetRootGroup: IPhoaPicGroup;
@@ -3181,49 +3039,49 @@ type
      // Создаёт дерево по пути к изображению
     procedure ProcessFilePathTree(ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
-      sDir, sOneDir: String;
+      wsDir, wsOneDir: WideString;
       Group, GParent: IPhotoAlbumPicGroup;
     begin
-      sDir := ExtractFileDir(Pic.FileName);
+      wsDir := WideExtractFileDir(Pic.FileName);
        // Начинаем с корня
       Group := ParentGroup;
       repeat
          // Выделяем первый каталог из пути и удаляем его из sDir
-        sOneDir := ExtractFirstWord(sDir, '\');
+        wsOneDir := ExtractFirstWord(wsDir, '\');
          // Если корневой каталог, добавляем слэш в конце
-        if (Length(sOneDir)=2) and (sOneDir[2]=':') then sOneDir := sOneDir+'\';
+        if (Length(wsOneDir)=2) and (wsOneDir[2]=':') then wsOneDir := wsOneDir+'\';
          // Получаем последнего ребёнка текущей группы
         if Group.Groups.Count=0 then GParent := nil else GParent := Group.GroupsX[Group.Groups.Count-1];
          // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-        if (GParent=nil) or not AnsiSameText(GParent.Text, sOneDir) then begin
+        if (GParent=nil) or not WideSameText(GParent.Text, wsOneDir) then begin
           GParent := NewPhotoAlbumPicGroup(Group, 0);
-          GParent.Text     := sOneDir;
+          GParent.Text     := wsOneDir;
           GParent.Expanded := True;
         end;
         Group := GParent;
-      until sDir='';
+      until wsDir='';
       Group.PicsX.Add(Pic, True);
     end;
 
      // Создаёт дерево по компонентам даты (one level)
     procedure ProcessDateTree(Prop: TPicGroupByProperty; ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
-      sDatePart: String;
+      wsDatePart: WideString;
       Group: IPhotoAlbumPicGroup;
     begin
        // Находим наименование компонента даты
       case Prop of
-        gbpDateByYear:  sDatePart := 'yyyy';
-        gbpDateByMonth: sDatePart := 'mmmm';
-        gbpDateByDay:   sDatePart := 'd';
+        gbpDateByYear:  wsDatePart := 'yyyy';
+        gbpDateByMonth: wsDatePart := 'mmmm';
+        gbpDateByDay:   wsDatePart := 'd';
       end;
-      sDatePart := FormatDateTime(sDatePart, PhoaDateToDate(Pic.Date));
+      wsDatePart := FormatDateTime(wsDatePart, PhoaDateToDate(Pic.Date)); {???}
        // Получаем последнего ребёнка текущей группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      if (Group=nil) or not AnsiSameText(Group.Text, sDatePart) then begin
+      if (Group=nil) or not WideSameText(Group.Text, wsDatePart) then begin
         Group := NewPhotoAlbumPicGroup(ParentGroup, 0);
-        Group.Text     := sDatePart;
+        Group.Text     := wsDatePart;
         Group.Expanded := True;
       end;
       Group.PicsX.Add(Pic, True);
@@ -3232,17 +3090,17 @@ type
      // Создаёт дерево по компонентам времени (one level)
     procedure ProcessTimeTree(Prop: TPicGroupByProperty; ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
-      sTimePart: String;
+      wsTimePart: WideString;
       Group: IPhotoAlbumPicGroup;
     begin
        // Находим наименование компонента времени
-      sTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), PhoaTimeToTime(Pic.Time));
+      wsTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), PhoaTimeToTime(Pic.Time)); {???}
        // Получаем последнего ребёнка текущей группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      if (Group=nil) or not AnsiSameText(Group.Text, sTimePart) then begin
+      if (Group=nil) or not WideSameText(Group.Text, wsTimePart) then begin
         Group := NewPhotoAlbumPicGroup(ParentGroup, 0);
-        Group.Text     := sTimePart;
+        Group.Text     := wsTimePart;
         Group.Expanded := True;
       end;
       Group.PicsX.Add(Pic, True);
@@ -3252,15 +3110,15 @@ type
     procedure ProcessPlainPropTree(PicProp: TPicProperty; ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
       Group: IPhotoAlbumPicGroup;
-      sPropVal: String;
+      wsPropVal: WideString;
     begin
        // Получаем последнего ребёнка группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
-      sPropVal := Pic.PropStrValues[PicProp];
-      if (Group=nil) or not AnsiSameText(Group.Text, sPropVal) then begin
+      wsPropVal := Pic.PropStrValues[PicProp];
+      if (Group=nil) or not WideSameText(Group.Text, wsPropVal) then begin
         Group := NewPhotoAlbumPicGroup(ParentGroup, 0);
-        Group.Text := sPropVal;
+        Group.Text := wsPropVal;
       end;
        // Добавляем изображение к группе
       Group.PicsX.Add(Pic, True);
@@ -3272,7 +3130,7 @@ type
 
        // Ищет группу для ключевого слова, если нет такой - создаёт; при этом сохраняет сортированную последовательность
        //   групп
-      function GetKWGroup(const sKW: String): IPhotoAlbumPicGroup;
+      function GetKWGroup(const wsKW: WideString): IPhotoAlbumPicGroup;
       var
         i, idx: Integer;
         G: IPhotoAlbumPicGroup;
@@ -3284,7 +3142,7 @@ type
           G := ParentGroup.GroupsX[i];
            // Пропускаем группу "Без ключевых слов"
           if G<>GUnclassified then
-            case AnsiCompareText(G.Text, sKW) of
+            case WideCompareText(G.Text, wsKW) of
                // Ещё не достигли группы
               Low(Integer)..-1: ;
                // Нашли соответствие
@@ -3302,7 +3160,7 @@ type
          // Создаём группу
         if Result=nil then begin
           Result := NewPhotoAlbumPicGroup(ParentGroup, 0);
-          Result.Text := sKW;
+          Result.Text := wsKW;
            // Если нужно вставить перед найденной группой - передвигаем
           if idx>=0 then Result.Index := idx;
         end;
@@ -3393,17 +3251,12 @@ type
     FRootGroup.FixupIDs;
   end;
 
-  procedure TPhotoAlbumView.SetFilterExpression(const Value: String);
+  procedure TPhotoAlbumView.SetFilterExpression(const Value: WideString);
   begin
     FFilterExpression := Value;
   end;
 
-  procedure TPhotoAlbumView.SetFilterExpressionW(const Value: WideString);
-  begin
-    FFilterExpression := PhoaUnicodeToAnsi(Value);
-  end;
-
-  procedure TPhotoAlbumView.SetName(const Value: String);
+  procedure TPhotoAlbumView.SetName(const Value: WideString);
   var SelfRef: IPhotoAlbumView;
   begin
     if FName<>Value then begin
@@ -3413,11 +3266,6 @@ type
       GetListX.Delete(GetIndex);
       GetListX.Add(SelfRef);
     end;
-  end;
-
-  procedure TPhotoAlbumView.SetNameW(const Value: WideString);
-  begin
-    SetName(PhoaUnicodeToAnsi(Value));
   end;
 
   procedure TPhotoAlbumView.StreamerLoad(Streamer: TPhoaStreamer);
@@ -3487,12 +3335,11 @@ type
      // Prop storage
     FPics: IPhoaPicList;
      // IPhoaViewList
-    function  FindName(const sName: String; var Index: Integer): Boolean; stdcall;
+    function  FindName(const wsName: WideString; var Index: Integer): Boolean; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaView; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
-    function  IndexOfName(const sName: String): Integer; stdcall;
-    function  IndexOfNameW(const sName: WideString): Integer; stdcall;
+    function  IndexOfName(const wsName: WideString): Integer; stdcall;
     procedure Invalidate; stdcall;
      // IPhoaMutableViewList
     function  Add(Item: IPhoaView): Integer; stdcall;
@@ -3542,7 +3389,7 @@ type
     FList.Delete(Index);
   end;
 
-  function TPhotoAlbumViewList.FindName(const sName: String; var Index: Integer): Boolean;
+  function TPhotoAlbumViewList.FindName(const wsName: WideString; var Index: Integer): Boolean;
   var i1, i2, i, iCompare: Integer;
   begin
     Result := False;
@@ -3551,7 +3398,7 @@ type
     i2 := FList.Count-1;
     while i1<=i2 do begin
       i := (i1+i2) shr 1;
-      iCompare := AnsiCompareText(GetItems(i).Name, sName);
+      iCompare := WideCompareText(GetItems(i).Name, wsName);
       if iCompare<0 then
         i1 := i+1
       else begin
@@ -3600,14 +3447,9 @@ type
     Result := FPics as IPhotoAlbumPicList;
   end;
 
-  function TPhotoAlbumViewList.IndexOfName(const sName: String): Integer;
+  function TPhotoAlbumViewList.IndexOfName(const wsName: WideString): Integer;
   begin
-    if not FindName(sName, Result) then Result := -1;
-  end;
-
-  function TPhotoAlbumViewList.IndexOfNameW(const sName: WideString): Integer;
-  begin
-    Result := IndexOfName(PhoaUnicodeToAnsi(sName));
+    if not FindName(wsName, Result) then Result := -1;
   end;
 
   procedure TPhotoAlbumViewList.Invalidate;
@@ -3665,8 +3507,8 @@ type
   TPhotoAlbumProject = class(TInterfacedObject, IPhoaProject, IPhoaMutableProject, IPhotoAlbumProject)
   private
      // Prop storage
-    FDescription: String;
-    FFileName: String;
+    FDescription: WideString;
+    FFileName: WideString;
     FFileRevision: Integer;
     FPics: IPhotoAlbumPicList; 
     FRootGroup: IPhotoAlbumPicGroup;
@@ -3676,10 +3518,8 @@ type
     FViews: IPhotoAlbumViewList; 
      // IPhoaProject
     function  GetCurrentView: IPhoaView; stdcall;
-    function  GetDescription: String; stdcall;
-    function  GetDescriptionW: WideString; stdcall;
-    function  GetFileName: String; stdcall;
-    function  GetFileNameW: WideString; stdcall;
+    function  GetDescription: WideString; stdcall;
+    function  GetFileName: WideString; stdcall;
     function  GetFileRevision: Integer; stdcall;
     function  GetPics: IPhoaPicList; stdcall;
     function  GetRootGroup: IPhoaPicGroup; stdcall;
@@ -3695,15 +3535,11 @@ type
     function  GetViewRootGroupM: IPhoaMutablePicGroup; stdcall;
     function  GetViewsM: IPhoaMutableViewList; stdcall;
     procedure Assign(Source: IPhoaProject; bCopyRevision: Boolean); stdcall;
-    procedure LoadFromFile(const sFileName: String); stdcall;
-    procedure LoadFromFileW(const sFileName: WideString); stdcall;
+    procedure LoadFromFile(const wsFileName: WideString); stdcall;
     procedure New; stdcall;
-    procedure SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer); stdcall;
-    procedure SaveToFileW(const sFileName, sGenerator, sRemark: WideString; iRevisionNumber: Integer); stdcall;
-    procedure SetDescription(const Value: String); stdcall;
-    procedure SetDescriptionW(const Value: WideString); stdcall;
-    procedure SetFileName(const Value: String); stdcall;
-    procedure SetFileNameW(const Value: WideString); stdcall;
+    procedure SaveToFile(const wsFileName, wsGenerator, wsRemark: WideString; iRevisionNumber: Integer); stdcall;
+    procedure SetDescription(const Value: WideString); stdcall;
+    procedure SetFileName(const Value: WideString); stdcall;
     procedure SetThumbnailQuality(Value: Byte); stdcall;
     procedure SetThumbnailSize(const Value: TSize); stdcall;
     procedure SetViewIndex(Value: Integer); stdcall;
@@ -3714,7 +3550,7 @@ type
     function  GetViewRootGroupX: IPhotoAlbumPicGroup;
     function  GetViewsX: IPhotoAlbumViewList;
     procedure StreamerLoad(Streamer: TPhoaStreamer);
-    procedure StreamerSave(Streamer: TPhoaStreamer; const sGenerator, sRemark: String);
+    procedure StreamerSave(Streamer: TPhoaStreamer; const wsGenerator, wsRemark: WideString);
   public
     constructor Create;
   end;
@@ -3751,24 +3587,14 @@ type
     Result := GetCurrentView as IPhotoAlbumView;
   end;
 
-  function TPhotoAlbumProject.GetDescription: String;
+  function TPhotoAlbumProject.GetDescription: WideString;
   begin
     Result := FDescription;
   end;
 
-  function TPhotoAlbumProject.GetDescriptionW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FDescription);
-  end;
-
-  function TPhotoAlbumProject.GetFileName: String;
+  function TPhotoAlbumProject.GetFileName: WideString;
   begin
     Result := FFileName;
-  end;
-
-  function TPhotoAlbumProject.GetFileNameW: WideString;
-  begin
-    Result := PhoaAnsiToUnicode(FFileName);
   end;
 
   function TPhotoAlbumProject.GetFileRevision: Integer;
@@ -3855,18 +3681,18 @@ type
     Result := FViews;
   end;
 
-  procedure TPhotoAlbumProject.LoadFromFile(const sFileName: String);
+  procedure TPhotoAlbumProject.LoadFromFile(const wsFileName: WideString);
   var Streamer: TPhoaStreamer;
   begin
     New;
     try
        // Создаём FilerEx и загружаем с его помощью
-      Streamer := TPhoaFilerEx.Create(psmRead, sFileName);
+      Streamer := TPhoaFilerEx.Create(psmRead, wsFileName);
       try
         Streamer.ReadHeader;
         StreamerLoad(Streamer);
          // Применяем новое имя файла и ревизию
-        FFileName     := sFileName;
+        FFileName     := wsFileName;
         FFileRevision := Streamer.RevisionNumber;
       finally
         Streamer.Free;
@@ -3875,11 +3701,6 @@ type
       New;
       raise;
     end;
-  end;
-
-  procedure TPhotoAlbumProject.LoadFromFileW(const sFileName: WideString);
-  begin
-    LoadFromFile(PhoaUnicodeToAnsi(sFileName));
   end;
 
   procedure TPhotoAlbumProject.New;
@@ -3896,46 +3717,31 @@ type
     FViewIndex        := -1;
   end;
 
-  procedure TPhotoAlbumProject.SaveToFile(const sFileName, sGenerator, sRemark: String; iRevisionNumber: Integer);
+  procedure TPhotoAlbumProject.SaveToFile(const wsFileName, wsGenerator, wsRemark: WideString; iRevisionNumber: Integer);
   var Streamer: TPhoaStreamer;
   begin
      // Создаём FilerEx и сохраняем с его помощью
-    Streamer := TPhoaFilerEx.Create(psmWrite, sFileName);
+    Streamer := TPhoaFilerEx.Create(psmWrite, wsFileName);
     try
       Streamer.RevisionNumber := iRevisionNumber;
       Streamer.WriteHeader;
-      StreamerSave(Streamer, sGenerator, sRemark);
+      StreamerSave(Streamer, wsGenerator, wsRemark);
     finally
       Streamer.Free;
     end;
      // Применяем новое имя файла и ревизию
-    FFileName     := sFileName;
+    FFileName     := wsFileName;
     FFileRevision := iRevisionNumber;
   end;
 
-  procedure TPhotoAlbumProject.SaveToFileW(const sFileName, sGenerator, sRemark: WideString; iRevisionNumber: Integer);
-  begin
-    SaveToFile(PhoaUnicodeToAnsi(sFileName), PhoaUnicodeToAnsi(sGenerator), PhoaUnicodeToAnsi(sRemark), iRevisionNumber);
-  end;
-
-  procedure TPhotoAlbumProject.SetDescription(const Value: String);
+  procedure TPhotoAlbumProject.SetDescription(const Value: WideString);
   begin
     FDescription := Value;
   end;
 
-  procedure TPhotoAlbumProject.SetDescriptionW(const Value: WideString);
-  begin
-    FDescription := PhoaUnicodeToAnsi(Value);
-  end;
-
-  procedure TPhotoAlbumProject.SetFileName(const Value: String);
+  procedure TPhotoAlbumProject.SetFileName(const Value: WideString);
   begin
     FFileName := Value;
-  end;
-
-  procedure TPhotoAlbumProject.SetFileNameW(const Value: WideString);
-  begin
-    FFileName := PhoaUnicodeToAnsi(Value);
   end;
 
   procedure TPhotoAlbumProject.SetThumbnailQuality(Value: Byte);
@@ -4010,7 +3816,7 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumProject.StreamerSave(Streamer: TPhoaStreamer; const sGenerator, sRemark: String);
+  procedure TPhotoAlbumProject.StreamerSave(Streamer: TPhoaStreamer; const wsGenerator, wsRemark: WideString);
   begin
      // *** Old format
     if not Streamer.Chunked then begin
@@ -4031,9 +3837,9 @@ type
     end else begin
       with Streamer do begin
          // Write photo album 'metadata'
-        WriteChunkString(IPhChunk_Remark,           sRemark);
+        WriteChunkString(IPhChunk_Remark,           wsRemark);
          // Write photo album properties
-        WriteChunkString(IPhChunk_PhoaGenerator,    sGenerator);
+        WriteChunkString(IPhChunk_PhoaGenerator,    wsGenerator);
         WriteChunkInt   (IPhChunk_PhoaSavedDate,    DateToPhoaDate(Date));
         WriteChunkInt   (IPhChunk_PhoaSavedTime,    TimeToPhoaTime(Time));
         WriteChunkString(IPhChunk_PhoaDescription,  FDescription);
@@ -4136,9 +3942,9 @@ type
       if not GetItems(i)^.bChecked then Delete(i);
   end;
 
-  function TFileList.GetFiles(Index: Integer): String;
+  function TFileList.GetFiles(Index: Integer): WideString;
   begin
-    with GetItems(Index)^ do Result := sPath+sName;
+    with GetItems(Index)^ do Result := wsPath+wsName;
   end;
 
   function TFileList.GetItems(Index: Integer): PFileRec;
@@ -4146,12 +3952,12 @@ type
     Result := PFileRec(inherited Items[Index]);
   end;
 
-  function TFileList.IndexOf(const sName, sPath: String): Integer;
+  function TFileList.IndexOf(const wsName, wsPath: WideString): Integer;
   var p: PFileRec;
   begin
     for Result := 0 to Count-1 do begin
       p := GetItems(Result);
-      if AnsiSameText(p.sName, sName) and AnsiSameText(p.sPath, sPath) then Exit;
+      if WideSameText(p.wsName, wsName) and WideSameText(p.wsPath, wsPath) then Exit;
     end;
     Result := -1;
   end;
@@ -4164,8 +3970,8 @@ type
     function DoCompare(p1, p2: PFileRec; Prop: TFileListSortProperty; bFurtherSort: Boolean): Integer;
     begin
       case Prop of
-        flspName:       Result := AnsiCompareText(p1.sName, p2.sName);
-        flspPath:       Result := AnsiCompareText(p1.sPath, p2.sPath);
+        flspName:       Result := WideCompareText(p1.wsName, p2.wsName);
+        flspPath:       Result := WideCompareText(p1.wsPath, p2.wsPath);
         flspSize:       Result := Sign(p1.i64Size-p2.i64Size);
         else {flspDate} Result := Sign(p1.dModified-p2.dModified);
       end;
@@ -4199,9 +4005,9 @@ type
     if Action in [lnExtracted, lnDeleted] then Dispose(PFileRec(Ptr));
   end;
 
-  function TFileList.Remove(const sName, sPath: String): Integer;
+  function TFileList.Remove(const wsName, wsPath: WideString): Integer;
   begin
-    Result := IndexOf(sName, sPath);
+    Result := IndexOf(wsName, wsPath);
     if Result>=0 then Delete(Result);
   end;
 
@@ -4214,37 +4020,37 @@ type
    // TPhoaMask
    //===================================================================================================================
 
-  constructor TPhoaMask.Create(const sMask: String; bNegative: Boolean);
+  constructor TPhoaMask.Create(const wsMask: WideString; bNegative: Boolean);
   begin
-    inherited Create(sMask);
+    inherited Create(wsMask); //TODO Should create and use WideMask here
     FNegative := bNegative;
   end;
 
-  function TPhoaMask.Matches(const sFilename: String): Boolean;
+  function TPhoaMask.Matches(const wsFilename: WideString): Boolean;
   begin
-    Result := inherited Matches(sFilename) xor FNegative;
+    Result := inherited Matches(wsFilename) xor FNegative;
   end;
 
    //===================================================================================================================
    // TPhoaMasks
    //===================================================================================================================
 
-  constructor TPhoaMasks.Create(const sMasks: String);
+  constructor TPhoaMasks.Create(const wsMasks: WideString);
   var
-    s, sMask: String;
+    ws, wsMask: WideString;
     bNegative: Boolean;
   begin
     inherited Create;
     FMasks := TList.Create;
      // Создаём массив масок
-    s := iif(sMasks='*.*', '', sMasks);
-    while s<>'' do begin
-      sMask := ExtractFirstWord(s, ';');
-      if sMask<>'' then begin
+    ws := iif(wsMasks='*.*', '', wsMasks);
+    while ws<>'' do begin
+      wsMask := ExtractFirstWord(ws, ';');
+      if wsMask<>'' then begin
          // Если маска начинается с '!' - её действие инвертируется
-        bNegative := sMask[1]='!';
-        if bNegative then Delete(sMask, 1, 1);
-        if sMask<>'' then FMasks.Add(TPhoaMask.Create(sMask, bNegative));
+        bNegative := wsMask[1]='!';
+        if bNegative then Delete(wsMask, 1, 1);
+        if wsMask<>'' then FMasks.Add(TPhoaMask.Create(wsMask, bNegative));
       end;
     end;
   end;
@@ -4262,7 +4068,7 @@ type
     Result := FMasks.Count=0;
   end;
 
-  function TPhoaMasks.Matches(const sFilename: String): Boolean;
+  function TPhoaMasks.Matches(const wsFilename: WideString): Boolean;
   var i: Integer;
   begin
      // Если масок нет - считаем подходящим любой файл
@@ -4270,7 +4076,7 @@ type
      // Иначе проверяем все маски по порядку - авось какая-то подойдёт
     if not Result then
       for i := 0 to FMasks.Count-1 do begin
-        Result := TPhoaMask(FMasks[i]).Matches(sFilename);
+        Result := TPhoaMask(FMasks[i]).Matches(wsFilename);
         if Result then Break;
       end;
   end;
@@ -4279,15 +4085,15 @@ type
    // TPhoaCommandLine
    //===================================================================================================================
 
-  procedure PhoaCommandLineError(const sMsg: String; const aParams: Array of const);
+  procedure PhoaCommandLineError(const wsMsg: WideString; const aParams: Array of const);
   begin
-    raise EPhoaCommandLineError.CreateFmt(sMsg, aParams);
+    raise EPhoaCommandLineError.CreateFmt(wsMsg, aParams);
   end;
 
   constructor TPhoaCommandLine.Create;
   begin
     inherited Create;
-    FKeyValues := TStringList.Create;
+    FKeyValues := TTntStringList.Create;
     ParseCmdLine;
   end;
 
@@ -4297,7 +4103,7 @@ type
     inherited Destroy;
   end;
 
-  function TPhoaCommandLine.GetKeyValues(Key: TCmdLineKey): String;
+  function TPhoaCommandLine.GetKeyValues(Key: TCmdLineKey): WideString;
   var idx: Integer;
   begin
     idx := FKeyValues.IndexOfObject(Pointer(Key));
@@ -4312,62 +4118,62 @@ type
   procedure TPhoaCommandLine.ParseCmdLine;
   var
     i: Integer;
-    sParam, sPhoaName: String;
+    wsParam, wsPhoaName: WideString;
     k, kLast: TCmdLineKey;
 
      // Находит и возвращает TCmdLineKey, соответствующий символу c (case insensitive). Если не находит, вызывает
      //   EPhoaCommandLineError
-    function GetKeyByChar(c: Char): TCmdLineKey;
+    function GetKeyByChar(wc: WideChar): TCmdLineKey;
     begin
        // Convert to lowercase
-      if c in ['A'..'Z'] then Inc(c, Ord('a')-Ord('A'));
+      if wc in ['A'..'Z'] then Inc(wc, Ord('a')-Ord('A'));
        // Iterate through known chars
       for Result := Low(Result) to High(Result) do
-        if aCmdLineKeys[Result].cChar=c then Exit;
+        if aCmdLineKeys[Result].wcChar=wc then Exit;
       Result := clkOpenPhoa; // Satisfy the compiler
-      PhoaCommandLineError(SCmdLineErrMsg_UnknownKey, [c]);
+      PhoaCommandLineError(SCmdLineErrMsg_UnknownKey, [wc]);
     end;
 
      // Устанавливает значение sValue для ключа Key. Если у этого ключа уже есть значение, вызывает
      //   EPhoaCommandLineError
-    procedure SetKeyValue(Key: TCmdLineKey; sValue: String);
+    procedure SetKeyValue(Key: TCmdLineKey; wsValue: WideString);
     begin
        // Ищем такой ключ
       if KeyValIndex(Key)>=0 then
         if Key=clkOpenPhoa then
           PhoaCommandLineError(SCmdLineErrMsg_DuplicateOpenPhoaValue, [])
         else
-          PhoaCommandLineError(SCmdLineErrMsg_DuplicateKeyValue, [aCmdLineKeys[Key].cChar]);
+          PhoaCommandLineError(SCmdLineErrMsg_DuplicateKeyValue, [aCmdLineKeys[Key].wcChar]);
        // Нет ещё такого
-      FKeyValues.AddObject(sValue, Pointer(Key));
+      FKeyValues.AddObject(wsValue, Pointer(Key));
     end;
 
   begin
     FKeys := [];
     FKeyValues.Clear;
     kLast := clkOpenPhoa;
-    sPhoaName := '';
+    wsPhoaName := '';
      // Перебираем все параметры
     for i := 1 to ParamCount do begin
-      sParam := Trim(ParamStr(i));
-      if sParam<>'' then
-        case sParam[1] of
+      wsParam := Trim(ParamStr(i));
+      if wsParam<>'' then
+        case wsParam[1] of
            // Ключ. Проверяем его формат
           '-':
-            if Length(sParam)=2 then begin
-              k := GetKeyByChar(sParam[2]);
-              if k in FKeys then PhoaCommandLineError(SCmdLineErrMsg_DuplicateKey, [aCmdLineKeys[k].cChar]);
+            if Length(wsParam)=2 then begin
+              k := GetKeyByChar(wsParam[2]);
+              if k in FKeys then PhoaCommandLineError(SCmdLineErrMsg_DuplicateKey, [aCmdLineKeys[k].wcChar]);
               Include(FKeys, k);
               kLast := k;
             end else
-              PhoaCommandLineError(SCmdLineErrMsg_KeyNameInvalid, [sParam]);
+              PhoaCommandLineError(SCmdLineErrMsg_KeyNameInvalid, [wsParam]);
            // Значение. Проверяем потребность предыдущего ключа в значении
           else begin
             case aCmdLineKeys[kLast].ValueMode of
                // Нет значения. Трактуем значение как файл фотоальбома для открытия
-              clkvmNo: SetKeyValue(clkOpenPhoa, sParam);
+              clkvmNo: SetKeyValue(clkOpenPhoa, wsParam);
                // Есть значение. Связываем его с ключом
-              else SetKeyValue(kLast, sParam);
+              else SetKeyValue(kLast, wsParam);
             end;
              // Если значение попало в ключ по умолчанию, включаем его в набор (т.к. явно он не указывается)
             if kLast=clkOpenPhoa then Include(FKeys, clkOpenPhoa);
@@ -4379,7 +4185,7 @@ type
      // Проверяем обязательные значения параметров
     for k := Low(k) to High(k) do
       if (k in FKeys) and (aCmdLineKeys[k].ValueMode=clkvmRequired) and (KeyValIndex(k)<0) then
-        PhoaCommandLineError(SCmdLineErrMsg_KeyValueMissing, [aCmdLineKeys[k].cChar]);
+        PhoaCommandLineError(SCmdLineErrMsg_KeyValueMissing, [aCmdLineKeys[k].wcChar]);
   end;
 
    //===================================================================================================================

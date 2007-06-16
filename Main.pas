@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.88 2005-09-11 06:45:57 dale Exp $
+//  $Id: Main.pas,v 1.89 2007-06-16 13:49:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -316,8 +316,8 @@ type
      // Вызывается при изменении размера эскиза проекта
     procedure UpdateThumbnailSize;
      // Загрузка/сохранение фотоальбома в файле
-    procedure DoLoad(const sFileName: String);
-    procedure DoSave(const sFileName: String; iRevisionNumber: Integer);
+    procedure DoLoad(const wsFileName: WideString);
+    procedure DoSave(const wsFileName: WideString; iRevisionNumber: Integer);
      // Обрабатывает параметры командной строки
     procedure ProcessCommandLine;
      // Изменяет текущее состояние приложения
@@ -325,8 +325,8 @@ type
      // Настраивает доступность инструментов для заданного контейнерного пункта
     procedure DoEnableTools(Item: TTBCustomItem);
      // Выполняет заданную операцию
-    procedure PerformOperation(const sOpName: String; const aParams: Array of Variant); overload;
-    procedure PerformOperation(const sOpName: String; OpParams: IPhoaOperationParams); overload;
+    procedure PerformOperation(const wsOpName: WideString; const aParams: Array of Variant); overload;
+    procedure PerformOperation(const wsOpName: WideString; OpParams: IPhoaOperationParams); overload;
      // Создаёт список изображений:
      //   если активно дерево групп - то всех изображений группы
      //   если активен вьюер - то выделенных во вьюере изображений
@@ -424,7 +424,7 @@ type
     function  IPhotoAlbumApp.GetSelectedPicsX  = IApp_GetSelectedPicsX;
     function  IPhotoAlbumApp.GetViewedPicsX    = IApp_GetViewedPicsX;
     procedure IPhotoAlbumApp.SetCurGroupX      = IApp_SetCurGroupX;
-    procedure IApp_PerformOperation(const sOpName: String; const aParams: Array of Variant);
+    procedure IApp_PerformOperation(const wsOpName: WideString; const aParams: Array of Variant);
     function  IApp_GetCurGroupX: IPhotoAlbumPicGroup;
     function  IApp_GetImageList: TCustomImageList;
     function  IApp_GetProjectX: IPhotoAlbumProject;
@@ -438,12 +438,12 @@ type
     procedure WMHelp(var Msg: TWMHelp);                   message WM_HELP;
     procedure WMStartViewMode(var Msg: TWMStartViewMode); message WM_STARTVIEWMODE;
      // Prop handlers
-    function  GetFileName: String;
-    function  GetDisplayFileName: String;
+    function  GetFileName: WideString;
+    function  GetDisplayFileName: WideString;
     function  GetCurGroupID: Integer;
     procedure SetCurGroupID(Value: Integer);
   protected
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure DoDestroy; override;
@@ -462,9 +462,9 @@ type
      // -- ID текущей выбранной группы в дереве; 0, если нет
     property CurGroupID: Integer read GetCurGroupID write SetCurGroupID;
      // -- Имя файла фотоальбома для отображения (не бывает пустым, в таком случае 'untitled.phoa')
-    property DisplayFileName: String read GetDisplayFileName;
+    property DisplayFileName: WideString read GetDisplayFileName;
      // -- Имя текущего файла фотоальбома (пустая строка, если новый фотоальбом)
-    property FileName: String read GetFileName;
+    property FileName: WideString read GetFileName;
      // -- Текущий сфокусированный контрол
     property FocusedControl: TPhoaAppFocusedControl read IApp_GetFocusedControl;
      // -- Просмотрщик эскизов
@@ -485,7 +485,7 @@ uses
   phToolSetting, phMsgBox, udGroupProps, phPluginUsage, phGraphics;
 
    // Загружает ImageList из PNG-ресурса, если он ещё не загружен
-  procedure MakeImagesLoaded(const sResourceName: String; Images: TCustomImageList);
+  procedure MakeImagesLoaded(const wsResourceName: WideString; Images: TCustomImageList);
   var
     PNG: TPNGGraphic;
     Bmp: TBitmap;
@@ -494,7 +494,7 @@ uses
        // Загружаем картинки в PNG
       PNG := TPNGGraphic.Create;
       try
-        PNG.LoadFromResourceName(HInstance, sResourceName);
+        PNG.LoadFromResourceName(HInstance, wsResourceName {???});
          // Копируем в битмэп
         Bmp := TBitmap.Create;
         try
@@ -641,10 +641,10 @@ uses
 
   procedure TfMain.aaIniLoadSettings(Sender: TObject);
 
-    procedure DoIniLoad(const sFileName: String);
+    procedure DoIniLoad(const wsFileName: WideString);
     begin
        // Загружаем настройки
-      IniLoadSettings(sFileName);
+      IniLoadSettings(wsFileName);
        // Применяем настройки
       BeginUpdate;
       try
@@ -656,7 +656,7 @@ uses
     end;
 
   begin
-    with TOpenDialog.Create(Self) do
+    with TTntOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultIniFileExt;
         FileName   := SDefaultIniFileName;
@@ -844,13 +844,13 @@ uses
   end;
 
   procedure TfMain.AppException(Sender: TObject; E: Exception);
-  var s: String;
+  var ws: WideString;
   begin
      // Добавляем точку, если в конце не знак препинания (ripped from Application.ShowException)
-    s := E.Message;
-    if (s<>'') and (AnsiLastChar(s)>'.') then s := s+'.';
+    ws := E.Message; {!!! handle Unicode-enabled exceptions }
+    if (ws<>'') and (AnsiLastChar(ws)>'.') then ws := ws+'.';
      // Кажем сообщение об ошибке
-    PhoaMsgBox(mbkError, s, False, False, [mbbOK]);
+    PhoaMsgBox(mbkError, ws, False, False, [mbbOK]);
   end;
 
   procedure TfMain.AppHint(Sender: TObject);
@@ -1125,7 +1125,7 @@ uses
       AdjustToolAvailability(RootSetting.Settings[ISettingID_Tools] as TPhoaToolPageSetting, Item, GetSelectedPics);
   end;
 
-  procedure TfMain.DoLoad(const sFileName: String);
+  procedure TfMain.DoLoad(const wsFileName: WideString);
   begin
     BeginUpdate;
     try
@@ -1138,13 +1138,13 @@ uses
              // Уничтожаем результаты поиска
             DisplaySearchResults(True, False);
              // Загружаем файл
-            FProject.LoadFromFile(ExpandUNCFileName(sFileName));
+            FProject.LoadFromFile(WideExpandUNCFileName(wsFileName));
             UpdateThumbnailSize;
              // Очищаем буфер отката
             FUndo.Clear;
             FUndo.SetSavepoint;
              // Регистрируем файл в списке MRU
-            mruOpen.Add(sFileName);
+            mruOpen.Add(wsFileName); {!!! Not Unicode-enabled solution }
             StateChanged([asActionChangePending, asFileNameChangePending, asModifiedChangePending]);
           finally
              // Перегружаем список представлений
@@ -1162,7 +1162,7 @@ uses
     end;
   end;
 
-  procedure TfMain.DoSave(const sFileName: String; iRevisionNumber: Integer);
+  procedure TfMain.DoSave(const wsFileName: WideString; iRevisionNumber: Integer);
   begin
      // Предупреждаем пользователя, если он сохраняет в более старую ревизию
     if (iRevisionNumber<IPhFileRevisionNumber) and not PhoaConfirm(True, 'SConfirm_SavingOldFormatFile', ISettingID_Dlgs_ConfmOldFile) then Exit;
@@ -1170,10 +1170,10 @@ uses
     try
       StartWait;
       try
-        FProject.SaveToFile(sFileName, SProject_Generator, SProject_Remark, iRevisionNumber);
+        FProject.SaveToFile(wsFileName, SProject_Generator, SProject_Remark, iRevisionNumber);
         FUndo.SetSavepoint;
          // Регистрируем имя файла в списке MRU
-        mruOpen.Add(sFileName);
+        mruOpen.Add(wsFileName); {!!! Not Unicode-enabled solution }
         StateChanged([asActionChangePending, asFileNameChangePending, asModifiedChangePending]);
       finally
         StopWait;
@@ -1217,13 +1217,13 @@ uses
     if Group=nil then Result := 0 else Result := Group.ID;
   end;
 
-  function TfMain.GetDisplayFileName: String;
+  function TfMain.GetDisplayFileName: WideString;
   begin
     Result := FileName;
     if Result='' then Result := SDefaultFName;
   end;
 
-  function TfMain.GetFileName: String;
+  function TfMain.GetFileName: WideString;
   begin
     Result := FProject.FileName;
   end;
@@ -1238,7 +1238,7 @@ uses
     Result := PicGroupsVT_GetNodeKind(tvGroups, Node, FProject.ViewIndex>=0);
   end;
 
-  function TfMain.GetRelativeRegistryKey: String;
+  function TfMain.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegMainWindow_Root;
   end;
@@ -1344,9 +1344,9 @@ uses
     Result := FViewedPics;
   end;
 
-  procedure TfMain.IApp_PerformOperation(const sOpName: String; const aParams: array of Variant);
+  procedure TfMain.IApp_PerformOperation(const wsOpName: WideString; const aParams: array of Variant);
   begin
-    PerformOperation(sOpName, aParams);
+    PerformOperation(wsOpName, aParams);
   end;
 
   procedure TfMain.IApp_SetCurGroup(Value: IPhoaPicGroup);
@@ -1396,12 +1396,12 @@ uses
     if CheckSave then DoLoad(FileName);
   end;
 
-  procedure TfMain.PerformOperation(const sOpName: String; const aParams: Array of Variant);
+  procedure TfMain.PerformOperation(const wsOpName: WideString; const aParams: Array of Variant);
   begin
-    PerformOperation(sOpName, NewPhoaOperationParams(aParams));
+    PerformOperation(wsOpName, NewPhoaOperationParams(aParams));
   end;
 
-  procedure TfMain.PerformOperation(const sOpName: String; OpParams: IPhoaOperationParams);
+  procedure TfMain.PerformOperation(const wsOpName: WideString; OpParams: IPhoaOperationParams);
   var
     Changes: TPhoaOperationChanges;
     ViewerData: IThumbnailViewerDisplayData;
@@ -1422,7 +1422,7 @@ uses
          // Создаём (выполняем операцию)
         Changes := [];
         try
-          Operation := OperationFactory.NewOperation(sOpName, FUndo, FProject, OpParams, Changes);
+          Operation := OperationFactory.NewOperation(wsOpName, FUndo, FProject, OpParams, Changes);
            // Записываем состояние интерфейса в Undo-файл
           UndoStream := FUndo.UndoStream;
           Operation.GUIStateUndoDataPosition := UndoStream.Position;
@@ -1464,23 +1464,23 @@ uses
 
   procedure TfMain.ProcessCommandLine;
   var
-    sPhoaFile: String;
+    wsPhoaFile: WideString;
     CmdLine: TPhoaCommandLine;
     ImgViewInitFlags: TImgViewInitFlags;
 
      // Выбирает в качестве текущего заданное представление, если sViewName<>''
-    procedure SelectViewByName(const sViewName: String);
+    procedure SelectViewByName(const wsViewName: WideString);
     begin
-      if sViewName<>'' then begin
-        FProject.ViewIndex := FProject.Views.IndexOfName(sViewName);
+      if wsViewName<>'' then begin
+        FProject.ViewIndex := FProject.Views.IndexOfName(wsViewName);
         UpdateViewIndex;
       end
     end;
 
      // Выбирает в качестве текущей заданную группу в дереве, если sGroupPath<>''
-    procedure SelectGroupByPath(const sGroupPath: String);
+    procedure SelectGroupByPath(const wsGroupPath: WideString);
     begin
-      if sGroupPath<>'' then CurGroupX := FProject.ViewRootGroupX.GroupByPathX[sGroupPath];
+      if wsGroupPath<>'' then CurGroupX := FProject.ViewRootGroupX.GroupByPathX[wsGroupPath];
     end;
 
      // Выбирает изображение с заданным ID
@@ -1500,9 +1500,9 @@ uses
       try
          // Если указан файл - загружаем его
         if clkOpenPhoa in CmdLine.Keys then begin
-          sPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
-          ShowProgressInfo('SMsg_LoadingPhoa', [ExtractFileName(sPhoaFile)]);
-          DoLoad(sPhoaFile);
+          wsPhoaFile := CmdLine.KeyValues[clkOpenPhoa];
+          ShowProgressInfo('SMsg_LoadingPhoa', [WideExtractFileName(wsPhoaFile)]);
+          DoLoad(wsPhoaFile);
            // -- Если указан режим рекурсивного просмотра
           if clkFlatMode in CmdLine.Keys then begin
             SetSettingValueBool(ISettingID_Browse_FlatMode, CmdLine.KeyValues[clkFlatMode]<>'0');
@@ -1708,15 +1708,15 @@ uses
   var
     iPicIndex: Integer;
     ViewerTool: TPhoaToolSetting;
-    sPicFileName: String;
+    wsPicFileName: WideString;
 
      // Пытается найти инструмент вида ptkExtViewer, подходящий под текущее изображение. Если не нашла, возвращает nil
-    function FindViewerTool(const sFileName: String): TPhoaToolSetting;
+    function FindViewerTool(const wsFileName: WideString): TPhoaToolSetting;
     var i: Integer;
     begin
       for i := 0 to RootSetting.Settings[ISettingID_Tools].ChildCount-1 do begin
         Result := RootSetting.Settings[ISettingID_Tools].Children[i] as TPhoaToolSetting;
-        if (Result.Kind=ptkExtViewer) and Result.MatchesFile(sFileName) then Exit;
+        if (Result.Kind=ptkExtViewer) and Result.MatchesFile(wsFileName) then Exit;
       end;
       Result := nil;
     end;
@@ -1726,11 +1726,11 @@ uses
     if (FViewedPics<>nil) and (iPicIndex>=0) then begin
       ResetMode;
        // Пытаемся найти внешний вьюер
-      sPicFileName := FViewedPics[iPicIndex].FileName;
-      ViewerTool := FindViewerTool(sPicFileName);
+      wsPicFileName := FViewedPics[iPicIndex].FileName;
+      ViewerTool := FindViewerTool(wsPicFileName);
        // Если нашли - запускаем
       if ViewerTool<>nil then
-        ViewerTool.Execute(sPicFileName)
+        ViewerTool.Execute(wsPicFileName)
        // Иначе входим в режим просмотра
       else begin
         ViewImage(InitFlags, Self, iPicIndex, FUndo);
@@ -2090,11 +2090,11 @@ uses
 
      // Настраивает Caption/Application.Title
     procedure Adjust_Title;
-    var s: String;
+    var ws: WideString;
     begin
-      s := Format('[%s%s] - %s', [ExtractFileName(DisplayFileName), iif(FUndo.IsUnmodified, '', '*'), ConstVal('SAppCaption')]);
-      Caption           := s;
-      Application.Title := s;
+      ws := WideFormat('[%s%s] - %s', [WideExtractFileName(DisplayFileName), iif(FUndo.IsUnmodified, '', '*'), ConstVal('SAppCaption')]);
+      Caption           := ws;
+      Application.Title := ws;
     end;
 
      // Настраивает информацию о текущем выделении

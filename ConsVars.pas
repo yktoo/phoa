@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.100 2007-06-12 13:21:48 dale Exp $
+//  $Id: ConsVars.pas,v 1.101 2007-06-16 13:49:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -222,13 +222,13 @@ type
      // ƒолжна рисовать изображение обрабатываемого эскиза
     procedure PaintThumbnail(Bitmap32: TBitmap32); 
      // Prop handlers
-    function GetCurrentStatus: String;
+    function GetCurrentStatus: WideString;
     function GetProcessingActive: Boolean;
     function GetProgressCur: Integer;
     function GetProgressMax: Integer;
      // Props
      // -- “екущее состо€ние обработки (сообщение)
-    property CurrentStatus: String read GetCurrentStatus; 
+    property CurrentStatus: WideString read GetCurrentStatus; 
      // -- True, если оработка в данный момент активна
     property ProcessingActive: Boolean read GetProcessingActive;
      // -- “екущее состо€ние прогресса
@@ -243,10 +243,10 @@ type
      // ¬ызываетс€ ћастером при изменении видимости окна просмотра
     procedure PreviewVisibilityChanged(bVisible: Boolean);
      // Prop handlers
-    function  GetCurrentFileName: String;
+    function  GetCurrentFileName: WideString;
      // Props
      // -- »м€ текущего отображаемого на странице файла изображени€. ѕуста€ строка, если нет текущего файла
-    property CurrentFileName: String read GetCurrentFileName;
+    property CurrentFileName: WideString read GetCurrentFileName;
   end;
 
   {=====================================================================================================================
@@ -884,19 +884,19 @@ var
    // —пецифичные дл€ программы установки формата
   AppFormatSettings: TFormatSettings;
    // ѕуть, по которому запущено приложение
-  sApplicationPath: String;
+  wsApplicationPath: WideString;
 
    // —оставл€ет описание изображени€ Pic из свойств Props, выбира€ только указанные данные.
    //   ≈сли задано sNameValSep, то выводит также наименование свойств, раздел€€ им€ от значени€ этой строкой.
    //   sPropSep - разделительна€ строка между отдельными свойствами
-  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const wsNameValSep, wsPropSep: WideString): WideString;
      // —оставл€ет описание группы Group из свойств Props, выбира€ только указанные данные.
      //   ≈сли задано sNameValSep, то выводит также наименование свойств, раздел€€ им€ от значени€ этой строкой.
      //   sPropSep - разделительна€ строка между отдельными свойствами
-  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
+  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const wsNameValSep, wsPropSep: WideString): WideString;
 
    // —оставл€ет фильтр дл€ диалога сохранени€ файла фотоальбома на основе массива ревизий
-  function  GetPhoaSaveFilter: String;
+  function  GetPhoaSaveFilter: WideString;
    // ¬озвращает индекс в aFileRevisions[], соответствующий указанной ревизии, или -1, если такой нет
   function  GetIndexOfRevision(iRev: Integer): Integer;
    // ¬озвращает переданный индекс ревизии, если он в допустимом диапазоне; иначе возвращает 0 (индекс самой свежей ревизии)
@@ -920,43 +920,44 @@ uses
   DKLang,
   phPhoa, phObjConst, phGUIObj, phUtils, phSettings, phValSetting, phToolSetting, udAbout;
 
-  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const sNameValSep, sPropSep: String): String;
+  function GetPicPropStrs(Pic: IPhoaPic; Props: TPicProperties; const wsNameValSep, wsPropSep: WideString): WideString;
   var
     Prop: TPicProperty;
-    sVal: String;
+    wsVal: WideString;
   begin
     Result := '';
     for Prop := Low(Prop) to High(Prop) do
       if Prop in Props then begin
-        sVal := Pic.PropStrValues[Prop];
-        if sVal<>'' then begin
-          if sNameValSep<>'' then sVal := PicPropName(Prop)+sNameValSep+sVal;
-          AccumulateStr(Result, sPropSep, sVal);
+        wsVal := Pic.PropStrValues[Prop];
+        if wsVal<>'' then begin
+          if wsNameValSep<>'' then wsVal := PicPropName(Prop)+wsNameValSep+wsVal;
+          AccumulateStr(Result, wsPropSep, wsVal);
         end;
       end;
   end;
 
-  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const sNameValSep, sPropSep: String): String;
+  function GetPicGroupPropStrs(Group: IPhoaPicGroup; Props: TGroupProperties; const wsNameValSep, wsPropSep: WideString): WideString;
   var
     Prop: TGroupProperty;
-    sVal: String;
+    wsVal: WideString;
   begin
     Result := '';
     for Prop := Low(Prop) to High(Prop) do
       if Prop in Props then begin
-        sVal := Group.Props[Prop];
-        if sVal<>'' then begin
-          if sNameValSep<>'' then sVal := GroupPropName(Prop)+sNameValSep+sVal;
-          AccumulateStr(Result, sPropSep, sVal);
+        wsVal := Group.Props[Prop];
+        if wsVal<>'' then begin
+          if wsNameValSep<>'' then wsVal := GroupPropName(Prop)+wsNameValSep+wsVal;
+          AccumulateStr(Result, wsPropSep, wsVal);
         end;
       end;
   end;
   
-  function GetPhoaSaveFilter: String;
+  function GetPhoaSaveFilter: WideString;
   var i: Integer;
   begin
     Result := '';
-    for i := 0 to High(aPhFileRevisions) do AccumulateStr(Result, '|', Format('%s photo album|*.%s', [aPhFileRevisions[i].sName, SDefaultExt]));
+    for i := 0 to High(aPhFileRevisions) do
+      AccumulateStr(Result, '|', WideFormat('%s photo album|*.%s', [aPhFileRevisions[i].wsName, SDefaultExt]));
   end;
 
   function GetIndexOfRevision(iRev: Integer): Integer;

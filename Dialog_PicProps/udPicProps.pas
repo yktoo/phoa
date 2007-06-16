@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: udPicProps.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -38,7 +38,7 @@ type
      // Список ImageIndeices файлов из системного ImageList'а
     FFileImageIndices: Array of Integer;
      // Список файлов изображений
-    FPictureFiles: TStringList;
+    FPictureFiles: TTntStringList;
      // Список операций для отмены редактирования/добавления
     FUndoOperations: TPhoaOperations;
      // Prop storage
@@ -60,10 +60,10 @@ type
     function  IWizardHostForm.GetStorageForm = WizHost_GetStorageForm;
      // Prop handlers
     function  GetFileImageIndex(Index: Integer): Integer;
-    function  GetPictureFiles(Index: Integer): String;
-    procedure SetPictureFiles(Index: Integer; const Value: String);
+    function  GetPictureFiles(Index: Integer): WideString;
+    procedure SetPictureFiles(Index: Integer; const Value: WideString);
   protected
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
@@ -75,7 +75,7 @@ type
   public
      // Ищет изображение по имени файла и возвращает его ID, если нашла, иначе возвращает 0. Поиск осуществляется с
      //   учётом новых имён файлов, заданных в диалоге, но среди ВСЕХ изображений проекта
-    function  FindPicIDByFileName(const sFileName: String): Integer;
+    function  FindPicIDByFileName(const wsFileName: WideString): Integer;
      // Props
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
@@ -84,7 +84,7 @@ type
      // -- ImageIndices файлов редактируемых изображений
     property FileImageIndex[Index: Integer]: Integer read GetFileImageIndex;
      // -- Имена файлов редактируемых изображений
-    property PictureFiles[Index: Integer]: String read GetPictureFiles write SetPictureFiles;
+    property PictureFiles[Index: Integer]: WideString read GetPictureFiles write SetPictureFiles;
   end;
 
   function EditPics(AApp: IPhotoAlbumApp; AEditedPics: IPhotoAlbumPicList; AUndoOperations: TPhoaOperations): Boolean;
@@ -117,7 +117,7 @@ uses
   procedure TdPicProps.ButtonClick_OK;
   var
     i, idxMainParam: Integer;
-    sOpParam: String;
+    wsOpParam: WideString;
     OpParams: IPhoaOperationParams;
     aMainOpParams: Array of Variant;
   begin
@@ -131,13 +131,13 @@ uses
     aMainOpParams := nil;
     idxMainParam  := -1;
     for i := 0 to FController.Count-1 do begin
-      sOpParam := '';
+      wsOpParam := '';
       OpParams := nil;
-      TPicPropsDialogPage(FController[i]).Apply(sOpParam, OpParams);
-      if sOpParam<>'' then begin
+      TPicPropsDialogPage(FController[i]).Apply(wsOpParam, OpParams);
+      if wsOpParam<>'' then begin
         SetLength(aMainOpParams, idxMainParam+3);
         Inc(idxMainParam);
-        aMainOpParams[idxMainParam] := sOpParam;
+        aMainOpParams[idxMainParam] := wsOpParam;
         Inc(idxMainParam);
         aMainOpParams[idxMainParam] := OpParams;
       end;
@@ -152,7 +152,7 @@ uses
   begin
     inherited DoCreate;
      // Создаём список файлов
-    FPictureFiles := TStringList.Create;
+    FPictureFiles := TTntStringList.Create;
      // Создаём контроллер страниц
     FController := TWizardController.Create(Self);
     with FController do begin
@@ -215,7 +215,7 @@ uses
     end;
   end;
 
-  function TdPicProps.FindPicIDByFileName(const sFileName: String): Integer;
+  function TdPicProps.FindPicIDByFileName(const wsFileName: WideString): Integer;
   var
     i, iPicID: Integer;
     ProjPics: IPhotoAlbumPicList;
@@ -261,12 +261,12 @@ type TWinControlCast = class(TWinControl);
     Result := pImgIdx^;
   end;
 
-  function TdPicProps.GetPictureFiles(Index: Integer): String;
+  function TdPicProps.GetPictureFiles(Index: Integer): WideString;
   begin
     Result := FPictureFiles[Index];
   end;
 
-  function TdPicProps.GetRelativeRegistryKey: String;
+  function TdPicProps.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegPicProps_Root;
   end;
@@ -281,7 +281,7 @@ type TWinControlCast = class(TWinControl);
     FController.SetVisiblePageID(TComponent(Sender).Tag+1, pcmForced);
   end;
 
-  procedure TdPicProps.SetPictureFiles(Index: Integer; const Value: String);
+  procedure TdPicProps.SetPictureFiles(Index: Integer; const Value: WideString);
   var i: Integer;
   begin
     if FPictureFiles[Index]<>Value then begin
