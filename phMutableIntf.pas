@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMutableIntf.pas,v 1.17 2007-06-16 09:15:44 dale Exp $
+//  $Id: phMutableIntf.pas,v 1.18 2007-06-24 17:47:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,7 +31,7 @@ type
     procedure SetFileName(const Value: WideString); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
     procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
-    procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
+    procedure SetRawData(PProps: TPicProperties; const Value: TPhoaRawData); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
      // Props
@@ -46,7 +46,7 @@ type
      // -- Writable PropValues
     property PropValues[PicProp: TPicProperty]: Variant read GetPropValues write SetPropValues;
      // -- Writable RawData[]
-    property RawData[PProps: TPicProperties]: String read GetRawData write SetRawData;
+    property RawData[PProps: TPicProperties]: TPhoaRawData read GetRawData write SetRawData;
      // -- Writable Rotation
     property Rotation: TPicRotation read GetRotation write SetRotation;
      // -- Writable Time
@@ -154,7 +154,7 @@ type
     function  GetRootM: IPhoaMutablePicGroup; stdcall;
     procedure SetDescription(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
-    procedure SetIconData(const Value: String); stdcall;
+    procedure SetIconData(const Value: TPhoaRawData); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
     procedure SetText(const Value: WideString); stdcall;
@@ -170,7 +170,7 @@ type
      // -- 'Mutable' version of GroupByPath[]
     property GroupByPathM[const wsPath: WideString]: IPhoaMutablePicGroup read GetGroupByPathM;
      // -- 'Mutable' version of IconData
-    property IconData: String read GetIconData write SetIconData;
+    property IconData: TPhoaRawData read GetIconData write SetIconData;
      // -- Group index in its Owner's list
     property Index: Integer read GetIndex write SetIndex;
      // -- Group owner

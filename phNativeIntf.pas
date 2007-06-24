@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.13 2007-06-16 09:15:44 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.14 2007-06-24 17:48:01 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -352,14 +352,14 @@ type
      // Стирает содержимое потока
     procedure Clear;
      // Методы для записи данных в поток
-    procedure WriteStr (const s: String);
-    procedure WriteStrW(const ws: WideString);
+    procedure WriteRaw (const Data: TPhoaRawData);
+    procedure WriteWStr(const ws: WideString);
     procedure WriteInt (i: Integer);
     procedure WriteByte(b: Byte);
     procedure WriteBool(b: Boolean);
      // Методы для чтения данных из потока
-    function  ReadStr:  String;
-    function  ReadStrW: WideString;
+    function  ReadRaw:  TPhoaRawData;
+    function  ReadWStr: WideString;
     function  ReadInt:  Integer;
     function  ReadByte: Byte;
     function  ReadBool: Boolean;

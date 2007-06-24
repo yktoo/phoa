@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicFilterHighlighter.pas,v 1.7 2004-12-31 13:38:58 dale Exp $
+//  $Id: phPicFilterHighlighter.pas,v 1.8 2007-06-24 17:48:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -121,7 +121,7 @@ var
     FKeywords := TSynHashEntryList.Create;
      // Составляем список ключевых слов: операторов
     for ok := Low(ok) to High(ok) do begin
-      sOperator := asPicFilterOperators[ok];
+      sOperator := awsPicFilterOperators[ok]; {!!! implicit Unicode to Ansi conversion}
       FKeywords[KeyHash(PChar(sOperator))] := TSynHashEntry.Create(sOperator, Ord(tkKey));
     end;
     DefHighlightChange(Self);

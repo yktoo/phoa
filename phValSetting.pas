@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.15 2005-02-13 19:16:38 dale Exp $
+//  $Id: phValSetting.pas,v 1.16 2007-06-24 17:48:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -100,10 +100,10 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaStrSetting - настройка, имеющая значение типа String
+   // TPhoaWideStrSetting - настройка, имеющая значение типа WideString
    //===================================================================================================================
 
-  TPhoaStrSetting = class(TPhoaValSetting)
+  TPhoaWideStrSetting = class(TPhoaValSetting)
   private
      // Prop handlers
     function  GetValue: String;
@@ -161,7 +161,7 @@ type
    // TPhoaFontSetting - настройка, имеющая значение типа TFont (хранится в виде строки)
    //===================================================================================================================
 
-  TPhoaFontSetting = class(TPhoaStrSetting)
+  TPhoaFontSetting = class(TPhoaWideStrSetting)
   protected
     function  GetDisplayString: String; override;
   public
@@ -211,7 +211,7 @@ type
    // TPhoaRectSetting - настройка, имеющая значение типа TRect. НЕ ПРЕДНАЗНАЧЕНА ДЛЯ ОТОБРАЖЕНИЯ!
    //===================================================================================================================
 
-  TPhoaRectSetting = class(TPhoaStrSetting)
+  TPhoaRectSetting = class(TPhoaWideStrSetting)
   private
      // Prop handlers
     function  GetValue: TRect;
@@ -466,43 +466,43 @@ type
   end;
 
    //===================================================================================================================
-   // TPhoaStrSetting
+   // TPhoaWideStrSetting
    //===================================================================================================================
 
-  procedure TPhoaStrSetting.Assign(Source: TPhoaSetting);
+  procedure TPhoaWideStrSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
-    if Source is TPhoaStrSetting then String(FData) := TPhoaStrSetting(Source).Value;
+    if Source is TPhoaWideStrSetting then String(FData) := TPhoaWideStrSetting(Source).Value;
   end;
 
-  constructor TPhoaStrSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
+  constructor TPhoaWideStrSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
   begin
     inherited Create(AOwner, iID, sName);
     SetValue(sValue);
   end;
 
-  destructor TPhoaStrSetting.Destroy;
+  destructor TPhoaWideStrSetting.Destroy;
   begin
     Finalize(String(FData));
     inherited Destroy;
   end;
 
-  function TPhoaStrSetting.GetAsString: String;
+  function TPhoaWideStrSetting.GetAsString: String;
   begin
     Result := GetValue;
   end;
 
-  function TPhoaStrSetting.GetValue: String;
+  function TPhoaWideStrSetting.GetValue: String;
   begin
     Result := String(FData);
   end;
 
-  procedure TPhoaStrSetting.SetAsString(const sValue: String);
+  procedure TPhoaWideStrSetting.SetAsString(const sValue: String);
   begin
     Value := sValue;
   end;
 
-  procedure TPhoaStrSetting.SetValue(const Value: String);
+  procedure TPhoaWideStrSetting.SetValue(const Value: String);
   begin
     if String(FData)<>Value then begin
       String(FData) := Value;

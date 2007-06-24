@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObjConst.pas,v 1.5 2004-12-31 13:38:58 dale Exp $
+//  $Id: phObjConst.pas,v 1.6 2007-06-24 17:48:10 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -23,13 +23,13 @@ const
   IThumbQuality_Default            = 40;
   IThumbQuality_Max                = 100;
 
-  asPicRotationText: Array[TPicRotation] of String = (
+  awsPicRotationText: Array[TPicRotation] of WideString = (
     '0°',    // pr0
     '90°',   // pr90
     '180°',  // pr180
     '270°'); // pr270
-  
-  asPicFlipText: Array[TPicFlip] of String = (
+
+  awsPicFlipText: Array[TPicFlip] of WideString = (
     'H',  // pflHorz                                          
     'V'); // pflVert                                          
 
@@ -141,7 +141,7 @@ const
    gbpKeywords);     // 6  Keywords
 
    // Наименования констант с наименованиями папок для неклассифицированных изображений в зависимости от вида группировки
-  asUnclassifiedConsts: Array[TPicGroupByProperty] of String[24] = (
+  asUnclassifiedConsts: Array[TPicGroupByProperty] of AnsiString = (
     '',                         // gbpFilePath - такого не бывает
     'SUnclassified_Date',       // gbpDateByYear
     'SUnclassified_Date',       // gbpDateByMonth

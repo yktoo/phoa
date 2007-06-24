@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMsgBox.pas,v 1.1 2005-08-15 11:19:54 dale Exp $
+//  $Id: phMsgBox.pas,v 1.2 2007-06-24 17:47:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -22,7 +22,7 @@ type
      // Вид сообщения
     FKind: TMessageBoxKind;
      // Текст сообщения
-    FMessage: String;
+    FMessage: WideString;
      // Кнопки, которые должны отображаться в диалоге
     FButtons: TMessageBoxButtons;
      // Если True, то дополнительно отображает checkbox 'Больше не показывать данное сообщение'
@@ -57,30 +57,32 @@ type
 
    // Отображает [почти] стандартный диалог-сообщение.
    //   AKind           - вид сообщения. Влияет на заголовок, значок и звуковой сигнал
-   //   sMessage        - текст сообщения
+   //   wsMessage       - текст сообщения
    //   AButtons        - кнопки, которые должны отображаться в диалоге
-   //   bMsgIsConstName - если True, то sMessage трактуется как имя константы, а её значение подставляется вместо текста
    //   bDiscardable    - если True, то дополнительно отображает checkbox 'Больше не показывать данное сообщение'
    //   Возвращает набор, соотоящий из одной из кнопок и, опционально, mbrDontShow (если включен переключатель "Больше
    //     не показывать..." и bDiscardable=True)
-  function PhoaMsgBox(AKind: TMessageBoxKind; const sMessage: String; bMsgIsConstName, bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
+  function PhoaMsgBox(AKind: TMessageBoxKind; const wsMessage: WideString; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
    // То же самое, но дополнительно принимает массив параметров для форматирования
-  function PhoaMsgBox(AKind: TMessageBoxKind; const sMessage: String; const aParams: Array of const; bMsgIsConstName, bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
+  function PhoaMsgBox(AKind: TMessageBoxKind; const wsMessage: WideString; const aParams: Array of const; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
+   // То же самое, но вместо текста сообщения передаётся имя соответствующей константы
+  function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
+  function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; const aParams: Array of const; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults; overload;
    // Отображает диалог информации, если iSettingID<=0 или значение настройки iSettingID=True, иначе диалог не
    //   отображается. При iSettingID>0 в диалоге отображается также переключатель "Больше не показывать...". Если
    //   пользователь включит его и нажмёт ОК, то в значение настройки заносится False
    //   Если bWarning=True, то отображается в режиме mbkWarning, иначе - mbkInfo
-  procedure PhoaInfo(bWarning: Boolean; const sConstName: String; iSettingID: Integer = 0); overload;
-  procedure PhoaInfo(bWarning: Boolean; const sConstName: String; const aParams: Array of const; iSettingID: Integer = 0); overload;
+  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0); overload;
+  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0); overload;
    // Отображает диалог подтверждения, если iSettingID<=0 или значение настройки iSettingID=True, иначе диалог не
    //   отображается, а просто возвращает True. При iSettingID>0 в диалоге отображается также переключатель "Больше не
    //   показывать...". Если пользователь включит его и нажмёт ОК, то в значение настройки заносится False
    //   Если bWarning=True, то отображается в режиме mbkConfirmWarning, иначе - mbkConfirm
-  function  PhoaConfirm(bWarning: Boolean; const sConstName: String; iSettingID: Integer = 0): Boolean; overload;
-  function  PhoaConfirm(bWarning: Boolean; const sConstName: String; const aParams: Array of const; iSettingID: Integer = 0): Boolean; overload;
+  function  PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0): Boolean; overload;
+  function  PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0): Boolean; overload;
    // Отображает диалог ошибки
-  procedure PhoaError(const sConstName: String); overload;
-  procedure PhoaError(const sConstName: String; const aParams: Array of const); overload;
+  procedure PhoaError(const wsConstName: WideString); overload;
+  procedure PhoaError(const wsConstName: WideString; const aParams: Array of const); overload;
 
 const
    // Минимальная разница между шириной экрана и шириной окна
@@ -116,80 +118,87 @@ implementation
 {$R *.dfm}
 uses phUtils, phSettings, phChmHlp;
 
-  function PhoaMsgBox(AKind: TMessageBoxKind; const sMessage: String; bMsgIsConstName, bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
+  function PhoaMsgBox(AKind: TMessageBoxKind; const wsMessage: WideString; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
   begin
     with TdMsgBox.Create(Application) do
       try
         FKind        := AKind;
         FButtons     := AButtons;
         FDiscardable := bDiscardable;
-        if bMsgIsConstName then FMessage := ConstVal(sMessage) else FMessage := sMessage;
+        if bMsgIsConstName then FMessage := ConstVal(wsMessage) else FMessage := wsMessage;
         Result := Execute;
       finally
         Free;
       end;
   end;
 
-  function PhoaMsgBox(AKind: TMessageBoxKind; const sMessage: String; const aParams: Array of const; bMsgIsConstName, bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
+  function PhoaMsgBox(AKind: TMessageBoxKind; const wsMessage: WideString; const aParams: Array of const; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
   begin
-    if bMsgIsConstName then
-      Result := PhoaMsgBox(AKind, ConstVal(sMessage, aParams), False, bDiscardable, AButtons)
-    else
-      Result := PhoaMsgBox(AKind, Format(sMessage, aParams), False, bDiscardable, AButtons);
+    Result := PhoaMsgBox(AKind, WideFormat(wsMessage, aParams), bDiscardable, AButtons);
   end;
 
-  procedure PhoaInfo(bWarning: Boolean; const sConstName: String; iSettingID: Integer = 0);
+  function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
+  begin
+    Result := PhoaMsgBox(AKind, ConstVal(sConstName), bDiscardable, AButtons);
+  end;
+
+  function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; const aParams: Array of const; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
+  begin
+    Result := PhoaMsgBox(AKind, ConstVal(sConstName, aParams), bDiscardable, AButtons);
+  end;
+
+  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0);
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkInfo, mbkWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBox(aKinds[bWarning], sConstName, True, iSettingID>0, [mbbOK]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, iSettingID>0, [mbbOK]);
       if (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end;
   end;
 
-  procedure PhoaInfo(bWarning: Boolean; const sConstName: String; const aParams: Array of const; iSettingID: Integer = 0);
+  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0);
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkInfo, mbkWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBox(aKinds[bWarning], sConstName, aParams, True, iSettingID>0, [mbbOK]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, aParams, iSettingID>0, [mbbOK]);
       if (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end;
   end;
 
-  function PhoaConfirm(bWarning: Boolean; const sConstName: String; iSettingID: Integer = 0): Boolean;
+  function PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0): Boolean;
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkConfirm, mbkConfirmWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBox(aKinds[bWarning], sConstName, True, iSettingID>0, [mbbOK, mbbCancel]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, iSettingID>0, [mbbOK, mbbCancel]);
       Result := mbrOK in mbr;
       if Result and (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end else
       Result := True;
   end;
 
-  function PhoaConfirm(bWarning: Boolean; const sConstName: String; const aParams: Array of const; iSettingID: Integer = 0): Boolean;
+  function PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0): Boolean;
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkConfirm, mbkConfirmWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBox(aKinds[bWarning], sConstName, aParams, True, iSettingID>0, [mbbOK, mbbCancel]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, aParams, iSettingID>0, [mbbOK, mbbCancel]);
       Result := mbrOK in mbr;
       if Result and (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end else
       Result := True;
   end;
 
-  procedure PhoaError(const sConstName: String);
+  procedure PhoaError(const wsConstName: WideString);
   begin
-    PhoaMsgBox(mbkError, sConstName, True, False, [mbbOK]);
+    PhoaMsgBoxConst(mbkError, wsConstName, False, [mbbOK]);
   end;
 
-  procedure PhoaError(const sConstName: String; const aParams: Array of const);
+  procedure PhoaError(const wsConstName: WideString; const aParams: Array of const);
   begin
-    PhoaMsgBox(mbkError, sConstName, aParams, True, False, [mbbOK]);
+    PhoaMsgBoxConst(mbkError, wsConstName, aParams, False, [mbbOK]);
   end;
 
    //===================================================================================================================
@@ -231,7 +240,7 @@ uses phUtils, phSettings, phChmHlp;
      // Создаёт возвращает кнопку
     function MakeButton(mbb: TMessageBoxButton): TButton;
     const
-      aBtnCaptionConsts: Array[TMessageBoxButton] of String = (
+      asBtnCaptionConsts: Array[TMessageBoxButton] of AnsiString = (
         'SBtn_Yes',      // mbbYes
         'SBtn_YesToAll', // mbbYesToAll
         'SBtn_No',       // mbbNo
@@ -252,7 +261,7 @@ uses phUtils, phSettings, phChmHlp;
       with Result do begin
         Parent   := Self;
         Cancel   := (mbb=mbbCancel) or ((mbb=mbbOK) and not (mbbCancel in FButtons)) or ((mbb=mbbNo) and (FButtons*[mbbOK, mbbCancel]=[]));
-        Caption  := ConstVal(aBtnCaptionConsts[mbb]);
+        Caption  := ConstVal(asBtnCaptionConsts[mbb]);
         Default  := (mbb=mbbOK) or ((mbb=mbbYes) and not (mbbOK in FButtons));
         if Default then Self.ActiveControl := Result;
         if mbb=mbbHelp then OnClick := BtnHelpClick else OnClick := BtnClick;
@@ -288,14 +297,14 @@ uses phUtils, phSettings, phChmHlp;
 
   procedure TdMsgBox.AdjustCaption;
   const
-    aCaptionConsts: Array[TMessageBoxKind] of String = (
+    asCaptionConsts: Array[TMessageBoxKind] of AnsiString = (
       'SDlgTitle_Info',           // mbkInfo
       'SDlgTitle_Warning',        // mbkWarning
       'SDlgTitle_Confirm',        // mbkConfirm
       'SDlgTitle_ConfirmWarning', // mbkConfirmWarning
       'SDlgTitle_Error');         // mbkError
   begin
-    Caption := ConstVal(aCaptionConsts[FKind]);
+    Caption := ConstVal(asCaptionConsts[FKind]);
   end;
 
   procedure TdMsgBox.AdjustIcon;

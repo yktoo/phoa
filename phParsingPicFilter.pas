@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.12 2005-06-26 16:04:01 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.13 2007-06-24 17:48:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -13,12 +13,15 @@ uses
   Windows, Classes, SysUtils, phIntf;
 
 type
-  EPhoaParseError = class(Exception)
+  EPhoaParseError = class(EPhoaWideException)
   private
+     // Prop storage
     FErrorPos: Integer;
   public
-    constructor Create(iPos: Integer; const sMessage: String);
-    constructor CreateFmt(iPos: Integer; const sMessage: String; const Params: Array of const);
+    constructor Create(iPos: Integer; const wsMessage: WideString);
+    constructor CreateFmt(iPos: Integer; const sMessage: WideString; const Params: Array of const);
+     // Props
+     // -- Позиция ошибки в тексте разбираемого выражения
     property ErrorPos: Integer read FErrorPos;
   end;
 
@@ -34,16 +37,16 @@ type
      // Возвращает True, если изображение соответствует заданному условию
     function  Matches(Pic: IPhoaPic): Boolean;
      // Prop handlers
-    function  GetExpression: String;
+    function  GetExpression: WideString;
     function  GetHasErrors: Boolean;
     function  GetParsed: Boolean;
-    function  GetParseErrorMsg: String;
+    function  GetParseErrorMsg: WideString;
     function  GetParseErrorPos: Integer;
     function  GetParseErrorLocation: TPoint;
-    procedure SetExpression(const sValue: String);
+    procedure SetExpression(const wsValue: WideString);
      // Props
      // -- Текущее вырыжение
-    property Expression: String read GetExpression write SetExpression;
+    property Expression: WideString read GetExpression write SetExpression;
      // -- Содержит ли разобранное выражение ошибки
     property HasErrors: Boolean read GetHasErrors;
      // -- Разобрано ли текущее выражение
@@ -53,7 +56,7 @@ type
      // -- Позиция ошибки в выражении
     property ParseErrorLocation: TPoint read GetParseErrorLocation;
      // -- Сообщение об ошибке при разборе выражения
-    property ParseErrorMsg: String read GetParseErrorMsg;
+    property ParseErrorMsg: WideString read GetParseErrorMsg;
   end;
 
    // Вид оператора
@@ -62,14 +65,14 @@ type
 
 const
    // Тексты операторов
-  asPicFilterOperators: Array [TPicFilterOperatorKind] of String = (
+  awsPicFilterOperators: Array [TPicFilterOperatorKind] of WideString = (
     'and', 'or', 'not', 'in', 'startsWith', 'endsWith', 'contains', 'isEmpty', '=', '<>', '<', '<=', '>', '>=');
 
    // Создаёт новый экземпляр IPhoaParsingPicFilter
   function  NewPhoaParsingPicFilter: IPhoaParsingPicFilter;
 
-  procedure PhoaParseError(iPos: Integer; const sMsg: String); overload;
-  procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const); overload;
+  procedure PhoaParseError(iPos: Integer; const wsMsg: WideString); overload;
+  procedure PhoaParseError(iPos: Integer; const wsMsg: WideString; const Params: Array of const); overload;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses phPhoa, Variants, phUtils, ConsVars;
@@ -130,14 +133,14 @@ resourcestring
   SPhoaParseError_InvalidDatatype             = 'Invalid datatype';
   SPhoaParseError_CommentBlockNotTerminated   = 'Unterminated comment block';
 
-  procedure PhoaParseError(iPos: Integer; const sMsg: String);
+  procedure PhoaParseError(iPos: Integer; const wsMsg: WideString);
   begin
-    raise EPhoaParseError.Create(iPos, sMsg);
+    raise EPhoaParseError.Create(iPos, wsMsg);
   end;
 
-  procedure PhoaParseError(iPos: Integer; const sMsg: String; const Params: Array of const);
+  procedure PhoaParseError(iPos: Integer; const wsMsg: WideString; const Params: Array of const);
   begin
-    raise EPhoaParseError.CreateFmt(iPos, sMsg, Params);
+    raise EPhoaParseError.CreateFmt(iPos, wsMsg, Params);
   end;
 
    //===================================================================================================================
@@ -167,12 +170,12 @@ type
     function  AsOperator: IPhoaParsedOperator;
      // Prop handlers
     function  GetPosition: Integer;
-    function  GetDescription: String;
+    function  GetDescription: WideString;
      // Props
      // -- Исходная позиция в строке
     property Position: Integer read GetPosition;
      // -- Описание элемента (для отладки)
-    property Description: String read GetDescription;
+    property Description: WideString read GetDescription;
   end;
 
   IPhoaParsedItemsList = interface(IInterfaceList)
@@ -200,10 +203,10 @@ type
     function  AsInteger(Pic: IPhoaPic): Integer;
      // Возвращает значение-список
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList;
-     // Возвращает строковое значение элемента
-    function  AsString(Pic: IPhoaPic): String;
      // Возвращает значение-время элемента
     function  AsTime(Pic: IPhoaPic): Integer;
+     // Возвращает строковое значение элемента
+    function  AsWideString(Pic: IPhoaPic): WideString;
      // Prop handlers
     function  GetDatatype: TPicPropDatatype;
      // Props
@@ -232,25 +235,20 @@ type
   protected
      // IPhoaParsedItemList
     function  GetItems(Index: Integer): IPhoaParsedItem;
-    procedure SetItems(Index: Integer; Value: IPhoaParsedItem);
     function  Pop: IPhoaParsedItem;
     function  Top: IPhoaParsedItem;
-    property  Items[Index: Integer]: IPhoaParsedItem read GetItems write SetItems; default;
+    procedure SetItems(Index: Integer; Value: IPhoaParsedItem);
      // IPhoaKeywordList
     function  IPhoaKeywordList.IndexOf       = KWL_IndexOf;
-    function  IPhoaKeywordList.IndexOfW      = KWL_IndexOfW;
     function  IPhoaKeywordList.GetCommaText  = KWL_GetCommaText;
-    function  IPhoaKeywordList.GetCommaTextW = KWL_GetCommaTextW;
     function  IPhoaKeywordList.GetCount      = KWL_GetCount;
     function  IPhoaKeywordList.GetItems      = KWL_GetItems;
-    function  IPhoaKeywordList.GetItemsW     = KWL_GetItemsW;
-    function  KWL_IndexOf(const sKeyword: String): Integer; stdcall;
-    function  KWL_IndexOfW(const sKeyword: WideString): Integer; stdcall;
-    function  KWL_GetCommaText: String; stdcall;
-    function  KWL_GetCommaTextW: WideString; stdcall;
+    function  KWL_IndexOf(const wsKeyword: WideString): Integer; stdcall;
+    function  KWL_GetCommaText: WideString; stdcall;
     function  KWL_GetCount: Integer; stdcall;
-    function  KWL_GetItems(Index: Integer): String; stdcall;
-    function  KWL_GetItemsW(Index: Integer): WideString; stdcall;
+    function  KWL_GetItems(Index: Integer): WideString; stdcall;
+     // Props
+    property  Items[Index: Integer]: IPhoaParsedItem read GetItems write SetItems; default;
   end;
 
   TPhoaParsedItem = class(TInterfacedObject, IPhoaParsedItem)
@@ -258,16 +256,17 @@ type
      // Prop storage
     FPosition: Integer;
      // IPhoaParsedItem
-    procedure OperandExpected;
-    procedure OperatorExpected;
-    procedure InvalidDatatype;
-    procedure InvalidOperatorKind;
-    function  GetPosition: Integer;
-    function  GetDescription: String; virtual; abstract;
-    function  IsOperator: Boolean; virtual; abstract;
     function  AsOperand: IPhoaParsedOperand; virtual;
     function  AsOperator: IPhoaParsedOperator; virtual;
-    property Description: String read GetDescription;
+    function  GetDescription: WideString; virtual; abstract;
+    function  GetPosition: Integer;
+    function  IsOperator: Boolean; virtual; abstract;
+    procedure InvalidDatatype;
+    procedure InvalidOperatorKind;
+    procedure OperandExpected;
+    procedure OperatorExpected;
+     // Props
+    property Description: WideString read GetDescription;
     property Position: Integer read GetPosition;
   public
     constructor Create(iPos: Integer);
@@ -280,12 +279,12 @@ type
     function  AsOperand: IPhoaParsedOperand; override;
      // IPhoaParsedOperand
     function  AsBoolean(Pic: IPhoaPic): Boolean; virtual;
-    function  AsString(Pic: IPhoaPic): String; virtual;
     function  AsDate(Pic: IPhoaPic): Integer; virtual;
-    function  AsTime(Pic: IPhoaPic): Integer; virtual;
-    function  AsInteger(Pic: IPhoaPic): Integer; virtual;
     function  AsFloat(Pic: IPhoaPic): Double; virtual;
+    function  AsInteger(Pic: IPhoaPic): Integer; virtual;
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; virtual;
+    function  AsTime(Pic: IPhoaPic): Integer; virtual;
+    function  AsWideString(Pic: IPhoaPic): WideString; virtual;
     function  GetDatatype: TPicPropDatatype; virtual; abstract;
      // Props
     property Datatype: TPicPropDatatype read GetDatatype;
@@ -309,7 +308,7 @@ type
   protected
      // Вид скобки
     FBracketType: TBracketType;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
     function  GetPriority: Integer; override;
     function  IsOpenBracket: Boolean; override;
     function  IsCloseBracket: Boolean; override;
@@ -321,17 +320,17 @@ type
   protected
      // Вид оператора
     FKind: TPicFilterOperatorKind;
+    function  IsUnaryOperator: Boolean; override;
+    function  GetDescription: WideString; override;
+    function  GetPriority: Integer; override;
+    procedure Execute(Stack: IPhoaParsedItemsList; Pic: IPhoaPic); override;
      // Сравнивают два значения с учётом вида оператора
     function  CompareValues(Val1, Val2: Integer): Boolean; overload;
     function  CompareValues(const Val1, Val2: Double): Boolean; overload;
-    function  CompareValues(const Val1, Val2: String): Boolean; overload;
+    function  CompareValues(const Val1, Val2: WideString): Boolean; overload;
     function  CompareValues(Val1, Val2: Boolean): Boolean; overload;
-    function  IsUnaryOperator: Boolean; override;
-    function  GetDescription: String; override;
-    function  GetPriority: Integer; override;
-    procedure Execute(Stack: IPhoaParsedItemsList; Pic: IPhoaPic); override;
-     // Выполняет оператор над двумя String операндами
-    function  CompareAsStrings(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
+     // Выполняет оператор над двумя WideString операндами
+    function  CompareAsWideStrings(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
      // Выполняет оператор над двумя Boolean операндами
     function  CompareAsBoolean(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
      // Выполняет оператор над двумя Integer операндами
@@ -343,49 +342,49 @@ type
      // Выполняет оператор над двумя Time операндами
     function  CompareAsTime(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
   public
-    constructor Create(const sKind: String; iPos: Integer);
+    constructor Create(const wsKind: WideString; iPos: Integer);
   end;
 
   TPhoaParsedLiteral = class(TPhoaParsedOperand)
   protected
      // Значение литерала
-    FValue: String;
-    function  AsString(Pic: IPhoaPic): String; override;
+    FValue: WideString;
     function  AsDate(Pic: IPhoaPic): Integer; override;
     function  AsTime(Pic: IPhoaPic): Integer; override;
+    function  AsWideString(Pic: IPhoaPic): WideString; override;
     function  GetDatatype: TPicPropDatatype; override;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
   public
-    constructor Create(const sValue: String; iPos: Integer);
+    constructor Create(const wsValue: WideString; iPos: Integer);
   end;
 
   TPhoaParsedPicProp = class(TPhoaParsedOperand)
   protected
      // Свойство изображения
     FProp: TPicProperty;
-    function  AsString(Pic: IPhoaPic): String; override;
     function  AsDate(Pic: IPhoaPic): Integer; override;
-    function  AsTime(Pic: IPhoaPic): Integer; override;
     function  AsInteger(Pic: IPhoaPic): Integer; override;
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; override;
+    function  AsTime(Pic: IPhoaPic): Integer; override;
+    function  AsWideString(Pic: IPhoaPic): WideString; override;
     function  GetDatatype: TPicPropDatatype; override;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
   public
-    constructor Create(const sPropName: String; iPos: Integer);
+    constructor Create(const wsPropName: WideString; iPos: Integer);
   end;
 
   TPhoaParsedValue = class(TPhoaParsedOperand)
   protected
      // Строковое представление значения
-    FStringValue: String;
+    FWideStringValue: WideString;
      // Текущий тип данных
     FCurrentDatatype: TPicPropDatatype;
     function  AsInteger(Pic: IPhoaPic): Integer; override;
     function  AsFloat(Pic: IPhoaPic): Double; override;
     function  GetDatatype: TPicPropDatatype; override;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
   public
-    constructor Create(const sStringValue: String; iPos: Integer);
+    constructor Create(const wsWideStringValue: WideString; iPos: Integer);
   end;
 
   TPhoaParsedList = class(TPhoaParsedOperand)
@@ -397,7 +396,7 @@ type
   protected
     function  AsList(Pic: IPhoaPic): IPhoaKeywordList; override;
     function  GetDatatype: TPicPropDatatype; override;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
      // Props
      // -- Список элементов
     property ItemList: IPhoaParsedItemsList read GetItemList;
@@ -409,7 +408,7 @@ type
     FValue: Boolean;
     function  AsBoolean(Pic: IPhoaPic): Boolean; override;
     function  GetDatatype: TPicPropDatatype; override;
-    function  GetDescription: String; override;
+    function  GetDescription: WideString; override;
   public
     constructor Create(bValue: Boolean; iPos: Integer);
   end;
@@ -418,15 +417,15 @@ type
    // EPhoaParseError
    //===================================================================================================================
 
-  constructor EPhoaParseError.Create(iPos: Integer; const sMessage: String);
+  constructor EPhoaParseError.Create(iPos: Integer; const wsMessage: WideString);
   begin
-    inherited Create(sMessage);
+    inherited Create(wsMessage);
     FErrorPos := iPos;
   end;
 
-  constructor EPhoaParseError.CreateFmt(iPos: Integer; const sMessage: String; const Params: array of const);
+  constructor EPhoaParseError.CreateFmt(iPos: Integer; const wsMessage: WideString; const Params: array of const);
   begin
-    inherited CreateFmt(sMessage, Params);
+    inherited CreateFmt(wsMessage, Params);
     FErrorPos := iPos;
   end;
 
@@ -439,7 +438,7 @@ type
     Result := IPhoaParsedItem(Get(Index));
   end;
 
-  function TPhoaParsedItemsList.KWL_GetCommaText: String;
+  function TPhoaParsedItemsList.KWL_GetCommaText: WideString;
   var i: Integer;
   begin
     Result := '';
@@ -448,37 +447,21 @@ type
     end;
   end;
 
-  function TPhoaParsedItemsList.KWL_GetCommaTextW: WideString;
-  begin
-    Result := '';
-    { stub }
-  end;
-
   function TPhoaParsedItemsList.KWL_GetCount: Integer;
   begin
     Result := Count;
   end;
 
-  function TPhoaParsedItemsList.KWL_GetItems(Index: Integer): String;
+  function TPhoaParsedItemsList.KWL_GetItems(Index: Integer): WideString;
   begin
-    Result := Items[Index].AsOperand.AsString(nil);
+    Result := Items[Index].AsOperand.AsWideString(nil);
   end;
 
-  function TPhoaParsedItemsList.KWL_GetItemsW(Index: Integer): WideString;
-  begin
-    Result := PhoaAnsiToUnicode(KWL_GetItems(Index));
-  end;
-
-  function TPhoaParsedItemsList.KWL_IndexOf(const sKeyword: String): Integer;
+  function TPhoaParsedItemsList.KWL_IndexOf(const wsKeyword: WideString): Integer;
   begin
     for Result := 0 to Count-1 do
-      if AnsiCompareText(Items[Result].AsOperand.AsString(nil), sKeyword)=0 then Exit;
+      if WideCompareText(Items[Result].AsOperand.AsWideString(nil), wsKeyword)=0 then Exit;
     Result := -1;
-  end;
-
-  function TPhoaParsedItemsList.KWL_IndexOfW(const sKeyword: WideString): Integer;
-  begin
-    Result := KWL_IndexOf(PhoaUnicodeToAnsi(sKeyword));
   end;
 
   function TPhoaParsedItemsList.Pop: IPhoaParsedItem;
@@ -599,18 +582,18 @@ type
     Result := Self;
   end;
 
-  function TPhoaParsedOperand.AsString(Pic: IPhoaPic): String;
-  begin
-     // Базовый класс не умеет возвращать типизированные значения
-    InvalidDatatype;
-  end;
-
   function TPhoaParsedOperand.AsTime(Pic: IPhoaPic): Integer;
   begin
      // Базовый класс не умеет возвращать типизированные значения
     InvalidDatatype;
      // Заглушка от предупреждений
     Result := 0;
+  end;
+
+  function TPhoaParsedOperand.AsWideString(Pic: IPhoaPic): WideString;
+  begin
+     // Базовый класс не умеет возвращать типизированные значения
+    InvalidDatatype;
   end;
 
   function TPhoaParsedOperand.IsOperator: Boolean;
@@ -666,10 +649,10 @@ type
     end;
   end;
 
-  function TPhoaParsedBracket.GetDescription: String;
+  function TPhoaParsedBracket.GetDescription: WideString;
   begin
     if FBracketType=btOpen then Result := 'open' else Result := 'close';
-    Result := Format('[%d] %s bracket', [Position, Result]);
+    Result := WideFormat('[%d] %s bracket', [Position, Result]);
   end;
 
   function TPhoaParsedBracket.GetPriority: Integer;
@@ -696,17 +679,17 @@ type
     Result := DateToPhoaDate(StrToDate(FValue, AppFormatSettings));
   end;
 
-  function TPhoaParsedLiteral.AsString(Pic: IPhoaPic): String;
-  begin
-    Result := FValue;
-  end;
-
   function TPhoaParsedLiteral.AsTime(Pic: IPhoaPic): Integer;
   begin
     Result := TimeToPhoaTime(StrToTime(FValue, AppFormatSettings));
   end;
 
-  constructor TPhoaParsedLiteral.Create(const sValue: String; iPos: Integer);
+  function TPhoaParsedLiteral.AsWideString(Pic: IPhoaPic): WideString;
+  begin
+    Result := FValue;
+  end;
+
+  constructor TPhoaParsedLiteral.Create(const wsValue: WideString; iPos: Integer);
   begin
     inherited Create(iPos);
     FValue := sValue;
@@ -717,9 +700,9 @@ type
     Result := ppdtString;
   end;
 
-  function TPhoaParsedLiteral.GetDescription: String;
+  function TPhoaParsedLiteral.GetDescription: WideString;
   begin
-    Result := Format('[%d] literal "%s"', [Position, FValue]);
+    Result := WideFormat('[%d] literal "%s"', [Position, FValue]);
   end;
 
    //===================================================================================================================
@@ -749,10 +732,10 @@ type
     if (Pic=nil) or not VarSupports(Pic.PropValues[FProp], IPhoaKeywordList, Result) then Result := nil;
   end;
 
-  function TPhoaParsedPicProp.AsString(Pic: IPhoaPic): String;
+  function TPhoaParsedPicProp.AsWideString(Pic: IPhoaPic): WideString;
   begin
     if Datatype<>ppdtString then InvalidDatatype;
-    if Pic=nil then Result := '' else Result := VarToStr(Pic.PropValues[FProp]);
+    if Pic=nil then Result := '' else Result := Pic.PropStrValues[FProp];
   end;
 
   function TPhoaParsedPicProp.AsTime(Pic: IPhoaPic): Integer;
@@ -761,11 +744,11 @@ type
     if Pic=nil then Result := 0 else Result := Pic.PropValues[FProp];
   end;
 
-  constructor TPhoaParsedPicProp.Create(const sPropName: String; iPos: Integer);
+  constructor TPhoaParsedPicProp.Create(const wsPropName: WideString; iPos: Integer);
   begin
     inherited Create(iPos);
-    FProp := StrToPicProp(sPropName, False);
-    if not (FProp in [Low(FProp)..High(FProp)]) then PhoaParseError(iPos, SPhoaParseError_InvalidProperty, [sPropName]);
+    FProp := StrToPicProp(wsPropName, False);
+    if not (FProp in [Low(FProp)..High(FProp)]) then PhoaParseError(iPos, SPhoaParseError_InvalidProperty, [wsPropName]);
   end;
 
   function TPhoaParsedPicProp.GetDatatype: TPicPropDatatype;
@@ -773,9 +756,9 @@ type
     Result := aPicPropDatatype[FProp];
   end;
 
-  function TPhoaParsedPicProp.GetDescription: String;
+  function TPhoaParsedPicProp.GetDescription: WideString;
   begin
-    Result := Format('[%d] property %s', [Position, PicPropToStr(FProp, True)]);
+    Result := WideFormat('[%d] property %s', [Position, PicPropToStr(FProp, True)]);
   end;
 
    //===================================================================================================================
@@ -792,11 +775,11 @@ type
     if not TryStrToInt(FStringValue, Result) then InvalidDatatype;
   end;
 
-  constructor TPhoaParsedValue.Create(const sStringValue: String; iPos: Integer);
+  constructor TPhoaParsedValue.Create(const wsWideStringValue: WideString; iPos: Integer);
   begin
     inherited Create(iPos);
-    FStringValue := sStringValue;
-    if Pos('.', FStringValue)>0 then FCurrentDatatype := ppdtFloat else FCurrentDatatype := ppdtInteger; 
+    FWideStringValue := wsWideStringValue;
+    if Pos('.', FWideStringValue)>0 then FCurrentDatatype := ppdtFloat else FCurrentDatatype := ppdtInteger; 
   end;
 
   function TPhoaParsedValue.GetDatatype: TPicPropDatatype;
@@ -804,9 +787,9 @@ type
     Result := FCurrentDatatype;
   end;
 
-  function TPhoaParsedValue.GetDescription: String;
+  function TPhoaParsedValue.GetDescription: WideString;
   begin
-    Result := Format('[%d] value "%s"', [Position, FStringValue]);
+    Result := WideFormat('[%d] value "%s"', [Position, FWideStringValue]);
   end;
 
    //===================================================================================================================
@@ -823,17 +806,17 @@ type
     Result := ppdtList;
   end;
 
-  function TPhoaParsedList.GetDescription: String;
+  function TPhoaParsedList.GetDescription: WideString;
   var
     i: Integer;
-    s: String;
+    ws: WideString;
   begin
-    s := '';
+    ws := '';
     for i := 0 to ItemList.Count-1 do begin
-      if s<>'' then s := s+',';
-      s := s+ItemList[i].GetDescription;
+      if ws<>'' then ws := ws+',';
+      ws := ws+ItemList[i].GetDescription;
     end;
-    Result := Format('[%d] list of %d items: (%s)', [Position, ItemList.Count, s]);
+    Result := WideFormat('[%d] list of %d items: (%s)', [Position, ItemList.Count, ws]);
   end;
 
   function TPhoaParsedList.GetItemList: IPhoaParsedItemsList;
@@ -862,9 +845,9 @@ type
     Result := ppdtBoolean;
   end;
 
-  function TPhoaParsedBoolean.GetDescription: String;
+  function TPhoaParsedBoolean.GetDescription: WideString;
   begin
-    Result := Format('[%d] boolean "%s"', [Position, BoolToStr(FValue)]);
+    Result := WideFormat('[%d] boolean "%s"', [Position, BoolToStr(FValue)]);
   end;
 
    //===================================================================================================================
@@ -904,11 +887,11 @@ type
   end;
 
   function TPhoaParsedOperator.CompareAsStrings(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
-  var s1, s2: String;
+  var ws1, ws2: WideString;
   begin
-    s1 := Op1.AsString(Pic);
-    s2 := Op2.AsString(Pic);
-    Result := CompareValues(s1, s2);
+    ws1 := Op1.AsWideString(Pic);
+    ws2 := Op2.AsWideString(Pic);
+    Result := CompareValues(ws1, ws2);
   end;
 
   function TPhoaParsedOperator.CompareAsTime(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
@@ -919,29 +902,29 @@ type
     Result := CompareValues(i1, i2);
   end;
 
-  function TPhoaParsedOperator.CompareValues(const Val1, Val2: String): Boolean;
-  var s1, s2: String;
+  function TPhoaParsedOperator.CompareValues(const Val1, Val2: WideString): Boolean;
+  var ws1, ws2: WideString;
   begin
     case FKind of
       okStartsWith, okEndsWith, okContains: begin
-        s1 := AnsiUpperCase(Val1);
-        s2 := AnsiUpperCase(Val2);
-        if FKind=okStartsWith then    Result := Copy(s1, 1, Length(s2))=s2
-        else if FKind=okEndsWith then Result := Copy(s1, Length(s1)-Length(s2)+1, Length(s2))=s2
-        else                          Result := Pos(s2, s1)>0;
+        ws1 := WideUpperCase(Val1);
+        ws2 := WideUpperCase(Val2);
+        if FKind=okStartsWith then    Result := Copy(ws1, 1, Length(ws2))=ws2
+        else if FKind=okEndsWith then Result := Copy(ws1, Length(ws1)-Length(ws2)+1, Length(ws2))=ws2
+        else                          Result := Pos(ws2, ws1)>0;
       end;
-      okEQ:    Result := AnsiCompareText(Val1, Val2)=0;
-      okNotEQ: Result := AnsiCompareText(Val1, Val2)<>0;
-      okLT:    Result := AnsiCompareText(Val1, Val2)<0;
-      okLE:    Result := AnsiCompareText(Val1, Val2)<=0;
-      okGT:    Result := AnsiCompareText(Val1, Val2)>0;
-      okGE:    Result := AnsiCompareText(Val1, Val2)>=0;
+      okEQ:    Result := WideSameText(Val1, Val2);
+      okNotEQ: Result := not WideSameText(Val1, Val2);
+      okLT:    Result := WideCompareText(Val1, Val2)<0;
+      okLE:    Result := WideCompareText(Val1, Val2)<=0;
+      okGT:    Result := WideCompareText(Val1, Val2)>0;
+      okGE:    Result := WideCompareText(Val1, Val2)>=0;
       else begin
         InvalidDatatype;
          // Заглушка от предупреждений
         Result := False;
       end;
-    end; 
+    end;
   end;
 
   function TPhoaParsedOperator.CompareValues(const Val1, Val2: Double): Boolean;
@@ -997,22 +980,22 @@ type
     end; 
   end;
 
-  constructor TPhoaParsedOperator.Create(const sKind: String; iPos: Integer);
+  constructor TPhoaParsedOperator.Create(const wsKind: WideString; iPos: Integer);
   var
-    s: String;
+    ws: WideString;
     bFind: Boolean;
     ok: TPicFilterOperatorKind;
   begin
     inherited Create(iPos);
-    s := UpperCase(sKind);
+    ws := WideUpperCase(wsKind);
     bFind := False;
     for ok := Low(ok) to High(ok) do
-      if SameText(asPicFilterOperators[ok], s) then begin
+      if WideSameText(awsPicFilterOperators[ok], ws) then begin
         FKind := ok;
         bFind := True;
         Break;
       end;
-    if not bFind then PhoaParseError(iPos, SPhoaParseError_InvalidOperator, [sKind]);
+    if not bFind then PhoaParseError(iPos, SPhoaParseError_InvalidOperator, [wsKind]);
   end;
 
   procedure TPhoaParsedOperator.Execute(Stack: IPhoaParsedItemsList; Pic: IPhoaPic);
@@ -1021,7 +1004,7 @@ type
     List: IPhoaKeywordList;
     dt: TPicPropDatatype;
     bResult: Boolean;
-    s: String;
+    ws: WideString;
   begin
     Op2 := Stack.Pop.AsOperand;
     if not IsUnaryOperator then Op1 := Stack.Pop.AsOperand;
@@ -1051,18 +1034,18 @@ type
         bResult := (List<>nil) and (List.Count=0);
       end;
       okIn: begin
-        s := Op1.AsString(Pic);
+        ws := Op1.AsWideString(Pic);
         List := Op2.AsList(Pic);
-        bResult := (List<>nil) and (List.IndexOf(s)>=0);
+        bResult := (List<>nil) and (List.IndexOf(ws)>=0);
       end;
       else InvalidOperatorKind;
-    end; 
+    end;
     Stack.Add(TPhoaParsedBoolean.Create(bResult, Op2.Position) as IPhoaParsedItem);
   end;
 
-  function TPhoaParsedOperator.GetDescription: String;
+  function TPhoaParsedOperator.GetDescription: WideString;
   begin
-    Result := Format('[%d] operator %s', [Position, asPicFilterOperators[FKind]]);
+    Result := WideFormat('[%d] operator %s', [Position, awsPicFilterOperators[FKind]]);
   end;
 
   function TPhoaParsedOperator.GetPriority: Integer;
@@ -1086,23 +1069,23 @@ type
   TPhoaParsingPicFilter = class(TInterfacedObject, IPhoaParsingPicFilter)
   private
      // Prop storage
-    FExpression: String;
+    FExpression: WideString;
     FHasErrors: Boolean;
     FParsed: Boolean;
-    FParseErrorMsg: String;
+    FParseErrorMsg: WideString;
     FParseErrorPos: Integer;
      // IPhoaParsingPicFilter
-    procedure ParseExpression(bCheck, bRaiseOnError: Boolean);
-    procedure CheckExpression;
-    procedure CheckHasNoErrors;
-    function  Matches(Pic: IPhoaPic): Boolean;
-    function  GetExpression: String;
+    function  GetExpression: WideString;
     function  GetHasErrors: Boolean;
     function  GetParsed: Boolean;
-    function  GetParseErrorMsg: String;
-    function  GetParseErrorPos: Integer;
     function  GetParseErrorLocation: TPoint;
-    procedure SetExpression(const sValue: String);
+    function  GetParseErrorMsg: WideString;
+    function  GetParseErrorPos: Integer;
+    function  Matches(Pic: IPhoaPic): Boolean;
+    procedure CheckExpression;
+    procedure CheckHasNoErrors;
+    procedure ParseExpression(bCheck, bRaiseOnError: Boolean);
+    procedure SetExpression(const wsValue: WideString);
   protected
      // Список разобранных элементов
     FItems: IPhoaParsedItemsList;
@@ -1132,7 +1115,7 @@ type
     FItems := TPhoaParsedItemsList.Create;
   end;
 
-  function TPhoaParsingPicFilter.GetExpression: String;
+  function TPhoaParsingPicFilter.GetExpression: WideString;
   begin
     Result := FExpression;
   end;
@@ -1173,7 +1156,7 @@ type
     end;
   end;
 
-  function TPhoaParsingPicFilter.GetParseErrorMsg: String;
+  function TPhoaParsingPicFilter.GetParseErrorMsg: WideString;
   begin
     Result := FParseErrorMsg;
   end;
@@ -1259,7 +1242,7 @@ type
     end;
 
      // Извлекает из FExpression и возвращает строку идентификатора, начиная с текущей позиции
-    function ExtractIdentifierString: String;
+    function ExtractIdentifierString: WideString;
     var iStartPos: Integer;
     begin
       iStartPos := iCurrentPos;
@@ -1268,7 +1251,7 @@ type
     end;
 
      // Извлекает из FExpression и возвращает строковый литерал, начиная с текущей позиции
-    function ExtractLiteralString: String;
+    function ExtractLiteralString: WideString;
     var
       iStartPos, iTempPos: Integer;
       bOpen: Boolean;
@@ -1304,7 +1287,7 @@ type
     end;
 
      // Извлекает из FExpression и возвращает значение в виде строки, начиная с текущей позиции
-    function ExtractValueString: String;
+    function ExtractValueString: WideString;
     var
       c: Char;
       bSignValid, bHasDot, bHasDigit: Boolean;
@@ -1359,18 +1342,18 @@ type
     function ExtractComparison: TPhoaParsedOperator;
     var
       iStartPos: Integer;
-      s: String;
-      c: Char;
+      ws: WideString;
+      wc: WideChar;
     begin
       iStartPos := iCurrentPos;
-      s := '';
+      ws := '';
       while iCurrentPos<=iLen do begin
-        c := FExpression[iCurrentPos];
-        if not (c in CSMathCompChars) then Break;
-        s := s+c;
+        wc := FExpression[iCurrentPos];
+        if not (wc in CSMathCompChars) then Break;
+        ws := ws+wc;
         Inc(iCurrentPos);
       end;
-      Result := TPhoaParsedOperator.Create(s, iStartPos);
+      Result := TPhoaParsedOperator.Create(ws, iStartPos);
     end;
 
      // Извлекает из FExpression и возвращает очередной элемент-список, начиная с текущей позиции
@@ -1442,15 +1425,15 @@ type
     function ExtractItem: IPhoaParsedItem;
     var
       iStartPos: Integer;
-      c: Char;
-      s: String;
+      wc: WideChar;
+      ws: WideString;
     begin
       iStartPos := iCurrentPos;
-      c := FExpression[iCurrentPos];
-      case c of
+      wc := FExpression[iCurrentPos];
+      case wc of
         '''': begin
-          s := ExtractLiteralString;
-          Result := TPhoaParsedLiteral.Create(s, iStartPos);
+          ws := ExtractLiteralString;
+          Result := TPhoaParsedLiteral.Create(ws, iStartPos);
         end;
         '[':
           Result := ExtractList;
@@ -1463,17 +1446,17 @@ type
         '{':
           SkipMultiLineComment;
         else begin
-          if (c='/') and (iCurrentPos<iLen) and (FExpression[iCurrentPos+1]='/') then
+          if (wc='/') and (iCurrentPos<iLen) and (FExpression[iCurrentPos+1]='/') then
             SkipSingleLineComment
-          else if c in CSMathCompChars then
+          else if wc in CSMathCompChars then
             Result := ExtractComparison
-          else if c in CSIDStartChars then
+          else if wc in CSIDStartChars then
             Result := ExtractOperator
-          else if c in CSValueChars then begin
-            s := ExtractValueString;
-            Result := TPhoaParsedValue.Create(s, iStartPos);
+          else if wc in CSValueChars then begin
+            ws := ExtractValueString;
+            Result := TPhoaParsedValue.Create(ws, iStartPos);
           end else
-            PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [c]);
+            PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [wc]);
         end;
       end; // case
     end;
@@ -1574,12 +1557,12 @@ type
     end;
   end;
 
-  procedure TPhoaParsingPicFilter.SetExpression(const sValue: String);
-  var s: String;
+  procedure TPhoaParsingPicFilter.SetExpression(const wsValue: WideString);
+  var ws: WideString;
   begin
-    s := AdjustLineBreaks(sValue);
-    if FExpression<>s then begin
-      FExpression := s;
+    ws := Tnt_AdjustLineBreaks(wsValue);
+    if FExpression<>ws then begin
+      FExpression := ws;
       FParsed := False;
     end;
   end;

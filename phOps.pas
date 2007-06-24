@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.22 2005-08-15 11:25:11 dale Exp $
+//  $Id: phOps.pas,v 1.23 2007-06-24 17:48:10 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -33,32 +33,32 @@ type
   IPhoaOperationParams = interface(IInterface)
     ['{4AF24473-A666-4373-9BD6-DC0868647DC9}']
      // Получает интерфейсное значение параметра. Если bRequired=True, то проверяет наличие параметра и при отсутствии
-     //   вызывает Exception; при bRequired=False и отсутствии параметра в Intf возвращает nil. Если параметр есть,
-     //   обязательно проверяет доступность интерфейса, при его отсутствии вызвает Exception
-    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
+     //   вызывает exception; при bRequired=False и отсутствии параметра в Intf возвращает nil. Если параметр есть,
+     //   обязательно проверяет доступность интерфейса, при его отсутствии вызвает exception
+    procedure ObtainValIntf(const sName: AnsiString; GUID: TGUID; out Intf; bRequired: Boolean = True);
      // Prop handlers
     function  GetCount: Integer;
-    function  GetNames(Index: Integer): String;
-    function  GetValBool(const sName: String): Boolean;
-    function  GetValByte(const sName: String): Byte;
-    function  GetValInt(const sName: String): Integer;
-    function  GetValStr(const sName: String): String;
-    function  GetValues(const sName: String): Variant;
+    function  GetNames(Index: Integer): AnsiString;
+    function  GetValBool(const sName: AnsiString): Boolean;
+    function  GetValByte(const sName: AnsiString): Byte;
+    function  GetValInt(const sName: AnsiString): Integer;
+    function  GetValStr(const sName: AnsiString): WideString;
+    function  GetValues(const sName: AnsiString): Variant;
     function  GetValuesByIndex(Index: Integer): Variant;
-    procedure SetValues(const sName: String; const Value: Variant);
+    procedure SetValues(const sName: AnsiString; const Value: Variant);
     procedure SetValuesByIndex(Index: Integer; const Value: Variant);
      // Props
      // -- Количество параметров
     property Count: Integer read GetCount;
      // -- Наименования параметров по индексу
-    property Names[Index: Integer]: String read GetNames;
+    property Names[Index: Integer]: AnsiString read GetNames;
      // -- Типизированные значения параметров с проверкой на существование и тип
-    property ValBool[const sName: String]: Boolean read GetValBool;
-    property ValByte[const sName: String]: Byte    read GetValByte;
-    property ValInt [const sName: String]: Integer read GetValInt;
-    property ValStr [const sName: String]: String  read GetValStr;
+    property ValBool[const sName: AnsiString]: Boolean    read GetValBool;
+    property ValByte[const sName: AnsiString]: Byte       read GetValByte;
+    property ValInt [const sName: AnsiString]: Integer    read GetValInt;
+    property ValStr [const sName: AnsiString]: WideString read GetValStr;
      // -- Значения параметров по имени (при присваивании Unassigned параметр удаляется)
-    property Values[const sName: String]: Variant read GetValues write SetValues; default;
+    property Values[const sName: AnsiString]: Variant read GetValues write SetValues; default;
      // -- Значения параметров по индексу (при присваивании Unassigned параметр удаляется)
     property ValuesByIndex[Index: Integer]: Variant read GetValuesByIndex write SetValuesByIndex;
   end;
@@ -96,14 +96,14 @@ type
 
   PPicFileChange = ^TPicFileChange;
   TPicFileChange = record
-    Pic:       IPhotoAlbumPic; // Изображение
-    sFileName: String;         // Имя нового файла, сопоставляемого Pic
+    Pic:        IPhotoAlbumPic; // Изображение
+    wsFileName: WideString;     // Имя нового файла, сопоставляемого Pic
   end;
 
   IPhoaPicFileChangeList = interface(IInterface)
     ['{9B327389-E6BC-4297-845C-563002068720}']
      // Добавляет новую запись
-    function  Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+    function  Add(Pic: IPhotoAlbumPic; const wsFileName: WideString): Integer;
      // Prop handlers
     function  GetCount: Integer;
     function  GetItems(Index: Integer): PPicFileChange;
@@ -182,7 +182,7 @@ type
      //   объект-операцию. В Changes добавляет набор флагов внесённых в процессе отката изменений
     procedure Undo(var Changes: TPhoaOperationChanges);
      // Наименование операции
-    function Name: String;
+    function Name: WideString;
      // Props
      // -- Позиция в Undo-файле данных о состоянии интерфейса
     property GUIStateUndoDataPosition: Int64 read FGUIStateUndoDataPosition write FGUIStateUndoDataPosition;
@@ -208,14 +208,14 @@ type
   IPhoaOperationFactory = interface(IInterface)
     ['{BE27C06A-6F28-4A8E-9F41-20350D45D8AC}']
      // Регистрирует новый класс операций в списке
-    procedure RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
+    procedure RegisterOpClass(const sOpName: AnsiString; OpClass: TPhoaOperationClass);
      // Инстанцирует и возвращает новую операцию
-    function  NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+    function  NewOperation(const sOpName: AnsiString; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
      // Prop handlers
-    function  GetClassByName(const sOpName: String): TPhoaOperationClass; 
+    function  GetClassByName(const sOpName: AnsiString): TPhoaOperationClass;
      // Props
      // -- Возвращает класс по имени операции. Если нет такого, вызывает Exception
-    property ClassByName[const sOpName: String]: TPhoaOperationClass read GetClassByName;
+    property ClassByName[const sOpName: AnsiString]: TPhoaOperationClass read GetClassByName;
   end;
 
    //===================================================================================================================
@@ -270,7 +270,7 @@ type
      // Ограничивает количество операций в списке числом MaxCount
     procedure LimitCount;
      // Prop handlers
-    function  GetLastOpName: String;
+    function  GetLastOpName: WideString;
     function  GetIsUnmodified: Boolean;
     procedure SetMaxCount(Value: Integer);
   public
@@ -285,7 +285,7 @@ type
      // -- Возвращает True, если текущее состояние буфера отката соответствует сохранённому состоянию фотоальбома
     property IsUnmodified: Boolean read GetIsUnmodified;
      // -- Возвращает наименование последней сделанной операции
-    property LastOpName: String read GetLastOpName;
+    property LastOpName: WideString read GetLastOpName;
      // -- Максимальное количество операций в списке
     property MaxCount: Integer read FMaxCount write SetMaxCount;
   end;
@@ -313,7 +313,7 @@ type
    // Операция переименования группы
    //   Params:
    //     Group:   IPhotoAlbumPicGroup - группа, которую переименовываем
-   //     NewText: String              - новое наименование группы
+   //     NewText: WideString          - новое наименование группы
    //===================================================================================================================
 
   TPhoaOp_GroupRename = class(TPhoaOperation)
@@ -326,9 +326,9 @@ type
    // Операция редактирования свойств группы
    //   Params:
    //     Group:          IPhotoAlbumPicGroup - редактируемая группа
-   //     NewText:        String              - новое наименование группы
-   //     NewDescription: String              - новое описание группы
-   //     NewIconData:    String              - PNG-данные значка группы
+   //     NewText:        WideString          - новое наименование группы
+   //     NewDescription: WideString          - новое описание группы
+   //     NewIconData:    TPhoaRawData        - PNG-данные значка группы
    //===================================================================================================================
 
   TPhoaOp_GroupEdit = class(TPhoaOperation)
@@ -570,10 +570,10 @@ type
    //===================================================================================================================
    // Операция редактирования свойств проекта
    //   Params:
-   //     NewThWidth:     Integer - новая ширина эскиза
-   //     NewThHeight:    Integer - новая высота эскиза
-   //     NewThQuality:   Byte    - новое качество эскиза
-   //     NewDescription: String  - новое описание проекта
+   //     NewThWidth:     Integer    - новая ширина эскиза
+   //     NewThHeight:    Integer    - новая высота эскиза
+   //     NewThQuality:   Byte       - новое качество эскиза
+   //     NewDescription: WideString - новое описание проекта
    //===================================================================================================================
 
   TPhoaOp_ProjectEdit = class(TPhoaOperation)
@@ -670,8 +670,8 @@ type
    //===================================================================================================================
    // Операция создания представления
    //   Params:
-   //     Name:             String                     - наименование представления
-   //     FilterExpression: String                     - выражение фильтра изображений
+   //     Name:             WideString                 - наименование представления
+   //     FilterExpression: WideString                 - выражение фильтра изображений
    //     Groupings:        IPhotoAlbumPicGroupingList - список группировок представления
    //     Sortings:         IPhotoAlbumPicSortingList  - список сортировок представления
    //===================================================================================================================
@@ -686,8 +686,8 @@ type
    // Операция изменения представления
    //   Params:
    //     View:             IPhotoAlbumView            - изменяемое представление
-   //     Name:             String                     - новое наименование представления
-   //     FilterExpression: String                     - новое выражение фильтра изображений
+   //     Name:             WideString                 - новое наименование представления
+   //     FilterExpression: WideString                 - новое выражение фильтра изображений
    //     Groupings:        IPhotoAlbumPicGroupingList - новый список группировок представления
    //     Sortings:         IPhotoAlbumPicSortingList  - новый список сортировок представления
    //       Если Groupings=nil и Sortings=nil, значит, это просто переименование представления
@@ -742,7 +742,7 @@ resourcestring
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
-  TypInfo, Clipbrd,
+  TypInfo, TntClipBrd,
   VirtualDataObject, GR32,
   phUtils, phGraphics, ConsVars, phSettings, Variants;
 
@@ -810,8 +810,8 @@ uses
 type
   PPhoaOperationParam = ^TPhoaOperationParam;
   TPhoaOperationParam = record
-    sName: String;
-    vValue: Variant;
+    sName:  AnsiString; // Наименование параметра
+    vValue: Variant;    // Значение параметра
   end;
 
   TPhoaOperationParams = class(TInterfacedObject, IPhoaOperationParams)
@@ -821,28 +821,28 @@ type
      // Удаляет параметр по индексу
     procedure Delete(iIndex: Integer);
      // Возвращает значение параметра по имени. Если такого параметра нет, вызывает Exception
-    function  GetValueStrict(const sName: String): Variant;
+    function  GetValueStrict(const sName: AnsiString): Variant;
      // Проверяет тип значения. При несоответствии вызывает Exception
-    procedure CheckVarType(const sName: String; const v: Variant; RequiredType: TVarType);
+    procedure CheckVarType(const sName: AnsiString; const v: Variant; RequiredType: TVarType);
      // Возвращает индекс записи по имени параметра, или -1, если нет такой
-    function  IndexOfName(const sName: String): Integer;
+    function  IndexOfName(const sName: AnsiString): Integer;
      // IPhoaOperationParams
-    procedure ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
+    procedure ObtainValIntf(const sName: AnsiString; GUID: TGUID; out Intf; bRequired: Boolean = True);
     function  GetCount: Integer;
-    function  GetNames(Index: Integer): String;
-    function  GetValBool(const sName: String): Boolean;
-    function  GetValByte(const sName: String): Byte;
-    function  GetValInt(const sName: String): Integer;
-    function  GetValStr(const sName: String): String;
-    function  GetValues(const sName: String): Variant;
+    function  GetNames(Index: Integer): AnsiString;
+    function  GetValBool(const sName: AnsiString): Boolean;
+    function  GetValByte(const sName: AnsiString): Byte;
+    function  GetValInt(const sName: AnsiString): Integer;
+    function  GetValStr(const sName: AnsiString): WideString;
+    function  GetValues(const sName: AnsiString): Variant;
     function  GetValuesByIndex(Index: Integer): Variant;
-    procedure SetValues(const sName: String; const Value: Variant);
+    procedure SetValues(const sName: AnsiString; const Value: Variant);
     procedure SetValuesByIndex(Index: Integer; const Value: Variant);
   public
     destructor Destroy; override;
   end;
 
-  procedure TPhoaOperationParams.CheckVarType(const sName: String; const v: Variant; RequiredType: TVarType);
+  procedure TPhoaOperationParams.CheckVarType(const sName: AnsiString; const v: Variant; RequiredType: TVarType);
   begin
     if VarType(v)<>RequiredType then PhoaException(SPhoaOpErrMsg_ParamTypeMismatch, [sName, VarTypeAsText(RequiredType), VarTypeAsText(VarType(v))]);
   end;
@@ -873,12 +873,12 @@ type
     Result := Length(FParams);
   end;
 
-  function TPhoaOperationParams.GetNames(Index: Integer): String;
+  function TPhoaOperationParams.GetNames(Index: Integer): AnsiString;
   begin
     Result := FParams[Index].sName;
   end;
 
-  function TPhoaOperationParams.GetValBool(const sName: String): Boolean;
+  function TPhoaOperationParams.GetValBool(const sName: AnsiString): Boolean;
   var v: Variant;
   begin
     v := GetValueStrict(sName);
@@ -886,7 +886,7 @@ type
     Result := v;
   end;
 
-  function TPhoaOperationParams.GetValByte(const sName: String): Byte;
+  function TPhoaOperationParams.GetValByte(const sName: AnsiString): Byte;
   var v: Variant;
   begin
     v := GetValueStrict(sName);
@@ -894,7 +894,7 @@ type
     Result := v;
   end;
 
-  function TPhoaOperationParams.GetValInt(const sName: String): Integer;
+  function TPhoaOperationParams.GetValInt(const sName: AnsiString): Integer;
   var v: Variant;
   begin
     v := GetValueStrict(sName);
@@ -902,15 +902,15 @@ type
     Result := v;
   end;
 
-  function TPhoaOperationParams.GetValStr(const sName: String): String;
+  function TPhoaOperationParams.GetValStr(const sName: AnsiString): WideString;
   var v: Variant;
   begin
     v := GetValueStrict(sName);
-    CheckVarType(sName, v, varString);
+    CheckVarType(sName, v, varWideString);
     Result := v;
   end;
 
-  function TPhoaOperationParams.GetValues(const sName: String): Variant;
+  function TPhoaOperationParams.GetValues(const sName: AnsiString): Variant;
   var idx: Integer;
   begin
     idx := IndexOfName(sName);
@@ -922,7 +922,7 @@ type
     Result := FParams[Index].vValue;
   end;
 
-  function TPhoaOperationParams.GetValueStrict(const sName: String): Variant;
+  function TPhoaOperationParams.GetValueStrict(const sName: AnsiString): Variant;
   var idx: Integer;
   begin
     idx := IndexOfName(sName);
@@ -930,7 +930,7 @@ type
     Result := FParams[idx].vValue;
   end;
 
-  function TPhoaOperationParams.IndexOfName(const sName: String): Integer;
+  function TPhoaOperationParams.IndexOfName(const sName: AnsiString): Integer;
   begin
     for Result := 0 to High(FParams) do
        // Для ускорения сравниваем, используя не-Ansi-версию, т.к. параметры не должны содержать национальных символов 
@@ -938,7 +938,7 @@ type
     Result := -1;
   end;
 
-  procedure TPhoaOperationParams.ObtainValIntf(const sName: String; GUID: TGUID; out Intf; bRequired: Boolean = True);
+  procedure TPhoaOperationParams.ObtainValIntf(const sName: AnsiString; GUID: TGUID; out Intf; bRequired: Boolean = True);
   var v: Variant;
   begin
     IInterface(Intf) := nil;
@@ -946,7 +946,7 @@ type
     if not VarIsEmpty(v) and not VarSupports(v, GUID, Intf) then PhoaException(SPhoaOpErrMsg_CannotObtainParamIntf, [sName]);
   end;
 
-  procedure TPhoaOperationParams.SetValues(const sName: String; const Value: Variant);
+  procedure TPhoaOperationParams.SetValues(const sName: AnsiString; const Value: Variant);
   var idx: Integer;
   begin
     idx := IndexOfName(sName);
@@ -1043,7 +1043,7 @@ type
      // Удаляет элемент из списка
     procedure Delete(Index: Integer);
      // IPhoaPicFileChangeList
-    function  Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+    function  Add(Pic: IPhotoAlbumPic; const wsFileName: WideString): Integer;
     function  GetCount: Integer;
     function  GetItems(Index: Integer): PPicFileChange;
   public
@@ -1051,13 +1051,13 @@ type
     destructor Destroy; override;
   end;
 
-  function TPhoaPicFileChangeList.Add(Pic: IPhotoAlbumPic; const sFileName: String): Integer;
+  function TPhoaPicFileChangeList.Add(Pic: IPhotoAlbumPic; const wsFileName: WideString): Integer;
   var p: PPicFileChange;
   begin
     New(p);
     Result := FList.Add(p);
-    p.Pic       := Pic;
-    p.sFileName := sFileName;
+    p.Pic        := Pic;
+    p.wsFileName := wsFileName;
   end;
 
   constructor TPhoaPicFileChangeList.Create;
@@ -1136,7 +1136,7 @@ type
     Result := FProject.RootGroupX.GroupByIDX[FOpParentGroupID];
   end;
 
-  function TPhoaOperation.Name: String;
+  function TPhoaOperation.Name: WideString;
   begin
     Result := ConstVal(ClassName);
   end;
@@ -1190,9 +1190,9 @@ type
      // Список зарегистрированных классов
     FClasses: TStringList;
      // IPhoaOperationFactory
-    procedure RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
-    function  NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
-    function  GetClassByName(const sOpName: String): TPhoaOperationClass; 
+    function  GetClassByName(const sOpName: AnsiString): TPhoaOperationClass;
+    function  NewOperation(const sOpName: AnsiString; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+    procedure RegisterOpClass(const sOpName: AnsiString; OpClass: TPhoaOperationClass);
   public
     constructor Create;
     destructor Destroy; override;
@@ -1212,7 +1212,7 @@ type
     inherited Destroy;
   end;
 
-  function TPhoaOperationFactory.GetClassByName(const sOpName: String): TPhoaOperationClass;
+  function TPhoaOperationFactory.GetClassByName(const sOpName: AnsiString): TPhoaOperationClass;
   var idx: Integer;
   begin
     Result := nil; // Satisfy the compiler
@@ -1220,12 +1220,12 @@ type
     if idx<0 then PhoaException(SPhoaOpErrMsg_OperationNotFound, [sOpName]) else Result := TPhoaOperationClass(FClasses.Objects[idx]);
   end;
 
-  function TPhoaOperationFactory.NewOperation(const sOpName: String; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
+  function TPhoaOperationFactory.NewOperation(const sOpName: AnsiString; AList: TPhoaOperations; AProject: IPhotoAlbumProject; Params: IPhoaOperationParams; var Changes: TPhoaOperationChanges): TPhoaOperation;
   begin
     Result := GetClassByName(sOpName).Create(AList, AProject, Params, Changes);
   end;
 
-  procedure TPhoaOperationFactory.RegisterOpClass(const sOpName: String; OpClass: TPhoaOperationClass);
+  procedure TPhoaOperationFactory.RegisterOpClass(const sOpName: AnsiString; OpClass: TPhoaOperationClass);
   begin
     FClasses.AddObject(sOpName, Pointer(OpClass));
   end;
@@ -1320,7 +1320,7 @@ type
     if Count=0 then Result := FSavepointOnEmpty else Result := GetItems(Count-1).FSavepoint;
   end;
 
-  function TPhoaUndo.GetLastOpName: String;
+  function TPhoaUndo.GetLastOpName: WideString;
   begin
     if Count=0 then Result := '' else Result := GetItems(Count-1).Name;
   end;
@@ -1576,7 +1576,7 @@ type
 
      // Выполняет операцию класса OpClass с параметрами, получаемыми из собственного параметра с именем sOpParamName,
      //   если он указан
-    procedure PerformIfSpecified(const sOpParamName: String; OpClass: TPhoaOperationClass);
+    procedure PerformIfSpecified(const sOpParamName: AnsiString; OpClass: TPhoaOperationClass);
     var OpParams: IPhoaOperationParams;
     begin
       Params.ObtainValIntf(sOpParamName, IPhoaOperationParams, OpParams, False);
@@ -1673,15 +1673,15 @@ type
   var
     i, iPicID: Integer;
     ChangedProps: TPicProperties;
-    sPicData: String;
+    PicData: TPhoaRawData;
   begin
      // Получаем набор изменённых свойств
     ChangedProps := IntToPicProps(UndoStream.ReadInt);
      // Возвращаем данные изменённых изображений
     for i := 0 to UndoStream.ReadInt-1 do begin
-      iPicID   := UndoStream.ReadInt;
-      sPicData := UndoStream.ReadStr;
-      Project.PicsX.ItemsByIDX[iPicID].RawData[ChangedProps] := sPicData;
+      iPicID  := UndoStream.ReadInt;
+      PicData := UndoStream.ReadRaw;
+      Project.PicsX.ItemsByIDX[iPicID].RawData[ChangedProps] := PicData;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
@@ -1698,7 +1698,7 @@ type
     KeywordList: IPhotoAlbumKeywordList;
     iPic, iCnt, iKwd, idxKeyword: Integer;
     Pic: IPhotoAlbumPic;
-    sKeyword: String;
+    wsKeyword: WideString;
     pkd: PPhoaKeywordData;
     bKWSaved: Boolean;
     PicKeywords: IPhotoAlbumKeywordList;
@@ -1708,8 +1708,8 @@ type
     begin
       if not bKWSaved then begin
         UndoStream.WriteBool(True); // Признак записи ключевого слова (в противоположность стоп-флагу)
-        UndoStream.WriteInt(Pic.ID);
-        UndoStream.WriteStr(Pic.Keywords.CommaText);
+        UndoStream.WriteInt (Pic.ID);
+        UndoStream.WriteWStr(Pic.Keywords.CommaText);
         bKWSaved := True;
          // Добавляем флаги изменений
         Include(Changes, pocPicProps);
@@ -2164,13 +2164,13 @@ type
     procedure CopyFileList;
     var
       i: Integer;
-      s: String;
+      ws: WideString;
     begin
        // Составляем список полных путей файлов
-      s := '';
-      for i := 0 to Pics.Count-1 do s := s+Pics[i].FileName+S_CRLF;
+      ws := '';
+      for i := 0 to Pics.Count-1 do ws := ws+Pics[i].FileName+S_CRLF;
        // Помещаем текст в clipboard
-      Clipboard.AsText := s;
+      TntClipboard.AsWideText := ws;
     end;
 
      // Копирует в буфер обмена bitmap-эскиз изображения Pic
@@ -2715,17 +2715,17 @@ type
 
   procedure TPhoaOp_ViewEdit.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   var
-    sViewName, sFilterExpression: String;
+    wsViewName, wsFilterExpression: WideString;
     iViewIndex: Integer;
     View: IPhotoAlbumView;
   begin
      // Восстанавливаем представление
-    sViewName         := UndoStream.ReadStr;
-    sFilterExpression := UndoStream.ReadStr;
-    iViewIndex        := UndoStream.ReadInt;
+    wsViewName         := UndoStream.ReadWStr;
+    wsFilterExpression := UndoStream.ReadWStr;
+    iViewIndex         := UndoStream.ReadInt;
     View := Project.ViewsX[iViewIndex];
-    View.Name             := sViewName;
-    View.FilterExpression := sFilterExpression;
+    View.Name             := wsViewName;
+    View.FilterExpression := wsFilterExpression;
     if UndoStream.ReadBool then UndoReadGroupings(UndoStream, View.GroupingsX);
     if UndoStream.ReadBool then UndoReadSortings (UndoStream, View.SortingsX);
     View.Invalidate;
@@ -2820,7 +2820,7 @@ type
    //    Позиция в потоке всегда сохраняется *за последним байтом потока*
 
    // Тип данных, сохраняемых в файле
-  TPhoaUndoDataStreamDatatype = (pudsdStr, pudsdInt, pudsdByte, pudsdBool);
+  TPhoaUndoDataStreamDatatype = (pudsdWideStr, pudsdInt, pudsdByte, pudsdBool, pudsdRaw);
 
   TPhoaUndoDataStream = class(TInterfacedObject, IPhoaDataStream, IPhoaUndoDataStream)
   private
@@ -2831,7 +2831,7 @@ type
      // Положение, запомненное в первом вызове BeginUndo
     FUndoPosition: Int64;
      // Prop storage
-    FFileName: String;
+    FFileName: WideString;
      // Создаёт поток, если он ещё не создан
     procedure CreateStream;
      // Записывает в поток тип данных
@@ -2840,20 +2840,22 @@ type
      //   Exception
     procedure ReadCheckDatatype(DTRequired: TPhoaUndoDataStreamDatatype);
      // IPhoaDataStream
-    procedure Clear;
-    procedure WriteStr (const s: String);
-    procedure WriteInt (i: Integer);
-    procedure WriteByte(b: Byte);
-    procedure WriteBool(b: Boolean);
-    function  ReadStr: String;
-    function  ReadInt: Integer;
-    function  ReadByte: Byte;
-    function  ReadBool: Boolean;
     function  GetPosition: Int64;
+    function  ReadBool: Boolean;
+    function  ReadByte: Byte;
+    function  ReadInt: Integer;
+    function  ReadRaw:  TPhoaRawData;
+    function  ReadWStr: WideString;
+    procedure Clear;
+    procedure WriteBool(b: Boolean);
+    procedure WriteByte(b: Byte);
+    procedure WriteInt (i: Integer);
+    procedure WriteRaw (const Data: TPhoaRawData);
+    procedure WriteWStr (const ws: WideString);
      // IPhoaUndoDataStream
+    function  GetFileName: WideString;
     procedure BeginUndo(i64Position: Int64);
     procedure EndUndo(bTruncate: Boolean);
-    function  GetFileName: String;
   public
     constructor Create;
     destructor Destroy; override;
@@ -2904,7 +2906,7 @@ type
     end;
   end;
 
-  function TPhoaUndoDataStream.GetFileName: String;
+  function TPhoaUndoDataStream.GetFileName: WideString;
   begin
     Result := FFileName;
   end;
@@ -2944,10 +2946,16 @@ type
     Result := StreamReadInt(FStream);
   end;
 
-  function TPhoaUndoDataStream.ReadStr: String;
+  function TPhoaUndoDataStream.ReadRaw: TPhoaRawData;
   begin
-    ReadCheckDatatype(pudsdStr);
+    ReadCheckDatatype(pudsdRaw);
     Result := StreamReadStr(FStream);
+  end;
+
+  function TPhoaUndoDataStream.ReadWStr: WideString;
+  begin
+    ReadCheckDatatype(pudsdWideStr);
+    Result := StreamReadWStr(FStream);
   end;
 
   procedure TPhoaUndoDataStream.WriteBool(b: Boolean);
@@ -2977,11 +2985,18 @@ type
     StreamWriteInt(FStream, i);
   end;
 
-  procedure TPhoaUndoDataStream.WriteStr(const s: String);
+  procedure TPhoaUndoDataStream.WriteRaw(const Data: TPhoaRawData);
   begin
     CreateStream;
-    WriteDatatype(pudsdStr);
-    StreamWriteStr(FStream, s);
+    WriteDatatype(pudsdRaw);
+    StreamWriteStr(FStream, Data);
+  end;
+
+  procedure TPhoaUndoDataStream.WriteWStr(const ws: WideString);
+  begin
+    CreateStream;
+    WriteDatatype(pudsdWideStr);
+    StreamWriteWStr(FStream, ws);
   end;
 
    //===================================================================================================================

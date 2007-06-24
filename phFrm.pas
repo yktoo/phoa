@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.3 2005-09-11 12:48:16 dale Exp $
+//  $Id: phFrm.pas,v 1.4 2007-06-24 17:47:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -24,7 +24,7 @@ type
      // Message handlers
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
      // Prop handlers
-    function  GetRegistryKey: String;
+    function  GetRegistryKey: WideString;
     procedure SetHasUpdates(Value: Boolean);
     procedure SetModified(Value: Boolean);
   protected
@@ -47,7 +47,7 @@ type
     procedure SettingsLoad(rif: TRegIniFile); virtual;
      // Prop handlers
     function  GetDataValid: Boolean; virtual;
-    function  GetRelativeRegistryKey: String; virtual;
+    function  GetRelativeRegistryKey: WideString; virtual;
     function  GetSizeable: Boolean; virtual;
   public
      // ћодально отображает форму. ¬озвращает HasUpdates
@@ -67,10 +67,10 @@ type
      // -- True, если в форме пользователь изменил какие-то данные
     property Modified: Boolean read FModified write SetModified;
      // --  люч реестра дл€ сохранени€ настроек
-    property RegistryKey: String read GetRegistryKey;
+    property RegistryKey: WideString read GetRegistryKey;
      // --  люч реестра дл€ сохранени€ настроек относительно корневого ключа приложени€. ≈сли пуста€ строка, сохранени€
      //    настроек не требуетс€
-    property RelativeRegistryKey: String read GetRelativeRegistryKey;
+    property RelativeRegistryKey: WideString read GetRelativeRegistryKey;
      // -- True, если размер формы позвол€етс€ мен€ть. ¬ базовом классе всегда возвращает False
     property Sizeable: Boolean read GetSizeable;
   end;
@@ -85,10 +85,10 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
   end;
 
   function TPhoaForm.CreateRegIni: TRegIniFile;
-  var sKey: String;
+  var wsKey: WideString;
   begin
-    sKey := RegistryKey;
-    if sKey='' then Result := nil else Result := TRegIniFile.Create(sKey);
+    wsKey := RegistryKey;
+    if wsKey='' then Result := nil else Result := TRegIniFile.Create(wsKey); {!!! Not Unicode-enabled solution }
   end;
 
   procedure TPhoaForm.DoCreate;
@@ -201,14 +201,14 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
     Result := True;
   end;
 
-  function TPhoaForm.GetRegistryKey: String;
-  var sRelativeKey: String;
+  function TPhoaForm.GetRegistryKey: WideString;
+  var wsRelativeKey: WideString;
   begin
-    sRelativeKey := RelativeRegistryKey;
-    if sRelativeKey='' then Result := '' else Result := SRegRoot+'\'+sRelativeKey;
+    wsRelativeKey := RelativeRegistryKey;
+    if wsRelativeKey='' then Result := '' else Result := SRegRoot+'\'+wsRelativeKey;
   end;
 
-  function TPhoaForm.GetRelativeRegistryKey: String;
+  function TPhoaForm.GetRelativeRegistryKey: WideString;
   begin
     Result := '';
   end;

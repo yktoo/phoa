@@ -1,0 +1,29 @@
+String
+AnsiString (possibly)
+Char
+Format
+PChar
+DrawText
+TextHeight
+TextWidth
+TextSize
+ExtractFileDrive
+ExtractFilePath
+ExtractFileDir
+ExtractFileName
+ExtractFileExt
+ChangeFileExt
+Exception
+regex: ^bs.+
+StreamWriteStr
+StreamReadStr
+SameText
+CompareText
+AnsiSameText
+AnsiCompareText
+TStringList
+Clipboard
+UpperCase
+AnsiUpperCase
+LowerCase
+AnsiLowerCase

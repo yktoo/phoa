@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.25 2007-06-16 09:15:44 dale Exp $
+//  $Id: phIntf.pas,v 1.26 2007-06-24 17:47:58 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -14,8 +14,24 @@ interface
 uses Windows, SysUtils;
 
 type
+   // Base Unicode-enabled Exception class
+  EPhoaWideException = class(Exception)
+  private
+     // Prop storage
+    FMessageW: WideString;
+  public
+    constructor Create(const wsMessage: WideString);
+    constructor CreateFmt(const wsMessage: WideString; const Args: Array of const);
+     // Props
+     // -- Unicode message
+    property MessageW: WideString read FMessageW;
+  end;
+
    // Exception class
-  EPhIntfException = class(Exception);
+  EPhIntfException = class(EPhoaWideException);
+
+   // Raw binary data of an arbitrary size (up to 2 GB)
+  TPhoaRawData = type AnsiString;
 
    // Picture property
   TPicProperty = (
@@ -95,10 +111,10 @@ type
     function  GetPlace: WideString; stdcall;
     function  GetPropStrValues(PicProp: TPicProperty): WideString; stdcall;
     function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
-    function  GetRawData(PProps: TPicProperties): String; stdcall;
+    function  GetRawData(PProps: TPicProperties): TPhoaRawData; stdcall;
     function  GetRotation: TPicRotation; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
-    function  GetThumbnailData: String; stdcall;
+    function  GetThumbnailData: TPhoaRawData; stdcall;
      // Props
      // -- Unique ID
     property ID: Integer read GetID;
@@ -137,13 +153,13 @@ type
      // -- Property values of type Variant, by index
     property PropValues[PicProp: TPicProperty]: Variant read GetPropValues;
      // -- Picture raw binary data (for PProps properties). No WideString version as it's meaningless
-    property RawData[PProps: TPicProperties]: String read GetRawData;
+    property RawData[PProps: TPicProperties]: TPhoaRawData read GetRawData;
      // -- Picture rotation
     property Rotation: TPicRotation read GetRotation;
      // -- Thumbnail dimensions in pixels
     property ThumbnailSize: TSize read GetThumbnailSize;
      // -- Thumbnail raw binary JPEG data
-    property ThumbnailData: String read GetThumbnailData;
+    property ThumbnailData: TPhoaRawData read GetThumbnailData;
   end;
 
    //===================================================================================================================
@@ -220,7 +236,7 @@ type
     function  GetGroups: IPhoaPicGroupList; stdcall;
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
     function  GetGroupByPath(const wsPath: WideString): IPhoaPicGroup; stdcall;
-    function  GetIconData: String; stdcall;
+    function  GetIconData: TPhoaRawData; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
@@ -243,7 +259,7 @@ type
      //    the first owned group. If sPath starts with '/', ignores this char
     property GroupByPath[const wsPath: WideString]: IPhoaPicGroup read GetGroupByPath;
      // -- Icon raw binary PNG data
-    property IconData: String read GetIconData;
+    property IconData: TPhoaRawData read GetIconData;
      // -- An unique group ID
     property ID: Integer read GetID;
      // -- Group index in its Owner's list
@@ -570,6 +586,24 @@ const
   function  StrToPicProp(const wsPropName: WideString; bStrict: Boolean): TPicProperty;
 
 implementation
+
+   //===================================================================================================================
+   // EPhoaWideException
+   //===================================================================================================================
+
+  constructor EPhoaWideException.Create(const wsMessage: WideString);
+  begin
+    inherited Create(wsMsg); // Implicit conversion to Ansi is done here
+    FMessageW := wsMsg;
+  end;
+
+  constructor EPhoaWideException.CreateFmt(const wsMessage: WideString; const Args: array of const);
+  begin
+    inherited CreateFmt(wsMsg, Args); // Implicit conversion to Ansi is done here
+    FMessageW := WideFormat(wsMsg, Args);
+  end;
+
+   //===================================================================================================================
 
   function PicPropToStr(Prop: TPicProperty; bStrict: Boolean): WideString;
   begin

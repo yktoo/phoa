@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.68 2007-06-16 13:49:45 dale Exp $
+//  $Id: phObj.pas,v 1.69 2007-06-24 17:48:01 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phObj;
 interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Masks,
-  TntClasses,
+  TntClasses, TntWideStrings,
   phPhoa, phIntf, phMutableIntf, phNativeIntf;
 
 type
@@ -219,14 +219,14 @@ resourcestring
   procedure StreamWriteByte(Stream: TStream; b: Byte);
   procedure StreamWriteInt (Stream: TStream; i: Integer);
   procedure StreamWriteDbl (Stream: TStream; const d: Double);
-  procedure StreamWriteStr (Stream: TStream; const s: String);
-  procedure StreamWriteStrW(Stream: TStream; const ws: WideString);
+  procedure StreamWriteRaw (Stream: TStream; const Data: TPhoaRawData);
+  procedure StreamWriteWStr(Stream: TStream; const ws: WideString);
 
   function  StreamReadByte(Stream: TStream): Byte;
   function  StreamReadInt (Stream: TStream): Integer;
   function  StreamReadDbl (Stream: TStream): Double;
-  function  StreamReadStr (Stream: TStream): String;
-  function  StreamReadStrW(Stream: TStream): WideString;
+  function  StreamReadRaw (Stream: TStream): TPhoaRawData;
+  function  StreamReadWStr(Stream: TStream): WideString;
 
    // Загружает в TStrings места, номера плёнок и авторов из изображений фотоальбома
   procedure StringsLoadPFAM(PhoA: IPhoaProject; SLPlaces, SLFilmNumbers, SLAuthors, SLMedia: TWideStrings);
@@ -286,15 +286,15 @@ uses
     if Stream.Write(d, SizeOf(d))<>SizeOf(d) then PhoaWriteError;
   end;
 
-  procedure StreamWriteStr(Stream: TStream; const s: String);
+  procedure StreamWriteRaw(Stream: TStream; const Data: TPhoaRawData);
   var i: Integer;
   begin
-    i := Length(s);
+    i := Length(Data);
     StreamWriteInt(Stream, i);
-    if (i>0) and (Stream.Write(s[1], i)<>i) then PhoaWriteError;
+    if (i>0) and (Stream.Write(Data[1], i)<>i) then PhoaWriteError;
   end;
 
-  procedure StreamWriteStrW(Stream: TStream; const ws: WideString);
+  procedure StreamWriteWStr(Stream: TStream; const ws: WideString);
   var i: Integer;
   begin
     i := Length(ws);
@@ -317,7 +317,7 @@ uses
     if Stream.Read(Result, SizeOf(Result))<>SizeOf(Result) then PhoaReadError;
   end;
 
-  function StreamReadStr(Stream: TStream): String;
+  function StreamReadRaw(Stream: TStream): TPhoaRawData;
   var i: Integer;
   begin
     i := StreamReadInt(Stream);
@@ -325,7 +325,7 @@ uses
     if (i>0) and (Stream.Read(Result[1], i)<>i) then PhoaReadError;
   end;
 
-  function StreamReadStrW(Stream: TStream): WideString;
+  function StreamReadWStr(Stream: TStream): WideString;
   var i: Integer;
   begin
     i := StreamReadInt(Stream);
@@ -396,7 +396,7 @@ type
     FNotes: WideString;
     FPlace: WideString;
     FRotation: TPicRotation;
-    FThumbnailData: WideString;
+    FThumbnailData: TPhoaRawData;
     FThumbnailSize: TSize;
      // IPhoaPic
     function  GetAuthor: WideString; stdcall;
@@ -416,9 +416,9 @@ type
     function  GetPlace: WideString; stdcall;
     function  GetPropStrValues(PicProp: TPicProperty): WideString; stdcall;
     function  GetPropValues(PicProp: TPicProperty): Variant; stdcall;
-    function  GetRawData(PProps: TPicProperties): String; stdcall;
+    function  GetRawData(PProps: TPicProperties): TPhoaRawData; stdcall;
     function  GetRotation: TPicRotation; stdcall;
-    function  GetThumbnailData: String; stdcall;
+    function  GetThumbnailData: TPhoaRawData; stdcall;
     function  GetThumbnailSize: TSize; stdcall;
     function  GetTime: Integer; stdcall;
      // IPhoaMutablePic
@@ -430,7 +430,7 @@ type
     procedure SetFileName(const Value: WideString); stdcall;
     procedure SetFlips(Value: TPicFlips); stdcall;
     procedure SetPropValues(PicProp: TPicProperty; const Value: Variant); stdcall;
-    procedure SetRawData(PProps: TPicProperties; const Value: String); stdcall;
+    procedure SetRawData(PProps: TPicProperties; const Value: TPhoaRawData); stdcall;
     procedure SetRotation(Value: TPicRotation); stdcall;
     procedure SetTime(Value: Integer); stdcall;
      // IPhotoAlbumPic
@@ -636,7 +636,7 @@ type
     end;
   end;
 
-  function TPhotoAlbumPic.GetRawData(PProps: TPicProperties): String;
+  function TPhotoAlbumPic.GetRawData(PProps: TPicProperties): TPhoaRawData;
   var
     Stream: TStringStream;
     Streamer: TPhoaStreamer;
@@ -662,7 +662,7 @@ type
     Result := FRotation;
   end;
 
-  function TPhotoAlbumPic.GetThumbnailData: String;
+  function TPhotoAlbumPic.GetThumbnailData: TPhoaRawData;
   begin
     Result := FThumbnailData;
   end;
@@ -736,7 +736,7 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumPic.SetRawData(PProps: TPicProperties; const Value: String);
+  procedure TPhotoAlbumPic.SetRawData(PProps: TPicProperties; const Value: TPhoaRawData);
   var
     Stream: TStringStream;
     Streamer: TPhoaStreamer;
@@ -1570,7 +1570,7 @@ type
     FDescription: WideString;
     FExpanded: Boolean;
     FGroups: IPhotoAlbumPicGroupList;
-    FIconData: String;
+    FIconData: TPhoaRawData;
     FID: Integer;
     FPics: IPhotoAlbumPicList;
     FText: WideString;
@@ -1582,7 +1582,7 @@ type
     function  GetGroups: IPhoaPicGroupList; stdcall;
     function  GetGroupByID(iID: Integer): IPhoaPicGroup; stdcall;
     function  GetGroupByPath(const wsPath: WideString): IPhoaPicGroup; stdcall;
-    function  GetIconData: String; stdcall;
+    function  GetIconData: TPhoaRawData; stdcall;
     function  GetID: Integer; stdcall;
     function  GetIndex: Integer; stdcall;
     function  GetNestedGroupCount: Integer; stdcall;
@@ -1602,7 +1602,7 @@ type
     procedure Assign(Source: IPhoaPicGroup; bCopyIDs, bCopyPics, bCopySubgroups: Boolean); stdcall;
     procedure SetDescription(const Value: WideString); stdcall;
     procedure SetExpanded(Value: Boolean); stdcall;
-    procedure SetIconData(const Value: String); stdcall;
+    procedure SetIconData(const Value: TPhoaRawData); stdcall;
     procedure SetIndex(Value: Integer); stdcall;
     procedure SetOwner(Value: IPhoaPicGroup); stdcall;
     procedure SetText(const Value: WideString); stdcall;
@@ -1751,7 +1751,7 @@ type
     Result := FGroups;
   end;
 
-  function TPhotoAlbumPicGroup.GetIconData: String;
+  function TPhotoAlbumPicGroup.GetIconData: TPhoaRawData;
   begin
     Result := FIconData;
   end;
@@ -1922,7 +1922,7 @@ type
     FExpanded := Value;
   end;
 
-  procedure TPhotoAlbumPicGroup.SetIconData(const Value: String);
+  procedure TPhotoAlbumPicGroup.SetIconData(const Value: TPhoaRawData);
   begin
     FIconData := Value;
   end;

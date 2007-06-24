@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPhoa.pas,v 1.14 2007-06-16 09:15:45 dale Exp $
+//  $Id: phPhoa.pas,v 1.15 2007-06-24 17:48:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -42,7 +42,7 @@
 unit phPhoa;
 
 interface
-uses SysUtils, Windows, Classes;
+uses SysUtils, Windows, Classes, phIntf;
 
    // 1. Introduction
    // ===============
@@ -505,19 +505,16 @@ type
    //-------------------------------------------------------------------------------------------------------------------
 
    // Base Exception class
-  EPhoaStreamerError = class(Exception)
+  EPhoaStreamerError = class(EPhoaWideException)
   private
      // Prop storage
     FErrorCode: Integer;
-    FMessageW: WideString;
   public
     constructor Create(const wsMsg: WideString; iErrCode: Integer);
     constructor CreateFmt(const wsMsg: WideString; const Args: Array of const; iErrCode: Integer);
      // Props
      // -- Code of error encountered, one of the IPhStatus_xxxxxx constants
     property ErrorCode: Integer read FErrorCode;
-     // -- Unicode message
-    property MessageW: WideString read FMessageW;
   end;
 
   TPhoaStreamingMode = (psmRead, psmWrite);
@@ -554,7 +551,7 @@ type
      // Raises an exception if bUnicodeRequired<>IsRevisionUnicode
     procedure CheckIsUnicode(bUnicodeRequired: Boolean);
      // Checking header data validity, virtual to have possibility to alter behaviour in a descendant
-    procedure ValidateSignature(const sReadSignature: String); virtual;
+    procedure ValidateSignature(const sReadSignature: AnsiString); virtual;
      // Raises an exception if RevisionNumber is invalid
     procedure ValidateRevision; virtual;
   public
@@ -563,24 +560,24 @@ type
     procedure WriteByte(b: Byte);
     procedure WriteWord(w: Word);
     procedure WriteInt(i: Integer);
-    procedure WriteStringB(const s: String);
-    procedure WriteStringW(const s: String);
-    procedure WriteStringI(const s: String);
+    procedure WriteStringB(const s: AnsiString);
+    procedure WriteStringW(const s: AnsiString);
+    procedure WriteStringI(const s: AnsiString);
     procedure WriteWideStringB(const ws: WideString);
     procedure WriteWideStringW(const ws: WideString);
     procedure WriteWideStringI(const ws: WideString);
-    procedure WriteRaw(const s: String);
+    procedure WriteRaw(const Data: TPhoaRawData);
      // Reading routines for typed data
     function  ReadByte: Byte;
     function  ReadWord: Word;
     function  ReadInt: Integer;
-    function  ReadStringB: String;
-    function  ReadStringW: String;
-    function  ReadStringI: String;
+    function  ReadStringB: AnsiString;
+    function  ReadStringW: AnsiString;
+    function  ReadStringI: AnsiString;
     function  ReadWideStringB: WideString;
     function  ReadWideStringW: WideString;
     function  ReadWideStringI: WideString;
-    function  ReadRaw: String;
+    function  ReadRaw: TPhoaRawData;
      // Writes/reads file header
     procedure WriteHeader;
     procedure ReadHeader;
@@ -594,7 +591,7 @@ type
     procedure WriteChunkWord(Code: TPhChunkCode; w: Word);
     procedure WriteChunkInt(Code: TPhChunkCode; i: Integer);
     procedure WriteChunkString(Code: TPhChunkCode; const ws: WideString); // Auto-detecting type
-    procedure WriteChunkRaw(Code: TPhChunkCode; const s: String); 
+    procedure WriteChunkRaw(Code: TPhChunkCode; const Data: TPhoaRawData); 
      // -- Reads chunk code and datatype
     function  ReadChunk(out Code: TPhChunkCode; out Datatype: TPhChunkDatatype): TPhReadingChunkResult;
      // -- Reads chunk code, datatype and value. Value is being read only if result is not rcrInvalidDatatype or rcrEOF,
@@ -726,7 +723,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
   end;
 
    // Raises 'Wrong Datatype passed' exception
-  procedure WrongWriteChunkDatatype(const sRequiredName: String);
+  procedure WrongWriteChunkDatatype(const sRequiredName: AnsiString);
   begin
     raise EPhoaStreamerError.CreateFmt(SPhStreamErr_WrongDatatypePassed, [sRequiredName], IPhStatus_WrongDatatypePassed);
   end;
@@ -737,16 +734,14 @@ uses Math, Variants, TntClasses, TntSysUtils;
 
   constructor EPhoaStreamerError.Create(const wsMsg: WideString; iErrCode: Integer);
   begin
-    inherited Create(wsMsg); // Implicit conversion to Ansi is done here
+    inherited Create(wsMsg);
     FErrorCode := iErrCode;
-    FMessageW  := wsMsg;
   end;
 
   constructor EPhoaStreamerError.CreateFmt(const wsMsg: WideString; const Args: Array of const; iErrCode: Integer);
   begin
-    inherited CreateFmt(wsMsg, Args); // Implicit conversion to Ansi is done here
+    inherited CreateFmt(wsMsg, Args);
     FErrorCode := iErrCode;
-    FMessageW  := wsMsg;
   end;
 
    //-------------------------------------------------------------------------------------------------------------------
@@ -874,7 +869,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
   end;
 
   procedure TPhoaStreamer.ReadHeader;
-  var s: String;
+  var s: AnsiString;
   begin
     try
        // Load and check signature
@@ -895,7 +890,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     Read(Result, SizeOf(Result));
   end;
 
-  function TPhoaStreamer.ReadRaw: String;
+  function TPhoaStreamer.ReadRaw: TPhoaRawData;
   var i: Integer;
   begin
     i := ReadInt;
@@ -903,7 +898,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     Read(Result[1], i);
   end;
 
-  function TPhoaStreamer.ReadStringB: String;
+  function TPhoaStreamer.ReadStringB: AnsiString;
   var b: Byte;
   begin
     CheckIsUnicode(False);
@@ -912,7 +907,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     Read(Result[1], b);
   end;
 
-  function TPhoaStreamer.ReadStringI: String;
+  function TPhoaStreamer.ReadStringI: AnsiString;
   var i: Integer;
   begin
     CheckIsUnicode(False);
@@ -921,7 +916,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     Read(Result[1], i);
   end;
 
-  function TPhoaStreamer.ReadStringW: String;
+  function TPhoaStreamer.ReadStringW: AnsiString;
   var w: Word;
   begin
     CheckIsUnicode(False);
@@ -1010,7 +1005,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     end;
   end;
 
-  procedure TPhoaStreamer.ValidateSignature(const sReadSignature: String);
+  procedure TPhoaStreamer.ValidateSignature(const sReadSignature: AnsiString);
   begin
     try
       if sReadSignature<>SPhoAFileSignature then
@@ -1086,7 +1081,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     end;
   end;
 
-  procedure TPhoaStreamer.WriteChunkRaw(Code: TPhChunkCode; const s: String);
+  procedure TPhoaStreamer.WriteChunkRaw(Code: TPhChunkCode; const Data: TPhoaRawData);
   var pe: PPhChunkEntry;
   begin
     try
@@ -1096,7 +1091,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
        // Write chunk/datatype code
       WriteChunk(Code, pcdRaw);
        // Write chunk data
-      WriteRaw(s);
+      WriteRaw(Data);
     except
       FErrorsOccured := True;
       raise;
@@ -1149,7 +1144,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
   end;
 
   procedure TPhoaStreamer.WriteHeader;
-  var s: String;
+  var s: AnsiString;
   begin
      // Write signature
     s := SPhoAFileSignature;
@@ -1163,15 +1158,15 @@ uses Math, Variants, TntClasses, TntSysUtils;
     Write(i, SizeOf(i));
   end;
 
-  procedure TPhoaStreamer.WriteRaw(const s: String);
+  procedure TPhoaStreamer.WriteRaw(const Data: TPhoaRawData);
   var i: Integer;
   begin
-    i := Length(s);
+    i := Length(Data);
     WriteInt(i);
-    if i>0 then Write(s[1], i);
+    if i>0 then Write(Data[1], i);
   end;
 
-  procedure TPhoaStreamer.WriteStringB(const s: String);
+  procedure TPhoaStreamer.WriteStringB(const s: AnsiString);
   var b: Byte;
   begin
     CheckIsUnicode(False);
@@ -1180,7 +1175,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     if b>0 then Write(s[1], b);
   end;
 
-  procedure TPhoaStreamer.WriteStringI(const s: String);
+  procedure TPhoaStreamer.WriteStringI(const s: AnsiString);
   var i: Integer;
   begin
     CheckIsUnicode(False);
@@ -1189,7 +1184,7 @@ uses Math, Variants, TntClasses, TntSysUtils;
     if i>0 then Write(s[1], i);
   end;
 
-  procedure TPhoaStreamer.WriteStringW(const s: String);
+  procedure TPhoaStreamer.WriteStringW(const s: AnsiString);
   var w: Word;
   begin
     CheckIsUnicode(False);

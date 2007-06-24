@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.8 2005-09-11 06:45:57 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.9 2007-06-24 17:48:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -79,7 +79,7 @@ type
     constructor Create;
     function  Add(hLib: HINST; Module: IPhoaPluginModule): Integer;
      // Регистрирует плагин. Возвращает True, если указанный файл действительно является плагин-библиотекой
-    function  RegisterPluginLib(const sPluginLib: String): Boolean;
+    function  RegisterPluginLib(const wsPluginLib: WideString): Boolean;
      // Props
      // -- Пункты по индексу
     property Items[Index: Integer]: P_PluginModuleInfo read GetItems; default;
@@ -97,24 +97,24 @@ type
   constructor T_PluginModuleInfoList.Create;
 
      // Рекурсивная процедура сканирования плагинов
-    procedure ScanPluginDir(const sDir: String);
+    procedure ScanPluginDir(const wsDir: WideString);
     var
-      sPath: String;
-      SRec: TSearchRec;
+      wsPath: WideString;
+      SRec: TSearchRecW;
     begin
-      sPath := IncludeTrailingPathDelimiter(sDir);
-      if FindFirst(sPath+'*.*', faAnyFile, SRec)=0 then
+      wsPath := WideIncludeTrailingPathDelimiter(wsDir);
+      if WideFindFirst(sPath+'*.*', faAnyFile, SRec)=0 then
         try
           repeat
              // Файл, вероятно плагин
             if SRec.Attr and faDirectory=0 then begin
-              if UpperCase(ExtractFileExt(SRec.Name))='.DLL' then RegisterPluginLib(sPath+SRec.Name);
+              if WideUpperCase(WideExtractFileExt(SRec.Name))='.DLL' then RegisterPluginLib(wsPath+SRec.Name);
              // Каталог
             end else if SRec.Name[1]<>'.' then
-              ScanPluginDir(sPath+SRec.Name);
-          until FindNext(SRec)<>0;
+              ScanPluginDir(wsPath+SRec.Name);
+          until WideFindNext(SRec)<>0;
         finally
-          FindClose(SRec);
+          WideFindClose(SRec);
         end;
     end;
 
@@ -141,16 +141,17 @@ type
     end;
   end;
 
-  function T_PluginModuleInfoList.RegisterPluginLib(const sPluginLib: String): Boolean;
+  function T_PluginModuleInfoList.RegisterPluginLib(const wsPluginLib: WideString): Boolean;
   var
     hLib: HINST;
     GetRevisionProc: TPhoaGetPluginSubsystemRevision;
     GetModuleProc: TPhoaGetPluginModuleProc;
+    wsErrorMessage: WideString;
   begin
     Result := False;
      // Грузим библиотеку
-    ShowProgressInfo('SMsg_LoadingPlugin', [ExtractFileName(sPluginLib)]);
-    hLib := LoadLibrary(PChar(sPluginLib));
+    ShowProgressInfo('SMsg_LoadingPlugin', [WideExtractFileName(wsPluginLib)]);
+    hLib := Tnt_LoadLibraryW(PWideChar(wsPluginLib));
     if hLib<>0 then begin
       try
          // Пытаемся получить функцию получения версии подсистемы
@@ -166,12 +167,15 @@ type
           end;
         end;
       except
-        on e: Exception do PhoaError('SErrCreatingPluginModule', [sPluginLib, e.Message]);
+        on e: Exception do begin
+          if e is TPhoaWideException then wsErrorMessage := TPhoaWideException(e).MessageW else wsErrorMessage := e.Message;
+          PhoaError('SErrCreatingPluginModule', [wsPluginLib, wsErrorMessage]);
+        end;
       end;
        // При неудаче выгружаем билиотеку
       if not Result then FreeLibrary(hLib);
     end else
-      PhoaError('SErrLoadingPluginModule', [sPluginLib, SysErrorMessage(GetLastError)]);
+      PhoaError('SErrLoadingPluginModule', [wsPluginLib, WideSysErrorMessage(GetLastError)]);
   end;
 
    //===================================================================================================================

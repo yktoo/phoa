@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.40 2005-09-11 12:59:03 dale Exp $
+//  $Id: phGUIObj.pas,v 1.41 2007-06-24 17:47:55 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phGUIObj;
 interface
 uses
   Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, ActnList, Forms,
-  GR32, TB2Item, TBX,
+  TntControls, GR32, TB2Item, TBX,
   phIntf, phMutableIntf, phAppIntf, phNativeIntf, phObj, phGraphics, ConsVars;
 
 type
@@ -382,7 +382,7 @@ type
    // выравнивается по левому краю, вторая - по правому)
    //===================================================================================================================
 
-  TPhoAHintWindow = class(THintWindow)
+  TPhoAHintWindow = class(TTntHintWindow)
   private
      // True в процессе вызова ActivateHint()
     FActivating: Boolean;
@@ -395,8 +395,8 @@ type
   protected
     procedure Paint; override;
   public
-    procedure ActivateHint(Rect: TRect; const AHint: string); override;
-    function  CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect; override;
+    procedure ActivateHint(Rect: TRect; const AHint: WideString); override;
+    function  CalcHintRect(MaxWidth: Integer; const AHint: WideString; AData: Pointer): TRect; override;
      // Props
      // -- Монитор, на котором отображается окно. nil до вызова ActivateHint()
     property Monitor: TMonitor read FMonitor;
@@ -502,9 +502,9 @@ type
     function  AddMenu: IPhoaMenu; stdcall;
     function  AddItem(Action: IPhoaAction): IPhoaMenuItem; stdcall;
     function  AddSeparator: IPhoaMenuSeparator; stdcall;
-    function  FindItemByActionName(const sActionName: WideString; bRecursive: LongBool): IPhoaMenuItem; stdcall;
+    function  FindItemByActionName {???}(const wsActionName: WideString; bRecursive: LongBool): IPhoaMenuItem; stdcall;
     function  GetCaption: WideString; stdcall;
-    function  GetItemByActionName(const sActionName: WideString; bRecursive: LongBool): IPhoaMenuItem; stdcall;
+    function  GetItemByActionName {???}(const wsActionName: WideString; bRecursive: LongBool): IPhoaMenuItem; stdcall;
     function  GetSubentryCount: Integer; stdcall;
     function  GetSubentries(Index: Integer): IPhoaMenuEntry; stdcall;
     procedure SetCaption(const Value: WideString); stdcall;
@@ -521,7 +521,7 @@ type
   function  NewThumbnailViewerDisplayData(SelectedPics: IPhoaPicList; iFocusedID, iTopOffset: Integer): IThumbnailViewerDisplayData; overload;
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
-uses Math, Themes, phUtils;
+uses Math, Themes, TntSysUtils, phUtils;
 
    //===================================================================================================================
    // TThumbnailViewer
@@ -1160,17 +1160,17 @@ uses Math, Themes, phUtils;
 
      // Отрисовывает на эскизе данные одного угла. Возвращает ширину отрисованного текста
     function DrawDetail(Corner: TThumbCorner; rText: TRect): Integer;
-    var sProp: String;
+    var wsProp: WideString;
     begin
       Result := 0;
       if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
-        sProp := Pic.PropStrValues[FThumbCornerDetails[Corner].Prop];
-        if sProp<>'' then begin
+        wsProp := Pic.PropStrValues[FThumbCornerDetails[Corner].Prop];
+        if wsProp<>'' then begin
           Result := Info.Bitmap.TextWidth(sProp)+2;
-          Info.Bitmap.Textout(
+          Info.Bitmap.Textout {??? Unicode}(
             rText,
             iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
-            sProp);
+            wsProp);
         end;
       end;
     end;
@@ -1752,7 +1752,7 @@ uses Math, Themes, phUtils;
    // TPhoAHintWindow
    //===================================================================================================================
 
-  procedure TPhoAHintWindow.ActivateHint(Rect: TRect; const AHint: string);
+  procedure TPhoAHintWindow.ActivateHint(Rect: TRect; const AHint: WideString);
   var
     bAnimate: BOOL;
     cStyle: Cardinal;
@@ -1790,7 +1790,7 @@ uses Math, Themes, phUtils;
     end;
   end;
 
-  function TPhoAHintWindow.CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect;
+  function TPhoAHintWindow.CalcHintRect(MaxWidth: Integer; const AHint: WideString; AData: Pointer): TRect;
   var iFlags, iXAdd: Integer;
   begin
      // Ограничиваем ширину окна
@@ -1804,7 +1804,7 @@ uses Math, Themes, phUtils;
     end else
       iXAdd  := 12; // Оставляем "запас" на пробел между левой и правой частями подсказки
      // Определяем размеры текста
-    DrawText(Canvas.Handle, PChar(AHint), -1, Result, iFlags);
+    Tnt_DrawTextW(Canvas.Handle, PWideChar(AHint), -1, Result, iFlags);
     Inc(Result.Right, iXAdd);
     Inc(Result.Bottom, 2);
   end;
@@ -1821,42 +1821,42 @@ uses Math, Themes, phUtils;
   procedure TPhoAHintWindow.Paint;
   var
     r, rLeft, rRight: TRect;
-    s, sLine, sLeft: String;
+    ws, wsLine, wsLeft: WideString;
     iTab: Integer;
   begin
     r := ClientRect;
     InflateRect(r, -2, -2);
     Canvas.Font.Color := Screen.HintFont.Color;
-    s := AdjustLineBreaks(Caption, tlbsLF);
+    ws := TntsAdjustLineBreaks(Caption, tlbsLF);
      // Если нет табуляций - просто выводим текст с переносом по словам
-    if Pos(#9, s)=0 then
-      DrawText(Canvas.Handle, PChar(s), -1, r, DT_LEFT or DT_NOPREFIX or DT_WORDBREAK or DrawTextBiDiModeFlagsReadingOnly)
+    if Pos(#9, ws)=0 then
+      Tnt_DrawTextW(Canvas.Handle, PWideChar(ws), -1, r, DT_LEFT or DT_NOPREFIX or DT_WORDBREAK or DrawTextBiDiModeFlagsReadingOnly)
      // Иначе - цикл по строкам
     else begin
        // Рассчитываем прямоугольник для одной строки
       r.Bottom := r.Top+Canvas.TextHeight('Wg');
-      while s<>'' do begin
-        sLine := ExtractFirstWord(s, #10);
-        if sLine<>'' then begin
+      while ws<>'' do begin
+        wsLine := ExtractFirstWord(ws, #10);
+        if wsLine<>'' then begin
            // Инициализируем прямоугольник для правой части строки
           rRight := r;
            // Ищем табуляцию
-          iTab := Pos(#9, sLine);
+          iTab := Pos(#9, wsLine);
            // Если в строке нет табуляции - значит, это продолжение предыдущей строки ПОСЛЕ табуляции. Иначе строка
            //   состоит из двух частей
           if iTab>0 then begin
              // Выделяем левую часть
-            sLeft := Copy(sLine, 1, iTab-1);
-            Delete(sLine, 1, iTab);
+            wsLeft := Copy(wsLine, 1, iTab-1);
+            Delete(wsLine, 1, iTab);
              // Рисуем левую часть
             rLeft := r;
-            DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_CALCRECT);
-            DrawText(Canvas.Handle, PChar(sLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
+            Tnt_DrawTextW(Canvas.Handle, PWideChar(wsLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_CALCRECT);
+            Tnt_DrawTextW(Canvas.Handle, PWideChar(wsLeft), -1, rLeft, DT_LEFT or DT_NOPREFIX or DT_END_ELLIPSIS);
              // Обрезаем прямоугольник правой части
             rRight.Left := rLeft.Right+6;
           end;
            // Рисуем правую часть
-          if sLine<>'' then DrawText(Canvas.Handle, PChar(sLine), -1, rRight, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
+          if wsLine<>'' then Tnt_DrawTextW(Canvas.Handle, PWideChar(wsLine), -1, rRight, DT_RIGHT or DT_NOPREFIX or DT_END_ELLIPSIS);
         end;
          // Смещаем прямоугольник на следующую строку
         OffsetRect(r, 0, r.Bottom-r.Top);
@@ -2247,13 +2247,13 @@ type
     inherited Destroy;
   end;
 
-  function TPhoaMenuItem.FindItemByActionName(const sActionName: WideString; bRecursive: LongBool): IPhoaMenuItem;
+  function TPhoaMenuItem.FindItemByActionName(const wsActionName: WideString; bRecursive: LongBool): IPhoaMenuItem;
   var
     i: Integer;
     Menu: IPhoaMenu;
     sAnsiActionName: String;
   begin
-    sAnsiActionName := PhoaUnicodeToAnsi(sActionName);
+    sAnsiActionName := PhoaUnicodeToAnsi(wsActionName);
      // Если задан Action, перебираем подпункты
     if (sAnsiActionName<>'') and (FSubentries<>nil) then
       for i := 0 to FSubentries.Count-1 do begin
@@ -2261,7 +2261,7 @@ type
         if Supports(FSubentries[i], IPhoaMenuItem, Result) and (Result.Action<>nil) and SameText(Result.Action.Name, sAnsiActionName) then Exit;
          // Если включена рекурсия, перебираем подпункты подпунктов
         if bRecursive and Supports(Result, IPhoaMenu, Menu) then begin
-          Result := Menu.FindItemByActionName(sActionName, True);
+          Result := Menu.FindItemByActionName(wsActionName, True);
           if Result<>nil then Exit;
         end;
       end;
@@ -2283,10 +2283,10 @@ type
     if FOwner=nil then Result := -1 else Result := FOwner.FItem.IndexOf(FItem);
   end;
 
-  function TPhoaMenuItem.GetItemByActionName(const sActionName: WideString; bRecursive: LongBool): IPhoaMenuItem;
+  function TPhoaMenuItem.GetItemByActionName(const wsActionName: WideString; bRecursive: LongBool): IPhoaMenuItem;
   begin
-    Result := FindItemByActionName(sActionName, bRecursive);
-    if Result=nil then PhoaException(SErrMsg_PhoaActionNotFound, [sActionName]);
+    Result := FindItemByActionName(wsActionName, bRecursive);
+    if Result=nil then PhoaException(SErrMsg_PhoaActionNotFound, [wsActionName]);
   end;
 
   function TPhoaMenuItem.GetOwner: IPhoaMenu;

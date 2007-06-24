@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.21 2007-06-12 13:21:49 dale Exp $
+//  $Id: phToolSetting.pas,v 1.22 2007-06-24 17:48:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -45,24 +45,24 @@ type
      // Маски, соответствующие текущим Masks. nil, если не созданы
     FMaskObj: TPhoaMasks;
      // Prop storage
-    FHint: String;
+    FHint: WideString;
     FKind: TPhoaToolKind;
-    FMasks: String;
-    FRunCommand: String;
-    FRunFolder: String;
-    FRunParameters: String;
+    FMasks: WideString;
+    FRunCommand: WideString;
+    FRunFolder: WideString;
+    FRunParameters: WideString;
     FRunShowCommand: Integer;
     FUsages: TPhoaToolUsages;
      // Возвращает имя секции для сохранения/загрузки настроек
-    function GetStoreSection: String;
+    function GetStoreSection: WideString;
      // Prop handlers
-    procedure SetHint(const Value: String);
+    procedure SetHint(const Value: WideString);
     procedure SetKind(Value: TPhoaToolKind);
-    procedure SetMasks(const Value: String);
-    procedure SetName(const Value: String);
-    procedure SetRunCommand(const Value: String);
-    procedure SetRunFolder(const Value: String);
-    procedure SetRunParameters(const Value: String);
+    procedure SetMasks(const Value: WideString);
+    procedure SetName(const Value: WideString);
+    procedure SetRunCommand(const Value: WideString);
+    procedure SetRunFolder(const Value: WideString);
+    procedure SetRunParameters(const Value: WideString);
     procedure SetRunShowCommand(Value: Integer);
     procedure SetUsages(Value: TPhoaToolUsages);
   protected
@@ -70,7 +70,7 @@ type
     function  GetModified: Boolean; override;
     procedure SetModified(Value: Boolean); override;
   public
-    constructor Create(AOwner: TPhoaSetting; const sName, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String;
+    constructor Create(AOwner: TPhoaSetting; const sName: AnsiString; const wsHint, wsRunCommand, wsRunFolder, wsRunParameters, wsMasks: WideString;
                        AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
     destructor Destroy; override;
     procedure AfterConstruction; override;
@@ -79,31 +79,31 @@ type
     procedure RegSave(RegIniFile: TRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
-     // Возвращает True, если инструмент подходит файлу изображения sFileName
-    function  MatchesFile(const sFileName: String): Boolean;
+     // Возвращает True, если инструмент подходит файлу изображения wsFileName
+    function  MatchesFile(const wsFileName: WideString): Boolean;
      // Возвращает True, если инструмент подходит всем файлам из Pics (Pics может быть nil)
     function  MatchesPicFiles(Pics: IPhoaPicList): Boolean;
      // Выполняет инструмент для одного изображения
-    procedure Execute(const sFileName: String); overload;
+    procedure Execute(const wsFileName: WideString); overload;
      // Выполняет инструмент для заданных изображений (Pics может быть nil)
     procedure Execute(Pics: IPhoaPicList); overload;
      // Props
      // -- Подсказка. Закодирована по правилам ConstValEx()
-    property Hint: String read FHint write SetHint;
+    property Hint: WideString read FHint write SetHint;
      // -- Вид инструмента
     property Kind: TPhoaToolKind read FKind write SetKind;
      // -- Наименование, доступное для записи. Закодировано по правилам ConstValEx()
     property Name read FName write SetName;
      // -- Команда запуска (для Kind in [ptkCustom, ptkExtViewer])
-    property RunCommand: String read FRunCommand write SetRunCommand;
+    property RunCommand: WideString read FRunCommand write SetRunCommand;
      // -- Каталог запуска (для Kind in [ptkCustom, ptkExtViewer])
-    property RunFolder: String read FRunFolder write SetRunFolder;
+    property RunFolder: WideString read FRunFolder write SetRunFolder;
      // -- Параметры запуска (для Kind in [ptkCustom, ptkExtViewer])
-    property RunParameters: String read FRunParameters write SetRunParameters;
+    property RunParameters: WideString read FRunParameters write SetRunParameters;
      // -- Команда показа при запуске (состояние окна SW_xxx)
     property RunShowCommand: Integer read FRunShowCommand write SetRunShowCommand;
      // -- Маски файлов, для которых применим инструмент
-    property Masks: String read FMasks write SetMasks;
+    property Masks: WideString read FMasks write SetMasks;
      // -- Где отображается пункт инструмента
     property Usages: TPhoaToolUsages read FUsages write SetUsages;
   end;
@@ -127,14 +127,14 @@ type
     procedure IniSave(IniFile: TIniFile); override;
   end;
 
-   // Преобразование TPhoaToolKind <-> String
-  function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
-  function PhoaToolKindFromStr(const sKind: String; Default: TPhoaToolKind): TPhoaToolKind;
-   // Преобразование TPhoaToolUsages <-> String
-  function PhoaToolUsagesToStr(Usages: TPhoaToolUsages): String;
-  function PhoaToolUsagesFromStr(const sUsages: String): TPhoaToolUsages;
+   // Преобразование TPhoaToolKind <-> WideString
+  function PhoaToolKindToWStr(Kind: TPhoaToolKind): WideString;
+  function PhoaToolKindFromWStr(const wsKind: WideString; Default: TPhoaToolKind): TPhoaToolKind;
+   // Преобразование TPhoaToolUsages <-> WideString
+  function PhoaToolUsagesToWStr(Usages: TPhoaToolUsages): WideString;
+  function PhoaToolUsagesFromWStr(const wsUsages: WideString): TPhoaToolUsages;
    // Возвращает название вида инструмента
-  function PhoaToolKindName(Kind: TPhoaToolKind): String;
+  function PhoaToolKindName(Kind: TPhoaToolKind): WideString;
 
    // Создаёт пункт меню инструмента Tool и добавляет его в состав дочерних пунктов пункта Item
   procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
@@ -164,37 +164,37 @@ const
 implementation
 uses TypInfo, ShellAPI, Menus, ImgList, Forms, VTHeaderPopup, phUtils, Main, udToolProps;
 
-  function PhoaToolKindToStr(Kind: TPhoaToolKind): String;
+  function PhoaToolKindToWStr(Kind: TPhoaToolKind): WideString;
   begin
     Result := Copy(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)), IPhoaToolKindPrefixLen+1, MaxInt);
   end;
 
-  function PhoaToolKindFromStr(const sKind: String; Default: TPhoaToolKind): TPhoaToolKind;
+  function PhoaToolKindFromWStr(const wsKind: WideString; Default: TPhoaToolKind): TPhoaToolKind;
   begin
     for Result := Low(Result) to High(Result) do
-      if AnsiSameText(sKind, PhoaToolKindToStr(Result)) then Exit;
+      if WideSameText(wsKind, PhoaToolKindToWStr(Result)) then Exit;
     Result := Default;
   end;
 
-  function PhoaToolUsagesToStr(Usages: TPhoaToolUsages): String;
+  function PhoaToolUsagesToWStr(Usages: TPhoaToolUsages): WideString;
   begin
     Result :=
-      iif(ptuToolsMenu in Usages,         'M', '')+
-      iif(ptuGroupPopupMenu in Usages,    'G', '')+
+      iif(ptuToolsMenu         in Usages, 'M', '')+
+      iif(ptuGroupPopupMenu    in Usages, 'G', '')+
       iif(ptuThViewerPopupMenu in Usages, 'V', '')+
       iif(ptuViewModePopupMenu in Usages, 'W', '');
   end;
 
-  function PhoaToolUsagesFromStr(const sUsages: String): TPhoaToolUsages;
+  function PhoaToolUsagesFromWStr(const wsUsages: WideString): TPhoaToolUsages;
   begin
     Result := [];
-    if AnsiStrScan(PChar(sUsages), 'M')<>nil then Include(Result, ptuToolsMenu);
-    if AnsiStrScan(PChar(sUsages), 'G')<>nil then Include(Result, ptuGroupPopupMenu);
-    if AnsiStrScan(PChar(sUsages), 'V')<>nil then Include(Result, ptuThViewerPopupMenu);
-    if AnsiStrScan(PChar(sUsages), 'W')<>nil then Include(Result, ptuViewModePopupMenu);
+    if WideStrScan(PWideChar(wsUsages), 'M')<>nil then Include(Result, ptuToolsMenu);
+    if WideStrScan(PWideChar(wsUsages), 'G')<>nil then Include(Result, ptuGroupPopupMenu);
+    if WideStrScan(PWideChar(wsUsages), 'V')<>nil then Include(Result, ptuThViewerPopupMenu);
+    if WideStrScan(PWideChar(wsUsages), 'W')<>nil then Include(Result, ptuViewModePopupMenu);
   end;
 
-  function PhoaToolKindName(Kind: TPhoaToolKind): String;
+  function PhoaToolKindName(Kind: TPhoaToolKind): WideString;
   begin
     Result := ConstVal(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)));
   end;
@@ -318,14 +318,14 @@ type
     end;
   end;
 
-  constructor TPhoaToolSetting.Create(AOwner: TPhoaSetting; const sName, sHint, sRunCommand, sRunFolder, sRunParameters, sMasks: String; AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
+  constructor TPhoaToolSetting.Create(AOwner: TPhoaSetting; const sName: AnsiString; const wsHint, wsRunCommand, wsRunFolder, wsRunParameters, wsMasks: WideString; AKind: TPhoaToolKind; iRunShowCommand: Integer; AUsages: TPhoaToolUsages);
   begin
     inherited Create(AOwner, 0, sName);
-    FHint           := sHint;
-    FRunCommand     := sRunCommand;
-    FRunFolder      := sRunFolder;
-    FRunParameters  := sRunParameters;
-    FMasks          := sMasks;
+    FHint           := wsHint;
+    FRunCommand     := wsRunCommand;
+    FRunFolder      := wsRunFolder;
+    FRunParameters  := wsRunParameters;
+    FMasks          := wsMasks;
     FKind           := AKind;
     FRunShowCommand := iRunShowCommand;
     FUsages         := AUsages;
@@ -345,23 +345,23 @@ type
     inherited Destroy;
   end;
 
-  procedure TPhoaToolSetting.Execute(const sFileName: String);
+  procedure TPhoaToolSetting.Execute(const wsFileName: WideString);
   var
     iRes: Integer;
-    sQFileName: String;
+    wsQFileName: WideString;
   begin
-    sQFileName := AnsiQuotedStr(sFileName, '"');
+    wsQFileName := WideQuotedStr(wsFileName, '"');
     case FKind of
-      ptkDefault:  iRes := ShellExecute(Application.Handle, nil,     PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-      ptkOpen:     iRes := ShellExecute(Application.Handle, 'open',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-      ptkEdit:     iRes := ShellExecute(Application.Handle, 'edit',  PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
-      ptkPrint:    iRes := ShellExecute(Application.Handle, 'print', PChar(sQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkDefault:  iRes := Tnt_ShellExecuteW(Application.Handle, nil,     PWideChar(wsQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkOpen:     iRes := Tnt_ShellExecuteW(Application.Handle, 'open',  PWideChar(wsQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkEdit:     iRes := Tnt_ShellExecuteW(Application.Handle, 'edit',  PWideChar(wsQFileName), nil, nil, SW_SHOWNORMAL);
+      ptkPrint:    iRes := Tnt_ShellExecuteW(Application.Handle, 'print', PWideChar(wsQFileName), nil, nil, SW_SHOWNORMAL);
       ptkExtViewer,
-        ptkCustom: iRes := ShellExecute(Application.Handle, nil,     PChar(FRunCommand), PChar(FRunParameters+' '+sQFileName), PChar(FRunFolder), SW_SHOWNORMAL);
+        ptkCustom: iRes := Tnt_ShellExecuteW(Application.Handle, nil,     PWideChar(FRunCommand), PWideChar(FRunParameters+' '+wsQFileName), PWideChar(FRunFolder), SW_SHOWNORMAL);
      else          iRes := 0;
     end;
      // Проверяем результат
-    if iRes<=32 then PhoaException(ConstVal('SErrExecutingToolFailed'), [FName, sFileName, SysErrorMessage(GetLastError)]);
+    if iRes<=32 then PhoaException(ConstVal('SErrExecutingToolFailed'), [FName, wsFileName, WideSysErrorMessage(GetLastError)]);
   end;
 
   procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
@@ -376,9 +376,9 @@ type
     Result := FModified or inherited GetModified;
   end;
 
-  function TPhoaToolSetting.GetStoreSection: String;
+  function TPhoaToolSetting.GetStoreSection: WideString;
   begin
-    Result := Format('%s\Item%.3d', [SRegPrefs_Tools, Index]);
+    Result := WideFormat('%s\Item%.3d', [SRegPrefs_Tools, Index]);
   end;
 
   procedure TPhoaToolSetting.IniLoad(IniFile: TIniFile);
@@ -391,12 +391,12 @@ type
     { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
-  function TPhoaToolSetting.MatchesFile(const sFileName: String): Boolean;
+  function TPhoaToolSetting.MatchesFile(const wsFileName: WideString): Boolean;
   begin
      // Создаём маски, если нужно
     if FMaskObj=nil then FMaskObj := TPhoaMasks.Create(FMasks);
      // Если маска пустая - подходит всегда. Иначе натравливаем маску на имя файла
-    Result := FMaskObj.Empty or FMaskObj.Matches(sFileName);
+    Result := FMaskObj.Empty or FMaskObj.Matches(wsFileName);
   end;
 
   function TPhoaToolSetting.MatchesPicFiles(Pics: IPhoaPicList): Boolean;
@@ -422,42 +422,42 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.RegLoad(RegIniFile: TRegIniFile);
-  var sSection: String;
+  procedure TPhoaToolSetting.RegLoad(RegIniFile: TRegIniFile {!!! Not Unicode-enabled solution });
+  var wsSection: WideString;
   begin
-    sSection := GetStoreSection;
-    FName           := RegIniFile.ReadString (sSection, 'Name',       '');
-    FHint           := RegIniFile.ReadString (sSection, 'Hint',       '');
+    wsSection := GetStoreSection;
+    FName           := RegIniFile.ReadString (wsSection, 'Name',       '');
+    FHint           := RegIniFile.ReadString (wsSection, 'Hint',       '');
     FKind           := PhoaToolKindFromStr(
-                       RegIniFile.ReadString (sSection, 'Kind',       ''),
+                       RegIniFile.ReadString (wsSection, 'Kind',       ''),
                        FKind);
-    FMasks          := RegIniFile.ReadString (sSection, 'Masks',      '');
-    FRunCommand     := RegIniFile.ReadString (sSection, 'RunCmd',     '');
-    FRunFolder      := RegIniFile.ReadString (sSection, 'RunFolder',  '');
-    FRunParameters  := RegIniFile.ReadString (sSection, 'RunParams',  '');
-    FRunShowCommand := RegIniFile.ReadInteger(sSection, 'RunShowCmd', SW_SHOWNORMAL);
+    FMasks          := RegIniFile.ReadString (wsSection, 'Masks',      '');
+    FRunCommand     := RegIniFile.ReadString (wsSection, 'RunCmd',     '');
+    FRunFolder      := RegIniFile.ReadString (wsSection, 'RunFolder',  '');
+    FRunParameters  := RegIniFile.ReadString (wsSection, 'RunParams',  '');
+    FRunShowCommand := RegIniFile.ReadInteger(wsSection, 'RunShowCmd', SW_SHOWNORMAL);
     FUsages         := PhoaToolUsagesFromStr(
-                       RegIniFile.ReadString (sSection, 'Usages',     'M'));
+                       RegIniFile.ReadString (wsSection, 'Usages',     'M'));
     inherited RegLoad(RegIniFile);
   end;
 
-  procedure TPhoaToolSetting.RegSave(RegIniFile: TRegIniFile);
-  var sSection: String;
+  procedure TPhoaToolSetting.RegSave(RegIniFile: TRegIniFile {!!! Not Unicode-enabled solution });
+  var wsSection: WideString;
   begin
-    sSection := GetStoreSection;
-    RegIniFile.WriteString (sSection, 'Name',       FName);
-    RegIniFile.WriteString (sSection, 'Hint',       FHint);
-    RegIniFile.WriteString (sSection, 'Kind',       PhoaToolKindToStr(FKind));
-    RegIniFile.WriteString (sSection, 'Masks',      FMasks);
-    RegIniFile.WriteString (sSection, 'RunCmd',     FRunCommand);
-    RegIniFile.WriteString (sSection, 'RunFolder',  FRunFolder);
-    RegIniFile.WriteString (sSection, 'RunParams',  FRunParameters);
-    RegIniFile.WriteInteger(sSection, 'RunShowCmd', FRunShowCommand);
-    RegIniFile.WriteString (sSection, 'Usages',     PhoaToolUsagesToStr(FUsages));
+    wsSection := GetStoreSection;
+    RegIniFile.WriteString (wsSection, 'Name',       FName);
+    RegIniFile.WriteString (wsSection, 'Hint',       FHint);
+    RegIniFile.WriteString (wsSection, 'Kind',       PhoaToolKindToStr(FKind));
+    RegIniFile.WriteString (wsSection, 'Masks',      FMasks);
+    RegIniFile.WriteString (wsSection, 'RunCmd',     FRunCommand);
+    RegIniFile.WriteString (wsSection, 'RunFolder',  FRunFolder);
+    RegIniFile.WriteString (wsSection, 'RunParams',  FRunParameters);
+    RegIniFile.WriteInteger(wsSection, 'RunShowCmd', FRunShowCommand);
+    RegIniFile.WriteString (wsSection, 'Usages',     PhoaToolUsagesToStr(FUsages));
     inherited RegSave(RegIniFile);
   end;
 
-  procedure TPhoaToolSetting.SetHint(const Value: String);
+  procedure TPhoaToolSetting.SetHint(const Value: WideString);
   begin
     if FHint<>Value then begin
       FHint := Value;
@@ -473,7 +473,7 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.SetMasks(const Value: String);
+  procedure TPhoaToolSetting.SetMasks(const Value: WideString);
   begin
     if FMasks<>Value then begin
       FMasks := Value;
@@ -488,7 +488,7 @@ type
     inherited SetModified(Value);
   end;
 
-  procedure TPhoaToolSetting.SetName(const Value: String);
+  procedure TPhoaToolSetting.SetName(const Value: WideString);
   begin
     if FName<>Value then begin
       FName := Value;
@@ -496,7 +496,7 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.SetRunCommand(const Value: String);
+  procedure TPhoaToolSetting.SetRunCommand(const Value: WideString);
   begin
     if FRunCommand<>Value then begin
       FRunCommand := Value;
@@ -504,7 +504,7 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.SetRunFolder(const Value: String);
+  procedure TPhoaToolSetting.SetRunFolder(const Value: WideString);
   begin
     if FRunFolder<>Value then begin
       FRunFolder := Value;
@@ -512,7 +512,7 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.SetRunParameters(const Value: String);
+  procedure TPhoaToolSetting.SetRunParameters(const Value: WideString);
   begin
     if FRunParameters<>Value then begin
       FRunParameters := Value;
@@ -617,14 +617,14 @@ type
   procedure TPhoaToolSettingEditor.CreatePopupMenu;
   var pm: TTBXPopupMenu;
 
-    function NewItem(iImgIdx: Integer; const sCaption, sShortcut: String; const ClickEvent: TNotifyEvent; bDefault: Boolean): TTBXItem;
+    function NewItem(iImgIdx: Integer; const wsCaption, wsShortcut: WideString; const ClickEvent: TNotifyEvent; bDefault: Boolean): TTBXItem; {!!! Not Unicode-enabled solution }
     begin
       Result := TTBXItem.Create(Self);
       Result.ImageIndex := iImgIdx;
-      Result.Caption    := sCaption;
+      Result.Caption    := wsCaption;
       if bDefault then Result.Options := Result.Options+[tboDefault];
       Result.OnClick    := ClickEvent;
-      Result.ShortCut   := TextToShortCut(sShortcut);
+      Result.ShortCut   := WideTextToShortCut(wsShortcut);
       pm.Items.Add(Result);
     end;
 
@@ -738,23 +738,20 @@ type
   end;
 
   procedure TPhoaToolSettingEditor.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    s: String;
-    Setting: TPhoaToolSetting;
+  var Setting: TPhoaToolSetting;
   begin
-    s := '';
+    CellText := '';
     Setting := GetSetting(Node);
     if Setting<>nil then
       case Column of
-        IColIdx_ToolEditor_Masks:       if Setting.Masks='' then s := ConstVal('SAll') else s := Setting.Masks;
-        IColIdx_ToolEditor_Kind:        s := PhoaToolKindName(Setting.Kind);
-        IColIdx_ToolEditor_Name:        s := ConstValEx(Setting.Name);
-        IColIdx_ToolEditor_Hint:        s := ConstValEx(Setting.Hint);
-        IColIdx_ToolEditor_Application: if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunCommand;
-        IColIdx_ToolEditor_Folder:      if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunFolder;
-        IColIdx_ToolEditor_Params:      if Setting.Kind in [ptkCustom, ptkExtViewer] then s := Setting.RunParameters;
+        IColIdx_ToolEditor_Masks:       if Setting.Masks='' then CellText := ConstVal('SAll') else CellText := Setting.Masks;
+        IColIdx_ToolEditor_Kind:        CellText := PhoaToolKindName(Setting.Kind);
+        IColIdx_ToolEditor_Name:        CellText := ConstValEx(Setting.Name);
+        IColIdx_ToolEditor_Hint:        CellText := ConstValEx(Setting.Hint);
+        IColIdx_ToolEditor_Application: if Setting.Kind in [ptkCustom, ptkExtViewer] then CellText := Setting.RunCommand;
+        IColIdx_ToolEditor_Folder:      if Setting.Kind in [ptkCustom, ptkExtViewer] then CellText := Setting.RunFolder;
+        IColIdx_ToolEditor_Params:      if Setting.Kind in [ptkCustom, ptkExtViewer] then CellText := Setting.RunParameters;
       end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TPhoaToolSettingEditor.DoHeaderDragged(Column: TColumnIndex; OldPosition: TColumnPosition);
@@ -870,7 +867,7 @@ type
 
   procedure TPhoaToolSettingEditor.SetupHeader;
 
-    procedure AddColumn(const sConst: String; iWidth: Integer; bVisible: Boolean);
+    procedure AddColumn(const sConst: AnsiString; iWidth: Integer; bVisible: Boolean);
     begin
       with Header.Columns.Add do begin
         Text    := ConstVal(sConst);

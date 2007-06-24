@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.16 2005-02-14 19:34:08 dale Exp $
+//  $Id: phSettings.pas,v 1.17 2007-06-24 17:48:23 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,7 +11,7 @@ uses SysUtils, Windows, Classes, Graphics, Controls, Registry, IniFiles, phObj, 
 
 type
    // Exception настроек
-  EPhoaSettingError = class(EPhoaException);
+  EPhoaSettingError = class(EPhoaWideException);
 
    //===================================================================================================================
    // TPhoaSetting - базовый пункт настройки
@@ -39,7 +39,7 @@ type
     procedure SetIndex(Value: Integer);
   protected
      // Prop storage
-    FName: String;
+    FName: AnsiString;
      // "Простой" конструктор, не инициализирующий свойств, кроме Owner (используется в "нормальных" конструкторах и в
      //   Assign)
     constructor CreateNew(AOwner: TPhoaSetting); virtual;
@@ -47,7 +47,7 @@ type
     function  GetModified: Boolean; virtual;
     procedure SetModified(Value: Boolean); virtual;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString);
     destructor Destroy; override;
      // Стирает все дочерние пункты
     procedure ClearChildren;
@@ -73,7 +73,7 @@ type
      // -- True, если значение настройки или любой из дочерних настроек модифицировано
     property Modified: Boolean read GetModified write SetModified;
      // -- Наименование пункта, закодированное по правилам ConstValEx()
-    property Name: String read FName;
+    property Name: AnsiString read FName;
      // -- Пункт-владелец данного пункта
     property Owner: TPhoaSetting read FOwner;
      // -- Пункты по ID
@@ -97,7 +97,7 @@ type
     function  GetEditorClass: TWinControlClass; virtual; abstract;
     function  GetVisible: Boolean; virtual;
   public
-    constructor Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
+    constructor Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: AnsiString; AHelpContext: THelpContext);
     procedure Assign(Source: TPhoaSetting); override;
      // Props
      // -- Класс компонента-редактора настройки
@@ -145,19 +145,19 @@ var
    // Функции/процедуры для доступа к значениям настроек
   function  SettingValueInt (iID: Integer): Integer;
   function  SettingValueBool(iID: Integer): Boolean;
-  function  SettingValueStr (iID: Integer): String;
+  function  SettingValueWStr(iID: Integer): WideString;
   function  SettingValueRect(iID: Integer): TRect;
   procedure SetSettingValueInt (iID, iValue: Integer);
   procedure SetSettingValueBool(iID: Integer; bValue: Boolean);
-  procedure SetSettingValueStr (iID: Integer; const sValue: String);
+  procedure SetSettingValueWStr(iID: Integer; const wsValue: WideString);
   procedure SetSettingValueRect(iID: Integer; const rValue: TRect);
 
    // Процедуры сохранения и загрузки настроек (дочерних узлов RootSetting) из реестра / phoa.ini (если последнее включено)
   procedure SaveAllSettings;
   procedure LoadAllSettings;
    // Процедуры сохранения и загрузки настроек из реестра ini-файла
-  procedure IniSaveSettings(const sIniFileName: String);
-  procedure IniLoadSettings(const sIniFileName: String);
+  procedure IniSaveSettings(const wsIniFileName: WideString);
+  procedure IniLoadSettings(const wsIniFileName: WideString);
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses TypInfo, phUtils, phValSetting;
@@ -168,7 +168,7 @@ const
   SSettingsErrMsg_InvalidSettingType = 'Cannot access setting (ID=%d) as type %s';
 
    // Вызывает EPhoaSettingError
-  procedure PhoaSettingError(const sMsg: String; const aParams: Array of const);
+  procedure PhoaSettingError(const wsMessage: WideString; const aParams: Array of const);
 
      function RetAddr: Pointer;
      asm
@@ -176,7 +176,7 @@ const
      end;
 
   begin
-    raise EPhoaSettingError.CreateFmt(sMsg, aParams) at RetAddr;
+    raise EPhoaSettingError.CreateFmt(wsMessage, aParams) at RetAddr;
   end;
 
   function SettingValueInt(iID: Integer): Integer;
@@ -195,12 +195,12 @@ const
     Result := TPhoaBoolSetting(Setting).Value;
   end;
 
-  function SettingValueStr(iID: Integer): String;
+  function SettingValueWStr(iID: Integer): WideString;
   var Setting: TPhoaSetting;
   begin
     Setting := RootSetting.Settings[iID];
-    if not (Setting is TPhoaStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['String']);
-    Result := TPhoaStrSetting(Setting).Value;
+    if not (Setting is TPhoaWideStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['WideString']);
+    Result := TPhoaWideStrSetting(Setting).Value;
   end;
 
   function SettingValueRect(iID: Integer): TRect;
@@ -227,12 +227,12 @@ const
     TPhoaBoolSetting(Setting).Value := bValue;
   end;
 
-  procedure SetSettingValueStr(iID: Integer; const sValue: String);
+  procedure SetSettingValueWStr(iID: Integer; const wsValue: WideString);
   var Setting: TPhoaSetting;
   begin
     Setting := RootSetting.Settings[iID];
-    if not (Setting is TPhoaStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['String']);
-    TPhoaStrSetting(Setting).Value := sValue;
+    if not (Setting is TPhoaWideStrSetting) then PhoaSettingError(SSettingsErrMsg_InvalidSettingType, ['WideString']);
+    TPhoaWideStrSetting(Setting).Value := wsValue;
   end;
 
   procedure SetSettingValueRect(iID: Integer; const rValue: TRect);
@@ -258,7 +258,7 @@ const
   procedure LoadAllSettings;
   var
     rif: TRegIniFile;
-    sAutoLoadIniFile: String;
+    wsAutoLoadIniFile: WideString;
   begin
      // Загружаем настройки из реестра
     rif := TRegIniFile.Create(SRegRoot);
@@ -269,15 +269,15 @@ const
     end;
      // Если нужно и присутствует ini-файл, подгружаем настройки из него
     if SettingValueBool(ISettingID_Gen_LookupPhoaIni) then begin
-      sAutoLoadIniFile := sApplicationPath+SDefaultIniFileName;
-      if FileExists(sAutoLoadIniFile) then IniLoadSettings(sAutoLoadIniFile);
+      wsAutoLoadIniFile := wsApplicationPath+SDefaultIniFileName;
+      if WideFileExists(wsAutoLoadIniFile) then IniLoadSettings(wsAutoLoadIniFile);
     end;
   end;
 
-  procedure IniSaveSettings(const sIniFileName: String);
+  procedure IniSaveSettings(const wsIniFileName: WideString);
   var fi: TIniFile;
   begin
-    fi := TIniFile.Create(sIniFileName);
+    fi := TIniFile.Create(wsIniFileName); {!!! Not Unicode-enabled solution }
     try
       RootSetting.IniSave(fi);
     finally
@@ -285,10 +285,10 @@ const
     end;
   end;
 
-  procedure IniLoadSettings(const sIniFileName: String);
+  procedure IniLoadSettings(const wsIniFileName: WideString);
   var fi: TIniFile;
   begin
-    fi := TIniFile.Create(sIniFileName);
+    fi := TIniFile.Create(wsIniFileName); {!!! Not Unicode-enabled solution }
     try
       RootSetting.IniLoad(fi);
     finally
@@ -332,7 +332,7 @@ const
     end;
   end;
 
-  constructor TPhoaSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String);
+  constructor TPhoaSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString);
   begin
     CreateNew(AOwner);
     FID   := iID;
@@ -464,7 +464,7 @@ const
     end;
   end;
 
-  constructor TPhoaPageSetting.Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: String; AHelpContext: THelpContext);
+  constructor TPhoaPageSetting.Create(AOwner: TPhoaSetting; iID, iImageIndex: Integer; const sName: AnsiString; AHelpContext: THelpContext);
   begin
     inherited Create(AOwner, iID, sName);
     FImageIndex  := iImageIndex;
