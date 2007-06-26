@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.16 2007-06-24 17:48:23 dale Exp $
+//  $Id: phValSetting.pas,v 1.17 2007-06-26 18:03:22 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -23,9 +23,9 @@ type
      // Состояние изменённости данных
     FModified: Boolean;
      // Prop handlers
-    function  GetAsString: String; virtual; abstract;
-    procedure SetAsString(const sValue: String); virtual; abstract;
-    function  GetDisplayString: String; virtual;
+    function  GetAsWideString: WideString; virtual; abstract;
+    procedure SetAsWideString(const wsValue: WideString); virtual; abstract;
+    function  GetDisplayString: WideString; virtual;
     function  GetModified: Boolean; override;
     procedure SetModified(Value: Boolean); override;
   public
@@ -37,9 +37,9 @@ type
     procedure IniSave(IniFile: TIniFile); override;
      // Props
      // -- Значение (данные) в виде строки
-    property AsString: String read GetAsString write SetAsString;
+    property AsWideString: WideString read GetAsWideString write SetAsWideString;
      // -- Отображаемое значение в виде строки. В базовом классе совпадает с AsString
-    property DisplayString: String read GetDisplayString;
+    property DisplayString: WideString read GetDisplayString;
   end;
 
    //===================================================================================================================
@@ -55,11 +55,11 @@ type
     function  GetValue: Integer;
     procedure SetValue(Value: Integer);
   protected
-    function  GetAsString: String; override;
-    procedure SetAsString(const sValue: String); override;
-    function  GetDisplayString: String; override;
+    function  GetAsWideString: WideString; override;
+    function  GetDisplayString: WideString; override;
+    procedure SetAsWideString(const wsValue: WideString); override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue, iMinValue, iMaxValue: Integer);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue, iMinValue, iMaxValue: Integer);
     procedure Assign(Source: TPhoaSetting); override;
      // Props
      // -- Максимальное и минимальное значения пунктов
@@ -75,7 +75,7 @@ type
 
   TPhoaIntEntrySetting = class(TPhoaIntSetting)
   protected
-    function  GetDisplayString: String; override;
+    function  GetDisplayString: WideString; override;
   end;
 
    //===================================================================================================================
@@ -88,11 +88,11 @@ type
     function  GetValue: Boolean;
     procedure SetValue(Value: Boolean);
   protected
-    function  GetAsString: String; override;
-    procedure SetAsString(const sValue: String); override;
-    function  GetDisplayString: String; override;
+    function  GetAsWideString: WideString; override;
+    procedure SetAsWideString(const wsValue: WideString); override;
+    function  GetDisplayString: WideString; override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; bValue: Boolean);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; bValue: Boolean);
     procedure Assign(Source: TPhoaSetting); override;
      // Props
      // -- Значение пункта
@@ -106,18 +106,18 @@ type
   TPhoaWideStrSetting = class(TPhoaValSetting)
   private
      // Prop handlers
-    function  GetValue: String;
-    procedure SetValue(const Value: String);
+    function  GetValue: WideString;
+    procedure SetValue(const Value: WideString);
   protected
-    function  GetAsString: String; override;
-    procedure SetAsString(const sValue: String); override;
+    function  GetAsWideString: WideString; override;
+    procedure SetAsWideString(const wsValue: WideString); override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; const wsValue: WideString);
     destructor Destroy; override;
     procedure Assign(Source: TPhoaSetting); override;
      // Props
      // -- Значение пункта
-    property Value: String read GetValue write SetValue;
+    property Value: WideString read GetValue write SetValue;
   end;
 
    //===================================================================================================================
@@ -132,18 +132,18 @@ type
   private
      // Prop storage
     FValueType: TListSettingValueType;
-    FVariants: TStrings;
+    FVariants: TWideStrings;
      // Prop handlers
     function  GetVariantIndex: Integer;
-    function  GetVariantText: String;
+    function  GetVariantText: WideString;
     procedure SetVariantIndex(iValue: Integer);
   protected
     constructor CreateNew(AOwner: TPhoaSetting); override;
-    function  GetAsString: String; override;
-    procedure SetAsString(const sValue: String); override;
-    function  GetDisplayString: String; override;
+    function  GetAsWideString: WideString; override;
+    function  GetDisplayString: WideString; override;
+    procedure SetAsWideString(const wsValue: WideString); override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; AValueType: TListSettingValueType);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer; AValueType: TListSettingValueType);
     destructor Destroy; override;
     procedure Assign(Source: TPhoaSetting); override;
      // Props
@@ -154,7 +154,7 @@ type
      // -- Дочерние пункты (варианты) пункта. Текст закодирован по правилам ConstValEx()
     property Variants: TStrings read FVariants;
      // -- Текст из Variants, соответствующий текущему ValueInt; пустая строка, если нет такого соответствия
-    property VariantText: String read GetVariantText;
+    property VariantText: WideString read GetVariantText;
   end;
 
    //===================================================================================================================
@@ -163,7 +163,7 @@ type
 
   TPhoaFontSetting = class(TPhoaWideStrSetting)
   protected
-    function  GetDisplayString: String; override;
+    function  GetDisplayString: WideString; override;
   public
      // Присваивает шрифт объекту TFont
     procedure GetFont(Font: TFont);
@@ -177,9 +177,9 @@ type
 
   TPhoaColorSetting = class(TPhoaIntSetting)
   protected
-    function  GetDisplayString: String; override;
+    function  GetDisplayString: WideString; override;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer);
   end;
 
    //===================================================================================================================
@@ -204,7 +204,7 @@ type
 
   TPhoaMutexIntSetting = class(TPhoaIntSetting)
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer);
   end;
 
    //===================================================================================================================
@@ -217,7 +217,7 @@ type
     function  GetValue: TRect;
     procedure SetValue(const Value: TRect);
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; const rValue: TRect);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; const rValue: TRect);
      // Props
      // -- Значение пункта
     property Value: TRect read GetValue write SetValue;
@@ -321,9 +321,9 @@ type
     if Source is TPhoaValSetting then FModified := TPhoaValSetting(Source).FModified;
   end;
 
-  function TPhoaValSetting.GetDisplayString: String;
+  function TPhoaValSetting.GetDisplayString: WideString;
   begin
-    Result := GetAsString;
+    Result := GetAsWideString;
   end;
 
   function TPhoaValSetting.GetModified: Boolean;
@@ -375,7 +375,7 @@ type
     end;
   end;
 
-  constructor TPhoaIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue, iMinValue, iMaxValue: Integer);
+  constructor TPhoaIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue, iMinValue, iMaxValue: Integer);
   begin
     inherited Create(AOwner, iID, sName);
     FMinValue := iMinValue;
@@ -383,12 +383,12 @@ type
     SetValue(iValue);
   end;
 
-  function TPhoaIntSetting.GetAsString: String;
+  function TPhoaIntSetting.GetAsWideString: WideString;
   begin
     Result := IntToStr(FData);
   end;
 
-  function TPhoaIntSetting.GetDisplayString: String;
+  function TPhoaIntSetting.GetDisplayString: WideString;
   begin
     Result := ''; // IntSetting не отображает значения
   end;
@@ -398,9 +398,9 @@ type
     Result := FData;
   end;
 
-  procedure TPhoaIntSetting.SetAsString(const sValue: String);
+  procedure TPhoaIntSetting.SetAsWideString(const wsValue: WideString);
   begin
-    Value := StrToIntDef(sValue, FData);
+    Value := StrToIntDef(wsValue, FData);
   end;
 
   procedure TPhoaIntSetting.SetValue(Value: Integer);
@@ -416,9 +416,9 @@ type
    // TPhoaIntEntrySetting
    //===================================================================================================================
 
-  function TPhoaIntEntrySetting.GetDisplayString: String;
+  function TPhoaIntEntrySetting.GetDisplayString: WideString;
   begin
-    Result := AsString; // Перекрываем унаследованное поведение (пустую строку)
+    Result := AsWideString; // Перекрываем унаследованное поведение (пустую строку)
   end;
 
    //===================================================================================================================
@@ -431,18 +431,18 @@ type
     if Source is TPhoaBoolSetting then FData := TPhoaBoolSetting(Source).FData;
   end;
 
-  constructor TPhoaBoolSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; bValue: Boolean);
+  constructor TPhoaBoolSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; bValue: Boolean);
   begin
     inherited Create(AOwner, iID, sName);
     SetValue(bValue);
   end;
 
-  function TPhoaBoolSetting.GetAsString: String;
+  function TPhoaBoolSetting.GetAsWideString: WideString;
   begin
     Result := IntToStr(FData);
   end;
 
-  function TPhoaBoolSetting.GetDisplayString: String;
+  function TPhoaBoolSetting.GetDisplayString: WideString;
   begin
     Result := '';
   end;
@@ -452,9 +452,9 @@ type
     Result := FData<>0;
   end;
 
-  procedure TPhoaBoolSetting.SetAsString(const sValue: String);
+  procedure TPhoaBoolSetting.SetAsWideString(const wsValue: WideString);
   begin
-    Value := StrToIntDef(sValue, FData)<>0;
+    Value := StrToIntDef(wsValue, FData)<>0;
   end;
 
   procedure TPhoaBoolSetting.SetValue(Value: Boolean);
@@ -472,40 +472,40 @@ type
   procedure TPhoaWideStrSetting.Assign(Source: TPhoaSetting);
   begin
     inherited Assign(Source);
-    if Source is TPhoaWideStrSetting then String(FData) := TPhoaWideStrSetting(Source).Value;
+    if Source is TPhoaWideStrSetting then WideString(FData) := TPhoaWideStrSetting(Source).Value;
   end;
 
-  constructor TPhoaWideStrSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName, sValue: String);
+  constructor TPhoaWideStrSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; const wsValue: WideString);
   begin
     inherited Create(AOwner, iID, sName);
-    SetValue(sValue);
+    SetValue(wsValue);
   end;
 
   destructor TPhoaWideStrSetting.Destroy;
   begin
-    Finalize(String(FData));
+    Finalize(WideString(FData));
     inherited Destroy;
   end;
 
-  function TPhoaWideStrSetting.GetAsString: String;
+  function TPhoaWideStrSetting.GetAsWideString: WideString;
   begin
     Result := GetValue;
   end;
 
-  function TPhoaWideStrSetting.GetValue: String;
+  function TPhoaWideStrSetting.GetValue: WideString;
   begin
-    Result := String(FData);
+    Result := WideString(FData);
   end;
 
-  procedure TPhoaWideStrSetting.SetAsString(const sValue: String);
+  procedure TPhoaWideStrSetting.SetAsWideString(const wsValue: WideString);
   begin
-    Value := sValue;
+    Value := wsValue;
   end;
 
-  procedure TPhoaWideStrSetting.SetValue(const Value: String);
+  procedure TPhoaWideStrSetting.SetValue(const Value: WideString);
   begin
-    if String(FData)<>Value then begin
-      String(FData) := Value;
+    if WideString(FData)<>Value then begin
+      WideString(FData) := Value;
       FModified := True;
     end;
   end;
@@ -523,7 +523,7 @@ type
     end;
   end;
 
-  constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer; AValueType: TListSettingValueType);
+  constructor TPhoaListSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer; AValueType: TListSettingValueType);
   begin
     inherited Create(AOwner, iID, sName, iValue, -1, MaxInt);
     FValueType := AValueType;
@@ -533,7 +533,7 @@ type
   begin
     inherited CreateNew(AOwner);
      // FVariants создаём здесь, т. к. при Assign Create() не вызывается
-    FVariants  := TStringList.Create;
+    FVariants  := TTntStringList.Create;
   end;
 
   destructor TPhoaListSetting.Destroy;
@@ -542,15 +542,15 @@ type
     inherited Destroy;
   end;
 
-  function TPhoaListSetting.GetAsString: String;
+  function TPhoaListSetting.GetAsWideString: WideString;
   begin
     case FValueType of
       lsvtIndexString: Result := GetVariantText;
-      else Result := inherited GetAsString;
+      else             Result := inherited GetAsWideString;
     end;
   end;
 
-  function TPhoaListSetting.GetDisplayString: String;
+  function TPhoaListSetting.GetDisplayString: WideString;
   begin
     Result := GetVariantText;
   end;
@@ -559,22 +559,22 @@ type
   begin
     case FValueType of
       lsvtObject: Result := FVariants.IndexOfObject(Pointer(FData));
-      else Result := FData;
+      else        Result := FData;
     end;
   end;
 
-  function TPhoaListSetting.GetVariantText: String;
+  function TPhoaListSetting.GetVariantText: WideString;
   var idx: Integer;
   begin
     idx := GetVariantIndex;
     if idx<0 then Result := '' else Result := FVariants[idx];
   end;
 
-  procedure TPhoaListSetting.SetAsString(const sValue: String);
+  procedure TPhoaListSetting.SetAsWideString(const wsValue: WideString);
   begin
     case FValueType of
-      lsvtIndexString: SetVariantIndex(FVariants.IndexOf(sValue));
-      else inherited SetAsString(sValue);
+      lsvtIndexString: SetVariantIndex(FVariants.IndexOf(wsValue));
+      else             inherited SetAsWideString(wsValue);
     end;
   end;
 
@@ -582,7 +582,7 @@ type
   begin
     case FValueType of
       lsvtObject: if iValue<0 then Value := -1 else Value := Integer(FVariants.Objects[iValue]);
-      else Value := iValue;
+      else        Value := iValue;
     end;
   end;
 
@@ -590,7 +590,7 @@ type
    // TPhoaFontSetting
    //===================================================================================================================
 
-  function TPhoaFontSetting.GetDisplayString: String;
+  function TPhoaFontSetting.GetDisplayString: WideString;
   begin
     Result := GetFirstWord(Value, '/');
   end;
@@ -609,12 +609,12 @@ type
    // TPhoaColorSetting
    //===================================================================================================================
 
-  constructor TPhoaColorSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+  constructor TPhoaColorSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer);
   begin
     inherited Create(AOwner, iID, sName, iValue, MinInt, MaxInt);
   end;
 
-  function TPhoaColorSetting.GetDisplayString: String;
+  function TPhoaColorSetting.GetDisplayString: WideString;
   begin
     Result := ' '; // Возвращаем непустую строку, чтобы не работал column spanning
   end;
@@ -623,7 +623,7 @@ type
    // TPhoaMutexIntSetting
    //===================================================================================================================
 
-  constructor TPhoaMutexIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; iValue: Integer);
+  constructor TPhoaMutexIntSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; iValue: Integer);
   begin
     inherited Create(AOwner, iID, sName, iValue, MinInt, MaxInt);
   end;
@@ -632,7 +632,7 @@ type
    // TPhoaRectSetting
    //===================================================================================================================
 
-  constructor TPhoaRectSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: String; const rValue: TRect);
+  constructor TPhoaRectSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString; const rValue: TRect);
   begin
     inherited Create(AOwner, iID, sName, RectToStr(rValue));
   end;
@@ -742,20 +742,19 @@ type
 
   procedure TPhoaValSettingEditor.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   var
-    s, sVal: String;
+    wsVal: WideString;
     Setting: TPhoaSetting;
   begin
-    s := '';
+    CellText := '';
     Setting := GetSetting(Node);
     case Column of
-      0: s := ConstValEx(Setting.Name);
-      1: 
+      0: CellText := ConstValEx(Setting.Name);
+      1:
         if Setting is TPhoaValSetting then begin
-          sVal := TPhoaListSetting(Setting).DisplayString;
-          if Setting is TPhoaListSetting then s := ConstValEx(sVal) else s := sVal;
+          wsVal := TPhoaListSetting(Setting).DisplayString;
+          if Setting is TPhoaListSetting then CellText := ConstValEx(wsVal) else CellText := wsVal;
         end;
     end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TPhoaValSettingEditor.DoInitNode(ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -815,12 +814,12 @@ type
      // Создаёт и присваивает в FEditorControl Control заданного класса в качестве редактора значения настройки
     procedure NewControl(CtlClass: TWinControlClass);
 
-      procedure BindKeyEvent(const sPropName: String; Event: TKeyEvent);
+      procedure BindKeyEvent(const sPropName: AnsiString; Event: TKeyEvent);
       begin
         SetMethodProp(FEditorControl, sPropName, TMethod(Event));
       end;
 
-      procedure BindNotifyEvent(const sPropName: String; Event: TNotifyEvent);
+      procedure BindNotifyEvent(const sPropName: AnsiString; Event: TNotifyEvent);
       begin
         SetMethodProp(FEditorControl, sPropName, TMethod(Event));
       end;

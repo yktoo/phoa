@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.54 2005-08-28 06:09:03 dale Exp $
+//  $Id: phUtils.pas,v 1.55 2007-06-26 18:03:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -13,8 +13,10 @@ uses
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, ConsVars;
 
    // Exception raising
-  procedure PhoaException(const sMsg: String); overload;
-  procedure PhoaException(const sMsg: String; const aParams: Array of const); overload;
+  procedure PhoaException(const wsMsg: WideString); overload;
+  procedure PhoaException(const wsMsg: WideString; const aParams: Array of const); overload;
+  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString); overload;
+  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString; const aParams: Array of const); overload;
 
    // Min/max values
   function  Max(i1, i2: Integer): Integer;
@@ -25,20 +27,20 @@ uses
    // Преобразует Variant в Integer (при этом Null конвертируется в 0)
   function  VarToInt(const v: Variant): Integer;
 
-  procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
-  procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
-  procedure RegisterCBHistory(cb: TComboBox);
+  procedure RegLoadHistory(const wsSection: WideString; cb: TTntComboBox; bSetLastItem: Boolean);
+  procedure RegSaveHistory(const wsSection: WideString; cb: TTntComboBox; bRegisterFirst: Boolean);
+  procedure RegisterCBHistory(cb: TTntComboBox);
    // Возвращает Integer(Items.Objects[ItemIndex]) для TComboBox, или -1, если ItemIndex<0
-  function  GetCurrentCBObject(ComboBox: TComboBox): Integer;
+  function  GetCurrentCBObject(ComboBox: TTntComboBox): Integer;
    // То же, для установки ComboBox по Objects[]. Возвращает True, если удалось
-  function  SetCurrentCBObject(ComboBox: TComboBox; iObj: Integer): Boolean;
+  function  SetCurrentCBObject(ComboBox: TTntComboBox; iObj: Integer): Boolean;
 
    // Изготовление типа TSize
   function  Size(cx, cy: Integer): TSize;
 
    // Преобразование TRect<->Строка вида '1,2,3,4'
-  function  RectToStr(const r: TRect): String;
-  function  StrToRect(const s: String; const rDefault: TRect): TRect;
+  function  RectToStr(const r: TRect): WideString;
+  function  StrToRect(const ws: WideString; const rDefault: TRect): TRect;
    // "Упорядочивает" координаты в r так, что TopLeft всегда левее и выше, чем BottomRight
   function  OrderRect(const r: TRect): TRect;
    // Корректирует и возвращает прямоугольник r так, чтобы он вписался в rBounds, по возможности сохранив размеры
@@ -49,98 +51,96 @@ uses
   function  GetRectIntersection(const r1, r2: TRect): TRect;
 
    // Преобразование Положение/размеры формы<->Строка
-  function  FormPositionToStr(Form: TCustomForm): String;
-  procedure FormPositionFromStr(Form: TCustomForm; const sPosition: String);
+  function  FormPositionToStr(Form: TCustomForm): WideString;
+  procedure FormPositionFromStr(Form: TCustomForm; const wsPosition: WideString);
    // Возвращает объект-монитор, задаваемый свойством DefaultMonitor формы. Если подходящего монитора не найдено,
    //   возвращает первичный монитор
   function  GetDefaultMonitorForForm(Form: TCustomForm): TMonitor;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
-  function  FontToStr(Font: TFont): String;
-  procedure FontFromStr(Font: TFont; const sFont: String);
+  function  FontToStr(Font: TFont): WideString;
+  procedure FontFromStr(Font: TFont; const wsFont: WideString);
 
    // Транслирует Charset в кодовую страницу
   function  CharsetToCP(Charset: TFontCharset): Cardinal;
    // Преобразует Ansi-строку в Unicode-строку, используя указанную кодовую страницу и наоборот
-  function  AnsiToUnicodeCP(const s: AnsiString; cCodePage: Cardinal): WideString;
-  function  UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString;
+  function  AnsiToUnicodeCP(const s: AnsiString; cCodePage: Cardinal): WideString; deprecated;
+  function  UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString; deprecated;
    // То же самое, но для cCodePage использует значение cMainCodePage
-  function  PhoaAnsiToUnicode(const s: AnsiString): WideString;
-  function  PhoaUnicodeToAnsi(const s: WideString): AnsiString;
+  function  PhoaAnsiToUnicode(const s: AnsiString): WideString; deprecated;
+  function  PhoaUnicodeToAnsi(const s: WideString): AnsiString; deprecated;
 
-   // Заменяет вхождения символов sReplaceChars в строке s на символ cReplaceWith и возвращает результат
-  function  ReplaceChars(const s, sReplaceChars: String; cReplaceWith: Char): String;
-   // Возвращает первое слово из строки s, считая за разделители слов любой из символов в sDelimiters. Если разделителя
-   //   в строке нет, возвращается вся строка
-  function  GetFirstWord(const s, sDelimiters: String): String;
-   // Извлекает и возвращает первое слово из строки s, считая за разделители слов любой из символов в sDelimiters. Из
-   //   строки s слово вместе с разделителем удаляется. Если разделителя в строке нет, возвращается вся строка
-  function  ExtractFirstWord(var s: String; const sDelimiters: String): String;
-   // Добавляет к строке s строку sAdd. Если обе они не пустые, между ними вставляется sSeparator
-  procedure AccumulateStr(var s: String; const sSeparator, sAdd: String);
+   // Заменяет вхождения символов wsReplaceChars в строке ws на символ wcReplaceWith и возвращает результат
+  function  ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
+   // Возвращает первое слово из строки ws, считая за разделители слов любой из символов в wsDelimiters. Если
+   //   разделителя в строке нет, возвращается вся строка
+  function  GetFirstWord(const ws, wsDelimiters: WideString): WideString;
+   // Извлекает и возвращает первое слово из строки ws, считая за разделители слов любой из символов в wsDelimiters. Из
+   //   строки ws слово вместе с разделителем удаляется. Если разделителя в строке нет, возвращается вся строка
+  function  ExtractFirstWord(var ws: WideString; const wsDelimiters: WideString): WideString;
+   // Добавляет к строке ws строку wsAdd. Если обе они не пустые, между ними вставляется wsSeparator
+  procedure AccumulateStr(var ws: WideString; const wsSeparator, wsAdd: WideString);
    // Функция сравнения строк с конца *без учёта регистра* (для имён файлов работает быстрее сравнения с начала)
-  function  ReverseCompare(const s1, s2: String): Boolean;
-   // Преобразует относительный путь к файлу в абсолютный, используя базовый каталог sBasePath
-  function  ExpandRelativePath(const sBasePath, sRelFileName: String): String;
+  function  ReverseCompare(const ws1, ws2: WideString): Boolean;
+   // Преобразует относительный путь к файлу в абсолютный, используя базовый каталог wsBasePath
+  function  ExpandRelativePath(const wsBasePath, wsRelFileName: WideString): WideString;
    // Возвращает строку, представляющую собой наиболее длинную совпадающую часть обоих строк. Сравнение ведётся без
    //   учёта регистра
-  function  LongestCommonPart(const s1, s2: String): String;
+  function  LongestCommonPart(const ws1, ws2: WideString): WideString;
    // Возвращает путь к каталогу временных файлов Windows
-  function  GetWindowsTempPath: String;
+  function  GetWindowsTempPath: WideString;
 
-  function  iif(b: Boolean; const sTrue, sFalse: String): String; overload;
-  function  iif(b: Boolean; iTrue, iFalse: Integer): Integer;     overload;
-  function  iif(b: Boolean; pTrue, pFalse: Pointer): Pointer;     overload;
-  function  iif(b: Boolean; sTrue, sFalse: Single): Single;       overload;
+  function  iif(b: Boolean; const sTrue, sFalse: String): String;           overload;
+  function  iif(b: Boolean; const wsTrue, wsFalse: WideString): WideString; overload;
+  function  iif(b: Boolean; iTrue, iFalse: Integer): Integer;               overload;
+  function  iif(b: Boolean; pTrue, pFalse: Pointer): Pointer;               overload;
+  function  iif(b: Boolean; sgTrue, sgFalse: Single): Single;                 overload;
 
-  procedure Swap(var A, B: String);  overload;
-  procedure Swap(var A, B: Integer); overload;
-  procedure Swap(var A, B: Pointer); overload;
-  procedure Swap(var A, B: Single);  overload;
+  procedure Swap(var A, B: WideString); overload;
+  procedure Swap(var A, B: Integer);    overload;
+  procedure Swap(var A, B: Pointer);    overload;
+  procedure Swap(var A, B: Single);     overload;
 
    // Преобразует размер файла в удобочитаемую форму
-  function  HumanReadableSize(i64Size: Int64): String; 
+  function  HumanReadableSize(i64Size: Int64): WideString; 
 
    // Проверяет ввод текста, представляющего из себя дату (bTime=False) или время (bTime=True). В случае удачи результат
-   //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если sText -
+   //   помещает в dtResult и возвращает True, иначе отображает сообщение об ошибке и возвращает False. Если wsText -
    //   пустая маска, то в dtResult возвращается -1
-  function  CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
+  function  CheckMaskedDateTime(const wsText: WideString; bTime: Boolean; var dtResult: TDateTime): Boolean;
    // Заменяет разделитель времени в строке и возвращает её. При bToSystem=False заменяет системный разделитель на
    //   AppFormatSettings.TimeSeparator, при bToSystem=True заменяет AppFormatSettings.TimeSeparator на системный
    //   разделитель времени
-  function  ChangeTimeSeparator(const sTime: String; bToSystem: Boolean): String;
+  function  ChangeTimeSeparator(const wsTime: WideString; bToSystem: Boolean): WideString;
 
-   // Возвращает локализованное значение константы по её наименованию
-  function  ConstVal(const sConstName: String): String; overload;
-  function  ConstVal(const sConstName: String; const aParams: Array of const): String; overload;
    // Возвращает sText, если он начинается на символ, отличный от '@'. Иначе - трактует текст после '@' как имя
    //   константы и возвращает её значение
-  function  ConstValEx(const sText: String): String;
+  function  ConstValEx(const wsText: WideString): WideString;
 
    // Преобразование TPicProperties <-> Integer
   function  PicPropsToInt(PicProps: TPicProperties): Integer;
   function  IntToPicProps(i: Integer): TPicProperties;
    // Возвращает наименование свойства изображения
-  function  PicPropName(PicProp: TPicProperty): String;
+  function  PicPropName(PicProp: TPicProperty): WideString;
    // Преобразование TGroupProperties <-> Integer
   function  GroupPropsToInt(GroupProps: TGroupProperties): Integer;
   function  IntToGroupProps(i: Integer): TGroupProperties;
    // Возвращает наименование свойства группы
-  function  GroupPropName(GroupProp: TGroupProperty): String;
+  function  GroupPropName(GroupProp: TGroupProperty): WideString;
    // Возвращает наименование свойства изображения для группировки
-  function  GroupByPropName(GBProp: TPicGroupByProperty): String;
+  function  GroupByPropName(GBProp: TPicGroupByProperty): WideString;
    // Возвращает наименование пиксельного формата изображения
-  function  PixelFormatName(PFmt: TPhoaPixelFormat): String;
+  function  PixelFormatName(PFmt: TPhoaPixelFormat): WideString;
    // Возвращает наименование единицы измерения размера файла
-  function  FileSizeUnitName(FSUnit: TFileSizeUnit): String;
+  function  FileSizeUnitName(FSUnit: TFileSizeUnit): WideString;
    // Возвращает наименование свойства дискового файла
-  function  DiskFilePropName(DFProp: TDiskFileProp): String;
+  function  DiskFilePropName(DFProp: TDiskFileProp): WideString;
    // Возвращает значение свойства дискового файла по объекту TNamespace файла. Если Namespace=nil, возвращает пустую строку
-  function  DiskFilePropValue(DFProp: TDiskFileProp; Namespace: TNamespace): String;
+  function  DiskFilePropValue(DFProp: TDiskFileProp; Namespace: TNamespace): WideString;
    // Возвращает наименование свойства для автозаполнения даты/времени изображения
-  function  DateTimeAutofillPropName(DTAProp: TDateTimeAutofillProp): String;
+  function  DateTimeAutofillPropName(DTAProp: TDateTimeAutofillProp): WideString;
    // Возвращает текст результата автозаполнения даты/времени изображения
-  function  DateTimeFillResultName(DTFResult: TDateTimeFillResult): String;
+  function  DateTimeFillResultName(DTFResult: TDateTimeFillResult): WideString;
 
    // Разрешает или запрещает контрол; если это TWinControl, то он, перекрашивается в clWindow или clBtnFace
    //   соответственно
@@ -149,10 +149,10 @@ uses
   procedure EnableControls(bEnable: Boolean; const Ctls: Array of TControl);
 
    // Возвращает размер указанного файла, или iDefault, если такого файла не существует
-  function  GetFileSize(const sFileName: String; iDefault: Integer): Integer;
+  function  GetFileSize(const wsFileName: WideString; iDefault: Integer): Integer;
 
    // Добавляет к Menu новый пункт
-  function  AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
+  function  AddTBXMenuItem(Menu: TTBCustomItem; const wsCaption: WideString; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
 
    // Фокусирует и выделяет узел. При bScrollIntoView=True проматывает дерево так, чтобы он был виден. Возвращает True,
    //   если Node<>nil
@@ -162,8 +162,8 @@ uses
    // Возвращает узел корневого каталога дерева по заданному индексу. Если нет такого, возвращает nil
   function  GetVTRootNodeByIndex(Tree: TBaseVirtualTree; iIndex: Integer): PVirtualNode;
    // Сохранение/загрузка настроек столбцов VirtualTree
-  procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
-  procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  procedure RegSaveVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
+  procedure RegLoadVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
    // Устанавливает опцию coVisible столбца согласно bVisible
   procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
    // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
@@ -211,10 +211,10 @@ uses
   procedure PicGroupsVT_HandlePaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
    // Укорачивает строку как имя файла
-  function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
+  function  ShortenFileName(Canvas: TCanvas; iWidth: Integer; const ws: WideString): WideString;
 
    // Отображает системное контекстное меню для заданного файла. Возвращает True, если удалось
-  function  ShowFileShellContextMenu(const sFileName: String): Boolean;
+  function  ShowFileShellContextMenu(const wsFileName: WideString): Boolean;
 
    // Показ/скрытие курсора HourGlass
   procedure StartWait;
@@ -223,7 +223,7 @@ uses
 implementation
 uses
   TypInfo, Variants, Registry, ShellAPI,
-  GR32,
+  TntSysUtils, TntWideStrUtils, GR32,
   DKLang,
   phSettings, phMsgBox, phPhoa, phGraphics;
 
@@ -241,7 +241,7 @@ type
   public
     constructor Create; reintroduce;
      // Отображает контекстное меню для файла. Возвращает True, если удачно
-    function  ShowMenu(const sFileName: String): Boolean;
+    function  ShowMenu(const wsFileName: WideString): Boolean;
   end;
 
   constructor TShellContextMenuManager.Create;
@@ -249,14 +249,15 @@ type
     CreateNew(Application);
   end;
 
-  function TShellContextMenuManager.ShowMenu(const sFileName: String): Boolean;
+  function TShellContextMenuManager.ShowMenu(const wsFileName: WideString): Boolean;
   begin
     Result := False;
     try
       try
-        FNamespace := TNamespace.CreateFromFileName(sFileName);
+        {??? Is Unicode supported? }
+        FNamespace := TNamespace.CreateFromFileName(wsFileName);
       except
-        PhoaError('SErrFileNotFoundFmt', [sFileName]);
+        PhoaError('SErrFileNotFoundFmt', [wsFileName]);
       end;
       if FNamespace<>nil then Result := FNamespace.ShowContextMenu(Self, nil, nil, nil);
     finally
@@ -280,7 +281,7 @@ var
 
    //===================================================================================================================
 
-  procedure PhoaException(const sMsg: String);
+  procedure PhoaException(const wsMsg: WideString);
 
      function RetAddr: Pointer;
      asm
@@ -288,10 +289,10 @@ var
      end;
 
   begin
-    raise EPhoaException.Create(sMsg) at RetAddr;
+    raise EPhoaWideException.Create(wsMsg) at RetAddr;
   end;
 
-  procedure PhoaException(const sMsg: String; const aParams: Array of const);
+  procedure PhoaException(const wsMsg: WideString; const aParams: Array of const);
 
      function RetAddr: Pointer;
      asm
@@ -299,7 +300,29 @@ var
      end;
 
   begin
-    raise EPhoaException.CreateFmt(sMsg, aParams) at RetAddr;
+    raise EPhoaWideException.CreateFmt(wsMsg, aParams) at RetAddr;
+  end;
+
+  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString);
+
+     function RetAddr: Pointer;
+     asm
+       mov eax, [ebp+4]
+     end;
+
+  begin
+    raise ExcClass.Create(wsMsg) at RetAddr;
+  end;
+
+  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString; const aParams: Array of const);
+
+     function RetAddr: Pointer;
+     asm
+       mov eax, [ebp+4]
+     end;
+
+  begin
+    raise ExcClass.CreateFmt(wsMsg, aParams) at RetAddr;
   end;
 
   function Max(i1, i2: Integer): Integer;
@@ -331,16 +354,16 @@ var
    // History
    //-------------------------------------------------------------------------------------------------------------------
 
-  procedure RegLoadHistory(const sSection: String; cb: TComboBox; bSetLastItem: Boolean);
+  procedure RegLoadHistory(const wsSection: WideString; cb: TTntComboBox; bSetLastItem: Boolean);
   var
-    sl: TStringList;
+    sl: TTntStringList;
     i: Integer;
   begin
-    sl := TStringList.Create;
+    sl := TTntStringList.Create;
     try
       with TRegIniFile.Create(SRegRoot) do
         try
-          ReadSectionValues(sSection, sl);
+          ReadSectionValues(wsSection, sl); {!!! Not Unicode-enabled solution }
         finally
           Free;
         end;
@@ -349,47 +372,45 @@ var
     finally
       sl.Free;
     end;
-    with cb do
-      if bSetLastItem and (Items.Count>0) then ItemIndex := 0;
+    if bSetLastItem and (cb.Items.Count>0) then cb.ItemIndex := 0;
   end;
 
-  procedure RegSaveHistory(const sSection: String; cb: TComboBox; bRegisterFirst: Boolean);
+  procedure RegSaveHistory(const wsSection: WideString; cb: TTntComboBox; bRegisterFirst: Boolean);
   var i: Integer;
   begin
     if bRegisterFirst then RegisterCBHistory(cb);
     with TRegIniFile.Create(SRegRoot) do
       try
-        EraseSection(sSection);
-        for i := 0 to cb.Items.Count-1 do WriteString(sSection, 'Item'+IntToStr(i), cb.Items[i]);
+        EraseSection(wsSection); {!!! Not Unicode-enabled solution }
+        for i := 0 to cb.Items.Count-1 do WriteString(wsSection, 'Item'+IntToStr(i), cb.Items[i]); {!!! Not Unicode-enabled solution }
       finally
         Free;
       end;
   end;
 
-  procedure RegisterCBHistory(cb: TComboBox);
+  procedure RegisterCBHistory(cb: TTntComboBox);
   var
     idx: Integer;
-    s: String;
+    ws: WideString;
   begin
-    s := Trim(cb.Text);
-    if s<>'' then
-      with cb.Items do begin
-        idx := IndexOf(s);
-        if idx>=0 then Delete(idx);
-        Insert(0, s);
-        while Count>IMaxHistoryEntries do Delete(IMaxHistoryEntries);
-      end;
-    cb.Text := s;
+    ws := Trim(cb.Text);
+    if ws<>'' then begin
+      idx := cb.Items.IndexOf(ws);
+      if idx>=0 then cb.Items.Delete(idx);
+      cb.Items.Insert(0, ws);
+      while cb.Items.Count>IMaxHistoryEntries do cb.Items.Delete(IMaxHistoryEntries);
+    end;
+    cb.Text := ws;
   end;
 
-  function GetCurrentCBObject(ComboBox: TComboBox): Integer;
+  function GetCurrentCBObject(ComboBox: TTntComboBox): Integer;
   var idx: Integer;
   begin
     idx := ComboBox.ItemIndex;
     if idx<0 then Result := -1 else Result := Integer(ComboBox.Items.Objects[idx]);
   end;
 
-  function SetCurrentCBObject(ComboBox: TComboBox; iObj: Integer): Boolean;
+  function SetCurrentCBObject(ComboBox: TTntComboBox; iObj: Integer): Boolean;
   var idx: Integer;
   begin
     idx := ComboBox.Items.IndexOfObject(Pointer(iObj));
@@ -403,20 +424,20 @@ var
     Result.cy := cy;
   end;
 
-  function  RectToStr(const r: TRect): String;
+  function RectToStr(const r: TRect): WideString;
   begin
-    Result := Format('%d,%d,%d,%d', [r.Left, r.Top, r.Right, r.Bottom]);
+    Result := WideFormat('%d,%d,%d,%d', [r.Left, r.Top, r.Right, r.Bottom]);
   end;
 
-  function  StrToRect(const s: String; const rDefault: TRect): TRect;
-  var ss: String;
+  function  StrToRect(const ws: WideString; const rDefault: TRect): TRect;
+  var wss: WideString;
   begin
-    ss := s;
+    wss := ws;
     try
-      Result.Left   := StrToInt(ExtractFirstWord(ss, ','));
-      Result.Top    := StrToInt(ExtractFirstWord(ss, ','));
-      Result.Right  := StrToInt(ExtractFirstWord(ss, ','));
-      Result.Bottom := StrToInt(ExtractFirstWord(ss, ','));
+      Result.Left   := StrToInt(ExtractFirstWord(wss, ','));
+      Result.Top    := StrToInt(ExtractFirstWord(wss, ','));
+      Result.Right  := StrToInt(ExtractFirstWord(wss, ','));
+      Result.Bottom := StrToInt(ExtractFirstWord(wss, ','));
     except
       on EConvertError do Result := rDefault;
     end;
@@ -469,22 +490,22 @@ var
     IntersectRect(Result, r1, r2);
   end;
   
-  function FormPositionToStr(Form: TCustomForm): String;
+  function FormPositionToStr(Form: TCustomForm): WideString;
   var Placement: TWindowPlacement;
   begin
     Placement.length := SizeOf(Placement);
     GetWindowPlacement(Form.Handle, @Placement);
-    Result := Format(
+    Result := WideFormat(
       '%d,%d,%d,%d,%d',
       [Placement.rcNormalPosition.Left, Placement.rcNormalPosition.Top, Placement.rcNormalPosition.Right,
        Placement.rcNormalPosition.Bottom, iif(Placement.showCmd=SW_SHOWMAXIMIZED, 1, 0)]);
   end;
 
-  procedure FormPositionFromStr(Form: TCustomForm; const sPosition: String);
+  procedure FormPositionFromStr(Form: TCustomForm; const wsPosition: WideString);
   var
     r, rWorkArea: TRect;
     iw, ih: Integer;
-    s: String;
+    ws: WideString;
     bMaximized: Boolean;
     Monitor: TMonitor;
 
@@ -494,12 +515,12 @@ var
     end;
 
   begin
-    s := sPosition;
-    r.Left     := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Top      := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Right    := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    r.Bottom   := StrToIntDef(ExtractFirstWord(s, ','), MaxInt);
-    bMaximized := StrToIntDef(ExtractFirstWord(s, ','), 0)<>0;
+    ws := wsPosition;
+    r.Left     := StrToIntDef(ExtractFirstWord(ws, ','), MaxInt);
+    r.Top      := StrToIntDef(ExtractFirstWord(ws, ','), MaxInt);
+    r.Right    := StrToIntDef(ExtractFirstWord(ws, ','), MaxInt);
+    r.Bottom   := StrToIntDef(ExtractFirstWord(ws, ','), MaxInt);
+    bMaximized := StrToIntDef(ExtractFirstWord(ws, ','), 0)<>0;
      // Если все координаты нормальные
     if (r.Right<MaxInt) and (r.Bottom<MaxInt) and (r.Left<r.Right) and (r.Top<r.Bottom) then begin
        // Находим монитор, наиболее подходящий по координатам
@@ -545,22 +566,20 @@ var
    // Fonts / chars
    //-------------------------------------------------------------------------------------------------------------------
 
-  function FontToStr(Font: TFont): String;
+  function FontToStr(Font: TFont): WideString;
   begin
-    with Font do Result := Format('%s/%d/%d/%d/%d', [Name, Size, Byte(Style), Color, Charset]);
+    Result := WideFormat('%s/%d/%d/%d/%d', [Font.Name, Font.Size, Byte(Font.Style), Font.Color, Font.Charset]);
   end;
 
-  procedure FontFromStr(Font: TFont; const sFont: String);
-  var s: String;
+  procedure FontFromStr(Font: TFont; const wsFont: WideString);
+  var ws: WideString;
   begin
-    s := sFont;
-    with Font do begin
-      Name    := ExtractFirstWord(s, '/');
-      Size    := StrToIntDef(ExtractFirstWord(s, '/'), 10);
-      Style   := TFontStyles(Byte(StrToIntDef(ExtractFirstWord(s, '/'), 0)));
-      Color   := StrToIntDef(ExtractFirstWord(s, '/'), 0);
-      Charset := StrToIntDef(ExtractFirstWord(s, '/'), DEFAULT_CHARSET);
-    end;
+    ws := wsFont;
+    Font.Name    := ExtractFirstWord(ws, '/');
+    Font.Size    := StrToIntDef(ExtractFirstWord(ws, '/'), 10);
+    Font.Style   := TFontStyles(Byte(StrToIntDef(ExtractFirstWord(ws, '/'), 0)));
+    Font.Color   := StrToIntDef(ExtractFirstWord(ws, '/'), 0);
+    Font.Charset := StrToIntDef(ExtractFirstWord(ws, '/'), DEFAULT_CHARSET);
   end;
 
   function CharsetToCP(Charset: TFontCharset): Cardinal;
@@ -618,117 +637,121 @@ var
    // Misc
    //-------------------------------------------------------------------------------------------------------------------
 
-  function ReplaceChars(const s, sReplaceChars: String; cReplaceWith: Char): String;
+  function ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
   var i: Integer;
   begin
-    Result := s;
+    Result := ws;
     for i := 1 to Length(Result) do
-      if StrScan(PChar(sReplaceChars), Result[i])<>nil then Result[i] := cReplaceWith;
+      if WStrScan(PWideChar(wsReplaceChars), Result[i])<>nil then Result[i] := wcReplaceWith;
   end;
 
-  function GetFirstWord(const s, sDelimiters: String): String;
+  function GetFirstWord(const ws, wsDelimiters: WideString): WideString;
   var i: Integer;
   begin
     i := 1;
-    while (i<=Length(s)) and (Pos(s[i], sDelimiters)=0) do Inc(i);
-    Result := Copy(s, 1, i-1);
+    while (i<=Length(ws)) and (WStrScan(PWideChar(wsDelimiters), ws[i])<>nil) do Inc(i);
+    Result := Copy(ws, 1, i-1);
   end;
 
-  function ExtractFirstWord(var s: String; const sDelimiters: String): String;
+  function ExtractFirstWord(var ws: WideString; const wsDelimiters: WideString): WideString;
   begin
-    Result := GetFirstWord(s, sDelimiters);
-    Delete(s, 1, Length(Result)+1);
+    Result := GetFirstWord(ws, wsDelimiters);
+    Delete(ws, 1, Length(Result)+1);
   end;
 
-  procedure AccumulateStr(var s: String; const sSeparator, sAdd: String);
+  procedure AccumulateStr(var ws: WideString; const wsSeparator, wsAdd: WideString);
   begin
-    s := s+iif((s='') or (sAdd=''), '', sSeparator)+sAdd;
+    if (ws<>'') and (wsAdd<>'') then ws := ws+wsSeparator;
+    ws := ws+wsAdd;
   end;
 
-  function ReverseCompare(const s1, s2: String): Boolean;
-  const acUpTable: Array[Char] of Char =
-    #0#1#2#3#4#5#6#7#8#9#10#11#12#13#14#15#16#17#18#19#20#21#22#23#24#25#26#27#28#29#30#31+
-    ' !"#$%&''()*+,-./0123456789:;<=>?'+
-    '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_'+
-    '`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~'#127+
-    'ЂЃ‚ѓ„…†‡€‰Љ‹ЊЌЋЏђ‘’“”•–—™љ›њќћџ'+
-    ' ЎўЈ¤Ґ¦§Ё©Є«¬­®Ї°±Ііґµ¶·Ё№є»јЅѕї'+
-    'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЯЭЮЯ'+
-    'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЯЭЮЯ';
-  var i: Integer;
+  function ReverseCompare(const ws1, ws2: WideString): Boolean;
+  var
+    wsUp1, wsUp2: WideString;
+    i, iLength: Integer;
   begin
     Result := False;
-    i := Length(s1);
-    if i<>Length(s2) then Exit;
-    for i := i downto 1 do
-      if acUpTable[s1[i]]<>acUpTable[s2[i]] then Exit;
+    wsUp1 := WideUpperCase(ws1);
+    wsUp2 := WideUpperCase(ws2);
+    iLength := Length(wsUp1);
+    if iLength<>Length(wsUp2) then Exit;
+    for i := iLength downto 1 do
+      if wsUp1[i]<>wsUp2[i] then begin
+        Result := False;
+        Exit;
+      end;
     Result := True;
   end;
 
-  function ExpandRelativePath(const sBasePath, sRelFileName: String): String;
+  function ExpandRelativePath(const wsBasePath, wsRelFileName: WideString): WideString;
   var
     i: Integer;
-    sOneDir, sRelName: String;
+    wsOneDir, wsRelName: WideString;
   begin
-    if sRelFileName='' then
+    if wsRelFileName='' then
       Result := ''
     else begin
-      sRelName := sRelFileName;
+      wsRelName := wsRelFileName;
        // Если путь содержит в себе диск (абсолютный путь)
-      if (Pos(':', sRelName)>0) or (Pos('\\', sRelName)>0) then
-        Result := sRelName
+      if (Pos(':', wsRelName)>0) or (Pos('\\', wsRelName)>0) then
+        Result := wsRelName
        // Иначе - относительный путь
       else begin
          // Если начинается на '\' - идём с корня
-        Result := sBasePath;
+        Result := wsBasePath;
         if (Result<>'') and (Result[Length(Result)]='\') then Delete(Result, Length(Result), 1);
-        if sRelName[1]='\' then
-          Result := Copy(Result, 1, 3)+Copy(sRelName, 2, MaxInt)
+        if wsRelName[1]='\' then
+          Result := Copy(Result, 1, 3)+Copy(wsRelName, 2, MaxInt)
          // Иначе - с каталога файла
         else begin
           repeat
-            i := Pos('\', sRelName);
+            i := Pos('\', wsRelName);
             if i=0 then Break;
-            sOneDir := Copy(sRelName, 1, i);
-            Delete(sRelName, 1, i);
-            if sOneDir='..\' then begin
+            wsOneDir := Copy(wsRelName, 1, i);
+            Delete(wsRelName, 1, i);
+            if wsOneDir='..\' then begin
               i := LastDelimiter('\', Result);
-              if i=0 then PhoaException(ConstVal('SErrInvalidPicFileName'), [sRelFileName]);
+              if i=0 then PhoaException(ConstVal('SErrInvalidPicFileName'), [wsRelFileName]);
               Delete(Result, i, MaxInt);
             end else
-              Result := Result+'\'+Copy(sOneDir, 1, Length(sOneDir)-1);
+              Result := Result+'\'+Copy(wsOneDir, 1, Length(wsOneDir)-1);
           until False;
-          Result := Result+'\'+sRelName;
+          Result := Result+'\'+wsRelName;
         end;
       end;
     end;
   end;
 
-  function LongestCommonPart(const s1, s2: String): String;
+  function LongestCommonPart(const ws1, ws2: WideString): WideString;
   var
-    sUp1, sUp2: String;
+    wsUp1, wsUp2: WideString;
     i: Integer;
   begin
-    sUp1 := AnsiUpperCase(s1);
-    sUp2 := AnsiUpperCase(s2);
+    wsUp1 := WideUpperCase(ws1);
+    wsUp2 := WideUpperCase(ws2);
     Result := '';
     i := 1;
-    while (i<=Length(sUp1)) and (i<=Length(sUp2)) and (sUp1[i]=sUp2[i]) do begin
-      Result := Result+s1[i];
+    while (i<=Length(wsUp1)) and (i<=Length(wsUp2)) and (wsUp1[i]=wsUp2[i]) do begin
+      Result := Result+ws1[i];
       Inc(i);
     end;
   end;
 
-  function GetWindowsTempPath: String;
-  var aBuf: Array[0..MAX_PATH] of Char;
+  function GetWindowsTempPath: WideString;
+  var awcBuf: Array[0..MAX_PATH] of WideChar;
   begin
-    GetTempPath(MAX_PATH, aBuf);
-    Result := IncludeTrailingPathDelimiter(aBuf);
+    Tnt_GetTempPathW(MAX_PATH, awcBuf);
+    Result := WideIncludeTrailingPathDelimiter(awcBuf);
   end;
 
   function iif(b: Boolean; const sTrue, sFalse: String): String;
   begin
     if b then Result := sTrue else Result := sFalse;
+  end;
+
+  function iif(b: Boolean; const wsTrue, wsFalse: WideString): WideString;
+  begin
+    if b then Result := wsTrue else Result := wsFalse;
   end;
 
   function iif(b: Boolean; iTrue, iFalse: Integer): Integer;
@@ -741,13 +764,13 @@ var
     if b then Result := pTrue else Result := pFalse;
   end;
 
-  function iif(b: Boolean; sTrue, sFalse: Single): Single;
+  function iif(b: Boolean; sgTrue, sgFalse: Single): Single;
   begin
-    if b then Result := sTrue else Result := sFalse;
+    if b then Result := sgTrue else Result := sgFalse;
   end;
 
-  procedure Swap(var A, B: String);
-  var C: String;
+  procedure Swap(var A, B: WideString);
+  var C: WideString;
   begin
     C := A;
     A := B;
@@ -778,7 +801,7 @@ var
     B := C;
   end;
 
-  function HumanReadableSize(i64Size: Int64): String;
+  function HumanReadableSize(i64Size: Int64): WideString;
   var fsu: TFileSizeUnit;
   begin
      // Определяем требуемую единицу измерения размера
@@ -789,60 +812,50 @@ var
       else                         fsu := fsuGBytes;
     end;
      // Форматируем размер
-    Result := Format(
+    Result := WideFormat(
       iif(fsu=fsuBytes, '%.0f %s', '%.2f %s'),
       [i64Size/aFileSizeUnitMultipliers[fsu], FileSizeUnitName(fsu)]);
   end;
 
-  function CheckMaskedDateTime(const sText: String; bTime: Boolean; var dtResult: TDateTime): Boolean;
+  function CheckMaskedDateTime(const wsText: WideString; bTime: Boolean; var dtResult: TDateTime): Boolean;
   begin
     Result := True;
      // Если не введено ни одной цифры - значит, ввода не было
-    if LastDelimiter('0123456789', sText)=0 then
+    if WideLastDelimiter('0123456789', wsText)=0 then
       dtResult := -1
     else begin
       if bTime then
-        Result := TryStrToTime(ChangeTimeSeparator(sText, False), dtResult, AppFormatSettings)
+        Result := TntTryStrToTime(ChangeTimeSeparator(wsText, False), dtResult, AppFormatSettings)
       else
-        Result := TryStrToDate(sText, dtResult, AppFormatSettings);
-      if not Result then PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [sText]);
+        Result := TntTryStrToDate(wsText, dtResult, AppFormatSettings);
+      if not Result then PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [wsText]);
     end;
   end;
 
-  function ChangeTimeSeparator(const sTime: String; bToSystem: Boolean): String;
+  function ChangeTimeSeparator(const wsTime: WideString; bToSystem: Boolean): WideString;
   var
     i: Integer;
-    cFrom, cTo: Char;
+    wcFrom, wcTo: WideChar;
   begin
-    Result := sTime;
+    Result := wsTime;
      // Определяем, что на что будем заменять
     if bToSystem then begin
-      cFrom := AppFormatSettings.TimeSeparator;
-      cTo   := TimeSeparator;
+      wcFrom := AppFormatSettings.TimeSeparator;
+      wcTo   := TimeSeparator;
     end else begin
-      cFrom := TimeSeparator;
-      cTo   := AppFormatSettings.TimeSeparator;
+      wcFrom := TimeSeparator;
+      wcTo   := AppFormatSettings.TimeSeparator;
     end;
      // Проверяем все символы строки и заменям
     for i := 1 to Length(Result) do
-      if Result[i]=cFrom then Result[i] := cTo; 
+      if Result[i]=wcFrom then Result[i] := wcTo;
   end;
 
-  function ConstVal(const sConstName: String): String;
+  function ConstValEx(const wsText: WideString): WideString;
   begin
-    Result := LangManager.ConstantValue[sConstName];
-  end;
-
-  function ConstVal(const sConstName: String; const aParams: Array of const): String;
-  begin
-    Result := Format(LangManager.ConstantValue[sConstName], aParams);
-  end;
-
-  function ConstValEx(const sText: String): String;
-  begin
-    Result := sText;
+    Result := wsText;
      // Если наименование начинается на '@' - это константа
-    if (Result<>'') and (Result[1]='@') then Result := ConstVal(Copy(Result, 2, MaxInt));
+    if (Result<>'') and (Result[1]='@') then Result := DKLangConstW(Copy(Result, 2, MaxInt));
   end;
 
   function PicPropsToInt(PicProps: TPicProperties): Integer;
@@ -856,9 +869,9 @@ var
     Move(i, Result, SizeOf(Result));
   end;
 
-  function PicPropName(PicProp: TPicProperty): String;
+  function PicPropName(PicProp: TPicProperty): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
+    Result := DKLangContW(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
   end;
 
   function GroupPropsToInt(GroupProps: TGroupProperties): Integer;
@@ -872,33 +885,33 @@ var
     Move(i, Result, SizeOf(Result));
   end;
 
-  function GroupPropName(GroupProp: TGroupProperty): String;
+  function GroupPropName(GroupProp: TGroupProperty): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TGroupProperty), Byte(GroupProp)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TGroupProperty), Byte(GroupProp)));
   end;
 
-  function GroupByPropName(GBProp: TPicGroupByProperty): String;
+  function GroupByPropName(GBProp: TPicGroupByProperty): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPicGroupByProperty), Byte(GBProp)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TPicGroupByProperty), Byte(GBProp)));
   end;
 
-  function PixelFormatName(PFmt: TPhoaPixelFormat): String;
+  function PixelFormatName(PFmt: TPhoaPixelFormat): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPhoaPixelFormat), Byte(PFmt)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TPhoaPixelFormat), Byte(PFmt)));
   end;
 
-  function FileSizeUnitName(FSUnit: TFileSizeUnit): String;
+  function FileSizeUnitName(FSUnit: TFileSizeUnit): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TFileSizeUnit), Byte(FSUnit)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TFileSizeUnit), Byte(FSUnit)));
   end;
 
-  function DiskFilePropName(DFProp: TDiskFileProp): String;
+  function DiskFilePropName(DFProp: TDiskFileProp): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TDiskFileProp), Byte(DFProp)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TDiskFileProp), Byte(DFProp)));
   end;
 
-  function DiskFilePropValue(DFProp: TDiskFileProp; Namespace: TNamespace): String;
-  const asBoolPropVals: Array[Boolean] of String = (' ', '•');
+  function DiskFilePropValue(DFProp: TDiskFileProp; Namespace: TNamespace): WideString;
+  const awsBoolPropVals: Array[Boolean] of WideString = (' ', '•');
   begin
     Result := '';
     if Namespace<>nil then
@@ -906,28 +919,28 @@ var
         case DFProp of
           dfpFileName:            Result := FileName;
           dfpFileType:            Result := FileType;
-          dfpSizeOfFile:          Result := Format('%s (%s)', [SizeOfFile, SizeOfFileKB]);
+          dfpSizeOfFile:          Result := WideFormat('%s (%s)', [SizeOfFile, SizeOfFileKB]);
           dfpSizeOfFileDiskUsage: Result := SizeOfFileDiskUsage;
           dfpCreationTime:        Result := CreationTime;
           dfpLastWriteTime:       Result := LastWriteTime;
           dfpLastAccessTime:      Result := LastAccessTime;
-          dfpReadOnlyFile:        Result := asBoolPropVals[ReadOnlyFile];
-          dfpHidden:              Result := asBoolPropVals[Hidden];
-          dfpArchive:             Result := asBoolPropVals[Archive];
-          dfpCompressed:          Result := asBoolPropVals[Compressed];
-          dfpSystemFile:          Result := asBoolPropVals[SystemFile];
-          dfpTemporary:           Result := asBoolPropVals[Temporary];
+          dfpReadOnlyFile:        Result := awsBoolPropVals[ReadOnlyFile];
+          dfpHidden:              Result := awsBoolPropVals[Hidden];
+          dfpArchive:             Result := awsBoolPropVals[Archive];
+          dfpCompressed:          Result := awsBoolPropVals[Compressed];
+          dfpSystemFile:          Result := awsBoolPropVals[SystemFile];
+          dfpTemporary:           Result := awsBoolPropVals[Temporary];
         end;
   end;
 
-  function DateTimeAutofillPropName(DTAProp: TDateTimeAutofillProp): String;
+  function DateTimeAutofillPropName(DTAProp: TDateTimeAutofillProp): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TDateTimeAutofillProp), Byte(DTAProp)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TDateTimeAutofillProp), Byte(DTAProp)));
   end;
 
-  function DateTimeFillResultName(DTFResult: TDateTimeFillResult): String;
+  function DateTimeFillResultName(DTFResult: TDateTimeFillResult): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TDateTimeFillResult), Byte(DTFResult)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TDateTimeFillResult), Byte(DTFResult)));
   end;
 
   procedure EnableControl(bEnable: Boolean; Ctl: TControl);
@@ -955,12 +968,12 @@ var
     end;
   end;
 
-  function GetFileSize(const sFileName: String; iDefault: Integer): Integer;
+  function GetFileSize(const wsFileName: WideString; iDefault: Integer): Integer;
   var
     hF: THandle;
-    FindData: TWin32FindData;
+    FindData: TWin32FindDataW;
   begin
-    hF := FindFirstFile(PChar(sFileName), FindData);
+    hF := Tnt_FindFirstFileW(PWideChar(wsFileName), FindData);
     if hF<>INVALID_HANDLE_VALUE then begin
       Windows.FindClose(hF);
       Result := FindData.nFileSizeLow;
@@ -968,10 +981,11 @@ var
       Result := iDefault;
   end;
 
-  function  AddTBXMenuItem(Menu: TTBCustomItem; const sCaption: String; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
+  function  AddTBXMenuItem(Menu: TTBCustomItem; const wsCaption: WideString; iImageIndex, iTag: Integer; const AOnClick: TNotifyEvent): TTBCustomItem;
   begin
+    {!!! Not Unicode-enabled solution }
     Result := TTBXItem.Create(Menu.Owner);
-    Result.Caption    := sCaption;
+    Result.Caption    := wsCaption;
     Result.ImageIndex := iImageIndex;
     Result.Tag        := iTag;
     Result.OnClick    := AOnClick;
@@ -1015,16 +1029,17 @@ var
     end;
   end;
   
-  procedure RegSaveVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  procedure RegSaveVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
   var
     i: Integer;
     c: TVirtualTreeColumn;
   begin
+    {!!! Not Unicode-enabled solution }
     with TRegIniFile.Create(SRegRoot) do
       try
         for i := 0 to Tree.Header.Columns.Count-1 do begin
           c := Tree.Header.Columns[i];
-          WriteString(sSection, 'Column'+IntToStr(i), Format('%d,%d,%d', [c.Position, c.Width, Byte(coVisible in c.Options)]));
+          WriteString(wsSection, 'Column'+IntToStr(i), WideFormat('%d,%d,%d', [c.Position, c.Width, Byte(coVisible in c.Options)]));
         end;
       finally
         Free;
@@ -1034,20 +1049,21 @@ var
 type
   TVTColumnsCast = class(TVirtualTreeColumns);
 
-  procedure RegLoadVTColumns(const sSection: String; Tree: TVirtualStringTree);
+  procedure RegLoadVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
   var
     i: Integer;
     c: TVirtualTreeColumn;
-    s: String;
+    ws: WideString;
   begin
+    {!!! Not Unicode-enabled solution }
     with TRegIniFile.Create(SRegRoot) do
       try
         for i := 0 to Tree.Header.Columns.Count-1 do begin
           c := Tree.Header.Columns[i];
-          s := ReadString(sSection, 'Column'+IntToStr(i), '');
-          c.Position := StrToIntDef(ExtractFirstWord(s, ','), c.Position);
-          c.Width    := StrToIntDef(ExtractFirstWord(s, ','), c.Width);
-          SetVTColumnVisible(c, StrToIntDef(ExtractFirstWord(s, ','), Byte(coVisible in c.Options))<>0);
+          ws := ReadString(wsSection, 'Column'+IntToStr(i), '');
+          c.Position := StrToIntDef(ExtractFirstWord(ws, ','), c.Position);
+          c.Width    := StrToIntDef(ExtractFirstWord(ws, ','), c.Width);
+          SetVTColumnVisible(c, StrToIntDef(ExtractFirstWord(ws, ','), Byte(coVisible in c.Options))<>0);
         end;
     finally
       Free;
@@ -1136,15 +1152,13 @@ type
   end;
 
   procedure PicGroupsVT_HandleGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString; App: IPhotoAlbumApp; bViewGroups: Boolean);
-  var s: String;
   begin
     LineBreakStyle := hlbForceMultiLine;
     case PicGroupsVT_GetNodeKind(Sender, Node, bViewGroups) of
-      gnkProject:   s := App.Project.Description;
-      gnkPhoaGroup: s := GetPicGroupPropStrs(PicGroupsVT_GetNodeGroup(Sender, Node), IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps)), ': ', S_CRLF);
-      else          s := '';
+      gnkProject:   HintText := App.Project.Description;
+      gnkPhoaGroup: HintText := GetPicGroupPropStrs(PicGroupsVT_GetNodeGroup(Sender, Node), IntToGroupProps(SettingValueInt(ISettingID_Browse_GT_HintProps)), ': ', S_CRLF);
+      else          HintText := '';
     end;
-    HintText := PhoaAnsiToUnicode(s);
   end;
 
   procedure PicGroupsVT_HandleGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; bViewGroups: Boolean);
@@ -1163,24 +1177,21 @@ type
   end;
 
   procedure PicGroupsVT_HandleGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString; View: IPhoaView);
-  var
-    Group: IPhotoAlbumPicGroup;
-    s: String;
+  var Group: IPhotoAlbumPicGroup;
   begin
     Group := PicGroupsVT_GetNodeGroup(Sender, Node);
-    s := '';
+    CellText := '';
     case TextType of
       ttNormal:
         case PicGroupsVT_GetNodeKind(Sender, Node, View<>nil) of
-          gnkProject:     s := ConstVal('SPhotoAlbumNode');
-          gnkView:        s := View.Name;
-          gnkSearch:      s := ConstVal('SSearchResultsNode');
+          gnkProject:     CellText := DKLangConstW('SPhotoAlbumNode');
+          gnkView:        CellText := View.Name;
+          gnkSearch:      CellText := DKLangConstW('SSearchResultsNode');
           gnkPhoaGroup,
-            gnkViewGroup: s := Group.Text;
+            gnkViewGroup: CellText := Group.Text;
         end;
-      ttStatic: if Group.Pics.Count>0 then s := Format('(%d)', [Group.Pics.Count]);
+      ttStatic: if Group.Pics.Count>0 then CellText := WideFormat('(%d)', [Group.Pics.Count]);
     end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure PicGroupsVT_HandleInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates; RootGroup, SearchResultsGroup: IPhotoAlbumPicGroup; bRootButton, bInitExpanded: Boolean);
@@ -1213,23 +1224,23 @@ type
     else if Sender.NodeParent[Node]=nil then TargetCanvas.Font.Style := [fsBold];
   end;
 
-  function ShortenFileName(Canvas: TCanvas; iWidth: Integer; const s: String): String;
+  function ShortenFileName(Canvas: TCanvas; iWidth: Integer; const ws: WideString): WideString;
   var
-    aBuf: Array[0..1024] of Char;
+    awcBuf: Array[0..1024] of WideChar;
     r: TRect;
   begin
-    StrPCopy(aBuf, s);
+    WStrPCopy(awcBuf, ws);
     r := Rect(0, 0, iWidth, 0);
-    DrawText(Canvas.Handle, aBuf, -1, r, DT_LEFT or DT_PATH_ELLIPSIS or DT_MODIFYSTRING);
-    Result := aBuf;
+    Tnt_DrawTextW(Canvas.Handle, awcBuf, -1, r, DT_LEFT or DT_PATH_ELLIPSIS or DT_MODIFYSTRING);
+    Result := awcBuf;
   end;
 
-  function ShowFileShellContextMenu(const sFileName: String): Boolean;
+  function ShowFileShellContextMenu(const wsFileName: WideString): Boolean;
   begin
      // Создаём экземпляр NS_MenuManager, если он ещё не создан
     if NS_MenuManager=nil then NS_MenuManager := TShellContextMenuManager.Create;
      // Отображаем меню
-    Result := NS_MenuManager.ShowMenu(sFileName);
+    Result := NS_MenuManager.ShowMenu(wsFileName); 
   end;
 
 var

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.26 2007-06-24 17:47:58 dale Exp $
+//  $Id: phIntf.pas,v 1.27 2007-06-26 18:03:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -26,6 +26,8 @@ type
      // -- Unicode message
     property MessageW: WideString read FMessageW;
   end;
+
+  EPhoaWideExceptionClass = class of EPhoaWideException;
 
    // Exception class
   EPhIntfException = class(EPhoaWideException);
