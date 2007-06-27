@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Groups.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_Groups.pas,v 1.3 2007-06-27 18:29:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -188,7 +188,7 @@ type
       if TextType=ttStatic then begin
         if p.Group.Pics.Count>0 then CellText := WideFormat(iif(p.iSelCount>0, '(%d/%d)', '(%1:d)'), [p.iSelCount, p.Group.Pics.Count]);
       end else if Sender.NodeParent[Node]<>nil then CellText := p.Group.Text
-      else CellText := ConstVal('SPhotoAlbumNode');
+      else CellText := DKLangConstW('SPhotoAlbumNode');
   end;
 
   procedure TfrPicProps_Groups.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

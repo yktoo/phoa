@@ -10,7 +10,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Shell Dlg 2'
+    Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoHotTrack, hoShowSortGlyphs, hoVisible]
     Header.ParentFont = True

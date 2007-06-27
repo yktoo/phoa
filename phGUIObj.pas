@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.41 2007-06-24 17:47:55 dale Exp $
+//  $Id: phGUIObj.pas,v 1.42 2007-06-27 18:29:11 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phGUIObj;
 interface
 uses
   Windows, Messages, Types, SysUtils, Graphics, Classes, Controls, ActnList, Forms,
-  TntControls, GR32, TB2Item, TBX,
+  TntWindows, TntControls, GR32, TB2Item, TBX,
   phIntf, phMutableIntf, phAppIntf, phNativeIntf, phObj, phGraphics, ConsVars;
 
 type
@@ -1166,7 +1166,7 @@ uses Math, Themes, TntSysUtils, phUtils;
       if (FThumbCornerDetails[Corner].bDisplay) and (rText.Left<rText.Right) then begin
         wsProp := Pic.PropStrValues[FThumbCornerDetails[Corner].Prop];
         if wsProp<>'' then begin
-          Result := Info.Bitmap.TextWidth(sProp)+2;
+          Result := Info.Bitmap.TextWidth(wsProp)+2;
           Info.Bitmap.Textout {??? Unicode}(
             rText,
             iif(Corner in [tcRightTop, tcRightBottom], DT_RIGHT, DT_LEFT) or DT_SINGLELINE or DT_NOPREFIX or DT_VCENTER or DT_END_ELLIPSIS,
@@ -1827,7 +1827,7 @@ uses Math, Themes, TntSysUtils, phUtils;
     r := ClientRect;
     InflateRect(r, -2, -2);
     Canvas.Font.Color := Screen.HintFont.Color;
-    ws := TntsAdjustLineBreaks(Caption, tlbsLF);
+    ws := TntAdjustLineBreaks(Caption, tlbsLF);
      // Если нет табуляций - просто выводим текст с переносом по словам
     if Pos(#9, ws)=0 then
       Tnt_DrawTextW(Canvas.Handle, PWideChar(ws), -1, r, DT_LEFT or DT_NOPREFIX or DT_WORDBREAK or DrawTextBiDiModeFlagsReadingOnly)
@@ -2173,7 +2173,7 @@ type
   function TPhoaActionList.FindName(const sName: WideString): IPhoaAction;
   var
     i: Integer;
-    sAnsiName: String;
+    sAnsiName: AnsiString;
   begin
     sAnsiName := PhoaUnicodeToAnsi(sName);
     for i := 0 to FNativeList.ActionCount-1 do begin
@@ -2251,7 +2251,7 @@ type
   var
     i: Integer;
     Menu: IPhoaMenu;
-    sAnsiActionName: String;
+    sAnsiActionName: AnsiString;
   begin
     sAnsiActionName := PhoaUnicodeToAnsi(wsActionName);
      // Если задан Action, перебираем подпункты

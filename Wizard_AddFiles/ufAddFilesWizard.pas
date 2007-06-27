@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -53,11 +53,11 @@ type
      // Prop storage
     FAddList: TStrings;
     FApp: IPhotoAlbumApp;
-    FDefaultPath: String;
+    FDefaultPath: WideString;
     FFileList: TFileList;
     FFilter_DateFrom: TDateTime;
     FFilter_DateTo: TDateTime;
-    FFilter_Masks: String;
+    FFilter_Masks: WideString;
     FFilter_Presence: TAddFilePresenceFilter;
     FFilter_SizeFrom: Integer;
     FFilter_SizeFromUnit: TFileSizeUnit;
@@ -77,8 +77,8 @@ type
      // Вызывается потоком, добавляющим файлы, для уведомления о том, что файл обработан
     procedure ThreadFileProcessed;
      // Добавление строки в протокол
-    procedure LogSuccess(const s: String; const aParams: Array of const);
-    procedure LogFailure(const s: String; const aParams: Array of const);
+    procedure LogSuccess(const ws: WideString; const aParams: Array of const);
+    procedure LogFailure(const ws: WideString; const aParams: Array of const);
      // Обновляет видимость окна просмотра и вызывает UpdatePreview
     procedure UpdatePreviewVisibility;
      // Обновляет масштаб, используемый для просмотра
@@ -88,7 +88,7 @@ type
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
      // IPhoaWizardPageHost_Process
     procedure ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
-    function  ProcPage_GetCurrentStatus: String;
+    function  ProcPage_GetCurrentStatus: WideString;
     function  ProcPage_GetProcessingActive: Boolean;
     function  ProcPage_GetProgressCur: Integer;
     function  ProcPage_GetProgressMax: Integer;
@@ -103,7 +103,7 @@ type
     procedure SetShowPreview(Value: Boolean);
   protected
     function  GetNextPageID: Integer; override;
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetStartPageID: Integer; override;
     function  IsBtnBackEnabled: Boolean; override;
     function  IsBtnCancelEnabled: Boolean; override;
@@ -131,7 +131,7 @@ type
      // -- Приложение
     property App: IPhotoAlbumApp read FApp;
      // -- Папка для добавления, выбираемая по умолчанию
-    property DefaultPath: String read FDefaultPath write FDefaultPath;
+    property DefaultPath: WideString read FDefaultPath write FDefaultPath;
      // -- Список файлов
     property FileList: TFileList read FFileList;
      // -- Фильтр: дата модификации файла "С" фильтра
@@ -139,7 +139,7 @@ type
      // -- Фильтр: дата модификации файла "По" фильтра
     property Filter_DateTo: TDateTime read FFilter_DateTo write FFilter_DateTo;
      // -- Фильтр: маски файлов
-    property Filter_Masks: String read FFilter_Masks write FFilter_Masks;
+    property Filter_Masks: WideString read FFilter_Masks write FFilter_Masks;
      // -- Фильтр: присутствие файлов в фотоальбоме
     property Filter_Presence: TAddFilePresenceFilter read FFilter_Presence write FFilter_Presence;
      // -- Фильтр: минимальный размер файла в единицах Filter_SizeFromUnits
@@ -250,7 +250,7 @@ uses
     function FillExifDate(iTag: Integer): Boolean;
     var
       idx: Integer;
-      s: String;
+      s: AnsiString;
     begin
       Result := False;
        // Ищем значение тега
@@ -273,7 +273,7 @@ uses
     function FillExifTime(iTag: Integer): Boolean;
     var
       idx: Integer;
-      s: String;
+      s: AnsiString;
     begin
       Result := False;
        // Ищем значение тега
@@ -295,14 +295,14 @@ uses
      // Пытается заполнить дату изображения, извлекая её из имени файла изображения. Возвращает True, если удалось
     function FillDateFromFilename: Boolean;
     var
-      s: String;
+      ws: WideString;
       wy, wm, wd: Word;
     begin
       Result := False;
-      s := ExtractFileName(Pic.FileName);
-      wy := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
-      wm := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
-      wd := StrToIntDef(ExtractFirstWord(s, '-,. '), 0);
+      ws := WideExtractFileName(Pic.FileName);
+      wy := StrToIntDef(ExtractFirstWord(ws, '-,.'), 0);
+      wm := StrToIntDef(ExtractFirstWord(ws, '-,.'), 0);
+      wd := StrToIntDef(ExtractFirstWord(ws, '-,. '), 0);
       try
         Pic.Date := DateToPhoaDate(EncodeDate(wy, wm, wd));
         Result := True;
@@ -314,18 +314,18 @@ uses
      // Пытается заполнить время изображения, извлекая его из имени файла изображения. Возвращает True, если удалось
     function FillTimeFromFilename: Boolean;
     var
-      s: String;
+      ws: WideString;
       bh, bm, bs: Word;
       t: TDateTime;
     begin
       Result := False;
-      s := ExtractFileName(Pic.FileName);
+      ws := WideExtractFileName(Pic.FileName);
        // Удаляем часть, отвечающую за дату
-      ExtractFirstWord(s, ' ');
+      ExtractFirstWord(ws, ' ');
        // Извлекаем компоненты времени
-      bh := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
-      bm := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
-      bs := StrToIntDef(ExtractFirstWord(s, '-,.'), 0);
+      bh := StrToIntDef(ExtractFirstWord(ws, '-,.'), 0);
+      bm := StrToIntDef(ExtractFirstWord(ws, '-,.'), 0);
+      bs := StrToIntDef(ExtractFirstWord(ws, '-,.'), 0);
       try
         t := EncodeTime(bh, bm, bs, 0);
         if t>0 then begin
@@ -442,19 +442,19 @@ uses
   end;
 
   procedure TAddFilesThread.Execute;
-  var sFileName: String;
+  var wsFileName: WideString;
   begin
     try
       while not Terminated do
         with FWizard do begin
           try
-            sFileName := FileList.Files[0];
+            wsFileName := FileList.Files[0];
              // Ищем изображение по имени файла
-            FAddedPic := App.ProjectX.PicsX.ItemsByFileNameX[sFileName];
+            FAddedPic := App.ProjectX.PicsX.ItemsByFileNameX[wsFileName];
              // Если не нашли - создаём новое и генерируем эскиз
             if FAddedPic=nil then begin
               FAddedPic := NewPhotoAlbumPic;
-              FAddedPic.FileName := sFileName;
+              FAddedPic.FileName := wsFileName;
               FAddedPic.ReloadPicFileData(
                 App.Project.ThumbnailSize,
                 TPhoaStretchFilter(SettingValueInt(ISettingID_Browse_ViewerStchFilt)),
@@ -468,7 +468,7 @@ uses
               [sFileName,
                DateTimeFillResultName(FDateFillResult),
                DateTimeFillResultName(FTimeFillResult),
-               ConstVal(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
+               DKLangConstW(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
           except
             on e: Exception do begin
               FAddedPic := nil;
@@ -496,10 +496,10 @@ uses
      // Настраиваем окно просмотра
     dpPreview.Floating := True;
      // Создаём страницы
-    Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   ConstVal('SWzPageAddFiles_SelFiles'));
-    Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, ConstVal('SWzPageAddFiles_CheckFiles'));
-    Controller.CreatePage(TfrWzPage_Processing,         IWzAddFilesPageID_Processing, IDH_intf_pic_add_process,    ConstVal('SWzPageAddFiles_Processing'));
-    Controller.CreatePage(TfrWzPage_Log,                IWzAddFilesPageID_Log,        IDH_intf_pic_add_log,        ConstVal('SWzPageAddFiles_Log'));
+    Controller.CreatePage(TfrWzPageAddFiles_SelFiles,   IWzAddFilesPageID_SelFiles,   IDH_intf_pic_add_selfiles,   DKLangConstW('SWzPageAddFiles_SelFiles'));
+    Controller.CreatePage(TfrWzPageAddFiles_CheckFiles, IWzAddFilesPageID_CheckFiles, IDH_intf_pic_add_checkfiles, DKLangConstW('SWzPageAddFiles_CheckFiles'));
+    Controller.CreatePage(TfrWzPage_Processing,         IWzAddFilesPageID_Processing, IDH_intf_pic_add_process,    DKLangConstW('SWzPageAddFiles_Processing'));
+    Controller.CreatePage(TfrWzPage_Log,                IWzAddFilesPageID_Log,        IDH_intf_pic_add_log,        DKLangConstW('SWzPageAddFiles_Log'));
   end;
 
   procedure TfAddFilesWizard.DoDestroy;
@@ -555,7 +555,7 @@ uses
     end;
   end;
 
-  function TfAddFilesWizard.GetRelativeRegistryKey: String;
+  function TfAddFilesWizard.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegAddFiles_Root;
   end;
@@ -608,14 +608,14 @@ uses
 
      // Добавляет файл к списку по его SearchRec. Если bUseFilter=True, предварительно проверяет его соответствие
      //   фильтру
-    procedure AddFile(const sPath: String; SRec: TSearchRec); overload;
+    procedure AddFile(const wsPath: WideString; SRec: TSearchRecW); overload;
     var
       dDateTime: TDateTime;
       i64Size: Int64;
       bMatches: Boolean;
     begin
        // Проверяем, что расширение знакомого типа
-      if FileFormatList.GraphicFromExtension(ExtractFileExt(SRec.Name))=nil then Exit;
+      if FileFormatList.GraphicFromExtension{??? Unicode support}(WideExtractFileExt(SRec.Name))=nil then Exit;
       dDateTime := FileDateToDateTime(SRec.Time);
       i64Size   := (Int64(SRec.FindData.nFileSizeHigh) shl 32) or SRec.FindData.nFileSizeLow;
       bMatches  := True;
@@ -640,29 +640,29 @@ uses
       if bMatches then FFileList.Add(SRec.Name, sPath, i64Size, iInitialImgIdx, dDateTime);
     end;
 
-    procedure AddFolder(const sPath: String);
+    procedure AddFolder(const wsPath: WideString);
     var
-      sr: TSearchRec;
+      sr: TSearchRecW;
       iRes: Integer;
     begin
        // Обновляем информацию о процессе
-      pProcess.Caption := ConstVal('SMsg_ProcessingSomething', [sPath]);
+      pProcess.Caption := DKLangConstW('SMsg_ProcessingSomething', [sPath]);
       pProcess.Update;
        // Сканируем каталог
-      iRes := FindFirst(sPath+'*.*', faAnyFile, sr);
+      iRes := WideFindFirst(wsPath+'*.*', faAnyFile, sr);
       try
         while iRes=0 do begin
           if sr.Name[1]<>'.' then
              // Если каталог - рекурсивно сканируем
             if sr.Attr and faDirectory<>0 then begin
-              if bRecurse then AddFolder(sPath+sr.Name+'\');
+              if bRecurse then AddFolder(wsPath+sr.Name+'\');
              // Если файл - добавляем к списку
             end else
               AddFile(sPath, sr);
-          iRes := FindNext(sr);
+          iRes := WideFindNext(sr);
         end;
       finally
-        FindClose(sr);
+        WideFindClose(sr);
       end;
     end;
 
@@ -670,30 +670,30 @@ uses
     procedure ProcessAddList;
     var
       i, iRes: Integer;
-      sName: String;
-      sr: TSearchRec;
+      wsName: WideString;
+      sr: TSearchRecW;
     begin
        // Стираем существующий список файлов
       FFileList.Clear;
        // Обрабатываем список выбранных файлов/папок
       for i := 0 to FAddList.Count-1 do begin
-        sName := FAddList[i];
+        wsName := FAddList[i];
          // Если это корень диска вида 'X:\'
-        if (Length(sName)=3) and (sName[2]=':') and (sName[3]='\') then
-          AddFolder(sName)
+        if (Length(wsName)=3) and (wsName[2]=':') and (wsName[3]='\') then
+          AddFolder(wsName)
          // Иначе определяем, файл это или папка
         else begin
-          iRes := FindFirst(sName, faAnyFile, sr);
+          iRes := WideFindFirst(wsName, faAnyFile, sr);
           try
             if iRes=0 then
                // Файл
               if sr.Attr and faDirectory=0 then
-                AddFile(ExtractFilePath(sName), sr)
+                AddFile(WideExtractFilePath(wsName), sr)
                // Каталог
               else
                 AddFolder(IncludeTrailingPathDelimiter(sName));
           finally
-            FindClose(sr);
+            WideFindClose(sr);
           end;
         end;
       end;
@@ -729,9 +729,9 @@ uses
     if not Result then PhoaInfo(False, 'SNoFilesSelected');
   end;
 
-  procedure TfAddFilesWizard.LogFailure(const s: String; const aParams: array of const);
+  procedure TfAddFilesWizard.LogFailure(const ws: WideString; const aParams: array of const);
   begin
-    FLog.Add('[!] '+ConstVal(s, aParams));
+    FLog.Add('[!] '+DKLangConstW(ws, aParams));
   end;
 
   function TfAddFilesWizard.LogPage_GetLog(iPageID: Integer): TStrings;
@@ -739,9 +739,9 @@ uses
     Result := FLog;
   end;
 
-  procedure TfAddFilesWizard.LogSuccess(const s: String; const aParams: array of const);
+  procedure TfAddFilesWizard.LogSuccess(const ws: WideString; const aParams: array of const);
   begin
-    FLog.Add('[+] '+ConstVal(s, aParams));
+    FLog.Add('[+] '+DKLangConstW(ws, aParams));
   end;
 
   procedure TfAddFilesWizard.PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
@@ -761,14 +761,14 @@ uses
       Result := LoadFileList(FRecurseFolders, True);
   end;
 
-  function TfAddFilesWizard.ProcPage_GetCurrentStatus: String;
+  function TfAddFilesWizard.ProcPage_GetCurrentStatus: WideString;
   begin
      // Если процесс активен, отображаем прогресс
     if FProcessingFiles then
-      Result := ConstVal('SWzAddFiles_Processing', [ProcPage_GetProgressCur+1, FInitialFileCount, FCountFailed, FFileList.Files[0]])
+      Result := DKLangConstW('SWzAddFiles_Processing', [ProcPage_GetProgressCur+1, FInitialFileCount, FCountFailed, FFileList.Files[0]])
      // Иначе пишем информацию о возможности продолжения
     else
-      Result := ConstVal('SWzAddFiles_Paused', [FPics.Count, FCountFailed]);
+      Result := DKLangConstW('SWzAddFiles_Paused', [FPics.Count, FCountFailed]);
   end;
 
   function TfAddFilesWizard.ProcPage_GetProcessingActive: Boolean;
@@ -824,14 +824,14 @@ uses
 
   procedure TfAddFilesWizard.SettingsInitialSave(rif: TRegIniFile);
 
-    procedure PutDate(const d: TDateTime; const sValueName: String);
-    begin
-      if d>0 then rif.WriteInteger('', sValueName, Trunc(d)) else rif.DeleteValue(sValueName);
+    procedure PutDate(const d: TDateTime; const wsValueName: WideString);
+    begin {!!! Not Unicode-enabled solution }
+      if d>0 then rif.WriteInteger('', wsValueName, Trunc(d)) else rif.DeleteValue(wsValueName);
     end;
 
-    procedure PutTime(const t: TDateTime; const sValueName: String);
-    begin
-      if t>=0 then rif.WriteString('', sValueName, FormatDateTime('hh:nn', t)) else rif.DeleteValue(sValueName);
+    procedure PutTime(const t: TDateTime; const wsValueName: WideString);
+    begin {!!! Not Unicode-enabled solution }
+      if t>=0 then rif.WriteString('', wsValueName, FormatDateTime('hh:nn', t)) else rif.DeleteValue(wsValueName);
     end;
 
   begin
@@ -940,18 +940,18 @@ uses
   procedure TfAddFilesWizard.UpdatePreview;
   var
     bLoaded: Boolean;
-    sFile: String;
+    wsFile: WideString;
     PreviewInfoIntf: IPhoaWizardPage_PreviewInfo;
     ImgSize: TSize;
   begin
     bLoaded := False;
      // Если окно просмотра отображается, получаем предметный интерфейс информации для просмотра и имя текущего файла
     if dpPreview.Visible and Supports(Controller.VisiblePage, IPhoaWizardPage_PreviewInfo, PreviewInfoIntf) then begin
-      sFile := PreviewInfoIntf.CurrentFileName;
+      wsFile := PreviewInfoIntf.CurrentFileName;
        // Если файл задан, загружаем изображение
-      if sFile<>'' then
+      if wsFile<>'' then
         try
-          LoadGraphicFromFile(sFile, iPreview.Bitmap, Size(iPreview.Width, iPreview.Height), ImgSize, nil);
+          LoadGraphicFromFile(wsFile, iPreview.Bitmap, Size(iPreview.Width, iPreview.Height), ImgSize, nil);
           bLoaded := True;
         except
         end;

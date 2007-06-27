@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.2 2007-06-27 18:29:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -52,8 +52,8 @@ type
      // Настраивает разрешённость Actions
     procedure EnableActions;
      // IPhoaWizardPage_PreviewInfo
+    function  GetCurrentFileName: WideString;
     procedure PreviewVisibilityChanged(bVisible: Boolean);
-    function  GetCurrentFileName: String;
   protected
     function  GetDataValid: Boolean; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
@@ -138,7 +138,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
     StateChanged;
   end;
 
-  function TfrWzPageAddFiles_CheckFiles.GetCurrentFileName: String;
+  function TfrWzPageAddFiles_CheckFiles.GetCurrentFileName: WideString;
   var Node: PVirtualNode;
   begin
     Node := tvFiles.FocusedNode;
@@ -171,18 +171,15 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.tvFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    p: PFileRec;
-    s: String;
+  var p: PFileRec;
   begin
     p := FFiles[Node.Index];
     case Column of
-      0: s := p.sName;
-      1: s := p.sPath;
-      2: s := HumanReadableSize(p.i64Size);
-      3: s := DateTimeToStr(p.dModified, AppFormatSettings);
+      0: CellText := p.wsName;
+      1: CellText := p.wsPath;
+      2: CellText := HumanReadableSize(p.i64Size);
+      3: CellText := DateTimeToStr(p.dModified, AppFormatSettings); {!!! Not Unicode-enabled solution }
     end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrWzPageAddFiles_CheckFiles.tvFilesHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -258,7 +255,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
       n := tvFiles.GetNext(n);
     end;
      // Обновляем информацию
-    pBottom.Caption := ConstVal('SWzPageAddFiles_CheckFiles_Info', [FFiles.Count, FCheckedFilesCount]);
+    pBottom.Caption := DKLangConstW('SWzPageAddFiles_CheckFiles_Info', [FFiles.Count, FCheckedFilesCount]);
     EnableActions;
   end;
 

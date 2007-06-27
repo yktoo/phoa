@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.12 2005-05-15 09:03:08 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.13 2007-06-27 18:29:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,25 +31,25 @@ type
      // Список ключевых слов
     FKeywords: IPhotoAlbumKeywordList;
      // Строка с ключевыми словами
-    FKeywordStr: String;
+    FKeywordStr: WideString;
   protected
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
     procedure ExecuteInitialize; override;
   end;
 
-  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var sKeywords: String): Boolean;
+  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var wsKeywords: WideString): Boolean;
 
 implementation
 {$R *.dfm}
 uses phUtils, ConsVars, Main, phSettings;
 
-  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var sKeywords: String): Boolean;
+  function SelectPhoaKeywords(AProject: IPhotoAlbumProject; var wsKeywords: WideString): Boolean;
   begin
     with TdSelKeywords.Create(Application) do
       try
         FProject    := AProject;
-        FKeywordStr := sKeywords;
+        FKeywordStr := wsKeywords;
         Result := ExecuteModal(False, False);
         if Result then sKeywords := FKeywordStr;
       finally

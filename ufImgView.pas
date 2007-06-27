@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.54 2005-09-11 12:58:30 dale Exp $
+//  $Id: ufImgView.pas,v 1.55 2007-06-27 18:29:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -34,14 +34,14 @@ type
      // Форма-владелец
     FOwner: TForm;
      // Prop storage
-    FQueuedFileName: String;
+    FQueuedFileName: WideString;
     FHDecodedEvent: THandle;
-    FErrorMessage: String;
+    FErrorMessage: WideString;
      // Событие прогресса загрузки изображения
     procedure LoadProgress(Sender: TObject; Stage: TProgressStage; PercentDone: Byte; RedrawNow: Boolean; const R: TRect; const Msg: string);
      // Prop handlers
-    procedure SetQueuedFileName(const Value: String);
     function  GetDecoding: Boolean;
+    procedure SetQueuedFileName(const Value: WideString);
   protected
     procedure Execute; override;
   public
@@ -54,12 +54,12 @@ type
      // -- True, пока поток занят декодированием
     property Decoding: Boolean read GetDecoding;
      // -- Текст сообщения об ошибке, если после декодирования Graphic=nil
-    property ErrorMessage: String read FErrorMessage;
+    property ErrorMessage: WideString read FErrorMessage;
      // -- Событие завершения декодирования
     property HDecodedEvent: THandle read FHDecodedEvent;
      // -- Имя файла, которым занимается, или будет заниматься поток. При присваивании файл изображения ставится в
      //    очередь на декодирование, упраздняется прежнее декодированное изображение
-    property QueuedFileName: String read FQueuedFileName write SetQueuedFileName;
+    property QueuedFileName: WideString read FQueuedFileName write SetQueuedFileName;
   end;
 
    // Направление предекодирования изображений
@@ -253,7 +253,7 @@ type
     FPic: IPhotoAlbumPic;
      // Предыдущее просмотренное скэшированное изображение, имя его файла и его преобразования
     FCachedBitmap: TBitmap32;
-    FCachedBitmapFilename: String;
+    FCachedBitmapFilename: WideString;
     FCachedRotation: TPicRotation;
     FCachedFlips: TPicFlips;
      // True, если курсор принудительно скрыт
@@ -278,7 +278,7 @@ type
     FHideCursorInFS: Boolean;
     FInfoBkColor: TColor;
     FInfoBkOpacity: Byte;
-    FInfoFont: String;
+    FInfoFont: WideString;
     FInfoProps: TPicProperties;
     FKeepCursorOverTB: Boolean;
     FPredecodePic: Boolean;
@@ -300,7 +300,7 @@ type
     FWPic, FHPic: Integer;
     FWScaled, FHScaled: Integer;
      // Описание изображения
-    FPicDesc: String;
+    FPicDesc: WideString;
      // ID таймера показа слайдов (0, если таймер не создан)
     FTimerID: Integer;
      // Список операций для отмены редактирования/добавления
@@ -393,7 +393,7 @@ type
   protected
     function  DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
     function  DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure DoCreate; override;
@@ -533,7 +533,7 @@ uses
     if FLoadAborted then raise ELoadGraphicAborted.Create('Load graphic aborted');
   end;
 
-  procedure TDecodeThread.SetQueuedFileName(const Value: String);
+  procedure TDecodeThread.SetQueuedFileName(const Value: WideString);
   begin
      // Если поток ещё занят, а попросили другой файл, взводим флаг отмены загрузки
     if (FQueuedFileName<>Value) and Decoding then begin
@@ -991,19 +991,19 @@ uses
   end;
 
   procedure TfImgView.DP_DescribePic;
-  var sCaption: String;
+  var wsCaption: WideString;
   begin
      // Настраиваем Caption / составляем описание
    if FErroneous then begin
-      sCaption := '';
-      FPicDesc := '';
+      wsCaption := '';
+      FPicDesc  := '';
     end else begin
-      sCaption := GetPicPropStrs(FPic, FCaptionProps, '', ' - ');
-      FPicDesc := GetPicPropStrs(FPic, FInfoProps,    '', '    ');
+      wsCaption := GetPicPropStrs(FPic, FCaptionProps, '', ' - ');
+      FPicDesc  := GetPicPropStrs(FPic, FInfoProps,    '', '    ');
     end;
-    if sCaption='' then Caption := ConstVal('SImgView_DefaultCaption') else Caption := sCaption;
+    if wsCaption='' then Caption := DKLangConstW('SImgView_DefaultCaption') else Caption := wsCaption;
      // Настраиваем счётчик
-    eCounter.Text := Format('%d/%d', [FPicIdx+1, FPicCount]);
+    eCounter.Text := WideFormat('%d/%d', [FPicIdx+1, FPicCount]);
   end;
 
   procedure TfImgView.DP_EnqueueNext;
@@ -1035,13 +1035,13 @@ uses
     bPicInCache: Boolean;
 
      // Рисует на iMain вместо изображения сообщение об ошибке
-    procedure PaintError(const sFileName, sError: String);
+    procedure PaintError(const wsFileName, wsError: WideString);
     var
       r: TRect;
-      sTitle: String;
+      wsTitle: WideString;
       Sz: TSize;
     begin
-      sTitle := ConstVal('SImgView_ErrorMsg');
+      wsTitle := DKLangConstW('SImgView_ErrorMsg');
       with iMain.Bitmap do begin
          // Стираем Bitmap
         Width  := 500;
@@ -1052,9 +1052,9 @@ uses
         Font.Color := $2020c0;
         Font.Size  := 72;
         Font.Style := [fsBold];
-        Sz := TextExtent(sTitle);
+        Sz := TextExtent(wsTitle); {??? Unicode support}
         r := Rect((Width-Sz.cx) div 2, (Height-Sz.cy) div 2, (Width+Sz.cx) div 2, (Height+Sz.cy) div 2);
-        TextOut(r, DT_LEFT or DT_NOPREFIX, sTitle);
+        TextOut(r, DT_LEFT or DT_NOPREFIX, wsTitle); {??? Unicode support}
          // Рисуем имя файла
         Font.Color := clRed;
         Font.Size  := 9;
@@ -1182,7 +1182,7 @@ uses
     Result := aFullScreen.Checked;
   end;
 
-  function TfImgView.GetRelativeRegistryKey: String;
+  function TfImgView.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegViewWindow_Root;
   end;

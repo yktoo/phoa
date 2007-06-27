@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.69 2007-06-24 17:48:01 dale Exp $
+//  $Id: phObj.pas,v 1.70 2007-06-27 18:29:14 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -259,12 +259,12 @@ uses
 
   procedure PhoaWriteError;
   begin
-    PhoaException(ConstVal('SErrCannotWrite'), []);
+    PhoaException(DKLangConstW('SErrCannotWrite'), []);
   end;
 
   procedure PhoaReadError;
   begin
-    PhoaException(ConstVal('SErrCannotRead'), []);
+    PhoaException(DKLangConstW('SErrCannotRead'), []);
   end;
 
    //===================================================================================================================
@@ -1420,7 +1420,7 @@ type
     p: PPhoaKeywordData;
   begin
      // Ищем уникальное ключевое слово вида "Новое ключевое слово (n)"
-    wsKWBase := ConstVal('SDefaultNewKeyword');
+    wsKWBase := DKLangConstW('SDefaultNewKeyword');
     iAttempt := 0;
     repeat
       Inc(iAttempt);
@@ -1494,7 +1494,7 @@ type
      // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
     if not WideSameText(p.wsKeyword, wsNewKeyword) then begin
        // Если уже есть такое в списке, вызываем Exception
-      if FindKeyword(wsNewKeyword, Result) then PhoaException(ConstVal('SErrDuplicateKeyword'));
+      if FindKeyword(wsNewKeyword, Result) then PhoaException(DKLangConstW('SErrDuplicateKeyword'));
        // Иначе сдвигаем на новое место
       if Index<Result then Dec(Result); 
       FList.Move(Index, Result); 
@@ -3234,7 +3234,7 @@ type
             if GUnclassified=nil then begin
               GUnclassified := NewPhotoAlbumPicGroup(Grp, 0);
               GUnclassified.Index := 0;
-              GUnclassified.Text := ConstVal(asUnclassifiedConsts[Gpg.Prop]);
+              GUnclassified.Text := DKLangConstW(asUnclassifiedConsts[Gpg.Prop]);
             end;
             GUnclassified.PicsX.Add(Pic, True);
            // Иначе - переходим к следующему изображению
@@ -3900,7 +3900,7 @@ type
   procedure TPhoaFilerEx.ValidateRevision;
   begin
      // Не допускаем считывания только более новых ревизий
-    if RevisionNumber>IPhFileRevisionNumber then PhoaException(ConstVal('SErrFileRevHigher'), []);
+    if RevisionNumber>IPhFileRevisionNumber then PhoaException(DKLangConstW('SErrFileRevHigher'), []);
   end;
 
    //===================================================================================================================

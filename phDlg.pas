@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.21 2005-08-15 11:25:11 dale Exp $
+//  $Id: phDlg.pas,v 1.22 2007-06-27 18:29:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -49,7 +49,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phChmHlp, phUtils, ConsVars, phObj, phGUIObj;
+uses DKLang, phChmHlp, phUtils, ConsVars, phObj, phGUIObj;
 
    //===================================================================================================================
    // TPhoaDialog
@@ -117,8 +117,9 @@ uses phChmHlp, phUtils, ConsVars, phObj, phGUIObj;
   procedure TPhoaDialog.UpdateState;
   begin
     bOK.Enabled := (IgnoreModified or Modified) and (IgnoreDataValidity or DataValid);
-    bCancel.Caption := ConstVal(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
+    bCancel.Caption := DKLangConstW(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
   end;
 
 end.
+
 

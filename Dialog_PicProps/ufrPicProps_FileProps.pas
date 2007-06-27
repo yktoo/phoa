@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.3 2007-06-27 18:29:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -62,7 +62,7 @@ type
        // Не нашли - изменяем файл
       if iPicID=0 then Dialog.PictureFiles[idx] := wsFileName
        // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
-      else if iPicID<>EditedPics[idx].ID then PhoaException(ConstVal('SErrPicFileAlreadyInUse', [wsFileName, iPicID]));
+      else if iPicID<>EditedPics[idx].ID then PhoaException(DKLangConstW('SErrPicFileAlreadyInUse', [wsFileName, iPicID]));
     end;
 
   begin
@@ -73,7 +73,7 @@ type
           FileName := Dialog.PictureFiles[idx];
           Filter   := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
           Options  := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-          Title    := ConstVal('SDlgTitle_SelectPicFile');
+          Title    := DKLangConstW('SDlgTitle_SelectPicFile');
           if Execute then UpdatePicFile(FileName);
         finally
           Free;
@@ -190,9 +190,9 @@ type
       DFProp := TDiskFileProp(Node.Index);
       case Column of
          // Имя свойства
-        0: if NS=nil then ws := ConstVal('SError') else ws := DiskFilePropName(DFProp);
+        0: if NS=nil then ws := DKLangConstW('SError') else ws := DiskFilePropName(DFProp);
          // Значение свойства
-        1: if NS=nil then ws := ConstVal('SErrFileNotFound') else ws := DiskFilePropValue(DFProp, NS);
+        1: if NS=nil then ws := DKLangConstW('SErrFileNotFound') else ws := DiskFilePropValue(DFProp, NS);
       end;
     end;
     CellText := PhoaAnsiToUnicode(s);

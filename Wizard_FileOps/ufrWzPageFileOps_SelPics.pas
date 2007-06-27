@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.2 2005-08-18 13:20:10 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.3 2007-06-27 18:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -112,9 +112,9 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
      // Настраиваем название радиокнопки "Все изображения фотоальбома/представления"
     View := Wiz.App.ProjectX.CurrentViewX;
     if View=nil then
-      rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInPhoa')
+      rbAllPics.Caption := DKLangConstW('SWzFileOps_AllPicsInPhoa')
     else
-      rbAllPics.Caption := ConstVal('SWzFileOps_AllPicsInView', [View.Name]);
+      rbAllPics.Caption := DKLangConstW('SWzFileOps_AllPicsInView', [View.Name]);
      // Устанавливаем выбранную радиокнопку в зависимости от режима
     rbSelPics.Checked   := Wiz.SelPicMode=fospmSelPics;
     rbAllPics.Checked   := Wiz.SelPicMode=fospmAll;
@@ -340,7 +340,7 @@ uses phUtils, udFileOpsWizard, Main, phSettings;
         end;
       end;
        // Обновляем информацию
-      lCountInfo.Caption := ConstVal('SWzFileOps_PicGroupSelectedCount', [FSelPicCount, FSelGroupCount, HumanReadableSize(FSelPicFileTotalSize)]);
+      lCountInfo.Caption := DKLangConstW('SWzFileOps_PicGroupSelectedCount', [FSelPicCount, FSelGroupCount, HumanReadableSize(FSelPicFileTotalSize)]);
       StateChanged;
     finally
       StopWait;

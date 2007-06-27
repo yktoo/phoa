@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.3 2007-06-12 13:21:49 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.4 2007-06-27 18:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,13 +10,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  GraphicEx, GR32,
+  TntSysUtils, TntClasses, GraphicEx, GR32,
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, phOps, ConsVars, phWizard, phGraphics, 
   phWizForm, DKLang, ExtCtrls, StdCtrls;
 
 type
    // Exception
-  EFileOpError = class(Exception);
+  EFileOpError = class(EPhoaWideException);
 
   TFileOpThread = class;
 
@@ -25,18 +25,18 @@ type
   TFileLink = class(TObject)
   private
      // Prop storage
-    FFileName: String;
-    FFilePath: String;
+    FFileName: WideString;
+    FFilePath: WideString;
     FFileSize: Integer;
     FPics: IPhoaMutablePicList;
     FFileTime: TDateTime;
   public
-    constructor Create(const sFileName, sFilePath: String; iFileSize: Integer; const dFileTime: TDateTime);
+    constructor Create(const wsFileName, wsFilePath: WideString; iFileSize: Integer; const dFileTime: TDateTime);
      // Props
      // -- Имя файла
-    property FileName: String read FFileName;
+    property FileName: WideString read FFileName;
      // -- Путь к файлу
-    property FilePath: String read FFilePath;
+    property FilePath: WideString read FFilePath;
      // -- Размер файла
     property FileSize: Integer read FFileSize;
      // -- Дата/время модификации файла
@@ -48,12 +48,13 @@ type
    // Список объектов TFileLink
   TFileLinks = class(TList)
   private
-    function GetItems(Index: Integer): TFileLink;
+     // Prop handlers
+    function  GetItems(Index: Integer): TFileLink;
   protected
     procedure Notify(Ptr: Pointer; Action: TListNotification); override;
   public
      // Добавляет новый объект файла и возвращает ссылку на него
-    function Add(const sFileName, sFilePath: String; iFileSize: Integer; const dFileTime: TDateTime): TFileLink;
+    function Add(const wsFileName, wsFilePath: WideString; iFileSize: Integer; const dFileTime: TDateTime): TFileLink;
      // Props
      // -- Файлы по индексу
     property Items[Index: Integer]: TFileLink read GetItems; default;
@@ -87,20 +88,20 @@ type
     FCDOpt_CreateAutorun: Boolean;
     FCDOpt_CreatePhoa: Boolean;
     FCDOpt_IncludeViews: Boolean;
-    FCDOpt_MediaLabel: String;
-    FCDOpt_PhoaDesc: String;
-    FCDOpt_PhoaFileName: String;
+    FCDOpt_MediaLabel: WideString;
+    FCDOpt_PhoaDesc: WideString;
+    FCDOpt_PhoaFileName: WideString;
     FDelFile_DeleteToRecycleBin: Boolean;
-    FDestinationFolder: String;
+    FDestinationFolder: WideString;
     FExportedProject: IPhotoAlbumProject;
     FFileOpKind: TFileOperationKind;
     FMoveFile_AllowDuplicating: Boolean;
     FMoveFile_Arranging: TFileOpMoveFileArranging;
     FMoveFile_BaseGroup: IPhotoAlbumPicGroup;
-    FMoveFile_BasePath: String;
+    FMoveFile_BasePath: WideString;
     FMoveFile_DeleteOriginal: Boolean;
     FMoveFile_DeleteToRecycleBin: Boolean;
-    FMoveFile_FileNameFormat: String;
+    FMoveFile_FileNameFormat: WideString;
     FMoveFile_NoOriginalMode: TFileOpMoveFileNoOriginalMode;
     FMoveFile_OverwriteMode: TFileOpMoveFileOverwriteMode;
     FMoveFile_RenameFiles: Boolean;
@@ -131,8 +132,8 @@ type
      // Вызывается потоком, обрабатывающим изображения, для уведомления о том, что изображение обработано
     procedure ThreadPicProcessed;
      // Добавление строки в протокол
-    procedure LogSuccess(const s: String; const aParams: Array of const);
-    procedure LogFailure(const s: String; const aParams: Array of const);
+    procedure LogSuccess(const ws: WideString; const aParams: Array of const);
+    procedure LogFailure(const ws: WideString; const aParams: Array of const);
      // Составляет список файлов-кандидатов для восстановления ссылок
     procedure Repair_SelectFiles;
      // IPhoaWizardPageHost_Log
@@ -140,7 +141,7 @@ type
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
      // IPhoaWizardPageHost_Process
     procedure ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
-    function  ProcPage_GetCurrentStatus: String;
+    function  ProcPage_GetCurrentStatus: WideString;
     function  ProcPage_GetProcessingActive: Boolean;
     function  ProcPage_GetProgressCur: Integer;
     function  ProcPage_GetProgressMax: Integer;
@@ -153,7 +154,7 @@ type
     function  IPhoaWizardPageHost_Process.GetProgressMax      = ProcPage_GetProgressMax;
   protected
     function  GetNextPageID: Integer; override;
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetStartPageID: Integer; override;
     function  IsBtnBackEnabled: Boolean; override;
     function  IsBtnCancelEnabled: Boolean; override;
@@ -172,9 +173,9 @@ type
      // -- Создание CD/DVD: True, если нужно создавать фотоальбом из копируемых изображений
     property CDOpt_CreatePhoa: Boolean read FCDOpt_CreatePhoa write FCDOpt_CreatePhoa;
      // -- Создание CD/DVD: относительное имя файла фотоальбома
-    property CDOpt_PhoaFileName: String read FCDOpt_PhoaFileName write FCDOpt_PhoaFileName;
+    property CDOpt_PhoaFileName: WideString read FCDOpt_PhoaFileName write FCDOpt_PhoaFileName;
      // -- Создание CD/DVD: описание фотоальбома
-    property CDOpt_PhoaDesc: String read FCDOpt_PhoaDesc write FCDOpt_PhoaDesc;
+    property CDOpt_PhoaDesc: WideString read FCDOpt_PhoaDesc write FCDOpt_PhoaDesc;
      // -- Создание CD/DVD: True, если нужно включить имеющиеся представления в создаваемый фотоальбом
     property CDOpt_IncludeViews: Boolean read FCDOpt_IncludeViews write FCDOpt_IncludeViews;
      // -- Создание CD/DVD: True, если нужно также скопировать исполняемый файл
@@ -187,11 +188,11 @@ type
      // -- Создание CD/DVD: True, если нужно создать файл autorun.inf
     property CDOpt_CreateAutorun: Boolean read FCDOpt_CreateAutorun write FCDOpt_CreateAutorun;
      // -- Создание CD/DVD: метка носителя для autorun.inf
-    property CDOpt_MediaLabel: String read FCDOpt_MediaLabel write FCDOpt_MediaLabel;
+    property CDOpt_MediaLabel: WideString read FCDOpt_MediaLabel write FCDOpt_MediaLabel;
      // -- Удаление: если True, удалять файлы в корзину, иначе - удалять совсем
     property DelFile_DeleteToRecycleBin: Boolean read FDelFile_DeleteToRecycleBin write FDelFile_DeleteToRecycleBin;
      // -- Папка назначения, с которой производятся операции
-    property DestinationFolder: String read FDestinationFolder write FDestinationFolder;
+    property DestinationFolder: WideString read FDestinationFolder write FDestinationFolder;
      // -- Проект, предназначенный для экспорта в процессе копирования/перемещения файлов
     property ExportedProject: IPhotoAlbumProject read FExportedProject;
      // -- Выбранная операция с файлами изображений
@@ -200,7 +201,7 @@ type
     property MoveFile_Arranging: TFileOpMoveFileArranging read FMoveFile_Arranging write FMoveFile_Arranging;
      // -- Копирование/перемещение: путь, относительно которого создавать папки с файлами (при
      //    MoveFileArranging=fomfaMaintainFolderLayout)
-    property MoveFile_BasePath: String read FMoveFile_BasePath write FMoveFile_BasePath;
+    property MoveFile_BasePath: WideString read FMoveFile_BasePath write FMoveFile_BasePath;
      // -- Копирование/перемещение: группа, относительно которой создавать папки с файлами (при
      //    MoveFileArranging=fomfaMaintainGroupLayout)
     property MoveFile_BaseGroup: IPhotoAlbumPicGroup read FMoveFile_BaseGroup write FMoveFile_BaseGroup;
@@ -211,7 +212,7 @@ type
     property MoveFile_RenameFiles: Boolean read FMoveFile_RenameFiles write FMoveFile_RenameFiles;
      // -- Копирование/перемещение: формат имени файла, используемый для переименовывания файлов при
      //    MoveFile_RenameFiles=True
-    property MoveFile_FileNameFormat: String read FMoveFile_FileNameFormat write FMoveFile_FileNameFormat;
+    property MoveFile_FileNameFormat: WideString read FMoveFile_FileNameFormat write FMoveFile_FileNameFormat;
      // -- Копирование/перемещение: поведение при отсутствии исходного файла при перемещении
     property MoveFile_NoOriginalMode: TFileOpMoveFileNoOriginalMode read FMoveFile_NoOriginalMode write FMoveFile_NoOriginalMode;
      // -- Копирование/перемещение: режим перезаписи существующих файлов
@@ -257,7 +258,7 @@ type
     FErrorOccured: Boolean;
     FChangesMade: Boolean;
      // Поля для AskOverwrite()
-    FOverwriteFileName: String;
+    FOverwriteFileName: WideString;
     FOverwriteResults: TMessageBoxResults;
      // Процедуры, выполняющие операцию для отдельного изображения
     procedure DoCopyMovePic(Pic: IPhotoAlbumPic);
@@ -265,11 +266,11 @@ type
     procedure DoRebuildThumb(Pic: IPhotoAlbumPic);
     procedure DoRepairFileLink(Pic: IPhotoAlbumPic);
      // Процедура удаления файла
-    procedure DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
+    procedure DoDeleteFile(const wsFileName: WideString; bDelToRecycleBin: Boolean);
      // Удаляет изображение из фотоальбома (также ссылки на него из групп)
     procedure DoDeletePic(Pic: IPhotoAlbumPic);
      // Обновляет ссылку на файл (предварительно проверяя допустимость этого)
-    procedure DoUpdateFileLink(Pic: IPhotoAlbumPic; const sNewFileName: String);
+    procedure DoUpdateFileLink(Pic: IPhotoAlbumPic; const wsNewFileName: WideString);
      // Спрашивает возможность перезаписи файла (вызывается в Synchronize())
     procedure AskOverwrite;
   protected
@@ -311,20 +312,21 @@ uses
   end;
 
    // Exception raising
-  procedure FileOpError(const sConstName: String; const aParams: Array of const);
+   //!!! remove this function
+  procedure FileOpError(const sConstName: AnsiString; const aParams: Array of const);
   begin
-    raise EFileOpError.Create(ConstVal(sConstName, aParams));
+    raise EFileOpError.Create(DKLangConstW(sConstName, aParams));
   end;
 
    //===================================================================================================================
    // TFileLink
    //===================================================================================================================
 
-  constructor TFileLink.Create(const sFileName, sFilePath: String; iFileSize: Integer; const dFileTime: TDateTime);
+  constructor TFileLink.Create(const wsFileName, wsFilePath: WideString; iFileSize: Integer; const dFileTime: TDateTime);
   begin
     inherited Create;
-    FFileName := sFileName;
-    FFilePath := sFilePath;
+    FFileName := wsFileName;
+    FFilePath := wsFilePath;
     FFileSize := iFileSize;
     FFileTime := dFileTime;
     FPics     := NewPhotoAlbumPicList(True);
@@ -334,9 +336,9 @@ uses
    // TFileLinks
    //===================================================================================================================
 
-  function TFileLinks.Add(const sFileName, sFilePath: String; iFileSize: Integer; const dFileTime: TDateTime): TFileLink;
+  function TFileLinks.Add(const wsFileName, wsFilePath: WideString; iFileSize: Integer; const dFileTime: TDateTime): TFileLink;
   begin
-    Result := TFileLink.Create(sFileName, sFilePath, iFileSize, dFileTime);
+    Result := TFileLink.Create(wsFileName, wsFilePath, iFileSize, dFileTime);
     inherited Add(Result);
   end;
 
@@ -369,8 +371,8 @@ uses
 
   procedure TFileOpThread.DoCopyMovePic(Pic: IPhotoAlbumPic);
   var
-    sSrcFileName, sSrcPath, sSrcFullFileName, sDestPath, sTargetPath, sTargetFileName: String;
-    SLRelTargetPaths: TStringList;
+    wsSrcFileName, wsSrcPath, wsSrcFullFileName, wsDestPath, wsTargetPath, wsTargetFileName: WideString;
+    SLRelTargetPaths: TTntStringList;
     i: Integer;
 
      // Добавляет относительный путь к изображению в SLRelTargetPaths, если группа выбрана и оно присутствует в группе
@@ -379,7 +381,7 @@ uses
     var
       i: Integer;
       g: IPhotoAlbumPicGroup;
-      sRelPath: String;
+      wsRelPath: WideString;
       bGroupSelected: Boolean;
     begin
        // Проверяем выбранность группы
@@ -412,30 +414,30 @@ uses
 
      // Возвращает отформатированное в соответствии с FWizard.MoveFile_FileNameFormat имя файла назначения для
      //   обрабатываемого изображения
-    function GetFormattedTargetFileName: String;
+    function GetFormattedTargetFileName: WideString;
     var
-      s: String;
+      ws: WideString;
       i1, i2: Integer;
       PProp: TPicProperty;
     begin
       Result := '';
-      s := FWizard.MoveFile_FileNameFormat;
+      ws := FWizard.MoveFile_FileNameFormat;
       repeat
          // Ищем фигурные скобки в строке
-        i1 := Pos('{', s);
-        i2 := Pos('}', s);
+        i1 := Pos('{', ws);
+        i2 := Pos('}', ws);
          // Фигурные скобки закончились
         if (i1=0) and (i2=0) then Break;
          // Добавляем к результату начало строки, не содержащее фигурных скобок
-        Result := Result+Copy(s, 1, Min(i1, i2)-1);
+        Result := Result+Copy(ws, 1, Min(i1, i2)-1);
          // Выделяем имя свойства изображения, содержащееся между фигурных скобок
         if (i1<>0) and (i2<>0) and (i1<i2-1) then begin
-          PProp := StrToPicProp(Copy(s, i1+1, i2-i1-1), True);
+          PProp := StrToPicProp(Copy(ws, i1+1, i2-i1-1), True);
            // Добавляем к результату значение свойства для обрабатываемого изображения
           Result := Result+Pic.PropStrValues[PProp];
         end;
-         // Удаляем обработанную часть строки из s
-        Delete(s, 1, Max(i1, i2));
+         // Удаляем обработанную часть строки из ws
+        Delete(ws, 1, Max(i1, i2));
       until s='';
        // Добавляем к результату остаток строки (не содержащий фигурных скобок) и расширение исходного файла
       Result := Result+s+ExtractFileExt(sSrcFileName);
@@ -444,21 +446,21 @@ uses
     end;
 
      // Копирует файл в путь sTargetPath
-    procedure PerformCopying(const sTargetPath: String);
-    var sTargetDir, sTargetFullFileName: String;
+    procedure PerformCopying(const wsTargetPath: WideString);
+    var wsTargetDir, wsTargetFullFileName: WideString;
     begin
-      sTargetDir := ExcludeTrailingPathDelimiter(sTargetPath);
+      wsTargetDir := WideExcludeTrailingPathDelimiter(wsTargetPath);
        // Проверяем, что исходный и целевой пути разные
-      if AnsiSameText(sSrcPath, sTargetPath) then FileOpError('SErrSrcAndDestFoldersAreSame', [sTargetDir, sSrcFileName]);
+      if WideSameText(wsSrcPath, wsTargetPath) then FileOpError('SErrSrcAndDestFoldersAreSame', [wsTargetDir, wsSrcFileName]);
        // Пытаемся создать каталог назначения
-      if not ForceDirectories(sTargetDir) then FileOpError('SErrCannotCreateFolder', [sTargetDir]);
+      if not WideForceDirectories(wsTargetDir) then FileOpError('SErrCannotCreateFolder', [wsTargetDir]);
        // Проверяем перезапись файла
-      sTargetFullFileName := sTargetPath+sTargetFileName;
+      wsTargetFullFileName := wsTargetPath+wsTargetFileName;
       case FWizard.MoveFile_OverwriteMode of
-        fomfomNever: if FileExists(sTargetFullFileName) then FileOpError('SErrTargetFileExists', [sTargetFullFileName]);
+        fomfomNever: if WideFileExists(wsTargetFullFileName) then FileOpError('SErrTargetFileExists', [wsTargetFullFileName]);
         fomfomPrompt:
-          if FileExists(sTargetFullFileName) then begin
-            FOverwriteFileName := sTargetFullFileName;
+          if WideFileExists(wsTargetFullFileName) then begin
+            FOverwriteFileName := wsTargetFullFileName;
             Synchronize(AskOverwrite);
              // "Да"
             if mbrYes in FOverwriteResults then
@@ -468,11 +470,11 @@ uses
               FWizard.MoveFile_OverwriteMode := fomfomAlways
              // "Нет"
             else if mbrNo in FOverwriteResults then
-              FileOpError('SLogEntry_UserDeniedFileOverwrite', [sTargetFullFileName])
+              FileOpError('SLogEntry_UserDeniedFileOverwrite', [wsTargetFullFileName])
              // "Нет для всех"
             else if mbrNoToAll in FOverwriteResults then begin
               FWizard.MoveFile_OverwriteMode := fomfomNever;
-              FileOpError('SErrTargetFileExists', [sTargetFullFileName]);
+              FileOpError('SErrTargetFileExists', [wsTargetFullFileName]);
              // "Отмена"
             end else begin
               FWizard.InterruptProcessing;
@@ -481,9 +483,9 @@ uses
           end;
       end;
        // Копируем файл
-      if not CopyFile(PChar(sSrcFullFileName), PChar(sTargetFullFileName), False) then RaiseLastOSError;
+      if not WideCopyFile(PWideChar(wsSrcFullFileName), PWideChar(wsTargetFullFileName), False) then RaiseLastOSError;
        // Протоколируем успех
-      FWizard.LogSuccess('SLogEntry_FileCopiedOK', [sSrcFullFileName, sTargetFullFileName]);
+      FWizard.LogSuccess('SLogEntry_FileCopiedOK', [wsSrcFullFileName, wsTargetFullFileName]);
     end;
 
   begin
@@ -512,7 +514,7 @@ uses
       end;
        // Переместить в каталог, сохранив расположение папок относительно группы MoveFile_BaseGroup
       else {fomfaMaintainGroupLayout} begin
-        SLRelTargetPaths := TStringList.Create;
+        SLRelTargetPaths := TTntStringList.Create;
         try
           SLRelTargetPaths.Sorted     := True;
           SLRelTargetPaths.Duplicates := dupIgnore;
@@ -520,7 +522,7 @@ uses
           AddPathIfPicInGroup(FWizard.App.ProjectX.ViewRootGroupX);
            // Если что-то есть (по идее, должно быть всегда)
           if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
-          sTargetPath := sDestPath+SLRelTargetPaths[0];
+          wsTargetPath := wsDestPath+SLRelTargetPaths[0];
           for i := 0 to iif(FWizard.MoveFile_AllowDuplicating, SLRelTargetPaths.Count-1, 0) do PerformCopying(sDestPath+SLRelTargetPaths[i]);
         finally
           SLRelTargetPaths.Free;
@@ -535,10 +537,10 @@ uses
       if FWizard.MoveFile_DeleteOriginal then DoDeleteFile(sSrcFullFileName, FWizard.MoveFile_DeleteToRecycleBin);
     end;
      // Если включен режим создания фотоальбома, исправляем ссылку на файл в соответствующем изображении
-    if FWizard.ExportedProject<>nil then FWizard.ExportedProject.PicsX.ItemsByIDX[Pic.ID].FileName := sTargetPath+sTargetFileName;
+    if FWizard.ExportedProject<>nil then FWizard.ExportedProject.PicsX.ItemsByIDX[Pic.ID].FileName := wsTargetPath+wsTargetFileName;
   end;
 
-  procedure TFileOpThread.DoDeleteFile(const sFileName: String; bDelToRecycleBin: Boolean);
+  procedure TFileOpThread.DoDeleteFile(const wsFileName: WideString; bDelToRecycleBin: Boolean);
   var SFOS: TSHFileOpStruct;
   begin
      // Проверяем наличие файла. Если его нет - удалять, пожалуй, не стоит
@@ -584,15 +586,15 @@ uses
   end;
 
   procedure TFileOpThread.DoDelPicAndFile(Pic: IPhotoAlbumPic);
-  var sFileName: String;
+  var wsFileName: WideString;
   begin
      // Удаляем файл
-    sFileName := Pic.FileName;
-    DoDeleteFile(sFileName, FWizard.DelFile_DeleteToRecycleBin);
+    wsFileName := Pic.FileName;
+    DoDeleteFile(wsFileName, FWizard.DelFile_DeleteToRecycleBin);
      // Удаляем изображение
     DoDeletePic(Pic);
      // Протоколируем успех
-    FWizard.LogSuccess('SLogEntry_PicDeletedOK', [sFileName]);
+    FWizard.LogSuccess('SLogEntry_PicDeletedOK', [wsFileName]);
   end;
 
   procedure TFileOpThread.DoRebuildThumb(Pic: IPhotoAlbumPic);
@@ -623,17 +625,17 @@ uses
     //#ToDo3: Написать repair routine
   end;
 
-  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhotoAlbumPic; const sNewFileName: String);
-  var sPrevFileName: String;
+  procedure TFileOpThread.DoUpdateFileLink(Pic: IPhotoAlbumPic; const wsNewFileName: WideString);
+  var wsPrevFileName: WideString;
   begin
      // Проверяем, можно ли исправить путь
-    if not AnsiSameText(Pic.FileName, sNewFileName) and (FWizard.App.Project.Pics.IndexOfFileName(sNewFileName)>=0) then
-      FileOpError('SLogEntry_PicRelinkingError', [sNewFileName]);
+    if not WideSameText(Pic.FileName, wsNewFileName) and (FWizard.App.Project.Pics.IndexOfFileName(wsNewFileName)>=0) then
+      FileOpError('SLogEntry_PicRelinkingError', [wsNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
-    sPrevFileName := Pic.FileName;
-    if sPrevFileName<>sNewFileName then begin
-      Pic.FileName := sNewFileName;
-      FWizard.LogSuccess('SLogEntry_PicRelinkedOK', [sPrevFileName, sNewFileName]);
+    wsPrevFileName := Pic.FileName;
+    if wsPrevFileName<>wsNewFileName then begin
+      Pic.FileName := wsNewFileName;
+      FWizard.LogSuccess('SLogEntry_PicRelinkedOK', [wsPrevFileName, wsNewFileName]);
       FChangesMade := True;
     end;
   end;
@@ -641,12 +643,12 @@ uses
   procedure TFileOpThread.Execute;
   var
     Pic: IPhotoAlbumPic;
-    sFileName: String;
+    wsFileName: WideString;
   begin
     while not Terminated do begin
        // Обрабатываем изображение
       Pic := FWizard.SelectedPics[0];
-      sFileName := Pic.FileName;
+      wsFileName := Pic.FileName;
       FErrorOccured := False;
       FChangesMade := False;
       try
@@ -659,8 +661,9 @@ uses
         end;
       except
         on e: Exception do begin
+        {??? WideException}
           FErrorOccured := True;
-          FWizard.LogFailure('SLogEntry_FileOpError', [sFileName, e.Message]);
+          FWizard.LogFailure('SLogEntry_FileOpError', [wsFileName, e.Message]);
         end;
       end;
        // Регистрируем результат
@@ -742,22 +745,22 @@ uses
   end;
 
   procedure TdFileOpsWizard.DoCreate;
-  var sOptPageTitle: String;
+  var wsOptPageTitle: WideString;
   begin
     inherited DoCreate;
      // Создаём страницы
-    sOptPageTitle := ConstVal('SWzPageFileOps_Options');
-    Controller.CreatePage(TfrWzPageFileOps_SelTask,        IWzFileOpsPageID_SelTask,        IDH_intf_file_ops_seltask,   ConstVal('SWzPageFileOps_SelTask'));
-    Controller.CreatePage(TfrWzPageFileOps_SelPics,        IWzFileOpsPageID_SelPics,        IDH_intf_file_ops_selpics,   ConstVal('SWzPageFileOps_SelPics'));
-    Controller.CreatePage(TfrWzPageFileOps_SelFolder,      IWzFileOpsPageID_SelFolder,      IDH_intf_file_ops_selfolder, ConstVal('SWzPageFileOps_SelFolder'));
-    Controller.CreatePage(TfrWzPageFileOps_MoveOptions,    IWzFileOpsPageID_MoveOptions,    IDH_intf_file_ops_moveopts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   IDH_intf_file_ops_moveopts2, sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  sOptPageTitle);
-    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{#ToDo3: Завести HelpTopic}, ConstVal('SWzPageFileOps_RepairSelLinks'));
-    Controller.CreatePage(TfrWzPage_Processing,            IWzFileOpsPageID_Processing,     IDH_intf_file_ops_process,   ConstVal('SWzPageFileOps_Processing'));
-    Controller.CreatePage(TfrWzPage_Log,                   IWzFileOpsPageID_Log,            IDH_intf_file_ops_log,       ConstVal('SWzPageFileOps_Log'));
+    wsOptPageTitle := DKLangConstW('SWzPageFileOps_Options');
+    Controller.CreatePage(TfrWzPageFileOps_SelTask,        IWzFileOpsPageID_SelTask,        IDH_intf_file_ops_seltask,   DKLangConstW('SWzPageFileOps_SelTask'));
+    Controller.CreatePage(TfrWzPageFileOps_SelPics,        IWzFileOpsPageID_SelPics,        IDH_intf_file_ops_selpics,   DKLangConstW('SWzPageFileOps_SelPics'));
+    Controller.CreatePage(TfrWzPageFileOps_SelFolder,      IWzFileOpsPageID_SelFolder,      IDH_intf_file_ops_selfolder, DKLangConstW('SWzPageFileOps_SelFolder'));
+    Controller.CreatePage(TfrWzPageFileOps_MoveOptions,    IWzFileOpsPageID_MoveOptions,    IDH_intf_file_ops_moveopts,  wsOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_MoveOptions2,   IWzFileOpsPageID_MoveOptions2,   IDH_intf_file_ops_moveopts2, wsOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_CDOptions,      IWzFileOpsPageID_CDOptions,      IDH_intf_file_ops_cdopts,    wsOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_DelOptions,     IWzFileOpsPageID_DelOptions,     IDH_intf_file_ops_delopts,   wsOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_RepairOptions,  IWzFileOpsPageID_RepairOptions,  IDH_intf_file_ops_repropts,  wsOptPageTitle);
+    Controller.CreatePage(TfrWzPageFileOps_RepairSelLinks, IWzFileOpsPageID_RepairSelLinks, 0{#ToDo3: Завести HelpTopic}, DKLangConstW('SWzPageFileOps_RepairSelLinks'));
+    Controller.CreatePage(TfrWzPage_Processing,            IWzFileOpsPageID_Processing,     IDH_intf_file_ops_process,   DKLangConstW('SWzPageFileOps_Processing'));
+    Controller.CreatePage(TfrWzPage_Log,                   IWzFileOpsPageID_Log,            IDH_intf_file_ops_log,       DKLangConstW('SWzPageFileOps_Log'));
   end;
 
   procedure TdFileOpsWizard.DoSelectPictures;
@@ -804,7 +807,7 @@ uses
     FCDOpt_CreateAutorun         := True;
     FCDOpt_CopyIniSettings       := True;
     FCDOpt_CopyLangFile          := True;
-    FCDOpt_MediaLabel            := ConstVal('SPhotoAlbumNode');
+    FCDOpt_MediaLabel            := DKLangConstW('SPhotoAlbumNode');
     FCDOpt_PhoaDesc              := FApp.Project.Description;
     FCDOpt_PhoaFileName          := ExtractFileName(FApp.Project.FileName);
     FMoveFile_ReplaceChar        := '_';
@@ -818,7 +821,7 @@ uses
   end;
 
   procedure TdFileOpsWizard.FinalizeProcessing;
-  var sDestPath: {!!!}String;
+  var wsDestPath: WideString;
 
     procedure SaveExportedProject;
     begin
@@ -827,18 +830,19 @@ uses
         LogSuccess('SLogEntry_PhoaSavedOK', [FExportedProject.FileName]);
       except
         on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, e.Message]);
+        {??? WideException}
       end;
     end;
 
     procedure CopyExecutable;
     begin
-      if CopyFile(
-          PChar(sApplicationPath+SPhoaExecutableFileName),
-          PChar(sDestPath+SPhoaExecutableFileName),
+      if WideCopyFile(
+          PWideChar(wsApplicationPath+SPhoaExecutableFileName),
+          PWideChar(wsDestPath+SPhoaExecutableFileName),
           False) then
         LogSuccess('SLogEntry_ExecutableCopiedOK', [FDestinationFolder])
       else
-        LogFailure('SLogEntry_ExecutableCopyingError', [FDestinationFolder, SysErrorMessage(GetLastError)]);
+        LogFailure('SLogEntry_ExecutableCopyingError', [FDestinationFolder, WideSysErrorMessage(GetLastError)]);
     end;
 
     procedure CopyLangFile;
@@ -870,11 +874,11 @@ uses
     procedure CreateAutorun;
     var fs: TFileStream;
 
-      procedure FSWriteLine(const s: String; const aParams: Array of const);
-      var sf: String;
+      procedure FSWriteLine(const ws: WideString; const aParams: Array of const);
+      var wsf: WideString;
       begin
-        sf := Format(s, aParams)+S_CRLF;
-        fs.Write(sf[1], Length(sf));
+        wsf := WideFormat(ws, aParams)+S_CRLF;
+        fs.Write(wsf[1], Length(wsf)*2);
       end;
 
     begin
@@ -949,7 +953,7 @@ uses
     end;
   end;
 
-  function TdFileOpsWizard.GetRelativeRegistryKey: String;
+  function TdFileOpsWizard.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegFileOps_Root;
   end;
@@ -990,10 +994,10 @@ uses
       end;
   end;
 
-  procedure TdFileOpsWizard.LogFailure(const s: String; const aParams: array of const);
+  procedure TdFileOpsWizard.LogFailure(const ws: WideString; const aParams: array of const);
   begin
     Inc(FCountErrors);
-    FLog.Add('[!] '+ConstVal(s, aParams));
+    FLog.Add('[!] '+DKLangConstW(ws, aParams));
   end;
 
   function TdFileOpsWizard.LogPage_GetLog(iPageID: Integer): TStrings;
@@ -1001,9 +1005,9 @@ uses
     Result := FLog;
   end;
 
-  procedure TdFileOpsWizard.LogSuccess(const s: String; const aParams: array of const);
+  procedure TdFileOpsWizard.LogSuccess(const ws: WideString; const aParams: array of const);
   begin
-    FLog.Add('[+] '+ConstVal(s, aParams));
+    FLog.Add('[+] '+DKLangConstW(ws, aParams));
   end;
 
   procedure TdFileOpsWizard.PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer);
@@ -1038,14 +1042,14 @@ uses
     end;
   end;
 
-  function TdFileOpsWizard.ProcPage_GetCurrentStatus: String;
+  function TdFileOpsWizard.ProcPage_GetCurrentStatus: WideString;
   begin
      // Если процесс активен, отображаем прогресс
     if FProcessing then
-      Result := ConstVal('SWzFileOps_Processing', [ProcPage_GetProgressCur+1, FInitialPicCount, FCountErrors, FSelectedPics[0].FileName])
+      Result := DKLangConstW('SWzFileOps_Processing', [ProcPage_GetProgressCur+1, FInitialPicCount, FCountErrors, FSelectedPics[0].FileName])
      // Иначе пишем информацию о возможности продолжения
     else
-      Result := ConstVal('SWzFileOps_Paused', [FCountSucceeded, FCountErrors]);
+      Result := DKLangConstW('SWzFileOps_Paused', [FCountSucceeded, FCountErrors]);
   end;
 
   function TdFileOpsWizard.ProcPage_GetProcessingActive: Boolean;
@@ -1072,7 +1076,7 @@ uses
 
      // Добавляет запись файла к FRepair_FileLinks и заносит в него ссылки на изображения, которым он подходит по
      //   текущим заданным критериям
-    procedure AddFile(const sPath: String; const SRec: TSearchRec);
+    procedure AddFile(const wsPath: WideString; const SRec: TSearchRecW);
     var
       FL: TFileLink;
       i: Integer;
@@ -1086,9 +1090,9 @@ uses
          // Проверяем совпадение - сначала по размеру, потом по имени файла (так быстрее)
         bMatches := True;
         if bMatches and (formfSize in FRepair_MatchFlags) then bMatches := SRec.Size=Pic.FileSize;
-        if bMatches and (formfName in FRepair_MatchFlags) then bMatches := AnsiSameText(SRec.Name, ExtractFileName(Pic.FileName));
+        if bMatches and (formfName in FRepair_MatchFlags) then bMatches := WideSameText(SRec.Name, WideExtractFileName(Pic.FileName));
          // Проверяем доступность по "занятости" другим изображением
-        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FApp.Project.Pics.IndexOfFileName(sPath+SRec.Name)<0;
+        if bMatches and not FRepair_RelinkFilesInUse      then bMatches := FApp.Project.Pics.IndexOfFileName(wsPath+SRec.Name)<0;
          // Если подходит
         if bMatches then begin
            // Создаём файл, если он ещё не создан
@@ -1100,25 +1104,25 @@ uses
     end;
 
      // Рекурсивно добавляет каталог sPath
-    procedure AddFolder(const sPath: String; bRecurse: Boolean);
+    procedure AddFolder(const wsPath: WideString; bRecurse: Boolean);
     var
-      sr: TSearchRec;
+      sr: TSearchRecW;
       iRes: Integer;
     begin
-      iRes := FindFirst(sPath+'*.*', faAnyFile, sr);
+      iRes := WideFindFirst(wsPath+'*.*', faAnyFile, sr);
       try
         while iRes=0 do begin
           if sr.Name[1]<>'.' then
              // Если каталог - рекурсивно сканируем
             if sr.Attr and faDirectory<>0 then begin
-              if bRecurse then AddFolder(sPath+sr.Name+'\', True);
+              if bRecurse then AddFolder(wsPath+sr.Name+'\', True);
              // Если файл и расширение знакомого типа - добавляем к списку
-            end else if FileFormatList.GraphicFromExtension(ExtractFileExt(sr.Name))<>nil then
+            end else if FileFormatList.GraphicFromExtension{!!! Not Unicode-enabled solution } (WideExtractFileExt(sr.Name))<>nil then
               AddFile(sPath, sr);
-          iRes := FindNext(sr);
+          iRes := WideFindNext(sr);
         end;
       finally
-        FindClose(sr);
+        WideFindClose(sr);
       end;
     end;
 
@@ -1132,13 +1136,13 @@ uses
   procedure TdFileOpsWizard.SettingsInitialLoad(rif: TRegIniFile);
   begin
     inherited SettingsInitialLoad(rif);
-    FDestinationFolder := rif.ReadString('', 'DestinationFolder', '');
+    FDestinationFolder := rif.ReadString('', 'DestinationFolder', ''); {!!! Not Unicode-enabled solution }
   end;
 
   procedure TdFileOpsWizard.SettingsInitialSave(rif: TRegIniFile);
   begin
     inherited SettingsInitialSave(rif);
-    rif.WriteString ('', 'DestinationFolder', FDestinationFolder);
+    rif.WriteString ('', 'DestinationFolder', FDestinationFolder); {!!! Not Unicode-enabled solution }
   end;
 
   procedure TdFileOpsWizard.StartProcessing;
@@ -1185,4 +1189,5 @@ uses
   end;
 
 end.
+
 

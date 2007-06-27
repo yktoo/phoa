@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrExprPicFilter.pas,v 1.3 2005-08-15 11:25:11 dale Exp $
+//  $Id: ufrExprPicFilter.pas,v 1.4 2007-06-27 18:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -72,7 +72,7 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
      // Возвращает базовый ключ реестра для сохранения настроек редактора
-    function  GetRegistryKey: String;
+    function  GetRegistryKey: WideString;
      // Обновляет достпуность Actions
     procedure EnableActions;
      // Событие клика на пункте вставки свойства изображения в выражение
@@ -80,18 +80,18 @@ type
      // Событие клика на пункте вставки оператора в выражение
     procedure ExprInsertOpClick(Sender: TObject);
      // Загрузка/сохранение текущего выражения в файле
-    procedure ExpressionLoad(const sFileName: String);
-    procedure ExpressionSave(const sFileName: String);
+    procedure ExpressionLoad(const wsFileName: WideString);
+    procedure ExpressionSave(const wsFileName: WideString);
      // Вызывает OnExpressionChange
     procedure DoExpressionChange;
      // Загрузка/сохрвнение настроек в реестре
     procedure LoadSettings;
     procedure SaveSettings;
      // Prop handlers
-    function  GetExpression: String;
-    procedure SetExpression(const Value: String);
-    function GetCaretPos: TPoint;
+    function  GetCaretPos: TPoint;
+    function  GetExpression: WideString;
     procedure SetCaretPos(const Value: TPoint);
+    procedure SetExpression(const Value: WideString);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -101,7 +101,7 @@ type
      // -- Положение курсора в редакторе
     property CaretPos: TPoint read GetCaretPos write SetCaretPos;  
      // -- Собственно текст выражения
-    property Expression: String read GetExpression write SetExpression;
+    property Expression: WideString read GetExpression write SetExpression;
      // Events
      // -- Вызывается при изменении выражения в редакторе
     property OnExpressionChange: TNotifyEvent read FOnExpressionChange write FOnExpressionChange;
@@ -115,7 +115,7 @@ uses
 
 var
    // Файл, использовавшийся в последний раз для загрузки/сохранения файла выражения
-  sLastExpressionFile: String;
+  wsLastExpressionFile: WideString;
 
   procedure TfrExprPicFilter.aaCopy(Sender: TObject);
   begin
@@ -138,9 +138,9 @@ var
       try
         DefaultExt := SDefaultSearchExpressionFileExt;
         FileName   := sLastExpressionFile;
-        Filter     := ConstVal('SFileFilter_SearchExpr');
+        Filter     := DKLangConstW('SFileFilter_SearchExpr');
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_OpenSearchExpr');
+        Title      := DKLangConstW('SDlgTitle_OpenSearchExpr');
         if Execute then ExpressionLoad(FileName);
       finally
         Free;
@@ -163,9 +163,9 @@ var
       try
         DefaultExt := SDefaultSearchExpressionFileExt;
         FileName   := sLastExpressionFile;
-        Filter     := ConstVal('SFileFilter_SearchExpr');
+        Filter     := DKLangConstW('SFileFilter_SearchExpr');
         Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_SaveSearchExprAs');
+        Title      := DKLangConstW('SDlgTitle_SaveSearchExprAs');
         if Execute then ExpressionSave(FileName);
       finally
         Free;
@@ -204,17 +204,17 @@ var
     procedure AddExprInsertPropItems;
     var
       pp: TPicProperty;
-      sProp: String;
+      wsProp: WideString;
     begin
       for pp := Low(pp) to High(pp) do begin
-        sProp := '$'+PicPropToStr(pp, True);
-        AddTBXMenuItem(
+        wsProp := '$'+PicPropToStr(pp, True);
+        AddTBXMenuItem( {!!! Not Unicode-enabled solution }
           smInsertProp,
-          Format('%s - %s', [sProp, PicPropName(pp)]),
+          WideFormat('%s - %s', [wsProp, PicPropName(pp)]),
           -1,
           Byte(pp),
           ExprInsertPropClick);
-        scpMain.AddItem(sProp, sProp);
+        scpMain.AddItem(wsProp, wsProp); {!!! Not Unicode-enabled solution }
       end;
     end;
 
@@ -295,25 +295,25 @@ var
     end;
   end;
 
-  procedure TfrExprPicFilter.ExpressionLoad(const sFileName: String);
+  procedure TfrExprPicFilter.ExpressionLoad(const wsFileName: WideString);
   begin
     BeginUpdate;
     try
-      eExpression.Lines.LoadFromFile(sFileName);
-      mruOpen.Add(sFileName);
-      sLastExpressionFile := sFileName;
+      eExpression.Lines.LoadFromFile(wsFileName); {!!! Not Unicode-enabled solution }
+      mruOpen.Add(wsFileName);
+      wsLastExpressionFile := wsFileName;
     finally
       EndUpdate;
     end;
   end;
 
-  procedure TfrExprPicFilter.ExpressionSave(const sFileName: String);
+  procedure TfrExprPicFilter.ExpressionSave(const wsFileName: WideString);
   begin
     BeginUpdate;
     try
-      eExpression.Lines.SaveToFile(sFileName);
-      mruOpen.Add(sFileName);
-      sLastExpressionFile := sFileName;
+      eExpression.Lines.SaveToFile(wsFileName); {!!! Not Unicode-enabled solution }
+      mruOpen.Add(wsFileName);
+      wsLastExpressionFile := wsFileName;
     finally
       EndUpdate;
     end;
@@ -339,12 +339,12 @@ var
     Result := TPoint(eExpression.CaretXY);
   end;
 
-  function TfrExprPicFilter.GetExpression: String;
+  function TfrExprPicFilter.GetExpression: WideString;
   begin
     Result := eExpression.Text;
   end;
 
-  function TfrExprPicFilter.GetRegistryKey: String;
+  function TfrExprPicFilter.GetRegistryKey: WideString;
   begin
     Result := SRegRoot+'\'+SRegDialogsRoot+'\'+SRegPicFilterExprEditor_Root;
   end;
@@ -383,7 +383,7 @@ var
     eExpression.CaretXY := TBufferCoord(Value);
   end;
 
-  procedure TfrExprPicFilter.SetExpression(const Value: String);
+  procedure TfrExprPicFilter.SetExpression(const Value: WideString);
   begin
     eExpression.Text := Value;
   end;

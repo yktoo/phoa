@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.27 2007-06-26 18:03:20 dale Exp $
+//  $Id: phIntf.pas,v 1.28 2007-06-27 18:29:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -18,13 +18,13 @@ type
   EPhoaWideException = class(Exception)
   private
      // Prop storage
-    FMessageW: WideString;
+    FWideMessage: WideString;
   public
     constructor Create(const wsMessage: WideString);
     constructor CreateFmt(const wsMessage: WideString; const Args: Array of const);
      // Props
      // -- Unicode message
-    property MessageW: WideString read FMessageW;
+    property WideMessage: WideString read FWideMessage;
   end;
 
   EPhoaWideExceptionClass = class of EPhoaWideException;
@@ -595,14 +595,14 @@ implementation
 
   constructor EPhoaWideException.Create(const wsMessage: WideString);
   begin
-    inherited Create(wsMsg); // Implicit conversion to Ansi is done here
-    FMessageW := wsMsg;
+    inherited Create(wsMessage); // Implicit conversion to Ansi is done here
+    FWideMessage := wsMessage;
   end;
 
   constructor EPhoaWideException.CreateFmt(const wsMessage: WideString; const Args: array of const);
   begin
-    inherited CreateFmt(wsMsg, Args); // Implicit conversion to Ansi is done here
-    FMessageW := WideFormat(wsMsg, Args);
+    inherited CreateFmt(wsMessage, Args); // Implicit conversion to Ansi is done here
+    FWideMessage := WideFormat(wsMessage, Args);
   end;
 
    //===================================================================================================================

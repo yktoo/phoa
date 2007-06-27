@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -80,30 +80,29 @@ uses phUtils, udFileOpsWizard, Main;
 
   procedure TfrWzPageFileOps_RepairSelLinks.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 //  var
-//    s: String;
+//    ws: WideString;
 //    Pic: IPhotoAlbumPic;
 //    FL: TFileLink;
   begin
-//    s := '';
+//    CellText := '';
 //     // Исходное изображение
 //    if Sender.NodeParent[Node]=nil then begin
 //      Pic := PPhoaPic(Sender.GetNodeData(Node))^;
 //      case Column of
-//        0: s := Pic.Props[ppFileName];
-//        1: s := Pic.Props[ppFilePath];
-//        2: s := HumanReadableSize(Pic.FileSize);
+//        0: CellText := Pic.Props[ppFileName];
+//        1: CellText := Pic.Props[ppFilePath];
+//        2: CellText := HumanReadableSize(Pic.FileSize);
 //      end;
 //     // Найденный файл
 //    end else begin
 //      FL := PFileLink(Sender.GetNodeData(Node))^;
 //      case Column of
-//        0: s := FL.FileName;
-//        1: s := FL.FilePath;
-//        2: s := HumanReadableSize(FL.FileSize);
-//        3: s := DateTimeToStr(FL.FileTime, AppFormatSettings);
+//        0: CellText := FL.FileName;
+//        1: CellText := FL.FilePath;
+//        2: CellText := HumanReadableSize(FL.FileSize);
+//        3: CellText := DateTimeToStr(FL.FileTime, AppFormatSettings);
 //      end;
 //    end;
-//    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrWzPageFileOps_RepairSelLinks.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

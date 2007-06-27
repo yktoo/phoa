@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.89 2007-06-16 13:49:45 dale Exp $
+//  $Id: Main.pas,v 1.90 2007-06-27 18:29:08 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -660,9 +660,9 @@ uses
       try
         DefaultExt := SDefaultIniFileExt;
         FileName   := SDefaultIniFileName;
-        Filter     := ConstVal('SFileFilter_Ini');
+        Filter     := DKLangConstW('SFileFilter_Ini');
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_OpenIni');
+        Title      := DKLangConstW('SDlgTitle_OpenIni');
         if Execute then DoIniLoad(FileName);
       finally
         Free;
@@ -675,9 +675,9 @@ uses
       try
         DefaultExt := SDefaultIniFileExt;
         FileName   := SDefaultIniFileName;
-        Filter     := ConstVal('SFileFilter_Ini');
+        Filter     := DKLangConstW('SFileFilter_Ini');
         Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_SaveIni');
+        Title      := DKLangConstW('SDlgTitle_SaveIni');
         if Execute then IniSaveSettings(FileName);
       finally
         Free;
@@ -728,9 +728,9 @@ uses
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultExt;
-        Filter     := ConstVal('SFileFilter_OpenPhoa');
+        Filter     := DKLangConstW('SFileFilter_OpenPhoa');
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-        Title      := ConstVal('SDlgTitle_OpenPhoa');
+        Title      := DKLangConstW('SDlgTitle_OpenPhoa');
         if Execute and CheckSave then DoLoad(FileName);
       finally
         Free;
@@ -789,7 +789,7 @@ uses
         Filter      := GetPhoaSaveFilter;
         FilterIndex := ValidRevisionIndex(GetIndexOfRevision(FProject.FileRevision))+1;
         Options     := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
-        Title       := ConstVal('SDlgTitle_SavePhoa');
+        Title       := DKLangConstW('SDlgTitle_SavePhoa');
         FileName    := DisplayFileName;
         if Execute then DoSave(FileName, aPhFileRevisions[ValidRevisionIndex(FilterIndex-1)].iNumber);
       finally
@@ -876,7 +876,7 @@ uses
       StateChanged([asFileNameChangePending]);
     end;
      // Настраиваем Help-файл
-    Application.HelpFile := sApplicationPath+ConstVal('SHelpFileName');
+    Application.HelpFile := sApplicationPath+DKLangConstW('SHelpFileName');
   end;
 
   procedure TfMain.ApplySettings;
@@ -1976,7 +1976,7 @@ uses
 
   procedure TfMain.ulToolbarUndoChange(Sender: TObject);
   begin
-    tbxlToolbarUndo.UpdateCaption(ConstVal('SUndoOperationCount', [ulToolbarUndo.ItemIndex+1]));
+    tbxlToolbarUndo.UpdateCaption(DKLangConstW('SUndoOperationCount', [ulToolbarUndo.ItemIndex+1]));
   end;
 
   procedure TfMain.ulToolbarUndoClick(Sender: TObject);
@@ -2047,7 +2047,7 @@ uses
       bPicSel := Viewer.SelectedPics.Count>0;
       bView   := FProject.ViewIndex>=0;
        // Настраиваем Actions/Menus
-      aUndo.Caption := ConstVal(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
+      aUndo.Caption := DKLangConstW(iif(FUndo.CanUndo, 'SUndoActionTitle', 'SCannotUndo'), [FUndo.LastOpName]);
       aUndo.Enabled                  := FUndo.CanUndo;
       smUndoHistory.Enabled          := FUndo.CanUndo;
       aNewGroup.Enabled              := gnk in [gnkProject, gnkPhoaGroup];
@@ -2092,7 +2092,7 @@ uses
     procedure Adjust_Title;
     var ws: WideString;
     begin
-      ws := WideFormat('[%s%s] - %s', [WideExtractFileName(DisplayFileName), iif(FUndo.IsUnmodified, '', '*'), ConstVal('SAppCaption')]);
+      ws := WideFormat('[%s%s] - %s', [WideExtractFileName(DisplayFileName), iif(FUndo.IsUnmodified, '', '*'), DKLangConstW('SAppCaption')]);
       Caption           := ws;
       Application.Title := ws;
     end;
@@ -2100,8 +2100,8 @@ uses
      // Настраивает информацию о текущем выделении
     procedure Adjust_SelInfo;
     begin
-      sbarMain.Panels[1].Caption := ConstVal('SPicCount',         [FProject.Pics.Count]);
-      sbarMain.Panels[2].Caption := ConstVal('SSelectedPicCount', [Viewer.SelectedPics.Count]);
+      sbarMain.Panels[1].Caption := DKLangConstW('SPicCount',         [FProject.Pics.Count]);
+      sbarMain.Panels[2].Caption := DKLangConstW('SSelectedPicCount', [Viewer.SelectedPics.Count]);
     end;
 
   begin
@@ -2189,3 +2189,4 @@ uses
   end;
 
 end.
+

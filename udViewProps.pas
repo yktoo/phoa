@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.19 2005-05-15 09:03:08 dale Exp $
+//  $Id: udViewProps.pas,v 1.20 2007-06-27 18:29:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -114,14 +114,14 @@ uses
 
   procedure TdViewProps.ButtonClick_OK;
   var
-    sExpression: String;
+    wsExpression: WideString;
     PicFilter: IPhoaParsingPicFilter;
   begin
      // Проверяем синтаксис выражения фильтра
-    sExpression := frExprPicFilter.Expression;
-    if Trim(sExpression)<>'' then begin
+    wsExpression := frExprPicFilter.Expression;
+    if Trim(wsExpression)<>'' then begin
       PicFilter := NewPhoaParsingPicFilter;
-      PicFilter.Expression := sExpression;
+      PicFilter.Expression := wsExpression;
       try
         PicFilter.ParseExpression(True, True);
       except

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.4 2007-06-24 17:47:55 dale Exp $
+//  $Id: phFrm.pas,v 1.5 2007-06-27 18:29:10 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -106,7 +106,7 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
       Position    := poScreenCenter;
     end;
      // Настраиваем шрифт
-    FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+    FontFromStr(Font, SettingValueWStr(ISettingID_Gen_MainFont));
      // Загружаем начальные настройки, если требуется
     rif := CreateRegIni;
     if rif<>nil then

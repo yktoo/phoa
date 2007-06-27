@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.10 2004-12-31 13:38:58 dale Exp $
+//  $Id: udAbout.pas,v 1.11 2007-06-27 18:29:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -37,7 +37,7 @@ type
      // Картинки заголовка
     FBmpTitle, FBmpAuthor, FBmpCredits: TBitmap32;
      // Строка состояния прогресса [при DialogMode=False]
-    FCurProgressStage: String;
+    FCurProgressStage: WideString;
      // Текущие отображаемые данные
     FShowDetail: TShowDetail;
      // Флаг отрисовки анимации
@@ -59,7 +59,7 @@ type
     procedure PaintTitleLayer(Sender: TObject; Buffer: TBitmap32);
     procedure PaintProgressLayer(Sender: TObject; Buffer: TBitmap32);
      // Создаёт TBitmap32 и загружает его из PNG-ресурса
-    function  CreatePNGBitmap(const sResourceName: String; bAlpha: Byte): TBitmap32;
+    function  CreatePNGBitmap(const wsResourceName: WideString; bAlpha: Byte): TBitmap32;
      // Возвращает текущий отображаемый Bitmap заголовка
     function  CurBitmap: TBitmap32;
      // Начинает закрытие окошка [в режиме DialogMode]
@@ -68,7 +68,7 @@ type
      // Создаёт диалог
     constructor Create(bDialogMode: Boolean); reintroduce;
      // Отображает заданную стадию прогресса [НЕ в режиме DialogMode]
-    procedure DisplayStage(const sStage: String);
+    procedure DisplayStage(const wsStage: WideString);
      // Скрывает окно
     procedure HideWindow;
      // Props
@@ -83,7 +83,7 @@ type
    // Отображает модальный диалог "О программе"
   procedure ShowAbout(bAnimateFadeout: Boolean);
    // Отображает прогресс загрузки, если окно прогресса отображается
-  procedure ShowProgressInfo(const sConstName: String; const aParams: array of const);
+  procedure ShowProgressInfo(const sConstName: AnsiString; const aParams: array of const);
    // Уничтожает окно прогресса, если оно есть
   procedure HideProgressWnd;
    // Если есть окошко прогресса, держит окно Wnd позади него
@@ -122,9 +122,9 @@ var
       end;
   end;
 
-  procedure ShowProgressInfo(const sConstName: String; const aParams: array of const);
+  procedure ShowProgressInfo(const sConstName: AnsiString; const aParams: array of const);
   begin
-    if ProgressWnd<>nil then ProgressWnd.DisplayStage(ConstVal(sConstName, aParams));
+    if ProgressWnd<>nil then ProgressWnd.DisplayStage(DKLangConstW(sConstName, aParams));
   end;
 
   procedure HideProgressWnd;
@@ -148,12 +148,12 @@ var
     DoInitialize;
   end;
 
-  function TdAbout.CreatePNGBitmap(const sResourceName: String; bAlpha: Byte): TBitmap32;
+  function TdAbout.CreatePNGBitmap(const wsResourceName: WideString; bAlpha: Byte): TBitmap32;
   var Png: TPNGGraphic;
   begin
     Png := TPNGGraphic.Create;
     try
-      Png.LoadFromResourceName(HInstance, sResourceName);
+      Png.LoadFromResourceName(HInstance, wsResourceName); {!!! handle Unicode-enabled exceptions }
       Result := TBitmap32.Create;
       Result.Assign(Png);
       Result.DrawMode := dmBlend;
@@ -172,9 +172,9 @@ var
     end;
   end;
 
-  procedure TdAbout.DisplayStage(const sStage: String);
+  procedure TdAbout.DisplayStage(const wsStage: WideString);
   begin
-    FCurProgressStage := sStage;
+    FCurProgressStage := wsStage;
     iMain.Invalidate;
     Update;
   end;

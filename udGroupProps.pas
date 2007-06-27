@@ -31,7 +31,7 @@ type
      // Буфер отката
     FUndoOperations: TPhoaOperations;
      // PNG-данные значка группы
-    FGroupIconData: String;
+    FGroupIconData: TPhoaRawData;
      // Обновляет отображаемый значок группы
     procedure UpdateGroupIcon;
   protected
@@ -78,7 +78,7 @@ uses GR32, GraphicEx, ConsVars, phUtils, phGraphics, Main, phFrm;
       try
         Filter   := FileFormatList.GetGraphicFilter([], fstExtension, [foCompact, foIncludeAll, foIncludeExtension], nil);
         Options  := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
-        Title    := ConstVal('SDlgTitle_SelectPicFile');
+        Title    := DKLangConstW('SDlgTitle_SelectPicFile');
         if Execute then begin
           FGroupIconData := GetBmp32ThumbnailData(FileName, Size(16, 16), psfLanczos, ImageSize, ThumbSize);
           UpdateGroupIcon;

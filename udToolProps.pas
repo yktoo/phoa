@@ -94,10 +94,10 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
   end;
 
   procedure TdToolProps.bBrowseRunFolderClick(Sender: TObject);
-  var s: String;
+  var ws: WideString;
   begin
-    s := eRunFolder.Text;
-    if SelectDirectory(ConstVal('SDlgTitle_SelectFolder'), '', s) then eRunFolder.Text := s;
+    ws := eRunFolder.Text;
+    if WideSelectDirectory(DKLangConstW('SDlgTitle_SelectFolder'), '', ws) then eRunFolder.Text := ws;
   end;
 
   procedure TdToolProps.ButtonClick_OK;
@@ -105,26 +105,26 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
     Kind: TPhoaToolKind;
     iShowCmd: Integer;
     Usages: TPhoaToolUsages;
-    sName, sHint, sRunCommand, sRunFolder, sRunParams: String;
+    wsName, wsHint, wsRunCommand, wsRunFolder, wsRunParams: WideString;
   begin
     Kind    := TPhoaToolKind(cbKind.ItemIndex);
     if Kind in [ptkSeparator, ptkExtViewer] then begin
-      sName := '';
-      sHint := '';
+      wsName := '';
+      wsHint := '';
     end else begin
-      sName := eName.Text;
-      sHint := eHint.Text;
+      wsName := eName.Text;
+      wsHint := eHint.Text;
     end;
     if Kind in [ptkCustom, ptkExtViewer] then begin
-      iShowCmd    := GetCurrentCBObject(cbRunShowCommand);
-      sRunCommand := eRunCommand.Text;
-      sRunFolder  := eRunFolder.Text;
-      sRunParams  := eRunParams.Text;
+      iShowCmd     := GetCurrentCBObject(cbRunShowCommand);
+      wsRunCommand := eRunCommand.Text;
+      wsRunFolder  := eRunFolder.Text;
+      wsRunParams  := eRunParams.Text;
     end else begin
       iShowCmd    := SW_SHOWNORMAL;
-      sRunCommand := '';
-      sRunFolder  := '';
-      sRunParams  := '';
+      wsRunCommand := '';
+      wsRunFolder  := '';
+      wsRunParams  := '';
     end;
     Usages := [];
     if Kind<>ptkExtViewer then begin
@@ -135,18 +135,18 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
     end;
      // Новый инструмент
     if FTool=nil then begin
-      FTool := TPhoaToolSetting.Create(FPage, sName, sHint, sRunCommand, sRunFolder, sRunParams, eMasks.Text, Kind, iShowCmd, Usages);
+      FTool := TPhoaToolSetting.Create(FPage, wsName, wsHint, wsRunCommand, wsRunFolder, wsRunParams, eMasks.Text, Kind, iShowCmd, Usages);
        // Новый помечаем как изменённый
       FTool.Modified := True;
      // Существующий инструмент
     end else begin
       FTool.Kind           := Kind;
-      FTool.Name           := sName;
+      FTool.Name           := wsName;
       FTool.Masks          := eMasks.Text;
-      FTool.Hint           := sHint;
-      FTool.RunCommand     := sRunCommand;
-      FTool.RunParameters  := sRunParams;
-      FTool.RunFolder      := sRunFolder;
+      FTool.Hint           := wsHint;
+      FTool.RunCommand     := wsRunCommand;
+      FTool.RunParameters  := wsRunParams;
+      FTool.RunFolder      := wsRunFolder;
       FTool.RunShowCommand := iShowCmd;
       FTool.Usages         := Usages;
     end;

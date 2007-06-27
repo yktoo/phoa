@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.23 2007-06-24 17:48:10 dale Exp $
+//  $Id: phOps.pas,v 1.24 2007-06-27 18:29:16 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1138,7 +1138,7 @@ type
 
   function TPhoaOperation.Name: WideString;
   begin
-    Result := ConstVal(ClassName);
+    Result := DKLangConstW(ClassName);
   end;
 
   procedure TPhoaOperation.Perform(Params: IPhoaOperationParams; UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
@@ -1364,7 +1364,7 @@ type
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
      // Создаём дочернюю группу
     NewGroup := NewPhotoAlbumPicGroup(Group, Project.RootGroupX.MaxGroupID+1);
-    NewGroup.Text := ConstVal('SDefaultNewGroupName');
+    NewGroup.Text := DKLangConstW('SDefaultNewGroupName');
     OpParentGroup := Group;
     OpGroup       := NewGroup;
      // Возвращаем через Params созданную группу
@@ -2278,7 +2278,7 @@ type
     for i := 0 to Pics.Count-1 do begin
       Pic := Pics[i];
        // Удаляем файл
-      if not DeleteFile(Pic.FileName) then PhoaException(ConstVal('SErrCannotDeleteFile', [Pic.FileName, SysErrorMessage(GetLastError)]));
+      if not DeleteFile(Pic.FileName) then PhoaException(DKLangConstW('SErrCannotDeleteFile', [Pic.FileName, SysErrorMessage(GetLastError)]));
        // Удаляем изображение из всех групп
       DoDeletePic(Pic.ID, Project.RootGroupX);
        // Удаляем изображение из списка изображений проекта

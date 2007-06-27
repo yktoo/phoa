@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.2 2007-06-27 18:29:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -48,8 +48,8 @@ type
      // Настраивает кнопку и панель расширенных опций
     procedure AdjustAdvancedCtls(bShowAdvanced: Boolean);
      // IPhoaWizardPage_PreviewInfo
+    function  GetCurrentFileName: WideString;
     procedure PreviewVisibilityChanged(bVisible: Boolean);
-    function  GetCurrentFileName: String;
   protected
     function  GetDataValid: Boolean; override;
     function  NextPage: Boolean; override;
@@ -66,7 +66,7 @@ uses
   begin
     gbFilter.Visible := bShowAdvanced;
     bAdvanced.Tag := iif(bShowAdvanced, 1, 0);
-    bAdvanced.Caption := ConstVal(iif(bShowAdvanced, 'SBtn_ExpandOn', 'SBtn_ExpandOff'));
+    bAdvanced.Caption := DKLangConstW(iif(bShowAdvanced, 'SBtn_ExpandOn', 'SBtn_ExpandOff'));
   end;
 
   procedure TfrWzPageAddFiles_SelFiles.bAdvancedClick(Sender: TObject);
@@ -124,7 +124,7 @@ uses
     cbFileSizeToUnit.Items.Assign(cbFileSizeFromUnit.Items);
   end;
 
-  function TfrWzPageAddFiles_SelFiles.GetCurrentFileName: String;
+  function TfrWzPageAddFiles_SelFiles.GetCurrentFileName: WideString;
   var
     Namespace: TNamespace;
     Node: PVirtualNode;

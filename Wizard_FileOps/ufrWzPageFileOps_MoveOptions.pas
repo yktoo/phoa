@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -129,29 +129,29 @@ uses phUtils, udFileOpsWizard, phMsgBox;
 
   procedure TfrWzPageFileOps_MoveOptions.MakeBaseFoldersLoaded;
   var
-    sPath, sPicPath: String;
+    wsPath, wsPicPath: WideString;
     i, iBSlashPos: Integer;
   begin
     if cbBaseFolder.Items.Count=0 then begin
        // Ищем самый длинный общий путь
-      sPath := '';
+      wsPath := '';
       for i := 0 to TdFileOpsWizard(StorageForm).SelectedPics.Count-1 do begin
-        sPicPath := ExtractFilePath(TdFileOpsWizard(StorageForm).SelectedPics[i].FileName);
-        if i=0 then sPath := sPicPath else sPath := LongestCommonPart(sPath, sPicPath);
+        wsPicPath := WideExtractFilePath(TdFileOpsWizard(StorageForm).SelectedPics[i].FileName);
+        if i=0 then wsPath := wsPicPath else wsPath := LongestCommonPart(wsPath, wsPicPath);
          // Если строка уже пустая, выходим
-        if sPath='' then Break;
+        if wsPath='' then Break;
       end;
        // Выделяем части по каждому каталогу
-      if (Length(sPath)>3) and (sPath[Length(sPath)]='\') then SetLength(sPath, Length(sPath)-1);
-      while sPath<>'' do begin
-        cbBaseFolder.Items.Add(sPath);
-        if Length(sPath)<=3 then Break;
-        iBSlashPos := LastDelimiter('\', sPath);
+      if (Length(wsPath)>3) and (wsPath[Length(sPath)]='\') then SetLength(wsPath, Length(wsPath)-1);
+      while wsPath<>'' do begin
+        cbBaseFolder.Items.Add(wsPath);
+        if Length(wsPath)<=3 then Break;
+        iBSlashPos := WideLastDelimiter('\', wsPath);
         if iBSlashPos=0 then Break;
-        Delete(sPath, iBSlashPos+iif((iBSlashPos=3) and (sPath[2]=':'), 1, 0), MaxInt);
+        Delete(wsPath, iBSlashPos+iif((iBSlashPos=3) and (wsPath[2]=':'), 1, 0), MaxInt);
       end;
        // Добавляем путь "(нет)"
-      cbBaseFolder.Items.Add(ConstVal('SNone'));
+      cbBaseFolder.Items.Add(DKLangConstW('SNone'));
        // Выбираем нужный пункт
       i := cbBaseFolder.Items.IndexOf(TdFileOpsWizard(StorageForm).MoveFile_BasePath);
       if i<0 then i:= 0;
@@ -165,7 +165,7 @@ uses phUtils, udFileOpsWizard, phMsgBox;
     Group: IPhotoAlbumPicGroup;
     i: Integer;
     Wiz: TdFileOpsWizard;
-    sRootGroupName: String;
+    wsRootGroupName: WideString;
 
      // Заполняет List группами, представляющими собой путь к Group
     procedure FillPath(Group: IPhotoAlbumPicGroup; List: IPhotoAlbumPicGroupList);
@@ -208,7 +208,7 @@ uses phUtils, udFileOpsWizard, phMsgBox;
         end;
       end;
        // Выделяем части пути, пишем в Items[] - путь группы, в Items.Objects[] - ссылку на группу
-      if Wiz.App.Project.CurrentView=nil then sRootGroupName := ConstVal('SPhotoAlbumNode') else sRootGroupName := Wiz.App.Project.CurrentView.Name;
+      if Wiz.App.Project.CurrentView=nil then sRootGroupName := DKLangConstW('SPhotoAlbumNode') else sRootGroupName := Wiz.App.Project.CurrentView.Name;
       for i := LPath.Count-1 downto 0 do begin
         Group := LPath[i];
         cbBaseGroup.Items.AddObject(Group.Path[sRootGroupName], Pointer(Group));
@@ -259,49 +259,50 @@ uses phUtils, udFileOpsWizard, phMsgBox;
 
   function TfrWzPageFileOps_MoveOptions.ValidateFileNameFormat: Boolean;
   var
-    s, sProp: String;
+    ws, wsProp: WideString;
     i1, i2: Integer;
     PProp: TPicProperty;
   begin
     Result := False;
      // Сначала проверяем отсутствие недопустимых символов в имени файла
-    s := eFileNameFormat.Text;
-    if LastDelimiter(SInvalidPathChars, s)>0 then
+    ws := eFileNameFormat.Text;
+    if WideLastDelimiter(SInvalidPathChars, ws)>0 then
       PhoaError('SErrInvalidCharsInFileName')
      // Проверяем синтаксис и верность имён подстановочных переменных
     else begin
       repeat
          // Проверяем сбалансированность фигурных скобок
-        i1 := Pos('{', s);
-        i2 := Pos('}', s);
+        i1 := Pos('{', ws);
+        i2 := Pos('}', ws);
         if (i1=0) and (i2=0) then Break;
         if (i1=0) or (i2=0) or (i1>i2) then begin
           PhoaError('SErrUnbalancedCurlyBraces');
           Exit;
         end;
          // Проверяем указание имени подстановочной переменной
-        sProp := Copy(s, i1+1, i2-i1-1);
-        if sProp='' then begin
+        wsProp := Copy(ws, i1+1, i2-i1-1);
+        if wsProp='' then begin
           PhoaError('SErrPicPropNameMissing');
           Exit;
         end;
          // Проверяем допустимость имени подстановочной переменной
-        PProp := StrToPicProp(sProp, False);
+        PProp := StrToPicProp(wsProp, False);
         if not (PProp in [Low(PProp)..High(PProp)]) then begin
-          PhoaError('SErrInvalidPicPropName', [sProp]);
+          PhoaError('SErrInvalidPicPropName', [wsProp]);
           Exit;
         end;
          // Проверяем, что не использованы свойства, содержащие путь к файлу
         if PProp in [ppFullFileName, ppFilePath] then begin
-          PhoaError('SErrCannotUsePathPropsInFormat', [sProp]);
+          PhoaError('SErrCannotUsePathPropsInFormat', [wsProp]);
           Exit;
         end;
          // Удаляем обработанную часть строки из s
-        Delete(s, 1, i2); 
-      until s='';
+        Delete(ws, 1, i2);
+      until ws='';
       Result := True;
     end;
   end;
 
 end.
+
 

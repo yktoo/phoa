@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.16 2005-08-15 11:25:11 dale Exp $
+//  $Id: phWizForm.pas,v 1.17 2007-06-27 18:29:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -45,7 +45,7 @@ type
     function  GetCurPage: TWizardPage;
     function  GetCurPageID: Integer;
   protected
-    function  GetRelativeRegistryKey: String; override; abstract;
+    function  GetRelativeRegistryKey: WideString; override; abstract;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure DoDestroy; override;
@@ -194,7 +194,7 @@ uses phUtils, phSettings, phGUIObj;
     bNext.Enabled   := IsBtnNextEnabled;
     bNext.Default   := bNext.Enabled;
     bCancel.Enabled := IsBtnCancelEnabled;
-    bCancel.Caption := ConstVal(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
+    bCancel.Caption := DKLangConstW(iif(HasUpdates, 'SBtn_Close', 'SBtn_Cancel'));
     bCancel.Default := not bNext.Default and bCancel.Enabled;
      // Устанавливаем heading
     if CurPage<>nil then lHeading.Caption := CurPage.PageTitle;
@@ -211,4 +211,5 @@ uses phUtils, phSettings, phGUIObj;
   end;
 
 end.
+
 

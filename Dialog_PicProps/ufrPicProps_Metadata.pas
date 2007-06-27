@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.3 2007-06-27 18:29:57 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -135,7 +135,7 @@ type
             IMS_InvalidTIFFHeader: CellText := 'IMS_InvalidTIFFHeader';
             else                   CellText := 'IMS_InternalError';
           end;
-          if CellText<>'' then CellText := ConstVal(CellText);
+          if CellText<>'' then CellText := DKLangConstW(CellText);
         end;
       end;
      // Для элементов строк метаданных (дочерних узлов по отношению к файлам)
@@ -199,10 +199,10 @@ type
   begin
     n := tvMain.FocusedNode;
     if tvMain.NodeParent[n]=nil then
-      ws := ConstVal('SMsg_NoMetatagSelected')
+      ws := DKLangConstW('SMsg_NoMetatagSelected')
     else begin
       ws := PPExifTag(tvMain.GetNodeData(n))^^.wsDesc;
-      if ws='' then ws := ConstVal('SNone');
+      if ws='' then ws := DKLangConstW('SNone');
     end;
     lDesc.Caption := ws;
   end;

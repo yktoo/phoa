@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMsgBox.pas,v 1.2 2007-06-24 17:47:59 dale Exp $
+//  $Id: phMsgBox.pas,v 1.3 2007-06-27 18:29:14 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -125,7 +125,7 @@ uses phUtils, phSettings, phChmHlp;
         FKind        := AKind;
         FButtons     := AButtons;
         FDiscardable := bDiscardable;
-        if bMsgIsConstName then FMessage := ConstVal(wsMessage) else FMessage := wsMessage;
+        FMessage     := wsMessage;
         Result := Execute;
       finally
         Free;
@@ -139,12 +139,12 @@ uses phUtils, phSettings, phChmHlp;
 
   function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
   begin
-    Result := PhoaMsgBox(AKind, ConstVal(sConstName), bDiscardable, AButtons);
+    Result := PhoaMsgBox(AKind, DKLangConstW(sConstName), bDiscardable, AButtons);
   end;
 
   function PhoaMsgBoxConst(AKind: TMessageBoxKind; const sConstName: AnsiString; const aParams: Array of const; bDiscardable: Boolean; AButtons: TMessageBoxButtons): TMessageBoxResults;
   begin
-    Result := PhoaMsgBox(AKind, ConstVal(sConstName, aParams), bDiscardable, AButtons);
+    Result := PhoaMsgBox(AKind, DKLangConstW(sConstName, aParams), bDiscardable, AButtons);
   end;
 
   procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0);
@@ -261,7 +261,7 @@ uses phUtils, phSettings, phChmHlp;
       with Result do begin
         Parent   := Self;
         Cancel   := (mbb=mbbCancel) or ((mbb=mbbOK) and not (mbbCancel in FButtons)) or ((mbb=mbbNo) and (FButtons*[mbbOK, mbbCancel]=[]));
-        Caption  := ConstVal(asBtnCaptionConsts[mbb]);
+        Caption  := DKLangConstW(asBtnCaptionConsts[mbb]);
         Default  := (mbb=mbbOK) or ((mbb=mbbYes) and not (mbbOK in FButtons));
         if Default then Self.ActiveControl := Result;
         if mbb=mbbHelp then OnClick := BtnHelpClick else OnClick := BtnClick;
@@ -304,7 +304,7 @@ uses phUtils, phSettings, phChmHlp;
       'SDlgTitle_ConfirmWarning', // mbkConfirmWarning
       'SDlgTitle_Error');         // mbkError
   begin
-    Caption := ConstVal(asCaptionConsts[FKind]);
+    Caption := DKLangConstW(asCaptionConsts[FKind]);
   end;
 
   procedure TdMsgBox.AdjustIcon;

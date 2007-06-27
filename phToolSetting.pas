@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.22 2007-06-24 17:48:23 dale Exp $
+//  $Id: phToolSetting.pas,v 1.23 2007-06-27 18:29:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -196,7 +196,7 @@ uses TypInfo, ShellAPI, Menus, ImgList, Forms, VTHeaderPopup, phUtils, Main, udT
 
   function PhoaToolKindName(Kind: TPhoaToolKind): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TPhoaToolKind), Byte(Kind)));
   end;
 
   procedure AddToolItem(Tool: TPhoaToolSetting; Item: TTBCustomItem; AOnClick: TNotifyEvent);
@@ -361,7 +361,7 @@ type
      else          iRes := 0;
     end;
      // Проверяем результат
-    if iRes<=32 then PhoaException(ConstVal('SErrExecutingToolFailed'), [FName, wsFileName, WideSysErrorMessage(GetLastError)]);
+    if iRes<=32 then PhoaException(DKLangConstW('SErrExecutingToolFailed'), [FName, wsFileName, WideSysErrorMessage(GetLastError)]);
   end;
 
   procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
@@ -637,12 +637,12 @@ type
      // Создаём меню
     pm := TTBXPopupMenu.Create(Self);
      // Наполняем пунктами
-    FItemDelete   := NewItem(iiDelete, ConstVal('SAction_Delete'),       'Del',       DeleteToolClick,   False);
+    FItemDelete   := NewItem(iiDelete, DKLangConstW('SAction_Delete'),       'Del',       DeleteToolClick,   False);
     NewSeparator;
-    FItemEdit     := NewItem(iiEdit,   ConstVal('SAction_EditEllipsis'), 'Alt+Enter', EditToolClick,     True);
+    FItemEdit     := NewItem(iiEdit,   DKLangConstW('SAction_EditEllipsis'), 'Alt+Enter', EditToolClick,     True);
     NewSeparator;
-    FItemMoveUp   := NewItem(iiUp,     ConstVal('SAction_MoveUp'),       'Ctrl+Up',   MoveToolUpClick,   False);
-    FItemMoveDown := NewItem(iiDown,   ConstVal('SAction_MoveDown'),     'Ctrl+Down', MoveToolDownClick, False);
+    FItemMoveUp   := NewItem(iiUp,     DKLangConstW('SAction_MoveUp'),       'Ctrl+Up',   MoveToolUpClick,   False);
+    FItemMoveDown := NewItem(iiDown,   DKLangConstW('SAction_MoveDown'),     'Ctrl+Down', MoveToolDownClick, False);
      // Привязываем ImageList
     pm.Images := fMain.ilActionsSmall;
      // Привязываем к дереву
@@ -744,7 +744,7 @@ type
     Setting := GetSetting(Node);
     if Setting<>nil then
       case Column of
-        IColIdx_ToolEditor_Masks:       if Setting.Masks='' then CellText := ConstVal('SAll') else CellText := Setting.Masks;
+        IColIdx_ToolEditor_Masks:       if Setting.Masks='' then CellText := DKLangConstW('SAll') else CellText := Setting.Masks;
         IColIdx_ToolEditor_Kind:        CellText := PhoaToolKindName(Setting.Kind);
         IColIdx_ToolEditor_Name:        CellText := ConstValEx(Setting.Name);
         IColIdx_ToolEditor_Hint:        CellText := ConstValEx(Setting.Hint);
@@ -870,7 +870,7 @@ type
     procedure AddColumn(const sConst: AnsiString; iWidth: Integer; bVisible: Boolean);
     begin
       with Header.Columns.Add do begin
-        Text    := ConstVal(sConst);
+        Text    := DKLangConstW(sConst);
         Width   := iWidth;
         Options := Options-[coAllowClick];
         if not bVisible then Options := Options-[coVisible];

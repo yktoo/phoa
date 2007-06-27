@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.55 2007-06-26 18:03:21 dale Exp $
+//  $Id: phUtils.pas,v 1.56 2007-06-27 18:29:26 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,8 +8,8 @@ unit phUtils;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Controls, Graphics, StdCtrls, Forms,
-  TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
+  Windows, Messages, SysUtils, Classes, Controls, Graphics, Forms,
+  TntSysUtils, TntClasses, TntStdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, ConsVars;
 
    // Exception raising
@@ -90,11 +90,11 @@ uses
    // Возвращает путь к каталогу временных файлов Windows
   function  GetWindowsTempPath: WideString;
 
-  function  iif(b: Boolean; const sTrue, sFalse: String): String;           overload;
+  function  iif(b: Boolean; const sTrue, sFalse: AnsiString): AnsiString;   overload;
   function  iif(b: Boolean; const wsTrue, wsFalse: WideString): WideString; overload;
   function  iif(b: Boolean; iTrue, iFalse: Integer): Integer;               overload;
   function  iif(b: Boolean; pTrue, pFalse: Pointer): Pointer;               overload;
-  function  iif(b: Boolean; sgTrue, sgFalse: Single): Single;                 overload;
+  function  iif(b: Boolean; sgTrue, sgFalse: Single): Single;               overload;
 
   procedure Swap(var A, B: WideString); overload;
   procedure Swap(var A, B: Integer);    overload;
@@ -223,7 +223,7 @@ uses
 implementation
 uses
   TypInfo, Variants, Registry, ShellAPI,
-  TntSysUtils, TntWideStrUtils, GR32,
+  TntWideStrUtils, GR32,
   DKLang,
   phSettings, phMsgBox, phPhoa, phGraphics;
 
@@ -711,7 +711,7 @@ var
             Delete(wsRelName, 1, i);
             if wsOneDir='..\' then begin
               i := LastDelimiter('\', Result);
-              if i=0 then PhoaException(ConstVal('SErrInvalidPicFileName'), [wsRelFileName]);
+              if i=0 then PhoaException(DKLangConstW('SErrInvalidPicFileName'), [wsRelFileName]);
               Delete(Result, i, MaxInt);
             end else
               Result := Result+'\'+Copy(wsOneDir, 1, Length(wsOneDir)-1);
@@ -744,7 +744,7 @@ var
     Result := WideIncludeTrailingPathDelimiter(awcBuf);
   end;
 
-  function iif(b: Boolean; const sTrue, sFalse: String): String;
+  function iif(b: Boolean; const sTrue, sFalse: AnsiString): AnsiString;
   begin
     if b then Result := sTrue else Result := sFalse;
   end;
@@ -1265,4 +1265,5 @@ var
   end;
 
 end.
+
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.22 2005-05-15 09:03:08 dale Exp $
+//  $Id: udStats.pas,v 1.23 2007-06-27 18:29:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -17,8 +17,8 @@ type
   PPStatsData = ^PStatsData;
   PStatsData = ^TStatsData;
   TStatsData = record
-    sName:   String;
-    sValue:  String;
+    wsName:  WideString;
+    wsValue: WideString;
     iImgIdx: Integer;
   end;
 
@@ -35,7 +35,7 @@ type
      // Собирает и отображает статистику проекта
     procedure LoadStats;
   protected
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure ExecuteInitialize; override;
@@ -74,7 +74,7 @@ uses phUtils, Main, phPhoa, phSettings;
     LoadStats;
   end;
 
-  function TdStats.GetRelativeRegistryKey: String;
+  function TdStats.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegStats_Root;
   end;
@@ -88,20 +88,17 @@ uses phUtils, Main, phPhoa, phSettings;
   var n0, n1: PVirtualNode;
 
      // Создаёт в памяти новый объект данных статистики
-    function NewStatData(const sName, sValue: String; iImgIdx: Integer = -1): PStatsData; overload;
-    var s: String;
+    function NewStatData(const wsName, wsValue: WideString; iImgIdx: Integer = -1): PStatsData; overload;
     begin
-       // Если строка начинается на '@' - это имя константы
-      if sName[1]='@' then s := ConstVal(Copy(sName, 2, MaxInt)) else s := sName;
       New(Result);
-      Result^.sName   := s;
-      Result^.sValue  := sValue;
-      Result^.iImgIdx := iImgIdx;
+      Result.wsName  := ConstValEx(wsName);
+      Result.wsValue := wsValue;
+      Result.iImgIdx := iImgIdx;
     end;
 
-    function NewStatData(const sName: String; iValue: Integer): PStatsData; overload;
+    function NewStatData(const wsName: WideString; iValue: Integer): PStatsData; overload;
     begin
-      Result := NewStatData(sName, IntToStr(iValue));
+      Result := NewStatData(wsName, IntToStr(iValue));
     end;
 
      // Добавляет узлы свойств файла фотоальбома
@@ -132,8 +129,8 @@ uses phUtils, Main, phPhoa, phSettings;
       i64AverageThumbSize: Int64; // Средний размер эскизов
       i64MaxFileSize: Int64;      // Размер самого большого файла
       i64MinFileSize: Int64;      // Размер самого маленького файла
-      sMaxFileName: String;       // Имя самого большого файла
-      sMinFileName: String;       // Имя самого маленького файла
+      wsMaxFileName: WideString;  // Имя самого большого файла
+      wsMinFileName: WideString;  // Имя самого маленького файла
       i: Integer;
       i64FSize: Int64;
       IDs: TIntegerList;
@@ -169,8 +166,8 @@ uses phUtils, Main, phPhoa, phSettings;
          // Считаем размеры файлов/эскизов
         i64MaxFileSize := 0;
         i64MinFileSize := MaxInt;
-        sMaxFileName   := '';
-        sMinFileName   := '';
+        wsMaxFileName  := '';
+        wsMinFileName  := '';
         for i := 0 to IDs.Count-1 do begin
           Pic := FApp.Project.Pics.ItemsByID[IDs[i]];
           i64FSize := Pic.FileSize;
@@ -179,12 +176,12 @@ uses phUtils, Main, phPhoa, phSettings;
            // -- Ищем самый большой файл
           if i64FSize>i64MaxFileSize then begin
             i64MaxFileSize := i64FSize;
-            sMaxFileName   := Pic.FileName;
+            wsMaxFileName  := Pic.FileName;
           end;
            // -- Ищем самый маленький файл
           if i64FSize<i64MinFileSize then begin
             i64MinFileSize := i64FSize;
-            sMinFileName   := Pic.FileName;
+            wsMinFileName  := Pic.FileName;
           end;
         end;
          // -- Находим средние значения
@@ -207,12 +204,12 @@ uses phUtils, Main, phPhoa, phSettings;
         AddChild(nParent, NewStatData('@SStat_AvgFileSize',     HumanReadableSize(i64AverageFileSize)));
         AddChild(nParent, NewStatData('@SStat_TotalThumbSize',  HumanReadableSize(i64TotalThumbSize)));
         AddChild(nParent, NewStatData('@SStat_AvgThumbSize',    HumanReadableSize(i64AverageThumbSize)));
-        if sMaxFileName<>'' then begin
-          AddChild(nParent, NewStatData('@SStat_MaxFileName',   sMaxFileName));
+        if wsMaxFileName<>'' then begin
+          AddChild(nParent, NewStatData('@SStat_MaxFileName',   wsMaxFileName));
           AddChild(nParent, NewStatData('@SStat_MaxFileSize',   HumanReadableSize(i64MaxFileSize)));
         end;
-        if sMinFileName<>'' then begin
-          AddChild(nParent, NewStatData('@SStat_MinFileName',   sMinFileName));
+        if wsMinFileName<>'' then begin
+          AddChild(nParent, NewStatData('@SStat_MinFileName',   wsMinFileName));
           AddChild(nParent, NewStatData('@SStat_MinFileSize',   HumanReadableSize(i64MinFileSize)));
         end;
       end;

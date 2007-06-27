@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.17 2007-06-26 18:03:22 dale Exp $
+//  $Id: phValSetting.pas,v 1.18 2007-06-27 18:29:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,8 @@ unit phValSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, StdCtrls, ExtCtrls, VirtualTrees,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, StdCtrls, ExtCtrls,
+  TntSysUtils, TntClasses, TntWideStrings, VirtualTrees,
   ConsVars, phSettings;
 
 type
@@ -38,7 +39,7 @@ type
      // Props
      // -- «начение (данные) в виде строки
     property AsWideString: WideString read GetAsWideString write SetAsWideString;
-     // -- ќтображаемое значение в виде строки. ¬ базовом классе совпадает с AsString
+     // -- ќтображаемое значение в виде строки. ¬ базовом классе совпадает с AsWideString
     property DisplayString: WideString read GetDisplayString;
   end;
 
@@ -152,7 +153,7 @@ type
      // -- »ндекс в Variants, соответствующий текущему Value; -1, если нет такого соответстви€
     property VariantIndex: Integer read GetVariantIndex write SetVariantIndex;
      // -- ƒочерние пункты (варианты) пункта. “екст закодирован по правилам ConstValEx()
-    property Variants: TStrings read FVariants;
+    property Variants: TWideStrings read FVariants;
      // -- “екст из Variants, соответствующий текущему ValueInt; пуста€ строка, если нет такого соответстви€
     property VariantText: WideString read GetVariantText;
   end;
@@ -333,25 +334,25 @@ type
 
   procedure TPhoaValSetting.IniLoad(IniFile: TIniFile);
   begin
-    if ID<>0 then AsString := IniFile.ReadString(SRegPrefs_Root, Name, AsString);
+    if ID<>0 then AsWideString := IniFile.ReadString(SRegPrefs_Root, Name, AsWideString);
     inherited IniLoad(IniFile);
   end;
 
   procedure TPhoaValSetting.IniSave(IniFile: TIniFile);
   begin
-    if ID<>0 then IniFile.WriteString(SRegPrefs_Root, Name, AsString);
+    if ID<>0 then IniFile.WriteString(SRegPrefs_Root, Name, AsWideString);
     inherited IniSave(IniFile);
   end;
 
   procedure TPhoaValSetting.RegLoad(RegIniFile: TRegIniFile);
   begin
-    if ID<>0 then AsString := RegIniFile.ReadString(SRegPrefs_Root, Name, AsString);
+    if ID<>0 then AsWideString := RegIniFile.ReadString(SRegPrefs_Root, Name, AsWideString);
     inherited RegLoad(RegIniFile);
   end;
 
   procedure TPhoaValSetting.RegSave(RegIniFile: TRegIniFile);
   begin
-    if ID<>0 then RegIniFile.WriteString(SRegPrefs_Root, Name, AsString);
+    if ID<>0 then RegIniFile.WriteString(SRegPrefs_Root, Name, AsWideString);
     inherited RegSave(RegIniFile);
   end;
 

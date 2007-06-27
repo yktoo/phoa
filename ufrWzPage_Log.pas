@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.13 2005-08-15 11:25:11 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.14 2007-06-27 18:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -47,7 +47,7 @@ type
      // Возвращает ссылку на протокол (через предметный интерфейс host-формы)
     function  GetLog: TStrings;
      // Осуществляет поиск записи протокола
-    procedure DoFind(const sPattern: String; bDown, bMatchCase: Boolean);
+    procedure DoFind(const wsPattern: WideString; bDown, bMatchCase: Boolean);
   protected
     procedure DoCreate; override;
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
@@ -112,7 +112,7 @@ uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
       for i := 0 to Log.Count-1 do
         if Log[i][2]='!' then Inc(iErrCount);
        // Отображаем информацию
-      lInfo.Caption := ConstVal(iif(iErrCount=0, 'SLogInfoNoErrors', 'SLogInfoWithErrors'), [Log.Count, iErrCount]);
+      lInfo.Caption := DKLangConstW(iif(iErrCount=0, 'SLogInfoNoErrors', 'SLogInfoWithErrors'), [Log.Count, iErrCount]);
     end;
   end;
 
@@ -122,24 +122,24 @@ uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
     ApplyTreeSettings(tvMain);
   end;
 
-  procedure TfrWzPage_Log.DoFind(const sPattern: String; bDown, bMatchCase: Boolean);
+  procedure TfrWzPage_Log.DoFind(const wsPattern: WideString; bDown, bMatchCase: Boolean);
   var
     n: PVirtualNode;
     GetProc: TGetNextNodeProc;
-    Log: TStrings;
-    sUpPattern: String;
+    Log: TWideStrings;
+    wsUpPattern: WideString;
 
-    function Matches(const s: String): Boolean;
-    var sMatch: String;
+    function Matches(const ws: WideString): Boolean;
+    var wsMatch: WideString;
     begin
-      if bMatchCase then sMatch := s else sMatch := AnsiUpperCase(s);
-      Result := Pos(sUpPattern, sMatch)>0;
+      if bMatchCase then wsMatch := ws else wsMatch := WideUpperCase(ws);
+      Result := Pos(wsUpPattern, wsMatch)>0;
     end;
 
   begin
      // Кэшируем данные для поиска
     Log := GetLog;
-    if bMatchCase then sUpPattern := sPattern else sUpPattern := AnsiUpperCase(sPattern);
+    if bMatchCase then wsUpPattern := wsPattern else wsUpPattern := WideUpperCase(wsPattern);
      // Определяем процедуру движения по узлам
     if bDown then GetProc := tvMain.GetNextVisible else GetProc := tvMain.GetPreviousVisible;
      // Цикл по узлам

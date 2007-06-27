@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.20 2005-05-17 13:14:39 dale Exp $
+//  $Id: udSettings.pas,v 1.21 2007-06-27 18:29:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -35,7 +35,7 @@ type
      // Prop handlers
     procedure SetCurPageSetting(Value: TPhoaPageSetting);
   protected
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
@@ -129,7 +129,7 @@ uses phUtils, Main, TypInfo;
     CurPageSetting := FLocalRootSetting.Settings[FDefPageSettingID] as TPhoaPageSetting;
   end;
 
-  function TdSettings.GetRelativeRegistryKey: String;
+  function TdSettings.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegSettings_Root;
   end;

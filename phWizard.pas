@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.7 2005-05-15 09:03:08 dale Exp $
+//  $Id: phWizard.pas,v 1.8 2007-06-27 18:29:29 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -13,7 +13,7 @@ uses
 
 type
    // Exception
-  EPhoaWizardError = class(Exception);
+  EPhoaWizardException = class(EPhoaWideException);
 
    // Метод смены страницы мастера
   TPageChangeMethod = (pcmBackBtn, pcmNextBtn, pcmForced);
@@ -49,7 +49,7 @@ type
      // Prop storage
     FController: TWizardController;
     FID: Integer;
-    FPageTitle: String;
+    FPageTitle: WideString;
      // Prop handlers
     function GetStorageForm: TPhoaForm;
     function GetIndex: Integer;
@@ -72,9 +72,9 @@ type
     function  NextPage: Boolean; virtual;
      // Prop handlers
     function  GetDataValid: Boolean; virtual;
-    function  GetRegistrySection: String; virtual;
+    function  GetRegistrySection: WideString; virtual;
   public
-    constructor Create(Controller: TWizardController; iID, iHelpContext: Integer; const sPageTitle: String); reintroduce; virtual;
+    constructor Create(Controller: TWizardController; iID, iHelpContext: Integer; const wsPageTitle: WideString); reintroduce; virtual;
     destructor Destroy; override;
      // Props
      // -- Должна возвращать True, если страница содержит допустимые данные. В базовом классе всегда True
@@ -86,10 +86,10 @@ type
      // -- Владелец страницы
     property Controller: TWizardController read FController;
      // -- Текст, выводимый в заглавии страницы
-    property PageTitle: String read FPageTitle;
+    property PageTitle: WideString read FPageTitle;
      // -- Секция реестра для сохранения визуальны настроек страницы. Если пустая (как в базовом классе), сохранения не
      //    требуется
-    property RegistrySection: String read GetRegistrySection;
+    property RegistrySection: WideString read GetRegistrySection;
      // -- Форма мастера. Получается через Controller
     property StorageForm: TPhoaForm read GetStorageForm;
   end;
@@ -117,7 +117,7 @@ type
     procedure Delete(Index: Integer);
     procedure Clear; override;
      // Создаёт и возвращает страницу заданного класса, дописывая её к концу списка
-    function  CreatePage(PClass: TWizardPageClass; iID, iHelpContext: Integer; const sPageTitle: String): TWizardPage; virtual;
+    function  CreatePage(PClass: TWizardPageClass; iID, iHelpContext: Integer; const wsPageTitle: WideString): TWizardPage; virtual;
      // Ищет страницу. Возвращает -1, если не найдена
     function  IndexOf(Page: TWizardPage): Integer;
      // Ищет страницу по ID. Возвращает -1, если не найдена
@@ -145,23 +145,9 @@ type
     property VisiblePage: TWizardPage read GetVisiblePage;
   end;
 
-   // Raises EPhoaWizardError
-  procedure PhoaWizardError(const sMsg: String); overload;
-  procedure PhoaWizardError(const sMsg: String; const aParams: Array of const); overload;
-
 implementation
 {$R *.dfm}
 uses VCLUtils, ConsVars, TB2Dock;
-
-  procedure PhoaWizardError(const sMsg: String);
-  begin
-    raise EPhoaWizardError.Create(sMsg);
-  end;
-
-  procedure PhoaWizardError(const sMsg: String; const aParams: Array of const);
-  begin
-    raise EPhoaWizardError.CreatefMT(sMsg, aParams);
-  end;
 
    //===================================================================================================================
    // TWizardPage
@@ -187,12 +173,12 @@ uses VCLUtils, ConsVars, TB2Dock;
     { does nothing }
   end;
 
-  constructor TWizardPage.Create(Controller: TWizardController; iID, iHelpContext: Integer; const sPageTitle: String);
+  constructor TWizardPage.Create(Controller: TWizardController; iID, iHelpContext: Integer; const wsPageTitle: WideString);
   begin
     inherited Create(Controller.HostFormIntf.StorageForm);
     FID         := iID;
     HelpContext := iHelpContext;
-    FPageTitle  := sPageTitle;
+    FPageTitle  := wsPageTitle;
     FController := Controller;
     FController.Add(Self);
     Parent      := FController.HostFormIntf.HostControl;
@@ -229,7 +215,7 @@ uses VCLUtils, ConsVars, TB2Dock;
     Result := FController.IndexOf(Self);
   end;
 
-  function TWizardPage.GetRegistrySection: String;
+  function TWizardPage.GetRegistrySection: WideString;
   begin
     Result := '';
   end;
@@ -276,9 +262,9 @@ uses VCLUtils, ConsVars, TB2Dock;
     FHostFormIntf := AHostFormIntf;
   end;
 
-  function TWizardController.CreatePage(PClass: TWizardPageClass; iID, iHelpContext: Integer; const sPageTitle: String): TWizardPage;
+  function TWizardController.CreatePage(PClass: TWizardPageClass; iID, iHelpContext: Integer; const wsPageTitle: WideString): TWizardPage;
   begin
-    Result := PClass.Create(Self, iID, iHelpContext, sPageTitle);
+    Result := PClass.Create(Self, iID, iHelpContext, wsPageTitle);
   end;
 
   procedure TWizardController.Delete(Index: Integer);
@@ -300,7 +286,7 @@ uses VCLUtils, ConsVars, TB2Dock;
   var idx: Integer;
   begin
     idx := IndexOfID(iID);
-    if idx<0 then PhoaWizardError('Invalid wizard page ID (%d)', [iID]);
+    if idx<0 then PhoaException(EPhoaWizardException, 'Invalid wizard page ID (%d)', [iID]);
     Result := GetItems(idx);
   end;
 
@@ -368,7 +354,7 @@ uses VCLUtils, ConsVars, TB2Dock;
   begin
      // Проверяем наличие записей в истории
     i := High(FPageIDHistory);
-    if i=-1 then PhoaWizardError('Page history is empty');
+    if i=-1 then PhoaException(EPhoaWizardException, 'Page history is empty');
      // Сохраняем ID последней страницы
     iLastPageID := FPageIDHistory[i];
      // Стираем последнюю запись истории

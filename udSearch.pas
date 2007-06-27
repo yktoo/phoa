@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.40 2005-08-28 06:05:23 dale Exp $
+//  $Id: udSearch.pas,v 1.41 2007-06-27 18:29:35 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -23,7 +23,7 @@ type
     sscInvalid, // "Недопустимое условие"
      // Number conditions
     sscNumberLess, sscNumberLessEqual, sscNumberEqual, sscNumberNotEqual, sscNumberGreaterEqual, sscNumberGreater,
-     // String conditions
+     // WideString conditions
     sscStrSpecified, sscStrNotSpecified, sscStrStarts, sscStrNotStarts, sscStrEqual, sscStrNotEqual, sscStrEnds,
     sscStrNotEnds, sscStrContains, sscStrNotContains, sscStrMatchesMask, sscStrNotMatchesMask,
      // Date/Time conditions
@@ -42,7 +42,7 @@ type
      // Заготовленные на время поиска типизированные значения критерия
     FValue_Integer: Integer;
     FValue_Float: Double;
-    FValue_String: String;
+    FValue_WideString: WideString;
     FValue_Masks: TPhoaMasks;
     FValue_Keywords: IPhotoAlbumKeywordList;
      // Prop storage
@@ -53,15 +53,15 @@ type
      // Настраивает поля, зависящие от PicProperty
     procedure AdjustPicProperty;
      // Prop handlers
-    function  GetAsExpression: String;
-    function  GetConditionName: String;
-    function  GetDataString: String;
-    function  GetPicPropertyName: String;
-    function  GetValueStr: String;
+    function  GetAsExpression: WideString;
+    function  GetConditionName: WideString;
+    function  GetDataWideString: WideString;
+    function  GetPicPropertyName: WideString;
+    function  GetValueWStr: WideString;
     procedure SetCondition(Value: TSimpleSearchCondition);
-    procedure SetDataString(const Value: String);
+    procedure SetDataWideString(const Value: WideString);
     procedure SetPicProperty(Value: TPicProperty);
-    procedure SetValueStr(const sValue: String);
+    procedure SetValueWStr(const wsValue: WideString);
   public
     constructor Create;
      // Возвращает True, если изображение подходит под критерий
@@ -73,23 +73,23 @@ type
     procedure ObtainConditionStrings(Strings: TStrings);
      // Props
      // -- Условие критерия в виде выражения поиска
-    property AsExpression: String read GetAsExpression;
+    property AsExpression: WideString read GetAsExpression;
      // -- Условие критерия
     property Condition: TSimpleSearchCondition read FCondition write SetCondition;
      // -- Наименование условия критерия
-    property ConditionName: String read GetConditionName;
-     // -- Все данные критерия в виде строки
-    property DataString: String read GetDataString write SetDataString;
+    property ConditionName: WideString read GetConditionName;
+     // -- Все данные критерия в виде Unicode-строки
+    property DataWideString: WideString read GetDataWideString write SetDataWideString;
      // -- Тип данных PicProperty
     property Datatype: TPicPropDatatype read FDatatype;
      // -- Свойство изображения, проверяемое на условие
     property PicProperty: TPicProperty read FPicProperty write SetPicProperty;
      // -- Наименование свойства изображения
-    property PicPropertyName: String read GetPicPropertyName;
+    property PicPropertyName: WideString read GetPicPropertyName;
      // -- Значение критерия
     property Value: Variant read FValue write FValue;
-     // -- Значение критерия в виде строки
-    property ValueStr: String read GetValueStr write SetValueStr;
+     // -- Значение критерия в виде Unicode-строки
+    property ValueWStr: WideString read GetValueWStr write SetValueWStr;
   end;
 
    //===================================================================================================================
@@ -113,8 +113,8 @@ type
     procedure InitializeSearch;
     procedure FinalizeSearch;
      // Сохранение/загрузка из реестра
-    procedure RegLoad(rif: TRegIniFile; const sSection: String);
-    procedure RegSave(rif: TRegIniFile; const sSection: String);
+    procedure RegLoad(rif: TRegIniFile; const wsSection: WideString);
+    procedure RegSave(rif: TRegIniFile; const wsSection: WideString);
      // Возвращает True, если изображение подходит под все критерии
     function  Matches(Pic: IPhoaPic): Boolean;
      // Props
@@ -184,7 +184,7 @@ type
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
   protected
-    function  GetRelativeRegistryKey: String; override;
+    function  GetRelativeRegistryKey: WideString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
@@ -245,7 +245,7 @@ const
     sscInvalid,       // ppdtRotation
     sscInvalid);      // ppdtFlips
    // Выражения для условий (%0:s - свойство; %1:s - значение)
-  aSSConditionExpressions: Array[TSimpleSearchCondition] of String = (
+  awsSSConditionExpressions: Array[TSimpleSearchCondition] of WideString = (
     '',                                  // sscInvalid
     '%0:s<%1:s',                         // sscNumberLess
     '%0:s<=%1:s',                        // sscNumberLessEqual
@@ -300,7 +300,7 @@ var
   SLPhoaAuthors:       TStringList;
   SLPhoaMedia:         TStringList;
    // Последнее использованное для поиска выражение
-  sSearchExpression:   String;
+  wsSearchExpression:  WideString;
 
   function DoSearch(AApp: IPhotoAlbumApp; ResultsGroup: IPhotoAlbumPicGroup): Boolean;
   begin
@@ -315,20 +315,20 @@ var
   end;
 
    // Возвращает [локализованное] наименование условия
-  function GetSimpleConditionName(c: TSimpleSearchCondition): String;
+  function GetSimpleConditionName(c: TSimpleSearchCondition): WideString;
   begin
-    Result := ConstVal(GetEnumName(TypeInfo(TSimpleSearchCondition), Byte(c)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TSimpleSearchCondition), Byte(c)));
   end;
 
    // Возвращает наименование элемента типа TSimpleSearchCondition в виде строки
-  function SimpleConditionTypeToStr(Condition: TSimpleSearchCondition): String;
+  function SimpleConditionTypeToStr(Condition: TSimpleSearchCondition): AnsiString;
   begin
     Result := GetEnumName(TypeInfo(TSimpleSearchCondition), Byte(Condition));
   end;
 
    // Возвращает элемент типа TSimpleSearchCondition по его строковому наименованию. Если такого наименования не
    //   найдено, возвращает sscInvalid
-  function StrToSimpleConditionType(const sCondition: String): TSimpleSearchCondition;
+  function StrToSimpleConditionType(const sCondition: AnsiString): TSimpleSearchCondition;
   begin
     Result := TSimpleSearchCondition(GetEnumValue(TypeInfo(TSimpleSearchCondition), sCondition));
     if not (Result in [Low(Result)..High(Result)]) then Result := sscInvalid;
@@ -354,34 +354,34 @@ var
 
   procedure TSimpleSearchCriterion.FinalizeSearch;
   begin
-    FValue_String := ''; // Release memory
+    FValue_WideString := ''; // Release memory
     FreeAndNil(FValue_Masks);
     FValue_Keywords := nil;
   end;
 
-  function TSimpleSearchCriterion.GetAsExpression: String;
+  function TSimpleSearchCriterion.GetAsExpression: WideString;
   begin
-    Result := Format(aSSConditionExpressions[FCondition], ['$'+PicPropToStr(FPicProperty, True), ValueStr]);
+    Result := WideFormat(awsSSConditionExpressions[FCondition], ['$'+PicPropToStr(FPicProperty, True), ValueWStr]);
   end;
 
-  function TSimpleSearchCriterion.GetConditionName: String;
+  function TSimpleSearchCriterion.GetConditionName: WideString;
   begin
     Result := GetSimpleConditionName(FCondition);
   end;
 
-  function TSimpleSearchCriterion.GetDataString: String;
+  function TSimpleSearchCriterion.GetDataWideString: WideString;
   begin
-    Result := Format(
+    Result := WideFormat(
       '%s,%s,%s',
-      [PicPropToStr(FPicProperty, True), SimpleConditionTypeToStr(FCondition), ValueStr]);
+      [PicPropToStr(FPicProperty, True), SimpleConditionTypeToStr(FCondition), ValueWStr]);
   end;
 
-  function TSimpleSearchCriterion.GetPicPropertyName: String;
+  function TSimpleSearchCriterion.GetPicPropertyName: WideString;
   begin
     Result := PicPropName(FPicProperty);
   end;
 
-  function TSimpleSearchCriterion.GetValueStr: String;
+  function TSimpleSearchCriterion.GetValueWStr: WideString;
   begin
     Result := '';
     if not VarIsNull(FValue) then
@@ -390,8 +390,8 @@ var
           ppdtList,
           ppdtInteger,
           ppdtFloat: Result := FValue;
-        ppdtDate:    Result := DateToStr(PhoaDateToDate(FValue), AppFormatSettings);
-        ppdtTime:    Result := TimeToStr(PhoaTimeToTime(FValue), AppFormatSettings);
+        ppdtDate:    Result := DateToStr(PhoaDateToDate(FValue), AppFormatSettings); {!!! Not Unicode-enabled solution }
+        ppdtTime:    Result := TimeToStr(PhoaTimeToTime(FValue), AppFormatSettings); {!!! Not Unicode-enabled solution }
       end;
   end;
 
@@ -402,7 +402,7 @@ var
     case FDatatype of
       ppdtString:
         if FCondition in SSCStringConditions_Pattern then
-          FValue_String := ValueStr
+          FValue_WideString := ValueWStr
         else if FCondition in SSCStringConditions_Mask then begin
           FreeAndNil(FValue_Masks);
           if not bNull then FValue_Masks := TPhoaMasks.Create(FValue);
@@ -430,19 +430,19 @@ var
     end;
 
     function TestString: Boolean;
-    var sProp: String;
+    var wsProp: WideString;
     begin
       Result := False;
        // Проверяем на условие без учёта отрицания
-      sProp := VarToStr(vProp);
+      wsProp := VarToWideStr(vProp);
       case FCondition of
-        sscStrSpecified, sscStrNotSpecified:     Result := sProp<>'';
-        sscStrStarts, sscStrNotStarts:           Result := AnsiStartsText(FValue_String, sProp);
-        sscStrEqual, sscStrNotEqual:             Result := AnsiSameText(FValue_String, sProp);
-        sscStrEnds, sscStrNotEnds:               Result := AnsiEndsText(FValue_String, sProp);
-        sscStrContains, sscStrNotContains:       Result := AnsiContainsText(sProp, FValue_String);
-        sscStrMatchesMask, sscStrNotMatchesMask: Result := (FValue_Masks=nil) or FValue_Masks.Matches(sProp);
-        else InvalidDatatype;
+        sscStrSpecified, sscStrNotSpecified:     Result := wsProp<>'';
+        sscStrStarts, sscStrNotStarts:           Result := WideStartsText  (FValue_WideString, wsProp);
+        sscStrEqual, sscStrNotEqual:             Result := WideSameText    (FValue_WideString, wsProp);
+        sscStrEnds, sscStrNotEnds:               Result := WideEndsText    (FValue_WideString, wsProp);
+        sscStrContains, sscStrNotContains:       Result := WideContainsText(wsProp, FValue_WideString);
+        sscStrMatchesMask, sscStrNotMatchesMask: Result := (FValue_Masks=nil) or FValue_Masks.Matches(wsProp);
+        else                                     InvalidDatatype;
       end;
        // Если отрицательное условие - инвертируем результат сравнения
       if FCondition in [sscStrNotSpecified, sscStrNotStarts, sscStrNotEqual, sscStrNotEnds, sscStrNotContains, sscStrNotMatchesMask] then
@@ -573,23 +573,23 @@ var
     end;
   end;
 
-  procedure TSimpleSearchCriterion.SetDataString(const Value: String);
+  procedure TSimpleSearchCriterion.SetDataWideString(const Value: WideString);
   var
-    s: String;
+    ws: WideString;
     pp: TPicProperty;
     c: TSimpleSearchCondition;
   begin
-    s := Value;
+    ws := Value;
      // Извлекаем свойство
-    pp := StrToPicProp(ExtractFirstWord(s, ','), False);
+    pp := StrToPicProp(ExtractFirstWord(ws, ','), False);
     if pp in [Low(pp)..High(pp)] then begin
       PicProperty := pp;
        // Извлекаем условие
-      c := StrToSimpleConditionType(ExtractFirstWord(s, ','));
+      c := StrToSimpleConditionType(ExtractFirstWord(ws, ','));
       if (c<>sscInvalid) and (c in aSSConditionsByDatatype[FDatatype]) then begin
         Condition := c;
          // Присваиваем значение
-        ValueStr := s; 
+        ValueWStr := ws; 
       end;
     end;
   end;
@@ -604,20 +604,20 @@ var
     end;
   end;
 
-  procedure TSimpleSearchCriterion.SetValueStr(const sValue: String);
+  procedure TSimpleSearchCriterion.SetValueWStr(const wsValue: WideString);
   begin
-     // Если строка пустая, или для даты/времени не введено ни одной цифры - заносим Null 
-    if (sValue='') or ((FDatatype in [ppdtDate, ppdtTime]) and (LastDelimiter('0123456789', sValue)=0)) then
+     // Если строка пустая, или для даты/времени не введено ни одной цифры - заносим Null
+    if (wsValue='') or ((FDatatype in [ppdtDate, ppdtTime]) and (WideLastDelimiter('0123456789', wsValue)=0)) then
       FValue := Null
-     // Иначе преобразуем занчение к правильному типу  
+     // Иначе преобразуем занчение к правильному типу
     else
       case FDatatype of
         ppdtString,
-          ppdtList:  FValue := sValue;
-        ppdtInteger: FValue := StrToInt(sValue);
-        ppdtFloat:   FValue := StrToFloat(sValue, AppFormatSettings);
-        ppdtDate:    FValue := DateToPhoaDate(StrToDate(sValue, AppFormatSettings));
-        ppdtTime:    FValue := TimeToPhoaTime(StrToTime(sValue, AppFormatSettings));
+          ppdtList:  FValue := wsValue;
+        ppdtInteger: FValue := StrToInt(wsValue);
+        ppdtFloat:   FValue := StrToFloat(wsValue, AppFormatSettings);
+        ppdtDate:    FValue := DateToPhoaDate(StrToDate(wsValue, AppFormatSettings)); {!!! Not Unicode-enabled solution }
+        ppdtTime:    FValue := TimeToPhoaTime(StrToTime(wsValue, AppFormatSettings)); {!!! Not Unicode-enabled solution }
       end;
   end;
 
@@ -685,17 +685,18 @@ var
       end;
   end;
 
-  procedure TSimpleSearchCriterionList.RegLoad(rif: TRegIniFile; const sSection: String);
+  procedure TSimpleSearchCriterionList.RegLoad(rif: TRegIniFile; const wsSection: WideString);
   var
-    SL: TStringList;
+    SL: TTntStringList;
     Crit: TSimpleSearchCriterion;
     i: Integer;
   begin
     FList.Clear;
-     // Загружаем секцию критериев в список строк 
-    SL := TStringList.Create;
+     // Загружаем секцию критериев в список строк
+    SL := TTntStringList.Create;
     try
-      rif.ReadSectionValues(sSection, SL);
+      {!!! Not Unicode-enabled solution }
+      rif.ReadSectionValues(wsSection, SL);
        // Сортируем список - при этом критерии будут отсортированы по индексу
       SL.Sorted := True;
       for i := 0 to SL.Count-1 do begin
@@ -712,14 +713,15 @@ var
     end;
   end;
 
-  procedure TSimpleSearchCriterionList.RegSave(rif: TRegIniFile; const sSection: String);
+  procedure TSimpleSearchCriterionList.RegSave(rif: TRegIniFile; const wsSection: WideString);
   var i: Integer;
   begin
+    {!!! Not Unicode-enabled solution }
      // Стираем секцию
-    rif.EraseSection(sSection);
+    rif.EraseSection(wsSection);
      // Записываем в цикле данные критериев
     for i := 0 to FList.Count-1 do
-      rif.WriteString(sSection, Format('%.8d', [i]), TSimpleSearchCriterion(FList[i]).DataString);
+      rif.WriteString(wsSection, WideFormat('%.8d', [i]), TSimpleSearchCriterion(FList[i]).DataString);
   end;
 
    //===================================================================================================================
@@ -801,7 +803,7 @@ type
   end;
 
   function TSimpleCriterionEditLink.EndEdit: Boolean;
-  var s: String;
+  var цs: WideString;
   begin
     FEndingEditing := True;
     Result := True;
@@ -813,20 +815,20 @@ type
      // Редактировали значение
     else begin
       case FCriterion.PicProperty of
-        ppDate:     s := (FWControl as TDateEdit).Text;
-        ppTime:     s := ChangeTimeSeparator((FWControl as TMaskEdit).Text, False);
-        ppKeywords: s := (FWControl as TComboEdit).Text;
+        ppDate:     ws := (FWControl as TDateEdit).Text;
+        ppTime:     ws := ChangeTimeSeparator((FWControl as TMaskEdit).Text, False);
+        ppKeywords: ws := (FWControl as TComboEdit).Text;
         else begin
-          s := (FWControl as TComboBox).Text;
+          ws := (FWControl as TComboBox).Text;
            // Сохраняем историю ввода
           if not (FCriterion.PicProperty in [ppPlace, ppFilmNumber, ppAuthor, ppMedia]) then
             RegSaveHistory(
-              Format(SRegSearch_PropMRUFormat, [GetEnumName(TypeInfo(TPicProperty), Integer(FCriterion.PicProperty))]),
+              WideFormat(SRegSearch_PropMRUFormat, [GetEnumName(TypeInfo(TPicProperty), Integer(FCriterion.PicProperty))]),
               TComboBox(FWControl),
               True);
         end;
       end;
-      FCriterion.ValueStr := s;
+      FCriterion.ValueWStr := ws;
     end;
     FTree.Invalidate; // Условие также влияет на доступность редактора значения
     FWControl.Hide;
@@ -922,7 +924,7 @@ type
                 Result,
                 False);
           end;
-          Text := FCriterion.ValueStr;
+          Text := FCriterion.ValueWStr;
         end;
       end;
     end;
@@ -935,7 +937,7 @@ type
         Visible    := False;
         Parent     := Tree;
         BlanksChar := '_';
-        Text       := FCriterion.ValueStr;
+        Text       := FCriterion.ValueWStr;
         OnExit     := WControlExit;
         OnKeyDown  := WControlKeyDown;
         if Date=0 then Clear;
@@ -951,7 +953,7 @@ type
         Parent     := Tree;
         EditMask   := '!99:99:99;1;_';
         MaxLength  := 8;
-        Text       := ChangeTimeSeparator(FCriterion.ValueStr, True);
+        Text       := ChangeTimeSeparator(FCriterion.ValueWStr, True);
         OnExit     := WControlExit;
         OnKeyDown  := WControlKeyDown;
       end;
@@ -965,7 +967,7 @@ type
         Visible       := False;
         Parent        := Tree;
         GlyphKind     := gkEllipsis;
-        Text          := FCriterion.ValueStr;
+        Text          := FCriterion.ValueWStr;
         OnButtonClick := WKeywordButtonClick;
         OnExit        := WControlExit;
         OnKeyDown     := WControlKeyDown;
@@ -1053,12 +1055,12 @@ type
   end;
 
   procedure TSimpleCriterionEditLink.WKeywordButtonClick(Sender: TObject);
-  var s: String;
+  var ws: WideString;
   begin
     FPreserveEndEdit := True;
     try
-      s := (Sender as TComboEdit).Text;
-      if SelectPhoaKeywords((FTree.Owner as TdSearch).FApp.ProjectX, s) then TComboEdit(Sender).Text := s;
+      ws := (Sender as TComboEdit).Text;
+      if SelectPhoaKeywords((FTree.Owner as TdSearch).FApp.ProjectX, ws) then TComboEdit(Sender).Text := ws;
     finally
       FPreserveEndEdit := False;
     end;
@@ -1070,15 +1072,15 @@ type
 
   procedure TdSearch.aaSimpleConvertToExpression(Sender: TObject);
   var
-    s: String;
+    ws: WideString;
     i: Integer;
   begin
     BeginUpdate;
     try
-      s := '';
+      ws := '';
       for i := 0 to FSimpleCriteria.Count-1 do
-        AccumulateStr(s, ' and'+S_CRLF, FSimpleCriteria[i].AsExpression);
-      frExprPicFilter.Expression := s;
+        AccumulateStr(ws, ' and'+S_CRLF, FSimpleCriteria[i].AsExpression);
+      frExprPicFilter.Expression := ws;
       pcCriteria.ActivePage := tsExpression;
       UpdateSearchKind;
     finally
@@ -1180,7 +1182,7 @@ type
     frExprPicFilter.Expression := sSearchExpression; 
   end;
 
-  function TdSearch.GetRelativeRegistryKey: String;
+  function TdSearch.GetRelativeRegistryKey: WideString;
   begin
     Result := SRegSearch_Root;
   end;
@@ -1404,23 +1406,20 @@ type
   end;
 
   procedure TdSearch.tvSimpleCriteriaGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-  var
-    Crit: TSimpleSearchCriterion;
-    s: String;
+  var Crit: TSimpleSearchCriterion;
   begin
-    s := '';
+    CellText := '';
     Crit := GetSimpleCriterion(Node);
      // Виртуальная "пустая" строка
     if Crit=nil then begin
-      if Column=IColIdx_Simple_Property then s := ConstVal('SMsg_SelectSearchPicProp');
+      if Column=IColIdx_Simple_Property then CellText := DKLangConstW('SMsg_SelectSearchPicProp');
      // Строка критерия
     end else
       case Column of
-        IColIdx_Simple_Property:  s := Crit.PicPropertyName;
-        IColIdx_Simple_Condition: s := Crit.ConditionName;
-        IColIdx_Simple_Value:     if not (Crit.Condition in SSCNoValueConditions) then s := Crit.ValueStr;
+        IColIdx_Simple_Property:  CellText := Crit.PicPropertyName;
+        IColIdx_Simple_Condition: CellText := Crit.ConditionName;
+        IColIdx_Simple_Value:     if not (Crit.Condition in SSCNoValueConditions) then CellText := Crit.ValueWStr;
       end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TdSearch.tvSimpleCriteriaInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

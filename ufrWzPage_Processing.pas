@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Processing.pas,v 1.5 2004-12-31 13:38:58 dale Exp $
+//  $Id: ufrWzPage_Processing.pas,v 1.6 2007-06-27 18:29:45 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -65,7 +65,7 @@ uses phUtils;
       pbMain.Position := IProcess.ProgressCur;
       IProcess.PaintThumbnail(iThumb.Bitmap);
     end;
-    bInterrupt.Caption := ConstVal(iif(bActive, 'SBtn_Interrupt', 'SBtn_Continue'));
+    bInterrupt.Caption := DKLangConstW(iif(bActive, 'SBtn_Interrupt', 'SBtn_Continue'));
     bInterrupt.Cancel  := bActive;
     bInterrupt.Default := bActive;
     pbMain.Visible := bActive;
