@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.56 2007-06-27 18:29:26 dale Exp $
+//  $Id: phUtils.pas,v 1.57 2007-06-28 18:41:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phUtils;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Controls, Graphics, Forms,
+  Windows, Messages, SysUtils, Classes, Controls, Graphics, Forms, TntForms,
   TntSysUtils, TntClasses, TntStdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, ConsVars;
 
@@ -30,7 +30,7 @@ uses
   procedure RegLoadHistory(const wsSection: WideString; cb: TTntComboBox; bSetLastItem: Boolean);
   procedure RegSaveHistory(const wsSection: WideString; cb: TTntComboBox; bRegisterFirst: Boolean);
   procedure RegisterCBHistory(cb: TTntComboBox);
-   // Возвращает Integer(Items.Objects[ItemIndex]) для TComboBox, или -1, если ItemIndex<0
+   // Возвращает Integer(Items.Objects[ItemIndex]) для TTntComboBox, или -1, если ItemIndex<0
   function  GetCurrentCBObject(ComboBox: TTntComboBox): Integer;
    // То же, для установки ComboBox по Objects[]. Возвращает True, если удалось
   function  SetCurrentCBObject(ComboBox: TTntComboBox; iObj: Integer): Boolean;
@@ -55,7 +55,7 @@ uses
   procedure FormPositionFromStr(Form: TCustomForm; const wsPosition: WideString);
    // Возвращает объект-монитор, задаваемый свойством DefaultMonitor формы. Если подходящего монитора не найдено,
    //   возвращает первичный монитор
-  function  GetDefaultMonitorForForm(Form: TCustomForm): TMonitor;
+  function  GetDefaultMonitorForForm(Form: TTntForm): TMonitor;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): WideString;
@@ -552,10 +552,10 @@ var
     end;
   end;
 
-  function GetDefaultMonitorForForm(Form: TCustomForm): TMonitor;
+  function GetDefaultMonitorForForm(Form: TTntForm): TMonitor;
   begin
     Result := nil;
-    case TForm(Form).DefaultMonitor of
+    case Form.DefaultMonitor of
       dmMainForm:   if Application.MainForm<>nil    then Result := Application.MainForm.Monitor;
       dmActiveForm: if Screen.ActiveCustomForm<>nil then Result := Screen.ActiveCustomForm.Monitor;
     end;
@@ -1265,5 +1265,6 @@ var
   end;
 
 end.
+
 
 

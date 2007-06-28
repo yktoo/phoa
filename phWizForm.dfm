@@ -18,7 +18,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
     Align = alTop
     Shape = bsBottomLine
   end
-  object pMain: TPanel
+  object pMain: TTntPanel
     Left = 0
     Top = 63
     Width = 632
@@ -28,7 +28,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
     BorderWidth = 8
     TabOrder = 0
   end
-  object pButtons: TPanel
+  object pButtons: TTntPanel
     Left = 0
     Top = 399
     Width = 632
@@ -39,7 +39,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
     DesignSize = (
       632
       36)
-    object bCancel: TButton
+    object bCancel: TTntButton
       Left = 548
       Top = 6
       Width = 75
@@ -50,7 +50,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
       TabOrder = 3
       OnClick = bCancelClick
     end
-    object bNext: TButton
+    object bNext: TTntButton
       Left = 408
       Top = 6
       Width = 75
@@ -61,7 +61,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
       TabOrder = 2
       OnClick = bNextClick
     end
-    object bHelp: TButton
+    object bHelp: TTntButton
       Left = 8
       Top = 6
       Width = 75
@@ -70,7 +70,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
       TabOrder = 0
       OnClick = bHelpClick
     end
-    object bBack: TButton
+    object bBack: TTntButton
       Left = 328
       Top = 6
       Width = 75
@@ -81,7 +81,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
       OnClick = bBackClick
     end
   end
-  object pHeader: TPanel
+  object pHeader: TTntPanel
     Left = 0
     Top = 0
     Width = 632
@@ -92,7 +92,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
     Color = clWindow
     ParentBackground = False
     TabOrder = 2
-    object lHeading: TLabel
+    object lHeading: TTntLabel
       Left = 8
       Top = 8
       Width = 571
@@ -104,7 +104,7 @@ inherited PhoaWizardForm: TPhoaWizardForm
       Layout = tlCenter
       WordWrap = True
     end
-    object iIcon: TImage
+    object iIcon: TTntImage
       Left = 579
       Top = 8
       Width = 45

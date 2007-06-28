@@ -3,7 +3,7 @@ inherited dPicOps: TdPicOps
   Caption = 'Picture operations'
   PixelsPerInch = 96
   TextHeight = 13
-  object lGroup: TLabel [1]
+  object lGroup: TTntLabel [1]
     Left = 12
     Top = 52
     Width = 33
@@ -11,7 +11,7 @@ inherited dPicOps: TdPicOps
     Caption = '&Group:'
     FocusControl = tvGroups
   end
-  object lOp: TLabel [2]
+  object lOp: TTntLabel [2]
     Left = 12
     Top = 12
     Width = 52
@@ -19,18 +19,18 @@ inherited dPicOps: TdPicOps
     Caption = '&Operation:'
     FocusControl = cbOp
   end
-  inherited pButtonsBottom: TPanel
-    inherited bCancel: TButton
+  inherited pButtonsBottom: TTntPanel
+    inherited bCancel: TTntButton
       Left = 472
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 392
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 550
     end
   end
-  object cbOp: TComboBox
+  object cbOp: TTntComboBox
     Left = 12
     Top = 28
     Width = 608

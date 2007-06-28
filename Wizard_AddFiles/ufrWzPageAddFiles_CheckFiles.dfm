@@ -10,7 +10,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Name = 'MS Shell Dlg 2'
     Header.Font.Style = []
     Header.Options = [hoAutoResize, hoColumnResize, hoHotTrack, hoShowSortGlyphs, hoVisible]
     Header.ParentFont = True
@@ -55,7 +55,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
         WideText = 'Date'
       end>
   end
-  object pBottom: TPanel
+  object pBottom: TTntPanel
     Left = 0
     Top = 260
     Width = 576
@@ -64,7 +64,7 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
     Alignment = taLeftJustify
     BevelOuter = bvNone
     TabOrder = 1
-    object cbShowPreview: TCheckBox
+    object cbShowPreview: TTntCheckBox
       Left = 352
       Top = 4
       Width = 221
@@ -74,23 +74,23 @@ inherited frWzPageAddFiles_CheckFiles: TfrWzPageAddFiles_CheckFiles
       OnClick = cbShowPreviewClick
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 8
     Top = 28
-    object aFilesCheckAll: TAction
+    object aFilesCheckAll: TTntAction
       Caption = 'Check &all files'
       Hint = 'Set check to all the files in the list'
       ImageIndex = 13
       OnExecute = aaFilesCheckAll
     end
-    object aFilesUncheckAll: TAction
+    object aFilesUncheckAll: TTntAction
       Caption = '&Uncheck all files'
       Hint = 'Remove check from all the files'
       ImageIndex = 14
       OnExecute = aaFilesUncheckAll
     end
-    object aFilesInvertChecks: TAction
+    object aFilesInvertChecks: TTntAction
       Caption = '&Invert file checks'
       Hint = 'Toggle each file'#39's check'
       ImageIndex = 40

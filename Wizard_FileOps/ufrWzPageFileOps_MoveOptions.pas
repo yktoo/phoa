@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.3 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,25 +11,25 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
-  phWizard, StdCtrls, Mask, DKLang;
+  phWizard, StdCtrls, Mask, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_MoveOptions = class(TWizardPage)
-    cbAllowDuplicating: TCheckBox;
-    cbBaseFolder: TComboBox;
-    cbBaseGroup: TComboBox;
-    cbRenameFiles: TCheckBox;
+    cbAllowDuplicating: TTntCheckBox;
+    cbBaseFolder: TTntComboBox;
+    cbBaseGroup: TTntComboBox;
+    cbRenameFiles: TTntCheckBox;
     dklcMain: TDKLanguageController;
-    eFileNameFormat: TEdit;
+    eFileNameFormat: TTntEdit;
     eReplaceChar: TMaskEdit;
-    gbFileArranging: TGroupBox;
-    gbFileNaming: TGroupBox;
-    lBaseFolder: TLabel;
-    lBaseGroup: TLabel;
-    lReplaceChar: TLabel;
-    rbMaintainFolderLayout: TRadioButton;
-    rbMaintainGroupLayout: TRadioButton;
-    rbPutFlatly: TRadioButton;
+    gbFileArranging: TTntGroupBox;
+    gbFileNaming: TTntGroupBox;
+    lBaseFolder: TTntLabel;
+    lBaseGroup: TTntLabel;
+    lReplaceChar: TTntLabel;
+    rbMaintainFolderLayout: TTntRadioButton;
+    rbMaintainGroupLayout: TTntRadioButton;
+    rbPutFlatly: TTntRadioButton;
     procedure AdjustOptionsNotify(Sender: TObject);
     procedure eReplaceCharKeyPress(Sender: TObject; var Key: Char);
   private

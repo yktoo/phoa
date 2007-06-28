@@ -3,7 +3,7 @@ inherited dSearch: TdSearch
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object gbSearch: TGroupBox [1]
+  object gbSearch: TTntGroupBox [1]
     Left = 12
     Top = 8
     Width = 609
@@ -11,7 +11,7 @@ inherited dSearch: TdSearch
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Perform search'
     TabOrder = 0
-    object rbAll: TRadioButton
+    object rbAll: TTntRadioButton
       Left = 16
       Top = 16
       Width = 137
@@ -22,7 +22,7 @@ inherited dSearch: TdSearch
       TabStop = True
       OnClick = DlgDataChange
     end
-    object rbCurGroup: TRadioButton
+    object rbCurGroup: TTntRadioButton
       Left = 156
       Top = 16
       Width = 145
@@ -31,7 +31,7 @@ inherited dSearch: TdSearch
       TabOrder = 1
       OnClick = DlgDataChange
     end
-    object rbSearchResults: TRadioButton
+    object rbSearchResults: TTntRadioButton
       Left = 304
       Top = 16
       Width = 189
@@ -41,22 +41,22 @@ inherited dSearch: TdSearch
       OnClick = DlgDataChange
     end
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 2
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Left = 471
       TabOrder = 1
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 391
       Caption = 'Find'
       TabOrder = 0
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 549
     end
   end
-  object pcCriteria: TPageControl
+  object pcCriteria: TTntPageControl
     Left = 12
     Top = 56
     Width = 608
@@ -65,7 +65,7 @@ inherited dSearch: TdSearch
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = pcCriteriaChange
-    object tsSimple: TTabSheet
+    object tsSimple: TTntTabSheet
       Caption = 'Simple search'
       object tvSimpleCriteria: TVirtualStringTree
         Left = 0
@@ -144,7 +144,7 @@ inherited dSearch: TdSearch
         end
       end
     end
-    object tsExpression: TTabSheet
+    object tsExpression: TTntTabSheet
       Caption = 'Expression search'
       ImageIndex = 1
       inline frExprPicFilter: TfrExprPicFilter
@@ -253,23 +253,23 @@ inherited dSearch: TdSearch
       Action = aSimpleCrDelete
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 36
     Top = 404
-    object aSimpleReset: TAction
+    object aSimpleReset: TTntAction
       Caption = '&Reset'
       Hint = 'Reset|Clear entered criteria'
       ImageIndex = 0
       OnExecute = aaSimpleReset
     end
-    object aSimpleCrDelete: TAction
+    object aSimpleCrDelete: TTntAction
       Caption = '&Delete'
       Hint = 'Delete selected criterion'
       ImageIndex = 7
       OnExecute = aaSimpleCrDelete
     end
-    object aSimpleConvertToExpression: TAction
+    object aSimpleConvertToExpression: TTntAction
       Caption = 'Convert to e&xpression'
       Hint = 'Convert selected criteria to search expression'
       ImageIndex = 81

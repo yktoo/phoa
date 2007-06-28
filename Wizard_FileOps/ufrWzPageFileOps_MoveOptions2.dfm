@@ -2,7 +2,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
   DesignSize = (
     576
     284)
-  object lOverwriteMode: TLabel
+  object lOverwriteMode: TTntLabel
     Left = 4
     Top = 92
     Width = 151
@@ -10,7 +10,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
     Caption = 'If the target file already e&xists:'
     FocusControl = cbOverwriteMode
   end
-  object lNoOriginalFileMode: TLabel
+  object lNoOriginalFileMode: TTntLabel
     Left = 4
     Top = 4
     Width = 156
@@ -18,7 +18,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
     Caption = 'If the &original file does not exist:'
     FocusControl = cbNoOriginalFileMode
   end
-  object cbDeleteOriginal: TCheckBox
+  object cbDeleteOriginal: TTntCheckBox
     Left = 4
     Top = 48
     Width = 567
@@ -28,7 +28,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
     TabOrder = 1
     OnClick = AdjustOptionsNotify
   end
-  object cbDeleteToRecycleBin: TCheckBox
+  object cbDeleteToRecycleBin: TTntCheckBox
     Left = 24
     Top = 68
     Width = 547
@@ -38,7 +38,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
     TabOrder = 2
     OnClick = PageDataChange
   end
-  object cbUseCDOptions: TCheckBox
+  object cbUseCDOptions: TTntCheckBox
     Left = 4
     Top = 264
     Width = 567
@@ -48,7 +48,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
     TabOrder = 4
     OnClick = PageDataChange
   end
-  object cbOverwriteMode: TComboBox
+  object cbOverwriteMode: TTntComboBox
     Left = 4
     Top = 108
     Width = 567
@@ -62,7 +62,7 @@ inherited frWzPageFileOps_MoveOptions2: TfrWzPageFileOps_MoveOptions2
       'Prompt to overwrite the file'
       'Always overwrite the file')
   end
-  object cbNoOriginalFileMode: TComboBox
+  object cbNoOriginalFileMode: TTntComboBox
     Left = 4
     Top = 20
     Width = 567

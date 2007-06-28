@@ -1,5 +1,5 @@
 inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
-  object gbFilter: TGroupBox
+  object gbFilter: TTntGroupBox
     Left = 0
     Top = 140
     Width = 576
@@ -11,7 +11,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     DesignSize = (
       576
       120)
-    object lFileDateFrom: TLabel
+    object lFileDateFrom: TTntLabel
       Left = 12
       Top = 68
       Width = 88
@@ -19,7 +19,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = '&File modified from:'
       FocusControl = eFileDateFrom
     end
-    object lFileMasks: TLabel
+    object lFileMasks: TTntLabel
       Left = 12
       Top = 44
       Width = 139
@@ -27,7 +27,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = 'File &masks (delimited with '#39';'#39'):'
       FocusControl = cbFileMasks
     end
-    object lPresence: TLabel
+    object lPresence: TTntLabel
       Left = 12
       Top = 20
       Width = 110
@@ -35,7 +35,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = '&Photo album presence:'
       FocusControl = cbPresence
     end
-    object lFileDateTo: TLabel
+    object lFileDateTo: TTntLabel
       Left = 364
       Top = 68
       Width = 14
@@ -43,7 +43,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = '&to:'
       FocusControl = eFileDateTo
     end
-    object lFileSizeFrom: TLabel
+    object lFileSizeFrom: TTntLabel
       Left = 12
       Top = 92
       Width = 66
@@ -51,7 +51,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = 'File si&ze from:'
       FocusControl = eFileSizeFrom
     end
-    object lFileSizeTo: TLabel
+    object lFileSizeTo: TTntLabel
       Left = 364
       Top = 92
       Width = 14
@@ -59,7 +59,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Caption = 't&o:'
       FocusControl = eFileSizeTo
     end
-    object cbFileMasks: TComboBox
+    object cbFileMasks: TTntComboBox
       Left = 184
       Top = 40
       Width = 377
@@ -71,7 +71,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       Text = '*.*'
       OnChange = PageDataChange
     end
-    object cbPresence: TComboBox
+    object cbPresence: TTntComboBox
       Left = 184
       Top = 16
       Width = 377
@@ -140,7 +140,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       TabOrder = 6
       OnChange = PageDataChange
     end
-    object cbFileSizeFromUnit: TComboBox
+    object cbFileSizeFromUnit: TTntComboBox
       Left = 276
       Top = 88
       Width = 81
@@ -162,7 +162,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       TabOrder = 8
       OnChange = PageDataChange
     end
-    object cbFileSizeToUnit: TComboBox
+    object cbFileSizeToUnit: TTntComboBox
       Left = 480
       Top = 88
       Width = 81
@@ -173,7 +173,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       OnChange = PageDataChange
     end
   end
-  object pMain: TPanel
+  object pMain: TTntPanel
     Left = 0
     Top = 260
     Width = 576
@@ -184,7 +184,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
     DesignSize = (
       576
       24)
-    object cbRecurseFolders: TCheckBox
+    object cbRecurseFolders: TTntCheckBox
       Left = 4
       Top = 4
       Width = 221
@@ -193,7 +193,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       TabOrder = 0
       OnClick = PageDataChange
     end
-    object bAdvanced: TButton
+    object bAdvanced: TTntButton
       Left = 452
       Top = 1
       Width = 119
@@ -202,7 +202,7 @@ inherited frWzPageAddFiles_SelFiles: TfrWzPageAddFiles_SelFiles
       TabOrder = 2
       OnClick = bAdvancedClick
     end
-    object cbShowPreview: TCheckBox
+    object cbShowPreview: TTntCheckBox
       Left = 228
       Top = 4
       Width = 221

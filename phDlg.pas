@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phDlg.pas,v 1.22 2007-06-27 18:29:10 dale Exp $
+//  $Id: phDlg.pas,v 1.23 2007-06-28 18:41:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,15 +10,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  StdCtrls, ExtCtrls, phFrm;
+  phFrm, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
   TPhoaDialog = class(TPhoaForm)
-    pButtonsBottom: TPanel;
-    bCancel: TButton;
-    bOK: TButton;
-    bHelp: TButton;
+    bCancel: TTntButton;
+    bHelp: TTntButton;
+    bOK: TTntButton;
     bvBottom: TBevel;
+    pButtonsBottom: TTntPanel;
      // ќбработчик событи€ дл€ прив€зывани€ событий TNotifyEvent, измен€ющих данные диалога
     procedure bCancelClick(Sender: TObject);
     procedure bHelpClick(Sender: TObject);

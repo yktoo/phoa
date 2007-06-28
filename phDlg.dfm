@@ -11,7 +11,7 @@ inherited PhoaDialog: TPhoaDialog
     Align = alBottom
     Shape = bsBottomLine
   end
-  object pButtonsBottom: TPanel
+  object pButtonsBottom: TTntPanel
     Left = 0
     Top = 400
     Width = 632
@@ -22,7 +22,7 @@ inherited PhoaDialog: TPhoaDialog
     DesignSize = (
       632
       35)
-    object bCancel: TButton
+    object bCancel: TTntButton
       Left = 473
       Top = 6
       Width = 75
@@ -33,7 +33,7 @@ inherited PhoaDialog: TPhoaDialog
       TabOrder = 0
       OnClick = bCancelClick
     end
-    object bOK: TButton
+    object bOK: TTntButton
       Left = 393
       Top = 6
       Width = 75
@@ -45,7 +45,7 @@ inherited PhoaDialog: TPhoaDialog
       TabOrder = 1
       OnClick = bOKClick
     end
-    object bHelp: TButton
+    object bHelp: TTntButton
       Left = 551
       Top = 6
       Width = 75

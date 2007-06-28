@@ -99,59 +99,59 @@ object frExprPicFilter: TfrExprPicFilter
     OnChange = eExpressionChange
     OnStatusChange = eExpressionStatusChange
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 132
     Top = 124
-    object aNew: TAction
+    object aNew: TTntAction
       Caption = '&New'
       Hint = 'New|Clear the expression'
       ImageIndex = 0
       OnExecute = aaNew
     end
-    object aOpen: TAction
+    object aOpen: TTntAction
       Caption = '&Open...'
       Hint = 'Open...|Open a text file containing the search expression'
       ImageIndex = 1
       OnExecute = aaOpen
     end
-    object aSaveAs: TAction
+    object aSaveAs: TTntAction
       Caption = 'Save &as...'
       Hint = 'Save as...|Save the expression to a file'
       ImageIndex = 3
       OnExecute = aaSaveAs
     end
-    object aCut: TAction
+    object aCut: TTntAction
       Caption = '&Cut'
       Hint = 'Cut|Cut selected text to the clipboard'
       ImageIndex = 20
       OnExecute = aaCut
     end
-    object aCopy: TAction
+    object aCopy: TTntAction
       Caption = 'Co&py'
       Hint = 'Copy|Copy selected text to the clipboard'
       ImageIndex = 21
       OnExecute = aaCopy
     end
-    object aPaste: TAction
+    object aPaste: TTntAction
       Caption = '&Paste'
       Hint = 'Paste|Paste text from the clipboard'
       ImageIndex = 22
       OnExecute = aaPaste
     end
-    object aUndo: TAction
+    object aUndo: TTntAction
       Caption = '&Undo'
       Hint = 'Undo|Undo the last change'
       ImageIndex = 23
       OnExecute = aaUndo
     end
-    object aRedo: TAction
+    object aRedo: TTntAction
       Caption = '&Redo'
       Hint = 'Redo|Redo the last undone change'
       ImageIndex = 80
       OnExecute = aaRedo
     end
-    object aSyntaxCheck: TAction
+    object aSyntaxCheck: TTntAction
       Caption = 'Syntax check'
       Hint = 'Syntax check the expression'
       ImageIndex = 57

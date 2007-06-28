@@ -3,7 +3,7 @@ inherited dGroupProps: TdGroupProps
   Caption = 'Properties: Picture group'
   PixelsPerInch = 96
   TextHeight = 13
-  object lID: TLabel [1]
+  object lID: TTntLabel [1]
     Left = 12
     Top = 12
     Width = 15
@@ -11,7 +11,7 @@ inherited dGroupProps: TdGroupProps
     Caption = '&ID:'
     FocusControl = eID
   end
-  object lText: TLabel [2]
+  object lText: TTntLabel [2]
     Left = 76
     Top = 12
     Width = 26
@@ -19,7 +19,7 @@ inherited dGroupProps: TdGroupProps
     Caption = '&Text:'
     FocusControl = eText
   end
-  object lDesc: TLabel [3]
+  object lDesc: TTntLabel [3]
     Left = 12
     Top = 52
     Width = 57
@@ -27,16 +27,16 @@ inherited dGroupProps: TdGroupProps
     Caption = '&Description:'
     FocusControl = mDescription
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 4
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       TabOrder = 1
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       TabOrder = 0
     end
   end
-  object eID: TEdit
+  object eID: TTntEdit
     Left = 12
     Top = 28
     Width = 61
@@ -45,7 +45,7 @@ inherited dGroupProps: TdGroupProps
     ReadOnly = True
     TabOrder = 0
   end
-  object eText: TEdit
+  object eText: TTntEdit
     Left = 76
     Top = 28
     Width = 542
@@ -54,7 +54,7 @@ inherited dGroupProps: TdGroupProps
     TabOrder = 1
     OnChange = DlgDataChange
   end
-  object mDescription: TMemo
+  object mDescription: TTntMemo
     Left = 12
     Top = 68
     Width = 606
@@ -64,7 +64,7 @@ inherited dGroupProps: TdGroupProps
     TabOrder = 2
     OnChange = DlgDataChange
   end
-  object gbGroupIcon: TGroupBox
+  object gbGroupIcon: TTntGroupBox
     Left = 12
     Top = 328
     Width = 606
@@ -72,7 +72,7 @@ inherited dGroupProps: TdGroupProps
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Group icon'
     TabOrder = 3
-    object bGroupIconSelect: TButton
+    object bGroupIconSelect: TTntButton
       Left = 44
       Top = 20
       Width = 85
@@ -80,7 +80,7 @@ inherited dGroupProps: TdGroupProps
       Action = aGroupIconSelect
       TabOrder = 1
     end
-    object bGroupIconReset: TButton
+    object bGroupIconReset: TTntButton
       Left = 136
       Top = 20
       Width = 85
@@ -122,16 +122,16 @@ inherited dGroupProps: TdGroupProps
       22000000070043617074696F6E21000000080043617465676F72792300000004
       0048696E74000A006947726F757049636F6E0000}
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Left = 32
     Top = 404
-    object aGroupIconSelect: TAction
+    object aGroupIconSelect: TTntAction
       Category = 'Group icon'
       Caption = '&Select...'
       Hint = 'Select...|Load group icon from a file'
       OnExecute = aaGroupIconSelect
     end
-    object aGroupIconReset: TAction
+    object aGroupIconReset: TTntAction
       Category = 'Group icon'
       Caption = '&Reset'
       Hint = 'Reset|Revert group icon to the default one'

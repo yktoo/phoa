@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.90 2007-06-27 18:29:08 dale Exp $
+//  $Id: Main.pas,v 1.91 2007-06-28 18:41:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -14,8 +14,8 @@ uses
   ActiveX, XPMan, Registry,
   phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps, ConsVars,
   phFrm, DKLang, ImgList, TB2Item, TB2MRU, TBXExtItems, Menus, TBX,
-  ActnList, TBXStatusBars, VirtualTrees, TBXDkPanels, TBXLists, TB2Dock,
-  TB2Toolbar;
+  ActnList, TntActnList, TBXStatusBars, VirtualTrees, TBXDkPanels,
+  TBXLists, TB2Dock, TB2Toolbar;
 
 type
    // Состояние приложения
@@ -31,47 +31,47 @@ type
   TAppStates = set of TAppState;
 
   TfMain = class(TPhoaForm, IPhoaApp, IPhoaMutableApp, IPhotoAlbumApp)
-    aAbout: TAction;
-    aCopy: TAction;
-    aCut: TAction;
-    aDelete: TAction;
-    aDeletePicsFromProject: TAction;
-    aDeletePicsWithFiles: TAction;
-    aEdit: TAction;
-    aExit: TAction;
-    aFileOperations: TAction;
-    aFind: TAction;
-    aFlatMode: TAction;
-    aHelpCheckUpdates: TAction;
-    aHelpContents: TAction;
-    aHelpFAQ: TAction;
-    aHelpProductWebsite: TAction;
-    aHelpSupport: TAction;
-    aHelpVendorWebsite: TAction;
-    aIniLoadSettings: TAction;
-    aIniSaveSettings: TAction;
-    alMain: TActionList;
-    aNew: TAction;
-    aNewGroup: TAction;
-    aNewPic: TAction;
-    aOpen: TAction;
-    aPaste: TAction;
-    aPhoaView_Delete: TAction;
-    aPhoaView_Edit: TAction;
-    aPhoaView_MakeGroup: TAction;
-    aPhoaView_New: TAction;
-    aPicOps: TAction;
-    aRemoveSearchResults: TAction;
-    aSave: TAction;
-    aSaveAs: TAction;
-    aSelectAll: TAction;
-    aSelectNone: TAction;
-    aSettings: TAction;
-    aSortPics: TAction;
-    aStats: TAction;
-    aUndo: TAction;
-    aView: TAction;
-    aViewSlideShow: TAction;
+    aAbout: TTntAction;
+    aCopy: TTntAction;
+    aCut: TTntAction;
+    aDelete: TTntAction;
+    aDeletePicsFromProject: TTntAction;
+    aDeletePicsWithFiles: TTntAction;
+    aEdit: TTntAction;
+    aExit: TTntAction;
+    aFileOperations: TTntAction;
+    aFind: TTntAction;
+    aFlatMode: TTntAction;
+    aHelpCheckUpdates: TTntAction;
+    aHelpContents: TTntAction;
+    aHelpFAQ: TTntAction;
+    aHelpProductWebsite: TTntAction;
+    aHelpSupport: TTntAction;
+    aHelpVendorWebsite: TTntAction;
+    aIniLoadSettings: TTntAction;
+    aIniSaveSettings: TTntAction;
+    alMain: TTntActionList;
+    aNew: TTntAction;
+    aNewGroup: TTntAction;
+    aNewPic: TTntAction;
+    aOpen: TTntAction;
+    aPaste: TTntAction;
+    aPhoaView_Delete: TTntAction;
+    aPhoaView_Edit: TTntAction;
+    aPhoaView_MakeGroup: TTntAction;
+    aPhoaView_New: TTntAction;
+    aPicOps: TTntAction;
+    aRemoveSearchResults: TTntAction;
+    aSave: TTntAction;
+    aSaveAs: TTntAction;
+    aSelectAll: TTntAction;
+    aSelectNone: TTntAction;
+    aSettings: TTntAction;
+    aSortPics: TTntAction;
+    aStats: TTntAction;
+    aUndo: TTntAction;
+    aView: TTntAction;
+    aViewSlideShow: TTntAction;
     bCopy: TTBXItem;
     bCut: TTBXItem;
     bDelete: TTBXItem;

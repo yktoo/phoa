@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,7 +11,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard,
-  phPicPropsDlgPage, Mask, ToolEdit, StdCtrls, DKLang;
+  phPicPropsDlgPage, DKLang, Mask, ToolEdit, TntStdCtrls, StdCtrls;
 
 type
    // Состояние значения редактируемого свойства изображения
@@ -32,25 +32,25 @@ type
   TPicEditorPropValues = Array[TPicProperty] of TPicEditorPropValue;
 
   TfrPicProps_Data = class(TPicPropsDialogPage)
-    lPlace: TLabel;
-    lDesc: TLabel;
-    lFilmNumber: TLabel;
-    lFrameNumber: TLabel;
-    lAuthor: TLabel;
-    lNotes: TLabel;
-    cbPlace: TComboBox;
-    mDesc: TMemo;
-    cbFilmNumber: TComboBox;
-    eFrameNumber: TEdit;
-    cbAuthor: TComboBox;
-    mNotes: TMemo;
-    eDate: TDateEdit;
-    eTime: TMaskEdit;
-    lDate: TLabel;
-    lTime: TLabel;
-    lMedia: TLabel;
-    cbMedia: TComboBox;
+    cbAuthor: TTntComboBox;
+    cbFilmNumber: TTntComboBox;
+    cbMedia: TTntComboBox;
+    cbPlace: TTntComboBox;
     dklcMain: TDKLanguageController;
+    eDate: TDateEdit;
+    eFrameNumber: TTntEdit;
+    eTime: TMaskEdit;
+    lAuthor: TTntLabel;
+    lDate: TTntLabel;
+    lDesc: TTntLabel;
+    lFilmNumber: TTntLabel;
+    lFrameNumber: TTntLabel;
+    lMedia: TTntLabel;
+    lNotes: TTntLabel;
+    lPlace: TTntLabel;
+    lTime: TTntLabel;
+    mDesc: TTntMemo;
+    mNotes: TTntMemo;
     procedure PicPropEditorChange(Sender: TObject);
   private
      // Флаг того, что контролы на странице проинициализированы

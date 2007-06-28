@@ -2,7 +2,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
   DesignSize = (
     576
     284)
-  object gbFileArranging: TGroupBox
+  object gbFileArranging: TTntGroupBox
     Left = 4
     Top = 0
     Width = 567
@@ -14,7 +14,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
     DesignSize = (
       567
       197)
-    object lBaseFolder: TLabel
+    object lBaseFolder: TTntLabel
       Left = 36
       Top = 68
       Width = 99
@@ -22,7 +22,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       Caption = 'Use path &relative to:'
       FocusControl = cbBaseFolder
     end
-    object lBaseGroup: TLabel
+    object lBaseGroup: TTntLabel
       Left = 36
       Top = 132
       Width = 130
@@ -30,7 +30,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       Caption = 'Use path r&elative to group:'
       FocusControl = cbBaseGroup
     end
-    object rbPutFlatly: TRadioButton
+    object rbPutFlatly: TTntRadioButton
       Left = 16
       Top = 24
       Width = 535
@@ -40,7 +40,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 0
       OnClick = AdjustOptionsNotify
     end
-    object rbMaintainFolderLayout: TRadioButton
+    object rbMaintainFolderLayout: TTntRadioButton
       Left = 16
       Top = 48
       Width = 535
@@ -50,7 +50,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 1
       OnClick = AdjustOptionsNotify
     end
-    object rbMaintainGroupLayout: TRadioButton
+    object rbMaintainGroupLayout: TTntRadioButton
       Left = 16
       Top = 112
       Width = 535
@@ -60,7 +60,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 3
       OnClick = AdjustOptionsNotify
     end
-    object cbAllowDuplicating: TCheckBox
+    object cbAllowDuplicating: TTntCheckBox
       Left = 36
       Top = 172
       Width = 517
@@ -70,7 +70,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 5
       OnClick = PageDataChange
     end
-    object cbBaseFolder: TComboBox
+    object cbBaseFolder: TTntComboBox
       Left = 36
       Top = 84
       Width = 515
@@ -82,7 +82,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 2
       OnChange = PageDataChange
     end
-    object cbBaseGroup: TComboBox
+    object cbBaseGroup: TTntComboBox
       Left = 36
       Top = 148
       Width = 515
@@ -95,7 +95,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       OnChange = PageDataChange
     end
   end
-  object gbFileNaming: TGroupBox
+  object gbFileNaming: TTntGroupBox
     Left = 4
     Top = 204
     Width = 567
@@ -106,7 +106,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
     DesignSize = (
       567
       73)
-    object lReplaceChar: TLabel
+    object lReplaceChar: TTntLabel
       Left = 16
       Top = 48
       Width = 200
@@ -115,7 +115,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       Caption = 'Replace &unallowed symbols with the char:'
       FocusControl = eReplaceChar
     end
-    object cbRenameFiles: TCheckBox
+    object cbRenameFiles: TTntCheckBox
       Left = 16
       Top = 20
       Width = 293
@@ -124,7 +124,7 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 0
       OnClick = AdjustOptionsNotify
     end
-    object eFileNameFormat: TEdit
+    object eFileNameFormat: TTntEdit
       Left = 312
       Top = 20
       Width = 241

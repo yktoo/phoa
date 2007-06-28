@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.12 2007-06-27 18:29:45 dale Exp $
+//  $Id: ufrSorting.pas,v 1.13 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,11 +11,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  StdCtrls, TB2Item, TBX, Menus, VirtualTrees;
+  TntStdCtrls, TB2Item, TBX, Menus, VirtualTrees, StdCtrls;
 
 type
-  TfrSorting = class(TFrame)
-    lMain: TLabel;
+  TfrSorting = class(TTntFrame)
+    lMain: TTntLabel;
     tvMain: TVirtualStringTree;
     pmMain: TTBXPopupMenu;
     ipmsmProp: TTBXSubmenuItem;

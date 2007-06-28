@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.21 2007-06-27 18:29:36 dale Exp $
+//  $Id: udSettings.pas,v 1.22 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,14 +10,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings, Registry,
-  phDlg, DKLang, TB2Dock, TB2Toolbar, TBX, StdCtrls, ExtCtrls;
+  phDlg, DKLang, TB2Dock, TB2Toolbar, TBX, StdCtrls, TntStdCtrls, ExtCtrls,
+  TntExtCtrls;
 
 type
   TdSettings = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
     dkNav: TTBXDock;
-    pEditor: TPanel;
-    pMain: TPanel;
+    pEditor: TTntPanel;
+    pMain: TTntPanel;
     tbNav: TTBXToolbar;
   private
      // Локальная копия настроек

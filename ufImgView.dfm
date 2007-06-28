@@ -547,11 +547,11 @@ inherited fImgView: TfImgView
     Height = 9
     Position = dpBottom
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 8
     Top = 48
-    object aNextPic: TAction
+    object aNextPic: TTntAction
       Category = 'Advance'
       Caption = '&Next picture'
       Hint = 'Next picture|Advance to the next picture in the group'
@@ -559,7 +559,7 @@ inherited fImgView: TfImgView
       ShortCut = 34
       OnExecute = aaNextPic
     end
-    object aPrevPic: TAction
+    object aPrevPic: TTntAction
       Category = 'Advance'
       Caption = '&Previous picture'
       Hint = 'Previous picture|Rewind to the previous picture in the group'
@@ -567,7 +567,7 @@ inherited fImgView: TfImgView
       ShortCut = 33
       OnExecute = aaPrevPic
     end
-    object aLastPic: TAction
+    object aLastPic: TTntAction
       Category = 'Advance'
       Caption = '&Last picture'
       Hint = 'Last picture|Jump to the last picture in the group'
@@ -575,7 +575,7 @@ inherited fImgView: TfImgView
       ShortCut = 35
       OnExecute = aaLastPic
     end
-    object aFirstPic: TAction
+    object aFirstPic: TTntAction
       Category = 'Advance'
       Caption = '&First picture'
       Hint = 'First picture|Jump to the first picture in the group'
@@ -583,35 +583,35 @@ inherited fImgView: TfImgView
       ShortCut = 36
       OnExecute = aaFirstPic
     end
-    object aZoomIn: TAction
+    object aZoomIn: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom &in'
       Hint = 'Zoom in|Enlarge the image'
       ImageIndex = 25
       OnExecute = aaZoomIn
     end
-    object aZoomOut: TAction
+    object aZoomOut: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom ou&t'
       Hint = 'Zoom out|Zoom image out'
       ImageIndex = 26
       OnExecute = aaZoomOut
     end
-    object aZoomActual: TAction
+    object aZoomActual: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom &actual'
       Hint = 'Zoom actual|Set magnification to 1:1'
       ImageIndex = 28
       OnExecute = aaZoomActual
     end
-    object aZoomFit: TAction
+    object aZoomFit: TTntAction
       Category = 'Zoom'
       Caption = 'Zoo&m best fit'
       Hint = 'Zoom best fit|Set magnification for image to fit in the window'
       ImageIndex = 27
       OnExecute = aaZoomFit
     end
-    object aEdit: TAction
+    object aEdit: TTntAction
       Category = 'Edit'
       Caption = '&Edit...'
       Hint = 'Edit...|Edit current picture'
@@ -619,7 +619,7 @@ inherited fImgView: TfImgView
       ShortCut = 32781
       OnExecute = aaEdit
     end
-    object aFullScreen: TAction
+    object aFullScreen: TTntAction
       Category = 'View'
       Caption = 'F&ullscreen mode'
       Hint = 'Fullscreen mode|Toggle fullscreen mode'
@@ -627,7 +627,7 @@ inherited fImgView: TfImgView
       ShortCut = 70
       OnExecute = aaFullScreen
     end
-    object aSlideShow: TAction
+    object aSlideShow: TTntAction
       Category = 'Slide show'
       Caption = '&Slide show'
       Hint = 
@@ -636,7 +636,7 @@ inherited fImgView: TfImgView
       ImageIndex = 35
       OnExecute = aaSlideShow
     end
-    object aRefresh: TAction
+    object aRefresh: TTntAction
       Category = 'View'
       Caption = '&Reload'
       Hint = 'Reload|Reload current picture from the file'
@@ -644,7 +644,7 @@ inherited fImgView: TfImgView
       ShortCut = 116
       OnExecute = aaRefresh
     end
-    object aShowInfo: TAction
+    object aShowInfo: TTntAction
       Category = 'View'
       Caption = 'Sho&w info'
       Hint = 'Show info|Display the picture'#39's description'
@@ -652,7 +652,7 @@ inherited fImgView: TfImgView
       ShortCut = 113
       OnExecute = aaShowInfo
     end
-    object aRelocateInfo: TAction
+    object aRelocateInfo: TTntAction
       Category = 'View'
       Caption = 'Rel&ocate info bar'
       Hint = 'Change position and size of the information bar'
@@ -660,7 +660,7 @@ inherited fImgView: TfImgView
       ShortCut = 16457
       OnExecute = aaRelocateInfo
     end
-    object aSettings: TAction
+    object aSettings: TTntAction
       Category = 'Edit'
       Caption = 'Pro&gram settings...'
       Hint = 'Program settings...|View/change program settings'
@@ -668,13 +668,13 @@ inherited fImgView: TfImgView
       ShortCut = 115
       OnExecute = aaSettings
     end
-    object aHelp: TAction
+    object aHelp: TTntAction
       Category = 'Help'
       Caption = '&Help'
       ImageIndex = 11
       OnExecute = aaHelp
     end
-    object aClose: TAction
+    object aClose: TTntAction
       Category = 'File'
       Caption = '&Close'
       Hint = 'Close|Close viewing window'
@@ -682,7 +682,7 @@ inherited fImgView: TfImgView
       ShortCut = 27
       OnExecute = aaClose
     end
-    object aRotate0: TAction
+    object aRotate0: TTntAction
       Category = 'Tools'
       Caption = '&No rotation'
       GroupIndex = 1
@@ -690,7 +690,7 @@ inherited fImgView: TfImgView
       ImageIndex = 66
       OnExecute = aaRotate0
     end
-    object aRotate90: TAction
+    object aRotate90: TTntAction
       Category = 'Tools'
       Caption = 'Rotate CW by &90'#176
       GroupIndex = 1
@@ -698,7 +698,7 @@ inherited fImgView: TfImgView
       ImageIndex = 67
       OnExecute = aaRotate90
     end
-    object aRotate180: TAction
+    object aRotate180: TTntAction
       Category = 'Tools'
       Caption = 'Rotate by &180'#176
       GroupIndex = 1
@@ -706,7 +706,7 @@ inherited fImgView: TfImgView
       ImageIndex = 68
       OnExecute = aaRotate180
     end
-    object aRotate270: TAction
+    object aRotate270: TTntAction
       Category = 'Tools'
       Caption = 'Rotate CCW by 9&0'#176
       GroupIndex = 1
@@ -716,21 +716,21 @@ inherited fImgView: TfImgView
       ImageIndex = 69
       OnExecute = aaRotate270
     end
-    object aFlipHorz: TAction
+    object aFlipHorz: TTntAction
       Category = 'Tools'
       Caption = 'Flip &horizontally'
       Hint = 'Flip horizontally|Flip the image horizontally'
       ImageIndex = 70
       OnExecute = aaFlipHorz
     end
-    object aFlipVert: TAction
+    object aFlipVert: TTntAction
       Category = 'Tools'
       Caption = 'Flip &vertically'
       Hint = 'Flip vertically|Flip the image vertically'
       ImageIndex = 71
       OnExecute = aaFlipVert
     end
-    object aStoreTransform: TAction
+    object aStoreTransform: TTntAction
       Category = 'Tools'
       Caption = 'Store &transformations'
       Hint = 
@@ -739,28 +739,28 @@ inherited fImgView: TfImgView
       ImageIndex = 72
       OnExecute = aaStoreTransform
     end
-    object aSlideShowBackward: TAction
+    object aSlideShowBackward: TTntAction
       Category = 'Slide show'
       Caption = '&Backward'
       Hint = 'Backward|Set backward Slide Show direction'
       ImageIndex = 76
       OnExecute = aaSlideShowBackward
     end
-    object aSlideShowRandom: TAction
+    object aSlideShowRandom: TTntAction
       Category = 'Slide show'
       Caption = '&Random'
       Hint = 'Random|Set random Slide Show direction'
       ImageIndex = 77
       OnExecute = aaSlideShowRandom
     end
-    object aSlideShowForward: TAction
+    object aSlideShowForward: TTntAction
       Category = 'Slide show'
       Caption = '&Forward'
       Hint = 'Forward|Set forward Slide Show direction'
       ImageIndex = 75
       OnExecute = aaSlideShowForward
     end
-    object aSlideShowCyclic: TAction
+    object aSlideShowCyclic: TTntAction
       Category = 'Slide show'
       Caption = '&Cyclic slide show'
       Hint = 

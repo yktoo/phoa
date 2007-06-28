@@ -75,42 +75,42 @@ inherited frPicProps_Keywords: TfrPicProps_Keywords
       DisplayMode = nbdmImageAndText
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 40
     Top = 252
-    object aCheckedOnly: TAction
+    object aCheckedOnly: TTntAction
       AutoCheck = True
       Caption = 'C&hecked only'
       Hint = 'Checked only|Display only checked keywords'
       ImageIndex = 41
       OnExecute = aaCheckedOnly
     end
-    object aAdd: TAction
+    object aAdd: TTntAction
       Caption = '&Add'
       Hint = 'Add a keyword|Add new keyword to selected pictures'
       ImageIndex = 0
       OnExecute = aaAdd
     end
-    object aEdit: TAction
+    object aEdit: TTntAction
       Caption = '&Edit'
       Hint = 'Edit keyword|Edit selected keyword'
       ImageIndex = 8
       OnExecute = aaEdit
     end
-    object aCheckAll: TAction
+    object aCheckAll: TTntAction
       Caption = '&Check all'
       Hint = 'Check all|Check all the keywords in the list'
       ImageIndex = 13
       OnExecute = aaCheckAll
     end
-    object aUncheckAll: TAction
+    object aUncheckAll: TTntAction
       Caption = '&Uncheck all'
       Hint = 'Uncheck all|Remove check from all the keywords in the list'
       ImageIndex = 14
       OnExecute = aaUncheckAll
     end
-    object aInvertCheck: TAction
+    object aInvertCheck: TTntAction
       Caption = '&Invert'
       Hint = 'Invert check|Toggle keyword check'
       ImageIndex = 40

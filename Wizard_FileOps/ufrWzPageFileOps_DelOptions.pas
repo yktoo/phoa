@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_DelOptions.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_DelOptions.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,11 +10,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang;
+  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_DelOptions = class(TWizardPage)
-    cbDeleteToRecycleBin: TCheckBox;
+    cbDeleteToRecycleBin: TTntCheckBox;
     dklcMain: TDKLanguageController;
   protected
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;

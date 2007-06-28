@@ -2,7 +2,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
   DesignSize = (
     576
     284)
-  object lCountInfo: TLabel
+  object lCountInfo: TTntLabel
     Left = 0
     Top = 271
     Width = 576
@@ -10,7 +10,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     Align = alBottom
     Alignment = taCenter
   end
-  object rbAllPics: TRadioButton
+  object rbAllPics: TTntRadioButton
     Left = 4
     Top = 24
     Width = 567
@@ -20,7 +20,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     TabOrder = 1
     OnClick = RBSelPicturesClick
   end
-  object rbSelPics: TRadioButton
+  object rbSelPics: TTntRadioButton
     Left = 4
     Top = 4
     Width = 567
@@ -30,7 +30,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     TabOrder = 0
     OnClick = RBSelPicturesClick
   end
-  object rbSelGroups: TRadioButton
+  object rbSelGroups: TTntRadioButton
     Left = 4
     Top = 44
     Width = 567
@@ -78,7 +78,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     Columns = <>
     WideDefaultText = 'Photo Album'
   end
-  object gbValidity: TGroupBox
+  object gbValidity: TTntGroupBox
     Left = 8
     Top = 176
     Width = 561
@@ -90,7 +90,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
     DesignSize = (
       561
       89)
-    object rbValidityAny: TRadioButton
+    object rbValidityAny: TTntRadioButton
       Left = 16
       Top = 20
       Width = 533
@@ -100,7 +100,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
       TabOrder = 0
       OnClick = UpdateCountInfoNotify
     end
-    object rbValidityValid: TRadioButton
+    object rbValidityValid: TTntRadioButton
       Left = 16
       Top = 40
       Width = 533
@@ -110,7 +110,7 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
       TabOrder = 1
       OnClick = UpdateCountInfoNotify
     end
-    object rbValidityInvalid: TRadioButton
+    object rbValidityInvalid: TTntRadioButton
       Left = 16
       Top = 60
       Width = 533
@@ -121,23 +121,23 @@ inherited frWzPageFileOps_SelPics: TfrWzPageFileOps_SelPics
       OnClick = UpdateCountInfoNotify
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 36
     Top = 72
-    object aCheckAll: TAction
+    object aCheckAll: TTntAction
       Caption = '&Check all groups'
       Hint = 'Set check to all the groups having pictures'
       ImageIndex = 13
       OnExecute = aaCheckAll
     end
-    object aUncheckAll: TAction
+    object aUncheckAll: TTntAction
       Caption = '&Uncheck all groups'
       Hint = 'Remove check from all the groups'
       ImageIndex = 14
       OnExecute = aaUncheckAll
     end
-    object aInvertChecks: TAction
+    object aInvertChecks: TTntAction
       Caption = '&Invert group checks'
       Hint = 'Toggle each group'#39's check'
       ImageIndex = 40

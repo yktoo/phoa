@@ -4,7 +4,7 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object lGroup: TLabel [0]
+  object lGroup: TTntLabel [0]
     Left = 12
     Top = 12
     Width = 33
@@ -49,15 +49,15 @@ inherited dSelPhoaGroup: TdSelPhoaGroup
     Columns = <>
     WideDefaultText = 'Photo Album'
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 1
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Left = 472
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 392
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 550
     end
   end

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrExprPicFilter.pas,v 1.4 2007-06-27 18:29:45 dale Exp $
+//  $Id: ufrExprPicFilter.pas,v 1.5 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,20 +11,20 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   DKLang, SynCompletionProposal, TB2MRU, TBXExtItems, Menus, TB2Item, TBX,
-  ActnList, SynEdit, TB2Dock, TB2Toolbar;
+  ActnList, SynEdit, TB2Dock, TB2Toolbar, TntActnList;
 
 type
-  TfrExprPicFilter = class(TFrame)
-    aCopy: TAction;
-    aCut: TAction;
-    alMain: TActionList;
-    aNew: TAction;
-    aOpen: TAction;
-    aPaste: TAction;
-    aRedo: TAction;
-    aSaveAs: TAction;
-    aSyntaxCheck: TAction;
-    aUndo: TAction;
+  TfrExprPicFilter = class(TTntFrame)
+    aCopy: TTntAction;
+    aCut: TTntAction;
+    alMain: TTntActionList;
+    aNew: TTntAction;
+    aOpen: TTntAction;
+    aPaste: TTntAction;
+    aRedo: TTntAction;
+    aSaveAs: TTntAction;
+    aSyntaxCheck: TTntAction;
+    aUndo: TTntAction;
     bCopy: TTBXItem;
     bCut: TTBXItem;
     bNew: TTBXItem;

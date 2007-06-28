@@ -3,7 +3,7 @@ inherited dPicProps: TdPicProps
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object pMain: TPanel [1]
+  object pMain: TTntPanel [1]
     Left = 0
     Top = 0
     Width = 632
@@ -72,7 +72,7 @@ inherited dPicProps: TdPicProps
         end
       end
     end
-    object pPages: TPanel
+    object pPages: TTntPanel
       Left = 82
       Top = 0
       Width = 550
@@ -82,16 +82,16 @@ inherited dPicProps: TdPicProps
       TabOrder = 1
     end
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 1
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Left = 471
       Caption = 'Close'
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 391
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 549
     end
   end

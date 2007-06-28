@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.17 2007-06-27 18:29:29 dale Exp $
+//  $Id: phWizForm.pas,v 1.18 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,21 +10,21 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, Registry,
-  StdCtrls, ExtCtrls, DKLang, phFrm;
+  phFrm, ExtCtrls, TntExtCtrls, StdCtrls, TntStdCtrls;
 
 type
   TPhoaWizardForm = class(TPhoaForm, IWizardHostForm)
-    bBack: TButton;
-    bCancel: TButton;
-    bHelp: TButton;
-    bNext: TButton;
+    bBack: TTntButton;
+    bCancel: TTntButton;
+    bHelp: TTntButton;
+    bNext: TTntButton;
     bvBottom: TBevel;
     bvTopPanel: TBevel;
-    iIcon: TImage;
-    lHeading: TLabel;
-    pButtons: TPanel;
-    pHeader: TPanel;
-    pMain: TPanel;
+    iIcon: TTntImage;
+    lHeading: TTntLabel;
+    pButtons: TTntPanel;
+    pHeader: TTntPanel;
+    pMain: TTntPanel;
     procedure bBackClick(Sender: TObject);
     procedure bCancelClick(Sender: TObject);
     procedure bHelpClick(Sender: TObject);

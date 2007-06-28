@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.13 2007-06-27 18:29:36 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.14 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,13 +11,13 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj,
-  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
+  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang, TntStdCtrls, TntExtCtrls;
 
 type
   TdSelKeywords = class(TPhoaDialog)
-    bReset: TButton;
+    bReset: TTntButton;
     dklcMain: TDKLanguageController;
-    lMain: TLabel;
+    lMain: TTntLabel;
     tvMain: TVirtualStringTree;
     procedure bResetClick(Sender: TObject);
     procedure tvMainChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);

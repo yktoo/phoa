@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.18 2007-06-27 18:29:29 dale Exp $
+//  $Id: phValSetting.pas,v 1.19 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -234,7 +234,7 @@ type
   end;
 
 implementation
-uses TypInfo, Forms, Dialogs, Math, RXSpin, phUtils;
+uses TypInfo, Forms, Dialogs, Math, TntStdCtrls, RXSpin, phUtils;
 
 type
    //===================================================================================================================
@@ -291,11 +291,11 @@ type
   end;
 
    //===================================================================================================================
-   // TSettingButton - потомок TButton, перехватывающий нажатия стрелок
+   // TSettingButton - потомок TTntButton, перехватывающий нажатия стрелок
    //===================================================================================================================
 
 type
-  TSettingButton = class(TButton)
+  TSettingButton = class(TTntButton)
   private
     procedure WMGetDlgCode(var Msg: TWMGetDlgCode); message WM_GETDLGCODE;
   end;
@@ -842,15 +842,15 @@ type
       BindKeyEvent   ('OnKeyDown', EmbeddedControlKeyDown);
     end;
 
-     // Создаёт и возвращает TComboBox в качестве редактора значения настройки
+     // Создаёт и возвращает TTntComboBox в качестве редактора значения настройки
     procedure NewComboBox;
     var
       i: Integer;
       ListSetting: TPhoaListSetting;
     begin
       ListSetting := Setting as TPhoaListSetting;
-      NewControl(TComboBox);
-      with TComboBox(FEditorControl) do begin
+      NewControl(TTntComboBox);
+      with TTntComboBox(FEditorControl) do begin
          // Копируем список вариантов
         Items.Clear;
         for i := 0 to ListSetting.Variants.Count-1 do Items.AddObject(ConstValEx(ListSetting.Variants[i]), ListSetting.Variants.Objects[i]);
@@ -874,7 +874,7 @@ type
       end;
     end;
 
-     // Создаёт и возвращает TEdit в качестве редактора значения настройки
+     // Создаёт и возвращает TRxSpinEdit в качестве редактора значения настройки
     procedure NewSpinEdit;
     var IES: TPhoaIntEntrySetting;
     begin
@@ -940,7 +940,7 @@ type
     Node := PVirtualNode(FEditorControl.Tag);
      // Получаем пункт настроек из данных узла
     Setting := GetSetting(Node);
-    if      Setting is TPhoaListSetting     then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TComboBox).ItemIndex
+    if      Setting is TPhoaListSetting     then TPhoaListSetting(Setting).VariantIndex := (FEditorControl as TTntComboBox).ItemIndex
     else if Setting is TPhoaColorSetting    then TPhoaColorSetting(Setting).Value := (FEditorControl as TColorBox).Selected
     else if Setting is TPhoaIntEntrySetting then TPhoaIntEntrySetting(Setting).Value := (FEditorControl as TRxSpinEdit).AsInteger;
     DoSettingChange;
@@ -1041,3 +1041,4 @@ type
   end;
 
 end.
+

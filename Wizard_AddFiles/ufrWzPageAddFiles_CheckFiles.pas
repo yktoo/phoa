@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.2 2007-06-27 18:29:57 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.3 2007-06-28 18:41:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,21 +12,21 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phObj, ConsVars,
   phWizard, ImgList, TB2Item, TBX, Menus, ActnList, ExtCtrls, VirtualTrees,
-  DKLang, StdCtrls;
+  DKLang, StdCtrls, TntActnList, TntStdCtrls, TntExtCtrls;
 
 type
   TfrWzPageAddFiles_CheckFiles = class(TWizardPage, IPhoaWizardPage_PreviewInfo)
-    aFilesCheckAll: TAction;
-    aFilesInvertChecks: TAction;
-    aFilesUncheckAll: TAction;
-    alMain: TActionList;
-    cbShowPreview: TCheckBox;
+    aFilesCheckAll: TTntAction;
+    aFilesInvertChecks: TTntAction;
+    aFilesUncheckAll: TTntAction;
+    alMain: TTntActionList;
+    cbShowPreview: TTntCheckBox;
     dklcMain: TDKLanguageController;
     ilFiles: TImageList;
     ipmFilesCheckAll: TTBXItem;
     ipmFilesInvertChecks: TTBXItem;
     ipmFilesUncheckAll: TTBXItem;
-    pBottom: TPanel;
+    pBottom: TTntPanel;
     pmFiles: TTBXPopupMenu;
     tvFiles: TVirtualStringTree;
     procedure aaFilesCheckAll(Sender: TObject);

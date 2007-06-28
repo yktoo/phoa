@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions2.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,17 +10,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phWizard, StdCtrls, DKLang;
+  phWizard, StdCtrls, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_MoveOptions2 = class(TWizardPage)
-    lNoOriginalFileMode: TLabel;
-    cbNoOriginalFileMode: TComboBox;
-    cbDeleteOriginal: TCheckBox;
-    cbDeleteToRecycleBin: TCheckBox;
-    cbUseCDOptions: TCheckBox;
-    lOverwriteMode: TLabel;
-    cbOverwriteMode: TComboBox;
+    lNoOriginalFileMode: TTntLabel;
+    cbNoOriginalFileMode: TTntComboBox;
+    cbDeleteOriginal: TTntCheckBox;
+    cbDeleteToRecycleBin: TTntCheckBox;
+    cbUseCDOptions: TTntCheckBox;
+    lOverwriteMode: TTntLabel;
+    cbOverwriteMode: TTntComboBox;
     dklcMain: TDKLanguageController;
     procedure AdjustOptionsNotify(Sender: TObject);
   private

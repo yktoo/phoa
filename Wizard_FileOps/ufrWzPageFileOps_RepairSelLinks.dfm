@@ -50,7 +50,7 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
         WideText = 'Date'
       end>
   end
-  object pBottom: TPanel
+  object pBottom: TTntPanel
     Left = 0
     Top = 260
     Width = 576
@@ -61,7 +61,7 @@ inherited frWzPageFileOps_RepairSelLinks: TfrWzPageFileOps_RepairSelLinks
     DesignSize = (
       576
       24)
-    object cbDeleteUnmatched: TCheckBox
+    object cbDeleteUnmatched: TTntCheckBox
       Left = 4
       Top = 4
       Width = 567

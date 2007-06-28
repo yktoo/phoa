@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSortPics.pas,v 1.17 2005-05-15 09:03:08 dale Exp $
+//  $Id: udSortPics.pas,v 1.18 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,16 +11,17 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, 
-  phDlg, VirtualTrees, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, ufrSorting, DKLang;
+  phDlg, DKLang, TntForms, ufrSorting, StdCtrls, TntStdCtrls, ExtCtrls,
+  TntExtCtrls;
 
 type
   TdSortPics = class(TPhoaDialog)
-    bReset: TButton;
+    bReset: TTntButton;
     dklcMain: TDKLanguageController;
     frSorting: TfrSorting;
-    gbWhereToSort: TGroupBox;
-    rbAllGroups: TRadioButton;
-    rbCurGroup: TRadioButton;
+    gbWhereToSort: TTntGroupBox;
+    rbAllGroups: TTntRadioButton;
+    rbCurGroup: TTntRadioButton;
     procedure bResetClick(Sender: TObject);
   private
      // Приложение

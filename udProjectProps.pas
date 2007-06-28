@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udProjectProps.pas,v 1.4 2005-05-15 09:03:08 dale Exp $
+//  $Id: udProjectProps.pas,v 1.5 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,20 +11,21 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phDlg, DKLang, RXSpin, ComCtrls, StdCtrls, ExtCtrls;
+  phDlg, DKLang, RXSpin, ComCtrls, StdCtrls, TntStdCtrls, ExtCtrls,
+  TntExtCtrls;
 
 type
   TdProjectProps = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
     eThumbSizeX: TRxSpinEdit;
     eThumbSizeY: TRxSpinEdit;
-    lDesc: TLabel;
-    lThQuality1: TLabel;
-    lThQuality2: TLabel;
-    lThumbQuality: TLabel;
-    lThumbSize: TLabel;
-    lThumbSizeX: TLabel;
-    mDesc: TMemo;
+    lDesc: TTntLabel;
+    lThQuality1: TTntLabel;
+    lThQuality2: TTntLabel;
+    lThumbQuality: TTntLabel;
+    lThumbSize: TTntLabel;
+    lThumbSizeX: TTntLabel;
+    mDesc: TTntMemo;
     tbThumbQuality: TTrackBar;
   private
      // Приложение

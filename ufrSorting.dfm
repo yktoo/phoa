@@ -4,7 +4,7 @@ object frSorting: TfrSorting
   Width = 320
   Height = 240
   TabOrder = 0
-  object lMain: TLabel
+  object lMain: TTntLabel
     Left = 0
     Top = 0
     Width = 320

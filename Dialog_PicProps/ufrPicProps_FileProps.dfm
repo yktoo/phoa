@@ -52,11 +52,11 @@ inherited frPicProps_FileProps: TfrPicProps_FileProps
       DisplayMode = nbdmImageAndText
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 8
     Top = 32
-    object aChangeFile: TAction
+    object aChangeFile: TTntAction
       Caption = '&Change file...'
       Hint = 'Change file...|Change file for selected picture'
       ImageIndex = 8

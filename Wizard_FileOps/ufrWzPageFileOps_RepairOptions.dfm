@@ -2,7 +2,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
   DesignSize = (
     576
     284)
-  object gbMatchFindingOptions: TGroupBox
+  object gbMatchFindingOptions: TTntGroupBox
     Left = 4
     Top = 0
     Width = 567
@@ -11,7 +11,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
     Caption = 'Searching for the matching file'
     ParentBackground = False
     TabOrder = 0
-    object rbSearchByName: TRadioButton
+    object rbSearchByName: TTntRadioButton
       Left = 16
       Top = 24
       Width = 497
@@ -20,7 +20,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
       TabOrder = 0
       OnClick = PageDataChange
     end
-    object rbSearchBySize: TRadioButton
+    object rbSearchBySize: TTntRadioButton
       Left = 16
       Top = 44
       Width = 497
@@ -29,7 +29,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
       TabOrder = 1
       OnClick = PageDataChange
     end
-    object rbSearchByNameSize: TRadioButton
+    object rbSearchByNameSize: TTntRadioButton
       Left = 16
       Top = 64
       Width = 497
@@ -39,7 +39,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
       OnClick = PageDataChange
     end
   end
-  object cbLookSubfolders: TCheckBox
+  object cbLookSubfolders: TTntCheckBox
     Left = 4
     Top = 176
     Width = 567
@@ -49,7 +49,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
     TabOrder = 2
     OnClick = PageDataChange
   end
-  object gbAlreadyInUseMode: TGroupBox
+  object gbAlreadyInUseMode: TTntGroupBox
     Left = 4
     Top = 104
     Width = 567
@@ -61,7 +61,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
     DesignSize = (
       567
       65)
-    object rbSkipFilesInUse: TRadioButton
+    object rbSkipFilesInUse: TTntRadioButton
       Left = 16
       Top = 20
       Width = 535
@@ -71,7 +71,7 @@ inherited frWzPageFileOps_RepairOptions: TfrWzPageFileOps_RepairOptions
       TabOrder = 0
       OnClick = PageDataChange
     end
-    object rbRelinkFilesInUse: TRadioButton
+    object rbRelinkFilesInUse: TTntRadioButton
       Left = 16
       Top = 40
       Width = 535

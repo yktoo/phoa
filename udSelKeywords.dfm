@@ -4,7 +4,7 @@ inherited dSelKeywords: TdSelKeywords
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object lMain: TLabel [0]
+  object lMain: TTntLabel [0]
     Left = 12
     Top = 12
     Width = 329
@@ -16,7 +16,7 @@ inherited dSelKeywords: TdSelKeywords
   inherited bvBottom: TBevel
     Width = 354
   end
-  object bReset: TButton [2]
+  object bReset: TTntButton [2]
     Left = 8
     Top = 403
     Width = 75
@@ -56,19 +56,19 @@ inherited dSelKeywords: TdSelKeywords
     Columns = <>
     WideDefaultText = ''
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     Width = 354
     TabOrder = 2
     DesignSize = (
       354
       35)
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Left = 195
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 115
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 273
     end
   end

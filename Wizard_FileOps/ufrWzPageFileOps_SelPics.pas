@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.3 2007-06-27 18:29:49 dale Exp $
+//  $Id: ufrWzPageFileOps_SelPics.pas,v 1.4 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,27 +12,27 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, StdCtrls, VirtualTrees, TB2Item, TBX, Menus,
-  ActnList, DKLang;
+  ActnList, DKLang, TntActnList, TntStdCtrls;
 
 type
   TfrWzPageFileOps_SelPics = class(TWizardPage)
-    aCheckAll: TAction;
-    aInvertChecks: TAction;
-    alMain: TActionList;
-    aUncheckAll: TAction;
+    aCheckAll: TTntAction;
+    aInvertChecks: TTntAction;
+    alMain: TTntActionList;
+    aUncheckAll: TTntAction;
     dklcMain: TDKLanguageController;
-    gbValidity: TGroupBox;
+    gbValidity: TTntGroupBox;
     ipmGroupsCheckAll: TTBXItem;
     ipmGroupsInvertChecks: TTBXItem;
     ipmGroupsUncheckAll: TTBXItem;
-    lCountInfo: TLabel;
+    lCountInfo: TTntLabel;
     pmGroups: TTBXPopupMenu;
-    rbAllPics: TRadioButton;
-    rbSelGroups: TRadioButton;
-    rbSelPics: TRadioButton;
-    rbValidityAny: TRadioButton;
-    rbValidityInvalid: TRadioButton;
-    rbValidityValid: TRadioButton;
+    rbAllPics: TTntRadioButton;
+    rbSelGroups: TTntRadioButton;
+    rbSelPics: TTntRadioButton;
+    rbValidityAny: TTntRadioButton;
+    rbValidityInvalid: TTntRadioButton;
+    rbValidityValid: TTntRadioButton;
     tvGroups: TVirtualStringTree;
     procedure aaCheckAll(Sender: TObject);
     procedure aaInvertChecks(Sender: TObject);

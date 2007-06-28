@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.3 2007-06-27 18:29:57 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.4 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,13 +11,13 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phWizard, VirtualTrees, phPicPropsDlgPage, TB2Dock, TB2Toolbar, TBX,
-  ActnList, TB2Item, DKLang;
+  phPicPropsDlgPage, DKLang, ActnList, TntActnList, TB2Item, TBX, TB2Dock,
+  TB2Toolbar, VirtualTrees;
 
 type
   TfrPicProps_FileProps = class(TPicPropsDialogPage)
-    aChangeFile: TAction;
-    alMain: TActionList;
+    aChangeFile: TTntAction;
+    alMain: TTntActionList;
     bChangeFile: TTBXItem;
     dklcMain: TDKLanguageController;
     tbMain: TTBXToolbar;

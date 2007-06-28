@@ -2,7 +2,7 @@ inherited frWzPageFileOps_DelOptions: TfrWzPageFileOps_DelOptions
   DesignSize = (
     576
     284)
-  object cbDeleteToRecycleBin: TCheckBox
+  object cbDeleteToRecycleBin: TTntCheckBox
     Left = 4
     Top = 4
     Width = 567

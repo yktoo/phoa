@@ -3,7 +3,7 @@ inherited dSettings: TdSettings
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object pMain: TPanel [1]
+  object pMain: TTntPanel [1]
     Left = 0
     Top = 0
     Width = 632
@@ -30,7 +30,7 @@ inherited dSettings: TdSettings
         TabOrder = 0
       end
     end
-    object pEditor: TPanel
+    object pEditor: TTntPanel
       Left = 27
       Top = 0
       Width = 605
@@ -40,9 +40,9 @@ inherited dSettings: TdSettings
       TabOrder = 1
     end
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 1
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Caption = 'Close'
     end
   end

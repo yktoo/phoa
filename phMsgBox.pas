@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMsgBox.pas,v 1.3 2007-06-27 18:29:14 dale Exp $
+//  $Id: phMsgBox.pas,v 1.4 2007-06-28 18:41:34 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,15 +9,15 @@ unit phMsgBox;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phDlg, StdCtrls, ExtCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, ConsVars,
+  phDlg, DKLang, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
-  TdMsgBox = class(TForm)
-    iIcon: TImage;
-    lMessage: TLabel;
-    cbDontShowAgain: TCheckBox;
+  TdMsgBox = class(TTntForm)
+    cbDontShowAgain: TTntCheckBox;
     dklcMain: TDKLanguageController;
+    iIcon: TTntImage;
+    lMessage: TTntLabel;
   private
      // Вид сообщения
     FKind: TMessageBoxKind;
@@ -28,7 +28,7 @@ type
      // Если True, то дополнительно отображает checkbox 'Больше не показывать данное сообщение'
     FDiscardable: Boolean;
      // Кнопки диалога
-    FButtonCtls: Array of TButton;
+    FButtonCtls: Array of TTntButton;
      // Ширина кнопок с учётом всех границ и зазоров, инициализируется в AdjustButtons()
     FButtonWidths: Integer;
      // Набор флагов - результат выполнения
@@ -238,7 +238,7 @@ uses phUtils, phSettings, phChmHlp;
     btn: TMessageBoxButton;
 
      // Создаёт возвращает кнопку
-    function MakeButton(mbb: TMessageBoxButton): TButton;
+    function MakeButton(mbb: TMessageBoxButton): TTntButton;
     const
       asBtnCaptionConsts: Array[TMessageBoxButton] of AnsiString = (
         'SBtn_Yes',      // mbbYes
@@ -257,7 +257,7 @@ uses phUtils, phSettings, phChmHlp;
         mbrCancel,              // mbbCancel
         TMessageBoxResult(-1)); // mbbHelp
     begin
-      Result := TButton.Create(Self);
+      Result := TTntButton.Create(Self);
       with Result do begin
         Parent   := Self;
         Cancel   := (mbb=mbbCancel) or ((mbb=mbbOK) and not (mbbCancel in FButtons)) or ((mbb=mbbNo) and (FButtons*[mbbOK, mbbCancel]=[]));
@@ -321,16 +321,15 @@ uses phUtils, phSettings, phChmHlp;
 
   procedure TdMsgBox.AdjustMessage;
   begin
-    with lMessage do begin
-       // Ставим точку в конце, если её нет
-      if (FMessage<>'') and not (FMessage[Length(FMessage)] in ['.', '!', '?', '…']) then FMessage := FMessage+'.';
-      Caption  := FMessage;
-       // Выставляем ширину текста побольше и пересчитываем размеры надписи
-      Width    := Screen.WorkAreaWidth-IMsgBox_ScreenWidthGap-Left-IMsgBox_LabelRightMargin;
-      AutoSize := True;
-       // Если высота надписи меньше высоты значка, центрируем по вертикали надпись относительно значка
-      if Height<iIcon.Height then Top := iIcon.Top+((iIcon.Height-Height) div 2);
-    end;
+     // Ставим точку в конце, если её нет
+    if (FMessage<>'') and not (FMessage[Length(FMessage)] in [WideChar('.'), WideChar('!'), WideChar('?'), WideChar('…')]) then
+      FMessage := FMessage+'.';
+    lMessage.Caption  := FMessage;
+     // Выставляем ширину текста побольше и пересчитываем размеры надписи
+    lMessage.Width    := Screen.WorkAreaWidth-IMsgBox_ScreenWidthGap-lMessage.Left-IMsgBox_LabelRightMargin;
+    lMessage.AutoSize := True;
+     // Если высота надписи меньше высоты значка, центрируем по вертикали надпись относительно значка
+    if lMessage.Height<iIcon.Height then lMessage.Top := iIcon.Top+((iIcon.Height-lMessage.Height) div 2);
   end;
 
   procedure TdMsgBox.AdjustSound;
@@ -378,4 +377,8 @@ uses phUtils, phSettings, phChmHlp;
   end;
 
 end.
+
+
+
+
 

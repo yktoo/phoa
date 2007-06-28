@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.11 2007-06-27 18:29:29 dale Exp $
+//  $Id: udAbout.pas,v 1.12 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,18 +9,19 @@ unit udAbout;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32, GR32_Layers, ConsVars, 
-  StdCtrls, GR32_Image, ExtCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, GR32, GR32_Layers,
+  ConsVars,
+  DKLang, ExtCtrls, StdCtrls, TntStdCtrls, GR32_Image;
 
 type
   TShowDetail = (sdTitle, sdAuthor, sdCredits);
 
-  TdAbout = class(TForm)
-    iMain: TImage32;
-    lWebsite: TLabel;
-    lOK: TLabel;
-    TheTimer: TTimer;
+  TdAbout = class(TTntForm)
     dklcMain: TDKLanguageController;
+    iMain: TImage32;
+    lOK: TTntLabel;
+    lWebsite: TTntLabel;
+    TheTimer: TTimer;
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure lWebsiteClick(Sender: TObject);
     procedure lOKClick(Sender: TObject);
@@ -324,4 +325,5 @@ var
   end;
 
 end.
+
 

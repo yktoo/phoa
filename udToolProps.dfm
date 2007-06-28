@@ -7,7 +7,7 @@ inherited dToolProps: TdToolProps
   inherited bvBottom: TBevel
     Top = 334
   end
-  object lKind: TLabel [1]
+  object lKind: TTntLabel [1]
     Left = 296
     Top = 12
     Width = 24
@@ -15,42 +15,42 @@ inherited dToolProps: TdToolProps
     Caption = '&Kind:'
     FocusControl = cbKind
   end
-  object lName: TLabel [2]
+  object lName: TTntLabel [2]
     Left = 12
     Top = 52
     Width = 250
     Height = 13
     Caption = '&Name (caption; use '#39'&&'#39' to indicate the shortcut key):'
   end
-  object lHint: TLabel [3]
+  object lHint: TTntLabel [3]
     Left = 296
     Top = 52
     Width = 23
     Height = 13
     Caption = '&Hint:'
   end
-  object lRunCommand: TLabel [4]
+  object lRunCommand: TTntLabel [4]
     Left = 12
     Top = 92
     Width = 113
     Height = 13
     Caption = '&Command (application):'
   end
-  object lRunParams: TLabel [5]
+  object lRunParams: TTntLabel [5]
     Left = 12
     Top = 132
     Width = 59
     Height = 13
     Caption = '&Parameters:'
   end
-  object lRunFolder: TLabel [6]
+  object lRunFolder: TTntLabel [6]
     Left = 12
     Top = 172
     Width = 163
     Height = 13
     Caption = '&Folder (leave empty for defaults):'
   end
-  object lRunShowCommand: TLabel [7]
+  object lRunShowCommand: TTntLabel [7]
     Left = 420
     Top = 132
     Width = 70
@@ -59,18 +59,18 @@ inherited dToolProps: TdToolProps
     Caption = 'W&indow state:'
     FocusControl = cbRunShowCommand
   end
-  object lMasks: TLabel [8]
+  object lMasks: TTntLabel [8]
     Left = 12
     Top = 12
     Width = 198
     Height = 13
     Caption = 'File &masks (empty mask matches all files):'
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     Top = 336
     TabOrder = 11
   end
-  object cbKind: TComboBox
+  object cbKind: TTntComboBox
     Left = 296
     Top = 28
     Width = 325
@@ -81,7 +81,7 @@ inherited dToolProps: TdToolProps
     OnChange = cbKindChange
     OnDrawItem = cbKindDrawItem
   end
-  object eName: TEdit
+  object eName: TTntEdit
     Left = 12
     Top = 68
     Width = 281
@@ -89,7 +89,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 2
     OnChange = DlgDataChange
   end
-  object eHint: TEdit
+  object eHint: TTntEdit
     Left = 296
     Top = 68
     Width = 325
@@ -98,7 +98,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 3
     OnChange = DlgDataChange
   end
-  object eRunCommand: TEdit
+  object eRunCommand: TTntEdit
     Left = 12
     Top = 108
     Width = 525
@@ -107,7 +107,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 4
     OnChange = DlgDataChange
   end
-  object bBrowseRunCommand: TButton
+  object bBrowseRunCommand: TTntButton
     Left = 540
     Top = 108
     Width = 81
@@ -117,7 +117,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 5
     OnClick = bBrowseRunCommandClick
   end
-  object eRunParams: TEdit
+  object eRunParams: TTntEdit
     Left = 12
     Top = 148
     Width = 405
@@ -126,7 +126,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 6
     OnChange = DlgDataChange
   end
-  object eRunFolder: TEdit
+  object eRunFolder: TTntEdit
     Left = 12
     Top = 188
     Width = 525
@@ -135,7 +135,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 8
     OnChange = DlgDataChange
   end
-  object bBrowseRunFolder: TButton
+  object bBrowseRunFolder: TTntButton
     Left = 540
     Top = 188
     Width = 81
@@ -145,7 +145,7 @@ inherited dToolProps: TdToolProps
     TabOrder = 9
     OnClick = bBrowseRunFolderClick
   end
-  object cbRunShowCommand: TComboBox
+  object cbRunShowCommand: TTntComboBox
     Left = 420
     Top = 148
     Width = 201
@@ -160,7 +160,7 @@ inherited dToolProps: TdToolProps
       'Minimized'
       'Maximized')
   end
-  object gbUsage: TGroupBox
+  object gbUsage: TTntGroupBox
     Left = 12
     Top = 212
     Width = 609
@@ -172,7 +172,7 @@ inherited dToolProps: TdToolProps
     DesignSize = (
       609
       109)
-    object cbUsageTools: TCheckBox
+    object cbUsageTools: TTntCheckBox
       Left = 16
       Top = 20
       Width = 577
@@ -184,7 +184,7 @@ inherited dToolProps: TdToolProps
       TabOrder = 0
       OnClick = DlgDataChange
     end
-    object cbUsageGroups: TCheckBox
+    object cbUsageGroups: TTntCheckBox
       Left = 16
       Top = 40
       Width = 577
@@ -194,7 +194,7 @@ inherited dToolProps: TdToolProps
       TabOrder = 1
       OnClick = DlgDataChange
     end
-    object cbUsageThViewer: TCheckBox
+    object cbUsageThViewer: TTntCheckBox
       Left = 16
       Top = 60
       Width = 577
@@ -204,7 +204,7 @@ inherited dToolProps: TdToolProps
       TabOrder = 2
       OnClick = DlgDataChange
     end
-    object cbUsageViewMode: TCheckBox
+    object cbUsageViewMode: TTntCheckBox
       Left = 16
       Top = 80
       Width = 577
@@ -215,7 +215,7 @@ inherited dToolProps: TdToolProps
       OnClick = DlgDataChange
     end
   end
-  object eMasks: TEdit
+  object eMasks: TTntEdit
     Left = 12
     Top = 28
     Width = 281
@@ -256,7 +256,7 @@ inherited dToolProps: TdToolProps
       0C006F6452756E436F6D6D616E64010200000064000000060046696C74657266
       00000005005469746C6500}
   end
-  object odRunCommand: TOpenDialog
+  object odRunCommand: TTntOpenDialog
     Filter = 
       'Applications (*.bat;*.com;*.exe)|*.bat;*.com;*.exe|All files (*.' +
       '*)|*.*'

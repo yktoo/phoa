@@ -7,7 +7,7 @@ inherited dSortPics: TdSortPics
   inherited bvBottom: TBevel
     Width = 392
   end
-  object bReset: TButton [1]
+  object bReset: TTntButton [1]
     Left = 309
     Top = 405
     Width = 75
@@ -17,23 +17,23 @@ inherited dSortPics: TdSortPics
     TabOrder = 0
     OnClick = bResetClick
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     Width = 392
     TabOrder = 1
     DesignSize = (
       392
       35)
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Left = 234
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       Left = 154
     end
-    inherited bHelp: TButton
+    inherited bHelp: TTntButton
       Left = 312
     end
   end
-  object gbWhereToSort: TGroupBox
+  object gbWhereToSort: TTntGroupBox
     Left = 12
     Top = 12
     Width = 367
@@ -41,7 +41,7 @@ inherited dSortPics: TdSortPics
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Where to sort pictures'
     TabOrder = 2
-    object rbCurGroup: TRadioButton
+    object rbCurGroup: TTntRadioButton
       Left = 16
       Top = 20
       Width = 345
@@ -50,7 +50,7 @@ inherited dSortPics: TdSortPics
       TabOrder = 0
       OnClick = DlgDataChange
     end
-    object rbAllGroups: TRadioButton
+    object rbAllGroups: TTntRadioButton
       Left = 16
       Top = 40
       Width = 345
@@ -67,7 +67,7 @@ inherited dSortPics: TdSortPics
     Height = 298
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
-    inherited lMain: TLabel
+    inherited lMain: TTntLabel
       Width = 366
       Caption = '&Sort pictures by:'
     end

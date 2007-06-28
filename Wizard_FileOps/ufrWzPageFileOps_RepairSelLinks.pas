@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairSelLinks.pas,v 1.3 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,13 +12,13 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, StdCtrls, ExtCtrls, Mask, VirtualTrees,
-  DKLang;
+  DKLang, TntStdCtrls, TntExtCtrls;
 
 type
   TfrWzPageFileOps_RepairSelLinks = class(TWizardPage)
-    cbDeleteUnmatched: TCheckBox;
+    cbDeleteUnmatched: TTntCheckBox;
     dklcMain: TDKLanguageController;
-    pBottom: TPanel;
+    pBottom: TTntPanel;
     tvMain: TVirtualStringTree;
     procedure tvMainBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

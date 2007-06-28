@@ -4,7 +4,7 @@ inherited dProjectProps: TdProjectProps
   OldCreateOrder = True
   PixelsPerInch = 96
   TextHeight = 13
-  object lDesc: TLabel [1]
+  object lDesc: TTntLabel [1]
     Left = 12
     Top = 80
     Width = 57
@@ -12,7 +12,7 @@ inherited dProjectProps: TdProjectProps
     Caption = '&Description:'
     FocusControl = mDesc
   end
-  object lThumbSize: TLabel [2]
+  object lThumbSize: TTntLabel [2]
     Left = 12
     Top = 12
     Width = 107
@@ -20,14 +20,14 @@ inherited dProjectProps: TdProjectProps
     Caption = '&Thumbnail size (WxH):'
     FocusControl = eThumbSizeX
   end
-  object lThumbSizeX: TLabel [3]
+  object lThumbSizeX: TTntLabel [3]
     Left = 64
     Top = 32
     Width = 6
     Height = 13
     Caption = 'x'
   end
-  object lThumbQuality: TLabel [4]
+  object lThumbQuality: TTntLabel [4]
     Left = 136
     Top = 12
     Width = 87
@@ -35,14 +35,14 @@ inherited dProjectProps: TdProjectProps
     Caption = '&Thumbnail quality:'
     FocusControl = tbThumbQuality
   end
-  object lThQuality1: TLabel [5]
+  object lThQuality1: TTntLabel [5]
     Left = 136
     Top = 60
     Width = 39
     Height = 26
     Caption = 'lower'#13#10'less size'
   end
-  object lThQuality2: TLabel [6]
+  object lThQuality2: TTntLabel [6]
     Left = 316
     Top = 60
     Width = 57
@@ -50,17 +50,17 @@ inherited dProjectProps: TdProjectProps
     Alignment = taRightJustify
     Caption = 'higher'#13#10'greater size'
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 4
-    inherited bCancel: TButton
+    inherited bCancel: TTntButton
       Caption = 'Close'
       TabOrder = 1
     end
-    inherited bOK: TButton
+    inherited bOK: TTntButton
       TabOrder = 0
     end
   end
-  object mDesc: TMemo
+  object mDesc: TTntMemo
     Left = 12
     Top = 96
     Width = 605

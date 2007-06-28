@@ -38,7 +38,7 @@ inherited dStats: TdStats
         Width = 305
       end>
   end
-  inherited pButtonsBottom: TPanel
+  inherited pButtonsBottom: TTntPanel
     TabOrder = 1
   end
   object dklcMain: TDKLanguageController

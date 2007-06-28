@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.8 2007-06-27 18:29:29 dale Exp $
+//  $Id: phWizard.pas,v 1.9 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -42,7 +42,7 @@ type
 
   TWizardController = class;
 
-  TWizardPage = class(TFrame)
+  TWizardPage = class(TTntFrame)
      // Событие изменения данных страницы, вызывает OnStatusChange
     procedure PageDataChange(Sender: TObject);
   private

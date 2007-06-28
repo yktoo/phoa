@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.5 2007-06-27 18:29:10 dale Exp $
+//  $Id: phFrm.pas,v 1.6 2007-06-28 18:41:33 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,10 +9,10 @@ unit phFrm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, Registry;
 
 type
-  TPhoaForm = class(TForm)
+  TPhoaForm = class(TTntForm)
   private
      // Счётчик блокировки обновления
     FLockCounter: Integer;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_CDOptions.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,22 +10,22 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang;
+  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_CDOptions = class(TWizardPage)
-    cbCopyExecutable: TCheckBox;
-    cbCopyIniSettings: TCheckBox;
-    cbCopyLangFile: TCheckBox;
-    cbCreateAutorun: TCheckBox;
-    cbCreatePhoa: TCheckBox;
-    cbIncludeViews: TCheckBox;
+    cbCopyExecutable: TTntCheckBox;
+    cbCopyIniSettings: TTntCheckBox;
+    cbCopyLangFile: TTntCheckBox;
+    cbCreateAutorun: TTntCheckBox;
+    cbCreatePhoa: TTntCheckBox;
+    cbIncludeViews: TTntCheckBox;
     dklcMain: TDKLanguageController;
-    eMediaLabel: TEdit;
-    ePhoaFileName: TEdit;
-    lMediaLabel: TLabel;
-    lPhoaDesc: TLabel;
-    mPhoaDesc: TMemo;
+    eMediaLabel: TTntEdit;
+    ePhoaFileName: TTntEdit;
+    lMediaLabel: TTntLabel;
+    lPhoaDesc: TTntLabel;
+    mPhoaDesc: TTntMemo;
     procedure AdjustOptionsNotify(Sender: TObject);
   private
      // Настраивает [вторичные] контролы опций

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.14 2007-06-27 18:29:45 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.15 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,29 +10,30 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, 
-  phWizard, VirtualTrees, ImgList, TB2Item, TBX, Menus, ActnList, StdCtrls, ExtCtrls, DKLang;
+  phWizard, VirtualTrees, ImgList, TB2Item, TBX, Menus, ActnList, StdCtrls, ExtCtrls, DKLang,
+  TntActnList, TntStdCtrls, TntExtCtrls;
 
 type
   TfrWzPage_Log = class(TWizardPage)
-    tvMain: TVirtualStringTree;
-    pmMain: TTBXPopupMenu;
-    ipmSaveToFile: TTBXItem;
-    pBottom: TPanel;
-    cbErrorsOnly: TCheckBox;
-    bSaveToFile: TButton;
-    alMain: TActionList;
-    aSaveToFile: TAction;
-    aDisplayErrorsOnly: TAction;
-    ipmDisplayErrorsOnly: TTBXItem;
-    ipmSep: TTBXSeparatorItem;
-    lInfo: TLabel;
-    aCopy: TAction;
-    aFind: TAction;
-    ipmFind: TTBXItem;
-    ipmCopy: TTBXItem;
-    ipmSep2: TTBXSeparatorItem;
-    fdMain: TFindDialog;
+    aCopy: TTntAction;
+    aDisplayErrorsOnly: TTntAction;
+    aFind: TTntAction;
+    alMain: TTntActionList;
+    aSaveToFile: TTntAction;
+    bSaveToFile: TTntButton;
+    cbErrorsOnly: TTntCheckBox;
     dklcMain: TDKLanguageController;
+    fdMain: TFindDialog;
+    ipmCopy: TTBXItem;
+    ipmDisplayErrorsOnly: TTBXItem;
+    ipmFind: TTBXItem;
+    ipmSaveToFile: TTBXItem;
+    ipmSep: TTBXSeparatorItem;
+    ipmSep2: TTBXSeparatorItem;
+    lInfo: TTntLabel;
+    pBottom: TTntPanel;
+    pmMain: TTBXPopupMenu;
+    tvMain: TVirtualStringTree;
     procedure tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure tvMainGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure tvMainBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);

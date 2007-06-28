@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,21 +10,21 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, DKLang;
+  Dialogs, phWizard, StdCtrls, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_SelTask = class(TWizardPage)
-    lCopyFiles: TLabel;
-    rbCopyFiles: TRadioButton;
-    lMoveFiles: TLabel;
-    rbMoveFiles: TRadioButton;
-    lDeleteFiles: TLabel;
-    rbDeleteFiles: TRadioButton;
-    lRepairFileLinks: TLabel;
-    rbRepairFileLinks: TRadioButton;
-    lNBUndoable: TLabel;
-    lRebuildThumbs: TLabel;
-    rbRebuildThumbs: TRadioButton;
+    lCopyFiles: TTntLabel;
+    rbCopyFiles: TTntRadioButton;
+    lMoveFiles: TTntLabel;
+    rbMoveFiles: TTntRadioButton;
+    lDeleteFiles: TTntLabel;
+    rbDeleteFiles: TTntRadioButton;
+    lRepairFileLinks: TTntLabel;
+    rbRepairFileLinks: TTntRadioButton;
+    lNBUndoable: TTntLabel;
+    lRebuildThumbs: TTntLabel;
+    rbRebuildThumbs: TTntRadioButton;
     dklcMain: TDKLanguageController;
   private
      // ћассив соответстви€ радиокнопок видам операций

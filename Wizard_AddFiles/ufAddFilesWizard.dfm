@@ -3,7 +3,7 @@ inherited fAddFilesWizard: TfAddFilesWizard
   OnCloseQuery = FormCloseQuery
   PixelsPerInch = 96
   TextHeight = 13
-  inherited pMain: TPanel
+  inherited pMain: TTntPanel
     object dpPreview: TTBXDockablePanel
       Left = 40
       Top = 4
@@ -30,7 +30,7 @@ inherited fAddFilesWizard: TfAddFilesWizard
       end
     end
   end
-  object pProcess: TPanel
+  object pProcess: TTntPanel
     Left = 39
     Top = 172
     Width = 553

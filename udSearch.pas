@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.41 2007-06-27 18:29:35 dale Exp $
+//  $Id: udSearch.pas,v 1.42 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,8 +11,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phDlg, ActnList, TBX, Menus, TB2Item, DKLang, TB2Dock, TB2Toolbar,
-  VirtualTrees, ComCtrls, StdCtrls, ExtCtrls, ufrExprPicFilter;
+  phDlg, ActnList, TntActnList, TBX, Menus, TB2Item, DKLang,
+  ufrExprPicFilter, TB2Dock, TB2Toolbar, VirtualTrees, ComCtrls,
+  TntComCtrls, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
    // Вид поиска
@@ -127,27 +128,27 @@ type
    //===================================================================================================================
 
   TdSearch = class(TPhoaDialog)
-    alMain: TActionList;
-    aSimpleConvertToExpression: TAction;
-    aSimpleCrDelete: TAction;
-    aSimpleReset: TAction;
+    alMain: TTntActionList;
+    aSimpleConvertToExpression: TTntAction;
+    aSimpleCrDelete: TTntAction;
+    aSimpleReset: TTntAction;
     bSimpleConvertToExpression: TTBXItem;
     bSimpleCrDelete: TTBXItem;
     bSimpleReset: TTBXItem;
     dklcMain: TDKLanguageController;
     dkSimpleTop: TTBXDock;
     frExprPicFilter: TfrExprPicFilter;
-    gbSearch: TGroupBox;
+    gbSearch: TTntGroupBox;
     ipmSimpleDelete: TTBXItem;
     ipmsmSimpleProp: TTBXSubmenuItem;
-    pcCriteria: TPageControl;
+    pcCriteria: TTntPageControl;
     pmSimple: TTBXPopupMenu;
-    rbAll: TRadioButton;
-    rbCurGroup: TRadioButton;
-    rbSearchResults: TRadioButton;
+    rbAll: TTntRadioButton;
+    rbCurGroup: TTntRadioButton;
+    rbSearchResults: TTntRadioButton;
     tbSimpleMain: TTBXToolbar;
-    tsExpression: TTabSheet;
-    tsSimple: TTabSheet;
+    tsExpression: TTntTabSheet;
+    tsSimple: TTntTabSheet;
     tvSimpleCriteria: TVirtualStringTree;
     procedure aaSimpleConvertToExpression(Sender: TObject);
     procedure aaSimpleCrDelete(Sender: TObject);
@@ -811,7 +812,7 @@ type
     FWControl.WindowProc := FOldWControlWndProc;
      // Редактировали условие
     if FColumn=1 then
-      FCriterion.Condition := TSimpleSearchCondition(GetCurrentCBObject(FWControl as TComboBox))
+      FCriterion.Condition := TSimpleSearchCondition(GetCurrentCBObject(FWControl as TTntComboBox))
      // Редактировали значение
     else begin
       case FCriterion.PicProperty of
@@ -819,12 +820,12 @@ type
         ppTime:     ws := ChangeTimeSeparator((FWControl as TMaskEdit).Text, False);
         ppKeywords: ws := (FWControl as TComboEdit).Text;
         else begin
-          ws := (FWControl as TComboBox).Text;
+          ws := (FWControl as TTntComboBox).Text;
            // Сохраняем историю ввода
           if not (FCriterion.PicProperty in [ppPlace, ppFilmNumber, ppAuthor, ppMedia]) then
             RegSaveHistory(
               WideFormat(SRegSearch_PropMRUFormat, [GetEnumName(TypeInfo(TPicProperty), Integer(FCriterion.PicProperty))]),
-              TComboBox(FWControl),
+              TTntComboBox(FWControl),
               True);
         end;
       end;
@@ -847,8 +848,8 @@ type
     Result := False;
     if FEndingEditing or FPreserveEndEdit then Exit;
      // ComboBox
-    if FWControl is TComboBox then
-      with TComboBox(FWControl) do begin
+    if FWControl is TTntComboBox then
+      with TTntComboBox(FWControl) do begin
          // Если ComboBox раскрыт, ничего не двигаем
         if (Direction<>emdNone) and DroppedDown then Exit;
          // Сдвигаем выделение без вопросов, если DropDownList, просто закрытие или нажато вверх или вниз
@@ -898,9 +899,9 @@ type
   function TSimpleCriterionEditLink.PrepareEdit(Tree: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex): Boolean;
 
      // Создаёт новый комбобокс. Если bCondition=True, то для выбора условия критерия, иначе для ввода значения
-    function NewCombobox(bCondition: Boolean): TComboBox;
+    function NewCombobox(bCondition: Boolean): TTntComboBox;
     begin
-      Result := TComboBox.Create(nil);
+      Result := TTntComboBox.Create(nil);
       with Result do begin
         Visible       := False;
         Parent        := Tree;

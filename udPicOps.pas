@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicOps.pas,v 1.19 2005-08-18 13:20:09 dale Exp $
+//  $Id: udPicOps.pas,v 1.20 2007-06-28 18:41:37 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,14 +11,14 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
-  phDlg, VirtualTrees, StdCtrls, ExtCtrls, DKLang;
+  phDlg, DKLang, VirtualTrees, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
   TdPicOps = class(TPhoaDialog)
-    cbOp: TComboBox;
+    cbOp: TTntComboBox;
     dklcMain: TDKLanguageController;
-    lGroup: TLabel;
-    lOp: TLabel;
+    lGroup: TTntLabel;
+    lOp: TTntLabel;
     tvGroups: TVirtualStringTree;
     procedure tvGroupsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
     procedure tvGroupsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);

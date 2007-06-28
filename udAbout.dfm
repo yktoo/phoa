@@ -31,7 +31,7 @@ object dAbout: TdAbout
     OnMouseDown = iMainMouseDown
     OnMouseMove = iMainMouseMove
     OnMouseUp = iMainMouseUp
-    object lWebsite: TLabel
+    object lWebsite: TTntLabel
       Left = 113
       Top = 12
       Width = 137
@@ -42,7 +42,7 @@ object dAbout: TdAbout
       Transparent = True
       OnClick = lWebsiteClick
     end
-    object lOK: TLabel
+    object lOK: TTntLabel
       Left = 308
       Top = 132
       Width = 29

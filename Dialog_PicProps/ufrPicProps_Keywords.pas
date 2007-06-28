@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,28 +12,28 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, Menus, TB2Item, TBX, ActnList, TB2Dock,
-  TB2Toolbar, VirtualTrees, phPicPropsDlgPage, DKLang;
+  TB2Toolbar, VirtualTrees, phPicPropsDlgPage, DKLang, TntActnList;
 
 type
   TfrPicProps_Keywords = class(TPicPropsDialogPage)
-    alMain: TActionList;
-    aAdd: TAction;
-    aEdit: TAction;
-    tvMain: TVirtualStringTree;
-    tbMain: TTBXToolbar;
+    aAdd: TTntAction;
+    aCheckAll: TTntAction;
+    aCheckedOnly: TTntAction;
+    aEdit: TTntAction;
+    aInvertCheck: TTntAction;
+    alMain: TTntActionList;
+    aUncheckAll: TTntAction;
     bAdd: TTBXItem;
+    bCheckAll: TTBXItem;
+    bCheckedOnly: TTBXItem;
     bEdit: TTBXItem;
-    pmMain: TTBXPopupMenu;
-    aCheckAll: TAction;
-    aUncheckAll: TAction;
-    aInvertCheck: TAction;
     bInvertCheck: TTBXItem;
     bUncheckAll: TTBXItem;
-    bCheckAll: TTBXItem;
-    tbSep1: TTBXSeparatorItem;
-    aCheckedOnly: TAction;
-    bCheckedOnly: TTBXItem;
     dklcMain: TDKLanguageController;
+    pmMain: TTBXPopupMenu;
+    tbMain: TTBXToolbar;
+    tbSep1: TTBXSeparatorItem;
+    tvMain: TVirtualStringTree;
     procedure aaAdd(Sender: TObject);
     procedure aaCheckAll(Sender: TObject);
     procedure aaCheckedOnly(Sender: TObject);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.20 2007-06-27 18:29:36 dale Exp $
+//  $Id: udViewProps.pas,v 1.21 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,13 +11,14 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phDlg, TBX, TB2Item, Menus, StdCtrls, ExtCtrls, VirtualTrees,
-  ufrSorting, DKLang, ComCtrls, ufrExprPicFilter;
+  phDlg, TB2Item, TBX, Menus, DKLang, ufrExprPicFilter, TntForms,
+  ufrSorting, VirtualTrees, StdCtrls, TntStdCtrls, ComCtrls, TntComCtrls,
+  ExtCtrls, TntExtCtrls;
 
 type
   TdViewProps = class(TPhoaDialog)
     dklcMain: TDKLanguageController;
-    eName: TEdit;
+    eName: TTntEdit;
     frExprPicFilter: TfrExprPicFilter;
     frSorting: TfrSorting;
     ipmDelete: TTBXItem;
@@ -25,12 +26,12 @@ type
     ipmMoveUp: TTBXItem;
     ipmSep: TTBXSeparatorItem;
     ipmsmProp: TTBXSubmenuItem;
-    lGrouping: TLabel;
-    lName: TLabel;
-    pcMain: TPageControl;
+    lGrouping: TTntLabel;
+    lName: TTntLabel;
+    pcMain: TTntPageControl;
     pmGrouping: TTBXPopupMenu;
-    tsFilterExpr: TTabSheet;
-    tsGeneral: TTabSheet;
+    tsFilterExpr: TTntTabSheet;
+    tsGeneral: TTntTabSheet;
     tvGrouping: TVirtualStringTree;
     procedure ipmDeleteClick(Sender: TObject);
     procedure ipmMoveDownClick(Sender: TObject);

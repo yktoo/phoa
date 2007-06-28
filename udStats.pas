@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.23 2007-06-27 18:29:36 dale Exp $
+//  $Id: udStats.pas,v 1.24 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,9 +9,9 @@ unit udStats;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phDlg, VirtualShellUtilities,
-  DKLang, VirtualTrees, StdCtrls, ExtCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualShellUtilities,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
+  phDlg, DKLang, VirtualTrees, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
   PPStatsData = ^PStatsData;

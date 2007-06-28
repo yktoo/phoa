@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.2 2007-06-27 18:29:57 dale Exp $
+//  $Id: ufrWzPageAddFiles_SelFiles.pas,v 1.3 2007-06-28 18:41:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -13,17 +13,17 @@ uses
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
   phWizard, VirtualTrees, VirtualExplorerTree, StdCtrls,
   ExtCtrls, Mask, ToolEdit, DKLang, TB2Dock, TB2ToolWindow, TBX, GR32_Image,
-  TBXDkPanels, RXSpin;
+  TBXDkPanels, RXSpin, TntStdCtrls, TntExtCtrls;
 
 type
   TfrWzPageAddFiles_SelFiles = class(TWizardPage, IPhoaWizardPage_PreviewInfo)
-    bAdvanced: TButton;
-    cbFileMasks: TComboBox;
-    cbFileSizeFromUnit: TComboBox;
-    cbFileSizeToUnit: TComboBox;
-    cbPresence: TComboBox;
-    cbRecurseFolders: TCheckBox;
-    cbShowPreview: TCheckBox;
+    bAdvanced: TTntButton;
+    cbFileMasks: TTntComboBox;
+    cbFileSizeFromUnit: TTntComboBox;
+    cbFileSizeToUnit: TTntComboBox;
+    cbPresence: TTntComboBox;
+    cbRecurseFolders: TTntCheckBox;
+    cbShowPreview: TTntCheckBox;
     dklcMain: TDKLanguageController;
     eFileDateFrom: TDateEdit;
     eFileDateTo: TDateEdit;
@@ -31,14 +31,14 @@ type
     eFileSizeTo: TRxSpinEdit;
     eFileTimeFrom: TMaskEdit;
     eFileTimeTo: TMaskEdit;
-    gbFilter: TGroupBox;
-    lFileDateFrom: TLabel;
-    lFileDateTo: TLabel;
-    lFileMasks: TLabel;
-    lFileSizeFrom: TLabel;
-    lFileSizeTo: TLabel;
-    lPresence: TLabel;
-    pMain: TPanel;
+    gbFilter: TTntGroupBox;
+    lFileDateFrom: TTntLabel;
+    lFileDateTo: TTntLabel;
+    lFileMasks: TTntLabel;
+    lFileSizeFrom: TTntLabel;
+    lFileSizeTo: TTntLabel;
+    lPresence: TTntLabel;
+    pMain: TTntPanel;
     tvMain: TVirtualExplorerTree;
     procedure bAdvancedClick(Sender: TObject);
     procedure cbShowPreviewClick(Sender: TObject);

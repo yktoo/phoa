@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_RepairOptions.pas,v 1.1 2005-08-15 11:16:09 dale Exp $
+//  $Id: ufrWzPageFileOps_RepairOptions.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,18 +10,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars,
-  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang;
+  Dialogs, phWizard, StdCtrls, ExtCtrls, Mask, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_RepairOptions = class(TWizardPage)
-    gbMatchFindingOptions: TGroupBox;
-    rbSearchByName: TRadioButton;
-    rbSearchBySize: TRadioButton;
-    rbSearchByNameSize: TRadioButton;
-    cbLookSubfolders: TCheckBox;
-    gbAlreadyInUseMode: TGroupBox;
-    rbSkipFilesInUse: TRadioButton;
-    rbRelinkFilesInUse: TRadioButton;
+    gbMatchFindingOptions: TTntGroupBox;
+    rbSearchByName: TTntRadioButton;
+    rbSearchBySize: TTntRadioButton;
+    rbSearchByNameSize: TTntRadioButton;
+    cbLookSubfolders: TTntCheckBox;
+    gbAlreadyInUseMode: TTntGroupBox;
+    rbSkipFilesInUse: TTntRadioButton;
+    rbRelinkFilesInUse: TTntRadioButton;
     dklcMain: TDKLanguageController;
   private
   protected

@@ -398,11 +398,11 @@ inherited fMain: TfMain
     PopupMenu = pmView
     UseSystemFont = False
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = ilActionsSmall
     Left = 444
     Top = 44
-    object aFlatMode: TAction
+    object aFlatMode: TTntAction
       Category = 'View'
       Caption = '&Flat mode'
       Hint = 
@@ -410,7 +410,7 @@ inherited fMain: TfMain
         'bgroups'
       OnExecute = aaFlatMode
     end
-    object aRemoveSearchResults: TAction
+    object aRemoveSearchResults: TTntAction
       Category = 'View'
       Caption = 'Remove Searc&h Results'
       Hint = 
@@ -420,7 +420,7 @@ inherited fMain: TfMain
       ShortCut = 24690
       OnExecute = aaRemoveSearchResults
     end
-    object aPhoaView_New: TAction
+    object aPhoaView_New: TTntAction
       Category = 'View'
       Caption = '&New view...'
       Hint = 'New view...|Create new photo album view'
@@ -428,7 +428,7 @@ inherited fMain: TfMain
       ShortCut = 41005
       OnExecute = aaPhoaView_New
     end
-    object aNew: TAction
+    object aNew: TTntAction
       Category = 'File'
       Caption = '&New'
       Hint = 'New|Create new photo album'
@@ -436,7 +436,7 @@ inherited fMain: TfMain
       ShortCut = 16462
       OnExecute = aaNew
     end
-    object aOpen: TAction
+    object aOpen: TTntAction
       Category = 'File'
       Caption = '&Open...'
       Hint = 'Open...|Open an existing photo album file'
@@ -444,7 +444,7 @@ inherited fMain: TfMain
       ShortCut = 16463
       OnExecute = aaOpen
     end
-    object aPhoaView_Delete: TAction
+    object aPhoaView_Delete: TTntAction
       Category = 'View'
       Caption = '&Delete view'
       Hint = 'Delete view|Delete current photo album view'
@@ -452,7 +452,7 @@ inherited fMain: TfMain
       ShortCut = 41006
       OnExecute = aaPhoaView_Delete
     end
-    object aSave: TAction
+    object aSave: TTntAction
       Category = 'File'
       Caption = '&Save'
       Hint = 'Save|Save current photo album to file'
@@ -460,7 +460,7 @@ inherited fMain: TfMain
       ShortCut = 16467
       OnExecute = aaSave
     end
-    object aSaveAs: TAction
+    object aSaveAs: TTntAction
       Category = 'File'
       Caption = 'Save &as...'
       Hint = 'Save as...|Save current photo album into a different file'
@@ -468,7 +468,7 @@ inherited fMain: TfMain
       ShortCut = 123
       OnExecute = aaSaveAs
     end
-    object aIniSaveSettings: TAction
+    object aIniSaveSettings: TTntAction
       Category = 'File'
       Caption = 'Sa&ve current settings to file...'
       Hint = 
@@ -478,7 +478,7 @@ inherited fMain: TfMain
       ShortCut = 24659
       OnExecute = aaIniSaveSettings
     end
-    object aIniLoadSettings: TAction
+    object aIniLoadSettings: TTntAction
       Category = 'File'
       Caption = '&Load settings from file...'
       Hint = 
@@ -488,14 +488,14 @@ inherited fMain: TfMain
       ShortCut = 24655
       OnExecute = aaIniLoadSettings
     end
-    object aExit: TAction
+    object aExit: TTntAction
       Category = 'File'
       Caption = 'E&xit'
       Hint = 'Exit|Exits the program'
       ImageIndex = 4
       OnExecute = aaExit
     end
-    object aUndo: TAction
+    object aUndo: TTntAction
       Category = 'Edit'
       Caption = 'Undo'
       Enabled = False
@@ -506,7 +506,7 @@ inherited fMain: TfMain
         'Alt+BkSp')
       OnExecute = aaUndo
     end
-    object aNewGroup: TAction
+    object aNewGroup: TTntAction
       Category = 'Edit'
       Caption = 'Add &group'
       Hint = 'Add group|Add new picture group'
@@ -514,7 +514,7 @@ inherited fMain: TfMain
       ShortCut = 32813
       OnExecute = aaNewGroup
     end
-    object aNewPic: TAction
+    object aNewPic: TTntAction
       Category = 'Edit'
       Caption = 'Add &pictures...'
       Hint = 
@@ -524,7 +524,7 @@ inherited fMain: TfMain
       ShortCut = 45
       OnExecute = aaNewPic
     end
-    object aDelete: TAction
+    object aDelete: TTntAction
       Category = 'Edit'
       Caption = '&Delete'
       Hint = 'Delete|Delete the selected element(s) '
@@ -532,7 +532,7 @@ inherited fMain: TfMain
       ShortCut = 46
       OnExecute = aaDelete
     end
-    object aDeletePicsFromProject: TAction
+    object aDeletePicsFromProject: TTntAction
       Category = 'Edit'
       Caption = 'De&lete from all groups'
       Hint = 
@@ -542,7 +542,7 @@ inherited fMain: TfMain
       ShortCut = 16430
       OnExecute = aaDeletePicFromProject
     end
-    object aDeletePicsWithFiles: TAction
+    object aDeletePicsWithFiles: TTntAction
       Category = 'Edit'
       Caption = 'Delete &files'
       Hint = 
@@ -552,7 +552,7 @@ inherited fMain: TfMain
       ShortCut = 24622
       OnExecute = aaDeletePicsWithFiles
     end
-    object aCut: TAction
+    object aCut: TTntAction
       Category = 'Edit'
       Caption = 'Cu&t'
       Hint = 'Cut|Cut selected pictures into the clipboard'
@@ -562,7 +562,7 @@ inherited fMain: TfMain
         'Shift+Del')
       OnExecute = aaCut
     end
-    object aCopy: TAction
+    object aCopy: TTntAction
       Category = 'Edit'
       Caption = '&Copy'
       Hint = 'Copy|Copy selected pictures to the clipboard'
@@ -572,7 +572,7 @@ inherited fMain: TfMain
         'Ctrl+Ins')
       OnExecute = aaCopy
     end
-    object aPaste: TAction
+    object aPaste: TTntAction
       Category = 'Edit'
       Caption = 'P&aste'
       Hint = 'Paste|Paste picture(s) from the clipboard'
@@ -582,7 +582,7 @@ inherited fMain: TfMain
         'Shift+Ins')
       OnExecute = aaPaste
     end
-    object aEdit: TAction
+    object aEdit: TTntAction
       Category = 'Edit'
       Caption = '&Edit...'
       Hint = 'Edit...|Edit selected element(s)'
@@ -590,7 +590,7 @@ inherited fMain: TfMain
       ShortCut = 32781
       OnExecute = aaEdit
     end
-    object aSortPics: TAction
+    object aSortPics: TTntAction
       Category = 'Edit'
       Caption = 'S&ort pictures...'
       Hint = 'Sort pictures...|Sort pictures by given criteria'
@@ -598,7 +598,7 @@ inherited fMain: TfMain
       ShortCut = 16498
       OnExecute = aaSortPics
     end
-    object aSelectAll: TAction
+    object aSelectAll: TTntAction
       Category = 'Edit'
       Caption = '&Select all'
       Hint = 'Select all|Select all pictures'
@@ -606,7 +606,7 @@ inherited fMain: TfMain
       ShortCut = 16449
       OnExecute = aaSelectAll
     end
-    object aSelectNone: TAction
+    object aSelectNone: TTntAction
       Category = 'Edit'
       Caption = 'Select &none'
       Hint = 'Select none|Select none of the pictures'
@@ -614,7 +614,7 @@ inherited fMain: TfMain
       ShortCut = 16452
       OnExecute = aaSelectNone
     end
-    object aView: TAction
+    object aView: TTntAction
       Category = 'Edit'
       Caption = '&View'
       Hint = 'View|Start view mode from the current picture'
@@ -622,7 +622,7 @@ inherited fMain: TfMain
       ShortCut = 16397
       OnExecute = aaView
     end
-    object aSettings: TAction
+    object aSettings: TTntAction
       Category = 'Tools'
       Caption = 'Pro&gram settings...'
       Hint = 'Program settings...|View/edit program settings'
@@ -630,7 +630,7 @@ inherited fMain: TfMain
       ShortCut = 115
       OnExecute = aaSettings
     end
-    object aStats: TAction
+    object aStats: TTntAction
       Category = 'Tools'
       Caption = '&Statistics...'
       Hint = 'Statistics...|Summary photo album information'
@@ -638,7 +638,7 @@ inherited fMain: TfMain
       ShortCut = 119
       OnExecute = aaStats
     end
-    object aPicOps: TAction
+    object aPicOps: TTntAction
       Category = 'Tools'
       Caption = '&Picture operations...'
       Hint = 
@@ -648,7 +648,7 @@ inherited fMain: TfMain
       ShortCut = 16497
       OnExecute = aaPicOps
     end
-    object aFileOperations: TAction
+    object aFileOperations: TTntAction
       Category = 'Tools'
       Caption = 'File ope&rations...'
       Hint = 
@@ -658,7 +658,7 @@ inherited fMain: TfMain
       ShortCut = 16466
       OnExecute = aaFileOperations
     end
-    object aFind: TAction
+    object aFind: TTntAction
       Category = 'Tools'
       Caption = '&Find...'
       Hint = 'Find...|Find pictures by given criteria'
@@ -666,7 +666,7 @@ inherited fMain: TfMain
       ShortCut = 114
       OnExecute = aaFind
     end
-    object aAbout: TAction
+    object aAbout: TTntAction
       Category = 'Help'
       Caption = '&About...'
       Hint = 'About...|Version and Copyright information'
@@ -674,14 +674,14 @@ inherited fMain: TfMain
       ShortCut = 16496
       OnExecute = aaAbout
     end
-    object aHelpContents: TAction
+    object aHelpContents: TTntAction
       Category = 'Help'
       Caption = '&Help contents'
       Hint = 'Help contents|Display help contents'
       ImageIndex = 11
       OnExecute = aaHelpContents
     end
-    object aPhoaView_Edit: TAction
+    object aPhoaView_Edit: TTntAction
       Category = 'View'
       Caption = '&Edit view...'
       Hint = 'Edit view...|Edit current photo album view'
@@ -689,7 +689,7 @@ inherited fMain: TfMain
       ShortCut = 40973
       OnExecute = aaPhoaView_Edit
     end
-    object aPhoaView_MakeGroup: TAction
+    object aPhoaView_MakeGroup: TTntAction
       Category = 'View'
       Caption = '&Make a group...'
       Hint = 
@@ -699,20 +699,20 @@ inherited fMain: TfMain
       ShortCut = 41031
       OnExecute = aaPhoaView_MakeGroup
     end
-    object aHelpFAQ: TAction
+    object aHelpFAQ: TTntAction
       Category = 'Help'
       Caption = 'FA&Q'
       Hint = 'FAQ|View the PhoA FAQ (Frequently Asked Questions) topic'
       OnExecute = aaHelpFAQ
     end
-    object aHelpCheckUpdates: TAction
+    object aHelpCheckUpdates: TTntAction
       Category = 'Help'
       Caption = 'Check for &updates'
       Hint = 'Check for updates|Check for program updates on the web'
       ImageIndex = 43
       OnExecute = aaHelpCheckUpdates
     end
-    object aHelpProductWebsite: TAction
+    object aHelpProductWebsite: TTntAction
       Category = 'Help'
       Caption = 'PhoA ho&me site'
       Hint = 'PhoA home site|Open the program home site in the browser'
@@ -720,20 +720,20 @@ inherited fMain: TfMain
       ShortCut = 16471
       OnExecute = aaHelpProductWebsite
     end
-    object aHelpSupport: TAction
+    object aHelpSupport: TTntAction
       Category = 'Help'
       Caption = 'Product &support'
       Hint = 'Product support|Open the product support page in the browser'
       OnExecute = aaHelpSupport
     end
-    object aHelpVendorWebsite: TAction
+    object aHelpVendorWebsite: TTntAction
       Category = 'Help'
       Caption = 'DK Software &Website'
       Hint = 'DK Software Website|Open the vendor home site in the browser'
       ImageIndex = 73
       OnExecute = aaHelpVendorWebsite
     end
-    object aViewSlideShow: TAction
+    object aViewSlideShow: TTntAction
       Category = 'Edit'
       Caption = 'Vie&w slide show'
       Hint = 'View slide show|Start view mode with slide show'

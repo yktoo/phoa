@@ -3,36 +3,36 @@ unit udToolProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, phSettings, phToolSetting,
-  Dialogs, phDlg, StdCtrls, ExtCtrls, DKLang;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phSettings, phToolSetting,
+  phDlg, TntDialogs, DKLang, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
   TdToolProps = class(TPhoaDialog)
-    bBrowseRunCommand: TButton;
-    bBrowseRunFolder: TButton;
-    cbKind: TComboBox;
-    cbRunShowCommand: TComboBox;
-    cbUsageGroups: TCheckBox;
-    cbUsageThViewer: TCheckBox;
-    cbUsageTools: TCheckBox;
-    cbUsageViewMode: TCheckBox;
+    bBrowseRunCommand: TTntButton;
+    bBrowseRunFolder: TTntButton;
+    cbKind: TTntComboBox;
+    cbRunShowCommand: TTntComboBox;
+    cbUsageGroups: TTntCheckBox;
+    cbUsageThViewer: TTntCheckBox;
+    cbUsageTools: TTntCheckBox;
+    cbUsageViewMode: TTntCheckBox;
     dklcMain: TDKLanguageController;
-    eHint: TEdit;
-    eMasks: TEdit;
-    eName: TEdit;
-    eRunCommand: TEdit;
-    eRunFolder: TEdit;
-    eRunParams: TEdit;
-    gbUsage: TGroupBox;
-    lHint: TLabel;
-    lKind: TLabel;
-    lMasks: TLabel;
-    lName: TLabel;
-    lRunCommand: TLabel;
-    lRunFolder: TLabel;
-    lRunParams: TLabel;
-    lRunShowCommand: TLabel;
-    odRunCommand: TOpenDialog;
+    eHint: TTntEdit;
+    eMasks: TTntEdit;
+    eName: TTntEdit;
+    eRunCommand: TTntEdit;
+    eRunFolder: TTntEdit;
+    eRunParams: TTntEdit;
+    gbUsage: TTntGroupBox;
+    lHint: TTntLabel;
+    lKind: TTntLabel;
+    lMasks: TTntLabel;
+    lName: TTntLabel;
+    lRunCommand: TTntLabel;
+    lRunFolder: TTntLabel;
+    lRunParams: TTntLabel;
+    lRunShowCommand: TTntLabel;
+    odRunCommand: TTntOpenDialog;
     procedure bBrowseRunCommandClick(Sender: TObject);
     procedure bBrowseRunFolderClick(Sender: TObject);
     procedure cbKindChange(Sender: TObject);

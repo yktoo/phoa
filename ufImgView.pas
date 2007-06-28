@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.55 2007-06-27 18:29:36 dale Exp $
+//  $Id: ufImgView.pas,v 1.56 2007-06-28 18:41:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,9 +11,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, Registry,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
-  GR32_Layers, 
-  TB2Item, TBX, Menus, ActnList, GR32_Image, TB2Dock,
-  TB2Toolbar, TB2ExtItems, TBXExtItems, DKLang, phFrm;
+  GR32_Layers,
+  phFrm, DKLang, Menus, TB2Item, TBX, ActnList, TntActnList, TB2ExtItems,
+  TBXExtItems, TB2Dock, TB2Toolbar, GR32_Image;
 
 const  
    // Событие окончания декодирования
@@ -32,7 +32,7 @@ type
      // Блокировка доступа к FLoadAborted
     FLoadAbortLock: TRTLCriticalSection;
      // Форма-владелец
-    FOwner: TForm;
+    FOwner: TTntForm;
      // Prop storage
     FQueuedFileName: WideString;
     FHDecodedEvent: THandle;
@@ -45,7 +45,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(AOwner: TForm);
+    constructor Create(AOwner: TTntForm);
     destructor Destroy; override;
      // Возвращает и забывает декодированный Bitmap
     function  GetAndReleasePicture: TBitmap32;
@@ -69,35 +69,35 @@ type
     pddBackward); // Назад
 
   TfImgView = class(TPhoaForm)
-    aClose: TAction;
-    aEdit: TAction;
-    aFirstPic: TAction;
-    aFlipHorz: TAction;
-    aFlipVert: TAction;
-    aFullScreen: TAction;
-    aHelp: TAction;
-    aLastPic: TAction;
-    alMain: TActionList;
-    aNextPic: TAction;
-    aPrevPic: TAction;
-    aRefresh: TAction;
-    aRelocateInfo: TAction;
-    aRotate0: TAction;
-    aRotate180: TAction;
-    aRotate270: TAction;
-    aRotate90: TAction;
-    aSettings: TAction;
-    aShowInfo: TAction;
-    aSlideShow: TAction;
-    aSlideShowBackward: TAction;
-    aSlideShowCyclic: TAction;
-    aSlideShowForward: TAction;
-    aSlideShowRandom: TAction;
-    aStoreTransform: TAction;
-    aZoomActual: TAction;
-    aZoomFit: TAction;
-    aZoomIn: TAction;
-    aZoomOut: TAction;
+    aClose: TTntAction;
+    aEdit: TTntAction;
+    aFirstPic: TTntAction;
+    aFlipHorz: TTntAction;
+    aFlipVert: TTntAction;
+    aFullScreen: TTntAction;
+    aHelp: TTntAction;
+    aLastPic: TTntAction;
+    alMain: TTntActionList;
+    aNextPic: TTntAction;
+    aPrevPic: TTntAction;
+    aRefresh: TTntAction;
+    aRelocateInfo: TTntAction;
+    aRotate0: TTntAction;
+    aRotate180: TTntAction;
+    aRotate270: TTntAction;
+    aRotate90: TTntAction;
+    aSettings: TTntAction;
+    aShowInfo: TTntAction;
+    aSlideShow: TTntAction;
+    aSlideShowBackward: TTntAction;
+    aSlideShowCyclic: TTntAction;
+    aSlideShowForward: TTntAction;
+    aSlideShowRandom: TTntAction;
+    aStoreTransform: TTntAction;
+    aZoomActual: TTntAction;
+    aZoomFit: TTntAction;
+    aZoomIn: TTntAction;
+    aZoomOut: TTntAction;
     bClose: TTBXItem;
     bEdit: TTBXItem;
     bFirstPic: TTBXItem;
@@ -457,7 +457,7 @@ uses
    // TDecodeThread
    //===================================================================================================================
 
-  constructor TDecodeThread.Create(AOwner: TForm);
+  constructor TDecodeThread.Create(AOwner: TTntForm);
   begin
     inherited Create(True);
     FreeOnTerminate := True;

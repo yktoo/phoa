@@ -45,7 +45,7 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
     OnEdited = tvFolderEdited
     Columns = <>
   end
-  object pFolderOptions: TPanel
+  object pFolderOptions: TTntPanel
     Left = 0
     Top = 254
     Width = 576
@@ -56,7 +56,7 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
     DesignSize = (
       576
       30)
-    object bCreateFolder: TButton
+    object bCreateFolder: TTntButton
       Left = 470
       Top = 4
       Width = 102
@@ -66,7 +66,7 @@ inherited frWzPageFileOps_SelFolder: TfrWzPageFileOps_SelFolder
       TabOrder = 0
       OnClick = bCreateFolderClick
     end
-    object eFolderPath: TEdit
+    object eFolderPath: TTntEdit
       Left = 4
       Top = 4
       Width = 463

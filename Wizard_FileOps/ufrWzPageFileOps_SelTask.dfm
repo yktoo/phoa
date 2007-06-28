@@ -1,5 +1,5 @@
 inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
-  object lCopyFiles: TLabel
+  object lCopyFiles: TTntLabel
     Left = 28
     Top = 24
     Width = 543
@@ -13,7 +13,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Transparent = False
     WordWrap = True
   end
-  object lMoveFiles: TLabel
+  object lMoveFiles: TTntLabel
     Left = 28
     Top = 76
     Width = 543
@@ -26,7 +26,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Transparent = False
     WordWrap = True
   end
-  object lDeleteFiles: TLabel
+  object lDeleteFiles: TTntLabel
     Left = 28
     Top = 128
     Width = 543
@@ -39,7 +39,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Transparent = False
     WordWrap = True
   end
-  object lRepairFileLinks: TLabel
+  object lRepairFileLinks: TTntLabel
     Left = 28
     Top = 232
     Width = 543
@@ -54,7 +54,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Visible = False
     WordWrap = True
   end
-  object lNBUndoable: TLabel
+  object lNBUndoable: TTntLabel
     Left = 0
     Top = 264
     Width = 576
@@ -65,7 +65,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Layout = tlCenter
     WordWrap = True
   end
-  object lRebuildThumbs: TLabel
+  object lRebuildThumbs: TTntLabel
     Left = 28
     Top = 180
     Width = 543
@@ -78,7 +78,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Transparent = False
     WordWrap = True
   end
-  object rbCopyFiles: TRadioButton
+  object rbCopyFiles: TTntRadioButton
     Left = 4
     Top = 4
     Width = 567
@@ -88,7 +88,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     TabOrder = 0
     OnClick = PageDataChange
   end
-  object rbMoveFiles: TRadioButton
+  object rbMoveFiles: TTntRadioButton
     Left = 4
     Top = 56
     Width = 551
@@ -98,7 +98,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     TabOrder = 1
     OnClick = PageDataChange
   end
-  object rbDeleteFiles: TRadioButton
+  object rbDeleteFiles: TTntRadioButton
     Left = 4
     Top = 108
     Width = 551
@@ -108,7 +108,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     TabOrder = 2
     OnClick = PageDataChange
   end
-  object rbRepairFileLinks: TRadioButton
+  object rbRepairFileLinks: TTntRadioButton
     Left = 4
     Top = 212
     Width = 567
@@ -119,7 +119,7 @@ inherited frWzPageFileOps_SelTask: TfrWzPageFileOps_SelTask
     Visible = False
     OnClick = PageDataChange
   end
-  object rbRebuildThumbs: TRadioButton
+  object rbRebuildThumbs: TTntRadioButton
     Left = 4
     Top = 160
     Width = 567

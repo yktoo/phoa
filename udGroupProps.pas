@@ -5,24 +5,25 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  phDlg, GR32_Image, ActnList, DKLang, StdCtrls, ExtCtrls;
+  phDlg, ActnList, TntActnList, DKLang, GR32_Image, StdCtrls, TntStdCtrls,
+  ExtCtrls, TntExtCtrls;
 
 type
   TdGroupProps = class(TPhoaDialog)
-    aGroupIconReset: TAction;
-    aGroupIconSelect: TAction;
-    alMain: TActionList;
-    bGroupIconReset: TButton;
-    bGroupIconSelect: TButton;
+    aGroupIconReset: TTntAction;
+    aGroupIconSelect: TTntAction;
+    alMain: TTntActionList;
+    bGroupIconReset: TTntButton;
+    bGroupIconSelect: TTntButton;
     dklcMain: TDKLanguageController;
-    eID: TEdit;
-    eText: TEdit;
-    gbGroupIcon: TGroupBox;
+    eID: TTntEdit;
+    eText: TTntEdit;
+    gbGroupIcon: TTntGroupBox;
     iGroupIcon: TImage32;
-    lDesc: TLabel;
-    lID: TLabel;
-    lText: TLabel;
-    mDescription: TMemo;
+    lDesc: TTntLabel;
+    lID: TTntLabel;
+    lText: TTntLabel;
+    mDescription: TTntMemo;
     procedure aaGroupIconReset(Sender: TObject);
     procedure aaGroupIconSelect(Sender: TObject);
   private

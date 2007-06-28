@@ -34,7 +34,7 @@ inherited frWzPage_Log: TfrWzPage_Log
         Width = 522
       end>
   end
-  object pBottom: TPanel
+  object pBottom: TTntPanel
     Left = 0
     Top = 252
     Width = 576
@@ -45,7 +45,7 @@ inherited frWzPage_Log: TfrWzPage_Log
     DesignSize = (
       576
       32)
-    object lInfo: TLabel
+    object lInfo: TTntLabel
       Left = 200
       Top = 4
       Width = 221
@@ -56,7 +56,7 @@ inherited frWzPage_Log: TfrWzPage_Log
       Caption = '...'
       Layout = tlCenter
     end
-    object cbErrorsOnly: TCheckBox
+    object cbErrorsOnly: TTntCheckBox
       Left = 8
       Top = 8
       Width = 181
@@ -64,7 +64,7 @@ inherited frWzPage_Log: TfrWzPage_Log
       Action = aDisplayErrorsOnly
       TabOrder = 0
     end
-    object bSaveToFile: TButton
+    object bSaveToFile: TTntButton
       Left = 426
       Top = 4
       Width = 143
@@ -95,32 +95,32 @@ inherited frWzPage_Log: TfrWzPage_Log
       Action = aFind
     end
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 8
     Top = 8
-    object aCopy: TAction
+    object aCopy: TTntAction
       Caption = '&Copy'
       Hint = 'Copy|Copy current record to clipboard'
       ImageIndex = 21
       ShortCut = 16451
       OnExecute = aaCopy
     end
-    object aFind: TAction
+    object aFind: TTntAction
       Caption = '&Find...'
       Hint = 'Find...|Show Find Text dialog'
       ImageIndex = 9
       ShortCut = 114
       OnExecute = aaFind
     end
-    object aSaveToFile: TAction
+    object aSaveToFile: TTntAction
       Caption = '&Save to file...'
       Hint = 'Save to file...|Save the log to a selected file'
       ImageIndex = 3
       ShortCut = 16467
       OnExecute = aaSaveToFile
     end
-    object aDisplayErrorsOnly: TAction
+    object aDisplayErrorsOnly: TTntAction
       AutoCheck = True
       Caption = '&Display errors only'
       Hint = 'Display errors only|Hide successfully added picture entries'

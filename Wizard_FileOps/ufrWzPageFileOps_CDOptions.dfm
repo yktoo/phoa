@@ -2,7 +2,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
   DesignSize = (
     576
     284)
-  object lMediaLabel: TLabel
+  object lMediaLabel: TTntLabel
     Left = 24
     Top = 236
     Width = 93
@@ -10,7 +10,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     Caption = '&Label the media as:'
     FocusControl = eMediaLabel
   end
-  object lPhoaDesc: TLabel
+  object lPhoaDesc: TTntLabel
     Left = 24
     Top = 48
     Width = 118
@@ -18,7 +18,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     Caption = '&Photo album description:'
     FocusControl = mPhoaDesc
   end
-  object cbCopyExecutable: TCheckBox
+  object cbCopyExecutable: TTntCheckBox
     Left = 4
     Top = 156
     Width = 567
@@ -28,7 +28,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 4
     OnClick = AdjustOptionsNotify
   end
-  object cbCreatePhoa: TCheckBox
+  object cbCreatePhoa: TTntCheckBox
     Left = 4
     Top = 4
     Width = 567
@@ -38,7 +38,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 0
     OnClick = AdjustOptionsNotify
   end
-  object ePhoaFileName: TEdit
+  object ePhoaFileName: TTntEdit
     Left = 24
     Top = 24
     Width = 547
@@ -47,7 +47,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 1
     OnChange = PageDataChange
   end
-  object cbCreateAutorun: TCheckBox
+  object cbCreateAutorun: TTntCheckBox
     Left = 4
     Top = 216
     Width = 567
@@ -59,7 +59,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 7
     OnClick = AdjustOptionsNotify
   end
-  object eMediaLabel: TEdit
+  object eMediaLabel: TTntEdit
     Left = 24
     Top = 252
     Width = 547
@@ -68,7 +68,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 8
     OnChange = PageDataChange
   end
-  object mPhoaDesc: TMemo
+  object mPhoaDesc: TTntMemo
     Left = 24
     Top = 64
     Width = 547
@@ -78,7 +78,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 2
     OnChange = PageDataChange
   end
-  object cbIncludeViews: TCheckBox
+  object cbIncludeViews: TTntCheckBox
     Left = 24
     Top = 136
     Width = 547
@@ -88,7 +88,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 3
     OnClick = PageDataChange
   end
-  object cbCopyIniSettings: TCheckBox
+  object cbCopyIniSettings: TTntCheckBox
     Left = 24
     Top = 176
     Width = 547
@@ -98,7 +98,7 @@ inherited frWzPageFileOps_CDOptions: TfrWzPageFileOps_CDOptions
     TabOrder = 5
     OnClick = PageDataChange
   end
-  object cbCopyLangFile: TCheckBox
+  object cbCopyLangFile: TTntCheckBox
     Left = 24
     Top = 196
     Width = 547

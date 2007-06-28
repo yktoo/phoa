@@ -1,5 +1,5 @@
 inherited frWzPage_Processing: TfrWzPage_Processing
-  object gbMain: TGroupBox
+  object gbMain: TTntGroupBox
     Left = 0
     Top = 0
     Width = 576
@@ -10,7 +10,7 @@ inherited frWzPage_Processing: TfrWzPage_Processing
     DesignSize = (
       576
       284)
-    object lInfo: TLabel
+    object lInfo: TTntLabel
       Left = 26
       Top = 167
       Width = 526
@@ -31,7 +31,7 @@ inherited frWzPage_Processing: TfrWzPage_Processing
       ScaleMode = smNormal
       TabOrder = 2
     end
-    object pbMain: TProgressBar
+    object pbMain: TTntProgressBar
       Left = 24
       Top = 227
       Width = 530
@@ -39,7 +39,7 @@ inherited frWzPage_Processing: TfrWzPage_Processing
       Anchors = [akLeft, akRight, akBottom]
       TabOrder = 0
     end
-    object bInterrupt: TButton
+    object bInterrupt: TTntButton
       Left = 232
       Top = 249
       Width = 111

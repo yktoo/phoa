@@ -19,13 +19,13 @@ object dMsgBox: TdMsgBox
     83)
   PixelsPerInch = 96
   TextHeight = 13
-  object iIcon: TImage
+  object iIcon: TTntImage
     Left = 11
     Top = 11
     Width = 32
     Height = 32
   end
-  object lMessage: TLabel
+  object lMessage: TTntLabel
     Left = 60
     Top = 20
     Width = 16
@@ -34,7 +34,7 @@ object dMsgBox: TdMsgBox
     Caption = '<>'
     WordWrap = True
   end
-  object cbDontShowAgain: TCheckBox
+  object cbDontShowAgain: TTntCheckBox
     Left = 11
     Top = 54
     Width = 277

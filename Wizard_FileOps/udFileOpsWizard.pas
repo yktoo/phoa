@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.4 2007-06-27 18:29:45 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.5 2007-06-28 18:41:53 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   TntSysUtils, TntClasses, GraphicEx, GR32,
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, phOps, ConsVars, phWizard, phGraphics, 
-  phWizForm, DKLang, ExtCtrls, StdCtrls;
+  phWizForm, DKLang, ExtCtrls, TntExtCtrls, StdCtrls, TntStdCtrls;
 
 type
    // Exception

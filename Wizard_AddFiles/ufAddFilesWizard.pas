@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.2 2007-06-27 18:29:49 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,7 +12,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
   GR32, GraphicEx,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
-  phWizForm, DKLang, GR32_Image, TB2Dock, TBXDkPanels, ExtCtrls, StdCtrls;
+  phWizForm, DKLang, GR32_Image, TB2Dock, TBXDkPanels, ExtCtrls,
+  TntExtCtrls, StdCtrls, TntStdCtrls;
 
 type
   TAddFilesThread = class;
@@ -21,7 +22,7 @@ type
     dklcMain: TDKLanguageController;
     dpPreview: TTBXDockablePanel;
     iPreview: TImage32;
-    pProcess: TPanel;
+    pProcess: TTntPanel;
     procedure dpPreviewResize(Sender: TObject);
     procedure dpPreviewVisibleChanged(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);

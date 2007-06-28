@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.3 2007-06-27 18:29:57 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.4 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,10 +9,10 @@ unit ufrPicProps_Metadata;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
-  Dialogs, phWizard, VirtualTrees, phPicPropsDlgPage, TBXDkPanels, TB2Dock,
-  TBX, Menus, TB2Item, DKLang;
+  phPicPropsDlgPage, DKLang, TB2Item, TBX, Menus, TBXDkPanels, TB2Dock,
+  VirtualTrees;
 
 type
   TfrPicProps_Metadata = class(TPicPropsDialogPage)

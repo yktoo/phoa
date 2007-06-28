@@ -109,60 +109,60 @@ inherited frPicProps_View: TfrPicProps_View
     Height = 9
     Position = dpBottom
   end
-  object alMain: TActionList
+  object alMain: TTntActionList
     Images = fMain.ilActionsSmall
     Left = 36
     Top = 252
-    object aZoomIn: TAction
+    object aZoomIn: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom &in'
       Hint = 'Zoom in|Enlarge the image'
       ImageIndex = 25
       OnExecute = aaZoomIn
     end
-    object aZoomOut: TAction
+    object aZoomOut: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom ou&t'
       Hint = 'Zoom out|Zoom image out'
       ImageIndex = 26
       OnExecute = aaZoomOut
     end
-    object aZoomActual: TAction
+    object aZoomActual: TTntAction
       Category = 'Zoom'
       Caption = 'Zoom &actual'
       Hint = 'Set zoom to 1:1'
       ImageIndex = 28
       OnExecute = aaZoomActual
     end
-    object aZoomFit: TAction
+    object aZoomFit: TTntAction
       Category = 'Zoom'
       Caption = '&Fit window'
       Hint = 'Set zoom to fit window'
       ImageIndex = 27
       OnExecute = aaZoomFit
     end
-    object aRotate0: TAction
+    object aRotate0: TTntAction
       Category = 'Tools'
       Caption = '&No rotation'
       Hint = 'No rotation|Don'#39't apply rotation to the image'
       ImageIndex = 66
       OnExecute = aaRotate0
     end
-    object aRotate90: TAction
+    object aRotate90: TTntAction
       Category = 'Tools'
       Caption = 'Rotate CW by &90'#176
       Hint = 'Rotate CW by 90'#176'|Rotate the image clockwise by 90'#176
       ImageIndex = 67
       OnExecute = aaRotate90
     end
-    object aRotate180: TAction
+    object aRotate180: TTntAction
       Category = 'Tools'
       Caption = 'Rotate by &180'#176
       Hint = 'Rotate by 180'#176'|Rotate the image by 180'#176
       ImageIndex = 68
       OnExecute = aaRotate180
     end
-    object aRotate270: TAction
+    object aRotate270: TTntAction
       Category = 'Tools'
       Caption = 'Rotate CCW by 9&0'#176
       Hint = 
@@ -171,14 +171,14 @@ inherited frPicProps_View: TfrPicProps_View
       ImageIndex = 69
       OnExecute = aaRotate270
     end
-    object aFlipHorz: TAction
+    object aFlipHorz: TTntAction
       Category = 'Tools'
       Caption = 'Flip &horizontally'
       Hint = 'Flip horizontally|Flip the image horizontally'
       ImageIndex = 70
       OnExecute = aaFlipHorz
     end
-    object aFlipVert: TAction
+    object aFlipVert: TTntAction
       Category = 'Tools'
       Caption = 'Flip &vertically'
       Hint = 'Flip vertically|Flip the image vertically'

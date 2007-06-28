@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: udPicProps.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,7 +12,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, GR32_Layers,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phMetadata, phWizard, phFrm,
   phDlg, Menus, TB2Item, TBX, ImgList, DKLang, TB2Dock, TB2Toolbar,
-  StdCtrls, ExtCtrls;
+  StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
   TdPicProps = class(TPhoaDialog, IWizardHostForm)
@@ -25,9 +25,9 @@ type
     dklcMain: TDKLanguageController;
     dkNav: TTBXDock;
     ilFiles: TImageList;
-    pMain: TPanel;
+    pMain: TTntPanel;
     pmNav: TTBXPopupMenu;
-    pPages: TPanel;
+    pPages: TTntPanel;
     tbNav: TTBXToolbar;
     procedure PageButtonClick(Sender: TObject);
   private

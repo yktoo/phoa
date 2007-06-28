@@ -1,6 +1,6 @@
 inherited frPicProps_Data: TfrPicProps_Data
   Height = 298
-  object lPlace: TLabel
+  object lPlace: TTntLabel
     Left = 164
     Top = 8
     Width = 29
@@ -8,7 +8,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Place:'
     FocusControl = cbPlace
   end
-  object lDesc: TLabel
+  object lDesc: TTntLabel
     Left = 8
     Top = 128
     Width = 132
@@ -16,7 +16,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = 'D&escription (for displaying):'
     FocusControl = mDesc
   end
-  object lFilmNumber: TLabel
+  object lFilmNumber: TTntLabel
     Left = 8
     Top = 48
     Width = 103
@@ -24,7 +24,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Film number or name:'
     FocusControl = cbFilmNumber
   end
-  object lFrameNumber: TLabel
+  object lFrameNumber: TTntLabel
     Left = 447
     Top = 48
     Width = 73
@@ -33,7 +33,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = 'F&rame number:'
     FocusControl = eFrameNumber
   end
-  object lAuthor: TLabel
+  object lAuthor: TTntLabel
     Left = 8
     Top = 88
     Width = 37
@@ -41,7 +41,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Author:'
     FocusControl = cbAuthor
   end
-  object lNotes: TLabel
+  object lNotes: TTntLabel
     Left = 8
     Top = 200
     Width = 110
@@ -49,7 +49,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Notes (additional info):'
     FocusControl = mNotes
   end
-  object lDate: TLabel
+  object lDate: TTntLabel
     Left = 8
     Top = 8
     Width = 27
@@ -57,7 +57,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Date:'
     FocusControl = eDate
   end
-  object lTime: TLabel
+  object lTime: TTntLabel
     Left = 100
     Top = 8
     Width = 26
@@ -65,7 +65,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Time:'
     FocusControl = eTime
   end
-  object lMedia: TLabel
+  object lMedia: TTntLabel
     Left = 8
     Top = 254
     Width = 100
@@ -74,7 +74,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Caption = '&Media name or code:'
     FocusControl = cbMedia
   end
-  object cbPlace: TComboBox
+  object cbPlace: TTntComboBox
     Left = 164
     Top = 24
     Width = 402
@@ -86,7 +86,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     TabOrder = 2
     OnChange = PicPropEditorChange
   end
-  object mDesc: TMemo
+  object mDesc: TTntMemo
     Left = 8
     Top = 144
     Width = 558
@@ -96,7 +96,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     TabOrder = 6
     OnChange = PicPropEditorChange
   end
-  object cbFilmNumber: TComboBox
+  object cbFilmNumber: TTntComboBox
     Left = 8
     Top = 64
     Width = 436
@@ -108,7 +108,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     TabOrder = 3
     OnChange = PicPropEditorChange
   end
-  object eFrameNumber: TEdit
+  object eFrameNumber: TTntEdit
     Left = 447
     Top = 64
     Width = 119
@@ -117,7 +117,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     TabOrder = 4
     OnChange = PicPropEditorChange
   end
-  object cbAuthor: TComboBox
+  object cbAuthor: TTntComboBox
     Left = 8
     Top = 104
     Width = 558
@@ -129,7 +129,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     TabOrder = 5
     OnChange = PicPropEditorChange
   end
-  object mNotes: TMemo
+  object mNotes: TTntMemo
     Left = 8
     Top = 216
     Width = 558
@@ -160,7 +160,7 @@ inherited frPicProps_Data: TfrPicProps_Data
     Text = '  :  :  '
     OnChange = PicPropEditorChange
   end
-  object cbMedia: TComboBox
+  object cbMedia: TTntComboBox
     Left = 8
     Top = 270
     Width = 558

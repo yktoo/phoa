@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_View.pas,v 1.2 2007-06-16 13:49:46 dale Exp $
+//  $Id: ufrPicProps_View.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,21 +12,21 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, GR32_Layers, TBXLists, ConsVars,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phGraphics,
   phWizard, Menus, TB2Item, TBX, ActnList, GR32_Image, TB2ExtItems,
-  TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DKLang;
+  TBXExtItems, TB2Dock, TB2Toolbar, phPicPropsDlgPage, DKLang, TntActnList;
 
 type
   TfrPicProps_View = class(TPicPropsDialogPage)
-    aFlipHorz: TAction;
-    aFlipVert: TAction;
-    alMain: TActionList;
-    aRotate0: TAction;
-    aRotate180: TAction;
-    aRotate270: TAction;
-    aRotate90: TAction;
-    aZoomActual: TAction;
-    aZoomFit: TAction;
-    aZoomIn: TAction;
-    aZoomOut: TAction;
+    aFlipHorz: TTntAction;
+    aFlipVert: TTntAction;
+    alMain: TTntActionList;
+    aRotate0: TTntAction;
+    aRotate180: TTntAction;
+    aRotate270: TTntAction;
+    aRotate90: TTntAction;
+    aZoomActual: TTntAction;
+    aZoomFit: TTntAction;
+    aZoomIn: TTntAction;
+    aZoomOut: TTntAction;
     bFlipHorz: TTBXItem;
     bFlipVert: TTBXItem;
     bRotate0: TTBXItem;

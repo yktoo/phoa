@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Processing.pas,v 1.6 2007-06-27 18:29:45 dale Exp $
+//  $Id: ufrWzPage_Processing.pas,v 1.7 2007-06-28 18:41:50 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,14 +10,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phWizard, StdCtrls, ComCtrls, ExtCtrls, GR32, GR32_Image;
+  phWizard, StdCtrls, ComCtrls, ExtCtrls, GR32, GR32_Image, TntStdCtrls,
+  TntComCtrls;
 
 type
   TfrWzPage_Processing = class(TWizardPage)
-    gbMain: TGroupBox;
-    lInfo: TLabel;
-    pbMain: TProgressBar;
-    bInterrupt: TButton;
+    gbMain: TTntGroupBox;
+    lInfo: TTntLabel;
+    pbMain: TTntProgressBar;
+    bInterrupt: TTntButton;
     iThumb: TImage32;
     procedure bInterruptClick(Sender: TObject);
   private
