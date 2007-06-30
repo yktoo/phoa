@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Keywords.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrPicProps_Keywords.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -69,7 +69,7 @@ type
     procedure BeforeDisplay(ChangeMethod: TPageChangeMethod); override;
     procedure DoCreate; override;
   public
-    procedure Apply(var wsOpParamName: CellTextString; var OpParams: IPhoaOperationParams); override;
+    procedure Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams); override;
   end;
 
 implementation
@@ -131,7 +131,7 @@ uses phUtils, Main, phSettings;
     CheckKeywords(mcmNone);
   end;
 
-  procedure TfrPicProps_Keywords.Apply(var wsOpParamName: CellTextString; var OpParams: IPhoaOperationParams);
+  procedure TfrPicProps_Keywords.Apply(var wsOpParamName: WideString; var OpParams: IPhoaOperationParams);
   begin
      // Если страница инициализирована, возвращаем параметры для операции изменения списка ключевых слов
     if FInitialized then begin
@@ -256,7 +256,7 @@ uses phUtils, Main, phSettings;
   begin
     case TextType of
        // Текст ключевого слова
-      ttNormal: CellText := PhoaAnsiToUnicode(FKeywords[Node.Index]);
+      ttNormal: CellText := FKeywords[Node.Index];
        // Количество вхождений слова
       ttStatic: begin
         p := FKeywords.KWData[Node.Index];
@@ -279,7 +279,7 @@ uses phUtils, Main, phSettings;
 
   procedure TfrPicProps_Keywords.tvMainNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
-    FNodeToFocusIndex := FKeywords.Rename(Node.Index, PhoaUnicodeToAnsi(NewText));
+    FNodeToFocusIndex := FKeywords.Rename(Node.Index, NewText);
     tvMain.ReinitChildren(nil, False);
     Modified;
   end;

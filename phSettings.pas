@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phSettings.pas,v 1.18 2007-06-27 18:29:26 dale Exp $
+//  $Id: phSettings.pas,v 1.19 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phSettings;
 
 interface
 uses
-  SysUtils, Windows, Classes, Graphics, Controls, Registry, IniFiles,
+  SysUtils, Windows, Classes, Graphics, Controls, IniFiles,
   TntSysUtils, TntClasses, 
   phIntf, phObj, ConsVars;
 
@@ -42,7 +42,7 @@ type
     procedure SetIndex(Value: Integer);
   protected
      // Prop storage
-    FName: AnsiString;
+    FName: WideString;
      // "Простой" конструктор, не инициализирующий свойств, кроме Owner (используется в "нормальных" конструкторах и в
      //   Assign)
     constructor CreateNew(AOwner: TPhoaSetting); virtual;
@@ -50,14 +50,14 @@ type
     function  GetModified: Boolean; virtual;
     procedure SetModified(Value: Boolean); virtual;
   public
-    constructor Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString);
+    constructor Create(AOwner: TPhoaSetting; iID: Integer; const wsName: WideString);
     destructor Destroy; override;
      // Стирает все дочерние пункты
     procedure ClearChildren;
      // Загрузка/сохранение в реестре значений с ID<>0. В базовом классе не делают ничего, кроме каскадных вызовов
      //   методов дочерних настроек
-    procedure RegLoad(RegIniFile: TRegIniFile); virtual;
-    procedure RegSave(RegIniFile: TRegIniFile); virtual;
+    procedure RegLoad(RegIniFile: TPhoaRegIniFile); virtual;
+    procedure RegSave(RegIniFile: TPhoaRegIniFile); virtual;
      // Загрузка/сохранение в Ini-файле значений с ID<>0. В базовом классе не делают ничего, кроме каскадных вызовов
      //   методов дочерних настроек
     procedure IniLoad(IniFile: TIniFile); virtual;
@@ -76,7 +76,7 @@ type
      // -- True, если значение настройки или любой из дочерних настроек модифицировано
     property Modified: Boolean read GetModified write SetModified;
      // -- Наименование пункта, закодированное по правилам ConstValEx()
-    property Name: AnsiString read FName;
+    property Name: WideString read FName;
      // -- Пункт-владелец данного пункта
     property Owner: TPhoaSetting read FOwner;
      // -- Пункты по ID
@@ -247,10 +247,10 @@ const
   end;
 
   procedure SaveAllSettings;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
      // Сохраняем настройки в реестре
-    rif := TRegIniFile.Create(SRegRoot);
+    rif := TPhoaRegIniFile.Create(SRegRoot);
     try
       RootSetting.RegSave(rif);
     finally
@@ -260,11 +260,11 @@ const
 
   procedure LoadAllSettings;
   var
-    rif: TRegIniFile;
+    rif: TPhoaRegIniFile;
     wsAutoLoadIniFile: WideString;
   begin
      // Загружаем настройки из реестра
-    rif := TRegIniFile.Create(SRegRoot);
+    rif := TPhoaRegIniFile.Create(SRegRoot);
     try
       RootSetting.RegLoad(rif);
     finally
@@ -335,11 +335,11 @@ const
     end;
   end;
 
-  constructor TPhoaSetting.Create(AOwner: TPhoaSetting; iID: Integer; const sName: AnsiString);
+  constructor TPhoaSetting.Create(AOwner: TPhoaSetting; iID: Integer; const wsName: WideString);
   begin
     CreateNew(AOwner);
     FID   := iID;
-    FName := sName;
+    FName := wsName;
   end;
 
   constructor TPhoaSetting.CreateNew(AOwner: TPhoaSetting);
@@ -423,14 +423,14 @@ const
       for i := 0 to FChildren.Count-1 do GetChildren(i).IniSave(IniFile);
   end;
 
-  procedure TPhoaSetting.RegLoad(RegIniFile: TRegIniFile);
+  procedure TPhoaSetting.RegLoad(RegIniFile: TPhoaRegIniFile);
   var i: Integer;
   begin
     if FChildren<>nil then
       for i := 0 to FChildren.Count-1 do GetChildren(i).RegLoad(RegIniFile);
   end;
 
-  procedure TPhoaSetting.RegSave(RegIniFile: TRegIniFile);
+  procedure TPhoaSetting.RegSave(RegIniFile: TPhoaRegIniFile);
   var i: Integer;
   begin
     if FChildren<>nil then

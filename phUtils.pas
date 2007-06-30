@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.57 2007-06-28 18:41:34 dale Exp $
+//  $Id: phUtils.pas,v 1.58 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phUtils;
 interface
 uses
   Windows, Messages, SysUtils, Classes, Controls, Graphics, Forms, TntForms,
-  TntSysUtils, TntClasses, TntStdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
+  TntWindows, TntSysUtils, TntClasses, TntStdCtrls, TB2Item, TBX, VirtualTrees, VirtualShellUtilities,
   phIntf, phMutableIntf, phNativeIntf, phAppIntf, phObj, ConsVars;
 
    // Exception raising
@@ -27,9 +27,9 @@ uses
    // Преобразует Variant в Integer (при этом Null конвертируется в 0)
   function  VarToInt(const v: Variant): Integer;
 
-  procedure RegLoadHistory(const wsSection: WideString; cb: TTntComboBox; bSetLastItem: Boolean);
-  procedure RegSaveHistory(const wsSection: WideString; cb: TTntComboBox; bRegisterFirst: Boolean);
-  procedure RegisterCBHistory(cb: TTntComboBox);
+  procedure RegLoadHistory(const sSection: AnsiString; ComboBox: TTntComboBox; bSetLastItem: Boolean);
+  procedure RegSaveHistory(const sSection: AnsiString; ComboBox: TTntComboBox; bRegisterFirst: Boolean);
+  procedure RegisterCBHistory(ComboBox: TTntComboBox);
    // Возвращает Integer(Items.Objects[ItemIndex]) для TTntComboBox, или -1, если ItemIndex<0
   function  GetCurrentCBObject(ComboBox: TTntComboBox): Integer;
    // То же, для установки ComboBox по Objects[]. Возвращает True, если удалось
@@ -51,11 +51,11 @@ uses
   function  GetRectIntersection(const r1, r2: TRect): TRect;
 
    // Преобразование Положение/размеры формы<->Строка
-  function  FormPositionToStr(Form: TCustomForm): WideString;
-  procedure FormPositionFromStr(Form: TCustomForm; const wsPosition: WideString);
+  function  FormPositionToStr(Form: TTntForm): WideString;
+  procedure FormPositionFromStr(Form: TTntForm; const wsPosition: WideString);
    // Возвращает объект-монитор, задаваемый свойством DefaultMonitor формы. Если подходящего монитора не найдено,
    //   возвращает первичный монитор
-  function  GetDefaultMonitorForForm(Form: TTntForm): TMonitor;
+  function  GetDefaultMonitorForForm(DefMonitor: TDefaultMonitor): TMonitor;
 
    // Работа с описанием шрифта в виде "Name/Size/Style/Color/Charset"
   function  FontToStr(Font: TFont): WideString;
@@ -64,12 +64,17 @@ uses
    // Транслирует Charset в кодовую страницу
   function  CharsetToCP(Charset: TFontCharset): Cardinal;
    // Преобразует Ansi-строку в Unicode-строку, используя указанную кодовую страницу и наоборот
-  function  AnsiToUnicodeCP(const s: AnsiString; cCodePage: Cardinal): WideString; deprecated;
   function  UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString; deprecated;
    // То же самое, но для cCodePage использует значение cMainCodePage
-  function  PhoaAnsiToUnicode(const s: AnsiString): WideString; deprecated;
   function  PhoaUnicodeToAnsi(const s: WideString): AnsiString; deprecated;
 
+
+   // Возвращает True, если wsText начинается на wsSubText (без учёта регистра) 
+  function WideStartsText(const wsSubText, wsText: WideString): Boolean;
+   // Возвращает True, если wsText оканчивается на wsSubText (без учёта регистра)
+  function WideEndsText(const wsSubText, wsText: WideString): Boolean;
+   // Возвращает True, если wsSubText содержится в wsText (без учёта регистра)
+  function WideContainsText(const wsSubText, wsText: WideString): Boolean;
    // Заменяет вхождения символов wsReplaceChars в строке ws на символ wcReplaceWith и возвращает результат
   function  ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
    // Возвращает первое слово из строки ws, считая за разделители слов любой из символов в wsDelimiters. Если
@@ -162,8 +167,8 @@ uses
    // Возвращает узел корневого каталога дерева по заданному индексу. Если нет такого, возвращает nil
   function  GetVTRootNodeByIndex(Tree: TBaseVirtualTree; iIndex: Integer): PVirtualNode;
    // Сохранение/загрузка настроек столбцов VirtualTree
-  procedure RegSaveVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
-  procedure RegLoadVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
+  procedure RegSaveVTColumns(const sSection: AnsiString; Tree: TVirtualStringTree);
+  procedure RegLoadVTColumns(const sSection: AnsiString; Tree: TVirtualStringTree);
    // Устанавливает опцию coVisible столбца согласно bVisible
   procedure SetVTColumnVisible(Column: TVirtualTreeColumn; bVisible: Boolean);
    // Возвращает VirtualTrees.TVTHintMode, соответствующиq заданному TGroupTreeHintMode
@@ -222,7 +227,7 @@ uses
 
 implementation
 uses
-  TypInfo, Variants, Registry, ShellAPI,
+  TypInfo, Variants, ShellAPI,
   TntWideStrUtils, GR32,
   DKLang,
   phSettings, phMsgBox, phPhoa, phGraphics;
@@ -354,53 +359,53 @@ var
    // History
    //-------------------------------------------------------------------------------------------------------------------
 
-  procedure RegLoadHistory(const wsSection: WideString; cb: TTntComboBox; bSetLastItem: Boolean);
+  procedure RegLoadHistory(const sSection: AnsiString; ComboBox: TTntComboBox; bSetLastItem: Boolean);
   var
-    sl: TTntStringList;
+    SL: TTntStringList;
     i: Integer;
   begin
-    sl := TTntStringList.Create;
+    SL := TTntStringList.Create;
     try
-      with TRegIniFile.Create(SRegRoot) do
+      with TPhoaRegIniFile.Create(SRegRoot) do
         try
-          ReadSectionValues(wsSection, sl); {!!! Not Unicode-enabled solution }
+          ReadSectionValues(sSection, SL);
         finally
           Free;
         end;
-      cb.Clear;
-      for i := 0 to sl.Count-1 do cb.Items.Add(sl.ValueFromIndex[i]);
+      ComboBox.Clear;
+      for i := 0 to SL.Count-1 do ComboBox.Items.Add(SL.ValueFromIndex[i]);
     finally
-      sl.Free;
+      SL.Free;
     end;
-    if bSetLastItem and (cb.Items.Count>0) then cb.ItemIndex := 0;
+    if bSetLastItem and (ComboBox.Items.Count>0) then ComboBox.ItemIndex := 0;
   end;
 
-  procedure RegSaveHistory(const wsSection: WideString; cb: TTntComboBox; bRegisterFirst: Boolean);
+  procedure RegSaveHistory(const sSection: AnsiString; ComboBox: TTntComboBox; bRegisterFirst: Boolean);
   var i: Integer;
   begin
-    if bRegisterFirst then RegisterCBHistory(cb);
-    with TRegIniFile.Create(SRegRoot) do
+    if bRegisterFirst then RegisterCBHistory(ComboBox);
+    with TPhoaRegIniFile.Create(SRegRoot) do
       try
-        EraseSection(wsSection); {!!! Not Unicode-enabled solution }
-        for i := 0 to cb.Items.Count-1 do WriteString(wsSection, 'Item'+IntToStr(i), cb.Items[i]); {!!! Not Unicode-enabled solution }
+        EraseSection(sSection);
+        for i := 0 to ComboBox.Items.Count-1 do WriteString(sSection, 'Item'+IntToStr(i), ComboBox.Items[i]);
       finally
         Free;
       end;
   end;
 
-  procedure RegisterCBHistory(cb: TTntComboBox);
+  procedure RegisterCBHistory(ComboBox: TTntComboBox);
   var
     idx: Integer;
     ws: WideString;
   begin
-    ws := Trim(cb.Text);
+    ws := Trim(ComboBox.Text);
     if ws<>'' then begin
-      idx := cb.Items.IndexOf(ws);
-      if idx>=0 then cb.Items.Delete(idx);
-      cb.Items.Insert(0, ws);
-      while cb.Items.Count>IMaxHistoryEntries do cb.Items.Delete(IMaxHistoryEntries);
+      idx := ComboBox.Items.IndexOf(ws);
+      if idx>=0 then ComboBox.Items.Delete(idx);
+      ComboBox.Items.Insert(0, ws);
+      while ComboBox.Items.Count>IMaxHistoryEntries do ComboBox.Items.Delete(IMaxHistoryEntries);
     end;
-    cb.Text := ws;
+    ComboBox.Text := ws;
   end;
 
   function GetCurrentCBObject(ComboBox: TTntComboBox): Integer;
@@ -490,7 +495,7 @@ var
     IntersectRect(Result, r1, r2);
   end;
   
-  function FormPositionToStr(Form: TCustomForm): WideString;
+  function FormPositionToStr(Form: TTntForm): WideString;
   var Placement: TWindowPlacement;
   begin
     Placement.length := SizeOf(Placement);
@@ -501,7 +506,7 @@ var
        Placement.rcNormalPosition.Bottom, iif(Placement.showCmd=SW_SHOWMAXIMIZED, 1, 0)]);
   end;
 
-  procedure FormPositionFromStr(Form: TCustomForm; const wsPosition: WideString);
+  procedure FormPositionFromStr(Form: TTntForm; const wsPosition: WideString);
   var
     r, rWorkArea: TRect;
     iw, ih: Integer;
@@ -543,7 +548,7 @@ var
       if bMaximized then Form.WindowState := wsMaximized;
      // Иначе центрируем форму на экране
     end else begin
-      rWorkArea := GetDefaultMonitorForForm(Form).WorkareaRect;
+      rWorkArea := GetDefaultMonitorForForm(Form.DefaultMonitor).WorkareaRect;
       Form.SetBounds(
         (rWorkArea.Left+rWorkArea.Right -Form.Width) div 2,
         (rWorkArea.Top +rWorkArea.Bottom-Form.Height) div 2,
@@ -552,10 +557,10 @@ var
     end;
   end;
 
-  function GetDefaultMonitorForForm(Form: TTntForm): TMonitor;
+  function GetDefaultMonitorForForm(DefMonitor: TDefaultMonitor): TMonitor;
   begin
     Result := nil;
-    case Form.DefaultMonitor of
+    case DefMonitor of
       dmMainForm:   if Application.MainForm<>nil    then Result := Application.MainForm.Monitor;
       dmActiveForm: if Screen.ActiveCustomForm<>nil then Result := Screen.ActiveCustomForm.Monitor;
     end;
@@ -607,25 +612,12 @@ var
     end;
   end;
 
-  function AnsiToUnicodeCP(const s: AnsiString; cCodePage: Cardinal): WideString;
-  var iLen: Integer;
-  begin
-    iLen := Length(s);
-    SetLength(Result, iLen);
-    MultiByteToWideChar(cCodePage, 0, @s[1], iLen, @Result[1], iLen);
-  end;
-
   function UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString;
   var iLen: Integer;
   begin
     iLen := Length(s);
     SetLength(Result, iLen);
     WideCharToMultiByte(cCodePage, 0, @s[1], iLen, @Result[1], iLen, nil, nil);
-  end;
-
-  function PhoaAnsiToUnicode(const s: AnsiString): WideString;
-  begin
-    Result := AnsiToUnicodeCP(s, cMainCodePage);
   end;
 
   function PhoaUnicodeToAnsi(const s: WideString): AnsiString;
@@ -636,6 +628,27 @@ var
    //-------------------------------------------------------------------------------------------------------------------
    // Misc
    //-------------------------------------------------------------------------------------------------------------------
+
+  function WideStartsText(const wsSubText, wsText: WideString): Boolean;
+  var iLenSubText, iLenText: Integer;
+  begin
+    iLenSubText := Length(wsSubText);
+    iLenText    := Length(wsText);
+    Result := (iLenText>=iLenSubText) and WideSameText(wsSubText, Copy(wsText, 1, iLenSubText));
+  end;
+
+  function WideEndsText(const wsSubText, wsText: WideString): Boolean;
+  var iLenSubText, iLenText: Integer;
+  begin
+    iLenSubText := Length(wsSubText);
+    iLenText    := Length(wsText);
+    Result := (iLenText>=iLenSubText) and WideSameText(wsSubText, Copy(wsText, iLenText-iLenSubText+1, iLenSubText));
+  end;
+
+  function WideContainsText(const wsSubText, wsText: WideString): Boolean;
+  begin
+    Result := Pos(WideUpperCase(wsSubText), WideUpperCase(wsText))>0;
+  end;
 
   function ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
   var i: Integer;
@@ -825,9 +838,9 @@ var
       dtResult := -1
     else begin
       if bTime then
-        Result := TntTryStrToTime(ChangeTimeSeparator(wsText, False), dtResult, AppFormatSettings)
+        Result := TryStrToTime(ChangeTimeSeparator(wsText, False), dtResult, AppFormatSettings)
       else
-        Result := TntTryStrToDate(wsText, dtResult, AppFormatSettings);
+        Result := TryStrToDate(wsText, dtResult, AppFormatSettings);
       if not Result then PhoaError(iif(bTime, 'SNotAValidTime', 'SNotAValidDate'), [wsText]);
     end;
   end;
@@ -835,20 +848,20 @@ var
   function ChangeTimeSeparator(const wsTime: WideString; bToSystem: Boolean): WideString;
   var
     i: Integer;
-    wcFrom, wcTo: WideChar;
+    cFrom, cTo: Char;
   begin
     Result := wsTime;
      // Определяем, что на что будем заменять
     if bToSystem then begin
-      wcFrom := AppFormatSettings.TimeSeparator;
-      wcTo   := TimeSeparator;
+      cFrom := AppFormatSettings.TimeSeparator;
+      cTo   := TimeSeparator;
     end else begin
-      wcFrom := TimeSeparator;
-      wcTo   := AppFormatSettings.TimeSeparator;
+      cFrom := TimeSeparator;
+      cTo   := AppFormatSettings.TimeSeparator;
     end;
      // Проверяем все символы строки и заменям
     for i := 1 to Length(Result) do
-      if Result[i]=wcFrom then Result[i] := wcTo;
+      if Result[i]=WideChar(cFrom) then Result[i] := WideChar(cTo);
   end;
 
   function ConstValEx(const wsText: WideString): WideString;
@@ -871,7 +884,7 @@ var
 
   function PicPropName(PicProp: TPicProperty): WideString;
   begin
-    Result := DKLangContW(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
+    Result := DKLangConstW(GetEnumName(TypeInfo(TPicProperty), Byte(PicProp)));
   end;
 
   function GroupPropsToInt(GroupProps: TGroupProperties): Integer;
@@ -1029,17 +1042,16 @@ var
     end;
   end;
   
-  procedure RegSaveVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
+  procedure RegSaveVTColumns(const sSection: AnsiString; Tree: TVirtualStringTree);
   var
     i: Integer;
     c: TVirtualTreeColumn;
   begin
-    {!!! Not Unicode-enabled solution }
-    with TRegIniFile.Create(SRegRoot) do
+    with TPhoaRegIniFile.Create(SRegRoot) do
       try
         for i := 0 to Tree.Header.Columns.Count-1 do begin
           c := Tree.Header.Columns[i];
-          WriteString(wsSection, 'Column'+IntToStr(i), WideFormat('%d,%d,%d', [c.Position, c.Width, Byte(coVisible in c.Options)]));
+          WriteString(sSection, 'Column'+IntToStr(i), WideFormat('%d,%d,%d', [c.Position, c.Width, Byte(coVisible in c.Options)]));
         end;
       finally
         Free;
@@ -1049,18 +1061,17 @@ var
 type
   TVTColumnsCast = class(TVirtualTreeColumns);
 
-  procedure RegLoadVTColumns(const wsSection: WideString; Tree: TVirtualStringTree);
+  procedure RegLoadVTColumns(const sSection: AnsiString; Tree: TVirtualStringTree);
   var
     i: Integer;
     c: TVirtualTreeColumn;
     ws: WideString;
   begin
-    {!!! Not Unicode-enabled solution }
-    with TRegIniFile.Create(SRegRoot) do
+    with TPhoaRegIniFile.Create(SRegRoot) do
       try
         for i := 0 to Tree.Header.Columns.Count-1 do begin
           c := Tree.Header.Columns[i];
-          ws := ReadString(wsSection, 'Column'+IntToStr(i), '');
+          ws := ReadString(sSection, 'Column'+IntToStr(i), '');
           c.Position := StrToIntDef(ExtractFirstWord(ws, ','), c.Position);
           c.Width    := StrToIntDef(ExtractFirstWord(ws, ','), c.Width);
           SetVTColumnVisible(c, StrToIntDef(ExtractFirstWord(ws, ','), Byte(coVisible in c.Options))<>0);

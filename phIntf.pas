@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phIntf.pas,v 1.28 2007-06-27 18:29:14 dale Exp $
+//  $Id: phIntf.pas,v 1.29 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -182,7 +182,7 @@ type
      // -- Number of keywords in the list
     property Count: Integer read GetCount;
      // -- Keywords by index; Index in range 0..Count-1
-    property Items[Index: Integer]: WideString read GetItems;
+    property Items[Index: Integer]: WideString read GetItems; default;
   end;
 
    //===================================================================================================================
@@ -258,7 +258,7 @@ type
      // -- Finds and returns the group by its ID (recursively); nil if no such group
     property GroupByID[iID: Integer]: IPhoaPicGroup read GetGroupByID;
      // -- Returns the group by its path; nil if no such group. The search is case-insensitive; starts searching from
-     //    the first owned group. If sPath starts with '/', ignores this char
+     //    the first owned group. If wsPath starts with '/', ignores this character
     property GroupByPath[const wsPath: WideString]: IPhoaPicGroup read GetGroupByPath;
      // -- Icon raw binary PNG data
     property IconData: TPhoaRawData read GetIconData;

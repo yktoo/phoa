@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrExprPicFilter.pas,v 1.5 2007-06-28 18:41:40 dale Exp $
+//  $Id: ufrExprPicFilter.pas,v 1.6 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrExprPicFilter;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms, phObj,
   DKLang, SynCompletionProposal, TB2MRU, TBXExtItems, Menus, TB2Item, TBX,
   ActnList, SynEdit, TB2Dock, TB2Toolbar, TntActnList;
 
@@ -137,7 +137,7 @@ var
     with TOpenDialog.Create(Self) do
       try
         DefaultExt := SDefaultSearchExpressionFileExt;
-        FileName   := sLastExpressionFile;
+        FileName   := wsLastExpressionFile;
         Filter     := DKLangConstW('SFileFilter_SearchExpr');
         Options    := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
         Title      := DKLangConstW('SDlgTitle_OpenSearchExpr');
@@ -162,7 +162,7 @@ var
     with TSaveDialog.Create(Self) do
       try
         DefaultExt := SDefaultSearchExpressionFileExt;
-        FileName   := sLastExpressionFile;
+        FileName   := wsLastExpressionFile;
         Filter     := DKLangConstW('SFileFilter_SearchExpr');
         Options    := [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing];
         Title      := DKLangConstW('SDlgTitle_SaveSearchExprAs');
@@ -182,7 +182,7 @@ var
      // Если есть ошибки
     if PicFilter.HasErrors then begin
       CaretPos := PicFilter.ParseErrorLocation;
-      PhoaMsgBox(mbkError, PicFilter.ParseErrorMsg, False, False, [mbbOK]);
+      PhoaMsgBox(mbkError, PicFilter.ParseErrorMsg, False, [mbbOK]);
      // Иначе сообщаем об успехе
     end else
       PhoaInfo(False, 'SMsg_SyntaxOK');
@@ -223,7 +223,7 @@ var
     var ok: TPicFilterOperatorKind;
     begin
       for ok := Low(ok) to High(ok) do
-        AddTBXMenuItem(smInsertOperator, asPicFilterOperators[ok], -1, Byte(ok), ExprInsertOpClick);
+        AddTBXMenuItem(smInsertOperator, awsPicFilterOperators[ok], -1, Byte(ok), ExprInsertOpClick);
     end;
 
   begin
@@ -232,7 +232,7 @@ var
     AddExprInsertPropItems;
     AddExprInsertOperatorItems;
      // Инициализируем выражение
-    FontFromStr(scpMain.Font, SettingValueStr(ISettingID_Gen_MainFont));
+    FontFromStr(scpMain.Font, SettingValueWStr(ISettingID_Gen_MainFont));
     scpMain.TitleFont.Assign(scpMain.Font);
     pmExpression.LinkSubitems := tbExprMain.Items;
     eExpression.Highlighter   := TSynPicFilterSyn.Create(Self);
@@ -321,7 +321,7 @@ var
 
   procedure TfrExprPicFilter.ExprInsertOpClick(Sender: TObject);
   begin
-    eExpression.SelText := asPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
+    eExpression.SelText := awsPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
   end;
 
   procedure TfrExprPicFilter.ExprInsertPropClick(Sender: TObject);
@@ -350,9 +350,9 @@ var
   end;
 
   procedure TfrExprPicFilter.LoadSettings;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
-    rif := TRegIniFile.Create(GetRegistryKey);
+    rif := TPhoaRegIniFile.Create(GetRegistryKey);
     try
       mruOpen.LoadFromRegIni(rif, SRegPFilterExprEditor_OpenMRU);
     finally
@@ -367,10 +367,10 @@ var
   end;
 
   procedure TfrExprPicFilter.SaveSettings;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
     if not FSettingsLoaded then Exit;
-    rif := TRegIniFile.Create(GetRegistryKey);
+    rif := TPhoaRegIniFile.Create(GetRegistryKey);
     try
       mruOpen.SaveToRegIni(rif, SRegPFilterExprEditor_OpenMRU);
     finally

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phValSetting.pas,v 1.19 2007-06-28 18:41:37 dale Exp $
+//  $Id: phValSetting.pas,v 1.20 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,9 +8,9 @@ unit phValSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, StdCtrls, ExtCtrls,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, IniFiles, StdCtrls, ExtCtrls,
   TntSysUtils, TntClasses, TntWideStrings, VirtualTrees,
-  ConsVars, phSettings;
+  phObj, ConsVars, phSettings;
 
 type
    //===================================================================================================================
@@ -32,8 +32,8 @@ type
   public
     procedure AfterConstruction; override;
     procedure Assign(Source: TPhoaSetting); override;
-    procedure RegLoad(RegIniFile: TRegIniFile); override;
-    procedure RegSave(RegIniFile: TRegIniFile); override;
+    procedure RegLoad(RegIniFile: TPhoaRegIniFile); override;
+    procedure RegSave(RegIniFile: TPhoaRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
      // Props
@@ -133,7 +133,7 @@ type
   private
      // Prop storage
     FValueType: TListSettingValueType;
-    FVariants: TWideStrings;
+    FVariants: TTntStringList;
      // Prop handlers
     function  GetVariantIndex: Integer;
     function  GetVariantText: WideString;
@@ -153,7 +153,7 @@ type
      // -- Индекс в Variants, соответствующий текущему Value; -1, если нет такого соответствия
     property VariantIndex: Integer read GetVariantIndex write SetVariantIndex;
      // -- Дочерние пункты (варианты) пункта. Текст закодирован по правилам ConstValEx()
-    property Variants: TWideStrings read FVariants;
+    property Variants: TTntStringList read FVariants;
      // -- Текст из Variants, соответствующий текущему ValueInt; пустая строка, если нет такого соответствия
     property VariantText: WideString read GetVariantText;
   end;
@@ -344,13 +344,13 @@ type
     inherited IniSave(IniFile);
   end;
 
-  procedure TPhoaValSetting.RegLoad(RegIniFile: TRegIniFile);
+  procedure TPhoaValSetting.RegLoad(RegIniFile: TPhoaRegIniFile);
   begin
     if ID<>0 then AsWideString := RegIniFile.ReadString(SRegPrefs_Root, Name, AsWideString);
     inherited RegLoad(RegIniFile);
   end;
 
-  procedure TPhoaValSetting.RegSave(RegIniFile: TRegIniFile);
+  procedure TPhoaValSetting.RegSave(RegIniFile: TPhoaRegIniFile);
   begin
     if ID<>0 then RegIniFile.WriteString(SRegPrefs_Root, Name, AsWideString);
     inherited RegSave(RegIniFile);

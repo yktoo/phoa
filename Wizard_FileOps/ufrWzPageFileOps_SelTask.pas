@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.2 2007-06-28 18:41:59 dale Exp $
+//  $Id: ufrWzPageFileOps_SelTask.pas,v 1.3 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -14,21 +14,21 @@ uses
 
 type
   TfrWzPageFileOps_SelTask = class(TWizardPage)
+    dklcMain: TDKLanguageController;
     lCopyFiles: TTntLabel;
-    rbCopyFiles: TTntRadioButton;
-    lMoveFiles: TTntLabel;
-    rbMoveFiles: TTntRadioButton;
     lDeleteFiles: TTntLabel;
-    rbDeleteFiles: TTntRadioButton;
-    lRepairFileLinks: TTntLabel;
-    rbRepairFileLinks: TTntRadioButton;
+    lMoveFiles: TTntLabel;
     lNBUndoable: TTntLabel;
     lRebuildThumbs: TTntLabel;
+    lRepairFileLinks: TTntLabel;
+    rbCopyFiles: TTntRadioButton;
+    rbDeleteFiles: TTntRadioButton;
+    rbMoveFiles: TTntRadioButton;
     rbRebuildThumbs: TTntRadioButton;
-    dklcMain: TDKLanguageController;
+    rbRepairFileLinks: TTntRadioButton;
   private
      // ћассив соответстви€ радиокнопок видам операций
-    FKindRadioButtons: Array[TFileOperationKind] of TRadioButton;
+    FKindRadioButtons: Array[TFileOperationKind] of TTntRadioButton;
   protected
     function  GetDataValid: Boolean; override;
     function  NextPage: Boolean; override;

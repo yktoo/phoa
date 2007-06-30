@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.24 2007-06-27 18:29:16 dale Exp $
+//  $Id: phOps.pas,v 1.25 2007-06-30 10:36:20 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -743,7 +743,7 @@ resourcestring
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
   TypInfo, TntClipBrd,
-  VirtualDataObject, GR32,
+  VirtualDataObject, GR32, DKLang,
   phUtils, phGraphics, ConsVars, phSettings, Variants;
 
    // Запись содержимого IPhotoAlbumPicGroupingList в Undo-файл
@@ -906,7 +906,7 @@ type
   var v: Variant;
   begin
     v := GetValueStrict(sName);
-    CheckVarType(sName, v, varWideString);
+    CheckVarType(sName, v, varOleStr);
     Result := v;
   end;
 
@@ -1393,7 +1393,7 @@ type
      // Запоминаем данные отката
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup := Group;
-    UndoStream.WriteStr(Group.Text);
+    UndoStream.WriteWStr(Group.Text);
      // Выполняем операцию
     Group.Text := Params.ValStr['NewText'];
      // Добавляем флаги изменений
@@ -1403,7 +1403,7 @@ type
   procedure TPhoaOp_GroupRename.RollbackChanges(UndoStream: IPhoaUndoDataStream; var Changes: TPhoaOperationChanges);
   begin
      // Получаем группу и восстанавливаем текст
-    OpGroup.Text := UndoStream.ReadStr;
+    OpGroup.Text := UndoStream.ReadWStr;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
     inherited RollbackChanges(UndoStream, Changes);
@@ -1420,9 +1420,9 @@ type
      // Запоминаем данные отката
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup := Group;
-    UndoStream.WriteStr(Group.Text);
-    UndoStream.WriteStr(Group.Description);
-    UndoStream.WriteStr(Group.IconData);
+    UndoStream.WriteWStr(Group.Text);
+    UndoStream.WriteWStr(Group.Description);
+    UndoStream.WriteRaw (Group.IconData);
      // Выполняем операцию
     Group.Text        := Params.ValStr['NewText'];
     Group.Description := Params.ValStr['NewDescription'];
@@ -1437,9 +1437,9 @@ type
      // Получаем группу
     Group := OpGroup;
      // Восстанавливаем свойства
-    Group.Text        := UndoStream.ReadStr;
-    Group.Description := UndoStream.ReadStr;
-    Group.IconData    := UndoStream.ReadStr;
+    Group.Text        := UndoStream.ReadWStr;
+    Group.Description := UndoStream.ReadWStr;
+    Group.IconData    := UndoStream.ReadRaw;
      // Добавляем флаги изменений
     Include(Changes, pocGroupProps);
     inherited RollbackChanges(UndoStream, Changes);
@@ -1472,11 +1472,11 @@ type
     Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
     OpGroup       := Group;
     OpParentGroup := Group.OwnerX;
-    UndoStream.WriteStr (Group.Text);
-    UndoStream.WriteStr (Group.Description);
+    UndoStream.WriteWStr(Group.Text);
+    UndoStream.WriteWStr(Group.Description);
     UndoStream.WriteInt (Group.Index);
     UndoStream.WriteBool(Group.Expanded);
-    UndoStream.WriteStr (Group.IconData);
+    UndoStream.WriteRaw (Group.IconData);
      // Записываем ID изображений и удаляем изображения из группы
     UndoStream.WriteInt(Group.Pics.Count);
     for i := 0 to Group.Pics.Count-1 do UndoStream.WriteInt(Group.Pics[i].ID);
@@ -1497,11 +1497,11 @@ type
   begin
      // Восстанавливаем группу
     g := NewPhotoAlbumPicGroup(OpParentGroup, OpGroupID);
-    g.Text        := UndoStream.ReadStr;
-    g.Description := UndoStream.ReadStr;
+    g.Text        := UndoStream.ReadWStr;
+    g.Description := UndoStream.ReadWStr;
     g.Index       := UndoStream.ReadInt;
     g.Expanded    := UndoStream.ReadBool;
-    g.IconData    := UndoStream.ReadStr;
+    g.IconData    := UndoStream.ReadRaw;
      // Восстанавливаем изображения
     for i := 0 to UndoStream.ReadInt-1 do g.PicsX.Add(Project.Pics.ItemsByID[UndoStream.ReadInt], False);
      // Добавляем флаги изменений
@@ -1541,7 +1541,7 @@ type
          // Пишем флаг продолжения
         UndoStream.WriteBool(True);
          // Сохраняем данные изображения
-        UndoStream.WriteStr(Pic.RawData[PPAllProps]);
+        UndoStream.WriteRaw(Pic.RawData[PPAllProps]);
          // Удаляем изображение из списка
         Project.PicsX.Delete(i);
          // Добавляем флаги изменений
@@ -1559,7 +1559,7 @@ type
        // Создаём изображение
       with NewPhotoAlbumPic do begin
          // Загружаем данные
-        RawData[PPAllProps] := UndoStream.ReadStr;
+        RawData[PPAllProps] := UndoStream.ReadRaw;
          // Кладём в список (ID уже загружен)
         PutToList(Project.PicsX);
          // Добавляем флаги изменений
@@ -1612,10 +1612,10 @@ type
     for i := 0 to FileChangeList.Count-1 do begin
       Pic := FileChangeList[i].Pic;
        // Сохраняем ID и прежний файл изображения
-      UndoStream.WriteInt(Pic.ID);
-      UndoStream.WriteStr(Pic.FileName);
+      UndoStream.WriteInt (Pic.ID);
+      UndoStream.WriteWStr(Pic.FileName);
        // Применяем новый файл
-      Pic.FileName := FileChangeList[i].sFileName;
+      Pic.FileName := FileChangeList[i].wsFileName;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
@@ -1627,7 +1627,7 @@ type
      // Возвращаем имена файлов изменённым изображениям обратно
     for i := 0 to UndoStream.ReadInt-1 do begin
       iPicID   := UndoStream.ReadInt;
-      Project.PicsX.ItemsByIDX[iPicID].FileName := UndoStream.ReadStr;
+      Project.PicsX.ItemsByIDX[iPicID].FileName := UndoStream.ReadWStr;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
@@ -1660,7 +1660,7 @@ type
        // Запоминаем старые данные
       Pic := Pics[iPic];
       UndoStream.WriteInt(Pic.ID);
-      UndoStream.WriteStr(Pic.RawData[ChangedProps]);
+      UndoStream.WriteRaw(Pic.RawData[ChangedProps]);
        // Применяем новые данные
       for iChg := 0 to ChangeList.Count-1 do
         with ChangeList[iChg]^ do Pic.PropValues[Prop] := vNewValue;
@@ -1729,7 +1729,7 @@ type
       bKWSaved := False;
        // Цикл по ключевым словам
       for iKwd := 0 to KeywordList.Count-1 do begin
-        sKeyword := KeywordList[iKwd];
+        wsKeyword := KeywordList[iKwd];
         pkd := KeywordList.KWData[iKwd];
         case pkd.Change of
            // КС не менялось. Проверяем изменение птицы
@@ -1738,7 +1738,7 @@ type
              //   - менять нечего. Если выделено полностью, и КС содержится во всех изображениях - менять нечего.
              //   Иначе проверяем наличие КС в изображении
             if ((pkd.State=pksOff) and (pkd.iSelCount>0)) or ((pkd.State=pksOn) and (pkd.iSelCount<iCnt)) then begin
-              idxKeyword := PicKeywords.IndexOf(sKeyword);
+              idxKeyword := PicKeywords.IndexOf(wsKeyword);
               case pkd.State of
                  // Надо убрать КС. Если оно есть - убираем
                 pksOff:
@@ -1750,7 +1750,7 @@ type
                 pksOn:
                   if idxKeyword<0 then begin
                     SavePicKeywords;
-                    PicKeywords.Add(sKeyword);
+                    PicKeywords.Add(wsKeyword);
                   end;
               end;
             end;
@@ -1758,13 +1758,13 @@ type
           pkcAdd:
             if pkd.State=pksOn then begin
               SavePicKeywords;
-              PicKeywords.Add(sKeyword);
+              PicKeywords.Add(wsKeyword);
             end;
            // КС менялось. Если только оно не полностью отсутствовало и отсутствует, ...
           pkcReplace:
             if (pkd.State<>pksOff) or (pkd.iSelCount>0) then begin
                // ... ищем старое КС и удаляем, ...
-              idxKeyword := PicKeywords.IndexOf(pkd.sOldKeyword);
+              idxKeyword := PicKeywords.IndexOf(pkd.wsOldKeyword);
               if idxKeyword>=0 then begin
                 SavePicKeywords;
                 PicKeywords.Delete(idxKeyword);
@@ -1772,7 +1772,7 @@ type
                // ... если состояние pksOn - добавляем новое всем, если pksGrayed - добавляем только в те, где было старое
               if (pkd.State=pksOn) or ((pkd.State=pksGrayed) and (idxKeyword>=0)) then begin
                 SavePicKeywords;
-                PicKeywords.Add(sKeyword);
+                PicKeywords.Add(wsKeyword);
               end;
             end;
         end;
@@ -1788,7 +1788,7 @@ type
      // Возвращаем КС изменённым изображениям: крутим цикл, пока не встретим стоп-флаг
     while UndoStream.ReadBool do begin
       iPicID    := UndoStream.ReadInt;
-      Project.PicsX.ItemsByIDX[iPicID].KeywordsM.CommaText := UndoStream.ReadStr;
+      Project.PicsX.ItemsByIDX[iPicID].KeywordsM.CommaText := UndoStream.ReadWStr;
        // Добавляем флаги изменений
       Include(Changes, pocPicProps);
     end;
@@ -1945,7 +1945,7 @@ type
       UndoStream.WriteBool(True);
        // Сохраняем данные изображения
       Pic := Pics[i];
-      UndoStream.WriteStr(Pic.RawData[PPAllProps]);
+      UndoStream.WriteRaw(Pic.RawData[PPAllProps]);
        // Удаляем изображение из списка
       Project.PicsX.Remove(Pic.ID);
        // Добавляем флаги изменений
@@ -1962,7 +1962,7 @@ type
        // Создаём изображение
       with NewPhotoAlbumPic do begin
          // Загружаем данные
-        RawData[PPAllProps] := UndoStream.ReadStr;
+        RawData[PPAllProps] := UndoStream.ReadRaw;
          // Кладём в список (ID уже загружен)
         PutToList(Project.PicsX);
          // Добавляем флаги изменений
@@ -2129,7 +2129,7 @@ type
         ms.Free;
       end;
        // Копируем
-      Clipboard.SetAsHandle(wClipbrdPicFormatID, hRec);
+      TntClipboard.SetAsHandle(wClipbrdPicFormatID, hRec);
     end;
 
      // Копирует в буфер обмена объекты "Файл"
@@ -2183,7 +2183,7 @@ type
         bmp32.SetSize(Pic.ThumbnailSize.cx, Pic.ThumbnailSize.cy);
         PaintThumbnail(Pic, bmp32);
          // Помещаем bitmap в clipboard
-        Clipboard.Assign(bmp32);
+        TntClipboard.Assign(bmp32);
       finally
         bmp32.Free;
       end;
@@ -2193,7 +2193,7 @@ type
     StartWait;
     try
       if Pics.Count>0 then begin
-        Clipboard.Open;
+        TntClipboard.Open;
         try
            // Помещаем PhoA-данные
           if pcfPhoa in ClipFormats then CopyPhoaData;
@@ -2204,7 +2204,7 @@ type
            // Помещаем изображение эскиза (в случае единственного изображения)
           if (pcfSingleBitmap in ClipFormats) and (Pics.Count=1) then CopyThumbBitmap(Pics[0]);
         finally
-          Clipboard.Close;
+          TntClipboard.Close;
         end;
       end;
     finally
@@ -2303,7 +2303,7 @@ type
     iSize: Integer;
   begin
     inherited Perform(Params, UndoStream, Changes);
-    if Clipboard.HasFormat(wClipbrdPicFormatID) then begin
+    if TntClipboard.HasFormat(wClipbrdPicFormatID) then begin
        // Получаем параметры
       Params.ObtainValIntf('Group', IPhotoAlbumPicGroup, Group);
       OpGroup := Group;
@@ -2312,10 +2312,10 @@ type
        // Создаём временный поток
       ms := TMemoryStream.Create;
       try
-        Clipboard.Open;
+        TntClipboard.Open;
         try
            // Получаем Handle блока данных из буфера обмена
-          hRec := Clipboard.GetAsHandle(wClipbrdPicFormatID);
+          hRec := TntClipboard.GetAsHandle(wClipbrdPicFormatID);
           if hRec=0 then RaiseLastOSError;
            // Получаем размер данных из буфера обмена
           p := GlobalLock(hRec);
@@ -2329,7 +2329,7 @@ type
             GlobalUnlock(hRec);
           end;
         finally
-          Clipboard.Close;
+          TntClipboard.Close;
         end;
         ms.Position := 0;
          // Создаём Streamer и загружаем изображения
@@ -2358,7 +2358,7 @@ type
     UndoStream.WriteInt (Project.ThumbnailSize.cx);
     UndoStream.WriteInt (Project.ThumbnailSize.cy);
     UndoStream.WriteByte(Project.ThumbnailQuality);
-    UndoStream.WriteStr (Project.Description);
+    UndoStream.WriteWStr(Project.Description);
      // Выполняем операцию
     Project.ThumbnailSize    := Size(Params.ValInt['NewThWidth'], Params.ValInt['NewThHeight']);
     Project.ThumbnailQuality := Params.ValByte['NewThQuality'];
@@ -2375,7 +2375,7 @@ type
     Sz.cy   := UndoStream.ReadInt;
     Project.ThumbnailSize    := Sz;
     Project.ThumbnailQuality := UndoStream.ReadByte;
-    Project.Description      := UndoStream.ReadStr;
+    Project.Description      := UndoStream.ReadWStr;
      // Добавляем флаги изменений
     Include(Changes, pocProjectProps);
     inherited RollbackChanges(UndoStream, Changes);
@@ -2685,8 +2685,8 @@ type
     Params.ObtainValIntf('Groupings', IPhotoAlbumPicGroupingList, Groupings, False);
     Params.ObtainValIntf('Sortings',  IPhotoAlbumPicSortingList,  Sortings,  False);
      // Сохраняем данные отката и применяем изменения
-    UndoStream.WriteStr(View.Name);
-    UndoStream.WriteStr(View.FilterExpression);
+    UndoStream.WriteWStr(View.Name);
+    UndoStream.WriteWStr(View.FilterExpression);
     View.Name             := Params.ValStr['Name'];
     View.FilterExpression := Params.ValStr['FilterExpression'];
      // Запоминаем новый индекс представления (ПОСЛЕ присвоения имени, т.к. оно изменяет позицию представления в списке)
@@ -2746,7 +2746,7 @@ type
     inherited Perform(Params, UndoStream, Changes);
      // Сохраняем данные отката
     View := Project.CurrentViewX;
-    UndoStream.WriteStr(View.Name);
+    UndoStream.WriteWStr(View.Name);
     UndoWriteGroupings(UndoStream, View.GroupingsX);
     UndoWriteSortings (UndoStream, View.SortingsX);
      // Удаляем представление
@@ -2762,7 +2762,7 @@ type
   begin
       // Создаём представление
     View := NewPhotoAlbumView(Project.ViewsX);
-    View.Name := UndoStream.ReadStr;
+    View.Name := UndoStream.ReadWStr;
     UndoReadGroupings(UndoStream, View.GroupingsX);
     UndoReadSortings (UndoStream, View.SortingsX);
      // Активизируем представление
@@ -2949,7 +2949,7 @@ type
   function TPhoaUndoDataStream.ReadRaw: TPhoaRawData;
   begin
     ReadCheckDatatype(pudsdRaw);
-    Result := StreamReadStr(FStream);
+    Result := StreamReadRaw(FStream);
   end;
 
   function TPhoaUndoDataStream.ReadWStr: WideString;
@@ -2989,7 +2989,7 @@ type
   begin
     CreateStream;
     WriteDatatype(pudsdRaw);
-    StreamWriteStr(FStream, Data);
+    StreamWriteRaw(FStream, Data);
   end;
 
   procedure TPhoaUndoDataStream.WriteWStr(const ws: WideString);

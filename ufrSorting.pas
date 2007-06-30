@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrSorting.pas,v 1.13 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrSorting.pas,v 1.14 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufrSorting;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ActiveX, TntForms,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   TntStdCtrls, TB2Item, TBX, Menus, VirtualTrees, StdCtrls;
 
@@ -68,7 +68,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, ConsVars, Main, phSettings;
+uses DKLang, phUtils, phSettings, ConsVars, Main;
 
   constructor TfrSorting.Create(AOwner: TComponent);
   var
@@ -275,8 +275,8 @@ uses phUtils, ConsVars, Main, phSettings;
     if SortingNode(Node) then begin
       Sorting := FSortings[Node.Index];
       case Column of
-        0: CellText := PhoaAnsiToUnicode(PicPropName(Sorting.Prop));
-        1: CellText := PhoaAnsiToUnicode(DKLangConstW(iif(Sorting.Direction=psdAsc, 'SSort_Ascending', 'SSort_Descending')));
+        0: CellText := PicPropName(Sorting.Prop);
+        1: CellText := DKLangConstW(iif(Sorting.Direction=psdAsc, 'SSort_Ascending', 'SSort_Descending'));
       end;
     end;
   end;

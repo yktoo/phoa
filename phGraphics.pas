@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.24 2007-06-27 18:29:10 dale Exp $
+//  $Id: phGraphics.pas,v 1.25 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -123,7 +123,7 @@ const
   C32Transparent           = 0; // "Прозрачный" цвет типа TColor32
 
 implementation
-uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, phUtils, phIJLIntf;
+uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, DKLang, phUtils, phIJLIntf;
 
   procedure RenderShadowTemplate(Bitmap: TBitmap32; iRadius: Integer; bOpacity: Byte; Color: TColor);
   var
@@ -305,7 +305,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, phUtils, phIJLIntf;
   begin
     LargeBitmap := TBitmap32.Create;
     try
-      LoadGraphicFromFile(sFileName, LargeBitmap, MaxSize, ImageSize, nil);
+      LoadGraphicFromFile(wsFileName, LargeBitmap, MaxSize, ImageSize, nil);
       LargeBitmap.StretchFilter := aPhoaSFtoGR32SF[StretchFilter];
        // Определяем коэффициент масштабирования
       if (ImageSize.cx>0) and (ImageSize.cy>0) then sScale := MinS(MinS(MaxSize.cx/ImageSize.cx, MaxSize.cy/ImageSize.cy), 1) else sScale := 1;
@@ -329,7 +329,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, phUtils, phIJLIntf;
     ThumbBitmap := TBitmap32.Create;
     try
        // Загружаем уменьшенную версию картинки в ThumbBitmap
-      MakeThumbnail(sFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
+      MakeThumbnail(wsFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
        // Преобразуем TBitmap32 в TBitmap
       bmp := TBitmap.Create;
       try
@@ -370,7 +370,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, phUtils, phIJLIntf;
     ThumbBitmap := TBitmap32.Create;
     try
        // Загружаем уменьшенную версию картинки в ThumbBitmap
-      MakeThumbnail(sFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
+      MakeThumbnail(wsFileName, MaxSize, StretchFilter, ImageSize, ThumbSize, ThumbBitmap);
        // Сохраняем эскиз в поток
       Stream := TStringStream.Create('');
       try
@@ -528,7 +528,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, phUtils, phIJLIntf;
       end;
      // Остальное - с помощью GraphicEx
     end else begin
-      GClass := FileFormatList.GraphicFromExtension(sExt);
+      GClass := FileFormatList.GraphicFromExtension(wsExt); { Implicit Unicode-to-Ansi conversion }
       if GClass=nil then PhoaException(DKLangConstW('SErrUnknownPicFileExtension', [wsFileName]));
       Graphic := GClass.Create;
       try

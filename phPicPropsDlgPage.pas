@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPicPropsDlgPage.pas,v 1.14 2007-06-28 18:41:34 dale Exp $
+//  $Id: phPicPropsDlgPage.pas,v 1.15 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, udPicProps,
   phWizard;
 
 type

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.23 2007-06-27 18:29:26 dale Exp $
+//  $Id: phToolSetting.pas,v 1.24 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,8 +8,8 @@ unit phToolSetting;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Registry, IniFiles, VirtualTrees, ActiveX, TB2Item, TBX,
-  ConsVars, phSettings, phIntf, phObj;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, IniFiles, VirtualTrees, ActiveX, TB2Item, TBX,
+  TntWindows, TntSysUtils, ConsVars, phSettings, phIntf, phObj;
 
 type
    // Вид инструмента
@@ -54,7 +54,7 @@ type
     FRunShowCommand: Integer;
     FUsages: TPhoaToolUsages;
      // Возвращает имя секции для сохранения/загрузки настроек
-    function GetStoreSection: WideString;
+    function GetStoreSection: AnsiString;
      // Prop handlers
     procedure SetHint(const Value: WideString);
     procedure SetKind(Value: TPhoaToolKind);
@@ -75,8 +75,8 @@ type
     destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Assign(Source: TPhoaSetting); override;
-    procedure RegLoad(RegIniFile: TRegIniFile); override;
-    procedure RegSave(RegIniFile: TRegIniFile); override;
+    procedure RegLoad(RegIniFile: TPhoaRegIniFile); override;
+    procedure RegSave(RegIniFile: TPhoaRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
      // Возвращает True, если инструмент подходит файлу изображения wsFileName
@@ -121,8 +121,8 @@ type
     function  GetModified: Boolean; override;
     procedure SetModified(Value: Boolean); override;
   public
-    procedure RegLoad(RegIniFile: TRegIniFile); override;
-    procedure RegSave(RegIniFile: TRegIniFile); override;
+    procedure RegLoad(RegIniFile: TPhoaRegIniFile); override;
+    procedure RegSave(RegIniFile: TPhoaRegIniFile); override;
     procedure IniLoad(IniFile: TIniFile); override;
     procedure IniSave(IniFile: TIniFile); override;
   end;
@@ -162,7 +162,10 @@ const
   IColIdx_ToolEditor_Params      = 6;
 
 implementation
-uses TypInfo, ShellAPI, Menus, ImgList, Forms, VTHeaderPopup, phUtils, Main, udToolProps;
+uses
+  TypInfo, ShellAPI, Menus, ImgList, Forms,
+  TntWideStrUtils, TntMenus, VTHeaderPopup, DKLang,
+  phUtils, Main, udToolProps;
 
   function PhoaToolKindToWStr(Kind: TPhoaToolKind): WideString;
   begin
@@ -188,10 +191,10 @@ uses TypInfo, ShellAPI, Menus, ImgList, Forms, VTHeaderPopup, phUtils, Main, udT
   function PhoaToolUsagesFromWStr(const wsUsages: WideString): TPhoaToolUsages;
   begin
     Result := [];
-    if WideStrScan(PWideChar(wsUsages), 'M')<>nil then Include(Result, ptuToolsMenu);
-    if WideStrScan(PWideChar(wsUsages), 'G')<>nil then Include(Result, ptuGroupPopupMenu);
-    if WideStrScan(PWideChar(wsUsages), 'V')<>nil then Include(Result, ptuThViewerPopupMenu);
-    if WideStrScan(PWideChar(wsUsages), 'W')<>nil then Include(Result, ptuViewModePopupMenu);
+    if Pos('M', wsUsages)>0 then Include(Result, ptuToolsMenu);
+    if Pos('G', wsUsages)>0 then Include(Result, ptuGroupPopupMenu);
+    if Pos('V', wsUsages)>0 then Include(Result, ptuThViewerPopupMenu);
+    if Pos('W', wsUsages)>0 then Include(Result, ptuViewModePopupMenu);
   end;
 
   function PhoaToolKindName(Kind: TPhoaToolKind): WideString;
@@ -376,9 +379,9 @@ type
     Result := FModified or inherited GetModified;
   end;
 
-  function TPhoaToolSetting.GetStoreSection: WideString;
+  function TPhoaToolSetting.GetStoreSection: AnsiString;
   begin
-    Result := WideFormat('%s\Item%.3d', [SRegPrefs_Tools, Index]);
+    Result := Format('%s\Item%.3d', [SRegPrefs_Tools, Index]);
   end;
 
   procedure TPhoaToolSetting.IniLoad(IniFile: TIniFile);
@@ -422,38 +425,38 @@ type
     end;
   end;
 
-  procedure TPhoaToolSetting.RegLoad(RegIniFile: TRegIniFile {!!! Not Unicode-enabled solution });
-  var wsSection: WideString;
+  procedure TPhoaToolSetting.RegLoad(RegIniFile: TPhoaRegIniFile);
+  var sSection: AnsiString;
   begin
-    wsSection := GetStoreSection;
-    FName           := RegIniFile.ReadString (wsSection, 'Name',       '');
-    FHint           := RegIniFile.ReadString (wsSection, 'Hint',       '');
-    FKind           := PhoaToolKindFromStr(
-                       RegIniFile.ReadString (wsSection, 'Kind',       ''),
+    sSection := GetStoreSection;
+    FName           := RegIniFile.ReadString (sSection, 'Name',       '');
+    FHint           := RegIniFile.ReadString (sSection, 'Hint',       '');
+    FKind           := PhoaToolKindFromWStr(
+                       RegIniFile.ReadString (sSection, 'Kind',       ''),
                        FKind);
-    FMasks          := RegIniFile.ReadString (wsSection, 'Masks',      '');
-    FRunCommand     := RegIniFile.ReadString (wsSection, 'RunCmd',     '');
-    FRunFolder      := RegIniFile.ReadString (wsSection, 'RunFolder',  '');
-    FRunParameters  := RegIniFile.ReadString (wsSection, 'RunParams',  '');
-    FRunShowCommand := RegIniFile.ReadInteger(wsSection, 'RunShowCmd', SW_SHOWNORMAL);
-    FUsages         := PhoaToolUsagesFromStr(
-                       RegIniFile.ReadString (wsSection, 'Usages',     'M'));
+    FMasks          := RegIniFile.ReadString (sSection, 'Masks',      '');
+    FRunCommand     := RegIniFile.ReadString (sSection, 'RunCmd',     '');
+    FRunFolder      := RegIniFile.ReadString (sSection, 'RunFolder',  '');
+    FRunParameters  := RegIniFile.ReadString (sSection, 'RunParams',  '');
+    FRunShowCommand := RegIniFile.ReadInteger(sSection, 'RunShowCmd', SW_SHOWNORMAL);
+    FUsages         := PhoaToolUsagesFromWStr(
+                       RegIniFile.ReadString (sSection, 'Usages',     'M'));
     inherited RegLoad(RegIniFile);
   end;
 
-  procedure TPhoaToolSetting.RegSave(RegIniFile: TRegIniFile {!!! Not Unicode-enabled solution });
-  var wsSection: WideString;
+  procedure TPhoaToolSetting.RegSave(RegIniFile: TPhoaRegIniFile);
+  var sSection: AnsiString;
   begin
-    wsSection := GetStoreSection;
-    RegIniFile.WriteString (wsSection, 'Name',       FName);
-    RegIniFile.WriteString (wsSection, 'Hint',       FHint);
-    RegIniFile.WriteString (wsSection, 'Kind',       PhoaToolKindToStr(FKind));
-    RegIniFile.WriteString (wsSection, 'Masks',      FMasks);
-    RegIniFile.WriteString (wsSection, 'RunCmd',     FRunCommand);
-    RegIniFile.WriteString (wsSection, 'RunFolder',  FRunFolder);
-    RegIniFile.WriteString (wsSection, 'RunParams',  FRunParameters);
-    RegIniFile.WriteInteger(wsSection, 'RunShowCmd', FRunShowCommand);
-    RegIniFile.WriteString (wsSection, 'Usages',     PhoaToolUsagesToStr(FUsages));
+    sSection := GetStoreSection;
+    RegIniFile.WriteString (sSection, 'Name',       FName);
+    RegIniFile.WriteString (sSection, 'Hint',       FHint);
+    RegIniFile.WriteString (sSection, 'Kind',       PhoaToolKindToWStr(FKind));
+    RegIniFile.WriteString (sSection, 'Masks',      FMasks);
+    RegIniFile.WriteString (sSection, 'RunCmd',     FRunCommand);
+    RegIniFile.WriteString (sSection, 'RunFolder',  FRunFolder);
+    RegIniFile.WriteString (sSection, 'RunParams',  FRunParameters);
+    RegIniFile.WriteInteger(sSection, 'RunShowCmd', FRunShowCommand);
+    RegIniFile.WriteString (sSection, 'Usages',     PhoaToolUsagesToWStr(FUsages));
     inherited RegSave(RegIniFile);
   end;
 
@@ -560,7 +563,7 @@ type
     { Инструменты не поддерживают хранение в Ini-файлах }
   end;
 
-  procedure TPhoaToolPageSetting.RegLoad(RegIniFile: TRegIniFile);
+  procedure TPhoaToolPageSetting.RegLoad(RegIniFile: TPhoaRegIniFile);
   var i, iCount: Integer;
   begin
      // Получаем количество детей
@@ -572,7 +575,7 @@ type
     end;
   end;
 
-  procedure TPhoaToolPageSetting.RegSave(RegIniFile: TRegIniFile);
+  procedure TPhoaToolPageSetting.RegSave(RegIniFile: TPhoaRegIniFile);
   begin
      // Стираем секцию инструментов
     RegIniFile.EraseSection(SRegPrefs_Tools);

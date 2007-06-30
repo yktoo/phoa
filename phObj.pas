@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.70 2007-06-27 18:29:14 dale Exp $
+//  $Id: phObj.pas,v 1.71 2007-06-30 10:36:20 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,12 +8,12 @@ unit phObj;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Masks,
-  TntClasses, TntWideStrings,
+  Windows, Messages, SysUtils, Classes, Graphics, Masks, Registry,
+  TntWindows, TntClasses, TntWideStrings, TntSysUtils, TntWideStrUtils, TntRegistry,
   phPhoa, phIntf, phMutableIntf, phNativeIntf;
 
 type
-   // Phoa Exception  
+   // Phoa Exception
   EPhoaException = class(Exception);
 
    //===================================================================================================================
@@ -41,6 +41,17 @@ type
     property AllowDuplicates: Boolean read FAllowDuplicates;
      // -- Числа по индексу
     property Items[Index: Integer]: Integer read GetItems; default;
+  end;
+
+   //===================================================================================================================
+   // Unicode-enabled TRegIniFile
+   //===================================================================================================================
+
+  TPhoaRegIniFile = class(TRegIniFile)
+  public
+    function  ReadString(const sSection, sName: AnsiString; const wsDefaultValue: WideString): WideString;
+    procedure WriteString(const sSection, sName: AnsiString; const wsValue: WideString);
+    procedure ReadSectionValues(const sSection: AnsiString; Strings: TWideStrings);
   end;
 
    //===================================================================================================================
@@ -84,7 +95,7 @@ type
   public
      // Добавляет запись о файле к списку, если такого файла ещё нет, иначе обновляет его данные
      //   Если iIconIndex=-1, это означает отсутствие иконки у файла
-     //   Если iIconIndex=-2, иконка файла получается вызовом SHGetFileInfo; Handle системного ImageList'а в этом
+     //   Если iIconIndex=-2, иконка файла получается вызовом Tnt_SHGetFileInfoW; Handle системного ImageList'а в этом
      //     случае будет находиться в SysImageListHandle
     function  Add(const wsName, wsPath: WideString; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
      // Удаляет файл с заданными именем и путём, возвращает его прежний индекс или -1, если нет такого в списке
@@ -253,9 +264,9 @@ resourcestring
 
 implementation /////////////////////////////////////////////////////////////////////////////////////////////////////////
 uses
-  TypInfo, Math, Registry, DateUtils, Clipbrd, ShellAPI, Themes,
-  phUtils, phSettings, phGraphics, Variants, phObjConst, ConsVars,
-  phParsingPicFilter;
+  TypInfo, Variants, Math, DateUtils, ShellAPI, Themes,
+  TntClipbrd, DKLang,
+  phUtils, phSettings, phGraphics, phObjConst, phParsingPicFilter, ConsVars;
 
   procedure PhoaWriteError;
   begin
@@ -385,7 +396,7 @@ type
     FDescription: WideString;
     FFileName: WideString;
     FFileSize: Integer;
-    FFilmNumber: vString;
+    FFilmNumber: WideString;
     FFlips: TPicFlips;
     FFrameNumber: WideString;
     FID: Integer;
@@ -606,8 +617,8 @@ type
       ppNotes:         Result := FNotes;
       ppMedia:         Result := FMedia;
       ppKeywords:      Result := FKeywords.CommaText;
-      ppRotation:      Result := asPicRotationText[FRotation];
-      ppFlips:         Result := iif(pflHorz in FFlips, asPicFlipText[pflHorz], '')+iif(pflVert in FFlips, asPicFlipText[pflVert], '');
+      ppRotation:      Result := awsPicRotationText[FRotation];
+      ppFlips:         Result := iif(pflHorz in FFlips, awsPicFlipText[pflHorz], '')+iif(pflVert in FFlips, awsPicFlipText[pflVert], '');
     end;
   end;
 
@@ -772,7 +783,7 @@ type
 
     function XFilename(const ws: WideString): WideString;
     begin
-      if bExpandRelative then Result := WideExpandRelativePath(Streamer.BasePath, ws) else Result := ws;
+      if bExpandRelative then Result := ExpandRelativePath(Streamer.BasePath, ws) else Result := ws;
     end;
 
   begin
@@ -1146,11 +1157,6 @@ type
     Result := -1;
   end;
 
-  function TPhotoAlbumPicList.IndexOfFileNameW(const sFileName: WideString): Integer;
-  begin
-    Result := IndexOfFileName(PhoaUnicodeToAnsi(sFileName));
-  end;
-
   function TPhotoAlbumPicList.IndexOfID(iID: Integer): Integer;
   begin
     if not FindID(iID, Result) then Result := -1;
@@ -1299,11 +1305,6 @@ type
       p.iSelCount := 0;
     end;
     if bSelected then Inc(p.iSelCount);
-  end;
-
-  function TPhotoAlbumKeywordList.AddW(const sKeyword: WideString): Integer;
-  begin
-    Result := Add(PhoaUnicodeToAnsi(sKeyword));
   end;
 
   procedure TPhotoAlbumKeywordList.Assign(Source: IPhoaKeywordList);
@@ -1608,7 +1609,7 @@ type
     procedure SetText(const Value: WideString); stdcall;
      // IPhotoAlbumPicGroup
     function  GetGroupByIDX(iID: Integer): IPhotoAlbumPicGroup;
-    function  GetGroupByPathX(const sPath: WideString): IPhotoAlbumPicGroup;
+    function  GetGroupByPathX(const wsPath: WideString): IPhotoAlbumPicGroup;
     function  GetGroupsX: IPhotoAlbumPicGroupList;
     function  GetOwnerX: IPhotoAlbumPicGroup;
     function  GetPicsX: IPhotoAlbumPicList;
@@ -1839,11 +1840,6 @@ type
       gpPicCount:    Result := IntToStrPositive(FPics.Count);
       gpGroupCount:  Result := IntToStrPositive(GetNestedGroupCount);
     end;
-  end;
-
-  function TPhotoAlbumPicGroup.GetPropsW(GroupProp: TGroupProperty): WideString;
-  begin
-    Result := PhoaAnsiToUnicode(GetProps(GroupProp));
   end;
 
   function TPhotoAlbumPicGroup.GetRoot: IPhoaPicGroup;
@@ -2328,8 +2324,8 @@ type
     procedure Move(iCurIndex, iNewIndex: Integer); stdcall;
     function  GetItemsM(Index: Integer): IPhoaMutablePicSorting; stdcall;
      // IPhotoAlbumPicSortingList
-    procedure RegSave(const wsRoot, wsSection: WideString);
-    procedure RegLoad(const wsRoot, wsSection: WideString);
+    procedure RegSave(const sRoot, sSection: AnsiString);
+    procedure RegLoad(const sRoot, sSection: AnsiString);
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);
     procedure RevertToDefaults;
@@ -2412,19 +2408,18 @@ type
     FList.Insert(iNewIndex, Item);
   end;
 
-  procedure TPhotoAlbumPicSortingList.RegLoad(const wsRoot, wsSection: WideString);
+  procedure TPhotoAlbumPicSortingList.RegLoad(const sRoot, sSection: AnsiString);
   var
     sl: TTntStringList;
     i: Integer;
     ws: WideString;
     Item: IPhotoAlbumPicSorting;
   begin
-     //!!! Not Unicode-enabled solution
     sl := TTntStringList.Create;
     try
-      with TRegIniFile.Create(wsRoot) do
+      with TPhoaRegIniFile.Create(sRoot) do
         try
-          ReadSectionValues(wsSection, sl);
+          ReadSectionValues(sSection, sl);
         finally
           Free;
         end;
@@ -2446,18 +2441,17 @@ type
     end;
   end;
 
-  procedure TPhotoAlbumPicSortingList.RegSave(const wsRoot, wsSection: WideString);
+  procedure TPhotoAlbumPicSortingList.RegSave(const sRoot, sSection: AnsiString);
   var
     i: Integer;
     Item: IPhoaPicSorting;
   begin
-     //!!! Not Unicode-enabled solution
-    with TRegIniFile.Create(wsRoot) do
+    with TPhoaRegIniFile.Create(sRoot) do
       try
-        EraseSection(wsSection);
+        EraseSection(sSection);
         for i := 0 to GetCount-1 do begin
           Item := GetItems(i);
-          WriteString(wsSection, 'Item'+IntToStr(i), WideFormat('%d,%d', [Byte(Item.Prop), Byte(Item.Direction)]));
+          WriteString(sSection, 'Item'+IntToStr(i), WideFormat('%d,%d', [Byte(Item.Prop), Byte(Item.Direction)]));
         end;
       finally
         Free;
@@ -2491,9 +2485,9 @@ type
       Item := GetItems(i);
       case Item.Prop of
         ppID:              Result := Pic1.ID-Pic2.ID;
-        ppFileName:        Result := AnsiCompareText(ExtractFileName(Pic1.FileName), ExtractFileName(Pic2.FileName));
-        ppFullFileName:    Result := AnsiCompareText(Pic1.FileName, Pic2.FileName);
-        ppFilePath:        Result := AnsiCompareText(ExtractFilePath(Pic1.FileName), ExtractFilePath(Pic2.FileName));
+        ppFileName:        Result := WideCompareText(ExtractFileName(Pic1.FileName), ExtractFileName(Pic2.FileName));
+        ppFullFileName:    Result := WideCompareText(Pic1.FileName, Pic2.FileName);
+        ppFilePath:        Result := WideCompareText(ExtractFilePath(Pic1.FileName), ExtractFilePath(Pic2.FileName));
         ppFileSize,
           ppFileSizeBytes: Result := Pic1.FileSize-Pic2.FileSize;
         ppPicWidth:        Result := Pic1.ImageSize.cx-Pic2.ImageSize.cx;
@@ -2505,14 +2499,14 @@ type
         ppFormat:          Result := Byte(Pic1.ImageFormat)-Byte(Pic2.ImageFormat);
         ppDate:            Result := Pic1.Date-Pic2.Date;
         ppTime:            Result := Pic1.Time-Pic2.Time;
-        ppPlace:           Result := AnsiCompareText(Pic1.Place,              Pic2.Place);
-        ppFilmNumber:      Result := AnsiCompareText(Pic1.FilmNumber,         Pic2.FilmNumber);
-        ppFrameNumber:     Result := AnsiCompareText(Pic1.FrameNumber,        Pic2.FrameNumber);
-        ppAuthor:          Result := AnsiCompareText(Pic1.Author,             Pic2.Author);
-        ppDescription:     Result := AnsiCompareText(Pic1.Description,        Pic2.Description);
-        ppNotes:           Result := AnsiCompareText(Pic1.Notes,              Pic2.Notes);
-        ppMedia:           Result := AnsiCompareText(Pic1.Media,              Pic2.Media);
-        ppKeywords:        Result := AnsiCompareText(Pic1.Keywords.CommaText, Pic2.Keywords.CommaText);
+        ppPlace:           Result := WideCompareText(Pic1.Place,              Pic2.Place);
+        ppFilmNumber:      Result := WideCompareText(Pic1.FilmNumber,         Pic2.FilmNumber);
+        ppFrameNumber:     Result := WideCompareText(Pic1.FrameNumber,        Pic2.FrameNumber);
+        ppAuthor:          Result := WideCompareText(Pic1.Author,             Pic2.Author);
+        ppDescription:     Result := WideCompareText(Pic1.Description,        Pic2.Description);
+        ppNotes:           Result := WideCompareText(Pic1.Notes,              Pic2.Notes);
+        ppMedia:           Result := WideCompareText(Pic1.Media,              Pic2.Media);
+        ppKeywords:        Result := WideCompareText(Pic1.Keywords.CommaText, Pic2.Keywords.CommaText);
         ppRotation:        Result := Ord(Pic1.Rotation)-Ord(Pic2.Rotation);
         ppFlips:           Result := Byte(Pic1.Flips)-Byte(Pic2.Flips);
       end;
@@ -2774,16 +2768,16 @@ type
     Result := 0;
     for i := 0 to GetCount-1 do begin
       case GetItems(i).Prop of
-        gbpFilePath:    Result := AnsiCompareText(Pic1.PropStrValues[ppFilePath], Pic2.PropStrValues[ppFilePath]);
+        gbpFilePath:    Result := WideCompareText(Pic1.PropStrValues[ppFilePath], Pic2.PropStrValues[ppFilePath]);
         gbpDateByYear:  Result := YearOf(PhoaDateToDate(Pic1.Date))-YearOf(PhoaDateToDate(Pic2.Date));
         gbpDateByMonth: Result := MonthOf(PhoaDateToDate(Pic1.Date))-MonthOf(PhoaDateToDate(Pic2.Date));
         gbpDateByDay:   Result := DayOf(PhoaDateToDate(Pic1.Date))-DayOf(PhoaDateToDate(Pic2.Date));
         gbpTimeHour:    Result := HourOf(PhoaTimeToTime(Pic1.Time))-HourOf(PhoaTimeToTime(Pic2.Time));
         gbpTimeMinute:  Result := MinuteOf(PhoaTimeToTime(Pic1.Time))-MinuteOf(PhoaTimeToTime(Pic2.Time));
-        gbpPlace:       Result := AnsiCompareText(Pic1.Place,      Pic2.Place);
-        gbpFilmNumber:  Result := AnsiCompareText(Pic1.FilmNumber, Pic2.FilmNumber);
-        gbpAuthor:      Result := AnsiCompareText(Pic1.Author,     Pic2.Author);
-        gbpMedia:       Result := AnsiCompareText(Pic1.Media,      Pic2.Media);
+        gbpPlace:       Result := WideCompareText(Pic1.Place,      Pic2.Place);
+        gbpFilmNumber:  Result := WideCompareText(Pic1.FilmNumber, Pic2.FilmNumber);
+        gbpAuthor:      Result := WideCompareText(Pic1.Author,     Pic2.Author);
+        gbpMedia:       Result := WideCompareText(Pic1.Media,      Pic2.Media);
         gbpKeywords:    Result := 0; // По ключевым словам сортировка неприменима
       end;
       if Result<>0 then Break;
@@ -3894,6 +3888,85 @@ type
   end;
 
    //===================================================================================================================
+   // TPhoaRegIniFile
+   //===================================================================================================================
+
+  procedure TPhoaRegIniFile.ReadSectionValues(const sSection: AnsiString; Strings: TWideStrings);
+  var
+    SLKeyList: TStringList;
+    i: Integer;
+  begin
+    SLKeyList := TStringList.Create;
+    try
+      ReadSection(sSection, SLKeyList);
+      Strings.BeginUpdate;
+      try
+        for i := 0 to SLKeyList.Count-1 do Strings.Values[SLKeyList[i]] := ReadString(sSection, SLKeyList[i], '');
+      finally
+        Strings.EndUpdate;
+      end;
+    finally
+      SLKeyList.Free;
+    end;
+  end;
+
+  function TPhoaRegIniFile.ReadString(const sSection, sName: AnsiString; const wsDefaultValue: WideString): WideString;
+  var
+    cDataType, cBufSize: Cardinal;
+    Key, OldKey: HKEY;
+  begin
+    if not Win32PlatformIsUnicode then
+      Result := inherited ReadString(sSection, sName, wsDefaultValue)
+    else begin
+      Result := wsDefaultValue;
+      Key := GetKey(sSection);
+      if Key<>0 then
+        try
+          OldKey := CurrentKey;
+          SetCurrentKey(Key);
+          try
+             // Get length and type
+            cDataType := REG_NONE;
+            if (RegQueryValueExW(CurrentKey, PWideChar(WideString(sName)), nil, @cDataType, nil, @cBufSize)=ERROR_SUCCESS) and
+                (cDataType in [REG_SZ, REG_EXPAND_SZ]) then begin
+              if cBufSize=1 then cBufSize := SizeOf(WideChar); // sometimes this occurs for single character values!
+              SetLength(Result, cBufSize div SizeOf(WideChar));
+              if RegQueryValueExW(CurrentKey, PWideChar(WideString(sName)), nil, @cDataType, PByte(PWideChar(Result)), @cBufSize)=ERROR_SUCCESS then
+                Result := PWideChar(Result);
+            end;
+          finally
+            SetCurrentKey(OldKey);
+          end;
+        finally
+          RegCloseKey(Key);
+        end;
+    end
+  end;
+
+  procedure TPhoaRegIniFile.WriteString(const sSection, sName: AnsiString; const wsValue: WideString);
+  var Key, OldKey: HKEY;
+  begin
+    if not Win32PlatformIsUnicode then
+      inherited WriteString(sSection, sName, wsValue)
+    else begin
+      CreateKey(sSection);
+      Key := GetKey(sSection);
+      if Key<>0 then
+        try
+          OldKey := CurrentKey;
+          SetCurrentKey(Key);
+          try
+            RegSetValueExW(CurrentKey, PWideChar(WideString(sName)), 0, REG_SZ, PWideChar(wsValue), (Length(wsValue)+1)*SizeOf(WideChar));
+          finally
+            SetCurrentKey(OldKey);
+          end;
+        finally
+          RegCloseKey(Key);
+        end;
+    end;
+  end;
+
+   //===================================================================================================================
    // TPhoaFilerEx
    //===================================================================================================================
 
@@ -3910,7 +3983,7 @@ type
   function TFileList.Add(const wsName, wsPath: WideString; i64Size: Int64; iIconIndex: Integer; const dModified: TDateTime): Integer;
   var
     p: PFileRec;
-    FileInfo: TSHFileInfo;
+    FileInfo: TSHFileInfoW;
   begin
      // Ищем такой же файл
     Result := IndexOf(wsName, wsPath);
@@ -3926,7 +3999,12 @@ type
       p := GetItems(Result);
      // Проверяем индекс иконки. Получаем, если надо
     if iIconIndex=-2 then begin
-      FSysImageListHandle := SHGetFileInfo(PAnsiChar(IncludeTrailingPathDelimiter(sPath)+sName), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+      FSysImageListHandle := Tnt_SHGetFileInfoW(
+        PWideChar(WideIncludeTrailingPathDelimiter(wsPath)+wsName),
+        0,
+        FileInfo,
+        SizeOf(FileInfo),
+        SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
       iIconIndex := FileInfo.iIcon;
     end;
      // Сохраняем данные
@@ -4126,7 +4204,7 @@ type
     function GetKeyByChar(wc: WideChar): TCmdLineKey;
     begin
        // Convert to lowercase
-      if wc in ['A'..'Z'] then Inc(wc, Ord('a')-Ord('A'));
+      if wc in [WideChar('A')..Widechar('Z')] then Inc(wc, Ord('a')-Ord('A'));
        // Iterate through known chars
       for Result := Low(Result) to High(Result) do
         if aCmdLineKeys[Result].wcChar=wc then Exit;

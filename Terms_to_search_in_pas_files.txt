@@ -1,16 +1,16 @@
-AnsiCompareText
-AnsiContainsText
-AnsiEndsText
-AnsiLowerCase
-AnsiSameText
-AnsiStartsText
+-AnsiCompareText
+-AnsiContainsText
+-AnsiEndsText
+-AnsiLowerCase
+-AnsiSameText
+-AnsiStartsText
 AnsiString (possibly)
-AnsiUpperCase
-ChangeFileExt
-Char
-Clipboard
-CompareText
-DrawText
+-AnsiUpperCase
+-ChangeFileExt
++Char
+-Clipboard
+-CompareText
+-DrawText
 Exception
 ExtractFileDir
 ExtractFileDrive
@@ -31,3 +31,4 @@ TextWidth
 TStringList
 UpperCase
 VarToStr
+IncludeTrailingPathDelimiter

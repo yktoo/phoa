@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Metadata.pas,v 1.4 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrPicProps_Metadata.pas,v 1.5 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phWizard,
   phPicPropsDlgPage, DKLang, TB2Item, TBX, Menus, TBXDkPanels, TB2Dock,
   VirtualTrees;
 
@@ -144,7 +144,7 @@ type
          // Код тега
         0: CellText := WideFormat('%.4x', [PPExifTag(Sender.GetNodeData(Node))^.iTag]);
          // Имя тега
-        1: CellText := PPExifTag(Sender.GetNodeData(Node))^.wsName;
+        1: CellText := PPExifTag(Sender.GetNodeData(Node))^.sName;
          // Загруженное значение тега
         2: CellText := Copy(PImageMetadata(Sender.GetNodeData(nParent))^.EXIFData[Node.Index], 1, 200);
       end;
@@ -188,7 +188,7 @@ type
 
   procedure TfrPicProps_Metadata.tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
   begin
-    Result := PhoaAnsiToUnicode(ShortenFileName(TargetCanvas, TextSpace-10, PhoaUnicodeToAnsi(S)));
+    Result := ShortenFileName(TargetCanvas, TextSpace-10, S);
     Done := True;
   end;
 
@@ -201,7 +201,7 @@ type
     if tvMain.NodeParent[n]=nil then
       ws := DKLangConstW('SMsg_NoMetatagSelected')
     else begin
-      ws := PPExifTag(tvMain.GetNodeData(n))^^.wsDesc;
+      ws := PPExifTag(tvMain.GetNodeData(n))^^.sDesc;
       if ws='' then ws := DKLangConstW('SNone');
     end;
     lDesc.Caption := ws;

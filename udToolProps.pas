@@ -3,7 +3,9 @@ unit udToolProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phSettings, phToolSetting,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  TntWindows, 
+  phSettings, phToolSetting,
   phDlg, TntDialogs, DKLang, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
 
 type
@@ -54,7 +56,7 @@ type
 
 implementation
 {$R *.dfm}
-uses FileCtrl, phUtils, Main, ImgList, ConsVars;
+uses TntFileCtrl, phUtils, Main, ImgList, ConsVars;
 
   function EditTool(ATool: TPhoaToolSetting; APage: TPhoaToolPageSetting): Boolean;
   begin
@@ -167,7 +169,7 @@ uses FileCtrl, phUtils, Main, ImgList, ConsVars;
     fMain.ilActionsSmall.Draw(cbKind.Canvas, Rect.Left, Rect.Top, aToolImageIndexes[TPhoaToolKind(Index)]);
      // Рисуем текст
     Inc(Rect.Left, 20);
-    DrawText(cbKind.Canvas.Handle, PChar(cbKind.Items[Index]), -1, Rect, DT_LEFT or DT_NOPREFIX or DT_SINGLELINE or DT_VCENTER);
+    Tnt_DrawTextW(cbKind.Canvas.Handle, PWideChar(cbKind.Items[Index]), -1, Rect, DT_LEFT or DT_NOPREFIX or DT_SINGLELINE or DT_VCENTER);
   end;
 
   procedure TdToolProps.DoCreate;

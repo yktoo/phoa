@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.3 2007-06-28 18:41:59 dale Exp $
+//  $Id: ufrWzPageFileOps_MoveOptions.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,8 +10,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  TntSysUtils,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars,
-  phWizard, StdCtrls, Mask, DKLang, TntStdCtrls;
+  phWizard, StdCtrls, DKLang, TntStdCtrls;
 
 type
   TfrWzPageFileOps_MoveOptions = class(TWizardPage)
@@ -21,7 +22,7 @@ type
     cbRenameFiles: TTntCheckBox;
     dklcMain: TDKLanguageController;
     eFileNameFormat: TTntEdit;
-    eReplaceChar: TMaskEdit;
+    eReplaceChar: TTntEdit;
     gbFileArranging: TTntGroupBox;
     gbFileNaming: TTntGroupBox;
     lBaseFolder: TTntLabel;
@@ -142,7 +143,7 @@ uses phUtils, udFileOpsWizard, phMsgBox;
         if wsPath='' then Break;
       end;
        // Выделяем части по каждому каталогу
-      if (Length(wsPath)>3) and (wsPath[Length(sPath)]='\') then SetLength(wsPath, Length(wsPath)-1);
+      if (Length(wsPath)>3) and (wsPath[Length(wsPath)]='\') then SetLength(wsPath, Length(wsPath)-1);
       while wsPath<>'' do begin
         cbBaseFolder.Items.Add(wsPath);
         if Length(wsPath)<=3 then Break;
@@ -208,10 +209,10 @@ uses phUtils, udFileOpsWizard, phMsgBox;
         end;
       end;
        // Выделяем части пути, пишем в Items[] - путь группы, в Items.Objects[] - ссылку на группу
-      if Wiz.App.Project.CurrentView=nil then sRootGroupName := DKLangConstW('SPhotoAlbumNode') else sRootGroupName := Wiz.App.Project.CurrentView.Name;
+      if Wiz.App.Project.CurrentView=nil then wsRootGroupName := DKLangConstW('SPhotoAlbumNode') else wsRootGroupName := Wiz.App.Project.CurrentView.Name;
       for i := LPath.Count-1 downto 0 do begin
         Group := LPath[i];
-        cbBaseGroup.Items.AddObject(Group.Path[sRootGroupName], Pointer(Group));
+        cbBaseGroup.Items.AddObject(Group.Path[wsRootGroupName], Pointer(Group));
       end;
        // Выбираем нужный пункт
       i := cbBaseGroup.Items.IndexOfObject(Pointer(Wiz.MoveFile_BaseGroup));

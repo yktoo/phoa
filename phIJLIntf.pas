@@ -7,7 +7,7 @@ unit phIJLIntf;
 interface
 
 uses
-  GR32, Classes, Windows, Graphics, SysUtils;
+  Windows, GR32, Classes, Graphics, SysUtils, TntSysUtils;
 
 type
   PShort = ^Short;
@@ -1372,7 +1372,7 @@ uses ConsVars;
   var hLib: HMODULE;
   begin
      // Грузим библиотеку
-    hLib := LoadLibrary(PChar(sApplicationPath+SRelativePluginPath+'ijl15.dll'));
+    hLib := WideSafeLoadLibrary(wsApplicationPath+SRelativePluginPath+'ijl15.dll');
     Result := hLib<>0;
      // Если удалось, подключаем функции
     if Result then begin

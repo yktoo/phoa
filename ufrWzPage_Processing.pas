@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Processing.pas,v 1.7 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrWzPage_Processing.pas,v 1.8 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -31,7 +31,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils;
+uses DKLang, phUtils;
 
   procedure TfrWzPage_Processing.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   begin

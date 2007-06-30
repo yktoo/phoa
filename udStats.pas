@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udStats.pas,v 1.24 2007-06-28 18:41:40 dale Exp $
+//  $Id: udStats.pas,v 1.25 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -35,7 +35,7 @@ type
      // Собирает и отображает статистику проекта
     procedure LoadStats;
   protected
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure ExecuteInitialize; override;
@@ -74,7 +74,7 @@ uses phUtils, Main, phPhoa, phSettings;
     LoadStats;
   end;
 
-  function TdStats.GetRelativeRegistryKey: WideString;
+  function TdStats.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegStats_Root;
   end;
@@ -223,7 +223,11 @@ uses phUtils, Main, phPhoa, phSettings;
       n0 := tvMain.AddChild(nil, NewStatData('@SStat_PhotoAlbum', '', iiPhoA));
         n1 := tvMain.AddChild(n0, NewStatData('@SStat_PhoaFilename', FApp.Project.FileName));
           AddPhoaFileProps(n1);
-          tvMain.AddChild(n1, NewStatData('@SStats_PhoaFileRevision', aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FApp.Project.FileRevision))].sName));
+          tvMain.AddChild(
+            n1,
+            NewStatData(
+              '@SStats_PhoaFileRevision',
+              aPhFileRevisions[ValidRevisionIndex(GetIndexOfRevision(FApp.Project.FileRevision))].wsName));
         tvMain.AddChild(n0, NewStatData('@SStats_DistinctPics', FApp.Project.Pics.Count));
         AddGroupStats(FApp.ProjectX.RootGroupX, n0);
        // -- Текущая группа
@@ -254,8 +258,8 @@ uses phUtils, Main, phPhoa, phSettings;
   begin
     ppsd := Sender.GetNodeData(Node);
     case Column of
-      0: CellText := PhoaAnsiToUnicode(ppsd^^.sName);
-      1: CellText := PhoaAnsiToUnicode(ppsd^^.sValue);
+      0: CellText := ppsd^^.wsName;
+      1: CellText := ppsd^^.wsValue;
     end;
   end;
 

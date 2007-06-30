@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_Data.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrPicProps_Data.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -205,7 +205,7 @@ const
         ppAuthor,
         ppMedia: pv.vValue := GetStrProp(pv.Control, 'Text');
       ppDescription,
-        ppNotes: pv.vValue := (pv.Control as TMemo).Text;
+        ppNotes: pv.vValue := (pv.Control as TTntMemo).Text;
     end;
     pv.State := pvsModified;
     SetPropEditor(Prop, True);
@@ -233,7 +233,7 @@ const
             ppAuthor,
             ppMedia: SetStrProp(pv.Control, 'Text', VarToStr(pv.vValue));
           ppDescription,
-            ppNotes: (pv.Control as TMemo).Text := VarToStr(pv.vValue);
+            ppNotes: (pv.Control as TTntMemo).Text := VarToStr(pv.vValue);
         end;
        // Настраиваем цвет
       SetOrdProp(pv.Control, 'Color', iif(pv.State=pvsVarious, clBtnFace, clWindow));

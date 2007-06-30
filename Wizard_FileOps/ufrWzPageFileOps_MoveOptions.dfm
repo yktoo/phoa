@@ -133,13 +133,12 @@ inherited frWzPageFileOps_MoveOptions: TfrWzPageFileOps_MoveOptions
       TabOrder = 1
       OnChange = PageDataChange
     end
-    object eReplaceChar: TMaskEdit
+    object eReplaceChar: TTntEdit
       Left = 528
       Top = 44
       Width = 25
       Height = 21
       Anchors = [akTop, akRight]
-      EditMask = 'c;; '
       MaxLength = 1
       TabOrder = 2
       Text = '_'

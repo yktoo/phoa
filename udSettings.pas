@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSettings.pas,v 1.22 2007-06-28 18:41:40 dale Exp $
+//  $Id: udSettings.pas,v 1.23 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit udSettings;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GR32, Controls, Forms, Dialogs, ConsVars, phSettings, 
   phDlg, DKLang, TB2Dock, TB2Toolbar, TBX, StdCtrls, TntStdCtrls, ExtCtrls,
   TntExtCtrls;
 
@@ -36,7 +36,7 @@ type
      // Prop handlers
     procedure SetCurPageSetting(Value: TPhoaPageSetting);
   protected
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
@@ -130,7 +130,7 @@ uses phUtils, Main, TypInfo;
     CurPageSetting := FLocalRootSetting.Settings[FDefPageSettingID] as TPhoaPageSetting;
   end;
 
-  function TdSettings.GetRelativeRegistryKey: WideString;
+  function TdSettings.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegSettings_Root;
   end;

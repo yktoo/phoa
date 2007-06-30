@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMetadata.pas,v 1.9 2004-12-31 13:38:58 dale Exp $
+//  $Id: phMetadata.pas,v 1.10 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -1084,7 +1084,7 @@ implementation
       sCode  := Copy(sTagValue, 1, 7);
       sValue := Copy(sTagValue, 9, MaxInt);
        // Make the only distinction for Unicode here
-      if AnsiSameText(sCode, 'UNICODE') then Result := UnicodeBufToAnsi(sValue) else Result := Trim(sValue);
+      if SameText(sCode, 'UNICODE') then Result := UnicodeBufToAnsi(sValue) else Result := Trim(sValue);
     end;
 
      // Formats raw binary data as hexadecimal ASCII representation (without any delimiters)

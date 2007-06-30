@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.101 2007-06-16 13:49:45 dale Exp $
+//  $Id: ConsVars.pas,v 1.102 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ConsVars;
 interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
-  Windows, SysUtils, Messages, Classes, Graphics, Controls, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32,
+  Windows, SysUtils, Messages, Classes, Graphics, Controls,
+  TntSystem, TntWideStrings, TntSysUtils, GraphicEx, VirtualTrees, TB2Dock, TBX, GR32,
   dkWebUtils, phIntf, phMutableIntf, phNativeIntf, phObj, phOps;
 
 type
@@ -206,10 +207,10 @@ type
   IPhoaWizardPageHost_Log = interface(IInterface)
     ['{9FA1E911-FFF6-44E6-9A32-D7AB76D759B0}']
      // Prop handlers
-    function  GetLog(iPageID: Integer): TStrings;
+    function  GetLog(iPageID: Integer): TWideStrings;
      // Props
      // -- Список строк протокола
-    property Log[iPageID: Integer]: TStrings read GetLog;
+    property Log[iPageID: Integer]: TWideStrings read GetLog;
   end;
 
    // Интерфейс предоставления информации о состоянии обработки (для страницы, отображающей состояние процесса)
@@ -978,7 +979,7 @@ uses
 
   procedure AdjustThemeSetting(Setting: TPhoaListSetting);
   begin
-    GetAvailableTBXThemes(Setting.Variants);
+    GetAvailableTBXThemes(Setting.Variants.AnsiStrings);
   end;
 
   procedure AddPicPropSettings(Owner: TPhoaIntSetting);
@@ -1310,7 +1311,7 @@ type
   begin
      // Сканируем языковые файлы
     ShowProgressInfo('SMsg_ScanningLanguages', []);
-    LangManager.ScanForLangFiles(sApplicationPath+SRelativeLangFilesPath, '*.'+SLangFileExt, False);
+    LangManager.ScanForLangFiles(wsApplicationPath+SRelativeLangFilesPath, '*.'+SLangFileExt, False);
      // Находим пункт списка "Язык интерфейса"
     LangSetting := RootSetting.Settings[ISettingID_Gen_Language];
      // Добавляем настройки выбора языка
@@ -1324,7 +1325,7 @@ type
 
 initialization
    // Получаем каталог приложения
-  sApplicationPath := ExtractFilePath(ParamStr(0)); 
+  wsApplicationPath := WideExtractFilePath(WideParamStr(0));
    // Грузим курсоры
   with Screen do begin
     Cursors[crHand]     := LoadCursor(HInstance, 'CRHAND');

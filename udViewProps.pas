@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udViewProps.pas,v 1.21 2007-06-28 18:41:40 dale Exp $
+//  $Id: udViewProps.pas,v 1.22 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -136,11 +136,11 @@ uses
     if FIsAdding then
       FApp.PerformOperation(
         'ViewNew',
-        ['Name', eName.Text, 'FilterExpression', sExpression, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings])
+        ['Name', eName.Text, 'FilterExpression', wsExpression, 'Groupings', FGroupings, 'Sortings', frSorting.Sortings])
     else
       FApp.PerformOperation(
         'ViewEdit',
-        ['View', FApp.ProjectX.CurrentViewX, 'Name', eName.Text, 'FilterExpression', sExpression,
+        ['View', FApp.ProjectX.CurrentViewX, 'Name', eName.Text, 'FilterExpression', wsExpression,
          'Groupings', FGroupings, 'Sortings', frSorting.Sortings]);
     inherited ButtonClick_OK;
   end;
@@ -364,7 +364,7 @@ uses
 
   procedure TdViewProps.tvGroupingGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
-    if GroupingNode(Node) and (Column=0) then CellText := PhoaAnsiToUnicode(GroupByPropName(FGroupings[Node.Index].Prop));
+    if GroupingNode(Node) and (Column=0) then CellText := GroupByPropName(FGroupings[Node.Index].Prop);
   end;
 
   procedure TdViewProps.tvGroupingInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.9 2007-06-24 17:48:23 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.10 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -7,7 +7,9 @@
 unit phPluginUsage;
 
 interface
-uses Windows, SysUtils, Classes, phIntf, phAppIntf, phMutableIntf, phNativeIntf;
+uses
+  Windows, SysUtils, Classes,
+  TntWindows, TntSysUtils, phIntf, phAppIntf, phMutableIntf, phNativeIntf;
 
 type
 
@@ -103,7 +105,7 @@ type
       SRec: TSearchRecW;
     begin
       wsPath := WideIncludeTrailingPathDelimiter(wsDir);
-      if WideFindFirst(sPath+'*.*', faAnyFile, SRec)=0 then
+      if WideFindFirst(wsPath+'*.*', faAnyFile, SRec)=0 then
         try
           repeat
              // Файл, вероятно плагин
@@ -121,7 +123,7 @@ type
   begin
     inherited Create;
      // Сканируем каталог плагинов
-    ScanPluginDir(sApplicationPath+SRelativePluginPath);
+    ScanPluginDir(wsApplicationPath+SRelativePluginPath);
   end;
 
   function T_PluginModuleInfoList.GetItems(Index: Integer): P_PluginModuleInfo;
@@ -168,7 +170,7 @@ type
         end;
       except
         on e: Exception do begin
-          if e is TPhoaWideException then wsErrorMessage := TPhoaWideException(e).MessageW else wsErrorMessage := e.Message;
+          if e is EPhoaWideException then wsErrorMessage := EPhoaWideException(e).WideMessage else wsErrorMessage := e.Message;
           PhoaError('SErrCreatingPluginModule', [wsPluginLib, wsErrorMessage]);
         end;
       end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.42 2007-06-28 18:41:37 dale Exp $
+//  $Id: udSearch.pas,v 1.43 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,11 +9,12 @@ unit udSearch;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, Contnrs,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Contnrs, TntSysUtils, TntClasses,
+  TntWideStrings,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
   phDlg, ActnList, TntActnList, TBX, Menus, TB2Item, DKLang,
   ufrExprPicFilter, TB2Dock, TB2Toolbar, VirtualTrees, ComCtrls,
-  TntComCtrls, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
+  TntComCtrls, StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls, TntForms;
 
 type
    // Вид поиска
@@ -71,7 +72,7 @@ type
     procedure InitializeSearch;
     procedure FinalizeSearch;
      // Заполняет Strings строками с возможными условиями критерия для текущего типа данных
-    procedure ObtainConditionStrings(Strings: TStrings);
+    procedure ObtainConditionStrings(Strings: TWideStrings);
      // Props
      // -- Условие критерия в виде выражения поиска
     property AsExpression: WideString read GetAsExpression;
@@ -114,8 +115,8 @@ type
     procedure InitializeSearch;
     procedure FinalizeSearch;
      // Сохранение/загрузка из реестра
-    procedure RegLoad(rif: TRegIniFile; const wsSection: WideString);
-    procedure RegSave(rif: TRegIniFile; const wsSection: WideString);
+    procedure RegLoad(rif: TPhoaRegIniFile; const sSection: AnsiString);
+    procedure RegSave(rif: TPhoaRegIniFile; const sSection: AnsiString);
      // Возвращает True, если изображение подходит под все критерии
     function  Matches(Pic: IPhoaPic): Boolean;
      // Props
@@ -185,13 +186,13 @@ type
      // Обновляет FSearchKind
     procedure UpdateSearchKind;
   protected
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
     procedure ExecuteInitialize; override;
-    procedure SettingsLoad(rif: TRegIniFile); override;
-    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); override;
+    procedure SettingsSave(rif: TPhoaRegIniFile); override;
     procedure UpdateState; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -296,10 +297,10 @@ uses
 
 var
    // Списки всех упоминаемых мест, номеров плёнок, авторов, носителей
-  SLPhoaPlaces:        TStringList;
-  SLPhoaFilmNumbers:   TStringList;
-  SLPhoaAuthors:       TStringList;
-  SLPhoaMedia:         TStringList;
+  SLPhoaPlaces:        TTntStringList;
+  SLPhoaFilmNumbers:   TTntStringList;
+  SLPhoaAuthors:       TTntStringList;
+  SLPhoaMedia:         TTntStringList;
    // Последнее использованное для поиска выражение
   wsSearchExpression:  WideString;
 
@@ -545,7 +546,7 @@ var
     end;
   end;
 
-  procedure TSimpleSearchCriterion.ObtainConditionStrings(Strings: TStrings);
+  procedure TSimpleSearchCriterion.ObtainConditionStrings(Strings: TWideStrings);
   var
     c: TSimpleSearchCondition;
     PossibleConditions: TSimpleSearchConditions;
@@ -686,7 +687,7 @@ var
       end;
   end;
 
-  procedure TSimpleSearchCriterionList.RegLoad(rif: TRegIniFile; const wsSection: WideString);
+  procedure TSimpleSearchCriterionList.RegLoad(rif: TPhoaRegIniFile; const sSection: AnsiString);
   var
     SL: TTntStringList;
     Crit: TSimpleSearchCriterion;
@@ -696,14 +697,13 @@ var
      // Загружаем секцию критериев в список строк
     SL := TTntStringList.Create;
     try
-      {!!! Not Unicode-enabled solution }
-      rif.ReadSectionValues(wsSection, SL);
+      rif.ReadSectionValues(sSection, SL);
        // Сортируем список - при этом критерии будут отсортированы по индексу
       SL.Sorted := True;
       for i := 0 to SL.Count-1 do begin
         Crit := TSimpleSearchCriterion.Create;
         try
-          Crit.DataString := SL.ValueFromIndex[i];
+          Crit.DataWideString := SL.ValueFromIndex[i];
           Add(Crit);
         except
           Crit.Free;
@@ -714,15 +714,14 @@ var
     end;
   end;
 
-  procedure TSimpleSearchCriterionList.RegSave(rif: TRegIniFile; const wsSection: WideString);
+  procedure TSimpleSearchCriterionList.RegSave(rif: TPhoaRegIniFile; const sSection: AnsiString);
   var i: Integer;
   begin
-    {!!! Not Unicode-enabled solution }
      // Стираем секцию
-    rif.EraseSection(wsSection);
+    rif.EraseSection(sSection);
      // Записываем в цикле данные критериев
     for i := 0 to FList.Count-1 do
-      rif.WriteString(wsSection, WideFormat('%.8d', [i]), TSimpleSearchCriterion(FList[i]).DataString);
+      rif.WriteString(sSection, Format('%.8d', [i]), TSimpleSearchCriterion(FList[i]).DataWideString);
   end;
 
    //===================================================================================================================
@@ -804,7 +803,7 @@ type
   end;
 
   function TSimpleCriterionEditLink.EndEdit: Boolean;
-  var цs: WideString;
+  var ws: WideString;
   begin
     FEndingEditing := True;
     Result := True;
@@ -1121,9 +1120,9 @@ type
 
   constructor TdSearch.Create(AOwner: TComponent);
 
-    function NewSL: TStringList;
+    function NewSL: TTntStringList;
     begin
-      Result := TStringList.Create;
+      Result := TTntStringList.Create;
       Result.Sorted     := True;
       Result.Duplicates := dupIgnore;
     end;
@@ -1180,10 +1179,10 @@ type
      // Инициализируем дерево / pmSimple
     ApplyTreeSettings(tvSimpleCriteria);
      // Поиск по выражению
-    frExprPicFilter.Expression := sSearchExpression; 
+    frExprPicFilter.Expression := wsSearchExpression; 
   end;
 
-  function TdSearch.GetRelativeRegistryKey: WideString;
+  function TdSearch.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegSearch_Root;
   end;
@@ -1248,9 +1247,9 @@ type
         pskSimple: FSimpleCriteria.InitializeSearch;
          // Поиск по выражению
         pskExpression: begin
-          sSearchExpression := frExprPicFilter.Expression;
+          wsSearchExpression := frExprPicFilter.Expression;
           PicFilter := NewPhoaParsingPicFilter;
-          PicFilter.Expression := sSearchExpression;
+          PicFilter.Expression := wsSearchExpression;
         end;
       end;
     end;
@@ -1313,7 +1312,7 @@ type
         with ipmsmSimpleProp[i] do Checked := TPicProperty(Tag)=Crit.PicProperty;
   end;
 
-  procedure TdSearch.SettingsLoad(rif: TRegIniFile);
+  procedure TdSearch.SettingsLoad(rif: TPhoaRegIniFile);
   begin
     inherited SettingsLoad(rif);
     pcCriteria.ActivePageIndex := rif.ReadInteger('', 'LastCriteriaPageIndex', 0);
@@ -1325,7 +1324,7 @@ type
     UpdateSearchKind;
   end;
 
-  procedure TdSearch.SettingsSave(rif: TRegIniFile);
+  procedure TdSearch.SettingsSave(rif: TPhoaRegIniFile);
   begin
     inherited SettingsSave(rif);
     rif.WriteInteger('', 'LastCriteriaPageIndex', pcCriteria.ActivePageIndex);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phParsingPicFilter.pas,v 1.13 2007-06-24 17:48:11 dale Exp $
+//  $Id: phParsingPicFilter.pas,v 1.14 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Written by Andrew Dudko
@@ -10,7 +10,7 @@ unit phParsingPicFilter;
 interface
 
 uses
-  Windows, Classes, SysUtils, phIntf;
+  Windows, Classes, SysUtils, TntSysUtils, phIntf;
 
 type
   EPhoaParseError = class(EPhoaWideException)
@@ -19,7 +19,7 @@ type
     FErrorPos: Integer;
   public
     constructor Create(iPos: Integer; const wsMessage: WideString);
-    constructor CreateFmt(iPos: Integer; const sMessage: WideString; const Params: Array of const);
+    constructor CreateFmt(iPos: Integer; const wsMessage: WideString; const Params: Array of const);
      // Props
      // -- Позиция ошибки в тексте разбираемого выражения
     property ErrorPos: Integer read FErrorPos;
@@ -78,20 +78,18 @@ implementation /////////////////////////////////////////////////////////////////
 uses phPhoa, Variants, phUtils, ConsVars;
 
 type
-  TChars = set of Char;
-
    // Тип скобки
   TBracketType = (btOpen, btClose);
 
 const
-  CSSpaceChars    = [#9, #10, #12, #13, ' '];
-  CSBrackets      = ['(', ')'];
-  CSDigits        = ['0'..'9'];
-  CSEngChars      = ['a'..'z', 'A'..'Z'];
-  CSMathCompChars = ['<', '>', '='];
-  CSIDStartChars  = CSEngChars+['_'];
+  CSSpaceChars    = [WideChar(#9), WideChar(#10), WideChar(#12), WideChar(#13), WideChar(' ')];
+  CSBrackets      = [WideChar('('), WideChar(')')];
+  CSDigits        = [WideChar('0')..WideChar('9')];
+  CSEngChars      = [WideChar('a')..WideChar('z'), WideChar('A')..WideChar('Z')];
+  CSMathCompChars = [WideChar('<'), WideChar('>'), WideChar('=')];
+  CSIDStartChars  = CSEngChars+[WideChar('_')];
   CSIDChars       = CSIDStartChars+CSDigits;
-  CSValueChars    = CSDigits+['.', '-'];
+  CSValueChars    = CSDigits+[WideChar('.'), WideChar('-')];
 
   OSUnaryOperators = [okNot, okIsEmpty];
   
@@ -313,7 +311,7 @@ type
     function  IsOpenBracket: Boolean; override;
     function  IsCloseBracket: Boolean; override;
   public
-    constructor Create(cBracket: Char; iPos: Integer);
+    constructor Create(wcBracket: WideChar; iPos: Integer);
   end;
 
   TPhoaParsedOperator = class(TPhoaParsedCustomOperator)
@@ -639,13 +637,13 @@ type
    // TPhoaParsedBracket
    //===================================================================================================================
 
-  constructor TPhoaParsedBracket.Create(cBracket: Char; iPos: Integer);
+  constructor TPhoaParsedBracket.Create(wcBracket: WideChar; iPos: Integer);
   begin
     inherited Create(iPos);
-    case cBracket of
+    case wcBracket of
       '(': FBracketType := btOpen;
       ')': FBracketType := btClose;
-      else PhoaParseError(iPos, SPhoaParseError_InvalidCharacter, [cBracket]);
+      else PhoaParseError(iPos, SPhoaParseError_InvalidCharacter, [wcBracket]);
     end;
   end;
 
@@ -692,7 +690,7 @@ type
   constructor TPhoaParsedLiteral.Create(const wsValue: WideString; iPos: Integer);
   begin
     inherited Create(iPos);
-    FValue := sValue;
+    FValue := wsValue;
   end;
 
   function TPhoaParsedLiteral.GetDatatype: TPicPropDatatype;
@@ -767,12 +765,12 @@ type
 
   function TPhoaParsedValue.AsFloat(Pic: IPhoaPic): Double;
   begin
-    if not TryStrToFloat(FStringValue, Result, ParserFormatSettings) then InvalidDatatype;
+    if not TryStrToFloat(FWideStringValue, Result, ParserFormatSettings) then InvalidDatatype;
   end;
 
   function TPhoaParsedValue.AsInteger(Pic: IPhoaPic): Integer;
   begin
-    if not TryStrToInt(FStringValue, Result) then InvalidDatatype;
+    if not TryStrToInt(FWideStringValue, Result) then InvalidDatatype;
   end;
 
   constructor TPhoaParsedValue.Create(const wsWideStringValue: WideString; iPos: Integer);
@@ -886,7 +884,7 @@ type
     Result := CompareValues(i1, i2);
   end;
 
-  function TPhoaParsedOperator.CompareAsStrings(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
+  function TPhoaParsedOperator.CompareAsWideStrings(Op1, Op2: IPhoaParsedOperand; Pic: IPhoaPic): Boolean;
   var ws1, ws2: WideString;
   begin
     ws1 := Op1.AsWideString(Pic);
@@ -1016,11 +1014,11 @@ type
       okNot:        bResult := not Op2.AsBoolean(Pic);
       okStartsWith,
         okEndsWith,
-        okContains: bResult := CompareAsStrings(Op1, Op2, Pic);
+        okContains: bResult := CompareAsWideStrings(Op1, Op2, Pic);
       okEQ, okNotEQ, okLT, okLE, okGT, okGE: begin
         if Op1=nil then dt := Op2.Datatype else dt := DatatypeCastMap[Op1.Datatype, Op2.Datatype];
         case dt of
-          ppdtString:  bResult := CompareAsStrings(Op1, Op2, Pic);
+          ppdtString:  bResult := CompareAsWideStrings(Op1, Op2, Pic);
           ppdtBoolean: bResult := CompareAsBoolean(Op1, Op2, Pic);
           ppdtInteger: bResult := CompareAsInteger(Op1, Op2, Pic);
           ppdtFloat:   bResult := CompareAsFloat(Op1, Op2, Pic);
@@ -1133,25 +1131,27 @@ type
   function TPhoaParsingPicFilter.GetParseErrorLocation: TPoint;
   var
     i, iLen: Integer;
-    c, cLast: Char;
+    wc, wcLast: WideChar;
   begin
     Result.x := 1;
     Result.y := 1;
     i := 1;
     iLen := Length(FExpression);
-    cLast := #0;
+    wcLast := #0;
     while (i<FParseErrorPos) and (i<=iLen) do begin
-      c := FExpression[i];
-       // Если встретили перевод строки
-      if c in [#10, #13] then begin
-        if not (cLast in [#10, #13]) or (c=cLast) then begin
-          Result.x := 1;
-          Inc(Result.y);
+      wc := FExpression[i];
+      case wc of
+         // Если встретили перевод строки
+        #10, #13: begin
+          if ((wcLast<>#10) and (wcLast<>#13)) or (wc=wcLast) then begin
+            Result.x := 1;
+            Inc(Result.y);
+          end;
         end;
-       // Иначе приращиваем горизонтальную координату
-      end else
-        Inc(Result.x);
-      cLast := c;
+         // Иначе приращиваем горизонтальную координату
+        else Inc(Result.x);
+      end;
+      wcLast := wc;
       Inc(i);
     end;
   end;
@@ -1200,10 +1200,10 @@ type
     OpStack: IPhoaParsedItemsList;
     bAfterOperand: Boolean;
 
-     // Проверяет, что текущий символ выражения равен c; в противном случае генерируется EPhoaParseError
-    procedure CheckCurrentChar(c: Char);
+     // Проверяет, что текущий символ выражения равен wc; в противном случае генерируется EPhoaParseError
+    procedure CheckCurrentChar(wc: WideChar);
     begin
-      if FExpression[iCurrentPos]<>c then PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [c]);
+      if FExpression[iCurrentPos]<>wc then PhoaParseError(iCurrentPos, SPhoaParseError_InvalidCharacter, [wc]);
     end;
 
      // Пропускает пробельные символы в выражении, начиная с текущей позиции
@@ -1221,7 +1221,7 @@ type
       CheckCurrentChar('/');
       Inc(iCurrentPos);
        // Пропускаем все символы до конца строки
-      while (iCurrentPos<=iLen) and not (FExpression[iCurrentPos] in [#10, #13]) do Inc(iCurrentPos);
+      while (iCurrentPos<=iLen) and not (FExpression[iCurrentPos] in [WideChar(#10), WideChar(#13)]) do Inc(iCurrentPos);
     end;
 
      // Пропускает многострочный комментарий
@@ -1289,7 +1289,7 @@ type
      // Извлекает из FExpression и возвращает значение в виде строки, начиная с текущей позиции
     function ExtractValueString: WideString;
     var
-      c: Char;
+      wc: WideChar;
       bSignValid, bHasDot, bHasDigit: Boolean;
       iStartPos: Integer;
     begin
@@ -1299,12 +1299,12 @@ type
       bHasDigit  := False;
        // Перебираем строку, пока не дойдём до конца или не будет принудительного выхода
       while iCurrentPos<=iLen do begin
-        c := FExpression[iCurrentPos];
-        if c='-' then begin
+        wc := FExpression[iCurrentPos];
+        if wc='-' then begin
           if not bSignValid then Break;
-        end else if c='.' then begin
+        end else if wc='.' then begin
           if not bHasDot then bHasDot := True else Break;
-        end else if c in CSDigits then
+        end else if wc in CSDigits then
           bHasDigit := True
         else
           Break;
@@ -1360,7 +1360,7 @@ type
     function ExtractList: TPhoaParsedList;
     var
       iStartPos: Integer;
-      c: Char;
+      wc: WideChar;
       bCloseValid, bSeparatorValid, bItemValid: Boolean;
       Item: IPhoaParsedItem;
     begin
@@ -1379,36 +1379,40 @@ type
            // Перед каждым очередным элементом пропускаем пробельные символы
           SkipSpaceChars;
            // Проверяем текущий символ, не меняя текущей позиции
-          c := FExpression[iCurrentPos];
-          if c=']' then begin
-             // Если конец списка в данный момент допускается, сдвигаем текущую позицию, закрываем список и выходим
-            if bCloseValid then begin
-              Inc(iCurrentPos);
-              bCloseValid := False;
-              Break;
-            end else
-              PhoaParseError(iCurrentPos, SPhoaParseError_ListItemExpected);
-          end else if c=',' then begin
-             // Если разделитель списка в данный момент допускается, сдвигаем текущую позицию
-            if bSeparatorValid then begin
-              Inc(iCurrentPos);
-               // После разделителя допускается только очередной элемент списка
-              bCloseValid     := False;
-              bItemValid      := True;
-              bSeparatorValid := False;
-            end else
-              PhoaParseError(iCurrentPos, SPhoaParseError_ListItemExpected);
-          end else begin
-             // Если элемент списка в данный момент допускается, извлекаем его и добавляем в список
-            if bItemValid then begin
-              Item := ExtractItem;
-              if Item<>nil then Result.ItemList.Add(Item);
-               // После элемента списка допускается только разделитель или конец списка
-              bCloseValid     := True;
-              bItemValid      := False;
-              bSeparatorValid := True;
-            end else
-              PhoaParseError(iCurrentPos, SPhoaParseError_SomethingExpected, [', or ]']);
+          wc := FExpression[iCurrentPos];
+          case wc of
+            ']': begin
+               // Если конец списка в данный момент допускается, сдвигаем текущую позицию, закрываем список и выходим
+              if bCloseValid then begin
+                Inc(iCurrentPos);
+                bCloseValid := False;
+                Break;
+              end else
+                PhoaParseError(iCurrentPos, SPhoaParseError_ListItemExpected);
+            end;
+            ',': begin
+               // Если разделитель списка в данный момент допускается, сдвигаем текущую позицию
+              if bSeparatorValid then begin
+                Inc(iCurrentPos);
+                 // После разделителя допускается только очередной элемент списка
+                bCloseValid     := False;
+                bItemValid      := True;
+                bSeparatorValid := False;
+              end else
+                PhoaParseError(iCurrentPos, SPhoaParseError_ListItemExpected);
+            end;
+            else begin
+               // Если элемент списка в данный момент допускается, извлекаем его и добавляем в список
+              if bItemValid then begin
+                Item := ExtractItem;
+                if Item<>nil then Result.ItemList.Add(Item);
+                 // После элемента списка допускается только разделитель или конец списка
+                bCloseValid     := True;
+                bItemValid      := False;
+                bSeparatorValid := True;
+              end else
+                PhoaParseError(iCurrentPos, SPhoaParseError_SomethingExpected, [', or ]']);
+            end;
           end;
         end;
       except
@@ -1441,7 +1445,7 @@ type
           Result := ExtractField;
         '(', ')': begin
           Inc(iCurrentPos);
-          Result := TPhoaParsedBracket.Create(c, iStartPos);
+          Result := TPhoaParsedBracket.Create(wc, iStartPos);
         end;
         '{':
           SkipMultiLineComment;
@@ -1560,7 +1564,7 @@ type
   procedure TPhoaParsingPicFilter.SetExpression(const wsValue: WideString);
   var ws: WideString;
   begin
-    ws := Tnt_AdjustLineBreaks(wsValue);
+    ws := TntAdjustLineBreaks(wsValue);
     if FExpression<>ws then begin
       FExpression := ws;
       FParsed := False;

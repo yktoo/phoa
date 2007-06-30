@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.91 2007-06-28 18:41:31 dale Exp $
+//  $Id: Main.pas,v 1.92 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -11,7 +11,8 @@ interface
 uses
    // GR32 must follow GraphicEx because of naming conflict between stretch filter constants
   Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs,
-  ActiveX, XPMan, Registry,
+  ActiveX, XPMan,
+  TntDialogs, TntSysUtils, TntClasses,
   phIntf, phAppIntf, phMutableIntf, phNativeIntf, phObj, phGUIObj, phOps, ConsVars,
   phFrm, DKLang, ImgList, TB2Item, TB2MRU, TBXExtItems, Menus, TBX,
   ActnList, TntActnList, TBXStatusBars, VirtualTrees, TBXDkPanels,
@@ -443,12 +444,12 @@ type
     function  GetCurGroupID: Integer;
     procedure SetCurGroupID(Value: Integer);
   protected
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure DoDestroy; override;
-    procedure SettingsLoad(rif: TRegIniFile); override;
-    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); override;
+    procedure SettingsSave(rif: TPhoaRegIniFile); override;
     procedure UpdateState; override;
   public
     function  IsShortCut(var Message: TWMKey): Boolean; override;
@@ -477,8 +478,8 @@ var
 implementation
 {$R *.dfm}
 uses
-  GraphicStrings, Clipbrd, Math, jpeg, TypInfo, // GraphicStrings => GraphicEx constants
-  VirtualDataObject,
+  GraphicStrings, Math, jpeg, TypInfo, // GraphicStrings => GraphicEx constants
+  TntClipbrd, VirtualDataObject,
   phChmHlp, phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
@@ -553,7 +554,7 @@ uses
 
   procedure TfMain.aaDeletePicsWithFiles(Sender: TObject);
   begin
-    if (Viewer.SelectedPics.Count>0) and (mbrOK in PhoaMsgBox(mbkConfirmWarning, 'SConfirm_DelPicsWithFiles', True, False, [mbbOK, mbbCancel])) then
+    if (Viewer.SelectedPics.Count>0) and (mbrOK in PhoaMsgBoxConst(mbkConfirmWarning, 'SConfirm_DelPicsWithFiles', False, [mbbOK, mbbCancel])) then
       PerformOperation('PicDeleteWithFiles', ['Pics', Viewer.SelectedPics]);
   end;
 
@@ -846,11 +847,11 @@ uses
   procedure TfMain.AppException(Sender: TObject; E: Exception);
   var ws: WideString;
   begin
+    if E is EPhoaWideException then ws := EPhoaWideException(E).WideMessage else ws := E.Message;
      // Добавляем точку, если в конце не знак препинания (ripped from Application.ShowException)
-    ws := E.Message; {!!! handle Unicode-enabled exceptions }
     if (ws<>'') and (AnsiLastChar(ws)>'.') then ws := ws+'.';
      // Кажем сообщение об ошибке
-    PhoaMsgBox(mbkError, ws, False, False, [mbbOK]);
+    PhoaMsgBox(mbkError, ws, False, [mbbOK]);
   end;
 
   procedure TfMain.AppHint(Sender: TObject);
@@ -876,7 +877,7 @@ uses
       StateChanged([asFileNameChangePending]);
     end;
      // Настраиваем Help-файл
-    Application.HelpFile := sApplicationPath+DKLangConstW('SHelpFileName');
+    Application.HelpFile := wsApplicationPath+DKLangConstW('SHelpFileName');
   end;
 
   procedure TfMain.ApplySettings;
@@ -900,7 +901,7 @@ uses
        // Настраиваем тему
       with (RootSetting.Settings[ISettingID_Gen_Theme] as TPhoaListSetting) do TBXSetTheme(VariantText); 
        // Настраиваем основной шрифт программы
-      FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+      FontFromStr(Font, SettingValueWStr(ISettingID_Gen_MainFont));
       ToolbarFont.Assign(Font);
        // Настраиваем текущую кодовую страницу
       cMainCodePage := CharsetToCP(Font.Charset);
@@ -1000,7 +1001,7 @@ uses
   begin
     Result := FUndo.IsUnmodified;
     if not Result then begin
-      mbr := PhoaMsgBox(mbkConfirm, 'SConfirm_FileNotSaved', [DisplayFileName], True, False, [mbbYes, mbbNo, mbbCancel]);
+      mbr := PhoaMsgBoxConst(mbkConfirm, 'SConfirm_FileNotSaved', [DisplayFileName], False, [mbbYes, mbbNo, mbbCancel]);
       if mbrYes in mbr then begin
         aSave.Execute;
         Result := FUndo.IsUnmodified;
@@ -1138,7 +1139,7 @@ uses
              // Уничтожаем результаты поиска
             DisplaySearchResults(True, False);
              // Загружаем файл
-            FProject.LoadFromFile(WideExpandUNCFileName(wsFileName));
+            FProject.LoadFromFile(WideExpandFileName(wsFileName));
             UpdateThumbnailSize;
              // Очищаем буфер отката
             FUndo.Clear;
@@ -1238,7 +1239,7 @@ uses
     Result := PicGroupsVT_GetNodeKind(tvGroups, Node, FProject.ViewIndex>=0);
   end;
 
-  function TfMain.GetRelativeRegistryKey: WideString;
+  function TfMain.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegMainWindow_Root;
   end;
@@ -1686,7 +1687,7 @@ uses
     UpdateViewIndex;
   end;
 
-  procedure TfMain.SettingsLoad(rif: TRegIniFile);
+  procedure TfMain.SettingsLoad(rif: TPhoaRegIniFile);
   begin
     inherited SettingsLoad(rif);
      // Load history
@@ -1695,7 +1696,7 @@ uses
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegMainWindow_Toolbars);
   end;
 
-  procedure TfMain.SettingsSave(rif: TRegIniFile);
+  procedure TfMain.SettingsSave(rif: TPhoaRegIniFile);
   begin
     inherited SettingsSave(rif);
      // Save toolbars
@@ -1964,8 +1965,8 @@ uses
   procedure TfMain.tvGroupsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
   begin
     case GetNodeKind(Node) of
-      gnkView:      PerformOperation('ViewEdit',    ['View', FProject.CurrentViewX, 'Name', PhoaUnicodeToAnsi(NewText), 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
-      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroupX, 'NewText', PhoaUnicodeToAnsi(NewText)]);
+      gnkView:      PerformOperation('ViewEdit',    ['View', FProject.CurrentViewX, 'Name', NewText, 'FilterExpression', FProject.CurrentViewX.FilterExpression]);
+      gnkPhoaGroup: PerformOperation('GroupRename', ['Group', CurGroupX, 'NewText', NewText]);
     end;
   end;
 
@@ -2058,7 +2059,7 @@ uses
       aEdit.Enabled                  := (bGr and (gnk in [gnkProject, gnkPhoaGroup, gnkView])) or (bPic and (gnk in [gnkProject, gnkSearch, gnkPhoaGroup, gnkViewGroup]) and bPicSel {!!!and not bView});
       aCut.Enabled                   := (gnk in [gnkProject, gnkPhoaGroup]) and bPicSel and (wClipbrdPicFormatID<>0);
       aCopy.Enabled                  := bPicSel and (wClipbrdPicFormatID<>0);
-      aPaste.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and Clipboard.HasFormat(wClipbrdPicFormatID);
+      aPaste.Enabled                 := (gnk in [gnkProject, gnkPhoaGroup]) and TntClipboard.HasFormat(wClipbrdPicFormatID);
       aSortPics.Enabled              := (gnk in [gnkProject, gnkPhoaGroup, gnkSearch]) and bPics;
       aSelectAll.Enabled             := (gnk<>gnkNone) and (Viewer.SelectedPics.Count<FViewedPics.Count);
       aSelectNone.Enabled            := bPicSel;

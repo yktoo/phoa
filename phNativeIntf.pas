@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phNativeIntf.pas,v 1.14 2007-06-24 17:48:01 dale Exp $
+//  $Id: phNativeIntf.pas,v 1.15 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -187,8 +187,8 @@ type
   IPhotoAlbumPicSortingList = interface(IPhoaMutablePicSortingList)
     ['{6010D0DF-0EA5-4461-96DC-956131E4BD35}']
      // Сохранение/загрузка из реестра
-    procedure RegSave(const wsRoot, wsSection: WideString);
-    procedure RegLoad(const wsRoot, wsSection: WideString);
+    procedure RegSave(const sRoot, sSection: AnsiString);
+    procedure RegLoad(const sRoot, sSection: AnsiString);
      // Загрузка/сохранение с помощью Streamer
     procedure StreamerLoad(Streamer: TPhoaStreamer);
     procedure StreamerSave(Streamer: TPhoaStreamer);

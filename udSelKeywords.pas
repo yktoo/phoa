@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSelKeywords.pas,v 1.14 2007-06-28 18:41:40 dale Exp $
+//  $Id: udSelKeywords.pas,v 1.15 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -51,7 +51,7 @@ uses phUtils, ConsVars, Main, phSettings;
         FProject    := AProject;
         FKeywordStr := wsKeywords;
         Result := ExecuteModal(False, False);
-        if Result then sKeywords := FKeywordStr;
+        if Result then wsKeywords := FKeywordStr;
       finally
         Free;
       end;
@@ -107,8 +107,8 @@ uses phUtils, ConsVars, Main, phSettings;
   procedure TdSelKeywords.tvMainGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
   begin
     case TextType of
-      ttNormal: CellText := PhoaAnsiToUnicode(FKeywords[Node.Index]);
-      ttStatic: CellText := PhoaAnsiToUnicode(Format('(%d)', [FKeywords.KWData[Node.Index].iCount]));
+      ttNormal: CellText := FKeywords[Node.Index];
+      ttStatic: CellText := WideFormat('(%d)', [FKeywords.KWData[Node.Index].iCount]);
     end;
   end;
 

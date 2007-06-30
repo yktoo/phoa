@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.4 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.5 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,7 +10,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars,
-  phIntf, phMutableIntf, phNativeIntf, phObj, phOps,
+  phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phWizard,
   phPicPropsDlgPage, DKLang, ActnList, TntActnList, TB2Item, TBX, TB2Dock,
   TB2Toolbar, VirtualTrees;
 
@@ -178,24 +178,22 @@ type
     nParent: PVirtualNode;
     NS: TNamespace;
     DFProp: TDiskFileProp;
-    ws: WideString;
   begin
     nParent := Sender.NodeParent[Node];
      // Для узлов файлов (корневых)
     if nParent=nil then begin
-      if Column=0 then ws := Dialog.PictureFiles[Node.Index];
+      if Column=0 then CellText := Dialog.PictureFiles[Node.Index];
      // Для элементов свойств файла (дочерних узлов по отношению к файлам)
     end else begin
       NS := PNamespace(Sender.GetNodeData(nParent))^;
       DFProp := TDiskFileProp(Node.Index);
       case Column of
          // Имя свойства
-        0: if NS=nil then ws := DKLangConstW('SError') else ws := DiskFilePropName(DFProp);
+        0: if NS=nil then CellText := DKLangConstW('SError') else CellText := DiskFilePropName(DFProp);
          // Значение свойства
-        1: if NS=nil then ws := DKLangConstW('SErrFileNotFound') else ws := DiskFilePropValue(DFProp, NS);
+        1: if NS=nil then CellText := DKLangConstW('SErrFileNotFound') else CellText := DiskFilePropValue(DFProp, NS);
       end;
     end;
-    CellText := PhoaAnsiToUnicode(s);
   end;
 
   procedure TfrPicProps_FileProps.tvMainInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -229,7 +227,7 @@ type
 
   procedure TfrPicProps_FileProps.tvMainShortenString(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; const S: WideString; TextSpace: Integer; RightToLeft: Boolean; var Result: WideString; var Done: Boolean);
   begin
-    Result := PhoaAnsiToUnicode(ShortenFileName(TargetCanvas, TextSpace-10, PhoaUnicodeToAnsi(S)));
+    Result := ShortenFileName(TargetCanvas, TextSpace-10, S);
     Done := True;
   end;
 

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.56 2007-06-28 18:41:40 dale Exp $
+//  $Id: ufImgView.pas,v 1.57 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit ufImgView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, GraphicEx, GR32, Controls, Forms, Dialogs, TntForms,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phGraphics,
   GR32_Layers,
   phFrm, DKLang, Menus, TB2Item, TBX, ActnList, TntActnList, TB2ExtItems,
@@ -393,7 +393,7 @@ type
   protected
     function  DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
     function  DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure DoCreate; override;
@@ -403,8 +403,8 @@ type
     procedure ExecuteInitialize; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
-    procedure SettingsSave(rif: TRegIniFile); override;
-    procedure SettingsLoad(rif: TRegIniFile); override;
+    procedure SettingsSave(rif: TPhoaRegIniFile); override;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); override;
   public
      // Props
      // -- True, если активен режим полноэкранного просмотра
@@ -814,12 +814,12 @@ uses
       FSlideShowCyclic    := SettingValueBool(ISettingID_View_SlideCyclic);
       FShowInfo           := SettingValueBool(ISettingID_View_ShowInfo);
       FInfoProps          := IntToPicProps(SettingValueInt(ISettingID_View_InfoPicProps));
-      FInfoFont           := SettingValueStr(ISettingID_View_InfoFont);
+      FInfoFont           := SettingValueWStr(ISettingID_View_InfoFont);
       FInfoBkColor        := SettingValueInt(ISettingID_View_InfoBkColor);
       FInfoBkOpacity      := SettingValueInt(ISettingID_View_InfoBkOpacity);
       FViewInfoPos        := SettingValueRect(ISettingID_Hidden_ViewInfoPos);
        // Настраиваем параметры окна
-      FontFromStr(Font, SettingValueStr(ISettingID_Gen_MainFont));
+      FontFromStr(Font, SettingValueWStr(ISettingID_Gen_MainFont));
       Color               := FBackgroundColor;
        // Настраиваем доки/панели инструментов
        // -- Видимость
@@ -1059,9 +1059,9 @@ uses
         Font.Color := clRed;
         Font.Size  := 9;
         Font.Style := [];
-        TextOut(Rect(0, 0, Width, r.Top), DT_CENTER or DT_NOPREFIX or DT_SINGLELINE or DT_BOTTOM or DT_PATH_ELLIPSIS, sFileName);
+        TextOut(Rect(0, 0, Width, r.Top), DT_CENTER or DT_NOPREFIX or DT_SINGLELINE or DT_BOTTOM or DT_PATH_ELLIPSIS, wsFileName); {??? Unicode support}
          // Рисуем текст ошибки
-        TextOut(Rect(0, r.Bottom, Width, Height), DT_CENTER or DT_NOPREFIX or DT_WORDBREAK, sError);
+        TextOut(Rect(0, r.Bottom, Width, Height), DT_CENTER or DT_NOPREFIX or DT_WORDBREAK, wsError); {??? Unicode support}
       end;
     end;
 
@@ -1182,7 +1182,7 @@ uses
     Result := aFullScreen.Checked;
   end;
 
-  function TfImgView.GetRelativeRegistryKey: WideString;
+  function TfImgView.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegViewWindow_Root;
   end;
@@ -1399,14 +1399,14 @@ uses
     end;
   end;
 
-  procedure TfImgView.SettingsLoad(rif: TRegIniFile);
+  procedure TfImgView.SettingsLoad(rif: TPhoaRegIniFile);
   begin
     inherited SettingsLoad(rif);
      // Восстанавливаем положение и видимость панелей инструментов
     TBRegLoadPositions(Self, HKEY_CURRENT_USER, SRegRoot+'\'+SRegViewWindow_Toolbars);
   end;
 
-  procedure TfImgView.SettingsSave(rif: TRegIniFile);
+  procedure TfImgView.SettingsSave(rif: TPhoaRegIniFile);
   begin
     inherited SettingsSave(rif);
      // Сохраняем положение и видимость панелей инструментов

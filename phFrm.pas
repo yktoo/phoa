@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phFrm.pas,v 1.6 2007-06-28 18:41:33 dale Exp $
+//  $Id: phFrm.pas,v 1.7 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phFrm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, Registry;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, phObj;
 
 type
   TPhoaForm = class(TTntForm)
@@ -19,12 +19,12 @@ type
      // Prop storage
     FHasUpdates: Boolean;
     FModified: Boolean;
-     // Если требуется, создаёт и возвращает TRegIniFile для сохранения/загрузки настроек; иначе возвращает nil
-    function  CreateRegIni: TRegIniFile;
+     // Если требуется, создаёт и возвращает TPhoaRegIniFile для сохранения/загрузки настроек; иначе возвращает nil
+    function  CreateRegIni: TPhoaRegIniFile;
      // Message handlers
     procedure WMHelp(var Msg: TWMHelp); message WM_HELP;
      // Prop handlers
-    function  GetRegistryKey: WideString;
+    function  GetRegistryKey: AnsiString;
     procedure SetHasUpdates(Value: Boolean);
     procedure SetModified(Value: Boolean);
   protected
@@ -40,14 +40,14 @@ type
     procedure UpdateState; virtual;
      // Процедуры записи/чтения начальных настроек из реестра. Могут использоваться потомками для сохранения и
      //   восстановления собственных настроек
-    procedure SettingsInitialSave(rif: TRegIniFile); virtual;
-    procedure SettingsInitialLoad(rif: TRegIniFile); virtual;
+    procedure SettingsInitialSave(rif: TPhoaRegIniFile); virtual;
+    procedure SettingsInitialLoad(rif: TPhoaRegIniFile); virtual;
      // Процедуры записи/чтения настроек из реестра, вызываемые непосредственно перед показом и после скрытия
-    procedure SettingsSave(rif: TRegIniFile); virtual;
-    procedure SettingsLoad(rif: TRegIniFile); virtual;
+    procedure SettingsSave(rif: TPhoaRegIniFile); virtual;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); virtual;
      // Prop handlers
     function  GetDataValid: Boolean; virtual;
-    function  GetRelativeRegistryKey: WideString; virtual;
+    function  GetRelativeRegistryKey: AnsiString; virtual;
     function  GetSizeable: Boolean; virtual;
   public
      // Модально отображает форму. Возвращает HasUpdates
@@ -67,10 +67,10 @@ type
      // -- True, если в форме пользователь изменил какие-то данные
     property Modified: Boolean read FModified write SetModified;
      // -- Ключ реестра для сохранения настроек
-    property RegistryKey: WideString read GetRegistryKey;
+    property RegistryKey: AnsiString read GetRegistryKey;
      // -- Ключ реестра для сохранения настроек относительно корневого ключа приложения. Если пустая строка, сохранения
      //    настроек не требуется
-    property RelativeRegistryKey: WideString read GetRelativeRegistryKey;
+    property RelativeRegistryKey: AnsiString read GetRelativeRegistryKey;
      // -- True, если размер формы позволяется менять. В базовом классе всегда возвращает False
     property Sizeable: Boolean read GetSizeable;
   end;
@@ -84,15 +84,15 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
     Inc(FLockCounter);
   end;
 
-  function TPhoaForm.CreateRegIni: TRegIniFile;
-  var wsKey: WideString;
+  function TPhoaForm.CreateRegIni: TPhoaRegIniFile;
+  var sKey: AnsiString;
   begin
-    wsKey := RegistryKey;
-    if wsKey='' then Result := nil else Result := TRegIniFile.Create(wsKey); {!!! Not Unicode-enabled solution }
+    sKey := RegistryKey;
+    if sKey='' then Result := nil else Result := TPhoaRegIniFile.Create(sKey);
   end;
 
   procedure TPhoaForm.DoCreate;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
     inherited DoCreate;
      // Если нужно, делаем форму Sizeable
@@ -118,7 +118,7 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
   end;
 
   procedure TPhoaForm.DoDestroy;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
      // Сохраняем начальные настройки, если требуется
     rif := CreateRegIni;
@@ -132,7 +132,7 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
   end;
 
   procedure TPhoaForm.DoHide;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
      // Сохраняем настройки, если требуется
     rif := CreateRegIni;
@@ -146,7 +146,7 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
   end;
 
   procedure TPhoaForm.DoShow;
-  var rif: TRegIniFile;
+  var rif: TPhoaRegIniFile;
   begin
     inherited DoShow;
      // Загружаем настройки, если требуется
@@ -201,14 +201,14 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
     Result := True;
   end;
 
-  function TPhoaForm.GetRegistryKey: WideString;
-  var wsRelativeKey: WideString;
+  function TPhoaForm.GetRegistryKey: AnsiString;
+  var sRelativeKey: AnsiString;
   begin
-    wsRelativeKey := RelativeRegistryKey;
-    if wsRelativeKey='' then Result := '' else Result := SRegRoot+'\'+wsRelativeKey;
+    sRelativeKey := RelativeRegistryKey;
+    if sRelativeKey='' then Result := '' else Result := SRegRoot+'\'+sRelativeKey;
   end;
 
-  function TPhoaForm.GetRelativeRegistryKey: WideString;
+  function TPhoaForm.GetRelativeRegistryKey: AnsiString;
   begin
     Result := '';
   end;
@@ -236,23 +236,23 @@ uses phChmHlp, phUtils, phSettings, ConsVars;
     StateChanged;
   end;
 
-  procedure TPhoaForm.SettingsInitialLoad(rif: TRegIniFile);
+  procedure TPhoaForm.SettingsInitialLoad(rif: TPhoaRegIniFile);
   begin
     { does nothing }
   end;
 
-  procedure TPhoaForm.SettingsInitialSave(rif: TRegIniFile);
+  procedure TPhoaForm.SettingsInitialSave(rif: TPhoaRegIniFile);
   begin
     { does nothing }
   end;
 
-  procedure TPhoaForm.SettingsLoad(rif: TRegIniFile);
+  procedure TPhoaForm.SettingsLoad(rif: TPhoaRegIniFile);
   begin
      // Если размер формы можно менять, восстанавливаем размеры формы
     if Sizeable then FormPositionFromStr(Self, rif.ReadString('', 'Position', ''));
   end;
 
-  procedure TPhoaForm.SettingsSave(rif: TRegIniFile);
+  procedure TPhoaForm.SettingsSave(rif: TPhoaRegIniFile);
   begin
      // Если размер формы можно менять, сохраняем её позицию
     if Sizeable then rif.WriteString('', 'Position', FormPositionToStr(Self));

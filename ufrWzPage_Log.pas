@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPage_Log.pas,v 1.15 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufrWzPage_Log.pas,v 1.16 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit ufrWzPage_Log;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ConsVars, 
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntWideStrings,
+  ConsVars, 
   phWizard, VirtualTrees, ImgList, TB2Item, TBX, Menus, ActnList, StdCtrls, ExtCtrls, DKLang,
   TntActnList, TntStdCtrls, TntExtCtrls;
 
@@ -46,7 +47,7 @@ type
      // Возвращает True, если узел отображает строку об ошибке
     function  IsNodeError(Node: PVirtualNode): Boolean;
      // Возвращает ссылку на протокол (через предметный интерфейс host-формы)
-    function  GetLog: TStrings;
+    function  GetLog: TWideStrings;
      // Осуществляет поиск записи протокола
     procedure DoFind(const wsPattern: WideString; bDown, bMatchCase: Boolean);
   protected
@@ -56,13 +57,13 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
+uses TntClipbrd, phUtils, Main, phSettings, phMsgBox;
 
   procedure TfrWzPage_Log.aaCopy(Sender: TObject);
   var n: PVirtualNode;
   begin
     n := tvMain.FocusedNode;
-    if n<>nil then Clipboard.AsText := GetLog[n.Index];
+    if n<>nil then TntClipboard.AsWideText := GetLog[n.Index];
   end;
 
   procedure TfrWzPage_Log.aaDisplayErrorsOnly(Sender: TObject);
@@ -102,7 +103,7 @@ uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
 
   procedure TfrWzPage_Log.BeforeDisplay(ChangeMethod: TPageChangeMethod);
   var
-    Log: TStrings;
+    Log: TWideStrings;
     i, iErrCount: Integer;
   begin
     if ChangeMethod=pcmNextBtn then begin
@@ -157,7 +158,7 @@ uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
     DoFind(fdMain.FindText, frDown in fdMain.Options, frWholeWord in fdMain.Options);
   end;
 
-  function TfrWzPage_Log.GetLog: TStrings;
+  function TfrWzPage_Log.GetLog: TWideStrings;
   begin
     Result := (StorageForm as IPhoaWizardPageHost_Log).Log[ID];
   end;
@@ -186,7 +187,7 @@ uses phUtils, Main, Clipbrd, phSettings, phMsgBox;
        // Порядковый номер
       0: CellText := IntToStr(Node.Index+1);
        // Текст записи протокола
-      1: CellText := PhoaAnsiToUnicode(Copy(GetLog[Node.Index], 5, MaxInt));
+      1: CellText := Copy(GetLog[Node.Index], 5, MaxInt);
     end;
   end;
 

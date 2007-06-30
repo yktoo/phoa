@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.9 2007-06-28 18:41:37 dale Exp $
+//  $Id: phWizard.pas,v 1.10 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, phFrm;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms, phIntf, phUtils, phFrm;
 
 type
    // Exception

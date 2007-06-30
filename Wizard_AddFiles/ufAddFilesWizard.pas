@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,8 +9,8 @@ unit ufAddFilesWizard;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry,
-  GR32, GraphicEx,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  TntSysUtils, TntWideStrings, TntClasses, GR32, GraphicEx,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, ConsVars, phWizard, phGraphics,
   phWizForm, DKLang, GR32_Image, TB2Dock, TBXDkPanels, ExtCtrls,
   TntExtCtrls, StdCtrls, TntStdCtrls;
@@ -38,7 +38,7 @@ type
      // Список изображений для добавления в проект
     FPics: IPhotoAlbumPicList;
      // Протокол добавления
-    FLog: TStrings;
+    FLog: TWideStrings;
      // Исходное количество добавляемых файлов
     FInitialFileCount: Integer;
      // Последнее добавленное изображение (nil, если нет)
@@ -85,7 +85,7 @@ type
      // Обновляет масштаб, используемый для просмотра
     procedure UpdatePreviewScale;
      // IPhoaWizardPageHost_Log
-    function  LogPage_GetLog(iPageID: Integer): TStrings;
+    function  LogPage_GetLog(iPageID: Integer): TWideStrings;
     function  IPhoaWizardPageHost_Log.GetLog = LogPage_GetLog;
      // IPhoaWizardPageHost_Process
     procedure ProcPage_PaintThumbnail(Bitmap32: TBitmap32);
@@ -104,7 +104,7 @@ type
     procedure SetShowPreview(Value: Boolean);
   protected
     function  GetNextPageID: Integer; override;
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetStartPageID: Integer; override;
     function  IsBtnBackEnabled: Boolean; override;
     function  IsBtnCancelEnabled: Boolean; override;
@@ -115,10 +115,10 @@ type
     procedure ExecuteFinalize; override;
     procedure ExecuteInitialize; override;
     procedure PageChanged(ChangeMethod: TPageChangeMethod; iPrevPageID: Integer); override;
-    procedure SettingsInitialLoad(rif: TRegIniFile); override;
-    procedure SettingsInitialSave(rif: TRegIniFile); override;
-    procedure SettingsLoad(rif: TRegIniFile); override;
-    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure SettingsInitialLoad(rif: TPhoaRegIniFile); override;
+    procedure SettingsInitialSave(rif: TPhoaRegIniFile); override;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); override;
+    procedure SettingsSave(rif: TPhoaRegIniFile); override;
   public
      // Загружает файл для просмотра
     procedure UpdatePreview;
@@ -466,7 +466,7 @@ uses
              // Пишем в протокол
             LogSuccess(
               'SLogEntry_AddingOK',
-              [sFileName,
+              [wsFileName,
                DateTimeFillResultName(FDateFillResult),
                DateTimeFillResultName(FTimeFillResult),
                DKLangConstW(iif(FXformFilled, 'STransformFilledFromExif', 'SNone'))]);
@@ -556,7 +556,7 @@ uses
     end;
   end;
 
-  function TfAddFilesWizard.GetRelativeRegistryKey: WideString;
+  function TfAddFilesWizard.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegAddFiles_Root;
   end;
@@ -615,8 +615,8 @@ uses
       i64Size: Int64;
       bMatches: Boolean;
     begin
-       // Проверяем, что расширение знакомого типа
-      if FileFormatList.GraphicFromExtension{??? Unicode support}(WideExtractFileExt(SRec.Name))=nil then Exit;
+       // Проверяем, что расширение знакомого типа (implicit Unicode-to-Ansi conversion)
+      if FileFormatList.GraphicFromExtension(WideExtractFileExt(SRec.Name))=nil then Exit;
       dDateTime := FileDateToDateTime(SRec.Time);
       i64Size   := (Int64(SRec.FindData.nFileSizeHigh) shl 32) or SRec.FindData.nFileSizeLow;
       bMatches  := True;
@@ -635,10 +635,10 @@ uses
         if bMatches and (Masks<>nil) then bMatches := Masks.Matches(SRec.Name);
          // Проверяем присутствие в фотоальбоме
         if bMatches and (FFilter_Presence<>afpfDontCare) then
-          bMatches := (FApp.Project.Pics.IndexOfFileName(sPath+SRec.Name)>=0) = (FFilter_Presence=afpfExistingOnly);
+          bMatches := (FApp.Project.Pics.IndexOfFileName(wsPath+SRec.Name)>=0) = (FFilter_Presence=afpfExistingOnly);
       end;
        // Если все критерии удовлетворены
-      if bMatches then FFileList.Add(SRec.Name, sPath, i64Size, iInitialImgIdx, dDateTime);
+      if bMatches then FFileList.Add(SRec.Name, wsPath, i64Size, iInitialImgIdx, dDateTime);
     end;
 
     procedure AddFolder(const wsPath: WideString);
@@ -647,7 +647,7 @@ uses
       iRes: Integer;
     begin
        // Обновляем информацию о процессе
-      pProcess.Caption := DKLangConstW('SMsg_ProcessingSomething', [sPath]);
+      pProcess.Caption := DKLangConstW('SMsg_ProcessingSomething', [wsPath]);
       pProcess.Update;
        // Сканируем каталог
       iRes := WideFindFirst(wsPath+'*.*', faAnyFile, sr);
@@ -659,7 +659,7 @@ uses
               if bRecurse then AddFolder(wsPath+sr.Name+'\');
              // Если файл - добавляем к списку
             end else
-              AddFile(sPath, sr);
+              AddFile(wsPath, sr);
           iRes := WideFindNext(sr);
         end;
       finally
@@ -692,7 +692,7 @@ uses
                 AddFile(WideExtractFilePath(wsName), sr)
                // Каталог
               else
-                AddFolder(IncludeTrailingPathDelimiter(sName));
+                AddFolder(IncludeTrailingPathDelimiter(wsName));
           finally
             WideFindClose(sr);
           end;
@@ -735,7 +735,7 @@ uses
     FLog.Add('[!] '+DKLangConstW(ws, aParams));
   end;
 
-  function TfAddFilesWizard.LogPage_GetLog(iPageID: Integer): TStrings;
+  function TfAddFilesWizard.LogPage_GetLog(iPageID: Integer): TWideStrings;
   begin
     Result := FLog;
   end;
@@ -800,7 +800,7 @@ uses
     end;
   end;
 
-  procedure TfAddFilesWizard.SettingsInitialLoad(rif: TRegIniFile);
+  procedure TfAddFilesWizard.SettingsInitialLoad(rif: TPhoaRegIniFile);
   begin
     inherited SettingsInitialLoad(rif);
     FDefaultPath         := rif.ReadString ('', 'DefaultFolder',       '');
@@ -823,7 +823,7 @@ uses
                             rif.ReadInteger('', 'FilterSizeToUnit',    Byte(fsuKBytes)));
   end;
 
-  procedure TfAddFilesWizard.SettingsInitialSave(rif: TRegIniFile);
+  procedure TfAddFilesWizard.SettingsInitialSave(rif: TPhoaRegIniFile);
 
     procedure PutDate(const d: TDateTime; const wsValueName: WideString);
     begin {!!! Not Unicode-enabled solution }
@@ -852,7 +852,7 @@ uses
     rif.WriteInteger('', 'FilterSizeToUnit',    Byte(FFilter_SizeToUnit));
   end;
 
-  procedure TfAddFilesWizard.SettingsLoad(rif: TRegIniFile);
+  procedure TfAddFilesWizard.SettingsLoad(rif: TPhoaRegIniFile);
   var r: TRect;
   begin
     inherited SettingsLoad(rif);
@@ -869,7 +869,7 @@ uses
       dpPreview.FloatingPosition := pMain.ClientToScreen(Point(40, 40));
   end;
 
-  procedure TfAddFilesWizard.SettingsSave(rif: TRegIniFile);
+  procedure TfAddFilesWizard.SettingsSave(rif: TPhoaRegIniFile);
   begin
     inherited SettingsSave(rif);
      // Сохраняем параметры просмотра
@@ -888,7 +888,7 @@ uses
   begin
     FProcessingFiles := True;
      // Создаём протокол
-    if FLog=nil then FLog := TStringList.Create;
+    if FLog=nil then FLog := TTntStringList.Create;
      // Удаляем неотмеченные файлы
     FFileList.DeleteUnchecked;
      // Запоминаем исходное количество файлов

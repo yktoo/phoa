@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGUIObj.pas,v 1.42 2007-06-27 18:29:11 dale Exp $
+//  $Id: phGUIObj.pas,v 1.43 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -464,8 +464,8 @@ type
      // Обработчик OnExecute для вновь создаваемых Actions
     procedure ActionExecute(Sender: TObject);
      // IPhoaActionList
-    function  Add(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
-    function  FindName(const sName: WideString): IPhoaAction; stdcall;
+    function  Add(const wsName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction; stdcall;
+    function  FindName(const wsName: WideString): IPhoaAction; stdcall;
     function  GetCount: Integer; stdcall;
     function  GetItems(Index: Integer): IPhoaAction; stdcall;
   public
@@ -2071,12 +2071,12 @@ type
 
   function TPhoaAction.GetCaption: WideString;
   begin
-    Result := PhoaAnsiToUnicode(FAction.Caption);
+    Result := FAction.Caption;
   end;
 
   function TPhoaAction.GetCategory: WideString;
   begin
-    Result := PhoaAnsiToUnicode(FAction.Category);
+    Result := FAction.Category;
   end;
 
   function TPhoaAction.GetEnabled: LongBool;
@@ -2086,12 +2086,12 @@ type
 
   function TPhoaAction.GetHint: WideString;
   begin
-    Result := PhoaAnsiToUnicode(FAction.Hint);
+    Result := FAction.Hint;
   end;
 
   function TPhoaAction.GetName: WideString;
   begin
-    Result := PhoaAnsiToUnicode(FAction.Name);
+    Result := FAction.Name;
   end;
 
   function TPhoaAction.GetNativeAction: TCustomAction;
@@ -2106,12 +2106,12 @@ type
 
   procedure TPhoaAction.SetCaption(const Value: WideString);
   begin
-    FAction.Caption := PhoaUnicodeToAnsi(Value);
+    FAction.Caption := Value;
   end;
 
   procedure TPhoaAction.SetCategory(const Value: WideString);
   begin
-    FAction.Category := PhoaUnicodeToAnsi(Value);
+    FAction.Category := Value;
   end;
 
   procedure TPhoaAction.SetEnabled(Value: LongBool);
@@ -2121,7 +2121,7 @@ type
 
   procedure TPhoaAction.SetHint(const Value: WideString);
   begin
-    FAction.Hint := PhoaUnicodeToAnsi(Value);
+    FAction.Hint := Value;
   end;
 
   procedure TPhoaAction.SetTag(Value: Integer);
@@ -2141,7 +2141,7 @@ type
     if (ActionIntf<>nil) then ActionIntf.Execute; // Результат Execute() [пока] игнорируется
   end;
 
-  function TPhoaActionList.Add(const sName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction;
+  function TPhoaActionList.Add(const wsName: WideString; AExecuteProc: TPhoaActionExecuteProc): IPhoaAction;
   var Action: TAction;
   begin
      // Создаём соответствующий Action в NativeList
@@ -2150,7 +2150,7 @@ type
     Result := TPhoaAction.Create(Action, True, AExecuteProc);
      // Настраиваем Action
     Action.ActionList := FNativeList;
-    Action.Name       := PhoaUnicodeToAnsi(sName);
+    Action.Name       := wsName;
     Action.OnExecute  := ActionExecute;
   end;
 
@@ -2170,12 +2170,12 @@ type
     end;
   end;
 
-  function TPhoaActionList.FindName(const sName: WideString): IPhoaAction;
+  function TPhoaActionList.FindName(const wsName: WideString): IPhoaAction;
   var
     i: Integer;
     sAnsiName: AnsiString;
   begin
-    sAnsiName := PhoaUnicodeToAnsi(sName);
+    sAnsiName := PhoaUnicodeToAnsi(wsName);
     for i := 0 to FNativeList.ActionCount-1 do begin
       Result := IPhoaAction(FNativeList[i].Tag);
       if SameText(Result.Name, sAnsiName) then Exit;
@@ -2275,7 +2275,7 @@ type
 
   function TPhoaMenuItem.GetCaption: WideString;
   begin
-    Result := PhoaAnsiToUnicode(FItem.Caption);
+    Result := FItem.Caption;
   end;
 
   function TPhoaMenuItem.GetIndex: Integer;
@@ -2316,7 +2316,7 @@ type
 
   procedure TPhoaMenuItem.SetCaption(const Value: WideString);
   begin
-    FItem.Caption := PhoaUnicodeToAnsi(Value);
+    FItem.Caption := Value;
   end;
 
   procedure TPhoaMenuItem.SetIndex(Value: Integer);

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udPicProps.pas,v 1.3 2007-06-28 18:41:50 dale Exp $
+//  $Id: udPicProps.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udPicProps;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Registry, GR32_Layers,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  TntWindows, TntClasses, GR32_Layers,
   phIntf, phMutableIntf, phNativeIntf, phObj, phOps, phMetadata, phWizard, phFrm,
   phDlg, Menus, TB2Item, TBX, ImgList, DKLang, TB2Dock, TB2Toolbar,
   StdCtrls, TntStdCtrls, ExtCtrls, TntExtCtrls;
@@ -63,15 +64,15 @@ type
     function  GetPictureFiles(Index: Integer): WideString;
     procedure SetPictureFiles(Index: Integer; const Value: WideString);
   protected
-    function  GetRelativeRegistryKey: WideString; override;
+    function  GetRelativeRegistryKey: AnsiString; override;
     function  GetSizeable: Boolean; override;
     procedure ButtonClick_OK; override;
     procedure DoCreate; override;
     procedure DoDestroy; override;
     procedure DoShow; override;
     procedure ExecuteInitialize; override;
-    procedure SettingsLoad(rif: TRegIniFile); override;
-    procedure SettingsSave(rif: TRegIniFile); override;
+    procedure SettingsLoad(rif: TPhoaRegIniFile); override;
+    procedure SettingsSave(rif: TPhoaRegIniFile); override;
   public
      // Ищет изображение по имени файла и возвращает его ID, если нашла, иначе возвращает 0. Поиск осуществляется с
      //   учётом новых имён файлов, заданных в диалоге, но среди ВСЕХ изображений проекта
@@ -200,7 +201,7 @@ uses
   procedure TdPicProps.ExecuteInitialize;
   var
     i: Integer;
-    FileInfo: TSHFileInfo;
+    FileInfo: TSHFileInfoW;
   begin
     inherited ExecuteInitialize;
     if FEditedPics.Count>0 then begin
@@ -211,7 +212,7 @@ uses
         FPictureFiles.Add(FEditedPics[i].FileName);
       end;
        // Получаем Handle системного ImageList-а
-      ilFiles.Handle := SHGetFileInfo(PAnsiChar(FPictureFiles[0]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+      ilFiles.Handle := Tnt_SHGetFileInfoW(PWideChar(FPictureFiles[0]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
     end;
   end;
 
@@ -222,7 +223,7 @@ uses
   begin
      // Сначала ищем среди редактируемых изображений
     for i := 0 to FPictureFiles.Count-1 do
-      if ReverseCompare(FPictureFiles[i], sFileName) then begin
+      if ReverseCompare(FPictureFiles[i], wsFileName) then begin
         Result := EditedPics[i].ID;
         Exit;
       end;
@@ -231,7 +232,7 @@ uses
     ProjPics := App.ProjectX.PicsX;
     for i := 0 to ProjPics.Count-1 do
        // Нашли такой файл
-      if ReverseCompare(ProjPics[i].FileName, sFileName) then begin
+      if ReverseCompare(ProjPics[i].FileName, wsFileName) then begin
          // Если изображение находится в числе редактируемых, значит, файл ему изменили (иначе мы нашли бы его ранее
          //   поиском по редактируемым изображениям) и изображения с таким файлом более не существует
         iPicID := ProjPics[i].ID;
@@ -249,13 +250,13 @@ type TWinControlCast = class(TWinControl);
 
   function TdPicProps.GetFileImageIndex(Index: Integer): Integer;
   var
-    FileInfo: TSHFileInfo;
+    FileInfo: TSHFileInfoW;
     pImgIdx: PInteger;
   begin
      // Если ImageIndex=-1 - это значит, он ещё не считывался
     pImgIdx := @FFileImageIndices[Index];
     if pImgIdx^=-1 then begin
-      SHGetFileInfo(PAnsiChar(FPictureFiles[Index]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+      Tnt_SHGetFileInfoW(PWideChar(FPictureFiles[Index]), 0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
       pImgIdx^ := FileInfo.iIcon;
     end;
     Result := pImgIdx^;
@@ -266,7 +267,7 @@ type TWinControlCast = class(TWinControl);
     Result := FPictureFiles[Index];
   end;
 
-  function TdPicProps.GetRelativeRegistryKey: WideString;
+  function TdPicProps.GetRelativeRegistryKey: AnsiString;
   begin
     Result := SRegPicProps_Root;
   end;
@@ -294,13 +295,13 @@ type TWinControlCast = class(TWinControl);
     end;
   end;
 
-  procedure TdPicProps.SettingsLoad(rif: TRegIniFile);
+  procedure TdPicProps.SettingsLoad(rif: TPhoaRegIniFile);
   begin
     inherited SettingsLoad(rif);
     FLastUsedPageID := rif.ReadInteger('', 'LastUsedPageID', 0);
   end;
 
-  procedure TdPicProps.SettingsSave(rif: TRegIniFile);
+  procedure TdPicProps.SettingsSave(rif: TPhoaRegIniFile);
   begin
     inherited SettingsSave(rif);
     rif.WriteInteger('', 'LastUsedPageID', FController.VisiblePageID);

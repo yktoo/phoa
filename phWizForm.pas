@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizForm.pas,v 1.18 2007-06-28 18:41:37 dale Exp $
+//  $Id: phWizForm.pas,v 1.19 2007-06-30 10:36:20 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,7 @@ unit phWizForm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, Registry,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, ConsVars, phObj, phWizard, 
   phFrm, ExtCtrls, TntExtCtrls, StdCtrls, TntStdCtrls;
 
 type
@@ -45,7 +45,7 @@ type
     function  GetCurPage: TWizardPage;
     function  GetCurPageID: Integer;
   protected
-    function  GetRelativeRegistryKey: WideString; override; abstract;
+    function  GetRelativeRegistryKey: AnsiString; override; abstract;
     function  GetSizeable: Boolean; override;
     procedure DoCreate; override;
     procedure DoDestroy; override;
@@ -80,7 +80,7 @@ type
 
 implementation
 {$R *.dfm}
-uses phUtils, phSettings, phGUIObj;
+uses DKLang, phUtils, phSettings, phGUIObj;
 
    //===================================================================================================================
    // TdFileOpsWizard
