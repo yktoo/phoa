@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrExprPicFilter.pas,v 1.6 2007-06-30 10:36:21 dale Exp $
+//  $Id: ufrExprPicFilter.pas,v 1.7 2007-07-01 18:07:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -10,8 +10,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms, phObj,
-  DKLang, SynCompletionProposal, TB2MRU, TBXExtItems, Menus, TB2Item, TBX,
-  ActnList, SynEdit, TB2Dock, TB2Toolbar, TntActnList;
+  DKLang, TB2MRU, TBXExtItems, Menus, TB2Item, TBX, ActnList, TntActnList,
+  StdCtrls, TntStdCtrls, TB2Dock, TB2Toolbar;
 
 type
   TfrExprPicFilter = class(TTntFrame)
@@ -21,44 +21,35 @@ type
     aNew: TTntAction;
     aOpen: TTntAction;
     aPaste: TTntAction;
-    aRedo: TTntAction;
     aSaveAs: TTntAction;
     aSyntaxCheck: TTntAction;
-    aUndo: TTntAction;
     bCopy: TTBXItem;
     bCut: TTBXItem;
     bNew: TTBXItem;
     bOpen: TTBXSubmenuItem;
     bPaste: TTBXItem;
-    bRedo: TTBXItem;
     bSaveAs: TTBXItem;
     bSyntaxCheck: TTBXItem;
-    bUndo: TTBXItem;
     dkExprTop: TTBXDock;
     dklcMain: TDKLanguageController;
-    eExpression: TSynEdit;
+    mExpression: TTntMemo;
     iMRUOpen: TTBXMRUListItem;
     mruOpen: TTBXMRUList;
     pmExpression: TTBXPopupMenu;
-    scpMain: TSynCompletionProposal;
     smInsertOperator: TTBXSubmenuItem;
     smInsertProp: TTBXSubmenuItem;
     tbExprMain: TTBXToolbar;
     tbSepCut: TTBXSeparatorItem;
     tbSepInsertProp: TTBXSeparatorItem;
     tbSepSyntaxCheck: TTBXSeparatorItem;
-    tbSepUndo: TTBXSeparatorItem;
     procedure aaCopy(Sender: TObject);
     procedure aaCut(Sender: TObject);
     procedure aaNew(Sender: TObject);
     procedure aaOpen(Sender: TObject);
     procedure aaPaste(Sender: TObject);
-    procedure aaRedo(Sender: TObject);
     procedure aaSaveAs(Sender: TObject);
     procedure aaSyntaxCheck(Sender: TObject);
-    procedure aaUndo(Sender: TObject);
-    procedure eExpressionChange(Sender: TObject);
-    procedure eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
+    procedure mExpressionChange(Sender: TObject);
     procedure mruOpenClick(Sender: TObject; const Filename: String);
     procedure EnableActionsNotify(Sender: TObject);
   private
@@ -110,8 +101,7 @@ type
 implementation
 {$R *.dfm}
 uses
-  SynEditTypes,
-  phIntf, phUtils, phSettings, phParsingPicFilter, phPicFilterHighlighter, ConsVars, phMsgBox, Main;
+  phIntf, phUtils, phSettings, phParsingPicFilter, phMsgBox, ConsVars, Main;
 
 var
    // Файл, использовавшийся в последний раз для загрузки/сохранения файла выражения
@@ -119,17 +109,17 @@ var
 
   procedure TfrExprPicFilter.aaCopy(Sender: TObject);
   begin
-    eExpression.CopyToClipboard;
+    mExpression.CopyToClipboard;
   end;
 
   procedure TfrExprPicFilter.aaCut(Sender: TObject);
   begin
-    eExpression.CutToClipboard;
+    mExpression.CutToClipboard;
   end;
 
   procedure TfrExprPicFilter.aaNew(Sender: TObject);
   begin
-    eExpression.Clear;
+    mExpression.Clear;
   end;
 
   procedure TfrExprPicFilter.aaOpen(Sender: TObject);
@@ -149,12 +139,7 @@ var
 
   procedure TfrExprPicFilter.aaPaste(Sender: TObject);
   begin
-    eExpression.PasteFromClipboard;
-  end;
-
-  procedure TfrExprPicFilter.aaRedo(Sender: TObject);
-  begin
-    eExpression.Redo;
+    mExpression.PasteFromClipboard;
   end;
 
   procedure TfrExprPicFilter.aaSaveAs(Sender: TObject);
@@ -177,7 +162,7 @@ var
   begin
     PicFilter := NewPhoaParsingPicFilter;
      // Присваиваем и разбираем выражение
-    PicFilter.Expression := eExpression.Text;
+    PicFilter.Expression := mExpression.Text;
     PicFilter.ParseExpression(True, False);
      // Если есть ошибки
     if PicFilter.HasErrors then begin
@@ -186,11 +171,6 @@ var
      // Иначе сообщаем об успехе
     end else
       PhoaInfo(False, 'SMsg_SyntaxOK');
-  end;
-
-  procedure TfrExprPicFilter.aaUndo(Sender: TObject);
-  begin
-    eExpression.Undo;
   end;
 
   procedure TfrExprPicFilter.BeginUpdate;
@@ -202,20 +182,15 @@ var
 
      // Добавляет пункты меню "Вставить свойство" и для scpMain
     procedure AddExprInsertPropItems;
-    var
-      pp: TPicProperty;
-      wsProp: WideString;
+    var pp: TPicProperty;
     begin
-      for pp := Low(pp) to High(pp) do begin
-        wsProp := '$'+PicPropToStr(pp, True);
+      for pp := Low(pp) to High(pp) do
         AddTBXMenuItem( {!!! Not Unicode-enabled solution }
           smInsertProp,
-          WideFormat('%s - %s', [wsProp, PicPropName(pp)]),
+          WideFormat('$%s - %s', [PicPropToStr(pp, True), PicPropName(pp)]),
           -1,
           Byte(pp),
           ExprInsertPropClick);
-        scpMain.AddItem(wsProp, wsProp); {!!! Not Unicode-enabled solution }
-      end;
     end;
 
      // Добавляет пункты меню "Вставить оператор"
@@ -232,10 +207,7 @@ var
     AddExprInsertPropItems;
     AddExprInsertOperatorItems;
      // Инициализируем выражение
-    FontFromStr(scpMain.Font, SettingValueWStr(ISettingID_Gen_MainFont));
-    scpMain.TitleFont.Assign(scpMain.Font);
     pmExpression.LinkSubitems := tbExprMain.Items;
-    eExpression.Highlighter   := TSynPicFilterSyn.Create(Self);
      // Загружаем настройки
     LoadSettings;
     EnableActions;
@@ -253,31 +225,19 @@ var
     if Assigned(FOnExpressionChange) then FOnExpressionChange(Self);
   end;
 
-  procedure TfrExprPicFilter.eExpressionChange(Sender: TObject);
-  begin
-    if FUpdateLock=0 then DoExpressionChange;
-  end;
-
-  procedure TfrExprPicFilter.eExpressionStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-  begin
-    EnableActions;
-  end;
-
   procedure TfrExprPicFilter.EnableActions;
   var bSExpr, bExprText, bExprSel: Boolean;
   begin
     if FUpdateLock>0 then Exit;
-    bSExpr := eExpression.Focused;
-    bExprText := eExpression.Lines.Count>0;
-    bExprSel  := bExprText and eExpression.SelAvail;
+    bSExpr := mExpression.Focused;
+    bExprText := mExpression.Lines.Count>0;
+    bExprSel  := bExprText and (mExpression.SelLength>0);
     aNew.Enabled         := bSExpr and bExprText;
     aOpen.Enabled        := bSExpr;
     aSaveAs.Enabled      := bSExpr and bExprText;
     aCut.Enabled         := bSExpr and bExprSel;
     aCopy.Enabled        := bSExpr and bExprSel;
     aPaste.Enabled       := bSExpr;
-    aUndo.Enabled        := bSExpr and eExpression.CanUndo;
-    aRedo.Enabled        := bSExpr and eExpression.CanRedo;
     aSyntaxCheck.Enabled := bSExpr and bExprText;
   end;
 
@@ -299,8 +259,8 @@ var
   begin
     BeginUpdate;
     try
-      eExpression.Lines.LoadFromFile(wsFileName); {!!! Not Unicode-enabled solution }
-      mruOpen.Add(wsFileName);
+      mExpression.Lines.LoadFromFile(wsFileName);
+      mruOpen.Add(wsFileName); {!!! Not Unicode-enabled solution }
       wsLastExpressionFile := wsFileName;
     finally
       EndUpdate;
@@ -311,8 +271,8 @@ var
   begin
     BeginUpdate;
     try
-      eExpression.Lines.SaveToFile(wsFileName); {!!! Not Unicode-enabled solution }
-      mruOpen.Add(wsFileName);
+      mExpression.Lines.SaveToFile(wsFileName);
+      mruOpen.Add(wsFileName); {!!! Not Unicode-enabled solution }
       wsLastExpressionFile := wsFileName;
     finally
       EndUpdate;
@@ -321,27 +281,27 @@ var
 
   procedure TfrExprPicFilter.ExprInsertOpClick(Sender: TObject);
   begin
-    eExpression.SelText := awsPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
+    mExpression.SelText := awsPicFilterOperators[TPicFilterOperatorKind(TComponent(Sender).Tag)];
   end;
 
   procedure TfrExprPicFilter.ExprInsertPropClick(Sender: TObject);
   begin
-    eExpression.SelText := '$'+PicPropToStr(TPicProperty(TComponent(Sender).Tag), True);
+    mExpression.SelText := '$'+PicPropToStr(TPicProperty(TComponent(Sender).Tag), True);
   end;
 
   procedure TfrExprPicFilter.FocusEditor;
   begin
-    if eExpression.CanFocus then eExpression.SetFocus;
+    if mExpression.CanFocus then mExpression.SetFocus;
   end;
 
   function TfrExprPicFilter.GetCaretPos: TPoint;
   begin
-    Result := TPoint(eExpression.CaretXY);
+    Result := mExpression.CaretPos;
   end;
 
   function TfrExprPicFilter.GetExpression: WideString;
   begin
-    Result := eExpression.Text;
+    Result := mExpression.Text;
   end;
 
   function TfrExprPicFilter.GetRegistryKey: WideString;
@@ -359,6 +319,11 @@ var
       rif.Free;
     end;
     FSettingsLoaded := True;
+  end;
+
+  procedure TfrExprPicFilter.mExpressionChange(Sender: TObject);
+  begin
+    if FUpdateLock=0 then DoExpressionChange;
   end;
 
   procedure TfrExprPicFilter.mruOpenClick(Sender: TObject; const Filename: String);
@@ -380,12 +345,12 @@ var
 
   procedure TfrExprPicFilter.SetCaretPos(const Value: TPoint);
   begin
-    eExpression.CaretXY := TBufferCoord(Value);
+    mExpression.CaretPos := Value;
   end;
 
   procedure TfrExprPicFilter.SetExpression(const Value: WideString);
   begin
-    eExpression.Text := Value;
+    mExpression.Text := Value;
   end;
 
 end.

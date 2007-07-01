@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.12 2007-06-28 18:41:37 dale Exp $
+//  $Id: udAbout.pas,v 1.13 2007-07-01 18:07:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -291,7 +291,7 @@ var
 
   procedure TdAbout.PaintProgressLayer(Sender: TObject; Buffer: TBitmap32);
   begin
-    Buffer.Textout(Rect(0, Height-IProgressAreaHeight, Width, Height), DT_CENTER or DT_VCENTER or DT_NOPREFIX, FCurProgressStage);
+    Buffer.TextoutW(Rect(0, Height-IProgressAreaHeight, Width, Height), DT_CENTER or DT_VCENTER or DT_NOPREFIX, FCurProgressStage);
   end;
 
   procedure TdAbout.PaintTitleLayer(Sender: TObject; Buffer: TBitmap32);

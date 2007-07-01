@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufImgView.pas,v 1.57 2007-06-30 10:36:21 dale Exp $
+//  $Id: ufImgView.pas,v 1.58 2007-07-01 18:07:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -500,7 +500,7 @@ uses
         try
           FBitmap := TBitmap32.Create;
            // Пытаемся загрузить изображение
-          if not FLoadAborted then LoadGraphicFromFile(FQueuedFileName, FBitmap, Size(0, 0), ImgSize, LoadProgress);
+          if not FLoadAborted then LoadGraphicFromFile(FQueuedFileName, FBitmap, MakeSize(0, 0), ImgSize, LoadProgress);
            // Если загрузка была прервана, уничтожаем изображение
           if FLoadAborted then FreeAndNil(FBitmap);
         except
@@ -883,7 +883,7 @@ uses
       r := MakeRect(FDescLayer.GetAdjustedLocation);
       FontFromStr(Buffer.Font, FInfoFont);
       Buffer.FillRectTS(r, (Color32(FInfoBkColor) and $00ffffff) or (Cardinal(FInfoBkOpacity) shl 24));
-      Buffer.Textout(r, DT_CENTER or DT_VCENTER or DT_WORDBREAK or DT_NOPREFIX, FPicDesc);
+      Buffer.TextoutW(r, DT_CENTER or DT_VCENTER or DT_WORDBREAK or DT_NOPREFIX, FPicDesc);
     end;
   end;
 
@@ -1052,16 +1052,16 @@ uses
         Font.Color := $2020c0;
         Font.Size  := 72;
         Font.Style := [fsBold];
-        Sz := TextExtent(wsTitle); {??? Unicode support}
+        Sz := TextExtentW(wsTitle);
         r := Rect((Width-Sz.cx) div 2, (Height-Sz.cy) div 2, (Width+Sz.cx) div 2, (Height+Sz.cy) div 2);
-        TextOut(r, DT_LEFT or DT_NOPREFIX, wsTitle); {??? Unicode support}
+        TextoutW(r, DT_LEFT or DT_NOPREFIX, wsTitle);
          // Рисуем имя файла
         Font.Color := clRed;
         Font.Size  := 9;
         Font.Style := [];
-        TextOut(Rect(0, 0, Width, r.Top), DT_CENTER or DT_NOPREFIX or DT_SINGLELINE or DT_BOTTOM or DT_PATH_ELLIPSIS, wsFileName); {??? Unicode support}
+        TextoutW(Rect(0, 0, Width, r.Top), DT_CENTER or DT_NOPREFIX or DT_SINGLELINE or DT_BOTTOM or DT_PATH_ELLIPSIS, wsFileName);
          // Рисуем текст ошибки
-        TextOut(Rect(0, r.Bottom, Width, Height), DT_CENTER or DT_NOPREFIX or DT_WORDBREAK, wsError); {??? Unicode support}
+        TextoutW(Rect(0, r.Bottom, Width, Height), DT_CENTER or DT_NOPREFIX or DT_WORDBREAK, wsError);
       end;
     end;
 

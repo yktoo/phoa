@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.58 2007-06-30 10:36:20 dale Exp $
+//  $Id: phUtils.pas,v 1.59 2007-07-01 18:07:06 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -36,7 +36,7 @@ uses
   function  SetCurrentCBObject(ComboBox: TTntComboBox; iObj: Integer): Boolean;
 
    // Изготовление типа TSize
-  function  Size(cx, cy: Integer): TSize;
+  function  MakeSize(cx, cy: Integer): TSize;
 
    // Преобразование TRect<->Строка вида '1,2,3,4'
   function  RectToStr(const r: TRect): WideString;
@@ -61,20 +61,14 @@ uses
   function  FontToStr(Font: TFont): WideString;
   procedure FontFromStr(Font: TFont; const wsFont: WideString);
 
-   // Транслирует Charset в кодовую страницу
-  function  CharsetToCP(Charset: TFontCharset): Cardinal;
-   // Преобразует Ansi-строку в Unicode-строку, используя указанную кодовую страницу и наоборот
-  function  UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString; deprecated;
-   // То же самое, но для cCodePage использует значение cMainCodePage
-  function  PhoaUnicodeToAnsi(const s: WideString): AnsiString; deprecated;
-
-
    // Возвращает True, если wsText начинается на wsSubText (без учёта регистра) 
-  function WideStartsText(const wsSubText, wsText: WideString): Boolean;
+  function  WideStartsText(const wsSubText, wsText: WideString): Boolean;
    // Возвращает True, если wsText оканчивается на wsSubText (без учёта регистра)
-  function WideEndsText(const wsSubText, wsText: WideString): Boolean;
+  function  WideEndsText(const wsSubText, wsText: WideString): Boolean;
    // Возвращает True, если wsSubText содержится в wsText (без учёта регистра)
-  function WideContainsText(const wsSubText, wsText: WideString): Boolean;
+  function  WideContainsText(const wsSubText, wsText: WideString): Boolean;
+   // Возвращает позицию первого вхождения символа wc в строке ws; 0, если символ в строке не содержится 
+  function  CharPos(wc: WideChar; const ws: WideString): Integer;
    // Заменяет вхождения символов wsReplaceChars в строке ws на символ wcReplaceWith и возвращает результат
   function  ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
    // Возвращает первое слово из строки ws, считая за разделители слов любой из символов в wsDelimiters. Если
@@ -423,7 +417,7 @@ var
     Result := idx>=0;
   end;
 
-  function Size(cx, cy: Integer): TSize;
+  function MakeSize(cx, cy: Integer): TSize;
   begin
     Result.cx := cx;
     Result.cy := cy;
@@ -587,44 +581,6 @@ var
     Font.Charset := StrToIntDef(ExtractFirstWord(ws, '/'), DEFAULT_CHARSET);
   end;
 
-  function CharsetToCP(Charset: TFontCharset): Cardinal;
-  begin
-    case Charset of
-      VIETNAMESE_CHARSET,
-        ANSI_CHARSET:      Result := 1252; // Windows 3.1 Latin 1 (US, Western Europe) or Vietnam
-      SHIFTJIS_CHARSET:    Result := 932;  // Japan
-      HANGEUL_CHARSET,
-        JOHAB_CHARSET:     Result := 949;  // Korean
-      GB2312_CHARSET:      Result := 936;  // Chinese (PRC, Singapore)
-      CHINESEBIG5_CHARSET: Result := 950;  // Chinese (Taiwan, Hong Kong)
-      HEBREW_CHARSET:      Result := 1255; // Hebrew
-      ARABIC_CHARSET:      Result := 1256; // Arabic
-      GREEK_CHARSET:       Result := 1253; // Windows 3.1 Greek
-      TURKISH_CHARSET:     Result := 1254; // Windows 3.1 Turkish
-      THAI_CHARSET:        Result := 874;  // Thai
-      EASTEUROPE_CHARSET:  Result := 1250; // Windows 3.1 Eastern European
-      RUSSIAN_CHARSET:     Result := 1251; // Windows 3.1 Cyrillic
-      BALTIC_CHARSET:      Result := 1257; // Baltic
-      SYMBOL_CHARSET:      Result := CP_SYMBOL;
-      MAC_CHARSET:         Result := CP_MACCP;
-      OEM_CHARSET:         Result := CP_OEMCP;
-      else                 Result := CP_ACP;
-    end;
-  end;
-
-  function UnicodeToAnsiCP(const s: WideString; cCodePage: Cardinal): AnsiString;
-  var iLen: Integer;
-  begin
-    iLen := Length(s);
-    SetLength(Result, iLen);
-    WideCharToMultiByte(cCodePage, 0, @s[1], iLen, @Result[1], iLen, nil, nil);
-  end;
-
-  function PhoaUnicodeToAnsi(const s: WideString): AnsiString;
-  begin
-    Result := UnicodeToAnsiCP(s, cMainCodePage);
-  end;
-
    //-------------------------------------------------------------------------------------------------------------------
    // Misc
    //-------------------------------------------------------------------------------------------------------------------
@@ -650,19 +606,26 @@ var
     Result := Pos(WideUpperCase(wsSubText), WideUpperCase(wsText))>0;
   end;
 
+  function CharPos(wc: WideChar; const ws: WideString): Integer;
+  begin
+    for Result := 1 to Length(ws) do
+      if ws[Result]=wc then Exit;
+    Result := 0;
+  end;
+
   function ReplaceChars(const ws, wsReplaceChars: WideString; wcReplaceWith: WideChar): WideString;
   var i: Integer;
   begin
     Result := ws;
     for i := 1 to Length(Result) do
-      if WStrScan(PWideChar(wsReplaceChars), Result[i])<>nil then Result[i] := wcReplaceWith;
+      if CharPos(Result[i], wsReplaceChars)>0 then Result[i] := wcReplaceWith;
   end;
 
   function GetFirstWord(const ws, wsDelimiters: WideString): WideString;
   var i: Integer;
   begin
-    i := 1;
-    while (i<=Length(ws)) and (WStrScan(PWideChar(wsDelimiters), ws[i])<>nil) do Inc(i);
+    i := 1;                                                  
+    while (i<=Length(ws)) and (CharPos(ws[i], wsDelimiters)=0) do Inc(i);
     Result := Copy(ws, 1, i-1);
   end;
 

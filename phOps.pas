@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.25 2007-06-30 10:36:20 dale Exp $
+//  $Id: phOps.pas,v 1.26 2007-07-01 18:07:03 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -2360,7 +2360,7 @@ type
     UndoStream.WriteByte(Project.ThumbnailQuality);
     UndoStream.WriteWStr(Project.Description);
      // Выполняем операцию
-    Project.ThumbnailSize    := Size(Params.ValInt['NewThWidth'], Params.ValInt['NewThHeight']);
+    Project.ThumbnailSize    := MakeSize(Params.ValInt['NewThWidth'], Params.ValInt['NewThHeight']);
     Project.ThumbnailQuality := Params.ValByte['NewThQuality'];
     Project.Description      := Params.ValStr ['NewDescription'];
      // Добавляем флаги изменений

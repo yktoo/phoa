@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.92 2007-06-30 10:36:20 dale Exp $
+//  $Id: Main.pas,v 1.93 2007-07-01 18:06:48 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -300,8 +300,6 @@ type
     FAppState: TAppStates;
      // Prop storage
     FViewer: TThumbnailViewer;
-    FAppActionList: IPhoaActionList;
-    FAppMenu: IPhoaMenu;
      // Применяет параметры настройки языка
     procedure ApplyLanguage;
      // Применяет параметры настройки инструментов
@@ -365,31 +363,25 @@ type
     procedure ViewerSelectionChange(Sender: TObject);
     procedure ViewerDragDrop(Sender, Source: TObject; X, Y: Integer);
      // IPhoaApp
-    function  IPhoaApp.GetActionList     = IApp_GetActionList;
     function  IPhoaApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhoaApp.GetHandle         = IApp_GetHandle;
-    function  IPhoaApp.GetMenu           = IApp_GetMenu;
     function  IPhoaApp.GetProject        = IApp_GetProject;
     function  IPhoaApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhoaApp.GetViewedPics     = IApp_GetViewedPics;
     procedure IPhoaApp.SetCurGroup       = IApp_SetCurGroup;
-    function  IApp_GetActionList: IPhoaActionList; stdcall;
     function  IApp_GetCurGroup: IPhoaPicGroup; stdcall;
     function  IApp_GetFocusedControl: TPhoaAppFocusedControl; stdcall;
     function  IApp_GetHandle: Cardinal; stdcall;
-    function  IApp_GetMenu: IPhoaMenu; stdcall;
     function  IApp_GetProject: IPhoaProject; stdcall;
     function  IApp_GetSelectedPics: IPhoaPicList; stdcall;
     function  IApp_GetViewedPics: IPhoaPicList; stdcall;
     procedure IApp_SetCurGroup(Value: IPhoaPicGroup); stdcall;
      // IPhoaMutableApp
-    function  IPhoaMutableApp.GetActionList     = IApp_GetActionList;
     function  IPhoaMutableApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhoaMutableApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhoaMutableApp.GetHandle         = IApp_GetHandle;
     function  IPhoaMutableApp.GetProject        = IApp_GetProject;
-    function  IPhoaMutableApp.GetMenu           = IApp_GetMenu;
     function  IPhoaMutableApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhoaMutableApp.GetViewedPics     = IApp_GetViewedPics;
     procedure IPhoaMutableApp.SetCurGroup       = IApp_SetCurGroup;
@@ -404,11 +396,9 @@ type
     function  IApp_GetViewedPicsM: IPhoaMutablePicList;
     procedure IApp_SetCurGroupM(Value: IPhoaMutablePicGroup);
      // IPhotoAlbumApp
-    function  IPhotoAlbumApp.GetActionList     = IApp_GetActionList;
     function  IPhotoAlbumApp.GetCurGroup       = IApp_GetCurGroup;
     function  IPhotoAlbumApp.GetFocusedControl = IApp_GetFocusedControl;
     function  IPhotoAlbumApp.GetHandle         = IApp_GetHandle;
-    function  IPhotoAlbumApp.GetMenu           = IApp_GetMenu;
     function  IPhotoAlbumApp.GetProject        = IApp_GetProject;
     function  IPhotoAlbumApp.GetSelectedPics   = IApp_GetSelectedPics;
     function  IPhotoAlbumApp.GetViewedPics     = IApp_GetViewedPics;
@@ -489,13 +479,19 @@ uses
   procedure MakeImagesLoaded(const wsResourceName: WideString; Images: TCustomImageList);
   var
     PNG: TPNGGraphic;
+    RS: TTntResourceStream;
     Bmp: TBitmap;
   begin
     if Images.Count=0 then begin
        // Загружаем картинки в PNG
       PNG := TPNGGraphic.Create;
       try
-        PNG.LoadFromResourceName(HInstance, wsResourceName {???});
+        RS := TTntResourceStream.Create(HInstance, wsResourceName, PWideChar(RT_RCDATA));
+        try
+          PNG.LoadFromStream(RS);
+        finally
+          RS.Free;
+        end;
          // Копируем в битмэп
         Bmp := TBitmap.Create;
         try
@@ -903,8 +899,6 @@ uses
        // Настраиваем основной шрифт программы
       FontFromStr(Font, SettingValueWStr(ISettingID_Gen_MainFont));
       ToolbarFont.Assign(Font);
-       // Настраиваем текущую кодовую страницу
-      cMainCodePage := CharsetToCP(Font.Charset);
        // Настраиваем список последних открывавшихся файлов
       mruOpen.MaxItems := SettingValueInt(ISettingID_Gen_OpenMRUCount);
        // Настраиваем максимальное количество операций в буфере отмены
@@ -1055,8 +1049,6 @@ uses
     try
        // Создаём интерфейсы
       FProject       := NewPhotoAlbumProject;
-      FAppActionList := TPhoaActionList.Create(alMain);
-      FAppMenu       := TPhoaMenuItem.Create(nil, tbMenu.Items, nil, False, True);
        // Настраиваем Application
       Application.OnActionExecute := AppActionExecute;
       Application.OnHint          := AppHint;
@@ -1108,8 +1100,6 @@ uses
      // Remove self from the clipboard viewer chain
     ChangeClipboardChain(Handle, FHNextClipbrdViewer);
      // Free interfaces and destroy objects
-    FAppMenu       := nil;
-    FAppActionList := nil;
     FViewer.Free;
     FViewedPics    := nil;
     FSearchResults := nil;
@@ -1258,11 +1248,6 @@ uses
     Result := True;
   end;
 
-  function TfMain.IApp_GetActionList: IPhoaActionList;
-  begin
-    Result := FAppActionList;
-  end;
-
   function TfMain.IApp_GetCurGroup: IPhoaPicGroup;
   begin
     Result := GetNodeGroup(tvGroups.FocusedNode);
@@ -1293,11 +1278,6 @@ uses
   function TfMain.IApp_GetImageList: TCustomImageList;
   begin
     Result := ilActionsSmall;
-  end;
-
-  function TfMain.IApp_GetMenu: IPhoaMenu;
-  begin
-    Result := FAppMenu;
   end;
 
   function TfMain.IApp_GetProject: IPhoaProject;

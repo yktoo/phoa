@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ConsVars.pas,v 1.102 2007-06-30 10:36:20 dale Exp $
+//  $Id: ConsVars.pas,v 1.103 2007-07-01 18:06:46 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -876,8 +876,6 @@ resourcestring
   SErrMsg_PhoaActionNotFound = 'Action "%s" not found.';  
 
 var
-   // Кодовая страница ANSI для текущего основного шрифта программы
-  cMainCodePage: Cardinal;
    // PhoA picture clipboard format identifier
   wClipbrdPicFormatID: Word;
    // Глобальный экземпляр IDKWeb

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.71 2007-06-30 10:36:20 dale Exp $
+//  $Id: phObj.pas,v 1.72 2007-07-01 18:06:53 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -607,8 +607,8 @@ type
       ppThumbHeight:   if FThumbnailSize.cy>0 then Result := IntToStr(FThumbnailSize.cy);
       ppThumbDims:     if (FThumbnailSize.cx>0) and (FThumbnailSize.cy>0) then Result := WideFormat('%dx%d', [FThumbnailSize.cx, FThumbnailSize.cy]);
       ppFormat:        Result := PixelFormatName(FImageFormat);
-      ppDate:          if FDate>0 then Result := DateToStr(PhoaDateToDate(FDate), AppFormatSettings); {???}
-      ppTime:          if FTime>0 then Result := TimeToStr(PhoaTimeToTime(FTime), AppFormatSettings); {???}
+      ppDate:          if FDate>0 then Result := DateToStr(PhoaDateToDate(FDate), AppFormatSettings);
+      ppTime:          if FTime>0 then Result := TimeToStr(PhoaTimeToTime(FTime), AppFormatSettings); 
       ppPlace:         Result := FPlace;
       ppFilmNumber:    Result := FFilmNumber;
       ppFrameNumber:   Result := FFrameNumber;
@@ -3060,16 +3060,17 @@ type
      // Создаёт дерево по компонентам даты (one level)
     procedure ProcessDateTree(Prop: TPicGroupByProperty; ParentGroup: IPhotoAlbumPicGroup; Pic: IPhotoAlbumPic);
     var
+      sDateFmt: AnsiString;
       wsDatePart: WideString;
       Group: IPhotoAlbumPicGroup;
     begin
        // Находим наименование компонента даты
       case Prop of
-        gbpDateByYear:  wsDatePart := 'yyyy';
-        gbpDateByMonth: wsDatePart := 'mmmm';
-        gbpDateByDay:   wsDatePart := 'd';
+        gbpDateByYear:  sDateFmt := 'yyyy';
+        gbpDateByMonth: sDateFmt := 'mmmm';
+        gbpDateByDay:   sDateFmt := 'd';
       end;
-      wsDatePart := FormatDateTime(wsDatePart, PhoaDateToDate(Pic.Date)); {???}
+      wsDatePart := FormatDateTime(sDateFmt, PhoaDateToDate(Pic.Date));
        // Получаем последнего ребёнка текущей группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
@@ -3088,7 +3089,7 @@ type
       Group: IPhotoAlbumPicGroup;
     begin
        // Находим наименование компонента времени
-      wsTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), PhoaTimeToTime(Pic.Time)); {???}
+      wsTimePart := FormatDateTime(iif(Prop=gbpTimeHour, 'h', 'n'), PhoaTimeToTime(Pic.Time));
        // Получаем последнего ребёнка текущей группы
       if ParentGroup.Groups.Count=0 then Group := nil else Group := ParentGroup.GroupsX[ParentGroup.Groups.Count-1];
        // Если нет детей или последний ребёнок не совпадает по наименованию, создаём нового ребёнка
@@ -3793,8 +3794,8 @@ type
              // Photo album properties
             IPhChunk_PhoaDescription:  FDescription      := vValue;
             IPhChunk_PhoaThumbQuality: SetThumbnailQuality(vValue);
-            IPhChunk_PhoaThumbWidth:   SetThumbnailSize(Size(vValue, FThumbnailSize.cy));
-            IPhChunk_PhoaThumbHeight:  SetThumbnailSize(Size(FThumbnailSize.cx, vValue));
+            IPhChunk_PhoaThumbWidth:   SetThumbnailSize(MakeSize(vValue, FThumbnailSize.cy));
+            IPhChunk_PhoaThumbHeight:  SetThumbnailSize(MakeSize(FThumbnailSize.cx, vValue));
              // Pictures
             IPhChunk_Pics_Open:        FPics.StreamerLoad(Streamer);
              // Root group

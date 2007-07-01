@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.4 2007-06-30 10:36:21 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.5 2007-07-01 18:07:12 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -952,7 +952,7 @@ uses
        // Если файл задан, загружаем изображение
       if wsFile<>'' then
         try
-          LoadGraphicFromFile(wsFile, iPreview.Bitmap, Size(iPreview.Width, iPreview.Height), ImgSize, nil);
+          LoadGraphicFromFile(wsFile, iPreview.Bitmap, MakeSize(iPreview.Width, iPreview.Height), ImgSize, nil);
           bLoaded := True;
         except
         end;

@@ -81,7 +81,7 @@ uses GR32, GraphicEx, ConsVars, phUtils, phGraphics, Main, phFrm;
         Options  := [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing];
         Title    := DKLangConstW('SDlgTitle_SelectPicFile');
         if Execute then begin
-          FGroupIconData := GetBmp32ThumbnailData(FileName, Size(16, 16), psfLanczos, ImageSize, ThumbSize);
+          FGroupIconData := GetBmp32ThumbnailData(FileName, MakeSize(16, 16), psfLanczos, ImageSize, ThumbSize);
           UpdateGroupIcon;
           Modified := True;
         end;
