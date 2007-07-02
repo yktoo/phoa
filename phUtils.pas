@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.59 2007-07-01 18:07:06 dale Exp $
+//  $Id: phUtils.pas,v 1.60 2007-07-02 17:29:15 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -61,6 +61,8 @@ uses
   function  FontToStr(Font: TFont): WideString;
   procedure FontFromStr(Font: TFont; const wsFont: WideString);
 
+   // Возвращает символ в верхнем регистре
+  function  WideUpCase(wc: WideChar): WideChar;
    // Возвращает True, если wsText начинается на wsSubText (без учёта регистра) 
   function  WideStartsText(const wsSubText, wsText: WideString): Boolean;
    // Возвращает True, если wsText оканчивается на wsSubText (без учёта регистра)
@@ -584,6 +586,11 @@ var
    //-------------------------------------------------------------------------------------------------------------------
    // Misc
    //-------------------------------------------------------------------------------------------------------------------
+
+  function WideUpCase(wc: WideChar): WideChar;
+  begin
+    Result := WideUpperCase(wc)[1];
+  end;
 
   function WideStartsText(const wsSubText, wsText: WideString): Boolean;
   var iLenSubText, iLenText: Integer;

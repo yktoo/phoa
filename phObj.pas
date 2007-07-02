@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.72 2007-07-01 18:06:53 dale Exp $
+//  $Id: phObj.pas,v 1.73 2007-07-02 17:29:11 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,7 @@ unit phObj;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Masks, Registry,
+  Windows, Messages, SysUtils, Classes, Contnrs, Graphics, Registry,
   TntWindows, TntClasses, TntWideStrings, TntSysUtils, TntWideStrUtils, TntRegistry,
   phPhoa, phIntf, phMutableIntf, phNativeIntf;
 
@@ -119,13 +119,22 @@ type
    // Маска для проверки имён файлов, поддерживающая инверсию
    //===================================================================================================================
 
-  TPhoaMask = class(TMask)
+  TPhoaMask = class(TObject)
   private
-    FNegative: Boolean;
+     //???
+    FMask: Pointer;
+     //???
+    FSize: Integer;
+     // Prop storage
+    FIsNegative: Boolean;
   public
-    constructor Create(const wsMask: WideString; bNegative: Boolean);
+    constructor Create(const wsMask: WideString; bIsNegative: Boolean);
+    destructor Destroy; override;
      // Возвращает True, если имя файла [не]соответствует маске
     function  Matches(const wsFilename: WideString): Boolean;
+     // Props
+     // -- True, если Matches() проверяет НЕсоответствие файла маске
+    property IsNegative: Boolean read FIsNegative;
   end;
 
    //===================================================================================================================
@@ -135,7 +144,7 @@ type
   TPhoaMasks = class(TObject)
   private
      // Список масок
-    FMasks: TList;
+    FMasks: TObjectList;
      // Prop handlers
     function  GetEmpty: Boolean;
   public
@@ -4096,18 +4105,308 @@ type
   end;
 
    //===================================================================================================================
+   // TWideCharSet - набор WideChar (helper class для TPhoaMask)
+   //===================================================================================================================
+type
+  TWideCharSet = class(TObject)
+  private
+     // Собственно список
+    FList: TIntegerList;
+     // Prop handlers
+    function  GetIsEmpty: Boolean;
+    function  GetIsInSet(wc: WideChar): Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+     // Очищает набор
+    procedure Clear;
+     // Копирует содержимое из списка Source
+    procedure Assign(Source: TWideCharSet);
+     // Добавляет символ в набор, если его там её нет
+    procedure Add(wc: WideChar);
+     // Удаляет символ из набора, если он там есть
+    procedure Remove(wc: WideChar);
+     // Props
+     // -- True, если набор пуст
+    property IsEmpty: Boolean read GetIsEmpty;
+     // -- Возвращает True, если символ присутствует в наборе
+    property IsInSet[wc: WideChar]: Boolean read GetIsInSet;
+  end;
+
+  procedure TWideCharSet.Add(wc: WideChar);
+  begin
+    FList.Add(Word(wc));
+  end;
+
+  procedure TWideCharSet.Assign(Source: TWideCharSet);
+  begin
+    FList.Assign(Source.FList);
+  end;
+
+  procedure TWideCharSet.Clear;
+  begin
+    FList.Clear;
+  end;
+
+  constructor TWideCharSet.Create;
+  begin
+    inherited Create;
+    FList := TIntegerList.Create(False);
+  end;
+
+  destructor TWideCharSet.Destroy;
+  begin
+    FList.Free;
+    inherited Destroy;
+  end;
+
+  function TWideCharSet.GetIsEmpty: Boolean;
+  begin
+    Result := FList.Count=0;
+  end;
+
+  function TWideCharSet.GetIsInSet(wc: WideChar): Boolean;
+  begin
+    Result := FList.IndexOf(Word(wc))>=0;
+  end;
+
+  procedure TWideCharSet.Remove(wc: WideChar);
+  begin
+    FList.Remove(Word(wc));
+  end;
+
+   //===================================================================================================================
    // TPhoaMask
    //===================================================================================================================
 
-  constructor TPhoaMask.Create(const wsMask: WideString; bNegative: Boolean);
+const
+  IMaxCardCount = 30;
+
+type
+  TPhoaMaskState = (pmsLiteral, pmsAny, pmsSet);
+
+  PPhoaMaskStateRec = ^TPhoaMaskStateRec;
+  TPhoaMaskStateRec = record
+    bSkipTo: Boolean;
+    case State: TPhoaMaskState of
+      pmsLiteral: (wcLiteral: WideChar);
+      pmsAny: ();
+      pmsSet: (
+        bNegate: Boolean;
+        CharSet: TWideCharSet);
+  end;
+
+  PMaskStateArray = ^TMaskStateArray;
+  TMaskStateArray = Array[0..128] of TPhoaMaskStateRec;
+
+  constructor TPhoaMask.Create(const wsMask: WideString; bIsNegative: Boolean);
+  var A: Array[0..0] of TPhoaMaskStateRec;
+
+    function InitMaskStates(var aMaskStates: Array of TPhoaMaskStateRec): Integer;
+    var
+      i, iCardCount: Integer;
+      bSkipTo: Boolean;
+      wcLiteral: WideChar;
+      pwcCurChar: PWideChar;
+      bNegate: Boolean;
+      CharSet: TWideCharSet;
+
+      procedure InvalidMask;
+      begin
+        PhoaException('''%s'' is an invalid mask at position %d' {!!! localize}, [wsMask, pwcCurChar-PWideChar(wsMask)+1]);
+      end;
+
+      procedure Reset;
+      begin
+        bSkipTo := False;
+        bNegate := False;
+        CharSet.Clear;
+      end;
+
+      procedure WriteScan(MaskState: TPhoaMaskState);
+      var pmsr: PPhoaMaskStateRec;
+      begin
+        if i<=High(aMaskStates) then begin
+          if bSkipTo then begin
+            Inc(iCardCount);
+            if iCardCount>IMaxCardCount then InvalidMask;
+          end;
+          pmsr := @aMaskStates[i];
+          pmsr.bSkipTo := bSkipTo;
+          pmsr.State   := MaskState;
+          case MaskState of
+            pmsLiteral: pmsr.wcLiteral := WideUpCase(wcLiteral);
+            pmsSet: begin
+              pmsr.bNegate := bNegate;
+              pmsr.CharSet := TWideCharSet.Create;
+              pmsr.CharSet.Assign(CharSet);
+            end;
+          end;
+        end;
+        Inc(i);
+        Reset;
+      end;
+
+      procedure ScanSet;
+      var wcLastChar, wc: WideChar;
+      begin
+        Inc(pwcCurChar);
+        if pwcCurChar^ = '!' then begin
+          bNegate := True;
+          Inc(pwcCurChar);
+        end;
+        wcLastChar := #0;
+        while (pwcCurChar^<>#0) and (pwcCurChar^<>']') do begin
+          case pwcCurChar^ of
+            '-':
+              if wcLastChar=#0 then
+                InvalidMask
+              else begin
+                Inc(pwcCurChar);
+                for wc := wcLastChar to WideUpCase(pwcCurChar^) do CharSet.Add(wc);
+              end;
+            else begin
+              wcLastChar := WideUpCase(pwcCurChar^);
+              CharSet.Add(wcLastChar);
+            end;
+          end;
+          Inc(pwcCurChar);
+        end;
+        if (pwcCurChar^<>']') or CharSet.IsEmpty then InvalidMask;
+        WriteScan(pmsSet);
+      end;
+
+    begin
+      pwcCurChar := PWideChar(wsMask);
+      i := 0;
+      iCardCount := 0;
+      CharSet := TWideCharSet.Create;
+      try
+        Reset;
+        while pwcCurChar^<>#0 do begin
+          case pwcCurChar^ of
+            '*': bSkipTo := True;
+            '?': if not bSkipTo then WriteScan(pmsAny);
+            '[': ScanSet;
+            else begin
+              wcLiteral := pwcCurChar^;
+              WriteScan(pmsLiteral);
+            end;
+          end;
+          Inc(pwcCurChar);
+        end;
+        wcLiteral := #0;
+        WriteScan(pmsLiteral);
+        Result := i;
+      finally
+        CharSet.Free;
+      end;
+    end;
+
   begin
-    inherited Create(wsMask); //TODO Should create and use WideMask here
-    FNegative := bNegative;
+    inherited Create;
+    FIsNegative := bIsNegative;
+    FSize := InitMaskStates(A);
+    FMask := AllocMem(FSize*SizeOf(TPhoaMaskStateRec));
+    InitMaskStates(Slice(PMaskStateArray(FMask)^, FSize));
+  end;
+
+  destructor TPhoaMask.Destroy;
+
+    procedure DoneMaskStates(var aMaskStates: Array of TPhoaMaskStateRec);
+    var
+      i: Integer;
+      pmsr: PPhoaMaskStateRec;
+    begin
+      for i := Low(aMaskStates) to High(aMaskStates) do begin
+        pmsr := @aMaskStates[i];
+        if pmsr.State=pmsSet then pmsr.CharSet.Free;
+      end;
+    end;
+
+  begin
+    if FMask<>nil then begin
+      DoneMaskStates(Slice(PMaskStateArray(FMask)^, FSize));
+      FreeMem(FMask, FSize*SizeOf(TPhoaMaskStateRec));
+    end;
+    inherited Destroy;
   end;
 
   function TPhoaMask.Matches(const wsFilename: WideString): Boolean;
+
+    function MatchesMaskStates(const aMaskStates: Array of TPhoaMaskStateRec): Boolean;
+    type
+      PStackRec = ^TStackRec;
+      TStackRec = record
+        p: PWideChar;
+        i: Integer;
+      end;
+    var
+      iStackTopIndex: Integer;
+      TheStack: Array[0..IMaxCardCount-1] of TStackRec;
+      i: Integer;
+      pwc: PWideChar;
+
+      procedure Push(pwc: PWideChar; i: Integer);
+      var psr: PStackRec;
+      begin
+        psr := @TheStack[iStackTopIndex];
+        psr.p := pwc;
+        psr.i := i;
+        Inc(iStackTopIndex);
+      end;
+
+      function Pop(var pwc: PWideChar; var i: Integer): Boolean;
+      var psr: PStackRec;
+      begin
+        if iStackTopIndex=0 then
+          Result := False
+        else begin
+          Dec(iStackTopIndex);
+          psr := @TheStack[iStackTopIndex];
+          pwc := psr.p;
+          i   := psr.i;
+          Result := True;
+        end;
+      end;
+
+      function Matches(pwc: PWideChar; iStart: Integer): Boolean;
+      var
+        i: Integer;
+        pmsr: PPhoaMaskStateRec;
+      begin
+        Result := False;
+        for i := iStart to High(aMaskStates) do begin
+          pmsr := @aMaskStates[i];
+          if pmsr.bSkipTo then begin
+            case pmsr.State of
+              pmsLiteral: while (pwc^<>#0) and (WideUpCase(pwc^)<>pmsr.wcLiteral) do Inc(pwc);
+              pmsSet:     while (pwc^<>#0) and not (pmsr.bNegate xor pmsr.CharSet.IsInSet[WideUpCase(pwc^)]) do Inc(pwc);
+            end;
+            if pwc^<>#0 then Push(@pwc[1], i);
+          end;
+          case pmsr.State of
+            pmsLiteral: if WideUpCase(pwc^)<>pmsr.wcLiteral then Exit;
+            pmsSet:     if not (pmsr.bNegate xor pmsr.CharSet.IsInSet[WideUpCase(pwc^)]) then Exit;
+          end;
+          Inc(pwc);
+        end;
+        Result := True;
+      end;
+
+    begin
+      Result := True;
+      iStackTopIndex := 0;
+      pwc := PWideChar(wsFilename);
+      i := Low(aMaskStates);
+      repeat
+        if Matches(pwc, i) then Exit;
+      until not Pop(pwc, i);
+      Result := False;
+    end;
+
   begin
-    Result := inherited Matches(wsFilename) xor FNegative;
+    Result := MatchesMaskStates(Slice(PMaskStateArray(FMask)^, FSize)) xor FIsNegative;
   end;
 
    //===================================================================================================================
@@ -4120,8 +4419,8 @@ type
     bNegative: Boolean;
   begin
     inherited Create;
-    FMasks := TList.Create;
-     // Создаём массив масок
+    FMasks := TObjectList.Create(True);
+     // Создаём список масок
     ws := iif(wsMasks='*.*', '', wsMasks);
     while ws<>'' do begin
       wsMask := ExtractFirstWord(ws, ';');
@@ -4135,9 +4434,7 @@ type
   end;
 
   destructor TPhoaMasks.Destroy;
-  var i: Integer;
   begin
-    for i := 0 to FMasks.Count-1 do TMask(FMasks[i]).Free;
     FMasks.Free;
     inherited Destroy;
   end;
