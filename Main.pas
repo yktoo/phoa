@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: Main.pas,v 1.93 2007-07-01 18:06:48 dale Exp $
+//  $Id: Main.pas,v 1.94 2007-07-03 13:37:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -469,7 +469,7 @@ implementation
 {$R *.dfm}
 uses
   GraphicStrings, Math, jpeg, TypInfo, // GraphicStrings => GraphicEx constants
-  TntClipbrd, VirtualDataObject,
+  TntClipbrd, TntWideStrUtils, VirtualDataObject,
   phChmHlp, phUtils, phPhoa,
   udPicProps, udSettings, ufImgView, udSearch, udProjectProps, udAbout, udPicOps, udSortPics, udViewProps, udSelPhoaGroup,
   ufAddFilesWizard, udStats, udFileOpsWizard, phSettings, phValSetting,
@@ -843,9 +843,9 @@ uses
   procedure TfMain.AppException(Sender: TObject; E: Exception);
   var ws: WideString;
   begin
-    if E is EPhoaWideException then ws := EPhoaWideException(E).WideMessage else ws := E.Message;
+    ws := GetWideExceptionMessage(E);
      // Добавляем точку, если в конце не знак препинания (ripped from Application.ShowException)
-    if (ws<>'') and (AnsiLastChar(ws)>'.') then ws := ws+'.';
+    if (ws<>'') and (Word(WideLastChar(ws))>Word('.')) then ws := ws+'.';
      // Кажем сообщение об ошибке
     PhoaMsgBox(mbkError, ws, False, [mbbOK]);
   end;

@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phPluginUsage.pas,v 1.10 2007-06-30 10:36:20 dale Exp $
+//  $Id: phPluginUsage.pas,v 1.11 2007-07-03 13:37:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -53,7 +53,7 @@ var
   procedure PluginsFinalize;
 
 implementation
-uses ConsVars, phMsgBox, udAbout;
+uses phUtils, phMsgBox, ConsVars, udAbout;
 
 type
 
@@ -148,7 +148,6 @@ type
     hLib: HINST;
     GetRevisionProc: TPhoaGetPluginSubsystemRevision;
     GetModuleProc: TPhoaGetPluginModuleProc;
-    wsErrorMessage: WideString;
   begin
     Result := False;
      // Грузим библиотеку
@@ -169,10 +168,7 @@ type
           end;
         end;
       except
-        on e: Exception do begin
-          if e is EPhoaWideException then wsErrorMessage := EPhoaWideException(e).WideMessage else wsErrorMessage := e.Message;
-          PhoaError('SErrCreatingPluginModule', [wsPluginLib, wsErrorMessage]);
-        end;
+        on e: Exception do PhoaError('SErrCreatingPluginModule', [wsPluginLib, GetWideExceptionMessage(e)]);
       end;
        // При неудаче выгружаем билиотеку
       if not Result then FreeLibrary(hLib);

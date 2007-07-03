@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.6 2007-06-30 10:36:21 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.7 2007-07-03 13:37:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -666,9 +666,8 @@ uses
         end;
       except
         on e: Exception do begin
-        {??? WideException}
           FErrorOccured := True;
-          FWizard.LogFailure('SLogEntry_FileOpError', [wsFileName, e.Message]);
+          FWizard.LogFailure('SLogEntry_FileOpError', [wsFileName, GetWideExceptionMessage(e)]);
         end;
       end;
        // Регистрируем результат
@@ -834,8 +833,7 @@ uses
         FExportedProject.SaveToFile(FExportedProject.FileName, SProject_Generator, SProject_Remark, FExportedProject.FileRevision);
         LogSuccess('SLogEntry_PhoaSavedOK', [FExportedProject.FileName]);
       except
-        on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, e.Message]);
-        {??? WideException}
+        on e: Exception do LogFailure('SLogEntry_PhoaSaveError', [FExportedProject.FileName, GetWideExceptionMessage(e)]);
       end;
     end;
 

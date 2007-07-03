@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.60 2007-07-02 17:29:15 dale Exp $
+//  $Id: phUtils.pas,v 1.61 2007-07-03 13:37:40 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -17,6 +17,8 @@ uses
   procedure PhoaException(const wsMsg: WideString; const aParams: Array of const); overload;
   procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString); overload;
   procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString; const aParams: Array of const); overload;
+   // Tries to obtain an Unicode exception message, or Ansi message if failed
+  function  GetWideExceptionMessage(E: Exception): WideString;
 
    // Min/max values
   function  Max(i1, i2: Integer): Integer;
@@ -324,6 +326,11 @@ var
 
   begin
     raise ExcClass.CreateFmt(wsMsg, aParams) at RetAddr;
+  end;
+
+  function GetWideExceptionMessage(E: Exception): WideString;
+  begin
+    if E is EPhoaWideException then Result := EPhoaWideException(E).WideMessage else Result := E.Message;
   end;
 
   function Max(i1, i2: Integer): Integer;
