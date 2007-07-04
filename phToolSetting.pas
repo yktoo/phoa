@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phToolSetting.pas,v 1.24 2007-06-30 10:36:20 dale Exp $
+//  $Id: phToolSetting.pas,v 1.25 2007-07-04 18:48:36 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -364,7 +364,7 @@ type
      else          iRes := 0;
     end;
      // Проверяем результат
-    if iRes<=32 then PhoaException(DKLangConstW('SErrExecutingToolFailed'), [FName, wsFileName, WideSysErrorMessage(GetLastError)]);
+    if iRes<=32 then PhoaExceptionConst('SErrExecutingToolFailed', [FName, wsFileName, WideSysErrorMessage(GetLastError)]);
   end;
 
   procedure TPhoaToolSetting.Execute(Pics: IPhoaPicList);
@@ -620,11 +620,12 @@ type
   procedure TPhoaToolSettingEditor.CreatePopupMenu;
   var pm: TTBXPopupMenu;
 
-    function NewItem(iImgIdx: Integer; const wsCaption, wsShortcut: WideString; const ClickEvent: TNotifyEvent; bDefault: Boolean): TTBXItem; {!!! Not Unicode-enabled solution }
+     {!!! Not Unicode-enabled solution }
+    function NewItem(iImgIdx: Integer; const sConstName: AnsiString; const wsShortcut: WideString; const ClickEvent: TNotifyEvent; bDefault: Boolean): TTBXItem;
     begin
       Result := TTBXItem.Create(Self);
       Result.ImageIndex := iImgIdx;
-      Result.Caption    := wsCaption;
+      Result.Caption    := DKLangConstW(sConstName);
       if bDefault then Result.Options := Result.Options+[tboDefault];
       Result.OnClick    := ClickEvent;
       Result.ShortCut   := WideTextToShortCut(wsShortcut);
@@ -640,12 +641,12 @@ type
      // Создаём меню
     pm := TTBXPopupMenu.Create(Self);
      // Наполняем пунктами
-    FItemDelete   := NewItem(iiDelete, DKLangConstW('SAction_Delete'),       'Del',       DeleteToolClick,   False);
+    FItemDelete   := NewItem(iiDelete, 'SAction_Delete',       'Del',       DeleteToolClick,   False);
     NewSeparator;
-    FItemEdit     := NewItem(iiEdit,   DKLangConstW('SAction_EditEllipsis'), 'Alt+Enter', EditToolClick,     True);
+    FItemEdit     := NewItem(iiEdit,   'SAction_EditEllipsis', 'Alt+Enter', EditToolClick,     True);
     NewSeparator;
-    FItemMoveUp   := NewItem(iiUp,     DKLangConstW('SAction_MoveUp'),       'Ctrl+Up',   MoveToolUpClick,   False);
-    FItemMoveDown := NewItem(iiDown,   DKLangConstW('SAction_MoveDown'),     'Ctrl+Down', MoveToolDownClick, False);
+    FItemMoveUp   := NewItem(iiUp,     'SAction_MoveUp',       'Ctrl+Up',   MoveToolUpClick,   False);
+    FItemMoveDown := NewItem(iiDown,   'SAction_MoveDown',     'Ctrl+Down', MoveToolDownClick, False);
      // Привязываем ImageList
     pm.Images := fMain.ilActionsSmall;
      // Привязываем к дереву

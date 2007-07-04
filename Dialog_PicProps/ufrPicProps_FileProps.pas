@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrPicProps_FileProps.pas,v 1.5 2007-06-30 10:36:21 dale Exp $
+//  $Id: ufrPicProps_FileProps.pas,v 1.6 2007-07-04 18:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -62,7 +62,7 @@ type
        // Не нашли - изменяем файл
       if iPicID=0 then Dialog.PictureFiles[idx] := wsFileName
        // Если нашли и это не то же самое изображение (т.е. файл изменён) - ошибка
-      else if iPicID<>EditedPics[idx].ID then PhoaException(DKLangConstW('SErrPicFileAlreadyInUse', [wsFileName, iPicID]));
+      else if iPicID<>EditedPics[idx].ID then PhoaExceptionConst('SErrPicFileAlreadyInUse', [wsFileName, iPicID]);
     end;
 
   begin

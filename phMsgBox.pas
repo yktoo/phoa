@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phMsgBox.pas,v 1.4 2007-06-28 18:41:34 dale Exp $
+//  $Id: phMsgBox.pas,v 1.5 2007-07-04 18:48:31 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -72,17 +72,17 @@ type
    //   отображается. При iSettingID>0 в диалоге отображается также переключатель "Больше не показывать...". Если
    //   пользователь включит его и нажмёт ОК, то в значение настройки заносится False
    //   Если bWarning=True, то отображается в режиме mbkWarning, иначе - mbkInfo
-  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0); overload;
-  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0); overload;
+  procedure PhoaInfo(bWarning: Boolean; const sConstName: AnsiString; iSettingID: Integer = 0); overload;
+  procedure PhoaInfo(bWarning: Boolean; const sConstName: AnsiString; const aParams: Array of const; iSettingID: Integer = 0); overload;
    // Отображает диалог подтверждения, если iSettingID<=0 или значение настройки iSettingID=True, иначе диалог не
    //   отображается, а просто возвращает True. При iSettingID>0 в диалоге отображается также переключатель "Больше не
    //   показывать...". Если пользователь включит его и нажмёт ОК, то в значение настройки заносится False
    //   Если bWarning=True, то отображается в режиме mbkConfirmWarning, иначе - mbkConfirm
-  function  PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0): Boolean; overload;
-  function  PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0): Boolean; overload;
+  function  PhoaConfirm(bWarning: Boolean; const sConstName: AnsiString; iSettingID: Integer = 0): Boolean; overload;
+  function  PhoaConfirm(bWarning: Boolean; const sConstName: AnsiString; const aParams: Array of const; iSettingID: Integer = 0): Boolean; overload;
    // Отображает диалог ошибки
-  procedure PhoaError(const wsConstName: WideString); overload;
-  procedure PhoaError(const wsConstName: WideString; const aParams: Array of const); overload;
+  procedure PhoaError(const sConstName: AnsiString); overload;
+  procedure PhoaError(const sConstName: AnsiString; const aParams: Array of const); overload;
 
 const
    // Минимальная разница между шириной экрана и шириной окна
@@ -147,58 +147,58 @@ uses phUtils, phSettings, phChmHlp;
     Result := PhoaMsgBox(AKind, DKLangConstW(sConstName, aParams), bDiscardable, AButtons);
   end;
 
-  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0);
+  procedure PhoaInfo(bWarning: Boolean; const sConstName: AnsiString; iSettingID: Integer = 0);
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkInfo, mbkWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, iSettingID>0, [mbbOK]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], sConstName, iSettingID>0, [mbbOK]);
       if (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end;
   end;
 
-  procedure PhoaInfo(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0);
+  procedure PhoaInfo(bWarning: Boolean; const sConstName: AnsiString; const aParams: Array of const; iSettingID: Integer = 0);
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkInfo, mbkWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, aParams, iSettingID>0, [mbbOK]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], sConstName, aParams, iSettingID>0, [mbbOK]);
       if (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end;
   end;
 
-  function PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; iSettingID: Integer = 0): Boolean;
+  function PhoaConfirm(bWarning: Boolean; const sConstName: AnsiString; iSettingID: Integer = 0): Boolean;
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkConfirm, mbkConfirmWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, iSettingID>0, [mbbOK, mbbCancel]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], sConstName, iSettingID>0, [mbbOK, mbbCancel]);
       Result := mbrOK in mbr;
       if Result and (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end else
       Result := True;
   end;
 
-  function PhoaConfirm(bWarning: Boolean; const wsConstName: WideString; const aParams: Array of const; iSettingID: Integer = 0): Boolean;
+  function PhoaConfirm(bWarning: Boolean; const sConstName: AnsiString; const aParams: Array of const; iSettingID: Integer = 0): Boolean;
   const aKinds: Array[Boolean] of TMessageBoxKind = (mbkConfirm, mbkConfirmWarning);
   var mbr: TMessageBoxResults;
   begin
     if (iSettingID<=0) or SettingValueBool(iSettingID) then begin
-      mbr := PhoaMsgBoxConst(aKinds[bWarning], wsConstName, aParams, iSettingID>0, [mbbOK, mbbCancel]);
+      mbr := PhoaMsgBoxConst(aKinds[bWarning], sConstName, aParams, iSettingID>0, [mbbOK, mbbCancel]);
       Result := mbrOK in mbr;
       if Result and (iSettingID>0) and (mbrDontShow in mbr) then SetSettingValueBool(iSettingID, False);
     end else
       Result := True;
   end;
 
-  procedure PhoaError(const wsConstName: WideString);
+  procedure PhoaError(const sConstName: AnsiString);
   begin
-    PhoaMsgBoxConst(mbkError, wsConstName, False, [mbbOK]);
+    PhoaMsgBoxConst(mbkError, sConstName, False, [mbbOK]);
   end;
 
-  procedure PhoaError(const wsConstName: WideString; const aParams: Array of const);
+  procedure PhoaError(const sConstName: AnsiString; const aParams: Array of const);
   begin
-    PhoaMsgBoxConst(mbkError, wsConstName, aParams, False, [mbbOK]);
+    PhoaMsgBoxConst(mbkError, sConstName, aParams, False, [mbbOK]);
   end;
 
    //===================================================================================================================

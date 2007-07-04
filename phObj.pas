@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phObj.pas,v 1.73 2007-07-02 17:29:11 dale Exp $
+//  $Id: phObj.pas,v 1.74 2007-07-04 18:48:31 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -279,12 +279,12 @@ uses
 
   procedure PhoaWriteError;
   begin
-    PhoaException(DKLangConstW('SErrCannotWrite'), []);
+    PhoaExceptionConst('SErrCannotWrite');
   end;
 
   procedure PhoaReadError;
   begin
-    PhoaException(DKLangConstW('SErrCannotRead'), []);
+    PhoaExceptionConst('SErrCannotRead');
   end;
 
    //===================================================================================================================
@@ -1504,7 +1504,7 @@ type
      // Если текст (без учёта регистра) поменялся, сдвигаем на новое место
     if not WideSameText(p.wsKeyword, wsNewKeyword) then begin
        // Если уже есть такое в списке, вызываем Exception
-      if FindKeyword(wsNewKeyword, Result) then PhoaException(DKLangConstW('SErrDuplicateKeyword'));
+      if FindKeyword(wsNewKeyword, Result) then PhoaExceptionConst('SErrDuplicateKeyword');
        // Иначе сдвигаем на новое место
       if Index<Result then Dec(Result); 
       FList.Move(Index, Result); 
@@ -3983,7 +3983,7 @@ type
   procedure TPhoaFilerEx.ValidateRevision;
   begin
      // Не допускаем считывания только более новых ревизий
-    if RevisionNumber>IPhFileRevisionNumber then PhoaException(DKLangConstW('SErrFileRevHigher'), []);
+    if RevisionNumber>IPhFileRevisionNumber then PhoaExceptionConst('SErrFileRevHigher');
   end;
 
    //===================================================================================================================
@@ -4212,8 +4212,8 @@ type
       CharSet: TWideCharSet;
 
       procedure InvalidMask;
-      begin
-        PhoaException('''%s'' is an invalid mask at position %d' {!!! localize}, [wsMask, pwcCurChar-PWideChar(wsMask)+1]);
+      begin               
+        PhoaExceptionConst('SErrInvalidMask', [wsMask, pwcCurChar-PWideChar(wsMask)+1]);
       end;
 
       procedure Reset;

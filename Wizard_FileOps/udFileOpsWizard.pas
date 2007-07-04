@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udFileOpsWizard.pas,v 1.7 2007-07-03 13:37:40 dale Exp $
+//  $Id: udFileOpsWizard.pas,v 1.8 2007-07-04 18:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,9 +15,6 @@ uses
   phWizForm, DKLang, ExtCtrls, TntExtCtrls, StdCtrls, TntStdCtrls;
 
 type
-   // Exception
-  EFileOpError = class(EPhoaWideException);
-
   TFileOpThread = class;
 
    // Объект файла и ссылок на подходящие изображения
@@ -311,13 +308,6 @@ uses
       end;
   end;
 
-   // Exception raising
-   //!!! remove this function
-  procedure FileOpError(const sConstName: AnsiString; const aParams: Array of const);
-  begin
-    raise EFileOpError.Create(DKLangConstW(sConstName, aParams));
-  end;
-
    //===================================================================================================================
    // TFileLink
    //===================================================================================================================
@@ -456,13 +446,13 @@ uses
     begin
       wsTargetDir := WideExcludeTrailingPathDelimiter(wsTargetPath);
        // Проверяем, что исходный и целевой пути разные
-      if WideSameText(wsSrcPath, wsTargetPath) then FileOpError('SErrSrcAndDestFoldersAreSame', [wsTargetDir, wsSrcFileName]);
+      if WideSameText(wsSrcPath, wsTargetPath) then PhoaExceptionConst('SErrSrcAndDestFoldersAreSame', [wsTargetDir, wsSrcFileName]);
        // Пытаемся создать каталог назначения
-      if not WideForceDirectories(wsTargetDir) then FileOpError('SErrCannotCreateFolder', [wsTargetDir]);
+      if not WideForceDirectories(wsTargetDir) then PhoaExceptionConst('SErrCannotCreateFolder', [wsTargetDir]);
        // Проверяем перезапись файла
       wsTargetFullFileName := wsTargetPath+wsTargetFileName;
       case FWizard.MoveFile_OverwriteMode of
-        fomfomNever: if WideFileExists(wsTargetFullFileName) then FileOpError('SErrTargetFileExists', [wsTargetFullFileName]);
+        fomfomNever: if WideFileExists(wsTargetFullFileName) then PhoaExceptionConst('SErrTargetFileExists', [wsTargetFullFileName]);
         fomfomPrompt:
           if WideFileExists(wsTargetFullFileName) then begin
             FOverwriteFileName := wsTargetFullFileName;
@@ -475,15 +465,15 @@ uses
               FWizard.MoveFile_OverwriteMode := fomfomAlways
              // "Нет"
             else if mbrNo in FOverwriteResults then
-              FileOpError('SLogEntry_UserDeniedFileOverwrite', [wsTargetFullFileName])
+              PhoaExceptionConst('SLogEntry_UserDeniedFileOverwrite', [wsTargetFullFileName])
              // "Нет для всех"
             else if mbrNoToAll in FOverwriteResults then begin
               FWizard.MoveFile_OverwriteMode := fomfomNever;
-              FileOpError('SErrTargetFileExists', [wsTargetFullFileName]);
+              PhoaExceptionConst('SErrTargetFileExists', [wsTargetFullFileName]);
              // "Отмена"
             end else begin
               FWizard.InterruptProcessing;
-              FileOpError('SLogEntry_UserAbort', []);
+              PhoaExceptionConst('SLogEntry_UserAbort');
             end;
           end;
       end;
@@ -526,7 +516,7 @@ uses
            // Заполняем SLRelTargetPaths путями назначения
           AddPathIfPicInGroup(FWizard.App.ProjectX.ViewRootGroupX);
            // Если что-то есть (по идее, должно быть всегда)
-          if SLRelTargetPaths.Count=0 then FileOpError('SErrNoTargetPathDetermined', [Pic.FileName]);
+          if SLRelTargetPaths.Count=0 then PhoaExceptionConst('SErrNoTargetPathDetermined', [Pic.FileName]);
           wsTargetPath := wsDestPath+SLRelTargetPaths[0];
           for i := 0 to iif(FWizard.MoveFile_AllowDuplicating, SLRelTargetPaths.Count-1, 0) do PerformCopying(wsDestPath+SLRelTargetPaths[i]);
         finally
@@ -563,13 +553,13 @@ uses
         if Tnt_SHFileOperationW(SFOS)=0 then
           FWizard.LogSuccess('SLogEntry_FileRecycledOK', [wsFileName])
         else
-          FileOpError('SLogEntry_FileRecyclingError', [wsFileName]);
+          PhoaExceptionConst('SLogEntry_FileRecyclingError', [wsFileName]);
        // -- Совсем
       end else
         if DeleteFile(wsFileName) then
           FWizard.LogSuccess('SLogEntry_FileDeletedOK', [wsFileName])
         else
-          FileOpError('SLogEntry_FileDeletingError', [wsFileName]);
+          PhoaExceptionConst('SLogEntry_FileDeletingError', [wsFileName]);
   end;
 
   procedure TFileOpThread.DoDeletePic(Pic: IPhotoAlbumPic);
@@ -635,7 +625,7 @@ uses
   begin
      // Проверяем, можно ли исправить путь
     if not WideSameText(Pic.FileName, wsNewFileName) and (FWizard.App.Project.Pics.IndexOfFileName(wsNewFileName)>=0) then
-      FileOpError('SLogEntry_PicRelinkingError', [wsNewFileName]);
+      PhoaExceptionConst('SLogEntry_PicRelinkingError', [wsNewFileName]);
      // Исправляем (даже при одинаковом тексте, т.к. регистр может отличаться)
     wsPrevFileName := Pic.FileName;
     if wsPrevFileName<>wsNewFileName then begin
@@ -867,7 +857,7 @@ uses
             if CopyFileW(PWideChar(wsLangFile), PWideChar(wsDestLangFile), False) then
               LogSuccess('SLogEntry_LangFileCopiedOK', [wsLangFile, wsDestLangFile])
             else
-              LogFailure('SLogEntry_LangFileCopyingError', [wsLangFile, wsDestLangFile, SysErrorMessage(GetLastError)])
+              LogFailure('SLogEntry_LangFileCopyingError', [wsLangFile, wsDestLangFile, WideSysErrorMessage(GetLastError)])
           else
             LogFailure('SErrCannotCreateFolder', [wsDestPath+SRelativeLangFilesPath]);
         end;

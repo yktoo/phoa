@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phGraphics.pas,v 1.25 2007-06-30 10:36:20 dale Exp $
+//  $Id: phGraphics.pas,v 1.26 2007-07-04 18:48:30 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -524,12 +524,12 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, DKLang, phUtils, phIJLIntf;
       try
         phIJLIntf.LoadJPEGFromFile(Bitmap32, wsFileName, DesiredSize, FullSize);
       except
-        on e: Exception do PhoaException(DKLangConstW('SErrCannotLoadPicture', [wsFileName, e.Message]));
+        on e: Exception do PhoaExceptionConst('SErrCannotLoadPicture', [wsFileName, GetWideExceptionMessage(e)]);
       end;
      // Остальное - с помощью GraphicEx
     end else begin
       GClass := FileFormatList.GraphicFromExtension(wsExt); { Implicit Unicode-to-Ansi conversion }
-      if GClass=nil then PhoaException(DKLangConstW('SErrUnknownPicFileExtension', [wsFileName]));
+      if GClass=nil then PhoaExceptionConst('SErrUnknownPicFileExtension', [wsFileName]);
       Graphic := GClass.Create;
       try
         Graphic.OnProgress := OnProgress;
@@ -539,7 +539,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, DKLang, phUtils, phIJLIntf;
         except
           on e: Exception do begin
             FreeAndNil(Graphic);
-            if not (e is ELoadGraphicAborted) then PhoaException(DKLangConstW('SErrCannotLoadPicture', [wsFileName, e.Message]));
+            if not (e is ELoadGraphicAborted) then PhoaExceptionConst('SErrCannotLoadPicture', [wsFileName, GetWideExceptionMessage(e)]);
           end;
         end;
          // Преобразовываем в TBitmap32
@@ -550,7 +550,7 @@ uses JPEG, Math, CommCtrl, TntSysUtils, GraphicEx, DKLang, phUtils, phIJLIntf;
             FullSize.cy := Bitmap32.Height;
           except
             on e: Exception do
-              if not (e is ELoadGraphicAborted) then PhoaException(DKLangConstW('SErrCannotDecodePicture', [wsFileName, e.Message]));
+              if not (e is ELoadGraphicAborted) then PhoaExceptionConst('SErrCannotDecodePicture', [wsFileName, GetWideExceptionMessage(e)]);
           end;
       finally
         Graphic.Free;

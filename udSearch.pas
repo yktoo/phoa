@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udSearch.pas,v 1.43 2007-06-30 10:36:20 dale Exp $
+//  $Id: udSearch.pas,v 1.44 2007-07-04 18:48:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -392,8 +392,8 @@ var
           ppdtList,
           ppdtInteger,
           ppdtFloat: Result := FValue;
-        ppdtDate:    Result := DateToStr(PhoaDateToDate(FValue), AppFormatSettings); {!!! Not Unicode-enabled solution }
-        ppdtTime:    Result := TimeToStr(PhoaTimeToTime(FValue), AppFormatSettings); {!!! Not Unicode-enabled solution }
+        ppdtDate:    Result := DateToStr(PhoaDateToDate(FValue), AppFormatSettings); 
+        ppdtTime:    Result := TimeToStr(PhoaTimeToTime(FValue), AppFormatSettings); 
       end;
   end;
 
@@ -618,8 +618,8 @@ var
           ppdtList:  FValue := wsValue;
         ppdtInteger: FValue := StrToInt(wsValue);
         ppdtFloat:   FValue := StrToFloat(wsValue, AppFormatSettings);
-        ppdtDate:    FValue := DateToPhoaDate(StrToDate(wsValue, AppFormatSettings)); {!!! Not Unicode-enabled solution }
-        ppdtTime:    FValue := TimeToPhoaTime(StrToTime(wsValue, AppFormatSettings)); {!!! Not Unicode-enabled solution }
+        ppdtDate:    FValue := DateToPhoaDate(StrToDate(wsValue, AppFormatSettings)); 
+        ppdtTime:    FValue := TimeToPhoaTime(StrToTime(wsValue, AppFormatSettings)); 
       end;
   end;
 

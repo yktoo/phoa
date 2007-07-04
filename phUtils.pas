@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phUtils.pas,v 1.61 2007-07-03 13:37:40 dale Exp $
+//  $Id: phUtils.pas,v 1.62 2007-07-04 18:48:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -15,8 +15,9 @@ uses
    // Exception raising
   procedure PhoaException(const wsMsg: WideString); overload;
   procedure PhoaException(const wsMsg: WideString; const aParams: Array of const); overload;
-  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString); overload;
-  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString; const aParams: Array of const); overload;
+   // The same but takes message's constant name
+  procedure PhoaExceptionConst(const sConstName: AnsiString); overload;
+  procedure PhoaExceptionConst(const sConstName: AnsiString; const aParams: Array of const); overload;
    // Tries to obtain an Unicode exception message, or Ansi message if failed
   function  GetWideExceptionMessage(E: Exception): WideString;
 
@@ -257,7 +258,6 @@ type
     Result := False;
     try
       try
-        {??? Is Unicode supported? }
         FNamespace := TNamespace.CreateFromFileName(wsFileName);
       except
         PhoaError('SErrFileNotFoundFmt', [wsFileName]);
@@ -284,6 +284,7 @@ var
 
    //===================================================================================================================
 
+  {$W+}
   procedure PhoaException(const wsMsg: WideString);
 
      function RetAddr: Pointer;
@@ -294,7 +295,9 @@ var
   begin
     raise EPhoaWideException.Create(wsMsg) at RetAddr;
   end;
+  {$W-}
 
+  {$W+}
   procedure PhoaException(const wsMsg: WideString; const aParams: Array of const);
 
      function RetAddr: Pointer;
@@ -305,27 +308,16 @@ var
   begin
     raise EPhoaWideException.CreateFmt(wsMsg, aParams) at RetAddr;
   end;
+  {$W-}
 
-  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString);
-
-     function RetAddr: Pointer;
-     asm
-       mov eax, [ebp+4]
-     end;
-
+  procedure PhoaExceptionConst(const sConstName: AnsiString);
   begin
-    raise ExcClass.Create(wsMsg) at RetAddr;
+    PhoaException(DKLangConstW(sConstName));
   end;
 
-  procedure PhoaException(ExcClass: EPhoaWideExceptionClass; const wsMsg: WideString; const aParams: Array of const);
-
-     function RetAddr: Pointer;
-     asm
-       mov eax, [ebp+4]
-     end;
-
+  procedure PhoaExceptionConst(const sConstName: AnsiString; const aParams: Array of const);
   begin
-    raise ExcClass.CreateFmt(wsMsg, aParams) at RetAddr;
+    PhoaException(DKLangConstW(sConstName, aParams));
   end;
 
   function GetWideExceptionMessage(E: Exception): WideString;
@@ -701,7 +693,7 @@ var
             Delete(wsRelName, 1, i);
             if wsOneDir='..\' then begin
               i := LastDelimiter('\', Result);
-              if i=0 then PhoaException(DKLangConstW('SErrInvalidPicFileName'), [wsRelFileName]);
+              if i=0 then PhoaExceptionConst('SErrInvalidPicFileName', [wsRelFileName]);
               Delete(Result, i, MaxInt);
             end else
               Result := Result+'\'+Copy(wsOneDir, 1, Length(wsOneDir)-1);

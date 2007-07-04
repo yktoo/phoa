@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: udAbout.pas,v 1.13 2007-07-01 18:07:06 dale Exp $
+//  $Id: udAbout.pas,v 1.14 2007-07-04 18:48:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -9,7 +9,8 @@ unit udAbout;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs, GR32, GR32_Layers,
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, TntForms, Dialogs,
+  TntClasses, GR32, GR32_Layers,
   ConsVars,
   DKLang, ExtCtrls, StdCtrls, TntStdCtrls, GR32_Image;
 
@@ -150,17 +151,24 @@ var
   end;
 
   function TdAbout.CreatePNGBitmap(const wsResourceName: WideString; bAlpha: Byte): TBitmap32;
-  var Png: TPNGGraphic;
+  var
+    PNG: TPNGGraphic;
+    RS: TTntResourceStream;
   begin
-    Png := TPNGGraphic.Create;
+    PNG := TPNGGraphic.Create;
     try
-      Png.LoadFromResourceName(HInstance, wsResourceName); {!!! handle Unicode-enabled exceptions }
+      RS := TTntResourceStream.Create(HInstance, wsResourceName, PWideChar(RT_RCDATA));
+      try
+        PNG.LoadFromStream(RS);
+      finally
+        RS.Free;
+      end;
       Result := TBitmap32.Create;
-      Result.Assign(Png);
-      Result.DrawMode := dmBlend;
+      Result.Assign(PNG);
+      Result.DrawMode    := dmBlend;
       Result.MasterAlpha := bAlpha;
     finally
-      Png.Free;
+      PNG.Free;
     end;
   end;
 

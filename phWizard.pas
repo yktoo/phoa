@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phWizard.pas,v 1.10 2007-06-30 10:36:20 dale Exp $
+//  $Id: phWizard.pas,v 1.11 2007-07-04 18:48:39 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -12,9 +12,6 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, TntForms, phIntf, phUtils, phFrm;
 
 type
-   // Exception
-  EPhoaWizardException = class(EPhoaWideException);
-
    // Метод смены страницы мастера
   TPageChangeMethod = (pcmBackBtn, pcmNextBtn, pcmForced);
 
@@ -286,7 +283,7 @@ uses VCLUtils, ConsVars, TB2Dock;
   var idx: Integer;
   begin
     idx := IndexOfID(iID);
-    if idx<0 then PhoaException(EPhoaWizardException, 'Invalid wizard page ID (%d)', [iID]);
+    Assert(idx>=0, 'Invalid wizard page ID: '+IntToStr(iID));
     Result := GetItems(idx);
   end;
 
@@ -354,7 +351,7 @@ uses VCLUtils, ConsVars, TB2Dock;
   begin
      // Проверяем наличие записей в истории
     i := High(FPageIDHistory);
-    if i=-1 then PhoaException(EPhoaWizardException, 'Page history is empty');
+    Assert(i>=0, 'Page history is empty');
      // Сохраняем ID последней страницы
     iLastPageID := FPageIDHistory[i];
      // Стираем последнюю запись истории

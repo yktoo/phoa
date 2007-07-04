@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: phOps.pas,v 1.26 2007-07-01 18:07:03 dale Exp $
+//  $Id: phOps.pas,v 1.27 2007-07-04 18:48:36 dale Exp $
 //===================================================================================================================---
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -8,7 +8,9 @@ unit phOps;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Contnrs, phObj, phPhoa, phIntf, phMutableIntf, phNativeIntf;
+  Windows, Messages, SysUtils, Classes, Contnrs,
+  TntSysUtils,
+  phObj, phPhoa, phIntf, phMutableIntf, phNativeIntf;
 
 type  
    // Возможные операции с изображениями (доступные через пункт меню Сервис | Операции с изображениями)
@@ -2278,7 +2280,7 @@ type
     for i := 0 to Pics.Count-1 do begin
       Pic := Pics[i];
        // Удаляем файл
-      if not DeleteFile(Pic.FileName) then PhoaException(DKLangConstW('SErrCannotDeleteFile', [Pic.FileName, SysErrorMessage(GetLastError)]));
+      if not DeleteFile(Pic.FileName) then PhoaExceptionConst('SErrCannotDeleteFile', [Pic.FileName, WideSysErrorMessage(GetLastError)]);
        // Удаляем изображение из всех групп
       DoDeletePic(Pic.ID, Project.RootGroupX);
        // Удаляем изображение из списка изображений проекта

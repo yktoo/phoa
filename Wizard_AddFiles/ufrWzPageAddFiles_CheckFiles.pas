@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.3 2007-06-28 18:41:53 dale Exp $
+//  $Id: ufrWzPageAddFiles_CheckFiles.pas,v 1.4 2007-07-04 18:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -178,7 +178,7 @@ uses phUtils, ufAddFilesWizard, Main, phSettings;
       0: CellText := p.wsName;
       1: CellText := p.wsPath;
       2: CellText := HumanReadableSize(p.i64Size);
-      3: CellText := DateTimeToStr(p.dModified, AppFormatSettings); {!!! Not Unicode-enabled solution }
+      3: CellText := DateTimeToStr(p.dModified, AppFormatSettings); 
     end;
   end;
 

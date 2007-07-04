@@ -1,5 +1,5 @@
 //**********************************************************************************************************************
-//  $Id: ufAddFilesWizard.pas,v 1.5 2007-07-01 18:07:12 dale Exp $
+//  $Id: ufAddFilesWizard.pas,v 1.6 2007-07-04 18:48:49 dale Exp $
 //----------------------------------------------------------------------------------------------------------------------
 //  PhoA image arranging and searching tool
 //  Copyright DK Software, http://www.dk-soft.org/
@@ -825,14 +825,14 @@ uses
 
   procedure TfAddFilesWizard.SettingsInitialSave(rif: TPhoaRegIniFile);
 
-    procedure PutDate(const d: TDateTime; const wsValueName: WideString);
-    begin {!!! Not Unicode-enabled solution }
-      if d>0 then rif.WriteInteger('', wsValueName, Trunc(d)) else rif.DeleteValue(wsValueName);
+    procedure PutDate(const d: TDateTime; const sValueName: AnsiString);
+    begin
+      if d>0 then rif.WriteInteger('', sValueName, Trunc(d)) else rif.DeleteValue(sValueName);
     end;
 
-    procedure PutTime(const t: TDateTime; const wsValueName: WideString);
-    begin {!!! Not Unicode-enabled solution }
-      if t>=0 then rif.WriteString('', wsValueName, FormatDateTime('hh:nn', t)) else rif.DeleteValue(wsValueName);
+    procedure PutTime(const t: TDateTime; const sValueName: AnsiString);
+    begin
+      if t>=0 then rif.WriteString('', sValueName, FormatDateTime('hh:nn', t)) else rif.DeleteValue(sValueName);
     end;
 
   begin
