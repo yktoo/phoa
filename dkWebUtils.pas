@@ -13,26 +13,26 @@ type
    // DK Software Web information interface
   IDKWeb = interface(IInterface)
     ['{D00820EA-9CB7-4511-9CB2-A412F72BAD26}']
-     // Открывает основной web-сайт
+     // Opens the main website
     procedure Open_MainWebsite;
-     // Открывает главную страницу сайта
+     // Opens the index page of the website
     procedure Open_Index;
-     // Открывает страницу поддержки продукта
+     // Opens support page
     procedure Open_Support;
-     // Открывает страницу проверки обновлений текущей версии
+     // Opens version check page
     procedure Open_VerCheck;
-     // Открывает страницу с информацией о продукте
+     // Opens product info page
     procedure Open_ViewInfo;
      // Prop handlers
     function GetMainSiteURI: String; 
     function GetProductSID: String;
     function GetVersionSID: String;
      // Props
-     // -- URI главного сайта
+     // -- Main website's URI
     property MainSiteURI: String read GetMainSiteURI;
-     // -- Строковый идентификатор продукта, присваивается при создании
+     // -- Product identifier, assigned during the construction
     property ProductSID: String read GetProductSID;
-     // -- Строковый идентификатор версии продукта, присваивается при создании
+     // -- Version identifier, assigned during the construction
     property VersionSID: String read GetVersionSID;
   end;
 
@@ -49,16 +49,16 @@ const
   SWeb_RedirAction_VersionCheck        = 'vercheck';
   SWeb_RedirAction_ViewInfo            = 'viewinfo';
 
-   // Склеивает параметры массива aParamsAndVals (формата ['param1', 'value1', 'param2', 'value2', ...]) в виде
-   //   HTML-строки параметров и возвращает эту строку. Если параметру не хватило значения или значение пустое, в
-   //   итоговой строке не пишет знака '='. Если cPrefix=#0, возвращает строку как есть, иначе вставляет cPrefix в
-   //   начало строки, но только если строка получилась не пустая
+   // Merges aParamsAndVals[] parameters (formatted as ['param1', 'value1', 'param2', 'value2', ...]) as an
+   //   HTML parameter string, and returns this string. If a parameter misses a value or its value is empty
+   //   the resulting string doesn't get a '='. If cPrefix=#0, returns the string as-is, otherwise inserts cPrefix
+   //   at the beginning, but only if the result is non-empty
   function  DKMakeParamStr(const aParamsAndVals: Array of String; cPrefix: Char = #0): String;
-   // Открывает заданный URI
+   // Opens the specified URI
   procedure DKShellOpen(const sURI: String); overload;
   procedure DKShellOpen(const sURI: String; const aParams: Array of const); overload;
 
-   // Создаёт и возвращает экземпляр IDKWeb
+   // Creates and returns an instance of IDKWeb
   function DKCreateDKWeb(const sProductSID, sVersionSID: String): IDKWeb;
 
 implementation
@@ -101,7 +101,7 @@ uses ShellAPI;
 
 type
    //===================================================================================================================
-   // TDKWeb - реализация TDKWeb
+   // TDKWeb - IDKWeb implementation
    //===================================================================================================================
 
   TDKWeb = class(TInterfacedObject, IDKWeb)
@@ -109,7 +109,7 @@ type
      // Prop storage
     FProductSID: String;
     FVersionSID: String;
-     // Открывает web-страницу редиректа с указанными параметрами
+     // Opens a redirecting web page with the specified parameters
     procedure RedirAction(const sRedirAction: String; const aParamsAndVals: Array of String);
      // IDKWeb
     procedure Open_MainWebsite;
