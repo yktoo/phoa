@@ -1,32 +1,31 @@
-<!-- $Id: tasks-tools.html,v 1.5 2005-03-25 19:50:48 dale Exp $ -->
 {[%hh_hdr_en:Common tasks :: Using external tools]}
 
-<p align=justify><b>PhoA</b> is capable of attaching external programs to use for viewing, printing or processing of the
+<p><b>PhoA</b> is capable of attaching external programs to use for viewing, printing or processing of the
   photo album pictures.
 
-<p align=justify>This is implemented with so-called <b>tools</b>, which you create and configure.
+<p>This is implemented with so-called <b>tools</b>, which you create and configure.
 
-<p align=justify>There is a variety of tool kinds.
+<p>There is a variety of tool kinds.
 
-<p align=justify>The majority of tool kinds is represented by so-called <b>default actions</b>. Additionally, there's a
+<p>The majority of tool kinds is represented by so-called <b>default actions</b>. Additionally, there's a
   possibility of using an arbitrary program as a custom tool.
 
 {[%hh_h2:Default actions]}
 
-<p align=justify>It is a sort of &quot;simplified&quot; tool kinds.
+<p>It is a sort of &quot;simplified&quot; tool kinds.
 
-<p align=justify>As is known, Windows introduces a concept of <i>file type</i>, which unambiguously linked to the file's
+<p>As is known, Windows introduces a concept of <i>file type</i>, which unambiguously linked to the file's
   extension. For instance, files with extension <b>.doc</b> are of type &quot;Microsoft Word document&quot;, while
   <b>.html</b> files are Internet documents.
 
-<p align=justify>Most registered file types (at least document types) in Windows have an associated <i>application</i>,
+<p>Most registered file types (at least document types) in Windows have an associated <i>application</i>,
   which opens the files of that type when you run them from the Explorer. This is how works the <i>default action</i>
   for that type of file. So, .doc files are open in Microsoft Word, while .html files are handled by the default
   browser.
 
-<p align=justify>Just such a behaviour is implemented by the <b>Default action</b> tool kind.
+<p>Just such a behaviour is implemented by the <b>Default action</b> tool kind.
 
-<p align=justify>Besides there's a number of other standard actions, namely:
+<p>Besides there's a number of other standard actions, namely:
 
 <ul>
   <li>open;
@@ -34,54 +33,54 @@
   <li>print.
 </ul>
 
-<p align=justify>Each of those actions has a corresponding tool kind.
+<p>Each of those actions has a corresponding tool kind.
 
-<p align=justify>Any of the actions listed above may be customized by you using standard Windows tools. You do it by 
+<p>Any of the actions listed above may be customized by you using standard Windows tools. You do it by
   selecting the <b>Tools | Folder options...</b> Explorer menu item, on the <b>File types page</b>.
 
-<p align=justify>Many graphic applications (such as graphic editors or viewers; but not <b>PhoA</b>) change file
+<p>Many graphic applications (such as graphic editors or viewers; but not <b>PhoA</b>) change file
   associations to open with themselves. Some of them confirm before making such changes.
 
-<p align=justify>Therefore if you are happy with your current file associations you will likely use just those standard
+<p>Therefore if you are happy with your current file associations you will likely use just those standard
   tool kinds.
 
-<p align=justify>There's one more subtle advantage of standard actions over custom ones (described below). The point is
+<p>There's one more subtle advantage of standard actions over custom ones (described below). The point is
   that standard actions in Windows often use so-called DDE (Dynamic Data Exchange) commands, which allow opening several
   pictures by the same application at once, while custom tools often spawn a new application instance for each picture.
   The latter case is less convenient.
 
 {[%hh_h2:Custom action]}
 
-<p align=justify>This kind of tool allows for specifying any program to open (or process) a certain type of files. In
+<p>This kind of tool allows for specifying any program to open (or process) a certain type of files. In
   most case it will be a graphic editor or a viewer. However you can also use more specific tools like a batch image
   converter.
 
 {[%hh_h2:Separator item]}
 
-<p align=justify>It is a most unpretentious tool kind used to create menu separators.
+<p>It is a most unpretentious tool kind used to create menu separators.
 
-<p align=justify>Well that's all for tool kinds. Let's now pass on to
+<p>Well that's all for tool kinds. Let's now pass on to
 
 {[%hh_h2:Tool masks]}
 
-<p align=justify>To describe image types for which a tool is applicable to, each tool in <b>PhoA</b> has a so-called
+<p>To describe image types for which a tool is applicable to, each tool in <b>PhoA</b> has a so-called
   <i>mask</i>. Mask writing rules are similar to respective Windows rules, and the masks are used in many cases in the
   program. Read <a href="info-file-masks.html">here</a> for detailed explanation of mask writing rules.
 
-<p align=justify>A tool becomes available only when <i>all</i> selected pictures match its mask (masks to be precise as
+<p>A tool becomes available only when <i>all</i> selected pictures match its mask (masks to be precise as
   a tool can have assigned a number of masks).
 
 {[%hh_h2:Tool usage]}
 
-<p align=justify>In order to make a tool useful you should be able to execute it. <b>PhoA</b> tools can appear in
+<p>In order to make a tool useful you should be able to execute it. <b>PhoA</b> tools can appear in
   various menus. You configure that in tool's <a href="info-tools.html">properties</a>.
 
 {[%hh_h2:Custom action settings]}
 
-<p align=justify>Ut supra, custom actions require specifying a program, and some additional parameters. Minute
+<p>Ut supra, custom actions require specifying a program, and some additional parameters. Minute
   information about tool properties is <a href="info-tools.html#usages">here</a>.
 
-<p align=justify>That program is passed the full picture file path as a command line parameter. Most image processing
+<p>That program is passed the full picture file path as a command line parameter. Most image processing
   applications take input file names in such a way.
 
 {[%hh_seealso_en]}

@@ -1,9 +1,8 @@
-<!-- $Id: info-resampling.html,v 1.4 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:Resampling]}
 
-<p align=justify>Pictures often appear &quot;fuzzy&quot; when scaled to a different size. The fuzziness of an image is
+<p>Pictures often appear &quot;fuzzy&quot; when scaled to a different size. The fuzziness of an image is
   controlled by two processes: resampling and filtering.
-<p align=justify>The filtering processes attempt to smooth (blur) the transformed pixels. When an image is being
+<p>The filtering processes attempt to smooth (blur) the transformed pixels. When an image is being
   resampled to a different resolution, there's a need to interpolate the old pixelmap to a new one. This requires some
   form of image interpolation and a number of interpolation methods can be used. The simpler and faster method, is to
   use nearest-neighbour function, known as the quick filter. Provided the resolution change is not too great, this is

@@ -1,16 +1,15 @@
-<!-- $Id: general-file-formats.html,v 1.4 2005-05-02 07:43:25 dale Exp $ -->
 {[%hh_hdr_ru:Форматы файлов]}
 
 <link rel="stylesheet" type="text/css" href="../main.css">
 <link rel="dummy" type="image/gif" href="../x-minus.gif">
 <script language=javascript>
-  function divToggle(img, divName){ 
+  function divToggle(img, divName){
     var div = document.all[divName];
     div.style.display = div.style.display=='none'?'':'none';
     img.src = div.style.display=='none'?'../x-plus.gif':'../x-minus.gif'; }
 </script>
 
-<p align=justify>Как было сказано ранее, программа <b>PhoA</b> работает с файлами фотоальбомов, имеющими расширение
+<p>Как было сказано ранее, программа <b>PhoA</b> работает с файлами фотоальбомов, имеющими расширение
   <b>.phoa</b> &mdash; такой файл содержит в себе:
 <ul>
   <li>текст описания и параметры фотоальбома;
@@ -18,11 +17,11 @@
   <li>иерархию групп-папок, каждая из которых содержит набор ссылок на список изображений фотоальбома.
   <li>список структур представлений (PhoA версии 1.0.1+).
 </ul>
-<p align=justify>Файл <b>.phoa</b> недоступен для непосредственного просмотра и открывается только программой <b>PhoA</b>. Начиная с версии программы <b>1.1.1a</b>
+<p>Файл <b>.phoa</b> недоступен для непосредственного просмотра и открывается только программой <b>PhoA</b>. Начиная с версии программы <b>1.1.1a</b>
   возможно также создание собственных инструментов благодаря открытым подробным спецификациям формата <b>PhoA</b>. Более детальная информация находится на
   <a href="http://www.dk-soft.org/" target=_blank>сайте программы</a>.
 
-<p align=justify>В качестве исходных изображений данная версия программы принимает файлы следующего формата (кликните на кнопке с плюсиком,
+<p>В качестве исходных изображений данная версия программы принимает файлы следующего формата (кликните на кнопке с плюсиком,
   чтобы развернуть детали):
 <div style="padding-left: 32px">
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divBMP')"> Стандартные изображения Windows и OS/2 bitmap (<b>*.bmp, *.rle, *.dib</b>)
@@ -47,8 +46,8 @@
   <li>color spaces: indexed, grayscale, RGB(A), CMYK, L*a*b*
   <li>compression formats: uncompressed, packed bits, LZW, CCITT T.4 (raw and modified fax group 3, possibly word aligned), ThunderScan, Deflate, new style JPEG
 </ul></div>
-  
-<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> Файлы GFI fax</a> (<b>*.fax</b>) 
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> Файлы GFI fax</a> (<b>*.fax</b>)
 <div id=divGFI style="display:none"><ul>
   <li>sample size: 1 bits per sample
   <li>color space: indexed
@@ -106,7 +105,7 @@
       <li>sizes: all resolutions, from 192 x 128 up to 6144 x 4096 (64 Base vaporware)
       <li>rotated: clockwise and counter-clockwise
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPPM')"> Файлы Portable pixel/gray map</a> (<b>*.ppm, *.pgm, *.pbm</b>)
@@ -119,7 +118,7 @@
     <ul>
       <li>ASCII and Binary format
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCUT')"> Файлы Dr. Halo</a> (<b>*.cut, *.pal</b>)
@@ -132,7 +131,7 @@
     <ul>
       <li>external palette file (*.pal) is automatically loaded
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGIF')"> Файлы CompuServe GIF</a> (<b>*.gif</b>)
@@ -145,7 +144,7 @@
     <ul>
       <li>interlaced, non-interlaced
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divRLA')"> Файлы SGI Wavefront</a> (<b>*.rla, *.rpf</b>)
@@ -166,7 +165,7 @@
     <ul>
       <li>duo tone
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSP')"> Файлы Paint Shop Pro</a> (<b>*.psp</b>)
@@ -188,11 +187,11 @@
       <li>supported chunks: IHDR, IDAT, IEND, PLTE, gAMA, tRNS, bKGD
       <li>transparency support partially for RGB, which is stored as 32 bits format
     </ul>
-  
+
 </ul></div>
 </div>
 
-<p align=justify>Мощная поддержка форматов изображений реализована благодаря <a href="http://www.lischke-online.de" target=_blank>Mike Lischke</a>.
+<p>Мощная поддержка форматов изображений реализована благодаря <a href="http://www.lischke-online.de" target=_blank>Mike Lischke</a>.
 
 <p class=lsmall><a href="general-thumbnails.html">Дальше &gt;&gt;</a>
 

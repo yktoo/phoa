@@ -1,16 +1,15 @@
-<!-- $Id: general-file-formats.html,v 1.5 2005-05-02 07:43:25 dale Exp $ -->
 {[%hh_hdr_en:Supported file formats]}
 
 <link rel="stylesheet" type="text/css" href="../main.css">
 <link rel="dummy" type="image/gif" href="../x-minus.gif">
 <script language=javascript>
-  function divToggle(img, divName){ 
+  function divToggle(img, divName){
     var div = document.all[divName];
     div.style.display = div.style.display=='none'?'':'none';
     img.src = div.style.display=='none'?'../x-plus.gif':'../x-minus.gif'; }
 </script>
 
-<p align=justify>As was mentioned above, <b>PhoA</b> program works with photo album files having <b>.phoa</b> extension
+<p>As was mentioned above, <b>PhoA</b> program works with photo album files having <b>.phoa</b> extension
   - such file holds:
 <ul>
   <li>photo album description text and settings;
@@ -18,12 +17,12 @@
   <li>folders-groups hierarchy, each holding a set of links to photo album images;
   <li>views' structures (PhoA version 1.0.1+).
 </ul>
-<p align=justify><b>.phoa</b> files cannot be viewed directly and are opened only in <b>PhoA</b>. But starting with
+<p><b>.phoa</b> files cannot be viewed directly and are opened only in <b>PhoA</b>. But starting with
   <b>PhoA</b> version <b>1.1.1a</b> that is possible to create your own tools due to open <b>PhoA</b> file format
   specifications. Refer to the program's <a href="http://www.dk-soft.org/" target=_blank>home site</a> for further
   information.
 
-<p align=justify>Current version recognises the following formats as source image files (click a plus-button to expand
+<p>Current version recognises the following formats as source image files (click a plus-button to expand
   the details):
 <div style="padding-left: 32px">
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divBMP')"> Standard Windows and OS/2 bitmap images
@@ -51,8 +50,8 @@
   <li>compression formats: uncompressed, packed bits, LZW, CCITT T.4 (raw and modified fax group 3, possibly word
       aligned), ThunderScan, Deflate, new style JPEG
 </ul></div>
-  
-<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> GFI fax images</a> (<b>*.fax</b>) 
+
+<p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGFI')"> GFI fax images</a> (<b>*.fax</b>)
 <div id=divGFI style="display:none"><ul>
   <li>sample size: 1 bits per sample
   <li>color space: indexed
@@ -116,7 +115,7 @@
       <li>sizes: all resolutions, from 192 x 128 up to 6144 x 4096 (64 Base vaporware)
       <li>rotated: clockwise and counter-clockwise
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPPM')"> Portable pixel/gray map images</a>
@@ -130,7 +129,7 @@
     <ul>
       <li>ASCII and Binary format
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divCUT')"> Dr. Halo images</a> (<b>*.cut,
@@ -144,7 +143,7 @@
     <ul>
       <li>external palette file (*.pal) is automatically loaded
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divGIF')"> CompuServe GIF images</a>
@@ -158,7 +157,7 @@
     <ul>
       <li>interlaced, non-interlaced
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divRLA')"> SGI Wavefront images</a> (<b>*.rla,
@@ -181,7 +180,7 @@
     <ul>
       <li>duo tone
     </ul>
-  
+
 </ul></div>
 
 <p><img src="../x-plus.gif" width=9 height=9 onClick="divToggle(this,'divPSP')"> Paint Shop Pro images</a>
@@ -205,11 +204,11 @@
       <li>supported chunks: IHDR, IDAT, IEND, PLTE, gAMA, tRNS, bKGD
       <li>transparency support partially for RGB, which is stored as 32 bits format
     </ul>
-  
+
 </ul></div>
 </div>
 
-<p align=justify>The powerful image format support is implemented thanks to
+<p>The powerful image format support is implemented thanks to
   <a href="http://www.soft-gems.net" target=_blank>Mike Lischke</a>.
 
 <p class=lsmall><a href="general-thumbnails.html">Next &gt;&gt;</a>

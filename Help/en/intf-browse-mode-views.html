@@ -1,8 +1,7 @@
-<!-- $Id: intf-browse-mode-views.html,v 1.9 2005-03-25 19:50:48 dale Exp $ -->
 {[%hh_hdr_en:Working with views]}
 
 {[%hh_h2:Introduction]}
-<p align=justify>Photo album <b>views</b> look similar to photo album group tree, the only difference is that groups are
+<p>Photo album <b>views</b> look similar to photo album group tree, the only difference is that groups are
   being created by you while view's folder hierarchy is built automatically based on picture data as well as on
   <b>groupings</b> you provide. A grouping is one logical unit of view's organzation, and it may form one or more folder
   tree levels. When generating view's folder hierarchy, <i>each picture passed through the
@@ -10,7 +9,7 @@
   below.
 
 {[%hh_h2:View properties]}
-<p align=justify>As you can see in <a href="intf-view-props.html">View properties dialog</a>, the view has name, the
+<p>As you can see in <a href="intf-view-props.html">View properties dialog</a>, the view has name, the
   list of groupings and the list of sortings.
 
 {[%hh_h2:Controls]}
@@ -21,7 +20,7 @@
     <td>The name is specified by you, and it reflects the view's content, eg, &quot;By place and date&quot;.</td>
   </tr>
   <tr>
-    <td class=command>List of groupings</td>  
+    <td class=command>List of groupings</td>
     <td>
       <b>PhoA</b> supports the following grouping kinds:
       <ul>
@@ -82,7 +81,7 @@
 </table>
 
 {[%hh_h2:<a name=unclassified></a>Arranging unclassified pictures into a separate folder]}
-<p align=justify>As you know, this is not mandatory to completely describe a picture. But since when generating a view
+<p>As you know, this is not mandatory to completely describe a picture. But since when generating a view
   each picture passed the <a href=#filter_expr>filter</a> is processed and included into the view (see above), there are
   two choices how to handle pictures having no data for the given grouping criteria (no date when grouping by date, no
   place when grouping by place etc.):
@@ -97,16 +96,16 @@
       while the rest of folders (with place specified) will be created under the date folders; thus picture
       classification by place will reside on different folder tree levels.
 </ul>
-<p align=justify>This feature (obvious) is not applicable for the grouping by picture file path since there are no
+<p>This feature (obvious) is not applicable for the grouping by picture file path since there are no
   pictures with no files, and there are no files without paths (at least I've heard nothing of it ;).
 
 {[%hh_h2:<a name=filter_expr></a>Picture filter expression]}
-<p align=justify>You are able to restrict the list of images placed to the view. You do it using
+<p>You are able to restrict the list of images placed to the view. You do it using
   <a href="intf-expr-editor.html">Filter expression editor</a> the way like in <a href="intf-search-expr.html">Exprssion
   search</a>. If no filter expression specified, the view will contain <b>all</b> photo album pictures.
 
 {[%hh_h2:Copying view's folders to the photo album]}
-<p align=justify><b>PhoA</b> also introduces the possibility for copying generated folder and picture structure as
+<p><b>PhoA</b> also introduces the possibility for copying generated folder and picture structure as
   ordinary photo album groups. For this you select <b>{[%hh_ii:GroupFromView]} View | Views | Make a group...</b> menu
   item, then <a href="intf-sel-phoa-group.html">Select a group dialog</a> appears, allowing you to select a group to
   place view's folders to.

@@ -1,24 +1,23 @@
-<!-- $Id: info-filter-expr.html,v 1.3 2005-02-05 16:15:58 dale Exp $ -->
 {[%hh_hdr_en:Picture filter expressions]}
 
-<p align=justify>Picture filter expressions are used for <a href="intf-search-expr.html">Expression search</a>, in
+<p>Picture filter expressions are used for <a href="intf-search-expr.html">Expression search</a>, in
   <a href="intf-view-props.html">View properties</a> and allow you to specify search criteria of an arbitrary complexity
   using special language similar to modern programming languages.
-<p align=justify>For editing expression <b>PhoA</b> provides the <a href="intf-expr-editor.html">standard expression
+<p>For editing expression <b>PhoA</b> provides the <a href="intf-expr-editor.html">standard expression
   editor</a>.
 
 {[%hh_h2:Filter expression language description]}
-<p align=justify>Filter expression language is <b>case-insensitive</b>; filter expression can be of arbitrary length
+<p>Filter expression language is <b>case-insensitive</b>; filter expression can be of arbitrary length
   and can occupy an arbitrary number of lines.
-<p align=justify>Filter expression must return a <i>logical</i> (or <i>boolean</i>) <i>value</i>: <i>True</i> or
+<p>Filter expression must return a <i>logical</i> (or <i>boolean</i>) <i>value</i>: <i>True</i> or
   <i>False</i>. If an expression evaluates to <i>True</i>, the picture is assumed matching the filter; otherwise it is
   discarded.
-<p align=justify>Filter expression is written using the following elements: <a href=#pic_props>picture properties</a>,
+<p>Filter expression is written using the following elements: <a href=#pic_props>picture properties</a>,
   <a href=#operators>operators</a>, <a href=#parens>parentheses</a>, <a href=#consts>constants</a>,
   <a href=#comments>comments</a>.
 
 <a name=pic_props></a>{[%hh_h2:Picture properties]}
-<p align=justify>Picture properties are always start with <b>$</b> symbol and correspond to actual
+<p>Picture properties are always start with <b>$</b> symbol and correspond to actual
   <a href="general-pic-data.html">picture data</a> which are replaced for them during the filtering (or search):
 
 <table class=plain border=0>
@@ -155,16 +154,16 @@
 </table>
 
 <a name=operators></a>{[%hh_h2:Operators]}
-<p align=justify>Operators can be of the two types:
+<p>Operators can be of the two types:
 <ul>
   <li><b>Unary operators</b> are operators having single operand placed on the right side of it.<br>
       Examples: <i>not</i>, <i>isEmpty</i>.
   <li><b>Binary operators</b> are operators having two operands on left and right sides of it.<br>
       Examples: <i>and</i>, <i>contains</i>, <i>&gt;</i>.
 </ul>
-<p align=justify>Operators can be applied only to operands which are of a datatype compatible with the given operator.
+<p>Operators can be applied only to operands which are of a datatype compatible with the given operator.
 
-<p align=justify>Current program version implements the following operators:
+<p>Current program version implements the following operators:
 <table class=plain border=0>
   <tr class=tblhdr>
     <td width=15% nowrap>Name</td>
@@ -202,7 +201,7 @@
     <td class=command>in</td>
     <td>Binary</td>
     <td><span class=fp><i>element</i> <b>in</b> <i>list</i></span></td>
-    <td>Checking of existence of an element in a list. Returns <i>True</i> if <i>element</i> is in the <i>list</i>; 
+    <td>Checking of existence of an element in a list. Returns <i>True</i> if <i>element</i> is in the <i>list</i>;
         otherwise returns <i>False</i>.<br>
         Example:<br>
         <span class=fp>'parrot' <b>in</b> $Keywords</span></td>
@@ -296,13 +295,13 @@
 </table>
 
 <a name=parens></a>{[%hh_h2:Parentheses]}
-<p align=justify>Parentheses are used for grouping parts of the expression, or to change the evaluation order. Expressions
+<p>Parentheses are used for grouping parts of the expression, or to change the evaluation order. Expressions
   can contain only round brackets: <b>(</b> and <b>)</b>. Example:<br>
   <span class=fp><b>not</b> (<b>isEmpty</b> $Keywords <b>or</b> ($Author <b>startsWith</b> 'John') <b>or</b>
-    ($Description='' <b>and</b> $PicWidth=$PicHeight))</span>                                              
+    ($Description='' <b>and</b> $PicWidth=$PicHeight))</span>
 
 <a name=consts></a>{[%hh_h2:Constants]}
-<p align=justify>Constants in the expressions can be of the following types:
+<p>Constants in the expressions can be of the following types:
 <ul>
   <li><b>Integer constants</b> contain digits <b>0...9</b> and an optional &quot;minus&quot; (<b>-</b>) sign.
       Example:<br>
@@ -324,19 +323,19 @@
 </ul>
 
 <a name=comments></a>{[%hh_h2:Comments]}
-<p align=justify>Comments are ignored when expression is parsed. They are used for describing and explaining expression
+<p>Comments are ignored when expression is parsed. They are used for describing and explaining expression
   blocks or to temporarily &quot;disconnect&quot; an expression block. The following comment kinds are supported:
 <ul>
-  <li>Stream comment <b>{comment}</b>: all the symbols starting with first occurence of <b>{</b> and ending with first 
+  <li>Stream comment <b>{comment}</b>: all the symbols starting with first occurence of <b>{</b> and ending with first
       occurence of <b>}</b> are considered to be a comment. Example:<br>
       <span class=fp>$Date&gt;'01.01.1914' { my grandma birth-date } <b>or</b>
       $Author&lt;&gt;'grandma'</span>
-  
+
   <li>Line comment <b>//comment</b>: all the symbols from <b>//</b> up to line end are considered to be a comment.
       Example:<br>
       <span class=fp>$Date&gt;'01.01.1914' // my grandma birth-date<br>
       <b>or</b> $Time&lt;'08:00'</span>
-  
+
 </ul>
 
 {[%hh_seealso_en]}
